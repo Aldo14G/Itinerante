@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 64" width="140" height="64" role="img" aria-label="Editorial Aliada">
+  <rect width="140" height="64" rx="8" fill="#FDFCF8"/>
+  <circle cx="26" cy="32" r="16" fill="#0D4A45"/>
+  <text x="26" y="37" text-anchor="middle" font-family="Georgia, 'Playfair Display', serif" font-size="13" font-weight="700" fill="#FDFCF8">EA</text>
+  <text x="50" y="30" font-family="Georgia, 'Playfair Display', serif" font-size="11" font-weight="600" fill="#0D2520">Editorial</text>
+  <text x="50" y="44" font-family="Georgia, 'Playfair Display', serif" font-size="11" fill="#2A8F84">Aliada</text>
+</svg>

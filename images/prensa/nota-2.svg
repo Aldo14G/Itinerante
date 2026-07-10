@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300" role="img" aria-label="Imagen de nota de prensa">
+  <rect width="480" height="300" fill="#0D4A45"/>
+  <rect x="0" y="0" width="480" height="300" fill="url(#g2)"/>
+  <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0D4A45"/><stop offset="1" stop-color="#2A8F84"/>
+  </linearGradient></defs>
+  <rect x="32" y="200" width="72" height="6" rx="3" fill="#E8A020"/>
+  <text x="32" y="240" font-family="Georgia, 'Playfair Display', serif" font-size="20" font-weight="600" fill="#FDFCF8">Talleres que reúnen</text>
+  <text x="32" y="60" font-family="Verdana, Inter, sans-serif" font-size="12" letter-spacing="3" fill="#9DE3DA">PRENSA · ITINERANTE</text>
+</svg>

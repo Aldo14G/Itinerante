@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /boletin_suscriptores/{docId} {
+      allow read, update, delete: if false;
+      allow create: if request.resource.data.keys().hasOnly(['email', 'creadoEn', 'origen'])
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$')
+        && request.resource.data.email.size() < 120
+        && request.resource.data.origen == 'sitio-itinerante';
+    }
+  }
+}

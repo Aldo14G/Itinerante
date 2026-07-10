@@ -17,7 +17,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
                  font-src https://fonts.gstatic.com;
                  img-src 'self' data: blob:;
-                 connect-src 'none';
+                 connect-src https://firestore.googleapis.com;
                  frame-src 'none';
                  object-src 'none';
                  base-uri 'self';
@@ -527,6 +527,120 @@
       line-height: 1.65;
       margin: 0;
     }
+    /* ── Helpers compartidos de las secciones nuevas (aliados/prensa/boletín) ── */
+    .section-inner {
+      margin: 0 auto;
+      max-width: 1200px;
+      padding: 0 24px;
+      width: 100%;
+    }
+    .section-head {
+      margin-bottom: 40px;
+      max-width: 700px;
+    }
+    .section-eyebrow {
+      color: var(--brand-dark);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .2em;
+      margin: 0 0 12px;
+      text-transform: uppercase;
+    }
+    .section-lead {
+      color: var(--text-md);
+      font-size: .98rem;
+      line-height: 1.75;
+      margin: 18px 0 0;
+      max-width: 540px;
+    }
+
+    /* ── En los Medios / Prensa (#prensa) ── */
+    .press-section {
+      background: var(--surface-paper);
+      padding: 80px 0;
+    }
+    .press-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1fr;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    @media (min-width: 641px) {
+      .press-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1025px) {
+      .press-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .press-card {
+      background: var(--surface-paper);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;
+    }
+    .press-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .press-card-link {
+      display: block;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .press-card-link:focus-visible {
+      outline: 2px solid var(--color-brand-strong);
+      outline-offset: 2px;
+      border-radius: var(--radius);
+    }
+    .press-media { position: relative; }
+    .press-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 480 / 300;
+      object-fit: cover;
+    }
+    .press-source {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      background: rgba(13,74,69,.82);
+      color: var(--paper);
+      font: 500 .78rem/1 'Inter', sans-serif;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .press-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      line-height: 1.25;
+      margin: 16px 16px 8px;
+    }
+    .press-excerpt {
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      line-height: 1.65;
+      color: var(--text-md);
+      margin: 0 16px;
+    }
+    .press-readmore {
+      display: inline-flex;
+      align-items: center;
+      margin: 12px 16px 20px;
+      color: var(--color-brand-strong);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      transition: color .2s ease;
+      min-height: 44px;
+    }
+    .press-card-link:hover .press-readmore {
+      color: var(--color-hero);
+    }
+    @media (max-width: 860px) {
+      .press-section { padding-block: 60px; }
+    }
     .catalog-section {
       background: linear-gradient(180deg, var(--surface-soft) 0%, var(--surface-paper) 100%);
       padding: 80px 24px;
@@ -630,6 +744,143 @@
       background: var(--brand-pale);
       outline: none;
       transform: translateY(-1px);
+    }
+    /* ── Aliados & Comunidad (#aliados) ── */
+    .allies-section {
+      background: var(--surface-soft);
+      padding: 76px 0;
+    }
+    .allies-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(2, 1fr);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    @media (min-width: 641px) {
+      .allies-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    }
+    @media (min-width: 1025px) {
+      .allies-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .ally-card {
+      background: var(--surface-paper);
+      border: 1px solid rgba(93,196,180,.18);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      min-height: 96px;
+    }
+    .ally-link {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      min-height: 44px;
+      padding: 16px;
+      border-radius: var(--radius);
+      transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    }
+    .ally-card:hover .ally-link {
+      transform: scale(1.025);
+    }
+    .ally-link:focus-visible {
+      outline: 2px solid var(--brand-dark);
+      outline-offset: 2px;
+    }
+    .ally-logo {
+      max-width: 100%;
+      height: auto;
+      filter: grayscale(1);
+      opacity: .8;
+      transition: filter .2s ease, opacity .2s ease;
+    }
+    .ally-card:hover .ally-logo,
+    .ally-link:focus-visible .ally-logo {
+      filter: grayscale(0);
+      opacity: 1;
+    }
+    /* ── Boletín Cultural (#boletin) ── */
+    .newsletter-section {
+      background: var(--color-hero);
+      color: var(--paper);
+      padding: 72px 0;
+    }
+    .newsletter-inner {
+      display: grid;
+      gap: 28px;
+      align-items: center;
+    }
+    @media (min-width: 861px) {
+      .newsletter-inner { grid-template-columns: 1.2fr 1fr; gap: 48px; }
+    }
+    .newsletter-eyebrow { color: var(--brand-light); }
+    .newsletter-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: var(--paper);
+      margin: 0 0 10px;
+    }
+    .newsletter-lead {
+      font-family: 'Inter', sans-serif;
+      color: rgba(253,252,248,.82);
+      margin: 0;
+    }
+    .newsletter-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .newsletter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .newsletter-input {
+      flex: 1 1 220px;
+      min-height: 48px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(253,252,248,.35);
+      background: rgba(253,252,248,.08);
+      color: var(--paper);
+      font: 400 1rem 'Inter', sans-serif;
+      transition: border-color .2s ease;
+    }
+    .newsletter-input::placeholder { color: rgba(253,252,248,.55); }
+    .newsletter-input:focus {
+      outline: 2px solid var(--brand-light);
+      outline-offset: 2px;
+      border-color: var(--brand-light);
+    }
+    .newsletter-cta {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      background: var(--paper);
+      color: var(--color-hero);
+      font: 600 1rem 'Inter', sans-serif;
+      padding: 12px 26px;
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform .2s cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+    }
+    .newsletter-cta:hover { transform: translateY(-2px); }
+    .newsletter-cta:disabled {
+      opacity: .6;
+      transform: none;
+      cursor: wait;
+    }
+    .newsletter-msg {
+      min-height: 1.4em;
+      margin: 10px 0 0;
+      font: 400 .9rem 'Inter', sans-serif;
+      color: var(--brand-light);
     }
     .faq-section {
       background: var(--surface-soft);
@@ -2187,6 +2438,55 @@
 
 
   <!-- ══════════════════════════════════════
+       EN LOS MEDIOS / PRENSA
+  ══════════════════════════════════════ -->
+  <section id="prensa" class="press-section" aria-labelledby="press-title">
+    <div class="section-inner">
+      <div class="section-head reveal">
+        <p class="section-eyebrow">En los medios</p>
+        <h2 id="press-title" class="section-title">Lo que se cuenta de la carreta.</h2>
+        <p class="section-lead">Notas, reseñas y menciones que nos han acompañado en el camino.</p>
+      </div>
+      <ul class="press-grid" role="list">
+        <li class="press-card reveal">
+          <a class="press-card-link" href="#" aria-labelledby="press-1-title">
+            <div class="press-media">
+              <img src="images/prensa/nota-1.svg" alt="" loading="lazy" width="480" height="300">
+              <span class="press-source">Medio · 2026</span>
+            </div>
+            <h3 id="press-1-title" class="press-card-title">Una librería que camina el centro de Monterrey</h3>
+            <p class="press-excerpt">Una frase que resume la mención: la carreta de libros que recorre las calles del centro.</p>
+            <span class="press-readmore">Leer nota →</span>
+          </a>
+        </li>
+        <li class="press-card reveal">
+          <a class="press-card-link" href="#" aria-labelledby="press-2-title">
+            <div class="press-media">
+              <img src="images/prensa/nota-2.svg" alt="" loading="lazy" width="480" height="300">
+              <span class="press-source">Medio · 2026</span>
+            </div>
+            <h3 id="press-2-title" class="press-card-title">Los talleres que están reuniendo lectores</h3>
+            <p class="press-excerpt">Una frase que resume la reseña: encuentros de lectura y escritura que hacen comunidad.</p>
+            <span class="press-readmore">Leer nota →</span>
+          </a>
+        </li>
+        <li class="press-card reveal">
+          <a class="press-card-link" href="#" aria-labelledby="press-3-title">
+            <div class="press-media">
+              <img src="images/prensa/nota-3.svg" alt="" loading="lazy" width="480" height="300">
+              <span class="press-source">Medio · 2026</span>
+            </div>
+            <h3 id="press-3-title" class="press-card-title">Café, libros y comunidad en un mismo lugar</h3>
+            <p class="press-excerpt">Una frase que resume la nota: un rincón donde el café y la lectura se encuentran.</p>
+            <span class="press-readmore">Leer nota →</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
        GALERÍA DE LIBROS
   ══════════════════════════════════════ -->
   <section id="galeria" class="catalog-section" aria-labelledby="catalog-title">
@@ -2383,6 +2683,84 @@
         </a>
       </div>
 
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       ALIADOS & COMUNIDAD
+  ══════════════════════════════════════ -->
+  <section id="aliados" class="allies-section" aria-labelledby="allies-title">
+    <div class="section-inner">
+      <div class="section-head reveal">
+        <p class="section-eyebrow">Comunidad</p>
+        <h2 id="allies-title" class="section-title">Tejemos librería con otros.</h2>
+        <p class="section-lead">Editoriales independientes, cafés, colectivos y bibliotecas que caminan con la carreta.</p>
+      </div>
+      <ul class="allies-grid" role="list">
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Editorial Aliada">
+            <img class="ally-logo" src="images/aliados/editorial-aliada.svg" alt="Logotipo de Editorial Aliada" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Café Vecino">
+            <img class="ally-logo" src="images/aliados/cafe-vecino.svg" alt="Logotipo de Café Vecino" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Colectivo Lector">
+            <img class="ally-logo" src="images/aliados/colectivo-lector.svg" alt="Logotipo de Colectivo Lector" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Biblioteca Amiga">
+            <img class="ally-logo" src="images/aliados/biblioteca-amiga.svg" alt="Logotipo de Biblioteca Amiga" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Sello Independiente">
+            <img class="ally-logo" src="images/aliados/sello-independiente.svg" alt="Logotipo de Sello Independiente" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Taller de Letras">
+            <img class="ally-logo" src="images/aliados/taller-de-letras.svg" alt="Logotipo de Taller de Letras" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Foro Cultural">
+            <img class="ally-logo" src="images/aliados/foro-cultural.svg" alt="Logotipo de Foro Cultural" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+        <li class="ally-card">
+          <a class="ally-link" href="#" aria-label="Distribuidora Local">
+            <img class="ally-logo" src="images/aliados/distribuidora-local.svg" alt="Logotipo de Distribuidora Local" loading="lazy" width="140" height="64">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       BOLETÍN CULTURAL
+  ══════════════════════════════════════ -->
+  <section id="boletin" class="newsletter-section" aria-labelledby="newsletter-title">
+    <div class="section-inner newsletter-inner">
+      <div class="newsletter-copy">
+        <p class="section-eyebrow newsletter-eyebrow">Boletín cultural</p>
+        <h2 id="newsletter-title" class="newsletter-title">Una carta de la librería, cada mes.</h2>
+        <p class="newsletter-lead">Recomendaciones curadas, talleres y novedades de la carreta. Sin ruido, sin spam.</p>
+      </div>
+      <form id="newsletterForm" class="newsletter-form" novalidate>
+        <label class="newsletter-label" for="newsletterEmail">Tu correo</label>
+        <div class="newsletter-row">
+          <input id="newsletterEmail" class="newsletter-input" type="email" name="email" placeholder="tucorreo@ejemplo.mx" autocomplete="email" required aria-describedby="newsletterMsg">
+          <button type="submit" class="newsletter-cta" id="newsletterSubmit">Suscribirme</button>
+        </div>
+        <p id="newsletterMsg" class="newsletter-msg" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 
@@ -3203,6 +3581,47 @@
         const diff = startX - e.changedTouches[0].clientX;
         if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
       }, {passive:true});
+    })();
+
+    /* ── Boletín: alta de suscriptor vía Firestore REST (sin SDK) ── */
+    (function initNewsletter() {
+      const NEWSLETTER_ENDPOINT = 'https://firestore.googleapis.com/v1/projects/libreria-itineranteymas/databases/(default)/documents/boletin_suscriptores?key=AIzaSyCZ31BQX5u4fY8gVVK_hM3zRI6asfyxisw';
+      const form = document.getElementById('newsletterForm');
+      if (!form) return;
+      const input = document.getElementById('newsletterEmail');
+      const msg = document.getElementById('newsletterMsg');
+      const btn = document.getElementById('newsletterSubmit');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = input.value.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+          msg.textContent = 'Revisa tu correo, algo no cuadra.';
+          return;
+        }
+        btn.disabled = true;
+        msg.textContent = 'Guardando tu lugar en la lista…';
+        try {
+          const res = await fetch(NEWSLETTER_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fields: {
+                email: { stringValue: email },
+                creadoEn: { timestampValue: new Date().toISOString() },
+                origen: { stringValue: 'sitio-itinerante' }
+              }
+            })
+          });
+          if (!res.ok) throw new Error('firestore ' + res.status);
+          form.reset();
+          msg.textContent = 'Listo. La próxima carta llega a tu correo.';
+        } catch (err) {
+          msg.textContent = 'No pudimos guardarlo. Intenta de nuevo o escríbenos por WhatsApp.';
+        } finally {
+          btn.disabled = false;
+        }
+      });
     })();
   </script>
 

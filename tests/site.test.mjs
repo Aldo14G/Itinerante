@@ -265,7 +265,7 @@ test('CSP keeps the static site intentionally closed', () => {
     "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     'font-src https://fonts.gstatic.com',
-    "connect-src 'none'",
+    'connect-src https://firestore.googleapis.com',
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",
@@ -571,4 +571,27 @@ test('events carousel contract: accessible carousel with autoplay and compact co
   // mobile fade width
   assert.match(html, /events-rail-wrap::after[\s\S]*?28px/,
     'mobile fade width must be 28px');
+});
+
+test('allies section: structure, tokens, motion budget', () => {
+  assert.match(html, /<section id="aliados" class="allies-section"/);
+  assert.match(html, /id="allies-title"/);
+  assert.ok(/\.allies-grid\s*\{[\s\S]*grid-template-columns/.test(html));
+  assertMotionBudget('.ally-link', 450);
+});
+
+test('press section: structure and motion budget', () => {
+  assert.match(html, /<section id="prensa" class="press-section"/);
+  assert.match(html, /id="press-title"/);
+  assert.ok(/\.press-grid\s*\{[\s\S]*grid-template-columns/.test(html));
+  assertMotionBudget('.press-card', 450);
+});
+
+test('newsletter band: real signup wired to Firestore, CSP updated', () => {
+  assert.match(html, /<section id="boletin" class="newsletter-section"/);
+  assert.match(html, /id="newsletterForm"/);
+  assert.match(html, /aria-live="polite"/);
+  assert.match(html, /connect-src https:\/\/firestore\.googleapis\.com/);
+  assert.match(html, /form-action 'none'/);
+  assertMotionBudget('.newsletter-cta', 300);
 });
