@@ -601,12 +601,16 @@
       color: var(--color-brand-strong);
       font-family: 'Inter', sans-serif;
       font-weight: 600;
-      transition: color .2s ease;
+      transition: color .2s ease, transform .2s cubic-bezier(.2,.8,.2,1);
       min-height: 44px;
     }
     .press-card-link:hover .press-readmore {
       color: var(--color-hero);
+      transform: translateX(4px);
     }
+    /* Entrada escalonada del grid de prensa (mismo patrón que #aliados) */
+    .press-grid .reveal:nth-child(2) { transition-delay: .08s; }
+    .press-grid .reveal:nth-child(3) { transition-delay: .16s; }
     @media (max-width: 860px) {
       .press-section { padding-block: 60px; }
     }

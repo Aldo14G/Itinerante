@@ -628,3 +628,11 @@ test('scroll performance: blurs contenidos, transitions enumeradas y render dife
   assert.match(html, /content-visibility:\s*auto/);
   assert.match(html, /contain-intrinsic-size:/);
 });
+
+test('motion: stagger en prensa y micro-interaccion del enlace de nota', () => {
+  assert.ok(/\.press-grid \.reveal:nth-child\(2\)\s*\{\s*transition-delay/.test(html),
+    'missing press grid stagger');
+  assert.ok(/\.press-card-link:hover \.press-readmore\s*\{[\s\S]*?translateX/.test(html),
+    'missing readmore slide micro-interaction');
+  assertMotionBudget('.press-readmore', 450);
+});
