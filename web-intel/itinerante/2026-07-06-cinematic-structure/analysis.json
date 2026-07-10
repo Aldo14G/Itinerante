@@ -1,0 +1,613 @@
+{
+  "analyzed_at": "2026-07-06T22:57:23.966007+00:00",
+  "input_url": "file:///C:/Proyectos/Itinerante/index.html",
+  "final_url": "file:///C:/Proyectos/Itinerante/index.html",
+  "title": "Librería Itinerante y Más — Monterrey",
+  "meta": {
+    "viewport": "width=device-width, initial-scale=1.0",
+    "description": "Literatura, cultura y comunidad en el centro de Monterrey. Libros, café, talleres y más.",
+    "og:title": "Librería Itinerante y Más — Monterrey",
+    "og:description": "Literatura, cultura y comunidad en el centro de Monterrey.",
+    "og:type": "website",
+    "referrer": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "default-src 'self';\n                 script-src 'self' 'unsafe-inline';\n                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;\n                 font-src https://fonts.gstatic.com;\n                 img-src 'self' data: blob:;\n                 connect-src 'none';\n                 frame-src 'none';\n                 object-src 'none';\n                 base-uri 'self';\n                 form-action 'none';"
+  },
+  "headers": {
+    "content-type": "text/html",
+    "content-length": "119929",
+    "last-modified": "Mon, 06 Jul 2026 22:56:02 GMT"
+  },
+  "html": {
+    "html_attrs": {
+      "lang": "es"
+    },
+    "body_classes": "",
+    "bytes": 119929
+  },
+  "headings": [
+    {
+      "level": "h1",
+      "text": "Librería Itinerante y Más",
+      "id": ""
+    },
+    {
+      "level": "h2",
+      "text": "Un lugar para leer, conversar y volver.",
+      "id": "transformacion-title"
+    },
+    {
+      "level": "h2",
+      "text": "Tres maneras de habitar la librería.",
+      "id": "experiencia-title"
+    },
+    {
+      "level": "h3",
+      "text": "Curaduría para encontrar algo propio",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Una pausa entre estantes",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Escena cultural en pequeño formato",
+      "id": ""
+    },
+    {
+      "level": "h2",
+      "text": "Talleres, lecturas y escena viva",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Taller de escritura creativa",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Círculos de lectura",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Teatro gestual",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Fotografía narrativa",
+      "id": ""
+    },
+    {
+      "level": "h2",
+      "text": "Explora por ánimo, género y curiosidad",
+      "id": "catalog-title"
+    },
+    {
+      "level": "h2",
+      "text": "La gente vuelve por algo más que libros.",
+      "id": "trust-title"
+    },
+    {
+      "level": "h2",
+      "text": "Antes de escribir o caerle al centro.",
+      "id": "faq-title"
+    },
+    {
+      "level": "h2",
+      "text": "¿Cómo llegar?",
+      "id": "visit-title"
+    },
+    {
+      "level": "h3",
+      "text": "Cómo funciona",
+      "id": ""
+    },
+    {
+      "level": "h3",
+      "text": "Librería Itinerante y Más",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "rel": "icon",
+      "href": "Logo.png"
+    },
+    {
+      "rel": "preconnect",
+      "href": "https://fonts.googleapis.com"
+    },
+    {
+      "rel": "preconnect",
+      "href": "https://fonts.gstatic.com",
+      "crossorigin": ""
+    },
+    {
+      "rel": "stylesheet",
+      "href": "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+    }
+  ],
+  "scripts": [
+    {}
+  ],
+  "stylesheets": [
+    "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+  ],
+  "images": [
+    {
+      "src": "file:///C:/Proyectos/Itinerante/Logo.webp",
+      "alt": "Librería Itinerante y Más",
+      "width": "42",
+      "height": "42",
+      "decoding": "async",
+      "style": "height:42px;width:42px;border-radius:9px;object-fit:cover;"
+    },
+    {
+      "src": "file:///C:/Proyectos/Itinerante/images/hero/itinerante-hero-cinematic.webp",
+      "alt": "Interior ilustrado de una librería cultural con libros, café y mesa de lectura",
+      "width": "1600",
+      "height": "878",
+      "fetchpriority": "high",
+      "decoding": "async"
+    },
+    {
+      "src": "file:///C:/Proyectos/Itinerante/Logo.webp",
+      "alt": "",
+      "width": "42",
+      "height": "42",
+      "decoding": "async"
+    },
+    {
+      "src": "file:///C:/Proyectos/Itinerante/images/books/poesia-latinoamericana-demo.webp",
+      "alt": "Selección ilustrada de libros de poesía y narrativa",
+      "width": "900",
+      "height": "900",
+      "loading": "lazy",
+      "decoding": "async"
+    },
+    {
+      "src": "file:///C:/Proyectos/Itinerante/images/hero/itinerante-hero-cinematic.webp",
+      "alt": "Mesa con café, libros abiertos y ambiente cálido de librería",
+      "width": "1600",
+      "height": "878",
+      "loading": "lazy",
+      "decoding": "async"
+    },
+    {
+      "src": "file:///C:/Proyectos/Itinerante/images/events/escritura-creativa-demo.webp",
+      "alt": "Ilustración de materiales para taller de escritura creativa",
+      "width": "900",
+      "height": "900",
+      "loading": "lazy",
+      "decoding": "async"
+    },
+    {
+      "src": "file:///C:/Proyectos/Itinerante/Logo.webp",
+      "alt": "Librería Itinerante y Más",
+      "width": "64",
+      "height": "64",
+      "loading": "lazy",
+      "decoding": "async",
+      "style": "width:64px;height:64px;border-radius:12px;object-fit:cover;opacity:.9;"
+    },
+    {
+      "id": "lightboxImg",
+      "src": "",
+      "alt": "Vista de la obra"
+    }
+  ],
+  "videos": [],
+  "forms": [],
+  "buttons_and_ctas": [
+    {
+      "tag": "a",
+      "text": "Itinerante",
+      "href": "file:///C:/Proyectos/Itinerante/index.html",
+      "class": "",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "WhatsApp",
+      "href": "https://wa.me/528180875940",
+      "class": "nav-cta",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Ver libros →",
+      "href": "file:///C:/Proyectos/Itinerante/index.html#galeria",
+      "class": "btn btn-primary",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Escribir por WhatsApp",
+      "href": "https://wa.me/528180875940",
+      "class": "btn btn-outline",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "01 Experiencia",
+      "href": "file:///C:/Proyectos/Itinerante/index.html#experiencia",
+      "class": "chapter-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "02 Agenda",
+      "href": "file:///C:/Proyectos/Itinerante/index.html#eventos",
+      "class": "chapter-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "03 Libros",
+      "href": "file:///C:/Proyectos/Itinerante/index.html#galeria",
+      "class": "chapter-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "04 Visita",
+      "href": "file:///C:/Proyectos/Itinerante/index.html#ubicacion",
+      "class": "chapter-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Reservar →",
+      "href": "https://wa.me/528180875940",
+      "class": "event-cta",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Sumarme →",
+      "href": "https://wa.me/528180875940",
+      "class": "event-cta",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Avisarme →",
+      "href": "https://wa.me/528180875940",
+      "class": "event-cta",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Consultar cupo →",
+      "href": "https://wa.me/528180875940",
+      "class": "event-cta",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "‹",
+      "type": "button",
+      "class": "events-nav-btn",
+      "aria_label": "Evento anterior"
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "events-dot active",
+      "aria_label": "Ir al evento 1"
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "events-dot",
+      "aria_label": "Ir al evento 2"
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "events-dot",
+      "aria_label": "Ir al evento 3"
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "events-dot",
+      "aria_label": "Ir al evento 4"
+    },
+    {
+      "tag": "button",
+      "text": "›",
+      "type": "button",
+      "class": "events-nav-btn",
+      "aria_label": "Siguiente evento"
+    },
+    {
+      "tag": "button",
+      "text": "Todo",
+      "type": "button",
+      "class": "filter-chip active",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Poesía",
+      "type": "button",
+      "class": "filter-chip",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Narrativa",
+      "type": "button",
+      "class": "filter-chip",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Ensayo",
+      "type": "button",
+      "class": "filter-chip",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Historia",
+      "type": "button",
+      "class": "filter-chip",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Arte",
+      "type": "button",
+      "class": "filter-chip",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Infantil",
+      "type": "button",
+      "class": "filter-chip",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Consultar por WhatsApp",
+      "href": "https://wa.me/528180875940",
+      "class": "catalog-whatsapp",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Ver más en @libreriaitineranteymasmty",
+      "href": "https://www.instagram.com/libreriaitineranteymasmty/",
+      "class": "catalog-instagram",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "‹",
+      "type": "",
+      "class": "carousel-btn",
+      "aria_label": "Anterior"
+    },
+    {
+      "tag": "button",
+      "text": "›",
+      "type": "",
+      "class": "carousel-btn",
+      "aria_label": "Siguiente"
+    },
+    {
+      "tag": "a",
+      "text": "Ver las 70 reseñas en Google",
+      "href": "https://www.google.com/maps/search/?api=1&query=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s&query_place_id=ChIJ857kjsu_YoYR29jOuP4VOWs",
+      "class": "review-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Cómo llegar",
+      "href": "https://www.google.com/maps/search/?api=1&query=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s&query_place_id=ChIJ857kjsu_YoYR29jOuP4VOWs",
+      "class": "visit-action visit-action--map",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Mensaje",
+      "href": "https://wa.me/528180875940",
+      "class": "visit-action visit-action--whatsapp",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Instagram",
+      "href": "https://www.instagram.com/libreriaitineranteymasmty/",
+      "class": "footer-social-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Facebook",
+      "href": "https://www.facebook.com/profile.php?id=100095548961064",
+      "class": "footer-social-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "WhatsApp",
+      "href": "https://wa.me/528180875940",
+      "class": "footer-social-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Correo",
+      "href": "file:///C:/Proyectos/Itinerante/index.html",
+      "class": "footer-social-link",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "¡Escríbenos!",
+      "href": "https://wa.me/528180875940",
+      "class": "wa-fab",
+      "aria_label": "Chatear por WhatsApp"
+    },
+    {
+      "tag": "button",
+      "text": "×",
+      "type": "button",
+      "class": "modal-close-btn",
+      "aria_label": "Cerrar"
+    }
+  ],
+  "stack_fingerprints": [
+    {
+      "name": "Vue",
+      "category": "frontend-library",
+      "confidence": "inferred",
+      "evidence": "vue"
+    },
+    {
+      "name": "Tailwind CSS",
+      "category": "css",
+      "confidence": "inferred",
+      "evidence": "sm:, md:, lg:"
+    },
+    {
+      "name": "Bootstrap",
+      "category": "css",
+      "confidence": "inferred",
+      "evidence": "btn btn-"
+    }
+  ],
+  "component_signals": [
+    {
+      "name": "document-outline",
+      "evidence": {
+        "h1": 1,
+        "h2": 7,
+        "h3": 9
+      },
+      "confidence": "observed"
+    },
+    {
+      "name": "navigation-and-ctas",
+      "count": 12,
+      "examples": [
+        {
+          "tag": "a",
+          "text": "Ver libros →",
+          "href": "file:///C:/Proyectos/Itinerante/index.html#galeria",
+          "class": "btn btn-primary",
+          "aria_label": ""
+        },
+        {
+          "tag": "a",
+          "text": "Escribir por WhatsApp",
+          "href": "https://wa.me/528180875940",
+          "class": "btn btn-outline",
+          "aria_label": ""
+        },
+        {
+          "tag": "a",
+          "text": "01 Experiencia",
+          "href": "file:///C:/Proyectos/Itinerante/index.html#experiencia",
+          "class": "chapter-link",
+          "aria_label": ""
+        },
+        {
+          "tag": "a",
+          "text": "02 Agenda",
+          "href": "file:///C:/Proyectos/Itinerante/index.html#eventos",
+          "class": "chapter-link",
+          "aria_label": ""
+        },
+        {
+          "tag": "a",
+          "text": "03 Libros",
+          "href": "file:///C:/Proyectos/Itinerante/index.html#galeria",
+          "class": "chapter-link",
+          "aria_label": ""
+        },
+        {
+          "tag": "a",
+          "text": "04 Visita",
+          "href": "file:///C:/Proyectos/Itinerante/index.html#ubicacion",
+          "class": "chapter-link",
+          "aria_label": ""
+        },
+        {
+          "tag": "button",
+          "text": "‹",
+          "type": "button",
+          "class": "events-nav-btn",
+          "aria_label": "Evento anterior"
+        },
+        {
+          "tag": "button",
+          "text": "›",
+          "type": "button",
+          "class": "events-nav-btn",
+          "aria_label": "Siguiente evento"
+        },
+        {
+          "tag": "button",
+          "text": "‹",
+          "type": "",
+          "class": "carousel-btn",
+          "aria_label": "Anterior"
+        },
+        {
+          "tag": "button",
+          "text": "›",
+          "type": "",
+          "class": "carousel-btn",
+          "aria_label": "Siguiente"
+        },
+        {
+          "tag": "a",
+          "text": "Facebook",
+          "href": "https://www.facebook.com/profile.php?id=100095548961064",
+          "class": "footer-social-link",
+          "aria_label": ""
+        },
+        {
+          "tag": "button",
+          "text": "×",
+          "type": "button",
+          "class": "modal-close-btn",
+          "aria_label": "Cerrar"
+        }
+      ],
+      "confidence": "inferred"
+    },
+    {
+      "name": "media-system",
+      "images": 8,
+      "videos_or_sources": 0,
+      "total": 8,
+      "confidence": "observed"
+    },
+    {
+      "name": "forms",
+      "count": 0,
+      "examples": [],
+      "confidence": "observed"
+    }
+  ],
+  "next_steps": [
+    "Open the page in a browser and capture desktop/mobile screenshots.",
+    "Inspect computed styles for tokens and responsive breakpoints.",
+    "Record network requests after key interactions.",
+    "Confirm animation libraries from rendered scripts and runtime globals."
+  ]
+}

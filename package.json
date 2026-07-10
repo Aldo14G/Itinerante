@@ -1,0 +1,11 @@
+{
+  "name": "itinerante-static-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "node tools/static-server.mjs 8080",
+    "test": "node --test tests/*.test.mjs",
+    "harness": "node --test tests/*.test.mjs"
+  }
+}

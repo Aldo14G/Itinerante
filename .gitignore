@@ -1,0 +1,8 @@
+node_modules/
+.firebase/
+*.log
+.env
+.env.*
+*.local
+*-firebase-adminsdk-*.json
+.worktrees/
