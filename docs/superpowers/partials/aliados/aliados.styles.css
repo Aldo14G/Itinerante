@@ -1,0 +1,94 @@
+/* ── Aliados & Comunidad (#aliados) ──
+   Pegar dentro del <style> de index.html, junto a las reglas de trust/faq.
+   Solo tokens var(--*). Motion: color ≤200ms, transform 300ms (budget ≤450ms). */
+
+.allies-section {
+  background: var(--surface-soft);
+  padding: 76px 0;
+}
+/* Los helpers .section-inner/.section-head/.section-eyebrow/.section-lead no
+   existen aún en index.html; se definen con scope de .allies-section para no
+   colisionar con .section-kicker/.section-copy existentes. */
+.allies-section .section-inner {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 24px;
+  width: 100%;
+}
+.allies-section .section-head {
+  margin-bottom: 40px;
+  max-width: 700px;
+}
+.allies-section .section-eyebrow {
+  color: var(--brand-dark);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.allies-section .section-lead {
+  color: var(--text-md);
+  font-size: .98rem;
+  line-height: 1.75;
+  margin: 18px 0 0;
+  max-width: 540px;
+}
+
+/* Grid de aliados — patrón curaclimate: 8 celdas uniformes, 4 col en desktop */
+.allies-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 641px) {
+  .allies-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}
+@media (min-width: 1025px) {
+  .allies-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.ally-card {
+  background: var(--surface-paper);
+  border: 1px solid rgba(93,196,180,.18);
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+  min-height: 96px;
+}
+.ally-link {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  padding: 16px;
+  border-radius: var(--radius);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.ally-card:hover .ally-link {
+  transform: scale(1.025);
+}
+.ally-link:focus-visible {
+  outline: 2px solid var(--brand-dark);
+  outline-offset: 2px;
+}
+.ally-logo {
+  max-width: 100%;
+  height: auto;
+  filter: grayscale(1);
+  opacity: .8;
+  transition: filter .2s ease, opacity .2s ease;
+}
+.ally-card:hover .ally-logo,
+.ally-link:focus-visible .ally-logo {
+  filter: grayscale(0);
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ally-link { transition: none; }
+  .ally-logo { transition: none; }
+}
