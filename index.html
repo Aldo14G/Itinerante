@@ -745,41 +745,63 @@
       outline: none;
       transform: translateY(-1px);
     }
-    /* ── Aliados & Comunidad (#aliados) ── */
+    /* ── Aliados & Comunidad (#aliados) — composición tipo curaclimate ── */
     .allies-section {
       background: var(--surface-soft);
-      padding: 76px 0;
+      padding: 84px 0;
     }
+    /* Split: intro editorial a la izquierda, grid de cards a la derecha */
+    .allies-layout {
+      display: grid;
+      gap: 44px;
+      align-items: center;
+    }
+    @media (min-width: 1025px) {
+      .allies-layout {
+        grid-template-columns: minmax(300px, 1fr) 2.2fr;
+        gap: 56px;
+      }
+    }
+    .eyebrow-pill {
+      display: inline-block;
+      background: var(--brand-pale);
+      color: var(--brand-hero);
+      border-radius: 999px;
+      padding: 8px 14px;
+    }
+    .allies-intro .section-lead + .section-lead { margin-top: 14px; }
     .allies-grid {
       display: grid;
-      gap: 24px;
+      gap: 14px;
       grid-template-columns: repeat(2, 1fr);
       list-style: none;
       margin: 0;
       padding: 0;
     }
     @media (min-width: 641px) {
-      .allies-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .allies-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (min-width: 1025px) {
       .allies-grid { grid-template-columns: repeat(4, 1fr); }
     }
+    /* Cards altas tipo curaclimate: logo al centro, nombre abajo */
     .ally-card {
+      position: relative;
       background: var(--surface-paper);
       border: 1px solid rgba(93,196,180,.18);
       border-radius: var(--radius);
-      display: grid;
-      place-items: center;
-      min-height: 96px;
+      overflow: hidden;
     }
     .ally-link {
-      display: grid;
-      place-items: center;
-      width: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+      min-height: 232px;
       height: 100%;
-      min-height: 44px;
-      padding: 16px;
-      border-radius: var(--radius);
+      padding: 22px 18px 18px;
+      text-decoration: none;
       transition: transform .3s cubic-bezier(.2,.8,.2,1);
     }
     .ally-card:hover .ally-link {
@@ -787,20 +809,72 @@
     }
     .ally-link:focus-visible {
       outline: 2px solid var(--brand-dark);
-      outline-offset: 2px;
+      outline-offset: -2px;
+    }
+    /* Capa hover: lavado editorial oscuro que se revela bajo el cursor */
+    .ally-hover {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background: linear-gradient(165deg, var(--brand-hero) 0%, var(--brand-dark) 100%);
+      transition: opacity .35s ease;
+    }
+    .ally-card:hover .ally-hover,
+    .ally-link:focus-visible .ally-hover {
+      opacity: 1;
     }
     .ally-logo {
-      max-width: 100%;
+      position: relative;
+      margin: 26px auto 0;
+      max-width: 74%;
       height: auto;
-      filter: grayscale(1);
-      opacity: .8;
-      transition: filter .2s ease, opacity .2s ease;
+      transition: filter .2s ease;
     }
     .ally-card:hover .ally-logo,
     .ally-link:focus-visible .ally-logo {
-      filter: grayscale(0);
-      opacity: 1;
+      filter: grayscale(1) invert(1) brightness(1.35);
     }
+    .ally-name {
+      position: relative;
+      font: 500 .88rem/1.3 'Inter', sans-serif;
+      color: var(--text-md);
+      transition: color .2s ease;
+    }
+    .ally-card:hover .ally-name,
+    .ally-link:focus-visible .ally-name {
+      color: var(--paper);
+    }
+    /* Card destacada con fotografía (estado que curaclimate muestra en su primera celda) */
+    .ally-card--featured .ally-link { justify-content: flex-end; }
+    .ally-card--featured .ally-media {
+      position: absolute;
+      inset: 0;
+    }
+    .ally-card--featured .ally-media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s cubic-bezier(.2,.8,.2,1);
+    }
+    .ally-card--featured:hover .ally-media img {
+      transform: scale(1.04);
+    }
+    .ally-card--featured .ally-media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(13,74,69,.05) 40%, rgba(13,37,32,.74) 100%);
+    }
+    .ally-card--featured .ally-name { color: var(--paper); }
+    /* Entrada escalonada del grid, como el reveal en cascada de curaclimate */
+    .allies-grid .reveal:nth-child(2) { transition-delay: .05s; }
+    .allies-grid .reveal:nth-child(3) { transition-delay: .1s; }
+    .allies-grid .reveal:nth-child(4) { transition-delay: .15s; }
+    .allies-grid .reveal:nth-child(5) { transition-delay: .2s; }
+    .allies-grid .reveal:nth-child(6) { transition-delay: .25s; }
+    .allies-grid .reveal:nth-child(7) { transition-delay: .3s; }
+    .allies-grid .reveal:nth-child(8) { transition-delay: .35s; }
     /* ── Boletín Cultural (#boletin) ── */
     .newsletter-section {
       background: var(--color-hero);
@@ -2692,53 +2766,73 @@
   ══════════════════════════════════════ -->
   <section id="aliados" class="allies-section" aria-labelledby="allies-title">
     <div class="section-inner">
-      <div class="section-head reveal">
-        <p class="section-eyebrow">Comunidad</p>
-        <h2 id="allies-title" class="section-title">Tejemos librería con otros.</h2>
-        <p class="section-lead">Editoriales independientes, cafés, colectivos y bibliotecas que caminan con la carreta.</p>
+      <div class="allies-layout">
+        <div class="allies-intro reveal">
+          <p class="section-eyebrow eyebrow-pill">El ecosistema de la carreta</p>
+          <h2 id="allies-title" class="section-title">Tejemos librería con otros.</h2>
+          <p class="section-lead">Editoriales independientes, cafés, colectivos y bibliotecas que caminan con la carreta para validar y crecer juntos.</p>
+          <p class="section-lead">Avanzamos con calma: cada alianza suma títulos, talleres y lectores a la mesa de la librería.</p>
+        </div>
+        <ul class="allies-grid" role="list">
+          <li class="ally-card ally-card--featured reveal">
+            <a class="ally-link" href="#" aria-label="Editorial Aliada">
+              <span class="ally-media" aria-hidden="true">
+                <img src="images/hero/itinerante-hero-cinematic.webp" alt="" loading="lazy" width="480" height="600">
+              </span>
+              <span class="ally-name">Editorial Aliada</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Café Vecino">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/cafe-vecino.svg" alt="Logotipo de Café Vecino" loading="lazy" width="140" height="64">
+              <span class="ally-name">Café Vecino</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Colectivo Lector">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/colectivo-lector.svg" alt="Logotipo de Colectivo Lector" loading="lazy" width="140" height="64">
+              <span class="ally-name">Colectivo Lector</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Biblioteca Amiga">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/biblioteca-amiga.svg" alt="Logotipo de Biblioteca Amiga" loading="lazy" width="140" height="64">
+              <span class="ally-name">Biblioteca Amiga</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Sello Independiente">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/sello-independiente.svg" alt="Logotipo de Sello Independiente" loading="lazy" width="140" height="64">
+              <span class="ally-name">Sello Independiente</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Taller de Letras">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/taller-de-letras.svg" alt="Logotipo de Taller de Letras" loading="lazy" width="140" height="64">
+              <span class="ally-name">Taller de Letras</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Foro Cultural">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/foro-cultural.svg" alt="Logotipo de Foro Cultural" loading="lazy" width="140" height="64">
+              <span class="ally-name">Foro Cultural</span>
+            </a>
+          </li>
+          <li class="ally-card reveal">
+            <a class="ally-link" href="#" aria-label="Distribuidora Local">
+              <span class="ally-hover" aria-hidden="true"></span>
+              <img class="ally-logo" src="images/aliados/distribuidora-local.svg" alt="Logotipo de Distribuidora Local" loading="lazy" width="140" height="64">
+              <span class="ally-name">Distribuidora Local</span>
+            </a>
+          </li>
+        </ul>
       </div>
-      <ul class="allies-grid" role="list">
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Editorial Aliada">
-            <img class="ally-logo" src="images/aliados/editorial-aliada.svg" alt="Logotipo de Editorial Aliada" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Café Vecino">
-            <img class="ally-logo" src="images/aliados/cafe-vecino.svg" alt="Logotipo de Café Vecino" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Colectivo Lector">
-            <img class="ally-logo" src="images/aliados/colectivo-lector.svg" alt="Logotipo de Colectivo Lector" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Biblioteca Amiga">
-            <img class="ally-logo" src="images/aliados/biblioteca-amiga.svg" alt="Logotipo de Biblioteca Amiga" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Sello Independiente">
-            <img class="ally-logo" src="images/aliados/sello-independiente.svg" alt="Logotipo de Sello Independiente" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Taller de Letras">
-            <img class="ally-logo" src="images/aliados/taller-de-letras.svg" alt="Logotipo de Taller de Letras" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Foro Cultural">
-            <img class="ally-logo" src="images/aliados/foro-cultural.svg" alt="Logotipo de Foro Cultural" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-        <li class="ally-card">
-          <a class="ally-link" href="#" aria-label="Distribuidora Local">
-            <img class="ally-logo" src="images/aliados/distribuidora-local.svg" alt="Logotipo de Distribuidora Local" loading="lazy" width="140" height="64">
-          </a>
-        </li>
-      </ul>
     </div>
   </section>
 
