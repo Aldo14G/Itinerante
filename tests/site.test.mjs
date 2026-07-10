@@ -595,3 +595,19 @@ test('newsletter band: real signup wired to Firestore, CSP updated', () => {
   assert.match(html, /form-action 'none'/);
   assertMotionBudget('.newsletter-cta', 300);
 });
+
+test('experiencia unificada: intro sticky + cards numeradas fusionan transformacion', () => {
+  // Una sola sección: layout split con intro y grid de cards
+  assert.match(html, /class=["']story-shell experience-layout["']/);
+  // Los 3 beneficios numerados viven ahora dentro de las cards
+  assert.ok((html.match(/class=["']experience-num["']/g) ?? []).length >= 3,
+    'expected 3 numbered experience cards');
+  // La estructura legacy de dos secciones debe desaparecer por completo (HTML y CSS)
+  assert.doesNotMatch(html, /benefit-row/);
+  assert.doesNotMatch(html, /transform-grid/);
+  // Layout y sticky del intro en desktop
+  assert.ok(/\.experience-layout\s*\{[\s\S]*?grid/.test(html), 'missing experience-layout grid rule');
+  assert.ok(/\.experience-intro\s*\{[\s\S]*?position:\s*sticky/.test(html), 'missing sticky intro rule');
+  // Zoom de imagen dentro del presupuesto de motion de la sección (300ms)
+  assertMotionBudget('.experience-media img', 300);
+});

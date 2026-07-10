@@ -420,61 +420,24 @@
       margin-bottom: 34px;
       max-width: 700px;
     }
-    .section-heading--split {
-      align-items: end;
-      display: grid;
-      gap: 24px;
-      grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
-      max-width: none;
-    }
-    .transform-grid {
-      align-items: center;
-      display: grid;
-      gap: 44px;
-      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
-    }
-    .transform-panel {
-      border-left: 2px solid var(--it-amber-500);
-      display: grid;
-      gap: 18px;
-      padding-left: 24px;
-    }
-    .benefit-row {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    .benefit-item {
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(93,196,180,.18);
-      border-radius: 8px;
-      padding: 20px;
-    }
-    .benefit-item span {
-      color: var(--it-amber-500);
-      display: block;
-      font-size: .72rem;
-      font-weight: 800;
-      letter-spacing: .16em;
-      margin-bottom: 16px;
-      text-transform: uppercase;
-    }
-    .benefit-item strong {
-      color: var(--text);
-      display: block;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      line-height: 1.18;
-      margin-bottom: 8px;
-    }
-    .benefit-item p {
-      color: var(--text-md);
-      font-size: .86rem;
-      line-height: 1.6;
-      margin: 0;
-    }
     .experience-section {
       border-block: 1px solid rgba(93,196,180,.16);
+    }
+    /* ── Experiencia unificada: intro sticky + cards (patrón curaclimate) ── */
+    .experience-layout {
+      display: grid;
+      gap: 44px;
+      align-items: start;
+    }
+    @media (min-width: 1025px) {
+      .experience-layout { grid-template-columns: minmax(300px, 1fr) 2.1fr; gap: 56px; }
+      .experience-intro { position: sticky; top: 132px; }
+    }
+    .experience-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--brand-hero);
+      margin: 26px 0 0;
     }
     .experience-grid {
       display: grid;
@@ -495,13 +458,19 @@
       box-shadow: var(--shadow-md);
       transform: translateY(-3px);
     }
-    .experience-panel img {
+    .experience-media { overflow: hidden; }
+    .experience-media img {
       aspect-ratio: 4 / 3;
       display: block;
       height: auto;
       object-fit: cover;
       width: 100%;
+      transition: transform .3s cubic-bezier(.2,.8,.2,1);
     }
+    .experience-panel:hover .experience-media img { transform: scale(1.04); }
+    /* Entrada escalonada (mismo patrón que #aliados) */
+    .experience-grid .reveal:nth-child(2) { transition-delay: .08s; }
+    .experience-grid .reveal:nth-child(3) { transition-delay: .16s; }
     .experience-panel-body {
       padding: 22px;
     }
@@ -1537,13 +1506,11 @@
     }
 
     @media(max-width:900px) {
-      .transform-grid,
-      .section-heading--split,
+      .experience-layout,
       .faq-grid,
       .visit-grid {
         grid-template-columns: 1fr;
       }
-      .benefit-row,
       .experience-grid {
         grid-template-columns: 1fr;
       }
@@ -1568,9 +1535,6 @@
       .faq-section,
       .visit-section { padding-block: 60px; }
       .section-title { font-size: 2.15rem; }
-      .transform-panel {
-        padding-left: 18px;
-      }
       .experience-panel-body,
       .visit-card,
       .visit-flow {
@@ -2280,77 +2244,46 @@
   <!-- ══════════════════════════════════════
        TRANSFORMACIÓN — Promesa cultural
   ══════════════════════════════════════ -->
-  <section class="story-section story-section--paper" aria-labelledby="transformacion-title">
-    <div class="story-shell transform-grid">
-      <div class="reveal">
-        <p class="section-kicker">Transforma tu visita</p>
+  <section id="experiencia" class="story-section story-section--soft experience-section" aria-labelledby="transformacion-title">
+    <div class="story-shell experience-layout">
+      <div class="experience-intro reveal">
+        <p class="section-kicker eyebrow-pill">Transforma tu visita</p>
         <h2 id="transformacion-title" class="section-title">Un lugar para leer, conversar y volver.</h2>
         <p class="section-copy">
           Itinerante funciona como una casa cultural compacta: entras por un libro, te quedas por el café,
           y vuelves por la conversación que se arma alrededor de la lectura.
         </p>
+        <p id="experiencia-title" class="experience-subtitle">Tres maneras de habitar la librería.</p>
       </div>
 
-      <div class="transform-panel reveal">
-        <div class="benefit-row" aria-label="Beneficios de la experiencia Itinerante">
-          <article class="benefit-item">
-            <span>01</span>
-            <strong>Curaduría cercana</strong>
-            <p>Rutas de lectura por ánimo, género e intereses, no anaqueles sin contexto.</p>
-          </article>
-          <article class="benefit-item">
-            <span>02</span>
-            <strong>Tiempo para estar</strong>
-            <p>Café, mesa y pausa para hojear, preguntar y decidir sin prisa.</p>
-          </article>
-          <article class="benefit-item">
-            <span>03</span>
-            <strong>Agenda viva</strong>
-            <p>Talleres, círculos y encuentros que convierten la librería en comunidad.</p>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════
-       EXPERIENCIA — Libros · Café · Talleres
-  ══════════════════════════════════════ -->
-  <section id="experiencia" class="story-section story-section--soft experience-section" aria-labelledby="experiencia-title">
-    <div class="story-shell">
-      <div class="section-heading section-heading--split reveal">
-        <div>
-          <p class="section-kicker">Experiencia</p>
-          <h2 id="experiencia-title" class="section-title">Tres maneras de habitar la librería.</h2>
-        </div>
-        <p class="section-copy">
-          El recorrido debe sentirse claro desde el primer scroll: descubrir libros, tomar una pausa y sumarse a la vida cultural del espacio.
-        </p>
-      </div>
-
-      <div class="experience-grid reveal">
-        <article class="experience-panel">
-          <img src="images/books/poesia-latinoamericana-demo.webp" alt="Selección ilustrada de libros de poesía y narrativa" width="900" height="900" loading="lazy" decoding="async">
+      <div class="experience-grid">
+        <article class="experience-panel reveal">
+          <div class="experience-media">
+            <img src="images/books/poesia-latinoamericana-demo.webp" alt="Selección ilustrada de libros de poesía y narrativa" width="900" height="900" loading="lazy" decoding="async">
+          </div>
           <div class="experience-panel-body">
-            <span>Libros</span>
-            <h3>Curaduría para encontrar algo propio</h3>
+            <span class="experience-num">01 · Libros</span>
+            <h3>Curaduría cercana</h3>
             <p>Narrativa, poesía, ensayo, crónica e infantil ordenados como rutas de lectura, no como inventario frío.</p>
           </div>
         </article>
-        <article class="experience-panel">
-          <img src="images/books/narrativa-mexicana-demo.webp" alt="Selección editorial para leer con café en la librería" width="900" height="900" loading="lazy" decoding="async">
+        <article class="experience-panel reveal">
+          <div class="experience-media">
+            <img src="images/books/narrativa-mexicana-demo.webp" alt="Selección editorial para leer con café en la librería" width="900" height="900" loading="lazy" decoding="async">
+          </div>
           <div class="experience-panel-body">
-            <span>Café</span>
-            <h3>Una pausa entre estantes</h3>
+            <span class="experience-num">02 · Café</span>
+            <h3>Tiempo para estar</h3>
             <p>Un espacio tranquilo para hojear, esperar a alguien o dejar que una recomendación encuentre su momento.</p>
           </div>
         </article>
-        <article class="experience-panel">
-          <img src="images/events/escritura-creativa-demo.webp" alt="Ilustración de materiales para taller de escritura creativa" width="900" height="900" loading="lazy" decoding="async">
+        <article class="experience-panel reveal">
+          <div class="experience-media">
+            <img src="images/events/escritura-creativa-demo.webp" alt="Ilustración de materiales para taller de escritura creativa" width="900" height="900" loading="lazy" decoding="async">
+          </div>
           <div class="experience-panel-body">
-            <span>Talleres</span>
-            <h3>Escena cultural en pequeño formato</h3>
+            <span class="experience-num">03 · Talleres</span>
+            <h3>Agenda viva</h3>
             <p>Lecturas, escritura, teatro, fotografía y conversación para que la librería también sea punto de encuentro.</p>
           </div>
         </article>
