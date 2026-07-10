@@ -1,0 +1,130 @@
+/* ══════════════════════════════════════
+   EN LOS MEDIOS / PRENSA — estilos del partial
+   Pegar dentro del <style> de index.html, junto a las reglas
+   de secciones afines (entre .events-* y .catalog-*).
+   Solo tokens var(--*). Motion: ≤200ms color, ≤450ms transform/shadow.
+══════════════════════════════════════ */
+
+.press-section {
+  background: var(--surface-paper);
+  padding: 80px 24px;
+}
+/* Cabecera de sección: scoped porque index.html usa .section-kicker/.section-copy;
+   estas clases (.section-inner/.section-head/.section-eyebrow/.section-lead)
+   replican ese patrón sin tocar reglas globales. */
+.press-section .section-inner {
+  margin: 0 auto;
+  max-width: 1200px;
+  width: 100%;
+}
+.press-section .section-head {
+  margin-bottom: 34px;
+  max-width: 700px;
+}
+.press-section .section-eyebrow {
+  color: var(--brand-dark);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.press-section .section-lead {
+  color: var(--text-md);
+  font-size: .98rem;
+  line-height: 1.75;
+  margin: 18px 0 0;
+  max-width: 540px;
+}
+
+.press-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 641px) {
+  .press-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1025px) {
+  .press-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.press-card {
+  background: var(--surface-paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;
+}
+.press-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.press-card-link {
+  display: block;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.press-card-link:focus-visible {
+  outline: 2px solid var(--color-brand-strong);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.press-media { position: relative; }
+.press-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 300; /* paisaje estable, sin CLS con placeholders SVG */
+  object-fit: cover;
+}
+.press-source {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  background: rgba(13,74,69,.82); /* --brand-hero al 82%: overlay editorial oscuro */
+  color: var(--paper);
+  font: 500 .78rem/1 'Inter', sans-serif;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.press-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin: 16px 16px 8px;
+}
+.press-excerpt {
+  font-family: 'Inter', sans-serif;
+  font-size: .95rem;
+  line-height: 1.65;
+  color: var(--text-md);
+  margin: 0 16px;
+}
+.press-readmore {
+  display: inline-flex;
+  align-items: center;
+  margin: 12px 16px 20px;
+  color: var(--color-brand-strong);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  transition: color .2s ease;
+  min-height: 44px; /* target táctil ≥44px (todo el card-link también es clicable) */
+}
+.press-card-link:hover .press-readmore {
+  color: var(--color-hero);
+}
+
+@media (max-width: 860px) {
+  .press-section { padding-block: 60px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .press-card,
+  .press-readmore { transition: none; }
+  .press-card:hover { transform: none; }
+}

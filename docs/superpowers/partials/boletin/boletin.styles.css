@@ -1,0 +1,17 @@
+/* ── Boletín Cultural (#boletin) ─────────────────────────────── */
+.newsletter-section { background: var(--color-hero); color: var(--paper); padding: 72px 0; }
+.newsletter-inner { display: grid; gap: 28px; align-items: center; }
+@media (min-width: 861px) { .newsletter-inner { grid-template-columns: 1.2fr 1fr; gap: 48px; } }
+.newsletter-eyebrow { color: var(--brand-light); }
+.newsletter-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); color: var(--paper); margin: 0 0 10px; }
+.newsletter-lead { font-family: 'Inter', sans-serif; color: rgba(253,252,248,.82); margin: 0; }
+.newsletter-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.newsletter-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.newsletter-input { flex: 1 1 220px; min-height: 48px; padding: 12px 16px; border-radius: var(--radius); border: 1px solid rgba(253,252,248,.35); background: rgba(253,252,248,.08); color: var(--paper); font: 400 1rem 'Inter', sans-serif; transition: border-color .2s ease; }
+.newsletter-input::placeholder { color: rgba(253,252,248,.55); }
+.newsletter-input:focus { outline: 2px solid var(--brand-light); outline-offset: 2px; border-color: var(--brand-light); }
+.newsletter-cta { min-height: 48px; display: inline-flex; align-items: center; background: var(--paper); color: var(--color-hero); font: 600 1rem 'Inter', sans-serif; padding: 12px 26px; border: 0; border-radius: var(--radius); cursor: pointer; transition: transform .2s cubic-bezier(.2,.8,.2,1), opacity .2s ease; }
+.newsletter-cta:hover { transform: translateY(-2px); }
+.newsletter-cta:disabled { opacity: .6; transform: none; cursor: wait; }
+.newsletter-msg { min-height: 1.4em; margin: 10px 0 0; font: 400 .9rem 'Inter', sans-serif; color: var(--brand-light); }
+@media (prefers-reduced-motion: reduce) { .newsletter-cta { transition: none; } }
