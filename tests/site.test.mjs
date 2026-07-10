@@ -611,3 +611,20 @@ test('experiencia unificada: intro sticky + cards numeradas fusionan transformac
   // Zoom de imagen dentro del presupuesto de motion de la sección (300ms)
   assertMotionBudget('.experience-media img', 300);
 });
+
+test('scroll performance: blurs contenidos, transitions enumeradas y render diferido', () => {
+  // Los dos elementos fijos/sticky no deben recomponer blur caro en cada frame
+  const navbar = cssRuleBlock('.navbar');
+  assert.doesNotMatch(navbar, /saturate\(/, 'navbar backdrop must not use saturate()');
+  const navBlur = navbar.match(/backdrop-filter:\s*blur\((\d+)px\)/);
+  assert.ok(navBlur && Number(navBlur[1]) <= 8, 'navbar blur must be <= 8px');
+  const chapterNav = cssRuleBlock('.chapter-nav');
+  assert.doesNotMatch(chapterNav, /saturate\(/, 'chapter-nav backdrop must not use saturate()');
+  const chBlur = chapterNav.match(/backdrop-filter:\s*blur\((\d+)px\)/);
+  assert.ok(chBlur && Number(chBlur[1]) <= 8, 'chapter-nav blur must be <= 8px');
+  // transition: all anima propiedades de layout sin querer — prohibido
+  assert.doesNotMatch(html, /transition:\s*all\b/, 'enumerate transition properties');
+  // Las secciones bajo el pliegue difieren layout/paint hasta acercarse al viewport
+  assert.match(html, /content-visibility:\s*auto/);
+  assert.match(html, /contain-intrinsic-size:/);
+});
