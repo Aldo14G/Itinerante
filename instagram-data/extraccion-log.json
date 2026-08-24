@@ -1,0 +1,33 @@
+{
+  "sesion": "2026-07-10T22:16:00Z",
+  "metodo": "browser_subagent_navegador",
+  "url_base": "https://www.instagram.com/libreriaitineranteymasmty/",
+  "posts_extraidos": 10,
+  "posts_ids": [
+    "DVmde4oEVzw", "DVmGeJpEa5A", "DT1SgqckXZh",
+    "DalnVkMBwAR", "Dalh-WjPWsk", "Daiwq_DRpN1",
+    "DadTzTpjjXy", "DaZdxdMN6az", "DaQ8o8FI2Cr", "DaBf3gjIi2B"
+  ],
+  "rango_fechas": {
+    "post_mas_antiguo": "2026-01-22",
+    "post_mas_reciente": "2026-07-09"
+  },
+  "perfil_extraido": true,
+  "highlights_detectados": 19,
+  "imagenes_descargadas": 0,
+  "limitaciones": [
+    "Instagram login wall impidió scroll infinito del grid (solo primeras 12 URLs visibles)",
+    "No se pudieron descargar imágenes directamente (CDN requiere sesión activa)",
+    "Story Highlights no se pudieron abrir (requiere login)",
+    "Posts anteriores a enero 2026 no accesibles sin scroll adicional"
+  ],
+  "archivos_generados": [
+    "instagram-data/perfil.json",
+    "instagram-data/posts-extraidos.json",
+    "instagram-data/eventos.json",
+    "instagram-data/talleres.json",
+    "instagram-data/menciones-frecuentes.json",
+    "instagram-data/extraccion-log.json"
+  ],
+  "siguiente_paso": "Tarea 2: Validar y cruzar datos extraídos con el contenido actual del sitio web"
+}

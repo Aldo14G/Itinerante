@@ -1,0 +1,50 @@
+[
+  {
+    "cuenta": "@sharonmirelesgong",
+    "frecuencia": 1,
+    "contexto": "Fotógrafa profesional. Crédito en post de fotos del espacio (DVmde4oEVzw).",
+    "tipo_relacion": "colaborador_fotografo",
+    "relevancia_web": "alta",
+    "notas": "Fotos del espacio con alta interacción (393 likes). Potencial fuente de imágenes para el sitio."
+  },
+  {
+    "cuenta": "@meteora",
+    "frecuencia": 2,
+    "contexto": "Artista/colectivo con exposición en la librería. Tiene Story Highlight dedicado.",
+    "tipo_relacion": "aliado_artista",
+    "relevancia_web": "alta",
+    "notas": "Exposición activa julio 2026. Story Highlight 'METEORA'. Candidato para sección #aliados."
+  },
+  {
+    "cuenta": "@vic.pulsoyplay",
+    "frecuencia": 2,
+    "contexto": "Aparece en reels del espacio y exposición Meteora.",
+    "tipo_relacion": "colaborador_contenido",
+    "relevancia_web": "media",
+    "notas": "Creador de contenido/videógrafo. Reels del espacio."
+  },
+  {
+    "cuenta": "@carolinamorenowriter",
+    "frecuencia": 1,
+    "contexto": "Autora del poemario 'Carroña Botánica'. Presentación 10 julio 2026.",
+    "tipo_relacion": "autor_invitado",
+    "relevancia_web": "baja",
+    "notas": "Evento puntual, no aliado permanente."
+  },
+  {
+    "cuenta": "@sedusomonterrey",
+    "frecuencia": 1,
+    "contexto": "Colaboración en conversatorio sobre movilidad ciclista (16 julio 2026).",
+    "tipo_relacion": "aliado_institucional",
+    "relevancia_web": "media",
+    "notas": "Posible aliado recurrente si el conversatorio se repite."
+  },
+  {
+    "cuenta": "@ojosdeeva",
+    "frecuencia": 1,
+    "contexto": "Relacionada con presentación del libro de Lourdes Specia.",
+    "tipo_relacion": "editorial_o_promotor",
+    "relevancia_web": "media",
+    "notas": "Posible editorial o distribuidora. Verificar."
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "usuario": "libreriaitineranteymasmty",
+  "nombre_display": "librería Itinerante y más",
+  "bio": "Librería Itinerante y más Mty. Crea espacios para la lectura y las artes, un lugar hecho por y para la comunidad. Libros, café, talleres y más.",
+  "posts_count": 543,
+  "seguidores": 4525,
+  "seguidos": 1686,
+  "link_bio": null,
+  "url_perfil": "https://www.instagram.com/libreriaitineranteymasmty/",
+  "direccion": {
+    "calle": "Mariano Matamoros 421 Pte.",
+    "entre": "Juan Aldama e Ignacio Rayón",
+    "colonia": "Centro",
+    "ciudad": "Monterrey",
+    "estado": "Nuevo León",
+    "pais": "México",
+    "ubicacion_anterior": "Padre Mier 821, Centro de Monterrey"
+  },
+  "contacto": {
+    "whatsapp": "+528180875940",
+    "instagram_dm": true,
+    "email": null,
+    "telefono": null
+  },
+  "google_maps_place_id": "ChIJ857kjsu_YoYR29jOuP4VOWs",
+  "story_highlights": [
+    { "nombre": "POTERART", "categoria_inferida": "arte_ceramica" },
+    { "nombre": "METEORA", "categoria_inferida": "exposicion_artistica" },
+    { "nombre": "TONO ITINERANTE", "categoria_inferida": "musica_identidad" },
+    { "nombre": "ITINERANTE", "categoria_inferida": "general_about" },
+    { "nombre": "ESPACIOS", "categoria_inferida": "fotos_espacio" },
+    { "nombre": "TARDE CHILL", "categoria_inferida": "eventos_sociales" },
+    { "nombre": "CHILL BAZAR", "categoria_inferida": "mercado_cultural" },
+    { "nombre": "CIRCULO LECTURA", "categoria_inferida": "circulo_lectura" },
+    { "nombre": "COLLAGE COLECTIV", "categoria_inferida": "taller_collage" },
+    { "nombre": "EL RECORRIDO", "categoria_inferida": "tour_experiencia" },
+    { "nombre": "ESPACIOS IT", "categoria_inferida": "rincones_libreria" },
+    { "nombre": "POESÍA", "categoria_inferida": "poesia_eventos" },
+    { "nombre": "HORMIGUERO", "categoria_inferida": "colectivo_aliado" },
+    { "nombre": "GIGANTEYLAPASTOR", "categoria_inferida": "proyecto_cultural" },
+    { "nombre": "UANLEER 2026", "categoria_inferida": "feria_lectura_uanl" },
+    { "nombre": "DÍA 1", "categoria_inferida": "evento_inaugural" },
+    { "nombre": "LA NUEVA LIBRE", "categoria_inferida": "proyecto_aliado" },
+    { "nombre": "MICRO ABIERTO", "categoria_inferida": "microfono_abierto" },
+    { "nombre": "TALLER DE CUENTO", "categoria_inferida": "taller_escritura" }
+  ],
+  "fecha_extraccion": "2026-07-10T22:22:00Z"
+}
