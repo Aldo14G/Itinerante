@@ -6,3 +6,6 @@ node_modules/
 *.local
 *-firebase-adminsdk-*.json
 .worktrees/
+
+# Cache local de skills de Claude agents
+.agents/
