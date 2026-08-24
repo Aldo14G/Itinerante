@@ -250,9 +250,9 @@ test('critical styles do not depend on the Tailwind CDN runtime', () => {
 
 test('global spacing and hero brand media stay professionally framed', () => {
   assert.match(cssRuleBlock('body'), /margin:\s*0/, 'body must reset default browser margin');
-  assert.match(cssRuleBlock('.hero-visual'), /border-radius:\s*8px/);
-  assert.match(cssRuleBlock('.hero-visual img'), /aspect-ratio:\s*16 \/ 10/);
-  assert.match(cssRuleBlock('.hero-brand-chip'), /border-radius:\s*8px/);
+  assert.match(cssRuleBlock('.hero-media'), /display:\s*flex/);
+  assert.match(cssRuleBlock('.hero-logo-wrap'), /max-width:\s*clamp\(/);
+  assert.match(cssRuleBlock('.rating-badge'), /border-radius:\s*100px/);
 });
 
 test('CSP keeps the static site intentionally closed', () => {
@@ -413,10 +413,10 @@ test('premium narrative architecture is explicit and navigable', () => {
   assertMotionBudget('.chapter-link', 250);
 });
 
-test('home narrative follows the cinematic cultural product structure', () => {
-  assert.match(html, /class=["'][^"']*hero-visual/);
-  assert.match(html, /itinerante-hero-cinematic\.webp/);
-  assert.match(html, /Libros, caf(?:e|é|Ã©) y comunidad/);
+test('home narrative preserves curaclimate composition', () => {
+  assert.match(html, /class=["'][^"']*hero-media/);
+  assert.match(html, /Logo\.webp/);
+  assert.match(html, /Literatura, cultura y comunidad/);
   assert.match(html, /id=["']transformacion-title["']/);
   assert.match(html, /Un lugar para leer, conversar y volver/);
   assert.match(html, /id=["']experiencia-title["']/);
