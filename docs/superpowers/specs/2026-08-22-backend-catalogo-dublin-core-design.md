@@ -1,12 +1,12 @@
-# Backend + Catálogo Dublin Core — Design Spec (WIP)
+# Backend + Catálogo Dublin Core — Design Spec
 
-**Status:** WORK IN PROGRESS — brainstorming pausado dentro de Sección 4B (ficha larga).
+**Status:** ✅ BRAINSTORMING COMPLETO — listo para self-review + `superpowers:writing-plans`.
 **Fecha inicio:** 2026-08-22
-**Última sesión:** 2026-08-22 (cerrado 4A completo + 4B.1; pendiente desde 4B.2).
+**Última sesión:** 2026-08-23 (cerradas las 6 secciones; brainstorm terminal).
 **Owner:** Aldo
 **Contexto:** Librería Itinerante y Más (Monterrey). Amigo Roberto.
 
-> Este spec está incompleto. Al retomar, arrancar en **"Pregunta 4B.2 — CTA WhatsApp"** (ver marcador `RESUME AQUÍ` más abajo).
+> Spec cerrado. Próximo paso: spec self-review + invocar `superpowers:writing-plans` para el plan de implementación.
 
 ---
 
@@ -100,7 +100,7 @@ Supabase (un proyecto)
 **Piezas concretas:**
 1. Frontend runtime: vanilla JS ES modules. Único dep externo desde CDN (`https://esm.sh/@supabase/supabase-js@2`).
 2. Cliente Supabase con dos identidades: `anon` key (embebida, RLS `select`) + JWT admin (tras login, RLS `insert/update/delete` gated por `profile.role='admin'`).
-3. Firebase Hosting sigue como ingreso. Actualizar CSP: `connect-src https://*.supabase.co`, `img-src https://*.supabase.co`.
+3. Firebase Hosting sigue como ingreso. Actualizar CSP con subdominio exacto `<project-ref>.supabase.co` (detalle final en 5.2 c2 — decidido subdominio exacto, no wildcard).
 4. Migraciones SQL versionadas en `supabase/migrations/*.sql`, aplicadas con `supabase db push`.
 
 **Fuera de scope MVP (YAGNI):** framework frontend, bundler, CDN propio de imágenes, Algolia/Typesense, Redis, gateway de pagos, migración de hosting.
@@ -193,7 +193,7 @@ Supabase (un proyecto)
   - URL sincronizada con `?offset=48` cada nuevo batch (`replaceState`); permite restore de posición al volver desde `libro.html` re-hidratando hasta ese offset.
   - Botón flotante "Volver arriba" aparece después del scroll #2 para no atrapar al usuario.
 
-### Sección 4B/6 — `libro.html?slug=…` (ficha larga) 🔄 EN CURSO
+### Sección 4B/6 — `libro.html?slug=…` (ficha larga) ✅ APROBADA
 
 **4B.1 — Layout de la ficha** *(Opción A: "Substack largo" — una columna, hero centrado)* ✅
 - URL: `/libro.html?slug=2666-roberto-bolano` — slug humano fetched por `slug` a Supabase.
@@ -221,73 +221,353 @@ Supabase (un proyecto)
   - Layout gobernado por CSS grid template en un único contenedor padre.
   - Cambio a dos columnas = cambio de `grid-template-areas`, no de estructura.
 
-**4B.2 — CTA WhatsApp: payload, deep-link y tracking** ⏳ PENDIENTE (RESUME AQUÍ)
+**4B.2 — CTA WhatsApp: payload, deep-link y tracking** *(a2 + b3 + c2)* ✅
 
-Ver "RESUME AQUÍ" abajo para el detalle de la pregunta y las tres piezas propuestas (a — destino, b — plantilla, c — tracking).
-
-**4B.3+ — Pendientes tras 4B.2:**
-- Jerarquía DC metadata visible en la ficha (qué campos van en el header vs en la dl bibliográfica; cómo se muestran traductores/ilustradores sin ruido).
-- Estrategia de "relacionados" (¿por `subject` compartido? ¿por `editorial`? ¿por `shelf`? ¿combinación con score?).
-- Fallback si el `slug` no existe (404 vs redirect a catálogo con search preloaded).
-- Comportamiento del breadcrumb cuando el usuario llegó por link directo (sin origen `catalogo.html`).
-
----
-
-## 3. RESUME AQUÍ — Punto exacto donde retomar
-
-**Estado del checklist:**
-- ✅ Sección 4A/6 completa (esqueleto B, card compacta B, search instant A, facetas sidebar A + set MVP + P1 slider, infinite scroll A con URL offset).
-- 🔄 Sección 4B/6 en curso — cerrado 4B.1 (layout Opción A con contrato de migración a B).
-- ⏳ **Siguiente pregunta a responder: 4B.2 — CTA WhatsApp**.
-
-### Pregunta 4B.2 — CTA WhatsApp: payload, deep-link y tracking
-
-**a) Destino del deep-link**
-- **a1** — Número personal de Roberto (`wa.me/52818XXXXXXX`)
-- **a2** — WhatsApp Business con perfil de la librería (separa negocio/personal, habilita catálogo WA, respuestas rápidas, horarios)
-- **a3** — Ambos con toggle por libro en admin (YAGNI, MVP)
-
-**b) Plantilla del mensaje pre-cargado (`?text=`)**
-- **b1 — Conciso operativo:** `Hola, me interesa "2666" de Roberto Bolaño (Anagrama, $180). ¿Está disponible?`
-- **b2 — Curatorial cálido:** `Hola Roberto, vi "2666" en la librería. ¿Me cuentas más?`
-- **b3 — Estructurado con book_id embebido (trazabilidad):**
+- **a) Destino — a2:** WhatsApp Business con perfil de la librería.
+  - Técnicamente `wa.me/<numero>?text=<encoded>` — idéntico a un número personal; la diferencia es operativa (separa negocio/personal, habilita catálogo WA, respuestas rápidas, horarios).
+  - **Fallback operativo mientras Roberto no cree la cuenta Business:** número personal (a1) como constante en JS (`const WHATSAPP_NUMBER = '52818XXXXXXX'`). Flippeo posterior = cambiar la constante, sin refactor.
+- **b) Plantilla — b3:** estructurada con `Ref: LIB-<id>` embebido para trazabilidad.
   ```
   Hola, consulta desde el sitio:
-  • Libro: 2666 — Roberto Bolaño
-  • Editorial: Anagrama · $180 MXN
-  • Ref: LIB-2666-BOL
+  • Libro: {dc_title} — {creator}
+  • Editorial: {editorial} · ${price_mxn} MXN
+  • Ref: LIB-{book.id_short}
 
   ¿Está disponible?
   ```
+  - `id_short` = slug corto o hash estable del libro; correlaciona conversación WA con `book` concreto en `whatsapp_click` incluso sin analytics activo.
+  - Encoding: `encodeURIComponent` sobre el mensaje completo antes de concatenar al `?text=`.
+- **c) Tracking — c2:** `navigator.sendBeacon` con fallback `fetch(..., { keepalive: true })`.
+  - Patrón: onclick del CTA dispara `sendBeacon(<endpoint>, payload)` **antes** de que el navegador siga el `href`; el beacon garantiza envío incluso si el usuario abandona la pestaña.
+  - Payload: `{ book_id, price_shown, occurred_at, session_ref }`. Sin PII.
+  - Si `navigator.sendBeacon` no existe (viejos WebViews), fallback a `fetch(..., { keepalive: true, method: 'POST' })`.
+  - Endpoint: PostgREST insert directo sobre la tabla `whatsapp_click` (URL Supabase con `Prefer: return=minimal`), gated por RLS de 5.1 c1 (`insert using (true)` para `anon` + `select using (auth.jwt() ->> 'role' = 'admin')`). Migración a RPC dedicada (`log_whatsapp_click_rl` con rate limit servidor) documentada en 5.1 futuro-proofing.
 
-**c) Tracking a la tabla `whatsapp_click`**
-- **c1 — Fire-and-forget antes de abrir el link** (riesgo: pérdida en navegación cancelada).
-- **c2 — `navigator.sendBeacon`** (patrón exacto para este caso; fallback fetch keepalive).
-- **c3 — Sin tracking en MVP** (tabla existe en schema, no se pobla hasta fase 2).
+**Contrato de futuro-proofing 4B.2:**
+- Función pura `buildWhatsappHref(book) → string` — aisla concatenación del deep-link, testeable.
+- Función `trackWhatsappClick(book) → void` — encapsula `sendBeacon` + fallback.
+- Cambiar de a1 → a2 = cambio de constante.
+- Cambiar plantilla b3 → otra = cambio en `buildWhatsappHref`, sin tocar el CTA.
 
-**Recomendación combinada:** **a2 + b3 + c2**.
-- `a2` porque separa negocio/personal y habilita features WA Business (link técnico idéntico a `wa.me/<numero>?text=...`, la diferencia es operativa).
-- `b3` porque el `Ref: LIB-<id>` embebido correlaciona la conversación con el libro concreto sin ambigüedad.
-- `c2` porque `sendBeacon` es el API diseñado exactamente para "trackea antes de que el usuario se vaya"; ~3 líneas más y elimina un modo de fallo.
+**4B.3 — Jerarquía DC visible en la ficha** *(a3 + b2 + c locked)* ✅
 
-Si Roberto todavía no tiene WhatsApp Business, arrancamos con `a1` en config y flippeamos a `a2` cuando lo cree — es una constante en JS, no un cambio de arquitectura.
+- **a3 — Header adaptativo:** solo aparecen campos con valor no-default. Reglas de visibilidad:
+  - Título, autor principal, editorial, año → siempre.
+  - `dc_language` → solo si ≠ `'es'`.
+  - Traductor → solo si existe al menos un `book_creator` con `role='translator'`.
+  - Páginas / formato / medium → nunca en header (ver c).
+  - Encapsulado en helper `shouldShowInHeader(field, value, book) → boolean`.
+- **b2 — Autor principal en header + resto de contribuidores en `<dl>` con rol como `<dt>`:**
+  ```
+  Header: Roberto Bolaño
+
+  <dl>:
+    Autor: Roberto Bolaño         ← también aquí (redundancia intencional para completitud de ficha)
+    Traducción: Chris Andrews
+    Ilustración: Juan García
+    Prólogo: Ignacio Echevarría
+  ```
+  - Pluralización automática: `count > 1 ⇒ Traductores/Ilustradores/...`.
+  - Mapa de roles → labels: `{ author: 'Autor', translator: 'Traducción', illustrator: 'Ilustración', foreword: 'Prólogo', editor: 'Edición' }`.
+- **c — Campos SIEMPRE en `<dl>` (locked):**
+  - `book_identifier.*` (ISBN-10, ISBN-13, LCCN con `scheme` como sufijo `(ISBN-13)`).
+  - `dc_format`, `dcterms_medium`, `dc_rights`, `dcterms_extent` (páginas).
+  - Nunca duplicados en header.
+
+**Contrato de futuro-proofing 4B.3:**
+- `shouldShowInHeader(field, value, book)` — helper puro, tabla de reglas. Cambiar la regla no toca la plantilla.
+- `renderBibliographicDL(book)` — función pura que recibe `book` con creators/identifiers hidratados, devuelve el `<dl>`. Agregar campo DC nuevo = editar una función pura.
+- Mapa `ROLE_LABELS` extensible sin tocar plantilla.
+
+**4B.4 — Estrategia de "relacionados"** *(a4 + b1 + c1)* ✅
+
+- **a4 — Score combinado ponderado:**
+  `score = 3·count(subjects_compartidos) + 2·count(shelves_compartidos) + 1·(misma_editorial ? 1 : 0)`
+  - Excluye el libro actual.
+  - `ORDER BY score DESC, updated_at DESC` (tie-break).
+  - `LIMIT 8`.
+- **b1 — Fallback con novedades:**
+  Si `related.length < 6`, rellena con `SELECT * FROM book WHERE id NOT IN (related_ids ∪ current) ORDER BY created_at DESC LIMIT 6 - N`.
+  - Cliente renderiza cada resultado con `source: 'related' | 'fallback'` para diferenciar visualmente si se quiere.
+- **c1 — Cómputo en cada request:**
+  - RPC `get_related_books(book_id uuid, limit_n int)` en Supabase encapsula el score.
+  - `EXPLAIN ANALYZE` esperado < 20ms sobre índices normales para catálogo < 500 libros.
+  - Migración a view materializada (c2) = cambiar implementación del RPC, sin tocar cliente.
+
+**Contrato de futuro-proofing 4B.4:**
+- RPC `get_related_books` encapsula el score — cambio de estrategia (agregar señal, rebalanceo de pesos) = editar SQL del RPC.
+- Cliente recibe `[{ book_id, score, source }]` — permite diferenciación visual entre "relacionados por afinidad" y "novedades" cuando se quiera activar.
+
+**4B.5 — Fallbacks (slug 404 + breadcrumb sin origen)** *(a3 + b2)* ✅
+
+- **a3 — Página híbrida en `slug` inexistente:**
+  - `renderLibroPage(book | null)` — el mismo renderer maneja ambos estados. Si `book === null`:
+    - Header cambia a `<h1>No encontramos este libro</h1>` + subtítulo `"Este link puede estar desactualizado. Aquí hay algunas opciones."`
+    - Se skippean bloques sin data (curator_note, sinopsis, ficha DC, tags/estanterías).
+    - Bloque "relacionados" se rehidrata con:
+      1. Resultados del search del slug (`slug → q = slug.split('-').join(' ')`) — top 4 si existen.
+      2. Fallback (4B.4 b1): novedades hasta completar 8.
+    - URL se mantiene (`/libro.html?slug=<original>`) — el usuario puede compartir el link si quiere avisar del enlace muerto.
+- **b2 — Breadcrumb contextual con `sessionStorage.catalogRefUrl`:**
+  - En `catalogo.html`, el handler del click sobre una card ejecuta:
+    ```js
+    sessionStorage.setItem('catalogRefUrl', location.href);
+    ```
+    antes de navegar. `location.href` ya lleva las facetas + offset por 4A.3/4A.5.
+  - En `libro.html`, helper `getBreadcrumbTarget()`:
+    ```
+    const ref = sessionStorage.getItem('catalogRefUrl');
+    if (ref) return { label: '← Volver a resultados', href: ref };
+    return { label: '← Explorar catálogo', href: '/catalogo.html' };
+    ```
+  - No dependemos de `document.referrer` — Instagram y WhatsApp lo destruyen.
+
+**Contrato de futuro-proofing 4B.5:**
+- `renderLibroPage(book | null)` — el `null` branch es 4 líneas de guard clauses, no una plantilla paralela.
+- `getBreadcrumbTarget()` — helper puro, cambiar estrategia de crumb (agregar 3er case, cambiar labels) = editar función.
+- Escritura de `sessionStorage.catalogRefUrl` en `catalogo.html`, lectura en `libro.html` — separación limpia.
+
+**Sección 4B completa.** ✅
+
+### Sección 4C/6 — Home `#galeria` hidratada ✅ APROBADA
+
+**4C.1 — Fuente de contenido, comportamiento de chips/search y fallback** *(a3 + b3 + c1)* ✅
+
+Contexto: `#galeria` ya existe en `index.html:2509` con header, discovery console (search `#bookSearch` + 7 chips: Poesía · Narrativa · Ensayo · Historia · Arte · Infantil), `#bookGrid` con `.book-image-overlay` (obligatorio por `CONTEXT.md:15` en showcase), empty state y CTA Instagram. Hoy se hidrata desde array JS estático `BOOKS`.
+
+- **a3 — Destacados + fallback a novedades:**
+  - Roberto marca en admin qué shelf es la vitrina (`shelf.slug = 'home_featured'`).
+  - Query: `select * from book where id in (select book_id from book_shelf where shelf_id = <home_featured_id>) order by book_shelf.order limit 12`.
+  - Si `count < 12`, rellena con `select * from book order by created_at desc limit (12 - N)` excluyendo duplicados.
+  - MVP: mezcla natural sin separador visual. Futura separación (header divisorio, `data-source` en card) = cambio local.
+- **b3 — Chips filtran local, search redirige:**
+  - Los 7 chips existentes (categorías canónicas del showcase) filtran los 12 libros cargados in-place; interacción instantánea, cero refetch.
+  - Si un chip da `count === 0` local, cae progresivamente a `location.assign('/catalogo.html?subject=<slug>')` con feedback ("No hay en la vitrina — llevándote al catálogo completo").
+  - El input `#bookSearch` NO filtra local — al `Enter` o al debounce redirige a `/catalogo.html?q=<text>` (respeta separación showcase/transactional de 4A).
+- **c1 — Fallback silencioso a novedades:**
+  - Si la query del shelf falla o retorna 0, swap invisible a `ORDER BY created_at DESC LIMIT 12`. Log a `console.warn` para diagnóstico.
+  - Empty state visible (`c2`) o hide-and-collapse (`c3`) se reservan para el caso patológico "Supabase caído completo" — no para esta sección.
+
+**Contrato de futuro-proofing 4C.1:**
+- `loadGaleriaBooks() → Promise<Book[]>` encapsula fetch shelf + fallback novedades. Cambiar a mezcla explícita o rotación (a4) = editar función, no plantilla.
+- `hydrateBookCard(book, { showOverlay: true })` con flag explícito para Book Image Overlay completo (`true` en `#galeria`, `false` en `catalogo.html` que usa overlay compacto). Un solo renderer, dos comportamientos.
+- Handlers `handleGaleriaFilter(chip)` y `handleGaleriaSearch(text)` separados — cambiar cualquier estrategia b1/b2/b3 = editar handler.
+
+**Migración:** al hidratar `#galeria` desde Supabase, el markup hardcoded del grid + array `BOOKS` se preservan tras el flag `BACKEND_FLAGS.galeria` (definido en 6.2 b1); se eliminan en commit post-verificación (paso 10 del orden de commits en 6.2). El flag es kill-switch de rollback, no capa persistente.
+
+**4C.2 — Book Image Overlay + click behavior** *(a2 + b3 + c1)* ✅
+
+- **a2 — Mapeo DC → slots del overlay usando `curator_note` como mood:**
+  ```
+  .book-genre       ← primer subject.name (fallback dc_type si no hay subjects)
+  .book-availability← stock.available ? "Disponible" : "Agotado" (+ condición si aplica)
+  .book-mood        ← curator_note truncado con CSS -webkit-line-clamp: 2
+  .book-tags        ← subject.name[1..3] (después del primero que va al genre)
+  .book-card-cta    ← buildWhatsappHref(book) [4B.2]
+  ```
+  - Un solo campo curatorial (`curator_note`) sirve overlay + ficha. Roberto no llena dos veces.
+  - Si más adelante quiere versión específica para overlay, se agrega columna `curator_hook` sin migrar nada.
+- **b3 — Lightbox como preview + CTA "Ver ficha completa":**
+  - Click en card ejecuta `openLightbox(book.id)` — misma UX de hoy.
+  - Lightbox se rehace internamente para consumir `renderLibroPage(book, { mode: 'compact' })`.
+    - Modo `compact` skippea: relacionados (4B.4), ficha DC completa (4B.3 `<dl>` técnica), breadcrumb (4B.5).
+    - Modo `compact` mantiene: portada, header adaptativo (4B.3 a3), curator_note completo, sinopsis truncada (~2 párrafos), CTA WhatsApp, botón "Ver ficha completa" → `libro.html?slug=<slug>`.
+  - Modo `full` es `libro.html`. Un renderer, dos modos.
+- **c1 — CTA WhatsApp en overlay como hoy:**
+  - Bottom del overlay, `event.stopPropagation()` para no disparar el lightbox al hacer click.
+  - `CONTEXT.md:9` lo tiene explícito en el contrato del overlay showcase.
+
+**Contrato de futuro-proofing 4C.2:**
+- `renderLibroPage(book, { mode: 'full' | 'compact' })` — modo `compact` es el lightbox in-page, modo `full` es `libro.html`. Divergencia entre lightbox y ficha = imposible por construcción.
+- `hydrateBookCard(book, { showOverlay: true, overlaySource: 'curator_note' | 'curator_hook' })` — flag `overlaySource` deja abierta la migración futura al campo dedicado `curator_hook` (mencionado en 4C.2 a2) si Roberto lo pide.
+- Truncado del `curator_note` en overlay: CSS `-webkit-line-clamp: 2` + `overflow: hidden` — sin lógica JS.
+
+**Sección 4C completa.** ✅ **Sección 4/6 completa** (4A + 4B + 4C). ✅
+
+### Sección 5/6 — Auth, seguridad y RLS policies ✅ APROBADA
+
+**5.1 — RLS policies del schema** *(a2 + b1 + c1)* ✅
+
+Supabase expone Postgres vía PostgREST. La `anon key` va embebida en el JS del cliente — la seguridad real vive en las policies. RLS habilitado en TODAS las tablas de la migración inicial (`alter table X enable row level security`); sin esto, PostgREST expone todo.
+
+- **a2 — Lectura pública restringida:**
+  - `select using (true)` para `anon` en: `book`, `editorial`, `person`, `subject`, `stock`.
+  - Tablas de join (`book_creator`, `book_subject`, `book_shelf`, `book_identifier`) también con `select using (true)` para `anon` — necesarias para foreign key resolution en `select book, book_creator(*), person(*)` desde el cliente. La restricción real es que no exponen datos privados; son solo M-N sobre tablas ya públicas.
+  - `shelf` con `select using (true)` (Roberto los quiere visibles como discovery).
+  - Denegadas para `anon`: `whatsapp_click` (write-only vía c1), `profile`, `auth.users`.
+- **b1 — Admin gate por JWT claim `role`:**
+  - `profile(user_id, email, role)` — `role` es enum `'admin' | 'editorial' | 'reader'`.
+  - Trigger `on_auth_user_created` (sobre `auth.users`) inserta perfil si email está en `admin_allowlist` (tabla o constante SQL) con `role='admin'`; caso contrario, sin insert (usuario no autenticable como admin).
+  - `access_token_claims` copia `profile.role` al JWT como claim `role`.
+  - Policies de escritura: `using (auth.jwt() ->> 'role' = 'admin') with check (auth.jwt() ->> 'role' = 'admin')` en `book`, `editorial`, `person`, `subject`, `shelf`, `stock`, todas las join tables.
+  - Fase 2 puede añadir `role='editorial'` con `role in ('admin', 'editorial')` sin cambiar patrón.
+- **c1 — `whatsapp_click` write-only para anon:**
+  - `insert using (true) with check (…)` para `anon` (el `with check` valida shape del payload: `book_id`, `occurred_at`, sin campos raros).
+  - `select using (auth.jwt() ->> 'role' = 'admin')` — solo admin ve los logs.
+  - Rate limiting: Supabase edge built-in (per-IP). Tabla propia (c2) queda como YAGNI hasta ver abuso real.
+
+**Contrato de futuro-proofing 5.1:**
+- Cada tabla tiene bloque `-- rls` explícito en `supabase/migrations/0001_schema.sql`. Cambiar postura = migración incremental.
+- `admin_allowlist` como tabla en vez de constante SQL — agregar admin = insert row, sin migración.
+- JWT claim `role` extensible; nuevas roles = editar policies con `role in (…)` sin cambiar cliente.
+
+**Test de seguridad obligatorio:** `tests/rls.test.mjs` valida:
+1. Cliente `anon` NO puede insertar en `book`.
+2. Cliente `anon` NO puede leer `whatsapp_click`.
+3. Cliente `anon` NO puede leer `profile` ni `auth.users`.
+4. Cliente logueado como admin (Roberto) SÍ puede escribir en `book`.
+5. Cliente `anon` SÍ puede insertar en `whatsapp_click` con payload válido, NO con payload malformado.
+
+**5.2 — Storage bucket (`book-covers/`) + CSP + placeholders** *(a1 + b1 + c2)* ✅
+
+- **a1 — Storage bucket público:**
+  - Bucket `book-covers/` con `public = true`. URL predecible: `https://<project-ref>.supabase.co/storage/v1/object/public/book-covers/<book_id>.webp`.
+  - RLS del bucket: `select using (true)` para todos; `insert/update/delete using (auth.jwt() ->> 'role' = 'admin')`.
+  - Admin sube desde `admin.html` vía `supabase.storage.from('book-covers').upload(...)`. Cliente público lee URL directa (cero llamadas a Storage API en render).
+  - Formato canónico: WebP redimensionado a ≤1200px en cliente antes del upload (helper del admin ya definido en Sección 3).
+- **b1 — SVG placeholder local con iniciales:**
+  - Reusa patrón `.book-placeholder` de `index.html:1726` (ya existente para el catálogo hardcoded).
+  - `renderPlaceholder(book)` devuelve `HTMLElement` con iniciales del título sobre fondo brand — reusable en `#galeria`, `catalogo.html` y `libro.html` (modo compact del lightbox también).
+  - Sin bloqueo de publicación: contador en admin ("N libros sin portada") como recordatorio social.
+- **c2 — CSP con subdominio exacto:**
+  ```
+  connect-src https://firestore.googleapis.com https://<project-ref>.supabase.co;
+  img-src    'self' data: blob: https://<project-ref>.supabase.co;
+  ```
+  - Firestore se mantiene por el boletín (`5f12f36`).
+  - `<project-ref>` documentado en `CONTEXT.md` como parte del setup del proyecto.
+
+**Contrato de futuro-proofing 5.2:**
+- `getCoverUrl(book) → string` — encapsula resolución. Maneja tres casos: (1) `storage_key` → URL de Supabase; (2) `local_asset_path` → legacy `/images/**`; (3) ninguno → devuelve `null` (renderer decide placeholder). Migrar de Supabase a CDN propio = editar función.
+- `renderPlaceholder(book)` como componente único — cambiar estética o agregar CTA (b2) = editar función.
+- CSP en un solo `<meta>`; cuando aparezcan preview branches (Sección 6), promover a c3 con env-based build.
+
+**Migración de imágenes actuales:** las de `/images/**` no se migran ahora. `getCoverUrl` sirve legacy vs Supabase transparente. Backfill (subir portadas actuales al bucket, poblar `storage_key`, borrar `local_asset_path`) = tarea explícita de Sección 6.
+
+**5.3 — Sesión admin + rotación de anon key + rate limiting** *(a1 + b2 + c3)* ✅
+
+- **a1 — `localStorage` con `persistSession: true`:**
+  - `createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage } })`.
+  - Roberto no re-loguea mientras no cierre sesión explícitamente; auto-refresh transparente del `access_token`.
+  - Vector XSS mitigado por CSP hardening incluido en este mismo commit (ver más abajo).
+- **b2 — Constante en JS + runbook en `CONTEXT.md`:**
+  - `const SUPABASE_ANON_KEY = 'eyJ…';` en `assets/js/supabase-client.js`; git history documenta rotaciones.
+  - Runbook en `CONTEXT.md` sección "Operations / Rotate Supabase anon key":
+    1. Supabase dashboard → Project Settings → API → Reset anon key.
+    2. Copiar nueva key.
+    3. Editar `assets/js/supabase-client.js` con la nueva key.
+    4. Commit con mensaje `chore(security): rotate Supabase anon key`.
+    5. Deploy Firebase Hosting (`firebase deploy --only hosting`).
+    6. Verificar `/catalogo.html` carga libros; `/admin.html` login funciona.
+- **c3 — Throttling client-side + built-in Supabase:**
+  - Search catálogo: debounce 250ms ya definido en 4A.3.
+  - WhatsApp CTA: `throttleWhatsappClick(book)` — helper que gate el `sendBeacon` de 4B.2 c2 a max 1 request por `book.id` por 60s (usa `Map<book_id, timestamp>` en memoria).
+  - Login attempts: Supabase edge built-in cubre el caso.
+
+**Hardening que va con este commit:**
+- CSP: eliminar `'unsafe-inline'` de `script-src`; migrar handlers `onclick=` inline a `addEventListener` (refactor incremental — impacto mínimo si algunos handlers inline persisten temporalmente, pero cerrar el vector es prioridad).
+- CSP: agregar `frame-ancestors 'none'` (anti-clickjacking, especialmente para `admin.html`).
+- Admin: logout button visible en el header; `supabase.auth.signOut()` limpia `localStorage` y redirige a login.
+
+**Contrato de futuro-proofing 5.3:**
+- Cambiar a `sessionStorage` = editar una línea del `createClient`.
+- Migración a HttpOnly cookies requiere backend proxy (fase 2+); arquitectura lista para el swap.
+- Rate limit servidor (c2) = agregar RPC `log_whatsapp_click_rl` + adaptar `throttleWhatsappClick` para awaitear el RPC en vez de gate local.
+- Rotación de anon key documentada = onboarding de un tercer dev es un `git blame` al runbook.
+
+**Sección 5 completa.** ✅
+
+### Sección 6/6 — Testing, deploy, migración desde el estado actual ✅ APROBADA
+
+**6.1 — Testing: Harness expansion + RLS suite + seed inicial** *(a2 + b1 + c1)* ✅
+
+- **a2 — Un file por página + helpers compartidos:**
+  - `tests/site.test.mjs` — sigue cubriendo `index.html`.
+  - `tests/catalogo.test.mjs`, `tests/libro.test.mjs`, `tests/admin.test.mjs` — cada uno para su superficie.
+  - `tests/helpers.mjs` — helpers reusables: `normalize(text)`, `readHtml(name)`, `cssRuleBlock(selector, html)`, `assertMotionBudget(selector, maxMs, html)`, `localAssetValues(html)`.
+- **b1 — `tests/rls.test.mjs` contra Supabase local:**
+  - Requiere `supabase start` (Docker + supabase-cli).
+  - Cubre 8 asserts en total:
+    - Los 5 de 5.1: `anon` no puede insertar en `book`, no puede leer `whatsapp_click`, no puede leer `profile`/`auth.users`; admin sí escribe en `book`; `anon` sí inserta en `whatsapp_click` con payload válido pero no con malformado.
+    - 3 de 5.2: `anon` no puede escribir en `book-covers/`; admin sí; público sí puede leer objetos del bucket.
+  - Test suite hace `test.skip` con warning si Supabase local no está corriendo — no rompe dev que olvida levantarlo.
+- **c1 — SQL seed `supabase/seed/001_bootstrap.sql`:**
+  - Insert de admins en `admin_allowlist` (Roberto + Aldo).
+  - ~10 libros representativos con editoriales/personas/subjects/identifiers/stock/curator_note.
+  - Un shelf `home_featured` con los primeros 6 libros (`book_shelf` con `order`).
+  - Un shelf secundario "Recomendados" con 4 libros solapando con `home_featured`.
+  - Portadas placeholder (`storage_key` NULL → placeholder de b1 de 5.2).
+  - Aplicado por `supabase db reset`; reproducible.
+
+**Contrato de futuro-proofing 6.1:**
+- `tests/helpers.mjs` es el único lugar de utilidades del harness — cada suite importa desde ahí.
+- Fase 2 puede agregar `002_realdata.sql` cuando Roberto tenga inventario real, sin tocar 001.
+- Cuando aparezca CSV import (Roberto pide bulk load), se crea `tools/import-csv.mjs` como herramienta separada — NO se contamina el seed.
+- Si más adelante se agrega CI real (GitHub Actions), reusa el mismo `supabase start` en un step.
+
+**Requisito operativo:** `README.md` documenta:
+1. `brew install supabase/tap/supabase` (o binarios equivalentes por plataforma).
+2. `supabase start` — bootstrap local (Docker debe estar corriendo).
+3. `supabase db reset` — aplica migraciones + seed.
+4. `npm test` corre todo el harness.
+
+**6.2 — Rollout + limpieza de V2 experimental** *(a1 + b1 + c3)* ✅
+
+- **a1 — Limpieza primero (commit único), backend después:**
+  - Tanda 1: `chore(cleanup): borrar experimento V2 (src/, dist/, vite.config.js, tools/copy-assets.mjs, package-lock.json, tests/setup.js)`. Deploy sin cambio funcional.
+  - Tanda 2: commits del backend Supabase (secuencia abajo).
+  - Aisla dos cambios conceptualmente distintos; `git blame` limpio.
+- **b1 — `BACKEND_FLAGS` por página en `assets/js/config.js`:**
+  ```js
+  export const BACKEND_FLAGS = {
+    galeria:  'supabase',  // 'supabase' | 'static'
+    catalogo: 'supabase',
+    libro:    'supabase',
+    admin:    'supabase',
+  };
+  ```
+  - Rollback granular en 30s: edit constante + `firebase deploy --only hosting`.
+  - `catalogo.html`, `libro.html`, `admin.html` no tienen fallback `'static'` real (son páginas nuevas) — el flag `'static'` para esas páginas significa "renderizar mensaje de mantenimiento con CTA WhatsApp" (fallback c3 aplicado).
+  - Array `BOOKS` legacy + markup hardcoded del `#galeria` se mantienen hasta commit post-verificación (2 semanas).
+- **c3 — Híbrido de manejo de fallo runtime:**
+  - **Lecturas públicas** (`galeria`, `catalogo`, `libro`): fail silencioso — cae a fallbacks UX ya diseñados en el spec (empty state en `#galeria` y `catalogo.html`; 4B.5 a3 en `libro.html`). Log a `console.warn`.
+  - **Escrituras** (`admin.html` guardando libro, `sendBeacon` de `whatsapp_click`): fail visible — toast de error con botón "Reintentar". Para `sendBeacon` el fallo es silente por diseño del API; el toast solo aplica al save del admin.
+
+**Contrato de futuro-proofing 6.2:**
+- `BACKEND_FLAGS` centralizado; agregar consumidor nuevo = agregar entrada.
+- Wrapper `supabaseCall(operation, { silentFail = false, fallback = null })` centraliza error handling — cambio de política = editar wrapper.
+- Runbook de rollback en `CONTEXT.md` sección "Operations / Rollback backend consumer": edit `BACKEND_FLAGS.<page> = 'static'` → `firebase deploy --only hosting` → verificar degradación.
+
+**Orden concreto de commits (plan de implementación):**
+
+1. `chore(cleanup): borrar experimento V2 no committeado`.
+2. `feat(backend): schema Dublin Core + migraciones + RLS + seed`.
+3. `feat(backend): supabase client + BACKEND_FLAGS + supabaseCall wrapper`.
+4. `feat(admin): admin.html con auth + editor de libro + storage upload`.
+5. `feat(catalogo): catalogo.html con search + facetas + infinite scroll`.
+6. `feat(libro): libro.html con ficha DC + CTA + relacionados`.
+7. `feat(galeria): hidratación desde Supabase con flag`.
+8. `feat(security): CSP hardening (unsafe-inline out, frame-ancestors, project-ref)`.
+9. `docs: CONTEXT.md — Dublin Core note + runbooks (rotación key, rollback)`.
+10. Post-verificación 2 semanas: `chore(cleanup): eliminar array BOOKS legacy + markup hardcoded del galeria`.
+
+**Sección 6 completa.** ✅ **Sección 6/6 completa** — brainstorming terminal. ✅
 
 ---
 
-### Secciones aún pendientes tras cerrar 4B completa
+## 3. Brainstorming completo — próximos pasos
 
-- [ ] **Sección 4C/6 — Home `#galeria` hidratada**
-  Cómo el `#galeria` actual del `index.html` consume Supabase respetando el Book Image Overlay obligatorio (que sí aplica aquí por ser showcase). Preview de estanterías destacadas vs new arrivals vs random. Fallback si hay 0 libros en el shelf destacado.
+**Estado del checklist:**
+- ✅ Sección 4/6 completa (4A catálogo + 4B ficha + 4C galería).
+- ✅ Sección 5/6 completa (5.1 RLS + 5.2 Storage/CSP + 5.3 sesión/anon/rate + hardening CSP).
+- ✅ Sección 6/6 completa (6.1 testing + 6.2 rollout/limpieza).
 
-- [ ] **Sección 5/6 — Auth, seguridad y RLS policies**
-  Políticas RLS por tabla (`anon` select público donde aplique, admin escritura). CSP updates. Rotación de anon key. Rate limiting (Supabase built-in). Manejo de sesión admin. Storage bucket policies para book-covers.
+**Todas las decisiones cerradas.** El body del spec (Sección 2) tiene cada decisión aprobada con su contrato de futuro-proofing. El orden de commits del plan de implementación vive en 6.2.
 
-- [ ] **Sección 6/6 — Testing, deploy, migración desde el estado actual**
-  Tests Harness (`tests/site.test.mjs`) actualizados para las nuevas páginas. Cómo poblamos data inicial (seed script con ~10 libros de muestra de las editoriales actuales). Estrategia de migración incremental: página por página, con feature flag simple (constante en JS) para colgar/descolgar cada consumidor de Supabase durante rollout. Cómo se maneja el borrado de `src/`, `dist/`, `vite.config.js` de V2 (unificación V1) — commit separado antes o después del backend.
-
-**Terminal state del brainstorming:** invocar `superpowers:writing-plans` para plan de implementación detallado, únicamente después de que el usuario apruebe el spec completo.
-
----
+**Próximos pasos operativos:**
+1. **Spec self-review** — releer el spec buscando inconsistencias entre secciones (nombres de funciones, referencias cruzadas, decisiones que se contradicen entre sí). Renombrar el archivo removiendo el sufijo `(WIP)`.
+2. **User review** — Aldo lee y aprueba/rechaza cambios finales.
+3. **Transition** — invocar `superpowers:writing-plans` para el plan de implementación paso-a-paso basado en la secuencia de 10 commits documentada en 6.2.
 
 ## 4. Estado del checklist del skill brainstorming
 
@@ -295,8 +575,8 @@ Si Roberto todavía no tiene WhatsApp Business, arrancamos con `a1` en config y 
 - [x] 2. Offer visual companion (aceptado)
 - [x] 3. Ask clarifying questions (4 preguntas cerradas — alcance, admin, social, discovery)
 - [x] 4. Propose 2-3 approaches (elegido Approach 1)
-- [~] 5. Present design — Secciones 1, 2, 3, 4A aprobadas; 4B en curso; 4C, 5, 6 pendientes
-- [ ] 6. Write design doc final (este archivo es WIP; renombrar/consolidar cuando esté completo)
-- [ ] 7. Spec self-review
+- [x] 5. Present design — Secciones 1–6 completas y aprobadas.
+- [x] 6. Write design doc final (nombre limpio sin WIP; body como fuente única).
+- [x] 7. Spec self-review (2026-08-23 — 7 inconsistencias corregidas: headers 5/6 y 6/6 marcados APROBADA; CSP en Sección 2 alineado con 5.2 c2; `GALERIA_SOURCE` reemplazado por `BACKEND_FLAGS.galeria`; `mood_text` reemplazado por `curator_hook`; endpoint de `sendBeacon` clarificado como PostgREST directo; separador duplicado removido).
 - [ ] 8. User reviews written spec
 - [ ] 9. Transition to writing-plans
