@@ -1,0 +1,106 @@
+{
+  "connector": "tools",
+  "location": "us-central1",
+  "service": "itinerante-service",
+  "tools": [
+    {
+      "name": "SearchBooks",
+      "type": "query",
+      "description": "Recuperacion semantica principal para Iti IA.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "description": "Texto libre que describe lo que la persona desea leer.",
+            "type": "string"
+          },
+          "categorySlug": {
+            "description": "Categoria canonica por slug; omitir para buscar en todas.",
+            "type": "string"
+          },
+          "subgenreSlug": {
+            "description": "Subgenero canonico por slug; omitir para buscar en todos.",
+            "type": "string"
+          },
+          "mood": {
+            "description": "Estado de animo exacto permitido; omitir para buscar en todos.",
+            "type": "string"
+          },
+          "maxPriceMxnCents": {
+            "description": "Precio maximo expresado en centavos MXN; omitir si no hay presupuesto.",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Numero maximo de candidatos que puede recuperar el agente.",
+            "type": "integer",
+            "default": 8
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "GetBookBySlug",
+      "type": "query",
+      "description": "Recuperacion exacta para confirmar una ficha antes de recomendarla.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "description": "Slug exacto obtenido previamente de SearchBooks o FilterBooks.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ]
+      }
+    },
+    {
+      "name": "FilterBooks",
+      "type": "query",
+      "description": "Filtros estructurados cuando la consulta ya incluye criterios concretos.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "categorySlugs": {
+            "description": "Categorias canonicas aceptables; omitir para incluir todas.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "subgenreSlugs": {
+            "description": "Subgeneros canonicos aceptables; omitir para incluir todos.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "moods": {
+            "description": "Estados de animo exactos aceptables; omitir para incluir todos.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "minPriceMxnCents": {
+            "description": "Precio minimo expresado en centavos MXN.",
+            "type": "integer"
+          },
+          "maxPriceMxnCents": {
+            "description": "Precio maximo expresado en centavos MXN.",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Numero maximo de candidatos que puede recuperar el agente.",
+            "type": "integer",
+            "default": 15
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "source_url": "https://www.kaggle.com/datasets/danielalbarracinm/books-with-isbn-of-different-genres",
+  "retrieved_on": "2026-09-04",
+  "csv_bytes": 23127876,
+  "csv_sha256": "b1566fd93b69ebaef29a1dcaab1173384d5fd36a939c353f22d44611d4e7b6b6",
+  "rows": 31284,
+  "columns": [
+    "title",
+    "description",
+    "gender",
+    "num_pages",
+    "editorial",
+    "isbn",
+    "year_edition",
+    "date_edition",
+    "writer",
+    "image"
+  ],
+  "missing_by_column": {
+    "title": 4,
+    "description": 8087,
+    "gender": 58,
+    "num_pages": 0,
+    "editorial": 15977,
+    "isbn": 38,
+    "year_edition": 0,
+    "date_edition": 18161,
+    "writer": 22134,
+    "image": 38
+  },
+  "exact_duplicate_excess": 5636,
+  "title_author_duplicate_excess": 7312,
+  "isbn_duplicate_excess": 5645,
+  "valid_isbn_rows": 31011,
+  "invalid_isbn_examples": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "repeated_description_excess": 5153,
+  "description_under_80_chars": 9050,
+  "genres": {
+    "Narrativa fantástica": 9671,
+    "Narrativa de ciencia ficción": 8073,
+    "Narrativa de viajes": 7216,
+    "Narrativa de terror": 3484,
+    "Narrativa de humor": 2761,
+    "nan": 58,
+    "Literatura en ingles": 8,
+    "Literatura en francés": 4,
+    "Narrativa extranjera hasta el siglo XVIII": 3,
+    "Cuentos populares": 2,
+    "Terror en bolsillo": 1,
+    "Literatura 10 a 12 años": 1,
+    "Historia de los países de África": 1,
+    "Fantasía y magia": 1
+  },
+  "topic_counts_by_source_genre": {
+    "poesia": 0,
+    "psicologia": 0,
+    "filosofia": 0
+  },
+  "topic_examples": {
+    "poesia": [],
+    "psicologia": [],
+    "filosofia": []
+  },
+  "seed_author_counts": {
+    "Juan Rulfo": 0,
+    "Octavio Paz": 0,
+    "Rosario Castellanos": 0,
+    "Elena Poniatowska": 0,
+    "Carlos Fuentes": 0,
+    "Sor Juana": 0,
+    "Amado Nervo": 1,
+    "Jaime Sabines": 0,
+    "José Emilio Pacheco": 0,
+    "Elena Garro": 0,
+    "Alfonso Reyes": 0,
+    "Valeria Luiselli": 0,
+    "Fernanda Melchor": 0
+  },
+  "seed_author_examples": {
+    "Amado Nervo": [
+      {
+        "title": "EL EXODO Y LAS FLORES DEL CAMINO",
+        "writer": "Amado Nervo",
+        "isbn": "9788494728396",
+        "gender": "Narrativa de viajes"
+      }
+    ]
+  },
+  "limitations": [
+    "Author seeds are a coverage probe, not a complete nationality classification.",
+    "Title-author duplicates may be distinct editions; never delete solely on this key.",
+    "A valid ISBN checksum does not verify correspondence with the book.",
+    "Genre and description values have not received full editorial verification.",
+    "Bibliographic records provide no evidence of Itinerante stock or price."
+  ]
+}

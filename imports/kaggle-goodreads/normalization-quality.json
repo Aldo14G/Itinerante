@@ -1,0 +1,396 @@
+{
+  "records": 84,
+  "languages": {
+    "en": 5,
+    "es": 77,
+    "mul": 2
+  },
+  "reviewStatusCounts": {
+    "candidate": 82,
+    "quarantined": 2
+  },
+  "recordsWithEditorialEvidence": 13,
+  "validIsbn13": 80,
+  "validIsbn10": 0,
+  "missingDescription": 2,
+  "issueCounts": {
+    "contributor-edition-unverified": 1,
+    "contributor-role-unresolved": 3,
+    "contributors-truncated": 1,
+    "controlled-theatre-term-missing": 1,
+    "description-missing": 2,
+    "edition-identity-conflict": 2,
+    "edition-pagination-conflict": 2,
+    "edition-publisher-conflict": 1,
+    "isbn-invalid-or-missing": 4,
+    "philosophy-fiction-overlap": 14,
+    "poetry-theatre-overlap": 3,
+    "poetry-topic-versus-form": 1,
+    "psychology-scope-unreviewed": 8,
+    "subjects-unmapped": 1
+  },
+  "subjectProposalCounts": {
+    "biografia-memoria": 9,
+    "cuento": 17,
+    "ensayo-literario": 2,
+    "filosofia": 33,
+    "habitos-desarrollo": 7,
+    "novela": 26,
+    "poesia": 41,
+    "psicologia": 8
+  },
+  "unmappedLabelCounts": {
+    "Spanish Literature": 51,
+    "Classics": 41,
+    "Fiction": 41,
+    "Literature": 38,
+    "Nonfiction": 28,
+    "Latin American": 24,
+    "Latin American Literature": 19,
+    "20th Century": 18,
+    "Spain": 17,
+    "School": 15,
+    "Womens": 9,
+    "Essays": 9,
+    "Historical Fiction": 8,
+    "History": 7,
+    "Romance": 7,
+    "Politics": 7,
+    "Spirituality": 6,
+    "Fantasy": 6,
+    "Drama": 6,
+    "Read For School": 5,
+    "Magical Realism": 5,
+    "Sociology": 5,
+    "Art": 4,
+    "Historical": 4,
+    "Nobel Prize": 4,
+    "Biography Memoir": 4,
+    "Contemporary": 4,
+    "Theory": 4,
+    "LGBT": 4,
+    "Queer": 4,
+    "Italian Literature": 3,
+    "Childrens": 3,
+    "Literary Fiction": 3,
+    "Unfinished": 3,
+    "Young Adult": 3,
+    "Feminism": 3,
+    "Horror": 3,
+    "Love": 2,
+    "Roman": 2,
+    "Writing": 2,
+    "Language": 2,
+    "Religion": 2,
+    "Cultural": 2,
+    "Society": 2,
+    "Audiobook": 2,
+    "College": 2,
+    "American": 2,
+    "Mystery": 2,
+    "France": 2,
+    "Portuguese Literature": 2,
+    "Portugal": 2,
+    "Plays": 2,
+    "Theatre": 2,
+    "Adult": 1,
+    "Science": 1,
+    "Biology": 1,
+    "Neuroscience": 1,
+    "Health": 1,
+    "Metaphysics": 1,
+    "Surreal": 1,
+    "Education": 1,
+    "German Literature": 1,
+    "Coming Of Age": 1,
+    "Anarchism": 1,
+    "Romanian Literature": 1,
+    "Romania": 1,
+    "Business": 1,
+    "Leadership": 1,
+    "Economics": 1,
+    "Political Science": 1,
+    "Graphic Novels": 1,
+    "Poetry Plays": 1,
+    "Relationships": 1,
+    "Boys Love": 1,
+    "European Literature": 1,
+    "Irish Literature": 1,
+    "Adolescence": 1,
+    "Academic": 1,
+    "Technology": 1,
+    "Internet": 1,
+    "Anthropology": 1,
+    "Books About Books": 1,
+    "Criticism": 1,
+    "Crafts": 1,
+    "Inspirational": 1,
+    "Brazil": 1,
+    "War": 1,
+    "Photography": 1,
+    "Mental Illness": 1,
+    "Italy": 1,
+    "Art History": 1,
+    "Thriller": 1,
+    "Medieval": 1,
+    "Epic": 1,
+    "Erotica": 1,
+    "French Literature": 1,
+    "18th Century": 1,
+    "BDSM": 1,
+    "19th Century": 1,
+    "Romanticism": 1,
+    "Death": 1
+  },
+  "reviewQueue": [
+    {
+      "id": "goodreads-10602457",
+      "title": "Arte poética",
+      "issues": [
+        "contributor-role-unresolved",
+        "description-missing",
+        "edition-pagination-conflict"
+      ]
+    },
+    {
+      "id": "goodreads-10802241",
+      "title": "DMT: La molecula del espiritu",
+      "issues": [
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-112646",
+      "title": "Ética para Amador",
+      "issues": [
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-1212537",
+      "title": "Los niños de Sukhavati",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-13041",
+      "title": "Demian / Siddhartha",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-1374111",
+      "title": "Cuentos para pensar",
+      "issues": [
+        "philosophy-fiction-overlap",
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-144919",
+      "title": "Abel Sánchez",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-1827646",
+      "title": "Antología Poética de la Generación del 27",
+      "issues": [
+        "contributor-role-unresolved",
+        "contributors-truncated"
+      ]
+    },
+    {
+      "id": "goodreads-18586193",
+      "title": "La noche de San Juan",
+      "issues": [
+        "edition-identity-conflict",
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-19049001",
+      "title": "El fin del poder",
+      "issues": [
+        "edition-identity-conflict"
+      ]
+    },
+    {
+      "id": "goodreads-237815",
+      "title": "Poema del Cante Jondo / Romancero Gitano",
+      "issues": [
+        "edition-pagination-conflict"
+      ]
+    },
+    {
+      "id": "goodreads-25623",
+      "title": "Amarse con los ojos abiertos",
+      "issues": [
+        "edition-publisher-conflict",
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-276859",
+      "title": "El árbol de la ciencia",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-28238538",
+      "title": "El chico de las estrellas",
+      "issues": [
+        "isbn-invalid-or-missing",
+        "poetry-theatre-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-323455",
+      "title": "De Profundis",
+      "issues": [
+        "contributor-edition-unverified",
+        "contributor-role-unresolved",
+        "isbn-invalid-or-missing"
+      ]
+    },
+    {
+      "id": "goodreads-3360761",
+      "title": "El caballero de la armadura oxidada",
+      "issues": [
+        "philosophy-fiction-overlap",
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-355871",
+      "title": "La princesa que creía en los cuentos de hadas",
+      "issues": [
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-36223358",
+      "title": "Todo lo que fuimos",
+      "issues": [
+        "isbn-invalid-or-missing"
+      ]
+    },
+    {
+      "id": "goodreads-4371304",
+      "title": "Epistles Book II and Epistle to the Pisones (Ars Poetica)",
+      "issues": [
+        "isbn-invalid-or-missing"
+      ]
+    },
+    {
+      "id": "goodreads-50627133",
+      "title": "Conversaciones sobre la escritura",
+      "issues": [
+        "poetry-topic-versus-form"
+      ]
+    },
+    {
+      "id": "goodreads-53809",
+      "title": "Maktub",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-54076",
+      "title": "El pintor de batallas",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-579438",
+      "title": "Poesía (Obras, #1)",
+      "issues": [
+        "description-missing"
+      ]
+    },
+    {
+      "id": "goodreads-59196",
+      "title": "La noche de Tlatelolco",
+      "issues": [
+        "subjects-unmapped"
+      ]
+    },
+    {
+      "id": "goodreads-63137",
+      "title": "Niebla",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-63169",
+      "title": "El banquero anarquista",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-64503",
+      "title": "San Manuel Bueno, mártir",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-67006",
+      "title": "Los renglones torcidos de Dios",
+      "issues": [
+        "psychology-scope-unreviewed"
+      ]
+    },
+    {
+      "id": "goodreads-77903",
+      "title": "Bodas de sangre",
+      "issues": [
+        "controlled-theatre-term-missing",
+        "poetry-theatre-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-796267",
+      "title": "Justine, or The Misfortunes of Virtue",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-855317",
+      "title": "La hora del Diablo",
+      "issues": [
+        "philosophy-fiction-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-916114",
+      "title": "La vida es sueño",
+      "issues": [
+        "poetry-theatre-overlap"
+      ]
+    },
+    {
+      "id": "goodreads-997498",
+      "title": "El Libro del Ego: Liberarse de la Ilusion",
+      "issues": [
+        "psychology-scope-unreviewed"
+      ]
+    }
+  ],
+  "publicationEligible": 0,
+  "limitations": [
+    "No records are admitted as reviewed; checksum validation is not edition verification.",
+    "Source genres propose subjects; they do not prove literary form or academic scope.",
+    "Unknown contributor roles and truncated lists require source review.",
+    "No price, stock, semantic embeddings or public integration are generated."
+  ]
+}

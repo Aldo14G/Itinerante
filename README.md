@@ -1,70 +1,44 @@
-# Librería Itinerante y Más — Static Site + Backend
+# Libreria Itinerante y Mas
 
-## Frontend (existente)
+La única superficie pública oficial es [`index.html`](index.html): el lenguaje
+editorial del prototipo cinematográfico de Claude Design, implementado como
+sitio estático mantenible. Higgsfield aporta únicamente los medios y el
+scroll-scrub local que acompaña Entrada, Experiencia, Comunidad y Agenda; los
+siete fotogramas aprobados sostienen la ruta cuando el video no carga o el
+usuario reduce movimiento. No hay SDKs externos. El monolito anterior quedó preservado en
+`_archive/models/` y no es una segunda home.
 
-Static Firebase Hosting site. Ver `AGENTS.md` para estructura y convenciones.
+Data Connect, Genkit y las rutas bajo `src/app/api` forman un servicio interno
+en preparacion. No son otra version del sitio y no deben presentarse como una
+experiencia desplegada hasta completar sus gates con datos autorizados.
 
-Comandos:
-- `npm run preview` — sirve el sitio en http://127.0.0.1:8080/
-- `firebase emulators:start --only hosting` — sirve con behavior Firebase real
-- `firebase deploy --only hosting` — deploy prod
-- `npm test` — corre todo el harness (site + rls + schema + lib)
+## Comandos
 
-## Backend (Supabase local)
+- `npm run dev` o `npm run preview`: inicia emulador Data Connect, backend e
+  interfaz en `http://127.0.0.1:8080/`. Espera el mensaje **Vista local lista**:
+  comprueba catálogo e Iti IA antes de anunciar disponibilidad. La demo usa los
+  datos de prueba ya presentes en el emulador, no inventario real.
+- `npm run preview:static`: sólo HTML, estilos y medios; necesita un backend
+  separado para consultar catálogo e Iti IA.
+- `npm test`: regresion del sitio y contratos Data Connect/RAG.
+- `npm run backend:dev`: rutas internas Next.js en `http://localhost:3000/`.
+- `npm run backend:build`: valida la compilacion del servicio interno.
+- `npm run books:validate -- ruta/catalogo.json`: valida datos sin escribir.
+- `npm run books:import -- ruta/catalogo.json`: importacion administrativa.
+- `npm run amazon:etl`: transforma el CSV Amazon en un catalogo local de prueba.
+- `npm run amazon:etl:check`: perfila y valida el CSV sin escribir artefactos.
+- `npm run reference:check`: comprueba veinte consultas bibliográficas locales
+  y el aislamiento de las candidatas; incluido en `npm test`. Normalización y
+  pruebas Python: [`docs/CATALOG_DATASET_AND_MODEL.md`](docs/CATALOG_DATASET_AND_MODEL.md#implementación-local--2026-09-05).
+- `npm run rag:test`: valida recuperacion local despues de importar en el emulador.
+- `npm run dataconnect:generate`: genera el SDK de Data Connect.
+- `npm run dataconnect:verify`: comprueba el SDK y el manifiesto de herramientas.
+- `npm run backend:dev:emulator`: alias del arranque local completo.
+- `npm run genkit:ui`: interfaz local de Genkit.
+- `firebase emulators:start`: emuladores Firebase/Data Connect.
 
-### Prerequisitos
-
-- **Docker Desktop** corriendo (Supabase local usa contenedores).
-- **Node.js ≥ 20**.
-- **Supabase CLI**:
-  - Windows: `winget install Microsoft.WSL` (si no está) y luego descargar el binario oficial de https://github.com/supabase/cli/releases al `~/bin/supabase/` y agregar al PATH del user. (Supabase CLI no está en winget al momento de escribir esto).
-  - macOS/Linux: `brew install supabase/tap/supabase`
-
-### Bootstrap primera vez
-
-```bash
-supabase start          # arranca Postgres + Auth + Storage + Studio (~10 min primer arranque, descarga imágenes Docker)
-supabase db reset       # aplica migrations + seed (10 libros)
-```
-
-Ver URLs y keys locales:
-```bash
-supabase status
-```
-
-Studio en http://127.0.0.1:54323 para explorar tablas visualmente.
-
-### Correr tests con backend
-
-Las suites `tests/rls.test.mjs` y `tests/schema.test.mjs` requieren Supabase local corriendo. Si no está, se saltan con warning (no rompen el flow).
-
-Env vars requeridas (una sola vez por terminal):
-
-```powershell
-# PowerShell
-$env:SUPABASE_LOCAL_ANON_KEY = "<anon key de supabase status>"
-$env:SUPABASE_LOCAL_SERVICE_KEY = "<service_role key de supabase status>"
-```
-
-```bash
-# bash/zsh
-export SUPABASE_LOCAL_ANON_KEY="..."
-export SUPABASE_LOCAL_SERVICE_KEY="..."
-```
-
-Correr:
-```bash
-npm test
-```
-
-### Detener stack local
-
-```bash
-supabase stop
-```
-
-## Runbooks operativos
-
-Ver `CONTEXT.md` sección Operations para runbooks de:
-- Rotación de Supabase anon key
-- Rollback de consumidor (BACKEND_FLAGS)
+La decision de superficie canonica esta en [`CONTEXT.md`](CONTEXT.md). El
+contrato, la plantilla y el procedimiento de verificacion de datos estan en
+[`docs/BOOK_DATA_AND_RAG.md`](docs/BOOK_DATA_AND_RAG.md). El backend Supabase
+anterior permanece en el repositorio solo como legado; no es la arquitectura
+activa para este vertical.

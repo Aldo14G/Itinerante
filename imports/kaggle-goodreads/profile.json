@@ -1,0 +1,441 @@
+{
+  "source_url": "https://www.kaggle.com/datasets/thedevastator/comprehensive-overview-of-52478-goodreads-best-b",
+  "retrieved_on": "2026-09-04",
+  "csv_bytes": 73839808,
+  "csv_sha256": "6b56f444a9c26fa643b41fb6b6a9248af3d81f3812e11e25595d5a65b6340453",
+  "rows": 52478,
+  "columns": [
+    "bookId",
+    "title",
+    "series",
+    "author",
+    "rating",
+    "description",
+    "language",
+    "isbn",
+    "genres",
+    "characters",
+    "bookFormat",
+    "edition",
+    "pages",
+    "publisher",
+    "publishDate",
+    "firstPublishDate",
+    "awards",
+    "numRatings",
+    "ratingsByStars",
+    "likedPercent",
+    "setting",
+    "coverImg",
+    "bbeScore",
+    "bbeVotes",
+    "price"
+  ],
+  "languages": {
+    "English": 42661,
+    "": 3806,
+    "Arabic": 1038,
+    "Spanish": 687,
+    "French": 579,
+    "German": 528,
+    "Indonesian": 371,
+    "Portuguese": 363,
+    "Italian": 255,
+    "Dutch": 215,
+    "Turkish": 211,
+    "Persian": 164,
+    "Polish": 138,
+    "Greek, Modern (1453-)": 112,
+    "Russian": 98,
+    "Japanese": 94,
+    "Swedish": 94,
+    "Romanian": 93,
+    "Bengali": 84,
+    "Malay": 74,
+    "Bulgarian": 70,
+    "Danish": 63,
+    "Urdu": 60,
+    "Finnish": 56,
+    "Czech": 55,
+    "Filipino; Pilipino": 54,
+    "Lithuanian": 46,
+    "Norwegian": 36,
+    "Serbian": 36,
+    "Tamil": 31,
+    "Croatian": 26,
+    "Estonian": 26,
+    "Georgian": 20,
+    "Vietnamese": 18,
+    "Marathi": 17,
+    "Hindi": 16,
+    "Hungarian": 14,
+    "Multiple languages": 13,
+    "Bokmål, Norwegian; Norwegian Bokmål": 12,
+    "Chinese": 11,
+    "Malayalam": 11,
+    "Catalan; Valencian": 11,
+    "Nepali": 9,
+    "Korean": 7,
+    "Slovak": 7,
+    "Latvian": 7,
+    "Tagalog": 7,
+    "Farsi": 6,
+    "Armenian": 5,
+    "Gujarati": 5,
+    "Albanian": 5,
+    "Kannada": 4,
+    "Bosnian": 4,
+    "Icelandic": 3,
+    "Ukrainian": 3,
+    "Amharic": 3,
+    "Thai": 3,
+    "Slovenian": 3,
+    "Telugu": 2,
+    "Macedonian": 2,
+    "Maltese": 2,
+    "Panjabi; Punjabi": 2,
+    "Afrikaans": 2,
+    "Greek, Ancient (to 1453)": 2,
+    "French, Middle (ca.1400-1600)": 1,
+    "Kurdish": 1,
+    "English, Middle (1100-1500)": 1,
+    "Azerbaijani": 1,
+    "Iranian (Other)": 1,
+    "Faroese": 1,
+    "Basque": 1,
+    "Aromanian; Arumanian; Macedo-Romanian": 1,
+    "Assamese": 1,
+    "Dutch, Middle (ca.1050-1350)": 1,
+    "Mongolian": 1,
+    "Galician": 1,
+    "Aleut": 1,
+    "Undetermined": 1,
+    "Mayan languages": 1,
+    "Duala": 1,
+    "Australian languages": 1,
+    "Norwegian Nynorsk; Nynorsk, Norwegian": 1
+  },
+  "missing_by_column": {
+    "bookId": 0,
+    "title": 0,
+    "series": 29009,
+    "author": 0,
+    "rating": 0,
+    "description": 1337,
+    "language": 3806,
+    "isbn": 0,
+    "genres": 0,
+    "characters": 0,
+    "bookFormat": 1473,
+    "edition": 47523,
+    "pages": 2347,
+    "publisher": 3695,
+    "publishDate": 880,
+    "firstPublishDate": 21326,
+    "awards": 0,
+    "numRatings": 0,
+    "ratingsByStars": 0,
+    "likedPercent": 622,
+    "setting": 0,
+    "coverImg": 605,
+    "bbeScore": 0,
+    "bbeVotes": 0,
+    "price": 14365
+  },
+  "source_id_duplicate_excess": 54,
+  "isbn_duplicate_excess": 4406,
+  "title_author_duplicate_excess": 95,
+  "valid_isbn_rows": 43261,
+  "isbn_sentinel_9999999999999": 4354,
+  "empty_genre_lists": 4623,
+  "topic_counts": {
+    "Poetry": 1595,
+    "Psychology": 1610,
+    "Philosophy": 2761,
+    "Mexican Literature": 0
+  },
+  "spanish_topic_counts": {
+    "Poetry": 39,
+    "Psychology": 8,
+    "Philosophy": 31,
+    "Mexican Literature": 0
+  },
+  "spanish_topic_examples": {
+    "Poetry": [
+      {
+        "bookId": "916114.La_vida_es_sue_o",
+        "title": "La vida es sueño",
+        "author": "Pedro Calderón de la Barca, Ciriaco Morón Arroyo (Editor)",
+        "language": "Spanish",
+        "isbn": "9788437600925",
+        "genres": "['Plays', 'Classics', 'Drama', 'Spanish Literature', 'Theatre', 'Fiction', 'School', 'Spain', 'Poetry', 'Literature']"
+      },
+      {
+        "bookId": "873472.Rimas_y_leyendas",
+        "title": "Rimas y leyendas",
+        "author": "Gustavo Adolfo Bécquer",
+        "language": "Spanish",
+        "isbn": "9788421824733",
+        "genres": "['Poetry', 'Classics', 'Spanish Literature', 'Short Stories', 'School', 'Spain', 'Fiction', 'Horror', 'Fantasy', 'Romanticism']"
+      },
+      {
+        "bookId": "73419.Poema_de_M_o_Cid",
+        "title": "Poema de Mío Cid",
+        "author": "Anonymous, Afonso Lopes Vieira (Translator), Ramón Menéndez Pidal (Foreword)",
+        "language": "Spanish",
+        "isbn": "9788489163935",
+        "genres": "['Poetry', 'Classics', 'Spanish Literature', 'Medieval', 'Fiction', 'Spain', 'Literature', 'School', 'Historical Fiction', 'Epic']"
+      },
+      {
+        "bookId": "77903.Bodas_de_sangre",
+        "title": "Bodas de sangre",
+        "author": "Federico García Lorca, Allen Josephs (Editor), Juan Caballero (Editor)",
+        "language": "Spanish",
+        "isbn": "9788437605609",
+        "genres": "['Plays', 'Classics', 'Spanish Literature', 'Drama', 'Theatre', 'Spain', 'Poetry', 'School', 'Fiction', 'Literature']"
+      }
+    ],
+    "Psychology": [
+      {
+        "bookId": "67006.Los_renglones_torcidos_de_Dios",
+        "title": "Los renglones torcidos de Dios",
+        "author": "Torcuato Luca de Tena",
+        "language": "Spanish",
+        "isbn": "9789681311889",
+        "genres": "['Fiction', 'Spanish Literature', 'Thriller', 'Mystery', 'Novels', 'Psychology', 'Classics', 'Spain', 'Drama', 'Contemporary']"
+      },
+      {
+        "bookId": "3360761-el-caballero-de-la-armadura-oxidada",
+        "title": "El caballero de la armadura oxidada",
+        "author": "Robert Fisher, Verónica d'Ornellas Radziwill (Translator)",
+        "language": "Spanish",
+        "isbn": "9788477204053",
+        "genres": "['Fantasy', 'Fiction', 'Self Help', 'Philosophy', 'Classics', 'School', 'Psychology', 'Spirituality', 'Short Stories', 'Spanish Literature']"
+      },
+      {
+        "bookId": "25623.Amarse_con_los_ojos_abiertos",
+        "title": "Amarse con los ojos abiertos",
+        "author": "Jorge Bucay, Silvia Salinas",
+        "language": "Spanish",
+        "isbn": "9788479019396",
+        "genres": "['Psychology', 'Nonfiction', 'Relationships', 'Self Help', 'Philosophy', 'Personal Development', 'Romance', 'Love', 'Literature', 'Unfinished']"
+      },
+      {
+        "bookId": "112646._tica_para_Amador",
+        "title": "Ética para Amador",
+        "author": "Fernando Savater",
+        "language": "Spanish",
+        "isbn": "9788434444706",
+        "genres": "['Philosophy', 'Nonfiction', 'Spanish Literature', 'School', 'Read For School', 'Essays', 'Spain', 'Self Help', 'Psychology', 'Education']"
+      }
+    ],
+    "Philosophy": [
+      {
+        "bookId": "63137.Niebla",
+        "title": "Niebla",
+        "author": "Miguel de Unamuno",
+        "language": "Spanish",
+        "isbn": "9788423919154",
+        "genres": "['Fiction', 'Spanish Literature', 'Classics', 'Spain', 'Literature', 'Novels', 'Philosophy', '20th Century', 'School', 'Drama']"
+      },
+      {
+        "bookId": "3360761-el-caballero-de-la-armadura-oxidada",
+        "title": "El caballero de la armadura oxidada",
+        "author": "Robert Fisher, Verónica d'Ornellas Radziwill (Translator)",
+        "language": "Spanish",
+        "isbn": "9788477204053",
+        "genres": "['Fantasy', 'Fiction', 'Self Help', 'Philosophy', 'Classics', 'School', 'Psychology', 'Spirituality', 'Short Stories', 'Spanish Literature']"
+      },
+      {
+        "bookId": "323455.De_Profundis",
+        "title": "De Profundis",
+        "author": "Oscar Wilde, George Arthur Lareau (Editor), Luca Scarlini (Redattore)",
+        "language": "Spanish",
+        "isbn": "9999999999999",
+        "genres": "['Classics', 'Nonfiction', 'Biography', 'LGBT', 'Memoir', 'Philosophy', 'Literature', 'Essays', 'Queer', 'Irish Literature']"
+      },
+      {
+        "bookId": "53809.Maktub",
+        "title": "Maktub",
+        "author": "Paulo Coelho (Goodreads Author)",
+        "language": "Spanish",
+        "isbn": "9788408057239",
+        "genres": "['Fiction', 'Philosophy', 'Novels', 'Short Stories', 'Literature', 'Inspirational', 'Spirituality', 'Self Help', 'Brazil', 'Latin American']"
+      }
+    ],
+    "Mexican Literature": []
+  },
+  "seed_author_counts": {
+    "Juan Rulfo": 2,
+    "Octavio Paz": 4,
+    "Rosario Castellanos": 0,
+    "Elena Poniatowska": 3,
+    "Carlos Fuentes": 6,
+    "Sor Juana": 0,
+    "Amado Nervo": 0,
+    "Jaime Sabines": 0,
+    "José Emilio Pacheco": 1,
+    "Elena Garro": 2,
+    "Alfonso Reyes": 0,
+    "Valeria Luiselli": 0,
+    "Fernanda Melchor": 0
+  },
+  "seed_author_examples": {
+    "Juan Rulfo": [
+      {
+        "bookId": "38787.Pedro_P_ramo",
+        "title": "Pedro Páramo",
+        "author": "Juan Rulfo, Margaret Sayers Peden (Translator), Susan Sontag (Foreword)",
+        "language": "English",
+        "isbn": "9780802133908",
+        "genres": "['Fiction', 'Classics', 'Magical Realism', 'Spanish Literature', 'Latin American', 'Novels', 'Literature', 'Latin American Literature', 'Fantasy', 'School']"
+      },
+      {
+        "bookId": "2075382.El_llano_en_llamas",
+        "title": "El llano en llamas",
+        "author": "Juan Rulfo",
+        "language": "Spanish",
+        "isbn": "9789500718035",
+        "genres": "['Short Stories', 'Fiction', 'Spanish Literature', 'Classics', 'Latin American', 'Literature', 'Latin American Literature', 'Novels', 'Magical Realism', '20th Century']"
+      }
+    ],
+    "Octavio Paz": [
+      {
+        "bookId": "11702.The_Labyrinth_of_Solitude_and_Other_Writings",
+        "title": "The Labyrinth of Solitude and Other Writings",
+        "author": "Octavio Paz, Lysander Kemp (Translator), Yara Milos (Translator)",
+        "language": "English",
+        "isbn": "9780802150424",
+        "genres": "['Nonfiction', 'Essays', 'History', 'Spanish Literature', 'Philosophy', 'Poetry', 'Classics', 'Latin American', 'Nobel Prize', 'Latin American Literature']"
+      },
+      {
+        "bookId": "244976.Libertad_Bajo_Palabra",
+        "title": "Libertad Bajo Palabra (1935-1957)",
+        "author": "Octavio Paz",
+        "language": "Spanish",
+        "isbn": "9788437607757",
+        "genres": "['Poetry', 'Latin American Literature', 'Latin American', 'Nonfiction', 'Spanish Literature']"
+      },
+      {
+        "bookId": "80483.El_arco_y_la_lira",
+        "title": "El arco y la lira: El poema. La revelación poética. Poesía e historia",
+        "author": "Octavio Paz",
+        "language": "Spanish",
+        "isbn": "9789681607821",
+        "genres": "['Poetry', 'Nonfiction', 'Theory', 'Latin American', '20th Century', 'Language']"
+      },
+      {
+        "bookId": "790525.Sunstone_Piedra_De_Sol",
+        "title": "Sunstone/Piedra De Sol",
+        "author": "Octavio Paz, Eliot Weinberger (Translator)",
+        "language": "Multiple languages",
+        "isbn": "9780811211956",
+        "genres": "['Poetry', 'Spanish Literature', 'Nobel Prize', 'Latin American', '20th Century', 'Philosophy', 'Literature', 'American', 'Classics', 'Read For School']"
+      }
+    ],
+    "Elena Poniatowska": [
+      {
+        "bookId": "1293796.Tinisima",
+        "title": "Tinisima: Novela",
+        "author": "Elena Poniatowska",
+        "language": "",
+        "isbn": "9789684113053",
+        "genres": "['Fiction', 'Historical Fiction', 'Spanish Literature', 'Latin American Literature', 'Biography Memoir', 'Latin American', 'Contemporary', '20th Century', 'Womens']"
+      },
+      {
+        "bookId": "59196.La_noche_de_Tlatelolco",
+        "title": "La noche de Tlatelolco",
+        "author": "Elena Poniatowska",
+        "language": "Spanish",
+        "isbn": "9789684114258",
+        "genres": "['History', 'Nonfiction', 'Spanish Literature', 'Latin American', 'Latin American Literature', 'Classics', 'Historical', 'Politics', 'School', 'Literature']"
+      },
+      {
+        "bookId": "10806851-leonora",
+        "title": "Leonora",
+        "author": "Elena Poniatowska",
+        "language": "Spanish",
+        "isbn": "9786070706325",
+        "genres": "['Art', 'Biography', 'Spanish Literature', 'Nonfiction', 'Womens', 'Latin American', 'Historical', 'Cultural', 'Latin American Literature', 'Surreal']"
+      }
+    ],
+    "Carlos Fuentes": [
+      {
+        "bookId": "56899.Aura",
+        "title": "Aura",
+        "author": "Carlos Fuentes",
+        "language": "Spanish",
+        "isbn": "9789580469711",
+        "genres": "['Fiction', 'Spanish Literature', 'Classics', 'Latin American', 'Magical Realism', 'Novels', 'Horror', 'Literature', 'Latin American Literature', 'Short Stories']"
+      },
+      {
+        "bookId": "59415.Terra_Nostra",
+        "title": "Terra Nostra",
+        "author": "Carlos Fuentes, Margaret Sayers Peden (Translator), Milan Kundera (Afterword), Jorge Volpi (Introduction)",
+        "language": "English",
+        "isbn": "9781564782878",
+        "genres": "['Fiction', 'Historical Fiction', 'Spanish Literature', 'Literature', 'Novels', 'Latin American', 'Spain', 'Literary Fiction', '20th Century', 'Latin American Literature']"
+      },
+      {
+        "bookId": "12764.The_Death_of_Artemio_Cruz",
+        "title": "The Death of Artemio Cruz",
+        "author": "Carlos Fuentes, Alfred J. Mac Adam (Translator)",
+        "language": "English",
+        "isbn": "9780374522834",
+        "genres": "['Fiction', 'Latin American', 'Spanish Literature', 'Classics', 'Novels', 'Literature', 'Latin American Literature', 'Historical Fiction', 'Magical Realism', '20th Century']"
+      },
+      {
+        "bookId": "59417.The_Crystal_Frontier",
+        "title": "The Crystal Frontier",
+        "author": "Carlos Fuentes, Alfred J. Mac Adam (Translator)",
+        "language": "English",
+        "isbn": "9780156006200",
+        "genres": "['Fiction', 'Short Stories', 'Spanish Literature', 'School', '20th Century', 'Contemporary', 'Latin American Literature', 'Historical Fiction', 'Latin American', 'Sociology']"
+      }
+    ],
+    "José Emilio Pacheco": [
+      {
+        "bookId": "1365225.Las_batallas_en_el_desierto",
+        "title": "Las batallas en el desierto",
+        "author": "José Emilio Pacheco",
+        "language": "Spanish",
+        "isbn": "9789684114739",
+        "genres": "['Fiction', 'Spanish Literature', 'Short Stories', 'Latin American', 'Novels', 'Classics', 'Latin American Literature', 'Literature', 'Romance', 'Read For School']"
+      }
+    ],
+    "Elena Garro": [
+      {
+        "bookId": "2514766.Los_recuerdos_del_porvenir",
+        "title": "Los recuerdos del porvenir",
+        "author": "Elena Garro",
+        "language": "Spanish",
+        "isbn": "9789682705670",
+        "genres": "['Fiction', 'Spanish Literature', 'Historical Fiction', 'Novels', 'Latin American Literature', '20th Century', 'Womens', 'Classics', 'Literature', 'Magical Realism']"
+      },
+      {
+        "bookId": "1034888.Y_Matarazo_no_llam_",
+        "title": "Y Matarazo no llamó...",
+        "author": "Elena Garro",
+        "language": "Spanish",
+        "isbn": "9789700500409",
+        "genres": "[]"
+      }
+    ]
+  },
+  "subset_rows": 84,
+  "subset_missing_description": 4,
+  "subset_languages": {
+    "Spanish": 77,
+    "English": 5,
+    "": 1,
+    "Multiple languages": 1
+  },
+  "subset_source_id_duplicate_excess": 0,
+  "limitations": [
+    "Source genres are community tags, not an authoritative subject classification.",
+    "Counts overlap: a book can have several genres.",
+    "Seed-author counts match the first contributor only; this is a partial probe, not a nationality census.",
+    "Language is the source field, not an independent language detection result.",
+    "The staged subset preserves source duplicates for review and has no store price or availability."
+  ]
+}

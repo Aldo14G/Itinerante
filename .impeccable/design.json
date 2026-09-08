@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-04T17:03:13.4621453-06:00",
+  "title": "Design System: Librería Itinerante y Más",
+  "extensions": {
+    "colorMeta": {
+      "mint-library": {
+        "role": "primary",
+        "displayName": "Menta librera",
+        "canonical": "#5dc4b4",
+        "tonalRamp": ["oklch(15% 0.035 175)", "oklch(27% 0.055 175)", "oklch(39% 0.075 175)", "oklch(51% 0.09 175)", "oklch(63% 0.1 175)", "oklch(75% 0.085 175)", "oklch(86% 0.055 175)", "oklch(95% 0.025 175)"]
+      },
+      "green-room": {
+        "role": "primary",
+        "displayName": "Verde sala",
+        "canonical": "#0d4a45",
+        "tonalRamp": ["oklch(15% 0.025 175)", "oklch(27% 0.045 175)", "oklch(39% 0.06 175)", "oklch(51% 0.07 175)", "oklch(63% 0.065 175)", "oklch(75% 0.05 175)", "oklch(86% 0.035 175)", "oklch(95% 0.015 175)"]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Tinta nocturna",
+        "canonical": "#061a18",
+        "tonalRamp": ["oklch(15% 0.018 175)", "oklch(27% 0.025 175)", "oklch(39% 0.028 175)", "oklch(51% 0.026 175)", "oklch(63% 0.022 175)", "oklch(75% 0.016 175)", "oklch(86% 0.01 175)", "oklch(95% 0.005 175)"]
+      },
+      "mint-light": {
+        "role": "secondary",
+        "displayName": "Menta clara",
+        "canonical": "#9de3da",
+        "tonalRamp": ["oklch(15% 0.03 175)", "oklch(27% 0.045 175)", "oklch(39% 0.06 175)", "oklch(51% 0.07 175)", "oklch(63% 0.075 175)", "oklch(75% 0.065 175)", "oklch(86% 0.045 175)", "oklch(95% 0.02 175)"]
+      },
+      "signal-amber": {
+        "role": "tertiary",
+        "displayName": "Ámbar de señal",
+        "canonical": "#e8a020",
+        "tonalRamp": ["oklch(15% 0.04 75)", "oklch(27% 0.075 75)", "oklch(39% 0.11 75)", "oklch(51% 0.14 75)", "oklch(63% 0.15 75)", "oklch(75% 0.12 75)", "oklch(86% 0.075 75)", "oklch(95% 0.03 75)"]
+      },
+      "ivory-paper": {
+        "role": "neutral",
+        "displayName": "Papel marfil",
+        "canonical": "#fdfcf8",
+        "tonalRamp": ["oklch(15% 0.008 85)", "oklch(27% 0.01 85)", "oklch(39% 0.012 85)", "oklch(51% 0.014 85)", "oklch(63% 0.015 85)", "oklch(75% 0.014 85)", "oklch(86% 0.011 85)", "oklch(95% 0.006 85)"]
+      },
+      "bright-paper": {
+        "role": "neutral",
+        "displayName": "Papel luminoso",
+        "canonical": "#ffffff",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(27% 0 0)", "oklch(39% 0 0)", "oklch(51% 0 0)", "oklch(63% 0 0)", "oklch(75% 0 0)", "oklch(86% 0 0)", "oklch(100% 0 0)"]
+      },
+      "muted-teal": {
+        "role": "neutral",
+        "displayName": "Verde apagado",
+        "canonical": "#3d6660",
+        "tonalRamp": ["oklch(15% 0.018 175)", "oklch(27% 0.028 175)", "oklch(39% 0.038 175)", "oklch(51% 0.045 175)", "oklch(63% 0.04 175)", "oklch(75% 0.03 175)", "oklch(86% 0.02 175)", "oklch(95% 0.008 175)"]
+      },
+      "status-error": {
+        "role": "tertiary",
+        "displayName": "Rojo de recuperación",
+        "canonical": "#8a241d",
+        "tonalRamp": ["oklch(15% 0.045 30)", "oklch(27% 0.085 30)", "oklch(39% 0.12 30)", "oklch(51% 0.14 30)", "oklch(63% 0.13 30)", "oklch(75% 0.1 30)", "oklch(86% 0.06 30)", "oklch(95% 0.025 30)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Ingreso editorial", "purpose": "Titular del hero y declaraciones de máxima escala." },
+      "headline": { "displayName": "Titular de capítulo", "purpose": "Encabeza cada sección con líneas cortas." },
+      "title": { "displayName": "Título editorial", "purpose": "Tarjetas, actividades y resultados." },
+      "body": { "displayName": "Lectura", "purpose": "Texto continuo y explicaciones." },
+      "label": { "displayName": "Metadato", "purpose": "Categorías, estados y numeración." },
+      "action": { "displayName": "Acción", "purpose": "Botones y navegación." }
+    },
+    "shadows": [
+      { "name": "dialog-separation", "value": "0 24px 90px rgba(6, 26, 24, 0.42)", "purpose": "Separa el diálogo Iti IA de la página sin elevar tarjetas ordinarias." },
+      { "name": "display-legibility", "value": "0 2px 24px rgba(0, 0, 0, 0.28)", "purpose": "Protege el gran titular cuando aparece sobre fotografía." }
+    ],
+    "motion": [
+      { "name": "state-quick", "value": "200ms ease", "purpose": "Hover y cambios de estado en navegación y botones." },
+      { "name": "media-reveal", "value": "260ms ease", "purpose": "Entrada del video cuando el medio está listo." },
+      { "name": "image-drift", "value": "420ms cubic-bezier(0.2, 0.8, 0.2, 1)", "purpose": "Acercamiento contenido en fotografía interactiva." }
+    ],
+    "breakpoints": [
+      { "name": "compact", "value": "680px" },
+      { "name": "stacked", "value": "980px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal sobre una superficie profunda.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\">Consultar catálogo</button>",
+      "css": ".ds-button-primary { min-height: 46px; padding: 0 18px; border: 1px solid transparent; border-radius: 999px; color: var(--brand-ink, #061a18); background: var(--paper, #fdfcf8); font: 700 .82rem/1.5 Inter, sans-serif; cursor: pointer; transition: transform 200ms ease, background-color 200ms ease; } .ds-button-primary:hover { transform: translateY(-2px); } .ds-button-primary:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; } .ds-button-primary:active { transform: translateY(0); }"
+    },
+    {
+      "name": "Botón fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acción secundaria sobre fotografía o verde sala.",
+      "html": "<button class=\"ds-button-ghost\" type=\"button\">Descubrir con Iti IA</button>",
+      "css": ".ds-button-ghost { min-height: 46px; padding: 0 18px; border: 1px solid rgba(245, 241, 232, .62); border-radius: 999px; color: var(--paper, #fdfcf8); background: transparent; font: 700 .82rem/1.5 Inter, sans-serif; cursor: pointer; transition: transform 200ms ease, background-color 200ms ease; } .ds-button-ghost:hover { background: rgba(255,255,255,.08); transform: translateY(-2px); } .ds-button-ghost:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; } .ds-button-ghost:active { transform: translateY(0); }"
+    },
+    {
+      "name": "Capítulo actual",
+      "kind": "nav",
+      "refersTo": "chapter-current",
+      "description": "Estado activo dentro de la navegación narrativa.",
+      "html": "<a class=\"ds-chapter-current\" href=\"#\"><span>02</span><strong>Agenda</strong></a>",
+      "css": ".ds-chapter-current { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; color: var(--brand-ink, #061a18); background: var(--brand-light, #9de3da); font: 700 .82rem/1.5 Inter, sans-serif; text-decoration: none; transition: transform 200ms ease; } .ds-chapter-current span { font-size: .7rem; letter-spacing: .1em; } .ds-chapter-current:hover { transform: translateY(-1px); } .ds-chapter-current:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; }"
+    },
+    {
+      "name": "Campo de búsqueda",
+      "kind": "input",
+      "refersTo": "search-input",
+      "description": "Entrada editorial unida a una acción directa.",
+      "html": "<label class=\"ds-search-label\" for=\"ds-search\">Título, autor o tema</label><input class=\"ds-search-input\" id=\"ds-search\" placeholder=\"Ej. poesía mexicana\">",
+      "css": ".ds-search-label { display: block; margin-bottom: 8px; color: var(--paper, #fdfcf8); font: 600 .7rem/1.4 Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; } .ds-search-input { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid rgba(6,26,24,.42); border-radius: 0; color: var(--brand-ink, #061a18); background: rgba(255,253,248,.84); font: 400 1rem/1.5 Inter, sans-serif; caret-color: var(--amber, #e8a020); } .ds-search-input:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; } .ds-search-input:disabled { opacity: .55; cursor: wait; }"
+    },
+    {
+      "name": "Chip de categoría",
+      "kind": "chip",
+      "description": "Filtro rectangular que invierte su contraste al seleccionarse.",
+      "html": "<button class=\"ds-category-chip\" type=\"button\" aria-pressed=\"true\">Narrativa</button>",
+      "css": ".ds-category-chip { min-height: 44px; padding: 0 12px; border: 1px solid rgba(255,255,255,.34); border-radius: 0; color: var(--paper, #fdfcf8); background: transparent; font: 600 .82rem/1.5 Inter, sans-serif; cursor: pointer; transition: color 180ms ease, background-color 180ms ease; } .ds-category-chip:hover, .ds-category-chip[aria-pressed=\"true\"] { color: var(--brand-ink, #061a18); background: var(--brand-light, #9de3da); } .ds-category-chip:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; }"
+    },
+    {
+      "name": "Tarjeta de libro",
+      "kind": "card",
+      "refersTo": "book-card",
+      "description": "Resultado plano sobre papel con jerarquía editorial.",
+      "html": "<article class=\"ds-book-card\"><span>Narrativa</span><h3>Un título de la librería</h3><p>Autor por confirmar</p><a href=\"#\">Preguntar por WhatsApp</a></article>",
+      "css": ".ds-book-card { display: flex; min-height: 270px; flex-direction: column; padding: 28px; color: var(--brand-ink, #061a18); background: #fff; font-family: Inter, sans-serif; } .ds-book-card span { color: var(--amber, #e8a020); font: 600 .7rem/1.3 Inter, sans-serif; text-transform: uppercase; } .ds-book-card h3 { margin: auto 0 10px; font: 700 1.55rem/1.05 \"Playfair Display\", Georgia, serif; letter-spacing: -.025em; } .ds-book-card p { margin: 0; color: var(--turquoise-deep, #3d6660); font-size: .88rem; } .ds-book-card a { display: inline-flex; min-height: 44px; align-items: center; margin-top: 10px; color: var(--amber, #e8a020); font-weight: 700; text-decoration: none; } .ds-book-card a:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; }"
+    },
+    {
+      "name": "Panel habitado",
+      "kind": "card",
+      "description": "Superficie ambiental de vidrio tenue sobre fotografía real.",
+      "html": "<article class=\"ds-habited-panel\"><h3>Leer y quedarse</h3><p>Un refugio para hojear con calma.</p></article>",
+      "css": ".ds-habited-panel { padding: 30px; border: 1px solid rgba(157,227,218,.2); border-radius: 16px; color: var(--paper, #fdfcf8); background: rgba(6,26,24,.38); backdrop-filter: blur(18px); } .ds-habited-panel h3 { margin: 0 0 8px; font: 700 1.5rem/1.05 \"Playfair Display\", Georgia, serif; letter-spacing: -.025em; } .ds-habited-panel p { max-width: 42ch; margin: 0; color: rgba(255,255,255,.72); font: 400 1rem/1.7 Inter, sans-serif; }"
+    },
+    {
+      "name": "Diálogo Iti IA",
+      "kind": "custom",
+      "description": "Capa temporal de papel con estado, recuperación y campo en flujo.",
+      "html": "<section class=\"ds-iti-dialog\"><header><h2>Iti IA</h2><button type=\"button\" aria-label=\"Cerrar\">×</button></header><p>Pregunta por un tema, autor o lectura.</p><input aria-label=\"Tu pregunta\" placeholder=\"¿Qué me recomiendas?\"></section>",
+      "css": ".ds-iti-dialog { width: min(620px, 100%); color: var(--brand-ink, #061a18); background: var(--paper, #fdfcf8); box-shadow: 0 24px 90px rgba(6,26,24,.42); font-family: Inter, sans-serif; } .ds-iti-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 26px 18px; border-bottom: 1px solid rgba(93,196,180,.2); } .ds-iti-dialog h2 { margin: 0; font: 700 2rem/1.02 \"Playfair Display\", Georgia, serif; letter-spacing: -.025em; } .ds-iti-dialog button { width: 44px; height: 44px; border: 1px solid rgba(93,196,180,.2); border-radius: 50%; color: inherit; background: transparent; cursor: pointer; } .ds-iti-dialog p { padding: 18px 26px 8px; color: var(--turquoise-deep, #3d6660); } .ds-iti-dialog input { width: calc(100% - 52px); min-height: 48px; margin: 8px 26px 26px; padding: 0 14px; border: 1px solid rgba(6,26,24,.42); border-radius: 0; background: rgba(255,253,248,.84); } .ds-iti-dialog button:focus-visible, .ds-iti-dialog input:focus-visible { outline: 3px solid var(--amber, #e8a020); outline-offset: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Librería Habitada",
+    "overview": "La interfaz debe sentirse como una estancia dentro de una librería real, no como un escaparate digital aislado. Su atmósfera es íntima, doméstica y pausada: la fotografía conserva la presencia material del lugar, la tipografía editorial ordena el relato y los controles permanecen claros y cercanos.\n\nLa expresión visual evita el espectáculo gratuito. El movimiento acompaña la orientación espacial, mientras las capas de verde, papel y vidrio tenue permiten que el contenido se lea con calma. La identidad nunca adopta la retórica de una interfaz SaaS, un marketplace, una IA genérica o una plantilla saturada.",
+    "keyCharacteristics": [
+      "Presencia constante del espacio físico y sus materiales reales.",
+      "Jerarquía editorial con titulares serif y controles sans serif.",
+      "Superficies profundas, translúcidas y contenidas, sin ornamentación excesiva.",
+      "Ritmo espacioso que conduce a acciones concretas sin urgencia artificial.",
+      "Movimiento continuo y reversible que nunca sustituye al contenido."
+    ],
+    "rules": [
+      { "name": "The Signal Amber Rule", "body": "El ámbar nunca llena grandes superficies ni compite con la menta; señala un momento, una categoría o una acción.", "section": "colors" },
+      { "name": "The Two-Voice Rule", "body": "Playfair narra; Inter orienta y permite actuar. No se intercambian esos papeles por conveniencia local.", "section": "typography" },
+      { "name": "The Reading Before Spectacle Rule", "body": "Catálogo, formularios e información de visita abandonan la composición cinematográfica cuando ésta pueda competir con la lectura o la acción.", "section": "layout" },
+      { "name": "The Shadow Is an Event Rule", "body": "Una sombra visible comunica una capa temporal o modal, no decoración permanente.", "section": "elevation" },
+      { "name": "The Shape Has a Job Rule", "body": "La cápsula indica interacción; el rectángulo indica contenido; el radio intermedio indica una superficie ambiental.", "section": "components" }
+    ],
+    "dos": [
+      "Do conservar el espacio, la arquitectura y la fotografía reales como referencia visual principal.",
+      "Do usar menta para orientar, ámbar para señalar y papel para leer.",
+      "Do mantener foco visible, objetivos táctiles suficientes y una ruta completa sin movimiento.",
+      "Do elegir profundidad tonal y bordes sutiles antes de añadir sombras.",
+      "Do permitir que los títulos serif sean expresivos y que los controles sans serif sean inequívocos."
+    ],
+    "donts": [
+      "Don't introducir estética SaaS, marketplace, IA genérica o plantilla saturada.",
+      "Don't inventar nuevas habitaciones, materiales o fotografías que sustituyan la identidad física del lugar.",
+      "Don't usar ámbar como fondo dominante ni añadir colores sin un papel durable.",
+      "Don't aplicar cápsulas a tarjetas o contenido puramente editorial.",
+      "Don't secuestrar el desplazamiento, reproducir video automáticamente ni depender de animación para comprender o usar la página."
+    ]
+  }
+}

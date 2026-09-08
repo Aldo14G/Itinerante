@@ -1,11 +1,26 @@
 node_modules/
+.next/
+tsconfig.tsbuildinfo
 .firebase/
+dataconnect/.dataconnect/
+tmp/
 *.log
 .env
 .env.*
 *.local
 *-firebase-adminsdk-*.json
+libreria-itineranteymas-*.json
 .worktrees/
 
 # Cache local de skills de Claude agents
 .agents/
+
+# Archivo reversible de demos y proceso (no desplegar, no versionar pesado)
+_archive/
+
+public/
+
+.tmp-audit/
+*.zip
+
+supabase/.temp/

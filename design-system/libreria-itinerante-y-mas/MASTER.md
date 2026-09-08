@@ -1,95 +1,46 @@
-# Libreria Itinerante Design Standard
+# Librería Itinerante Design Standard
 
-> Source of truth: before changing UI, read this file. Then check `design-system/libreria-itinerante-y-mas/pages/[page].md`; page rules override only where they are more specific.
+> Fuente de verdad visual. La composición canónica es el prototipo `Itinerante Home cinematico.dc.html` de Claude Design. Higgsfield aporta únicamente el recorrido, los posters y el movimiento, sin reemplazar la identidad ni la arquitectura local.
 
-## Product Positioning
+## Posicionamiento
 
-Libreria Itinerante y Mas is an independent cultural bookstore in Monterrey. The interface must feel editorial, warm, community-led, and practical. Avoid mixing unrelated AI-generated looks. Every section should feel like part of one cultural house: books, cafe, workshops, events, reviews, and location.
+Librería Itinerante y Más es una librería cultural independiente de Monterrey. La interfaz debe sentirse cercana, clara y memorable: un recorrido documental por el espacio real que conduce a libros, actividades, catálogo y visita.
 
-## Design Decision Rules
+## Dirección bloqueada
 
-| Situation | Pattern | Avoid |
-|-----------|---------|-------|
-| Primary brand moment | Editorial hero with logo/photo asset | Abstract gradients with no real brand signal |
-| Repeated cultural offerings | Horizontal rail with scroll-snap cards | Dense grids that feel like admin dashboards |
-| Community proof | Reviews, ratings, event participation cues | Generic marketing claims |
-| Calls to action | One primary action plus one contextual secondary | Three or more equal CTAs |
-| New colors | Extend token layers first | One-off hex values inside sections |
-| Animation | 180-300ms ease, opacity, lift, subtle scale | Slow effects, jitter, layout-shifting hovers |
+- Paleta: turquesa `#5dc4b4`, verde profundo `#0d4a45`, tinta `#061a18`, menta `#9de3da`, papel `#fdfcf8` y ámbar `#e8a020` sólo como acento.
+- Tipografía: Playfair Display para titulares y momentos editoriales; Inter para lectura, navegación y controles.
+- Composición: capítulos numerados, superficies verde profundo, jerarquía editorial, fotografía real y tarjetas translúcidas contenidas.
+- Movimiento: una toma continua controlada por scroll, con poster estático y salida completa para movimiento reducido.
+- Voz: cálida, culta y práctica. Nunca estética SaaS, marketplace, IA genérica ni plantilla saturada.
 
-## Token Architecture
+## Jerarquía de fuentes visuales
 
-Use three layers: primitive tokens, semantic tokens, then component tokens. In `index.html`, current variables live in `:root`; future work should move toward this naming without changing everything at once.
+1. Fotografías reales en `images/cinematic/real-space-*`.
+2. Medios web aprobados y optimizados en `images/cinematic/runtime/`.
+3. Composición preservada en `Itinerante Home cinematico.dc.html`, dentro de `_archive/root-loose/Documentación del proyecto Iti.zip`.
+4. La extracción `_archive/imports/higgsfield-d599d36a-2026-08-29/` es referencia de medios y mecánica, no de layout o contenido.
+5. `_archive/models/mixed-legacy-index-2026-09-04.html` conserva una referencia funcional, pero no vuelve a producción como monolito.
 
-### Primitive Tokens
+## Componentes
 
-| Token | Value | Purpose |
-|-------|-------|---------|
-| `--it-teal-400` | `#5DC4B4` | Brand bright |
-| `--it-teal-600` | `#2A8F84` | Brand action |
-| `--it-teal-900` | `#0D4A45` | Brand hero |
-| `--it-amber-500` | `#E8A020` | Warm accent |
-| `--it-paper-50` | `#FDFCF8` | Main paper |
-| `--it-paper-100` | `#F0EDE4` | Alternating band |
-| `--it-ink-900` | `#0D2520` | Primary text |
+- Navegación: lockup compacto, una acción destacada de WhatsApp y una barra única de cuatro capítulos numerados.
+- Recorrido: `scroll-scrub` de pantalla completa compartido por Entrada, Experiencia, Comunidad y Agenda; el video no reproduce solo y su tiempo sigue el scroll nativo, con siete fotogramas locales como hitos y respaldo.
+- Experiencia: introducción editorial y cuatro maneras de habitar la librería.
+- Agenda: lista sobria sin fechas, cupos ni estados inventados.
+- Galería: mosaico de cinco vistas del espacio real.
+- Catálogo: búsqueda y taxonomía controlada; existencia siempre confirmada con la librería.
+- Iti IA: acceso persistente mediante píldora flotante (icono + etiqueta, 56 px); el diálogo permanece modal y contextual —se abre desde el hero, el catálogo o la píldora—, nunca una conversación flotante permanente. Cada recomendado ofrece "Ver ficha" hacia la obra.
+- Visita: dirección y dos acciones directas, mapa y WhatsApp.
 
-### Semantic Tokens
+## Accesibilidad y rendimiento
 
-| Token | Maps To | Usage |
-|-------|---------|-------|
-| `--color-brand` | `--it-teal-400` | Main brand actions |
-| `--color-brand-strong` | `--it-teal-600` | Hover, active, nav |
-| `--color-hero` | `--it-teal-900` | Dark editorial surfaces |
-| `--color-accent` | `--it-amber-500` | Ratings, highlights |
-| `--surface-paper` | `--it-paper-50` | Body background |
-| `--surface-soft` | `--it-paper-100` | Section contrast |
-| `--text-primary` | `--it-ink-900` | Readable copy |
+- Controles de al menos 44 px, foco visible, HTML semántico y texto alternativo específico.
+- Sin autoplay, sonido, secuestro de scroll ni `transition: all`.
+- Respetar `prefers-reduced-motion` y `Save-Data`; mantener poster antes y en lugar del video.
+- Cargar recursos posteriores de forma diferida y conservar el catálogo como DOM normal.
+- No integrar SDKs ni llamadas a dominios de Higgsfield en producción.
 
-## Typography
+## Datos y verdad
 
-Use `Playfair Display` for editorial headings and `Inter` for navigation, body, controls, and metadata. Do not introduce new font families without updating this file. Headings should be expressive; controls should be quiet and legible.
-
-## Component Standards
-
-### Navigation
-
-Fixed top nav, paper backdrop, small logo, and one primary WhatsApp action. It must not duplicate section links from the chapter nav. Do not add large dropdowns or marketing-style nav.
-
-### Chapter Navigation
-
-Use a sticky chapter nav after the hero when the page needs premium long-form hierarchy. It is the single owner of section navigation: `Experiencia`, `Agenda`, `Libros`, and `Visita`. Keep it compact, horizontally scrollable on mobile, token-based, and below the fixed primary nav.
-
-### Buttons
-
-Primary buttons use filled paper or brand teal depending on surface. Secondary buttons use a clear border. Button hovers may lift up to `2px`; they must not resize siblings.
-
-### Event Cards
-
-Use horizontal rail cards with scroll-snap, dark editorial overlays, status pills, concise copy, and one CTA. Cards may use scale up to `1.025` on hover because the rail has overflow space. Keep text scannable: title, one sentence, metadata, CTA.
-
-### Catalog Discovery
-
-Book browsing should feel curated and searchable, not like a static poster grid. Use a compact search control, filter chips, a result count, and book cards with genre, availability, mood, tags, and one WhatsApp consultation CTA. When a card uses a real cover image, keep that metadata inside the cover through a readable dark editorial overlay. Keep the language editorial and local; avoid mimicking mass-market pricing or fake inventory precision.
-
-### Content Bands
-
-Alternate paper, white, dark teal, and soft paper bands. Avoid nested cards inside cards. Section padding should sit in the 56-86px range on desktop and 48-66px on mobile.
-
-## Motion
-
-Default transitions: `200ms` for color and focus, `300-450ms` for cards. Use `cubic-bezier(.2,.8,.2,1)` for premium lift. Add `prefers-reduced-motion` support before introducing larger animated systems.
-
-## Accessibility
-
-Maintain contrast for text on dark teal and paper surfaces. Interactive elements need semantic tags, visible focus, and at least 44px touch target height. Never use emoji as structural icons.
-
-## AI Contributor Rules
-
-Before changing UI:
-1. Name the page and pattern being changed.
-2. Check this design standard and page override.
-3. Reuse existing tokens/classes first.
-4. Add or update a harness test for critical structure.
-5. Run `npm.cmd test`.
-
-If a recommendation from `ui-ux-pro-max` conflicts with the brand tokens above, keep the Itinerante tokens and record the reason here before changing them.
+No publicar precios, existencia, fechas, cupos, reseñas, calificaciones, alianzas ni recomendaciones sin fuente verificable. Los fixtures deben identificarse como datos de prueba y jamás presentarse como inventario.

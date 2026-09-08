@@ -1,0 +1,117 @@
+{
+  "authors": [
+    {
+      "bio": null,
+      "fullName": "Juan Rulfo",
+      "id": "juan-rulfo",
+      "imageUrl": null,
+      "slug": "juan-rulfo"
+    }
+  ],
+  "bookAuthors": [
+    {
+      "authorId": "juan-rulfo",
+      "bookId": "pedro-paramo-juan-rulfo",
+      "ord": 0,
+      "role": "author"
+    }
+  ],
+  "books": [
+    {
+      "condition": "new",
+      "coverAlt": "Portada de Pedro Páramo",
+      "coverUrl": null,
+      "curatorNote": "Ficha piloto para validar el pipeline inventario→embedding→Iti IA. Precio y existencias pendientes de verificación física en librería.",
+      "description": "Novela de Juan Rulfo publicada en 1955. Juan Preciado viaja a Comala en busca de su padre, Pedro Páramo, y encuentra un pueblo habitado por murmullos y memoria.",
+      "editorialId": "fce",
+      "id": "pedro-paramo-juan-rulfo",
+      "isbn13": null,
+      "language": "es",
+      "mood": "Reflexivo",
+      "pages": null,
+      "priceMxnCents": 29900,
+      "publishedYear": null,
+      "slug": "pedro-paramo-juan-rulfo",
+      "sourceCategory": "Literatura y Ficción",
+      "sourceLabel": "Librería Itinerante · ficha piloto v1",
+      "sourceSubGenre": "Novela",
+      "sourceUrl": "https://www.fondodeculturaeconomica.com/Ficha/9786071671973/F",
+      "status": "active",
+      "stockQty": 1,
+      "subtitle": null,
+      "tags": [
+        "clasico-mexicano",
+        "comala"
+      ],
+      "title": "Pedro Páramo",
+      "verifiedAt": "2026-09-03T18:00:00.000Z",
+      "subgenreId": "novela"
+    }
+  ],
+  "catalogKind": "inventory",
+  "categories": [
+    {
+      "id": "fiction",
+      "name": "Literatura y Ficción",
+      "slug": "fiction",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    },
+    {
+      "id": "essay",
+      "name": "Ensayo y Filosofía",
+      "slug": "essay",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    },
+    {
+      "id": "history",
+      "name": "Historia y Crónica",
+      "slug": "history",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    },
+    {
+      "id": "psychology",
+      "name": "Psicología y Hábitos",
+      "slug": "psychology",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    },
+    {
+      "id": "children",
+      "name": "Infantil y Juvenil",
+      "slug": "children",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    },
+    {
+      "id": "arts",
+      "name": "Arte y Fotografía",
+      "slug": "arts",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    },
+    {
+      "id": "science",
+      "name": "Ciencia y Cocina",
+      "slug": "science",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    }
+  ],
+  "datasetKey": "inventory",
+  "editorials": [
+    {
+      "countryCode": "MX",
+      "id": "fce",
+      "name": "Fondo de Cultura Económica",
+      "slug": "fce",
+      "website": "https://www.fondodeculturaeconomica.com"
+    }
+  ],
+  "schemaVersion": 2,
+  "subgenres": [
+    {
+      "categoryId": "fiction",
+      "id": "novela",
+      "name": "Novela",
+      "slug": "novela",
+      "sourceLabel": "Librería Itinerante · taxonomía controlada v1"
+    }
+  ],
+  "source": "Ficha piloto: valida el camino inventario→embedding→búsqueda→Iti IA en emulador. No publicar."
+}

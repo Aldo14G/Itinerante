@@ -1,0 +1,123 @@
+fragment GroundedBook on Book {
+  id
+  slug
+  isbn13
+  title
+  subtitle
+  description
+  mood
+  format
+  coverUrl
+  coverAlt
+  tags
+  priceMxnCents
+  stockQty
+  condition
+  curatorNote
+  datasetKey
+  sourceKind
+  sourceLabel
+  sourceRecordId
+  referencePriceUsdCents
+  sourceRating
+  sourceReviewCount
+  sourceWeeksOnList
+  sourceRank
+  sourceBsr
+  sourceUrl
+  verifiedAt
+  editorial { name }
+  subgenre {
+    slug
+    name
+    category { slug name }
+  }
+  contributors: bookAuthors_on_book(orderBy: [{ ord: ASC }]) {
+    role
+    ord
+    author {
+      slug
+      fullName
+    }
+  }
+}
+
+# Recuperacion semantica principal para Iti IA.
+query SearchBooks(
+  # Texto libre que describe lo que la persona desea leer.
+  $query: String!
+  # Categoria canonica por slug; omitir para buscar en todas.
+  $categorySlug: String
+  # Subgenero canonico por slug; omitir para buscar en todos.
+  $subgenreSlug: String
+  # Estado de animo exacto permitido; omitir para buscar en todos.
+  $mood: String
+  # Precio maximo expresado en centavos MXN; omitir si no hay presupuesto.
+  $maxPriceMxnCents: Int
+  # Numero maximo de candidatos que puede recuperar el agente.
+  $limit: Int = 8
+) @auth(level: PUBLIC) {
+  books: books_embedding_similarity(
+    compare_embed: { model: "text-embedding-005", text: $query }
+    where: {
+      status: { eq: "active" }
+      stockQty: { gt: 0 }
+      datasetKey: { eq: "inventory" }
+      subgenre: {
+        slug: { eq: $subgenreSlug }
+        category: { slug: { eq: $categorySlug } }
+      }
+      mood: { eq: $mood }
+      priceMxnCents: { le: $maxPriceMxnCents }
+    }
+    limit: $limit
+  ) { ...GroundedBook }
+}
+
+# Recuperacion exacta para confirmar una ficha antes de recomendarla.
+query GetBookBySlug(
+  # Slug exacto obtenido previamente de SearchBooks o FilterBooks.
+  $slug: String!
+) @auth(level: PUBLIC) {
+  books(
+    where: {
+      slug: { eq: $slug }
+      status: { eq: "active" }
+      stockQty: { gt: 0 }
+      datasetKey: { eq: "inventory" }
+    }
+    limit: 1
+  ) { ...GroundedBook }
+}
+
+# Filtros estructurados cuando la consulta ya incluye criterios concretos.
+query FilterBooks(
+  # Categorias canonicas aceptables; omitir para incluir todas.
+  $categorySlugs: [String!]
+  # Subgeneros canonicos aceptables; omitir para incluir todos.
+  $subgenreSlugs: [String!]
+  # Estados de animo exactos aceptables; omitir para incluir todos.
+  $moods: [String!]
+  # Precio minimo expresado en centavos MXN.
+  $minPriceMxnCents: Int
+  # Precio maximo expresado en centavos MXN.
+  $maxPriceMxnCents: Int
+  # Numero maximo de candidatos que puede recuperar el agente.
+  $limit: Int = 15
+) @auth(level: PUBLIC) {
+  books(
+    where: {
+      status: { eq: "active" }
+      stockQty: { gt: 0 }
+      datasetKey: { eq: "inventory" }
+      subgenre: {
+        slug: { in: $subgenreSlugs }
+        category: { slug: { in: $categorySlugs } }
+      }
+      mood: { in: $moods }
+      priceMxnCents: { ge: $minPriceMxnCents, le: $maxPriceMxnCents }
+    }
+    orderBy: [{ title: ASC }]
+    limit: $limit
+  ) { ...GroundedBook }
+}

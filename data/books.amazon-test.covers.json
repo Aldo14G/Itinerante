@@ -1,0 +1,300 @@
+{
+  "provider": "Google Books / Open Library",
+  "count": 42,
+  "books": [
+    {
+      "slug": "libro-a-court-of-silver-flames-sarah-j-maas-bloomsbury-pub-3c7d5cbb",
+      "isbn13": "9781526635365",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10643508-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21703979W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-a-court-of-thorns-and-roses-sarah-j-maas-bloomsbury-c6660236",
+      "isbn13": "9782732472300",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8738585-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17352669W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-atmosphere-taylor-jenkins-reid-ballantine-books-9787-37272618",
+      "isbn13": "9780593158715",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15098710-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL42412330W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-atomic-habits-james-clear-avery-9787933209545-b595cae6",
+      "isbn13": "9798998881152",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12539702-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17930368W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-can-t-hurt-me-david-goggins-lioncrest-publishing-978-11cd0d15",
+      "isbn13": "9781544507859",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8305903-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18108064W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-dad-i-want-to-hear-your-story-jeffrey-mason-hear-you-14b83895",
+      "isbn13": "9781955034746",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15094938-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34159429W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-dear-debbie-freida-mcfadden-sourcebooks-landmark-978-982a5d33",
+      "isbn13": "9781464249624",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15163694-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL44800712W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-dune-frank-herbert-ace-9787946598287-c665da2c",
+      "isbn13": "9780441007493",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11481354-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL893414W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-fourth-wing-rebecca-yarros-entangled-red-tower-books-5cedbb5d",
+      "isbn13": "9786073901802",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14407898-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL29226517W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-greenlights-matthew-mcconaughey-crown-9785519046531-5b2e8caa",
+      "isbn13": "9781472280831",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10512439-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21911019W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-house-of-flame-and-shadow-sarah-j-maas-bloomsbury-pu-969599ca",
+      "isbn13": "9781408884447",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13525139-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34780775W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-iron-flame-rebecca-yarros-entangled-red-tower-books-bf4dda32",
+      "isbn13": "9798874823658",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14405746-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34028551W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-it-ends-with-us-colleen-hoover-atria-books-978863264-c406f268",
+      "isbn13": "9788820072940",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10473609-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18020194W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-killers-of-the-flower-moon-david-grann-doubleday-978-c0e455cf",
+      "isbn13": "9781524755935",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8055064-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17778665W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-lessons-in-chemistry-bonnie-garmus-doubleday-9784375-685f3d93",
+      "isbn13": "9788418681424",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12725772-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25344431W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-malibu-rising-taylor-jenkins-reid-ballantine-books-9-a4214dff",
+      "isbn13": "9781786331533",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10447065-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL22135561W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-never-never-colleen-hoover-hoover-ink-9785863506652-a4b28e6f",
+      "isbn13": "9781981426768",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10551706-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28948986W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-november-9-colleen-hoover-atria-books-9784150142119-380d84af",
+      "isbn13": "9789041715913",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9219001-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20018811W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-oh-the-places-you-ll-go-dr-seuss-random-house-978719-62f45d9b",
+      "isbn13": "9780679805274",
+      "coverUrl": "https://covers.openlibrary.org/b/id/5020952-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL261196W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-outlive-peter-attia-harmony-9788890693257-482f4e8a",
+      "isbn13": "9780593236604",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13191259-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28148070W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-project-hail-mary-andy-weir-ballantine-books-9784303-5e06bb4c",
+      "isbn13": "9786064310996",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11200092-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21745884W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-rich-dad-poor-dad-robert-kiyosaki-plata-publishing-9-11d3ae14",
+      "isbn13": "9782892254471",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8315603-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2010879W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-same-as-ever-morgan-housel-harriman-house-9789895938-bba4d448",
+      "isbn13": "9781804090633",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14157635-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL35156586W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-spare-prince-harry-random-house-9785271467524-58d437e3",
+      "isbn13": "9780593677865",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13415348-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL29240850W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-anxious-generation-jonathan-haidt-penguin-press-53179a66",
+      "isbn13": "9788817189767",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15104803-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL37575384W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-body-keeps-the-score-bessel-van-der-kolk-penguin-a53536ce",
+      "isbn13": "9780141978611",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8315367-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18147687W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-creative-act-rick-rubin-penguin-press-9780140673-83de0c6c",
+      "isbn13": "9781838858636",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13316390-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27955361W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-dinner-party-freida-mcfadden-sourcebooks-landmar-90759ab3",
+      "isbn13": "9798254378488",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15235011-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL45702677W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-housemaid-freida-mcfadden-sourcebooks-landmark-9-fde1797a",
+      "isbn13": "9789032520335",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15105883-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27729743W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-let-them-theory-mel-robbins-hay-house-9781132788-c53660dd",
+      "isbn13": "9781401971373",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15165806-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL39181496W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-message-ta-nehisi-coates-penguin-books-978777792-12ffd233",
+      "isbn13": "9780593230381",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14750902-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL37983202W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-midnight-library-matt-haig-viking-9780781469258-3bfec6cf",
+      "isbn13": "9788501304377",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10313767-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20965973W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-psychology-of-money-morgan-housel-harriman-house-182f711a",
+      "isbn13": "9789584299680",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10389354-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21640039W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-seven-husbands-of-evelyn-hugo-taylor-jenkins-rei-7cf6548d",
+      "isbn13": "9788417981006",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8354226-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18203673W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-subtle-art-of-not-giving-a-f-ck-mark-manson-harp-75d54bc6",
+      "isbn13": "9781760558772",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8231990-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17590212W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-wager-david-grann-doubleday-9789800081276-846733d4",
+      "isbn13": "9788439744573",
+      "coverUrl": "https://covers.openlibrary.org/b/isbn/9788439744573-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL42430191W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-the-woman-in-me-britney-spears-gallery-books-9782722-6295e9a8",
+      "isbn13": "9798890980205",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14538012-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL29331033W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-think-again-adam-grant-viking-9787644961633-e9826974",
+      "isbn13": "9780593298749",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10470266-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL22484556W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-tomorrow-and-tomorrow-and-tomorrow-gabrielle-zevin-k-bc254765",
+      "isbn13": "9780593321201",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12859975-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL26004554W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-ugly-love-colleen-hoover-atria-books-9781601409930-dd137174",
+      "isbn13": "9781476753188",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12856728-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20577143W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-verity-colleen-hoover-grand-central-publishing-97854-cdd1e1b6",
+      "isbn13": "9783423230124",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8747160-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20068530W",
+      "provider": "Open Library"
+    },
+    {
+      "slug": "libro-wild-dark-shore-charlotte-mcconaghy-flatiron-books-9-312c884d",
+      "isbn13": "9781837265930",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15095727-L.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL42424992W",
+      "provider": "Open Library"
+    }
+  ]
+}

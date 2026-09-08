@@ -1,0 +1,418 @@
+{
+  "analyzed_at": "2026-09-06T22:10:09.456598+00:00",
+  "input_url": "https://biblioteca-ecrmnl.vercel.app/?orden=anio_asc",
+  "final_url": "https://biblioteca-ecrmnl.vercel.app/?orden=anio_asc",
+  "title": "Biblioteca Digital ECRMNL — Cruz Roja Mexicana Nuevo León",
+  "meta": {
+    "viewport": "width=device-width, initial-scale=1",
+    "description": "Catálogo del acervo bibliográfico de la Escuela de Cruz Roja Mexicana en Nuevo León.",
+    "robots": "noindex, nofollow"
+  },
+  "headers": {
+    "age": "0",
+    "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+    "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'",
+    "content-type": "text/html; charset=utf-8",
+    "date": "Sun, 06 Sep 2026 22:10:08 GMT",
+    "link": "</_next/static/media/9f502796ecd51074-s.p.3_nd6iz4y0r23.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/a613c0ff7ec86511-s.p.3tvjjqv_wat_s.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/ad029b146f7e65ff-s.p.1qfthjj_67bh-.woff2>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/chunks/0nvf9b36n5v8_.css>; rel=preload; as=\"style\"",
+    "permissions-policy": "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "server": "Vercel",
+    "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+    "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-matched-path": "/",
+    "x-vercel-cache": "MISS",
+    "x-vercel-id": "sfo1::iad1::d592b-1788732608244-8d89f46fb842",
+    "connection": "close",
+    "transfer-encoding": "chunked"
+  },
+  "html": {
+    "html_attrs": {
+      "lang": "es",
+      "class": "oxygen_5ccb6ad6-module__6MbGBG__variable"
+    },
+    "body_classes": "min-h-screen flex flex-col",
+    "bytes": 68250
+  },
+  "headings": [
+    {
+      "level": "h1",
+      "text": "Catálogo de la Escuela",
+      "id": ""
+    },
+    {
+      "level": "h2",
+      "text": "Filtrar",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "rel": "stylesheet",
+      "href": "/_next/static/chunks/0nvf9b36n5v8_.css",
+      "data-precedence": "next"
+    },
+    {
+      "rel": "preload",
+      "href": "/_next/static/chunks/0jh_88ia20huo.js",
+      "as": "script",
+      "fetchpriority": "low"
+    },
+    {
+      "rel": "icon",
+      "href": "/favicon.ico?favicon.0ualzggd0zdm_.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "rel": "icon",
+      "href": "/icon.png?icon.0ualzggd0zdm_.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ],
+  "scripts": [
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/3gbn8xlczs-cp.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/17lccqqkh_-oa.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/2mowv4r4v2d66.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/0_bmh1s0g_5m3.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/turbopack-2kh58wzdxi3s7.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/1m4my61awaqwi.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/362r4kts3j1rr.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/0stu11jh90vb4.js",
+      "async": ""
+    },
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "nomodule": ""
+    },
+    {},
+    {
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/0jh_88ia20huo.js",
+      "id": "_R_",
+      "async": ""
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
+  ],
+  "stylesheets": [
+    "https://biblioteca-ecrmnl.vercel.app/_next/static/chunks/0nvf9b36n5v8_.css"
+  ],
+  "images": [
+    {
+      "alt": "Cruz Roja Mexicana Nuevo León",
+      "width": "180",
+      "height": "56",
+      "decoding": "async",
+      "data-nimg": "1",
+      "class": "h-9 sm:h-12 w-auto",
+      "style": "color:transparent",
+      "sizes": "180px",
+      "srcset": "/_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=32&q=85 32w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=48&q=85 48w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=64&q=85 64w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=96&q=85 96w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=128&q=85 128w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=256&q=85 256w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=384&q=85 384w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=640&q=85 640w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=750&q=85 750w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=828&q=85 828w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=1080&q=85 1080w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=1200&q=85 1200w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=1920&q=85 1920w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=2048&q=85 2048w, /_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=3840&q=85 3840w",
+      "src": "https://biblioteca-ecrmnl.vercel.app/_next/image?url=%2Flogo_cruz_roja_nuevo_leon.png&w=3840&q=85"
+    },
+    {
+      "alt": "Sesweb",
+      "loading": "lazy",
+      "width": "344",
+      "height": "91",
+      "decoding": "async",
+      "data-nimg": "1",
+      "class": "h-6 w-auto",
+      "style": "color:transparent",
+      "src": "https://biblioteca-ecrmnl.vercel.app/sesweb-logo.png"
+    },
+    {
+      "alt": "Sesweb",
+      "loading": "lazy",
+      "width": "344",
+      "height": "91",
+      "decoding": "async",
+      "data-nimg": "1",
+      "class": "h-5 w-auto",
+      "style": "color:transparent",
+      "src": "https://biblioteca-ecrmnl.vercel.app/sesweb-logo.png"
+    }
+  ],
+  "videos": [],
+  "forms": [
+    {
+      "method": "get",
+      "action": "",
+      "id": "",
+      "class": "flex flex-col sm:flex-row gap-3 w-full"
+    }
+  ],
+  "buttons_and_ctas": [
+    {
+      "tag": "a",
+      "text": "Biblioteca Digital ECRMNL",
+      "href": "https://biblioteca-ecrmnl.vercel.app/",
+      "class": "flex items-center gap-3 shrink-0",
+      "aria_label": "Biblioteca ECRMNL — inicio"
+    },
+    {
+      "tag": "a",
+      "text": "Cruz Roja NL",
+      "href": "https://cruzrojanuevoleon.org",
+      "class": "px-3 py-2 rounded-md text-sm font-medium text-cr-ink hover:bg-cr-paper-alt hover:text-cr-red transition-colors",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "w-11 h-11 flex items-center justify-center rounded-md text-cr-ink hover:bg-cr-paper-alt hover:text-cr-red transition-colors",
+      "aria_label": "Abrir menú"
+    },
+    {
+      "tag": "a",
+      "text": "Facebook",
+      "href": "https://www.facebook.com/escuelacruzrojanl/",
+      "class": "px-3 py-1.5 rounded-md bg-white/10 hover:bg-cr-red transition-colors text-white/90 hover:text-white",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Instagram",
+      "href": "https://www.instagram.com/escuelacruzrojanl/",
+      "class": "px-3 py-1.5 rounded-md bg-white/10 hover:bg-cr-red transition-colors text-white/90 hover:text-white",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "TikTok",
+      "href": "https://www.tiktok.com/@escuelacruzrojanl?lang=es",
+      "class": "px-3 py-1.5 rounded-md bg-white/10 hover:bg-cr-red transition-colors text-white/90 hover:text-white",
+      "aria_label": ""
+    },
+    {
+      "tag": "a",
+      "text": "Aviso de Privacidad",
+      "href": "https://biblioteca-ecrmnl.vercel.app/aviso-privacidad.pdf",
+      "class": "text-white/90 hover:text-white underline underline-offset-2 transition-colors",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Buscar",
+      "type": "submit",
+      "class": "px-6 py-3 rounded-md bg-cr-red text-white font-semibold hover:bg-cr-red-dark transition-colors active:scale-[0.98]",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Filtros",
+      "type": "button",
+      "class": "lg:hidden inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-cr-line-strong bg-cr-paper text-cr-ink font-medium text-sm hover:border-cr-red transition-colors min-h-[44px]",
+      "aria_label": "Abrir filtros"
+    },
+    {
+      "tag": "button",
+      "text": "Acervo General 768",
+      "type": "button",
+      "class": "rounded-full transition cursor-pointer px-3 py-2 min-h-[40px] text-sm text-left break-words max-w-full bg-cr-paper-alt text-cr-ink border border-cr-line hover:border-cr-red hover:text-cr-red hover:ring-2 hover:ring-cr-red/20",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Especial Cruz Roja 20",
+      "type": "button",
+      "class": "rounded-full transition cursor-pointer px-3 py-2 min-h-[40px] text-sm text-left break-words max-w-full bg-cr-paper-alt text-cr-ink border border-cr-line hover:border-cr-red hover:text-cr-red hover:ring-2 hover:ring-cr-red/20",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Material de Apoyo 24",
+      "type": "button",
+      "class": "rounded-full transition cursor-pointer px-3 py-2 min-h-[40px] text-sm text-left break-words max-w-full bg-cr-paper-alt text-cr-ink border border-cr-line hover:border-cr-red hover:text-cr-red hover:ring-2 hover:ring-cr-red/20",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Administración y Gestión 33",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Ciencias Básicas de la Salud 189",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Ciencias Sociales y Humanidades 186",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Clínica y Patología 113",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Enfermería 238",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Formación General 128",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Prácticas Profesionales 28",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "Urgencias y Atención Prehospitalaria 80",
+      "type": "button",
+      "class": "w-full flex items-center gap-2.5 pl-2 pr-3 py-2 min-h-[44px] text-left rounded-lg border transition border-transparent hover:border-cr-red hover:bg-cr-paper-alt hover:ring-2 hover:ring-cr-red/15 focus-visible:border-cr-red",
+      "aria_label": ""
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "p-2 min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors bg-cr-red text-white",
+      "aria_label": "Vista de cuadrícula"
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "p-2 min-h-[40px] min-w-[40px] flex items-center justify-center border-l border-cr-line-strong transition-colors bg-cr-paper text-cr-ink-soft hover:text-cr-red",
+      "aria_label": "Vista de lista"
+    },
+    {
+      "tag": "button",
+      "text": "",
+      "type": "button",
+      "class": "back-to-top focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cr-red cursor-pointer",
+      "aria_label": "Volver arriba"
+    }
+  ],
+  "stack_fingerprints": [
+    {
+      "name": "Next.js",
+      "category": "frontend/meta-framework",
+      "confidence": "observed",
+      "evidence": "/_next/, next-router"
+    },
+    {
+      "name": "React",
+      "category": "frontend-library",
+      "confidence": "inferred",
+      "evidence": "react"
+    },
+    {
+      "name": "Tailwind CSS",
+      "category": "css",
+      "confidence": "inferred",
+      "evidence": "sm:, md:, lg:, xl:"
+    },
+    {
+      "name": "Vercel",
+      "category": "hosting",
+      "confidence": "observed",
+      "evidence": "x-vercel, vercel"
+    }
+  ],
+  "component_signals": [
+    {
+      "name": "document-outline",
+      "evidence": {
+        "h1": 1,
+        "h2": 1
+      },
+      "confidence": "observed"
+    },
+    {
+      "name": "navigation-and-ctas",
+      "count": 1,
+      "examples": [
+        {
+          "tag": "a",
+          "text": "Facebook",
+          "href": "https://www.facebook.com/escuelacruzrojanl/",
+          "class": "px-3 py-1.5 rounded-md bg-white/10 hover:bg-cr-red transition-colors text-white/90 hover:text-white",
+          "aria_label": ""
+        }
+      ],
+      "confidence": "inferred"
+    },
+    {
+      "name": "media-system",
+      "images": 3,
+      "videos_or_sources": 0,
+      "total": 3,
+      "confidence": "observed"
+    },
+    {
+      "name": "forms",
+      "count": 1,
+      "examples": [
+        {
+          "method": "get",
+          "action": "",
+          "id": "",
+          "class": "flex flex-col sm:flex-row gap-3 w-full"
+        }
+      ],
+      "confidence": "observed"
+    }
+  ],
+  "next_steps": [
+    "Open the page in a browser and capture desktop/mobile screenshots.",
+    "Inspect computed styles for tokens and responsive breakpoints.",
+    "Record network requests after key interactions.",
+    "Confirm animation libraries from rendered scripts and runtime globals."
+  ]
+}

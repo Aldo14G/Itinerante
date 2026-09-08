@@ -1,0 +1,22 @@
+[
+  {"query":"Rulfo","options":{"limit":2},"expected":["goodreads-2075382","goodreads-38787"]},
+  {"query":"El llano en llamas","top":"goodreads-2075382"},
+  {"query":"Pedro Paramo","top":"goodreads-38787"},
+  {"query":"Pedro Páramo","options":{"language":"es"},"absent":["goodreads-38787"]},
+  {"query":"978-0-8021-3390-8","top":"goodreads-38787"},
+  {"query":"poesía de Octavio Paz","options":{"language":"es","subject":"poesia"},"expected":["goodreads-244976","goodreads-80483"]},
+  {"query":"filosofía en español","options":{"subject":"filosofia","limit":100},"expected":["goodreads-112646"],"language":"es"},
+  {"query":"Carlos Fuentes","options":{"language":"es"},"expected":["goodreads-56899","goodreads-223391"],"language":"es"},
+  {"query":"José Emilio Pacheco","top":"goodreads-1365225"},
+  {"query":"Elena Garro","expected":["goodreads-1034888","goodreads-2514766"]},
+  {"query":"La noche de Tlatelolco","top":"goodreads-59196"},
+  {"query":"Ética para Amador","top":"goodreads-112646"},
+  {"query":"Margaret Sayers Peden","options":{"language":"en"},"expected":["goodreads-38787","goodreads-59415"],"field":"contributor"},
+  {"query":"Y Matarazo no llamó","top":"goodreads-1034888"},
+  {"query":"Tinisima","options":{"language":"es"},"top":"goodreads-1293796"},
+  {"query":"Sunstone","options":{"language":"mul"},"top":"goodreads-790525"},
+  {"query":"zzzxq inexistente","empty":true},
+  {"query":"poesía zzzxq","empty":true},
+  {"query":"9999999999999","empty":true},
+  {"query":"manuales clínicos certificados","options":{"subject":"psicologia"},"empty":true}
+]

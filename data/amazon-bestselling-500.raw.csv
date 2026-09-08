@@ -1,0 +1,501 @@
+Rank,Title,Author,Category,Sub-Genre,Format,Price (USD),Rating,Reviews,Weeks on List,Publisher,Year Published,ISBN,Amazon BSR,Amazon URL
+1,The Let Them Theory,Mel Robbins,Non-Fiction,Self-Help,Paperback,14.99,4.7,98000.0,52.0,Hay House,2024.0,978-1-13278-859-4,112.0,View
+2,The Dinner Party,Freida McFadden,Fiction,Psychological Thriller,Paperback,11.69,4.3,1800.0,12.0,Sourcebooks Landmark,2025.0,978-3-76237-716-0,175.0,View
+3,Project Hail Mary,Andy Weir,Fiction,Science Fiction,Paperback,12.99,4.8,130000.0,108.0,Ballantine Books,2021.0,978-4-30379-320-5,64.0,View
+4,The Correspondent: A Novel,Virginia Evans,Fiction,Literary Fiction,Hardcover,19.58,4.6,87363.0,28.0,Random House,2025.0,978-6-20328-665-4,143.0,View
+5,Atomic Habits,James Clear,Non-Fiction,Self-Help / Productivity,Paperback,16.99,4.8,120000.0,220.0,Avery,2018.0,978-7-93320-954-5,237.0,View
+6,A Court of Thorns and Roses,Sarah J. Maas,Fiction,Romantasy,Paperback,11.99,4.7,85000.0,260.0,Bloomsbury Publishing,2015.0,978-6-45382-755-8,468.0,View
+7,House of Flame and Shadow,Sarah J. Maas,Fiction,Romantasy,Hardcover,22.49,4.8,42000.0,32.0,Bloomsbury Publishing,2024.0,978-9-51245-317-7,460.0,View
+8,Fourth Wing,Rebecca Yarros,Fiction,Romantasy,Hardcover,18.99,4.6,77000.0,50.0,Entangled: Red Tower Books,2023.0,978-9-62350-470-3,198.0,View
+9,The Body Keeps the Score,Bessel van der Kolk,Non-Fiction,Psychology / Health,Paperback,16.49,4.7,95000.0,150.0,Penguin Books,2014.0,978-6-88104-579-8,81.0,View
+10,The Anxious Generation,Jonathan Haidt,Non-Fiction,Psychology / Society,Hardcover,21.99,4.5,18000.0,28.0,Penguin Press,2024.0,978-7-10425-839-4,277.0,View
+11,Dog Man: Big Jim Believes,Dav Pilkey,Fiction,Children's / Graphic Novel,Hardcover,9.49,4.9,12000.0,15.0,Graphix,2024.0,978-8-10074-713-5,375.0,View
+12,"Oh, the Places You'll Go!",Dr. Seuss,Fiction,Children's Picture Book,Hardcover,12.99,4.9,60000.0,1200.0,Random House,1990.0,978-7-19071-878-8,387.0,View
+13,It's Not Her,Mary Kubica,Fiction,Psychological Thriller,Hardcover,19.99,4.2,3500.0,8.0,Park Row,2026.0,978-3-50857-508-5,118.0,View
+14,Stress Relief Coloring Book,Various Artists,Non-Fiction,Activity / Coloring,Paperback,9.99,4.6,22000.0,40.0,Independently Published,2023.0,978-9-38864-107-1,110.0,View
+15,"Dad, I Want to Hear Your Story",Jeffrey Mason,Non-Fiction,Gift / Journal,Hardcover,14.99,4.8,45000.0,130.0,Hear Your Story Books,2019.0,978-8-27342-840-9,211.0,View
+16,The Hunger Games Boxed Set,Suzanne Collins,Fiction,YA Dystopian,Paperback,24.99,4.8,55000.0,350.0,Scholastic Press,2010.0,978-7-17100-789-1,217.0,View
+17,Memorial Days,Alysia Abbott,Non-Fiction,Memoir,Hardcover,20.0,4.5,5400.0,14.0,Norton,2025.0,978-2-46509-573-3,209.0,View
+18,Atmosphere,Taylor Jenkins Reid,Fiction,Historical Fiction,Hardcover,21.0,4.6,31000.0,20.0,Ballantine Books,2025.0,978-7-73092-318-6,339.0,View
+19,Wild Dark Shore,Charlotte McConaghy,Fiction,Climate Fiction,Hardcover,22.0,4.4,9800.0,18.0,Flatiron Books,2024.0,978-7-30289-294-4,81.0,View
+20,How To Draw Everything,Angela Rizza,Non-Fiction,Art / Activity,Paperback,12.99,4.7,14000.0,22.0,Walter Foster Jr.,2023.0,978-0-76562-182-2,162.0,View
+21,The Housemaid,Freida McFadden,Fiction,Psychological Thriller,Paperback,10.99,4.5,93000.0,93.0,Sourcebooks Landmark,2022.0,978-4-36772-785-5,4613.0,View
+22,Dear Debbie,Freida McFadden,Fiction,Psychological Thriller,Paperback,11.99,4.4,8200.0,18.0,Sourcebooks Landmark,2025.0,978-1-19602-650-3,4451.0,View
+23,Iron Flame,Rebecca Yarros,Fiction,Romantasy,Hardcover,21.99,4.7,55000.0,40.0,Entangled: Red Tower Books,2023.0,978-4-90173-926-8,2232.0,View
+24,A Court of Silver Flames,Sarah J. Maas,Fiction,Romantasy,Paperback,12.99,4.8,72000.0,150.0,Bloomsbury Publishing,2021.0,978-4-89276-315-5,30.0,View
+25,Spare,Prince Harry,Non-Fiction,Memoir,Hardcover,18.0,4.2,41000.0,60.0,Random House,2023.0,978-5-27146-752-4,296.0,View
+26,Never Never,Colleen Hoover,Fiction,Contemporary Romance,Paperback,10.99,4.3,28000.0,80.0,Hoover Ink,2023.0,978-5-86350-665-2,2898.0,View
+27,It Ends with Us,Colleen Hoover,Fiction,Contemporary Romance,Paperback,10.49,4.3,220000.0,200.0,Atria Books,2016.0,978-8-63264-735-2,1305.0,View
+28,Ugly Love,Colleen Hoover,Fiction,Contemporary Romance,Paperback,9.99,4.2,130000.0,140.0,Atria Books,2014.0,978-1-60140-993-0,3265.0,View
+29,Verity,Colleen Hoover,Fiction,Psychological Thriller,Paperback,11.49,4.5,150000.0,120.0,Grand Central Publishing,2022.0,978-5-46517-985-1,4757.0,View
+30,November 9,Colleen Hoover,Fiction,Contemporary Romance,Paperback,10.99,4.4,85000.0,160.0,Atria Books,2015.0,978-4-15014-211-9,3573.0,View
+31,The Midnight Library,Matt Haig,Fiction,Literary Fiction,Paperback,12.99,4.2,88000.0,90.0,Viking,2020.0,978-0-78146-925-8,3346.0,View
+32,"Tomorrow, and Tomorrow, and Tomorrow",Gabrielle Zevin,Fiction,Literary Fiction,Paperback,14.99,4.4,62000.0,75.0,Knopf,2022.0,978-5-62743-813-4,2490.0,View
+33,Lessons in Chemistry,Bonnie Garmus,Fiction,Historical Fiction,Paperback,14.49,4.5,105000.0,80.0,Doubleday,2022.0,978-4-37549-540-9,4223.0,View
+34,The Seven Husbands of Evelyn Hugo,Taylor Jenkins Reid,Fiction,Historical Fiction,Paperback,11.99,4.6,145000.0,120.0,Washington Square Press,2017.0,978-9-53933-195-3,3396.0,View
+35,Daisy Jones and the Six,Taylor Jenkins Reid,Fiction,Historical Fiction,Paperback,12.99,4.4,68000.0,95.0,Ballantine Books,2019.0,978-9-35485-835-6,3806.0,View
+36,Malibu Rising,Taylor Jenkins Reid,Fiction,Historical Fiction,Paperback,13.49,4.4,50000.0,70.0,Ballantine Books,2021.0,978-0-83060-355-1,3653.0,View
+37,The Woman in Me,Britney Spears,Non-Fiction,Celebrity Memoir,Hardcover,20.0,4.4,37000.0,40.0,Gallery Books,2023.0,978-2-72216-560-4,2226.0,View
+38,Greenlights,Matthew McConaughey,Non-Fiction,Celebrity Memoir,Hardcover,17.99,4.5,53000.0,100.0,Crown,2020.0,978-5-51904-653-1,4446.0,View
+39,Think Again,Adam Grant,Non-Fiction,Business / Psychology,Paperback,15.99,4.6,40000.0,80.0,Viking,2021.0,978-7-64496-163-3,4410.0,View
+40,Outlive,Peter Attia,Non-Fiction,Health / Longevity,Hardcover,22.0,4.7,32000.0,45.0,Harmony,2023.0,978-8-89069-325-7,1046.0,View
+41,The Wager,David Grann,Non-Fiction,History / Adventure,Hardcover,19.99,4.6,28000.0,55.0,Doubleday,2023.0,978-9-80008-127-6,1734.0,View
+42,Killers of the Flower Moon,David Grann,Non-Fiction,True Crime / History,Paperback,14.99,4.6,55000.0,150.0,Doubleday,2017.0,978-7-52840-445-6,563.0,View
+43,The Creative Act,Rick Rubin,Non-Fiction,Creativity / Art,Hardcover,26.0,4.6,22000.0,60.0,Penguin Press,2023.0,978-0-14067-353-3,1375.0,View
+44,Same as Ever,Morgan Housel,Non-Fiction,Business / Finance,Hardcover,19.99,4.7,18000.0,40.0,Harriman House,2023.0,978-9-89593-865-1,835.0,View
+45,The Psychology of Money,Morgan Housel,Non-Fiction,Business / Finance,Paperback,14.99,4.7,65000.0,100.0,Harriman House,2020.0,978-4-99687-714-1,4016.0,View
+46,Rich Dad Poor Dad,Robert Kiyosaki,Non-Fiction,Personal Finance,Paperback,12.99,4.7,180000.0,400.0,Plata Publishing,1997.0,978-1-66822-470-7,2641.0,View
+47,The Subtle Art of Not Giving a F*ck,Mark Manson,Non-Fiction,Self-Help,Paperback,13.99,4.5,115000.0,200.0,HarperOne,2016.0,978-3-21359-385-7,2907.0,View
+48,Can't Hurt Me,David Goggins,Non-Fiction,Self-Help / Memoir,Hardcover,18.99,4.8,72000.0,130.0,Lioncrest Publishing,2018.0,978-4-54608-386-9,1969.0,View
+49,Dune,Frank Herbert,Fiction,Science Fiction,Paperback,13.99,4.7,90000.0,400.0,Ace,1965.0,978-7-94659-828-7,4535.0,View
+50,Ender's Game,Orson Scott Card,Fiction,Science Fiction,Paperback,10.99,4.7,75000.0,350.0,Tor Books,1985.0,978-8-55056-535-8,980.0,View
+51,Into Door,Gabor Maté,Non-Fiction,Health / Longevity,Paperback,15.64,4.3,35382.0,43.0,Scholastic Press,2019.0,978-3-48829-332-5,1571.0,View
+52,The Game and Rain,Erik Larson,Non-Fiction,Gift / Journal,Hardcover,22.72,4.7,13082.0,8.0,St. Martin's Press,2019.0,978-1-18564-510-7,710.0,View
+53,Last Ice,Robin DiAngelo,Non-Fiction,Science / Nature,Paperback,14.29,4.1,4947.0,44.0,Scholastic Press,2026.0,978-3-91987-316-4,5516.0,View
+54,Golden Deal,Greg Bear,Fiction,Middle Grade,Paperback,16.73,4.5,5664.0,48.0,Viking,2018.0,978-9-96662-923-3,3590.0,View
+55,Across Map,Doris Kearns Goodwin,Non-Fiction,Cooking / Food,Hardcover,29.24,4.1,6271.0,43.0,Plata Publishing,2012.0,978-5-89129-356-0,858.0,View
+56,Nurse Rising,Malcolm Gladwell,Non-Fiction,Spirituality / Religion,Hardcover,22.3,4.4,22040.0,47.0,Ballantine Books,2015.0,978-5-63955-810-7,2473.0,View
+57,Valley and Thunder,Gloria Steinem,Non-Fiction,Health / Longevity,Hardcover,19.43,4.1,41986.0,33.0,Crown,2025.0,978-4-81987-234-4,3703.0,View
+58,Chasing Sky,Tamora Pierce,Fiction,YA Dystopian,Audiobook,27.94,4.7,11090.0,36.0,Hay House,2026.0,978-8-45838-525-7,3984.0,View
+59,The Knight and Bone,Liane Moriarty,Fiction,Psychological Thriller,Kindle Edition,11.53,4.1,10738.0,33.0,Flatiron Books,2023.0,978-5-82340-881-8,3208.0,View
+60,The Choice and Rain,Mark Manson,Non-Fiction,Spirituality / Religion,Paperback,17.68,4.2,22757.0,60.0,HarperOne,2015.0,978-1-78937-567-0,1300.0,View
+61,Where Beauty,Pema Chödrön,Non-Fiction,Spirituality / Religion,Paperback,9.61,4.0,15908.0,52.0,Scholastic Press,2015.0,978-1-68153-270-4,359.0,View
+62,The Ocean,Carmen Maria Machado,Fiction,Historical Fiction,Audiobook,27.38,4.0,16783.0,36.0,Ace,2026.0,978-3-70443-753-4,3888.0,View
+63,Across Game,Michael J. Sullivan,Fiction,Graphic Novel,Board Book,13.96,4.6,24524.0,41.0,Howard Books,2019.0,978-4-12875-949-6,2374.0,View
+64,Hero Saga,Brad Thor,Fiction,Graphic Novel,Hardcover,24.52,4.6,48995.0,13.0,Hay House,2015.0,978-5-64460-279-3,1210.0,View
+65,The Grace Awakening,Lee Child,Fiction,Dark Romance,Board Book,14.01,4.3,37524.0,28.0,Harriman House,2015.0,978-0-44663-649-1,3855.0,View
+66,The Villain Legacy,Doris Kearns Goodwin,Non-Fiction,Cooking / Food,Hardcover,18.51,3.7,3971.0,7.0,"Little, Brown",2019.0,978-1-22739-340-8,1243.0,View
+67,Deal Reckoning,Robin DiAngelo,Non-Fiction,Science / Nature,Board Book,13.98,4.7,36682.0,46.0,Harriman House,2020.0,978-4-34878-225-7,884.0,View
+68,Throne and Lightning,Raina Telgemeier,Fiction,Space Opera,Kindle Edition,11.09,4.6,40058.0,5.0,Ace,2019.0,978-2-80807-356-2,1036.0,View
+69,The Throne of Ice,Nassim Taleb,Non-Fiction,Business / Finance,Kindle Edition,8.28,4.5,8146.0,33.0,Chronicle Books,2022.0,978-0-96363-633-4,3890.0,View
+70,The Mind Rising,V.E. Schwab,Fiction,Fantasy,Paperback,14.69,4.1,36937.0,50.0,Workman Publishing,2020.0,978-8-48652-564-8,5099.0,View
+71,The Letter Rising,Ta-Nehisi Coates,Non-Fiction,Self-Help,Paperback,11.28,4.8,32081.0,9.0,Hachette Book Group,2015.0,978-1-66606-198-5,1207.0,View
+72,Quiet Clock,Charlotte McConaghy,Fiction,Literary Fiction,Hardcover,19.0,4.3,32600.0,19.0,Flatiron Books,2025.0,978-8-58176-217-4,4847.0,View
+73,The Knight Fallen,Joe Abercrombie,Fiction,Crime / Detective,Hardcover,22.2,4.6,3009.0,10.0,Crown,2025.0,978-6-65028-564-5,1435.0,View
+74,The Hunter of Fire,Robin DiAngelo,Non-Fiction,Productivity,Hardcover,19.79,4.7,34577.0,12.0,Bloomsbury Publishing,2020.0,978-4-98895-794-9,4134.0,View
+75,How Warrior,Cal Newport,Non-Fiction,Self-Help,Paperback,15.71,4.5,47115.0,19.0,Convergent Books,2022.0,978-5-19447-506-0,3723.0,View
+76,The Fire of Roses,Malcolm Gladwell,Non-Fiction,Psychology / Health,Hardcover,18.37,4.6,29552.0,42.0,Hachette Book Group,2021.0,978-6-50668-863-5,1967.0,View
+77,The Plan Reborn,Jodi Picoult,Fiction,Dark Romance,Paperback,14.41,4.4,12609.0,54.0,Independently Published,2024.0,978-9-85952-559-9,5421.0,View
+78,The Mirror of Fire,Adam Grant,Non-Fiction,Politics / Society,Paperback,13.06,4.0,4728.0,28.0,Macmillan Publishers,2025.0,978-1-90610-708-8,3305.0,View
+79,Game Reimagined,Piers Anthony,Fiction,Historical Fiction,Hardcover,17.5,4.2,35345.0,38.0,Park Row,2023.0,978-5-47079-496-6,2929.0,View
+80,The Queen and Lightning,Seth Godin,Non-Fiction,Activity / Coloring,Audiobook,21.19,3.7,43995.0,49.0,Tor Books,2024.0,978-9-21104-417-8,3245.0,View
+81,Brave Earth,Publications International,Non-Fiction,Personal Finance,Paperback,17.99,4.5,7628.0,37.0,Baker Books,2025.0,978-8-14947-777-5,5224.0,View
+82,The Soldier and Snow,Daniel Pink,Non-Fiction,Science / Nature,Hardcover,21.01,4.6,31737.0,58.0,WaterBrook,2017.0,978-9-67749-572-4,3292.0,View
+83,The Villain Forever Changed,Orson Scott Card,Fiction,Middle Grade,Kindle Edition,6.45,4.5,29670.0,10.0,Knopf,2026.0,978-7-55820-127-6,602.0,View
+84,Shadow Mirror,Liane Moriarty,Fiction,Contemporary Romance,Audiobook,24.44,4.3,10095.0,53.0,HarperOne,2024.0,978-9-10688-181-0,2264.0,View
+85,The Map Method,bell hooks,Non-Fiction,Biography,Paperback,16.52,4.1,42415.0,37.0,Zondervan,2023.0,978-2-48177-539-0,5206.0,View
+86,The Book Reimagined,Tahereh Mafi,Fiction,Romantasy,Audiobook,15.86,4.4,26354.0,28.0,Penguin Books,2019.0,978-5-18855-453-3,5554.0,View
+87,Below Deal,Kim Stanley Robinson,Fiction,Fantasy,Kindle Edition,8.11,4.4,14072.0,7.0,Sourcebooks Landmark,2020.0,978-8-62196-934-8,4052.0,View
+88,The Shadow Legacy,Demi Moore,Non-Fiction,Science / Nature,Paperback,10.67,4.5,46355.0,36.0,Scribner,2020.0,978-4-20828-844-6,822.0,View
+89,The Storm of Shadows,Bob Woodward,Non-Fiction,Science / Nature,Hardcover,26.44,4.7,29504.0,22.0,Simon & Schuster,2024.0,978-1-97973-752-6,3154.0,View
+90,The Hope and Thunder,Ryan Holiday,Non-Fiction,Productivity,Hardcover,29.32,4.2,25380.0,33.0,Riverhead Books,2025.0,978-2-79397-475-6,2755.0,View
+91,The Day Rising,Carmen Maria Machado,Fiction,Climate Fiction,Paperback,17.24,4.3,5853.0,33.0,Zondervan,2017.0,978-7-21506-929-5,5652.0,View
+92,The Mountain Saga,Dean Koontz,Fiction,YA Romance,Kindle Edition,4.23,4.4,37308.0,41.0,Vintage,2020.0,978-2-90209-188-1,2717.0,View
+93,Into Love,Vince Flynn,Fiction,YA Romance,Hardcover,24.63,4.4,33955.0,60.0,Bloomsbury Publishing,2013.0,978-8-30056-411-2,1512.0,View
+94,Throne of Thorns,Eckhart Tolle,Non-Fiction,Biography,Paperback,14.76,4.3,39784.0,42.0,Convergent Books,2017.0,978-9-89316-445-9,525.0,View
+95,Land Revealed,Peter F. Hamilton,Fiction,Urban Fantasy,Hardcover,22.89,4.3,28238.0,35.0,Entangled: Red Tower Books,2022.0,978-9-28830-420-5,3019.0,View
+96,City Chronicles,Patrick Rothfuss,Fiction,Dark Romance,Paperback,17.5,4.3,41329.0,31.0,Ballantine Books,2018.0,978-5-85718-838-5,1747.0,View
+97,Nurse Revealed,Emily St. John Mandel,Fiction,Climate Fiction,Paperback,9.44,3.9,43877.0,48.0,Anchor Books,2022.0,978-0-24089-541-2,2360.0,View
+98,Sky and Bone,Ibram X. Kendi,Non-Fiction,Politics / Society,Kindle Edition,6.51,4.4,41844.0,48.0,Tor Books,2023.0,978-1-61629-482-5,4765.0,View
+99,The Key Undone,Ryan Holiday,Non-Fiction,Cooking / Food,Hardcover,23.69,4.2,11649.0,30.0,Baker Books,2026.0,978-4-87820-444-8,4373.0,View
+100,The Mind and Bone,Joyce Meyer,Non-Fiction,Activity / Coloring,Paperback,9.45,4.7,32486.0,15.0,Thomas Nelson,2022.0,978-9-59832-251-3,458.0,View
+101,Deal Untold,Greg Bear,Fiction,Science Fiction,Paperback,10.86,4.2,8809.0,14.0,Atria Books,2020.0,978-7-79878-450-8,3104.0,View
+102,Sky Unleashed,Barack Obama,Non-Fiction,Spirituality / Religion,Hardcover,24.28,4.7,13231.0,25.0,Bloomsbury Publishing,2019.0,978-9-98686-656-6,3436.0,View
+103,The River of Glass,Matthew Stover,Fiction,Children's Picture Book,Hardcover,18.77,4.2,4172.0,3.0,Scribner,2024.0,978-3-93616-338-0,1026.0,View
+104,Doctor Approach,Octavia Butler,Fiction,Middle Grade,Paperback,15.91,4.2,10887.0,20.0,Baker Books,2018.0,978-0-32946-527-2,505.0,View
+105,Beauty Fallen,Workman Publishing,Non-Fiction,Business / Finance,Audiobook,17.67,4.2,13451.0,5.0,Thomas Nelson,2020.0,978-7-94972-363-2,325.0,View
+106,Beneath Hero,Patricia A. McKillip,Fiction,YA Romance,Paperback,11.22,4.4,4472.0,14.0,IVP Books,2018.0,978-4-53204-409-9,4905.0,View
+107,Hope Reckoning,James Dashner,Fiction,Middle Grade,Hardcover,19.84,4.5,12450.0,21.0,Howard Books,2020.0,978-8-71712-875-8,5654.0,View
+108,The Night Code,Charlotte McConaghy,Fiction,Horror,Hardcover,19.13,4.5,14199.0,18.0,WaterBrook,2021.0,978-3-86434-600-1,4396.0,View
+109,Deal Method,Freida McFadden,Fiction,Paranormal Romance,Kindle Edition,9.19,4.6,1244.0,19.0,Macmillan Publishers,2026.0,978-7-14159-393-6,1692.0,View
+110,The Hate Forever Changed,Alan Dean Foster,Fiction,Crime / Detective,Paperback,10.14,4.5,3848.0,28.0,Penguin Books,2010.0,978-4-70686-789-8,3694.0,View
+111,Broken Hate,Andy Weir,Fiction,Climate Fiction,Paperback,9.29,4.1,997.0,9.0,Harriman House,2025.0,978-7-40715-652-3,684.0,View
+112,Fierce Teacher,Matthew Stover,Fiction,Science Fiction,Audiobook,32.58,4.2,3069.0,22.0,Vintage,2024.0,978-7-16145-452-6,4520.0,View
+113,The Light of Ice,David Grann,Non-Fiction,Cooking / Food,Hardcover,29.57,4.3,4178.0,10.0,Harmony,2018.0,978-1-68954-967-5,983.0,View
+114,Last Mirror,Colleen Hoover,Fiction,Graphic Novel,Paperback,10.7,4.4,12348.0,5.0,IVP Books,2025.0,978-7-41797-812-9,5993.0,View
+115,Before Book,Gloria Steinem,Non-Fiction,Spirituality / Religion,Paperback,17.82,3.9,3528.0,13.0,HarperCollins,2020.0,978-9-39002-859-2,362.0,View
+116,Night Saga,Michael Pollan,Non-Fiction,Personal Finance,Kindle Edition,8.39,4.5,12054.0,22.0,Independently Published,2025.0,978-2-56160-273-2,6132.0,View
+117,The Strength Legacy,Piers Anthony,Fiction,Climate Fiction,Hardcover,17.78,4.0,8116.0,23.0,Random House,2022.0,978-8-82305-521-0,371.0,View
+118,Across Moon,Kelly Link,Fiction,Horror,Hardcover,27.59,4.0,4579.0,27.0,Park Row,2021.0,978-6-70161-678-3,5947.0,View
+119,How Strength,Mercedes Lackey,Fiction,Historical Fiction,Kindle Edition,9.79,4.1,1762.0,30.0,HarperCollins,2023.0,978-3-37710-988-9,4133.0,View
+120,Prince of Ice,Virginia Evans,Fiction,Cozy Mystery,Paperback,16.5,5.0,6575.0,23.0,Entangled: Red Tower Books,2026.0,978-6-28343-909-1,4342.0,View
+121,Brave Game,Daniel Pink,Non-Fiction,Spirituality / Religion,Paperback,17.46,4.1,11024.0,14.0,Chronicle Books,2015.0,978-4-42302-830-1,914.0,View
+122,After Knight,N.K. Jemisin,Fiction,Children's Picture Book,Paperback,10.68,4.6,7553.0,19.0,Lioncrest Publishing,2023.0,978-1-13442-191-5,4784.0,View
+123,The Message and Bone,Jonathan Haidt,Non-Fiction,Memoir,Paperback,11.7,4.3,7321.0,10.0,St. Martin's Press,2021.0,978-1-57333-357-3,6151.0,View
+124,Beauty Approach,Isabel Wilkerson,Non-Fiction,Personal Finance,Kindle Edition,11.73,4.4,9938.0,6.0,Workman Publishing,2019.0,978-3-72784-421-2,3510.0,View
+125,Shadow Captain,Robert Kiyosaki,Non-Fiction,Creativity / Art,Board Book,11.22,4.3,4973.0,28.0,Lioncrest Publishing,2024.0,978-7-28242-748-4,2232.0,View
+126,The Deal Theory,Eckhart Tolle,Non-Fiction,Psychology / Health,Hardcover,28.88,4.1,1991.0,26.0,Convergent Books,2018.0,978-5-31802-762-9,614.0,View
+127,Out of Sky,Joyce Meyer,Non-Fiction,Activity / Coloring,Paperback,12.36,4.0,11512.0,18.0,Penguin Books,2016.0,978-7-23703-402-6,957.0,View
+128,The Mirror and Snow,Ibram X. Kendi,Non-Fiction,Science / Nature,Paperback,11.69,4.5,13474.0,24.0,Entangled: Red Tower Books,2016.0,978-1-98754-919-2,2254.0,View
+129,The Dream Code,John Grisham,Fiction,Romantasy,Hardcover,19.56,4.2,11746.0,8.0,IVP Books,2018.0,978-1-85674-204-8,1789.0,View
+130,Wild Sky,Andrew Huberman,Non-Fiction,Cooking / Food,Kindle Edition,10.34,4.3,5073.0,21.0,WaterBrook,2023.0,978-2-51049-220-3,2761.0,View
+131,The City Method,Jonathan Haidt,Non-Fiction,Creativity / Art,Hardcover,18.81,4.3,1078.0,29.0,Random House,2020.0,978-7-27895-299-6,4862.0,View
+132,Within Window,Neil Gaiman,Fiction,Children's Picture Book,Hardcover,19.18,4.7,7692.0,20.0,NavPress,2025.0,978-7-82053-623-1,4955.0,View
+133,The Code and Lightning,Morgan Rhodes,Fiction,Contemporary Romance,Paperback,16.75,4.8,2123.0,26.0,Crown,2025.0,978-9-55957-981-9,5449.0,View
+134,Hope and Rain,Charlotte McConaghy,Fiction,Middle Grade,Paperback,16.71,4.7,14948.0,23.0,Tor Books,2025.0,978-6-17770-383-2,6014.0,View
+135,Doctor Never Forgotten,John Green,Fiction,Historical Fiction,Hardcover,20.61,4.6,8196.0,12.0,NavPress,2023.0,978-1-70089-750-5,788.0,View
+136,Land Undone,Peter Attia,Non-Fiction,Personal Finance,Paperback,14.63,4.3,13908.0,16.0,Ballantine Books,2011.0,978-7-69836-100-6,1929.0,View
+137,Hidden World,Mary Kubica,Fiction,Graphic Novel,Hardcover,20.03,4.2,217.0,8.0,Tor Books,2022.0,978-9-39647-631-7,350.0,View
+138,The Fire Framework,Doris Kearns Goodwin,Non-Fiction,Psychology / Health,Paperback,15.95,4.1,12539.0,29.0,WaterBrook,2016.0,978-2-18966-643-9,345.0,View
+139,Truth Saga,Demi Moore,Non-Fiction,Activity / Coloring,Paperback,12.85,4.4,10761.0,4.0,Workman Publishing,2018.0,978-9-89638-391-0,5671.0,View
+140,River of Roses,Tony Robbins,Non-Fiction,Spirituality / Religion,Paperback,16.99,4.2,397.0,13.0,Tor Books,2026.0,978-6-84498-530-5,4755.0,View
+141,Before Game,Trevor Noah,Non-Fiction,Politics / Society,Hardcover,22.22,4.2,2701.0,10.0,Hachette Book Group,2015.0,978-8-36633-927-2,4676.0,View
+142,The Grace and Snow,Oprah Winfrey,Non-Fiction,Biography,Paperback,14.98,4.2,10981.0,25.0,Random House,2017.0,978-2-11487-267-7,3124.0,View
+143,Mind Always Watching,Kim Stanley Robinson,Fiction,Paranormal Romance,Board Book,12.38,4.1,1108.0,17.0,Ballantine Books,2025.0,978-5-30618-361-1,4987.0,View
+144,Map Revealed,Taylor Jenkins Reid,Fiction,Crime / Detective,Hardcover,28.87,4.4,12335.0,22.0,Grand Central Publishing,2021.0,978-3-64559-837-5,2510.0,View
+145,Dream Legacy,Vince Flynn,Fiction,Middle Grade,Kindle Edition,6.94,4.4,3487.0,11.0,Sourcebooks Landmark,2023.0,978-9-41795-575-5,5137.0,View
+146,Sun of Fire,Jack Reacher,Fiction,Psychological Thriller,Hardcover,28.03,4.4,12114.0,11.0,Scribner,2015.0,978-3-65026-603-0,1458.0,View
+147,Iron Sea,Lauren Groff,Fiction,Fantasy,Hardcover,22.64,4.6,4476.0,29.0,Harriman House,2020.0,978-5-51688-563-4,2207.0,View
+148,Into Hope,Martin Seligman,Non-Fiction,Business / Leadership,Hardcover,23.01,4.4,14167.0,5.0,WaterBrook,2015.0,978-4-89076-141-3,2981.0,View
+149,Deal of Thorns,Thich Nhat Hanh,Non-Fiction,Creativity / Art,Paperback,13.15,4.4,395.0,3.0,Knopf,2025.0,978-2-35969-943-6,3347.0,View
+150,The Shadow Unbound,Tamora Pierce,Fiction,Contemporary Romance,Paperback,17.31,4.3,7296.0,28.0,"Little, Brown",2024.0,978-0-60165-799-6,1715.0,View
+151,The Valley Revisited,Brandon Sanderson,Fiction,Science Fiction,Paperback,10.23,4.6,8814.0,9.0,Anchor Books,2024.0,978-0-60134-900-5,4231.0,View
+152,The Detective Revisited,Robin McKinley,Fiction,Science Fiction,Hardcover,26.96,4.9,4013.0,7.0,Convergent Books,2015.0,978-3-44934-646-0,2101.0,View
+153,Knight of Ice,Jon Meacham,Non-Fiction,Health / Longevity,Paperback,9.33,4.7,526.0,18.0,Entangled: Red Tower Books,2022.0,978-9-36406-925-2,3097.0,View
+154,Code Revisited,Doris Kearns Goodwin,Non-Fiction,Personal Finance,Paperback,17.77,4.5,12198.0,15.0,"Little, Brown",2025.0,978-5-32833-824-8,5989.0,View
+155,The Sun Reimagined,Paul Tremblay,Fiction,Crime / Detective,Paperback,16.27,4.1,1905.0,17.0,Baker Books,2016.0,978-1-41194-455-5,1685.0,View
+156,Map Always Watching,Tahereh Mafi,Fiction,Science Fiction,Hardcover,22.45,4.2,2925.0,30.0,Hoover Ink,2021.0,978-5-81568-484-1,4239.0,View
+157,Storm of Ice,Jonathan Haidt,Non-Fiction,Personal Finance,Audiobook,18.21,4.9,1725.0,12.0,Chronicle Books,2023.0,978-7-14062-541-2,5289.0,View
+158,The Mountain and Bone,Patrick Rothfuss,Fiction,Urban Fantasy,Paperback,14.14,4.7,13960.0,17.0,Park Row,2017.0,978-0-66047-189-4,5739.0,View
+159,Silent Key,Publications International,Non-Fiction,Parenting,Audiobook,20.29,4.2,6278.0,30.0,Atria Books,2021.0,978-7-15848-369-7,4127.0,View
+160,Saving Home,Louise Hay,Non-Fiction,Memoir,Hardcover,23.95,4.2,14403.0,17.0,Doubleday,2023.0,978-7-49171-180-6,6171.0,View
+161,Silent Home,Peter F. Hamilton,Fiction,Historical Fiction,Hardcover,29.95,4.1,4425.0,12.0,Macmillan Publishers,2026.0,978-1-60868-669-6,4844.0,View
+162,The Ice Unbound,Simon Sinek,Non-Fiction,Gift / Journal,Kindle Edition,11.8,4.1,14620.0,13.0,Viking,2026.0,978-6-95824-597-9,5312.0,View
+163,Fierce Signal,Morgan Housel,Non-Fiction,Psychology / Health,Paperback,16.13,4.2,14261.0,24.0,Knopf,2024.0,978-2-49384-861-7,2954.0,View
+164,Deep Game,Andy Weir,Fiction,Cozy Mystery,Paperback,13.55,4.8,2422.0,26.0,Riverhead Books,2025.0,978-0-32772-297-3,800.0,View
+165,Saving Lie,Publications International,Non-Fiction,Psychology / Health,Hardcover,19.3,4.6,5930.0,13.0,Viking,2017.0,978-1-47364-128-6,736.0,View
+166,Deep Beast,Hernan Diaz,Fiction,Crime / Detective,Kindle Edition,6.0,4.2,10167.0,27.0,Zondervan,2026.0,978-4-65549-485-5,4092.0,View
+167,Where Message,Rick Rubin,Non-Fiction,Parenting,Paperback,11.48,4.3,10949.0,24.0,Harmony,2026.0,978-4-34688-253-8,6604.0,View
+168,The Beast and Snow,Emily St. John Mandel,Fiction,Contemporary Romance,Kindle Edition,9.14,4.6,3311.0,12.0,Knopf,2024.0,978-8-93665-903-7,5839.0,View
+169,The Plan of Roses,Neil Gaiman,Fiction,Historical Fiction,Paperback,15.69,4.2,5628.0,13.0,Hay House,2019.0,978-7-25437-581-0,5534.0,View
+170,Warrior of Ice,Michael J. Sullivan,Fiction,YA Romance,Paperback,17.87,4.8,14828.0,16.0,Zondervan,2016.0,978-2-20592-599-5,5509.0,View
+171,Love Revisited,Jeannette Walls,Non-Fiction,True Crime,Hardcover,23.2,4.7,12171.0,13.0,Grand Central Publishing,2026.0,978-8-34979-118-0,5475.0,View
+172,Nurse of Shadows,Cinda Williams Chima,Fiction,Middle Grade,Kindle Edition,9.36,4.4,5735.0,15.0,Tor Books,2026.0,978-5-74248-467-3,1694.0,View
+173,The River and Rain,Michael Pollan,Non-Fiction,Memoir,Kindle Edition,9.6,4.3,1971.0,22.0,Simon & Schuster,2025.0,978-1-64627-554-6,1358.0,View
+174,The Storm of Fire,Cal Newport,Non-Fiction,Politics / Society,Paperback,16.05,4.4,8354.0,8.0,NavPress,2023.0,978-4-78569-306-5,6110.0,View
+175,Storm War,Workman Publishing,Non-Fiction,Gift / Journal,Paperback,9.8,4.0,1859.0,30.0,Knopf,2019.0,978-7-48800-370-7,760.0,View
+176,Power Reclaimed,Prince Harry,Non-Fiction,Personal Finance,Audiobook,34.09,4.4,4595.0,30.0,Park Row,2024.0,978-5-33969-216-6,3630.0,View
+177,First Choice,Robin DiAngelo,Non-Fiction,Gift / Journal,Paperback,12.41,4.4,11414.0,30.0,Tor Books,2025.0,978-7-73979-215-6,3964.0,View
+178,City and Snow,Bob Woodward,Non-Fiction,Parenting,Hardcover,25.33,4.4,2635.0,28.0,Chronicle Books,2025.0,978-0-11526-758-2,4497.0,View
+179,The Crown Rising,Jeannette Walls,Non-Fiction,Memoir,Kindle Edition,4.7,4.1,1642.0,29.0,Grand Central Publishing,2022.0,978-1-75191-863-0,1198.0,View
+180,The Kingdom Reimagined,Neil Gaiman,Fiction,Science Fiction,Kindle Edition,6.98,4.5,12773.0,21.0,Zondervan,2023.0,978-5-69314-216-1,6580.0,View
+181,Letter and Thunder,Daniel Kahneman,Non-Fiction,History,Paperback,10.75,4.8,3732.0,16.0,Gallery Books,2025.0,978-5-24125-875-6,742.0,View
+182,Town Reclaimed,various,Non-Fiction,Activity / Coloring,Audiobook,30.61,4.7,3103.0,24.0,Thomas Nelson,2023.0,978-2-23573-496-9,5329.0,View
+183,Into Choice,Rhonda Byrne,Non-Fiction,Productivity,Paperback,15.3,4.7,9269.0,22.0,Crown,2018.0,978-9-48086-803-5,5874.0,View
+184,Sky of Ice,Sabaa Tahir,Fiction,Middle Grade,Kindle Edition,8.69,4.1,614.0,14.0,Convergent Books,2016.0,978-0-36201-373-2,2715.0,View
+185,Between Garden,Matthew Walker,Non-Fiction,Memoir,Hardcover,27.35,4.3,969.0,14.0,WaterBrook,2021.0,978-5-82368-155-0,6462.0,View
+186,The Earth of Fire,John Grisham,Fiction,Crime / Detective,Hardcover,21.89,4.0,7220.0,10.0,Tor Books,2023.0,978-2-86544-966-4,418.0,View
+187,Plan Saga,Brent Weeks,Fiction,Space Opera,Hardcover,27.21,4.6,6809.0,4.0,Crown,2020.0,978-5-53393-469-4,2163.0,View
+188,The Beauty and Bone,Nassim Taleb,Non-Fiction,Memoir,Paperback,13.85,4.7,4833.0,2.0,NavPress,2026.0,978-5-77411-922-8,4026.0,View
+189,Where Ice,Peter F. Hamilton,Fiction,Climate Fiction,Hardcover,18.34,4.0,12346.0,26.0,Macmillan Publishers,2021.0,978-2-13113-570-5,688.0,View
+190,Soul Unleashed,Morgan Housel,Non-Fiction,Self-Help,Paperback,10.05,4.3,296.0,22.0,Macmillan Publishers,2024.0,978-9-15965-817-1,3310.0,View
+191,The Map,Robin Hobb,Fiction,Space Opera,Kindle Edition,11.16,4.5,10588.0,6.0,Thomas Nelson,2019.0,978-5-11461-666-8,1540.0,View
+192,The Star Unleashed,Susanna Clarke,Fiction,Dark Romance,Paperback,14.54,4.2,4340.0,8.0,Convergent Books,2016.0,978-9-17128-971-8,4162.0,View
+193,Found Hope,Kelly Link,Fiction,Middle Grade,Paperback,10.73,4.2,11003.0,11.0,Ace,2024.0,978-9-84299-473-5,3894.0,View
+194,A Town,Anne McCaffrey,Fiction,Graphic Novel,Hardcover,19.28,4.4,10138.0,4.0,Tor Books,2025.0,978-8-35746-369-1,6347.0,View
+195,House and Lightning,Mary Karr,Non-Fiction,Psychology / Health,Paperback,15.94,4.4,7813.0,18.0,Harriman House,2022.0,978-5-75820-110-3,5420.0,View
+196,Knight of Glass,Nicholas Sparks,Fiction,Fantasy,Paperback,9.38,4.2,3587.0,18.0,Park Row,2026.0,978-6-71561-565-0,718.0,View
+197,Burning Deal,Cassandra Clare,Fiction,Paranormal Romance,Board Book,9.55,4.0,5853.0,17.0,Workman Publishing,2025.0,978-0-75776-242-7,1750.0,View
+198,The Sea Chronicles,Patricia A. McKillip,Fiction,YA Dystopian,Hardcover,23.22,4.7,9879.0,7.0,Lioncrest Publishing,2024.0,978-0-41938-144-2,5094.0,View
+199,Across King,Terry Pratchett,Fiction,Historical Fiction,Hardcover,29.9,4.5,13804.0,15.0,Algonquin Books,2023.0,978-2-91685-775-8,2564.0,View
+200,The Land Reckoning,Trevor Noah,Non-Fiction,Politics / Society,Kindle Edition,9.44,4.3,3106.0,17.0,Workman Publishing,2026.0,978-0-79655-615-1,1163.0,View
+201,The Window Method,Viola Davis,Non-Fiction,Parenting,Paperback,16.23,4.8,9639.0,5.0,Viking,2021.0,978-7-40475-979-1,2722.0,View
+202,The Clock System,Tara Westover,Non-Fiction,Self-Help,Paperback,10.38,4.1,10875.0,20.0,Anchor Books,2019.0,978-6-84012-474-9,2661.0,View
+203,The Game of Stars,Michael Connelly,Fiction,YA Dystopian,Paperback,16.04,4.5,8528.0,14.0,Vintage,2025.0,978-9-99727-823-0,1722.0,View
+204,The Empire and Bone,Mark Manson,Non-Fiction,Productivity,Kindle Edition,12.37,4.4,6764.0,21.0,Hay House,2024.0,978-9-17531-892-2,5653.0,View
+205,The Clock Awakening,Ursula K. Le Guin,Fiction,Urban Fantasy,Paperback,10.41,4.8,5985.0,23.0,Algonquin Books,2021.0,978-3-77861-115-1,1148.0,View
+206,Spy Fallen,Ben Greenfield,Non-Fiction,History,Paperback,9.64,4.4,5021.0,12.0,Putnam,2026.0,978-4-80504-932-9,2461.0,View
+207,King of Roses,Carol Dweck,Non-Fiction,Memoir,Hardcover,19.98,4.1,8662.0,19.0,Viking,2010.0,978-3-47655-195-6,5932.0,View
+208,Voice Approach,Dean Koontz,Fiction,Horror,Kindle Edition,11.84,5.0,3587.0,9.0,Doubleday,2018.0,978-9-56665-259-1,1398.0,View
+209,Home Code,Walter Isaacson,Non-Fiction,Politics / Society,Paperback,15.74,4.6,7133.0,17.0,HarperCollins,2026.0,978-8-55519-503-2,4163.0,View
+210,Strength Framework,Bryan Johnson,Non-Fiction,Creativity / Art,Paperback,13.23,4.6,10244.0,12.0,"Little, Brown",2020.0,978-6-37594-529-5,3410.0,View
+211,Game Theory,John Grisham,Fiction,Dark Romance,Paperback,16.24,4.5,14835.0,29.0,Anchor Books,2024.0,978-5-73782-407-4,5027.0,View
+212,The Choice Legacy,Britney Spears,Non-Fiction,Psychology / Health,Hardcover,29.1,4.7,4422.0,13.0,Bloomsbury Publishing,2011.0,978-5-99074-720-3,5149.0,View
+213,Broken Power,Seth Godin,Non-Fiction,Cooking / Food,Audiobook,27.8,4.6,10232.0,20.0,Macmillan Publishers,2021.0,978-1-31233-451-3,2994.0,View
+214,River Rising,James Patterson,Fiction,YA Romance,Paperback,11.25,4.3,12387.0,24.0,Crown,2025.0,978-2-62041-205-1,950.0,View
+215,Window Unbound,Stephen King,Fiction,Graphic Novel,Paperback,11.55,4.3,13938.0,7.0,Convergent Books,2012.0,978-5-52624-984-7,4257.0,View
+216,Sea Revisited,various,Non-Fiction,Business / Leadership,Hardcover,27.45,4.3,7439.0,11.0,Viking,2020.0,978-2-49789-110-0,4719.0,View
+217,The Fear Saga,Daniel Pink,Non-Fiction,Productivity,Kindle Edition,8.92,4.6,7361.0,14.0,Zondervan,2018.0,978-6-59592-325-4,1082.0,View
+218,Always Weakness,Nnedi Ofofor,Fiction,YA Dystopian,Hardcover,22.88,4.9,11676.0,21.0,Grand Central Publishing,2022.0,978-0-29942-150-8,617.0,View
+219,The Shadow and Bone,Trevor Noah,Non-Fiction,Personal Finance,Paperback,16.19,4.7,13166.0,3.0,IVP Books,2020.0,978-2-17345-372-6,1022.0,View
+220,Home and Thunder,Simon Sinek,Non-Fiction,Cooking / Food,Hardcover,29.76,4.4,7946.0,14.0,Sourcebooks Landmark,2024.0,978-5-30789-744-0,6540.0,View
+221,Fire City,James Clear,Non-Fiction,Self-Help,Paperback,11.47,4.7,346.0,3.0,Howard Books,2023.0,978-7-88146-258-5,6756.0,View
+222,Faith of Fire,Dav Pilkey,Fiction,Space Opera,Board Book,13.51,4.7,12597.0,13.0,HarperOne,2025.0,978-3-12798-805-6,3378.0,View
+223,Court Revealed,Gloria Steinem,Non-Fiction,Self-Help,Paperback,16.47,4.7,1328.0,18.0,Hay House,2017.0,978-4-80989-475-7,451.0,View
+224,Iron Heart,Erik Larson,Non-Fiction,Biography,Paperback,14.76,4.2,2009.0,5.0,Macmillan Publishers,2022.0,978-0-27009-282-0,2103.0,View
+225,The Star Undone,Ursula K. Le Guin,Fiction,Climate Fiction,Hardcover,28.56,4.8,1194.0,13.0,Lioncrest Publishing,2023.0,978-5-17641-943-9,2627.0,View
+226,The Captain of Glass,Robert Sapolsky,Non-Fiction,Business / Finance,Hardcover,29.31,4.6,9349.0,25.0,Baker Books,2023.0,978-1-93705-690-5,5977.0,View
+227,Faith Revealed,Thich Nhat Hanh,Non-Fiction,Self-Help,Board Book,10.26,4.1,7254.0,28.0,Workman Publishing,2024.0,978-3-83812-658-3,3526.0,View
+228,Earth of Glass,Gillian Flynn,Fiction,Psychological Thriller,Board Book,9.49,4.7,5359.0,2.0,Howard Books,2025.0,978-4-82569-623-8,5130.0,View
+229,Map Reclaimed,Brandon Sanderson,Fiction,Graphic Novel,Hardcover,24.39,4.4,5519.0,27.0,"Little, Brown",2022.0,978-9-22499-709-4,764.0,View
+230,Map Chronicles,Paula Hawkins,Fiction,Science Fiction,Hardcover,21.14,4.5,9455.0,6.0,Howard Books,2020.0,978-3-30079-151-6,4110.0,View
+231,The Clock Saga,Peter Attia,Non-Fiction,Gift / Journal,Hardcover,20.4,4.2,11633.0,6.0,St. Martin's Press,2025.0,978-8-35966-599-6,5805.0,View
+232,When Hate,Bob Woodward,Non-Fiction,Psychology / Health,Paperback,12.09,4.6,10938.0,2.0,Ballantine Books,2025.0,978-5-90769-941-7,5569.0,View
+233,Court Reclaimed,Nassim Taleb,Non-Fiction,Personal Finance,Paperback,13.23,4.2,3671.0,8.0,IVP Books,2023.0,978-4-81932-594-9,6445.0,View
+234,House of Glass,Andy Weir,Fiction,Psychological Thriller,Paperback,11.43,4.8,14160.0,23.0,Scholastic Press,2020.0,978-0-48337-988-6,2361.0,View
+235,First Detective,Nora Roberts,Fiction,Contemporary Romance,Audiobook,21.09,4.0,501.0,13.0,Flatiron Books,2024.0,978-4-40959-613-4,7121.0,View
+236,Beneath Sea,Arianna Huffington,Non-Fiction,Business / Finance,Audiobook,28.72,4.4,7037.0,9.0,Plata Publishing,2023.0,978-4-89346-437-7,4913.0,View
+237,Game Unbound,Matthew Stover,Fiction,Fantasy,Hardcover,26.34,4.6,2584.0,25.0,Grand Central Publishing,2012.0,978-6-63903-410-7,6582.0,View
+238,The Storm and Bone,Suzanne Collins,Fiction,Romantasy,Paperback,16.01,4.8,2396.0,18.0,St. Martin's Press,2025.0,978-5-34114-972-6,4501.0,View
+239,The Map Reckoning,Victoria Aveyard,Fiction,Crime / Detective,Audiobook,24.79,4.3,4243.0,15.0,HarperCollins,2021.0,978-9-59856-837-5,3706.0,View
+240,Weakness Code,Mary Karr,Non-Fiction,Health / Longevity,Board Book,8.26,4.6,6547.0,18.0,Simon & Schuster,2025.0,978-3-48165-550-6,2974.0,View
+241,Found Choice,Brent Weeks,Fiction,YA Dystopian,Kindle Edition,12.43,4.4,6975.0,12.0,Atria Books,2022.0,978-7-87373-829-3,4206.0,View
+242,Game Method,Bessel van der Kolk,Non-Fiction,Biography,Paperback,12.42,4.3,12787.0,7.0,Riverhead Books,2026.0,978-2-31249-989-2,1949.0,View
+243,The Kingdom Forever Changed,Cinda Williams Chima,Fiction,Psychological Thriller,Hardcover,23.47,4.5,8284.0,9.0,Convergent Books,2018.0,978-7-69472-519-7,1136.0,View
+244,Against Message,Taylor Jenkins Reid,Fiction,Dark Romance,Hardcover,27.88,4.1,5089.0,12.0,Simon & Schuster,2026.0,978-1-64651-282-2,5993.0,View
+245,Saving Deal,Jack Reacher,Fiction,Fantasy,Hardcover,24.15,4.4,11580.0,29.0,Scribner,2019.0,978-6-78766-314-3,5503.0,View
+246,Beyond World,Rick Warren,Non-Fiction,Biography,Hardcover,26.47,4.5,8354.0,17.0,Chronicle Books,2025.0,978-3-48074-298-0,1460.0,View
+247,Hidden King,Jodi Picoult,Fiction,Middle Grade,Kindle Edition,6.76,4.2,300.0,5.0,Entangled: Red Tower Books,2024.0,978-6-84569-730-0,7310.0,View
+248,Princess of Roses,David Grann,Non-Fiction,History,Kindle Edition,6.68,4.4,12077.0,23.0,Anchor Books,2020.0,978-0-37297-691-5,7045.0,View
+249,The Crown and Bone,Greg Bear,Fiction,Graphic Novel,Audiobook,29.19,4.4,14569.0,9.0,Sourcebooks Landmark,2020.0,978-3-78825-409-2,1417.0,View
+250,The Home and Thunder,Jon Meacham,Non-Fiction,Business / Finance,Kindle Edition,5.28,4.5,14483.0,5.0,Scribner,2025.0,978-2-36894-841-0,4263.0,View
+251,Dark Empire,Charlotte McConaghy,Fiction,Romantasy,Kindle Edition,9.74,4.4,2397.0,5.0,NavPress,2023.0,978-7-97965-220-4,1725.0,View
+252,The Sun Blueprint,Charlotte McConaghy,Fiction,Middle Grade,Paperback,9.63,4.6,2824.0,9.0,Tor Books,2021.0,978-0-71700-791-0,1371.0,View
+253,Code Untold,Tim Ferriss,Non-Fiction,Gift / Journal,Paperback,16.21,4.4,2592.0,11.0,NavPress,2024.0,978-7-71675-337-3,1683.0,View
+254,Soul Reborn,J.K. Rowling,Fiction,YA Dystopian,Hardcover,27.98,4.3,2362.0,13.0,Riverhead Books,2020.0,978-2-76577-205-6,7205.0,View
+255,Map Approach,Patricia A. McKillip,Fiction,Cozy Mystery,Paperback,12.06,4.5,3616.0,10.0,Anchor Books,2025.0,978-3-32686-778-1,6566.0,View
+256,Game of Stars,Daniel Kahneman,Non-Fiction,Productivity,Hardcover,24.74,4.1,3154.0,6.0,Convergent Books,2022.0,978-0-21866-322-2,5269.0,View
+257,Wild Mirror,Virginia Evans,Fiction,Graphic Novel,Kindle Edition,10.11,4.9,2870.0,2.0,Chronicle Books,2023.0,978-8-62978-967-2,7497.0,View
+258,The Weakness and Lightning,Viola Davis,Non-Fiction,Self-Help,Hardcover,22.65,4.1,1780.0,11.0,Tor Books,2017.0,978-3-82800-493-5,7396.0,View
+259,The Map Approach,bell hooks,Non-Fiction,History,Audiobook,28.9,4.7,3772.0,9.0,HarperOne,2021.0,978-6-56570-331-2,3997.0,View
+260,Sun Forever Changed,Emily St. John Mandel,Fiction,YA Dystopian,Hardcover,25.97,4.3,1213.0,12.0,IVP Books,2024.0,978-4-70940-629-1,4807.0,View
+261,High Book,Jeffrey Mason,Non-Fiction,Politics / Society,Hardcover,21.3,4.0,2463.0,5.0,Howard Books,2017.0,978-9-49855-844-9,2655.0,View
+262,The Ice Untold,Jodi Picoult,Fiction,Children's Picture Book,Paperback,11.52,5.0,2154.0,1.0,Workman Publishing,2025.0,978-2-87564-856-2,5923.0,View
+263,The River Legacy,Demi Moore,Non-Fiction,History,Paperback,12.95,4.3,2876.0,1.0,IVP Books,2024.0,978-1-16884-271-7,3792.0,View
+264,Always Faith,Viola Davis,Non-Fiction,Science / Nature,Hardcover,29.49,4.3,386.0,2.0,Rodale Books,2026.0,978-5-66595-725-4,3272.0,View
+265,Voice Never Forgotten,Andy Weir,Fiction,Psychological Thriller,Paperback,9.87,4.6,1847.0,12.0,Gallery Books,2019.0,978-0-13106-734-1,995.0,View
+266,Spy Reclaimed,Adam Grant,Non-Fiction,Cooking / Food,Hardcover,28.99,4.6,2314.0,13.0,Convergent Books,2021.0,978-5-43729-265-1,2803.0,View
+267,Forest of Shadows,Octavia Butler,Fiction,Crime / Detective,Hardcover,18.86,4.4,920.0,15.0,Viking,2021.0,978-1-14569-174-1,5214.0,View
+268,The Beast Theory,Publications International,Non-Fiction,Politics / Society,Hardcover,22.24,4.2,624.0,9.0,Hoover Ink,2018.0,978-7-25886-680-8,3476.0,View
+269,A Letter,David Goggins,Non-Fiction,Creativity / Art,Board Book,12.62,4.3,924.0,11.0,"Little, Brown",2024.0,978-1-92941-548-3,1684.0,View
+270,Hate of Roses,Rick Riordan,Fiction,Contemporary Romance,Paperback,16.08,4.6,400.0,7.0,Harmony,2016.0,978-8-70079-794-8,1760.0,View
+271,Iron Captain,Paula Hawkins,Fiction,Science Fiction,Kindle Edition,4.87,4.0,573.0,14.0,Bloomsbury Publishing,2025.0,978-7-87984-918-9,2348.0,View
+272,Beyond Code,Rick Rubin,Non-Fiction,Personal Finance,Paperback,10.26,4.1,3450.0,3.0,Vintage,2024.0,978-2-67496-349-9,877.0,View
+273,Deal Undone,Jeffrey Mason,Non-Fiction,History,Hardcover,19.67,4.2,3425.0,4.0,Chronicle Books,2026.0,978-0-88154-284-7,5559.0,View
+274,Against War,Ben Greenfield,Non-Fiction,Health / Longevity,Paperback,15.92,4.2,1754.0,5.0,Bloomsbury Publishing,2013.0,978-2-99816-964-7,4623.0,View
+275,Knight Always Watching,Alan Dean Foster,Fiction,Science Fiction,Paperback,16.06,4.3,1977.0,12.0,Algonquin Books,2022.0,978-5-64927-303-5,2434.0,View
+276,The Crown Fallen,Seth Godin,Non-Fiction,True Crime,Paperback,14.47,4.4,1508.0,7.0,Independently Published,2020.0,978-3-92840-467-4,2208.0,View
+277,The Ocean Unbound,Paul Tremblay,Fiction,Middle Grade,Paperback,16.14,4.9,4785.0,9.0,Hachette Book Group,2025.0,978-6-78389-600-3,5400.0,View
+278,Below Empire,Matt Haig,Fiction,Contemporary Romance,Board Book,13.12,4.2,4180.0,1.0,Harriman House,2021.0,978-7-22844-563-7,2526.0,View
+279,Star Reclaimed,Greg Bear,Fiction,Cozy Mystery,Hardcover,24.4,3.8,3849.0,13.0,Zondervan,2016.0,978-6-34241-908-5,5692.0,View
+280,Truth and Lightning,David Eddings,Fiction,Science Fiction,Audiobook,28.48,4.1,472.0,2.0,Independently Published,2021.0,978-9-15357-474-5,1995.0,View
+281,The Villain of Roses,Ta-Nehisi Coates,Non-Fiction,Politics / Society,Paperback,9.56,4.2,4364.0,14.0,Zondervan,2016.0,978-8-98907-945-8,2956.0,View
+282,The Soldier Framework,Tomi Adeyemi,Fiction,Children's Picture Book,Hardcover,23.44,4.6,1723.0,9.0,Penguin Books,2026.0,978-4-64596-798-8,1645.0,View
+283,Game and Rain,Publications International,Non-Fiction,Self-Help,Hardcover,26.05,4.5,2541.0,10.0,Sourcebooks Landmark,2016.0,978-2-44079-332-7,3612.0,View
+284,Secret Sky,Dean Koontz,Fiction,Cozy Mystery,Paperback,17.93,4.2,4756.0,3.0,Park Row,2021.0,978-2-36890-675-0,6020.0,View
+285,Saving Garden,Cinda Williams Chima,Fiction,Dark Romance,Audiobook,18.11,4.7,4206.0,6.0,Hay House,2024.0,978-7-47988-872-9,6033.0,View
+286,Rising Forest,Carol Dweck,Non-Fiction,Biography,Hardcover,18.19,4.3,500.0,10.0,Algonquin Books,2024.0,978-8-39116-900-4,2175.0,View
+287,Garden Unleashed,Kim Stanley Robinson,Fiction,Dark Romance,Audiobook,22.38,4.3,2928.0,5.0,Vintage,2026.0,978-1-38271-845-7,6648.0,View
+288,Sea and Bone,Rick Rubin,Non-Fiction,Personal Finance,Audiobook,26.8,4.5,3128.0,2.0,Rodale Books,2010.0,978-4-64331-279-8,4361.0,View
+289,Silent City,Carol Dweck,Non-Fiction,Cooking / Food,Paperback,9.01,4.4,3921.0,2.0,Hay House,2024.0,978-6-33510-603-3,811.0,View
+290,The Princess of Ice,Susanna Clarke,Fiction,Paranormal Romance,Hardcover,18.89,5.0,3826.0,15.0,Flatiron Books,2024.0,978-2-16932-379-5,4016.0,View
+291,The Valley Method,Barack Obama,Non-Fiction,Self-Help,Kindle Edition,10.15,4.3,3019.0,2.0,Flatiron Books,2023.0,978-2-11690-240-8,2887.0,View
+292,Sea Framework,Thich Nhat Hanh,Non-Fiction,Health / Longevity,Kindle Edition,11.21,4.8,3468.0,8.0,Bloomsbury Publishing,2026.0,978-2-12277-591-5,3136.0,View
+293,House Awakening,V.E. Schwab,Fiction,Graphic Novel,Paperback,17.82,4.0,965.0,2.0,St. Martin's Press,2011.0,978-6-15572-301-1,854.0,View
+294,Code Forever Changed,Martin Seligman,Non-Fiction,Productivity,Hardcover,19.59,4.6,2929.0,1.0,Baker Books,2015.0,978-4-85989-456-5,1903.0,View
+295,The House Always Watching,Mary Kubica,Fiction,Psychological Thriller,Paperback,10.92,4.0,3052.0,12.0,HarperOne,2023.0,978-1-33704-954-5,3699.0,View
+296,The Beauty Blueprint,Matthew Stover,Fiction,Middle Grade,Kindle Edition,4.73,4.4,4094.0,2.0,Independently Published,2021.0,978-9-50895-803-7,2442.0,View
+297,Quiet City,Brené Brown,Non-Fiction,Business / Finance,Paperback,12.54,4.2,1432.0,2.0,Gallery Books,2020.0,978-5-36248-709-6,1599.0,View
+298,Ice Reclaimed,Daniel Kahneman,Non-Fiction,Cooking / Food,Paperback,13.39,3.8,1940.0,11.0,Penguin Books,2026.0,978-1-16927-950-1,4676.0,View
+299,The Desert of Fire,Publications International,Non-Fiction,Spirituality / Religion,Hardcover,24.04,4.5,194.0,13.0,Plata Publishing,2012.0,978-1-60283-560-5,7584.0,View
+300,First City,Nassim Taleb,Non-Fiction,Spirituality / Religion,Hardcover,23.37,4.1,4586.0,11.0,St. Martin's Press,2023.0,978-7-83695-974-2,4750.0,View
+301,Through Day,Robert Kiyosaki,Non-Fiction,Activity / Coloring,Kindle Edition,9.62,4.2,2977.0,7.0,Convergent Books,2020.0,978-3-42455-340-4,5456.0,View
+302,Cold Heart,Rhonda Byrne,Non-Fiction,Gift / Journal,Audiobook,20.32,4.6,3897.0,10.0,Grand Central Publishing,2011.0,978-6-84757-499-5,5294.0,View
+303,Saving Room,Adam Grant,Non-Fiction,Spirituality / Religion,Kindle Edition,8.81,4.4,4748.0,7.0,Chronicle Books,2025.0,978-1-85784-197-9,3365.0,View
+304,Cold Lie,Viktor Frankl,Non-Fiction,Self-Help,Hardcover,20.26,4.5,4271.0,8.0,Vintage,2024.0,978-2-12438-742-8,7675.0,View
+305,Fear Theory,Naomi Novik,Fiction,Urban Fantasy,Kindle Edition,10.88,4.5,577.0,11.0,Lioncrest Publishing,2018.0,978-4-47623-761-2,2710.0,View
+306,Valley of Shadows,Ta-Nehisi Coates,Non-Fiction,True Crime,Hardcover,17.47,4.2,1355.0,5.0,Viking,2016.0,978-4-96333-663-2,5890.0,View
+307,Warrior Reimagined,Tomi Adeyemi,Fiction,Urban Fantasy,Hardcover,23.49,4.7,4804.0,13.0,Viking,2026.0,978-7-21829-343-9,1615.0,View
+308,Silent Sky,Michael Pollan,Non-Fiction,History,Audiobook,16.11,4.7,4420.0,6.0,Bloomsbury Publishing,2024.0,978-5-81531-533-7,6208.0,View
+309,Below Fear,Jon Meacham,Non-Fiction,Memoir,Hardcover,26.1,4.7,4431.0,14.0,HarperOne,2018.0,978-6-11031-502-4,3082.0,View
+310,The Mirror Reborn,Tara Westover,Non-Fiction,Parenting,Audiobook,21.64,4.2,3510.0,15.0,Scholastic Press,2026.0,978-2-44205-618-1,3502.0,View
+311,Before Knight,Joyce Meyer,Non-Fiction,Self-Help,Paperback,10.41,3.7,1115.0,14.0,Lioncrest Publishing,2023.0,978-5-69177-589-2,2757.0,View
+312,The Earth of Thorns,Matthew Stover,Fiction,Romantasy,Hardcover,25.14,4.3,778.0,8.0,Howard Books,2018.0,978-2-16525-510-9,4137.0,View
+313,Soldier and Ash,Brian McClellan,Fiction,Climate Fiction,Audiobook,31.26,4.4,3179.0,3.0,Crown,2021.0,978-9-38254-943-4,6579.0,View
+314,The Game Reimagined,Colleen Hoover,Fiction,Historical Fiction,Hardcover,28.32,4.8,3306.0,11.0,Hoover Ink,2018.0,978-6-88275-362-1,1408.0,View
+315,Dark Warrior,Tim Ferriss,Non-Fiction,Psychology / Health,Board Book,11.91,4.2,4176.0,8.0,Independently Published,2026.0,978-2-21750-424-8,4176.0,View
+316,When River,Isabel Wilkerson,Non-Fiction,Self-Help,Audiobook,21.3,4.3,4074.0,13.0,Vintage,2026.0,978-7-16975-293-2,1079.0,View
+317,Book Never Forgotten,bell hooks,Non-Fiction,Spirituality / Religion,Hardcover,27.99,4.5,816.0,4.0,Atria Books,2026.0,978-2-76681-942-4,5248.0,View
+318,Voice System,Peter F. Hamilton,Fiction,Middle Grade,Board Book,8.84,4.3,3110.0,10.0,Scholastic Press,2026.0,978-5-30155-129-1,4406.0,View
+319,The Nurse Unleashed,Jeff Kinney,Fiction,Middle Grade,Kindle Edition,10.68,4.1,808.0,7.0,Doubleday,2019.0,978-6-21690-121-3,1972.0,View
+320,Beyond Captain,Viktor Frankl,Non-Fiction,Politics / Society,Hardcover,28.5,4.3,3952.0,5.0,Plata Publishing,2023.0,978-1-65382-930-5,5668.0,View
+321,The War Chronicles,Tana French,Fiction,Historical Fiction,Hardcover,18.02,4.5,1096.0,11.0,Doubleday,2026.0,978-8-66063-402-9,1032.0,View
+322,The Desert Framework,Morgan Housel,Non-Fiction,Politics / Society,Paperback,14.94,4.2,1520.0,13.0,Harriman House,2017.0,978-0-20917-526-4,3215.0,View
+323,Hero Theory,Freida McFadden,Fiction,Romantasy,Paperback,9.11,4.2,3368.0,14.0,Baker Books,2024.0,978-9-73795-410-9,7307.0,View
+324,The Court and Thunder,Patricia A. McKillip,Fiction,Climate Fiction,Hardcover,25.44,4.2,3619.0,14.0,Anchor Books,2024.0,978-3-21284-408-7,1861.0,View
+325,The House Awakening,Mary Karr,Non-Fiction,Gift / Journal,Paperback,9.06,4.1,3455.0,14.0,Algonquin Books,2022.0,978-9-82653-397-0,4643.0,View
+326,The Hate Chronicles,Jeffrey Mason,Non-Fiction,History,Paperback,14.59,4.1,2890.0,8.0,Penguin Books,2024.0,978-2-47750-843-3,4496.0,View
+327,The Court Revisited,Martin Seligman,Non-Fiction,Biography,Paperback,15.73,4.3,1684.0,3.0,Scholastic Press,2023.0,978-6-74713-410-3,2369.0,View
+328,House Reckoning,Daniel Pink,Non-Fiction,Biography,Paperback,11.01,4.3,2162.0,6.0,NavPress,2025.0,978-0-83010-373-2,7647.0,View
+329,World and Bone,Anthony Ryan,Fiction,Literary Fiction,Hardcover,28.31,4.5,2443.0,12.0,Putnam,2021.0,978-7-23014-257-5,3399.0,View
+330,Desert Saga,James Dashner,Fiction,Children's Picture Book,Kindle Edition,7.73,4.3,2060.0,3.0,Scribner,2025.0,978-6-39908-241-6,4046.0,View
+331,Mirror Undone,Jonathan Haidt,Non-Fiction,Celebrity Memoir,Hardcover,22.1,5.0,1286.0,15.0,Rodale Books,2023.0,978-8-48761-529-6,7918.0,View
+332,Land Saga,Robin DiAngelo,Non-Fiction,Biography,Hardcover,28.53,4.5,3363.0,13.0,Sourcebooks Landmark,2018.0,978-1-14845-650-5,3858.0,View
+333,The Princess and Thunder,Rebecca Yarros,Fiction,Romantasy,Audiobook,25.79,4.4,2539.0,12.0,Putnam,2021.0,978-1-17857-961-5,2793.0,View
+334,The Hero Code,Doris Kearns Goodwin,Non-Fiction,Business / Leadership,Paperback,16.05,4.9,4742.0,11.0,Hoover Ink,2016.0,978-8-42457-207-5,4898.0,View
+335,Storm and Rain,Morgan Rhodes,Fiction,Climate Fiction,Paperback,15.08,4.1,3284.0,14.0,"Little, Brown",2019.0,978-6-67682-805-7,6664.0,View
+336,Falling Earth,Mark Manson,Non-Fiction,Parenting,Kindle Edition,12.49,4.6,3075.0,15.0,Workman Publishing,2026.0,978-6-24461-223-5,5355.0,View
+337,Loud King,Trevor Noah,Non-Fiction,Activity / Coloring,Paperback,17.04,4.5,4054.0,1.0,Flatiron Books,2016.0,978-1-15856-527-7,5368.0,View
+338,Fire Throne,Kelly Link,Fiction,Historical Fiction,Hardcover,22.32,4.3,1957.0,15.0,Anchor Books,2021.0,978-0-97876-553-4,5967.0,View
+339,Before War,Ben Greenfield,Non-Fiction,Parenting,Audiobook,17.4,4.5,205.0,5.0,Doubleday,2025.0,978-9-68226-186-8,5649.0,View
+340,Between Knight,Brandon Sanderson,Fiction,Paranormal Romance,Paperback,9.88,4.3,1427.0,5.0,Viking,2016.0,978-1-30214-414-6,6239.0,View
+341,Chasing Teacher,Cassandra Clare,Fiction,Paranormal Romance,Audiobook,32.98,4.6,4940.0,10.0,Putnam,2018.0,978-8-60469-217-4,1178.0,View
+342,The Kingdom Code,Tim Ferriss,Non-Fiction,Creativity / Art,Paperback,12.65,4.5,737.0,14.0,Crown,2024.0,978-2-58929-653-2,7090.0,View
+343,The Warrior Reimagined,Rhonda Byrne,Non-Fiction,Activity / Coloring,Paperback,10.44,4.3,784.0,7.0,Tor Books,2024.0,978-8-46629-999-6,2413.0,View
+344,The Moon of Roses,Octavia Butler,Fiction,YA Romance,Audiobook,27.17,4.4,85.0,15.0,Atria Books,2010.0,978-6-82848-813-7,6934.0,View
+345,Cold Hero,Tamora Pierce,Fiction,YA Dystopian,Paperback,10.73,4.8,2353.0,11.0,Flatiron Books,2026.0,978-3-21792-935-9,5811.0,View
+346,First Key,Jonathan Haidt,Non-Fiction,Spirituality / Religion,Hardcover,25.57,4.4,4684.0,11.0,Riverhead Books,2024.0,978-2-18566-702-2,6803.0,View
+347,Door Framework,Peter Attia,Non-Fiction,True Crime,Audiobook,21.45,4.5,1047.0,11.0,"Little, Brown",2022.0,978-5-77797-877-0,7934.0,View
+348,Last King,Michael J. Sullivan,Fiction,Urban Fantasy,Paperback,11.79,4.2,842.0,1.0,Penguin Books,2022.0,978-9-92090-442-4,2720.0,View
+349,Where Clock,Taylor Jenkins Reid,Fiction,Science Fiction,Paperback,17.0,4.2,557.0,15.0,Simon & Schuster,2025.0,978-4-90050-741-6,1236.0,View
+350,The Message,Ta-Nehisi Coates,Non-Fiction,Cooking / Food,Audiobook,27.37,4.0,2832.0,11.0,Penguin Books,2026.0,978-7-77792-436-9,2276.0,View
+351,The Villain of Stars,Robin Hobb,Fiction,Urban Fantasy,Kindle Edition,4.53,4.3,2980.0,5.0,Anchor Books,2023.0,978-2-29321-580-4,5644.0,View
+352,The Queen Undone,Nnedi Ofofor,Fiction,Horror,Audiobook,30.7,4.6,2847.0,4.0,Howard Books,2024.0,978-7-88612-809-5,7683.0,View
+353,Secret Throne,Tamora Pierce,Fiction,Space Opera,Hardcover,20.1,4.3,2765.0,13.0,Crown,2025.0,978-6-34149-945-0,3678.0,View
+354,Always Court,Liane Moriarty,Fiction,Horror,Paperback,16.96,3.8,1477.0,6.0,Doubleday,2025.0,978-2-35688-122-2,7612.0,View
+355,The Message Blueprint,Robert Asprin,Fiction,Cozy Mystery,Board Book,14.97,4.8,585.0,2.0,Tor Books,2016.0,978-3-35124-645-6,6398.0,View
+356,Deal Chronicles,David Eddings,Fiction,YA Romance,Board Book,14.19,4.1,1764.0,12.0,St. Martin's Press,2014.0,978-9-18503-271-8,3891.0,View
+357,Map and Snow,David Sinclair,Non-Fiction,Parenting,Hardcover,25.29,4.5,1747.0,4.0,HarperOne,2026.0,978-3-61891-323-4,4195.0,View
+358,A Ice,Emily St. John Mandel,Fiction,Space Opera,Paperback,13.6,4.0,2805.0,7.0,Plata Publishing,2022.0,978-6-58170-923-7,3313.0,View
+359,Sea Legacy,Brad Thor,Fiction,Historical Fiction,Paperback,11.04,4.6,4523.0,4.0,WaterBrook,2020.0,978-5-42771-409-4,2279.0,View
+360,Warrior and Bone,Rainbow Rowell,Fiction,Dark Romance,Paperback,15.5,4.6,1769.0,8.0,Algonquin Books,2018.0,978-8-71438-839-7,3510.0,View
+361,The Crown and Lightning,John Grisham,Fiction,Graphic Novel,Paperback,16.28,4.5,3483.0,7.0,Harriman House,2024.0,978-8-49274-433-9,912.0,View
+362,Iron Day,Daniel Kahneman,Non-Fiction,Parenting,Paperback,17.65,4.2,2545.0,2.0,WaterBrook,2017.0,978-8-33283-132-9,4726.0,View
+363,Hunter Blueprint,James Clear,Non-Fiction,Business / Finance,Paperback,16.73,4.3,957.0,3.0,St. Martin's Press,2023.0,978-1-60986-986-3,1790.0,View
+364,The Ice Method,Rick Rubin,Non-Fiction,Science / Nature,Kindle Edition,9.43,4.5,2072.0,9.0,Riverhead Books,2020.0,978-7-70319-573-9,1048.0,View
+365,Within Knight,Lisa Jewell,Fiction,Cozy Mystery,Audiobook,25.74,4.4,1829.0,15.0,IVP Books,2022.0,978-8-25889-477-1,6918.0,View
+366,The Moon Rising,Viola Davis,Non-Fiction,Cooking / Food,Paperback,12.58,4.3,1642.0,7.0,Viking,2012.0,978-1-27888-434-7,4703.0,View
+367,The Game Saga,Leigh Bardugo,Fiction,Middle Grade,Hardcover,22.07,4.8,2288.0,3.0,Atria Books,2021.0,978-3-14514-791-8,2504.0,View
+368,Fierce House,Matthew Walker,Non-Fiction,Psychology / Health,Paperback,9.13,4.6,278.0,1.0,Gallery Books,2020.0,978-1-38910-198-2,6667.0,View
+369,The War of Roses,Terry Pratchett,Fiction,Space Opera,Paperback,11.9,4.8,148.0,7.0,Knopf,2018.0,978-1-96240-934-4,6062.0,View
+370,The Game Always Watching,Gary Vaynerchuk,Non-Fiction,Memoir,Paperback,14.71,4.4,2654.0,14.0,Macmillan Publishers,2024.0,978-5-12313-723-9,4417.0,View
+371,The War Saga,Robin Hobb,Fiction,Science Fiction,Paperback,11.66,4.5,360.0,4.0,Workman Publishing,2026.0,978-7-53082-237-4,3343.0,View
+372,Land of Thorns,Peter F. Hamilton,Fiction,Urban Fantasy,Hardcover,19.88,4.5,3175.0,9.0,HarperOne,2020.0,978-0-18469-990-7,1317.0,View
+373,The Captain Chronicles,Nora Roberts,Fiction,Horror,Hardcover,24.87,4.3,1699.0,5.0,St. Martin's Press,2026.0,978-1-57131-507-6,2120.0,View
+374,The Earth and Bone,Andrew Huberman,Non-Fiction,Creativity / Art,Paperback,13.16,4.7,3765.0,5.0,Workman Publishing,2021.0,978-7-19429-441-2,6604.0,View
+375,Game Revealed,Jon Meacham,Non-Fiction,Spirituality / Religion,Hardcover,24.64,4.3,1069.0,7.0,Ballantine Books,2026.0,978-3-67186-361-5,4924.0,View
+376,Detective Theory,Paul Tremblay,Fiction,Paranormal Romance,Hardcover,25.84,4.4,2133.0,4.0,Convergent Books,2023.0,978-2-11617-219-1,6030.0,View
+377,Hunter of Stars,Dave Ramsey,Non-Fiction,Memoir,Paperback,12.69,4.7,778.0,2.0,NavPress,2024.0,978-5-28705-375-3,8372.0,View
+378,Above Shadow,Mark Lawrence,Fiction,Cozy Mystery,Paperback,15.33,4.1,1672.0,8.0,Bloomsbury Publishing,2017.0,978-7-84329-933-3,2276.0,View
+379,The Spy,Lisa Jewell,Fiction,YA Dystopian,Paperback,9.26,4.4,875.0,1.0,IVP Books,2014.0,978-0-97205-696-0,1551.0,View
+380,Sea of Shadows,Veronica Roth,Fiction,Urban Fantasy,Hardcover,21.91,4.7,518.0,6.0,Scholastic Press,2026.0,978-0-69889-991-6,6701.0,View
+381,Moon Revisited,Nnedi Ofofor,Fiction,Psychological Thriller,Board Book,13.68,4.6,424.0,13.0,WaterBrook,2024.0,978-7-40612-721-7,4040.0,View
+382,Fire Voice,Mercedes Lackey,Fiction,YA Romance,Kindle Edition,6.7,4.4,4545.0,14.0,HarperOne,2022.0,978-1-73198-778-8,2737.0,View
+383,Spy Rising,Cal Newport,Non-Fiction,Parenting,Hardcover,28.99,4.2,2776.0,14.0,Riverhead Books,2018.0,978-9-18476-759-5,3854.0,View
+384,The Detective Blueprint,Edith Eger,Non-Fiction,Activity / Coloring,Kindle Edition,5.03,4.2,3062.0,3.0,Hoover Ink,2025.0,978-9-10220-418-0,5601.0,View
+385,World Unbound,Seth Godin,Non-Fiction,Self-Help,Kindle Edition,6.66,4.5,1257.0,10.0,Baker Books,2019.0,978-0-88496-427-4,4885.0,View
+386,The River Revisited,Vince Flynn,Fiction,Science Fiction,Paperback,13.38,4.8,3259.0,5.0,Convergent Books,2026.0,978-2-12826-661-6,3536.0,View
+387,Truth Never Forgotten,Jeff Kinney,Fiction,YA Romance,Kindle Edition,9.21,4.6,2540.0,8.0,Riverhead Books,2024.0,978-2-67918-812-7,3158.0,View
+388,Last Doctor,Jeffrey Mason,Non-Fiction,Business / Leadership,Paperback,9.46,3.9,4272.0,11.0,Plata Publishing,2020.0,978-2-92178-839-6,2783.0,View
+389,The Detective System,Leigh Bardugo,Fiction,Psychological Thriller,Paperback,10.09,4.1,1892.0,1.0,Riverhead Books,2023.0,978-7-45877-810-1,7285.0,View
+390,The World and Ash,Dalai Lama,Non-Fiction,Celebrity Memoir,Kindle Edition,11.04,4.0,4392.0,8.0,Algonquin Books,2014.0,978-8-95419-227-3,8690.0,View
+391,Falling Beauty,Matthew Stover,Fiction,Historical Fiction,Paperback,15.77,4.5,2495.0,6.0,Ballantine Books,2026.0,978-6-96266-100-3,3244.0,View
+392,The Land Blueprint,Kim Stanley Robinson,Fiction,Literary Fiction,Kindle Edition,6.12,4.5,1590.0,3.0,Crown,2019.0,978-2-88924-665-3,5631.0,View
+393,Quiet Spy,Seth Godin,Non-Fiction,True Crime,Hardcover,17.91,4.3,1628.0,12.0,Convergent Books,2020.0,978-8-89291-267-6,7516.0,View
+394,Spy of Glass,Malcolm Gladwell,Non-Fiction,Personal Finance,Paperback,11.99,3.6,2288.0,3.0,Knopf,2026.0,978-4-11292-200-6,8811.0,View
+395,The Grace of Stars,Paul Tremblay,Fiction,Children's Picture Book,Paperback,9.42,4.2,1530.0,6.0,WaterBrook,2025.0,978-8-82308-708-6,4696.0,View
+396,Within Warrior,Gabor Maté,Non-Fiction,Cooking / Food,Hardcover,21.59,4.8,3889.0,9.0,Plata Publishing,2019.0,978-8-39984-412-1,8553.0,View
+397,Above Kingdom,James Clear,Non-Fiction,Spirituality / Religion,Board Book,10.96,4.0,3979.0,8.0,WaterBrook,2022.0,978-8-26343-515-0,5842.0,View
+398,Window and Thunder,Frank Herbert,Fiction,Crime / Detective,Paperback,10.19,4.4,2944.0,1.0,Hoover Ink,2021.0,978-2-58927-215-5,8283.0,View
+399,The Empire of Glass,Mark Manson,Non-Fiction,Politics / Society,Audiobook,32.84,4.4,98.0,10.0,Sourcebooks Landmark,2022.0,978-5-24046-105-5,3848.0,View
+400,Voice Framework,Naomi Novik,Fiction,Psychological Thriller,Kindle Edition,6.24,4.3,3905.0,7.0,Park Row,2020.0,978-6-33878-649-4,2580.0,View
+401,Land Reborn,Robin Hobb,Fiction,Contemporary Romance,Paperback,15.69,4.5,1680.0,8.0,Avery,2026.0,978-1-65193-600-8,8921.0,View
+402,The Captain Forever Changed,James Clear,Non-Fiction,Politics / Society,Kindle Edition,6.12,4.3,2852.0,7.0,Baker Books,2026.0,978-0-66928-591-4,5427.0,View
+403,Sky Blueprint,Daniel Kahneman,Non-Fiction,Parenting,Kindle Edition,8.51,4.7,4893.0,11.0,Knopf,2024.0,978-1-27340-510-0,5292.0,View
+404,Where Shadow,Ta-Nehisi Coates,Non-Fiction,Personal Finance,Hardcover,23.62,5.0,473.0,5.0,Park Row,2015.0,978-4-56009-828-6,4854.0,View
+405,Silent Truth,Jodi Picoult,Fiction,Crime / Detective,Audiobook,22.26,4.4,161.0,11.0,Tor Books,2023.0,978-5-57260-859-5,6898.0,View
+406,The Faith Rising,Kevin J. Anderson,Fiction,Fantasy,Hardcover,20.91,4.5,3934.0,13.0,Thomas Nelson,2018.0,978-2-15742-230-3,7663.0,View
+407,Below House,Anthony Ryan,Fiction,Romantasy,Hardcover,26.05,4.5,4688.0,1.0,Howard Books,2025.0,978-3-62100-606-8,2042.0,View
+408,Mirror and Thunder,James Clear,Non-Fiction,Activity / Coloring,Audiobook,30.8,4.5,3780.0,9.0,Scribner,2024.0,978-4-49768-972-3,5671.0,View
+409,Teacher Unleashed,Daniel Silva,Fiction,Children's Picture Book,Paperback,17.81,4.6,1001.0,1.0,Rodale Books,2024.0,978-9-58380-432-1,5144.0,View
+410,Silver Book,Daniel Kahneman,Non-Fiction,Activity / Coloring,Kindle Edition,10.18,4.4,2158.0,14.0,Workman Publishing,2024.0,978-8-37021-936-7,4434.0,View
+411,How Captain,Cinda Williams Chima,Fiction,Crime / Detective,Paperback,16.75,4.5,1527.0,11.0,Sourcebooks Landmark,2019.0,978-2-33295-937-6,3899.0,View
+412,Empire of Glass,Tomi Adeyemi,Fiction,Romantasy,Kindle Edition,10.86,4.7,408.0,3.0,Hachette Book Group,2018.0,978-4-28695-742-9,1045.0,View
+413,Golden Throne,Ryan Holiday,Non-Fiction,Parenting,Paperback,13.88,4.4,223.0,14.0,Anchor Books,2013.0,978-4-23443-623-6,3149.0,View
+414,Falling Queen,Tomi Adeyemi,Fiction,Cozy Mystery,Paperback,17.6,4.7,2358.0,6.0,Entangled: Red Tower Books,2014.0,978-1-57250-186-0,3303.0,View
+415,Strength and Rain,Kim Stanley Robinson,Fiction,Paranormal Romance,Kindle Edition,11.09,4.8,1250.0,6.0,HarperOne,2016.0,978-7-18822-215-9,7833.0,View
+416,The Book Method,Oprah Winfrey,Non-Fiction,History,Kindle Edition,6.99,3.9,2064.0,7.0,"Little, Brown",2021.0,978-8-79962-604-8,4602.0,View
+417,World and Rain,Gary Vaynerchuk,Non-Fiction,Parenting,Audiobook,16.18,4.1,1191.0,5.0,Vintage,2022.0,978-6-41784-315-3,1749.0,View
+418,The King Framework,Veronica Roth,Fiction,Dark Romance,Paperback,11.2,4.8,152.0,10.0,Lioncrest Publishing,2025.0,978-2-33910-581-2,5743.0,View
+419,Land Never Forgotten,Ta-Nehisi Coates,Non-Fiction,Celebrity Memoir,Hardcover,28.38,4.0,4736.0,9.0,Knopf,2020.0,978-6-30552-378-1,7023.0,View
+420,Fire Window,Viola Davis,Non-Fiction,Celebrity Memoir,Paperback,16.22,4.2,3525.0,4.0,Scholastic Press,2019.0,978-1-57540-717-5,1299.0,View
+421,The Warrior Theory,Orson Scott Card,Fiction,Children's Picture Book,Board Book,11.94,4.0,424.0,1.0,Sourcebooks Landmark,2020.0,978-0-56746-869-4,7365.0,View
+422,Choice and Rain,Viola Davis,Non-Fiction,Activity / Coloring,Hardcover,28.28,4.2,356.0,5.0,WaterBrook,2017.0,978-7-20322-740-1,4638.0,View
+423,The Desert Reborn,Isabel Wilkerson,Non-Fiction,Biography,Paperback,15.4,4.3,664.0,3.0,"Little, Brown",2023.0,978-1-11958-246-4,2274.0,View
+424,The Plan and Lightning,Bryan Johnson,Non-Fiction,Cooking / Food,Board Book,14.84,4.2,3671.0,11.0,Bloomsbury Publishing,2026.0,978-9-73997-140-5,5544.0,View
+425,Love Reclaimed,Kelly Link,Fiction,Contemporary Romance,Board Book,8.39,4.5,4644.0,1.0,Scholastic Press,2017.0,978-4-59259-262-9,7391.0,View
+426,When Window,Rainbow Rowell,Fiction,Literary Fiction,Kindle Edition,5.79,4.0,2742.0,2.0,Workman Publishing,2020.0,978-7-37870-819-7,2725.0,View
+427,Into Forest,Angela Duckworth,Non-Fiction,Parenting,Paperback,16.8,4.8,2260.0,5.0,Hachette Book Group,2024.0,978-2-19077-380-6,2192.0,View
+428,Clock Reckoning,Michael J. Sullivan,Fiction,Cozy Mystery,Paperback,12.76,4.3,3945.0,9.0,Ballantine Books,2024.0,978-6-56490-809-9,7231.0,View
+429,Iron Soldier,Nassim Taleb,Non-Fiction,Self-Help,Kindle Edition,10.06,4.4,3740.0,14.0,Rodale Books,2025.0,978-7-93744-692-1,1455.0,View
+430,The Queen and Thunder,Gillian Flynn,Fiction,Romantasy,Audiobook,25.03,4.8,1071.0,12.0,Independently Published,2022.0,978-6-63790-460-5,7837.0,View
+431,Above Plan,Kim Stanley Robinson,Fiction,Middle Grade,Hardcover,22.68,4.3,862.0,2.0,Scholastic Press,2025.0,978-1-95147-116-9,7600.0,View
+432,Love Chronicles,Viola Davis,Non-Fiction,Creativity / Art,Paperback,16.7,4.7,1069.0,6.0,Independently Published,2026.0,978-6-94523-820-6,988.0,View
+433,The Doctor of Ice,Naomi Novik,Fiction,Romantasy,Kindle Edition,11.56,4.0,2650.0,6.0,Riverhead Books,2017.0,978-6-41697-669-6,4022.0,View
+434,A Admiral,Greg Bear,Fiction,Literary Fiction,Kindle Edition,8.53,4.4,4776.0,13.0,IVP Books,2021.0,978-4-82470-262-5,4206.0,View
+435,After World,Dean Koontz,Fiction,Crime / Detective,Hardcover,19.87,4.6,3147.0,13.0,Simon & Schuster,2019.0,978-4-20874-247-0,2564.0,View
+436,Shadow Undone,Simon Sinek,Non-Fiction,Celebrity Memoir,Hardcover,17.28,4.8,652.0,8.0,Macmillan Publishers,2026.0,978-3-65038-484-5,8259.0,View
+437,Out of Land,Michael Pollan,Non-Fiction,Business / Finance,Audiobook,18.85,4.5,4242.0,13.0,Park Row,2016.0,978-1-38437-130-5,3144.0,View
+438,Silver Valley,Rhonda Byrne,Non-Fiction,True Crime,Audiobook,33.44,4.4,2098.0,3.0,Zondervan,2018.0,978-4-61488-205-9,5981.0,View
+439,Found Captain,Rick Rubin,Non-Fiction,Psychology / Health,Hardcover,28.55,4.6,3407.0,5.0,Harmony,2023.0,978-8-56170-507-0,2756.0,View
+440,The Room Never Forgotten,Dav Pilkey,Fiction,Psychological Thriller,Hardcover,26.31,4.4,1801.0,8.0,Grand Central Publishing,2023.0,978-3-83615-167-6,5526.0,View
+441,The Map of Stars,Mercedes Lackey,Fiction,Science Fiction,Hardcover,29.86,4.3,1451.0,10.0,Hoover Ink,2020.0,978-3-85551-121-4,1174.0,View
+442,The Doctor Undone,Robin McKinley,Fiction,Fantasy,Paperback,16.21,4.5,2515.0,5.0,Flatiron Books,2020.0,978-6-20455-669-5,8974.0,View
+443,Lost Star,Jeff Kinney,Fiction,Literary Fiction,Audiobook,29.48,4.4,3071.0,14.0,Random House,2026.0,978-0-44037-903-0,2701.0,View
+444,Strength Reborn,Lee Child,Fiction,Dark Romance,Hardcover,28.04,4.5,3435.0,11.0,Bloomsbury Publishing,2022.0,978-8-79152-346-9,8718.0,View
+445,Hunter Code,Frank Herbert,Fiction,Fantasy,Board Book,8.41,4.6,3204.0,4.0,Entangled: Red Tower Books,2022.0,978-3-87401-879-8,9310.0,View
+446,Deep Shadow,Edith Eger,Non-Fiction,Celebrity Memoir,Paperback,12.8,4.4,2566.0,14.0,Scholastic Press,2023.0,978-2-70418-997-1,2697.0,View
+447,The Message Unbound,Isabel Wilkerson,Non-Fiction,Business / Leadership,Paperback,12.56,4.2,3665.0,5.0,Simon & Schuster,2020.0,978-6-65389-298-4,3997.0,View
+448,Power Approach,Taylor Jenkins Reid,Fiction,Science Fiction,Hardcover,20.09,4.5,4409.0,2.0,Chronicle Books,2019.0,978-6-61368-502-1,4498.0,View
+449,Fire of Stars,various,Non-Fiction,Biography,Kindle Edition,11.66,4.3,618.0,3.0,Independently Published,2017.0,978-2-11669-782-7,7909.0,View
+450,The Princess Undone,Robert Asprin,Fiction,Space Opera,Hardcover,26.8,4.3,819.0,2.0,Baker Books,2019.0,978-5-69325-602-5,5116.0,View
+451,Room and Ash,Suzanne Collins,Fiction,Dark Romance,Hardcover,20.17,4.4,2994.0,4.0,Gallery Books,2025.0,978-6-93720-210-4,8262.0,View
+452,Home Unleashed,Arianna Huffington,Non-Fiction,Personal Finance,Paperback,16.15,3.7,4692.0,13.0,Hay House,2025.0,978-1-11092-610-2,8544.0,View
+453,Clock and Rain,Liane Moriarty,Fiction,Climate Fiction,Kindle Edition,5.1,4.4,2935.0,11.0,Simon & Schuster,2025.0,978-4-28051-458-4,9130.0,View
+454,The Knight Awakening,Robert Sapolsky,Non-Fiction,Business / Leadership,Kindle Edition,9.72,4.4,3511.0,7.0,Scholastic Press,2026.0,978-4-49586-711-4,3747.0,View
+455,The Ocean Method,Virginia Evans,Fiction,Graphic Novel,Audiobook,24.21,4.6,3629.0,2.0,HarperOne,2016.0,978-5-76036-801-5,8583.0,View
+456,Moon of Ice,Rhonda Byrne,Non-Fiction,Activity / Coloring,Paperback,14.58,4.8,4683.0,15.0,IVP Books,2019.0,978-6-26506-512-0,8494.0,View
+457,The Dream and Thunder,Dan Simmons,Fiction,Science Fiction,Paperback,10.29,4.4,1881.0,15.0,Ace,2024.0,978-4-92344-418-0,8859.0,View
+458,Code and Thunder,Piers Anthony,Fiction,Romantasy,Hardcover,17.71,4.1,1047.0,5.0,Atria Books,2021.0,978-3-81659-366-9,8110.0,View
+459,Deep World,various,Non-Fiction,Parenting,Paperback,15.0,4.7,2304.0,7.0,Scholastic Press,2021.0,978-7-64643-933-6,3345.0,View
+460,The Princess Fallen,Colleen Hoover,Fiction,Children's Picture Book,Board Book,10.49,4.3,4172.0,4.0,Zondervan,2020.0,978-8-61199-625-1,3778.0,View
+461,Out of Storm,Gabor Maté,Non-Fiction,Productivity,Hardcover,29.05,4.4,1110.0,12.0,Algonquin Books,2020.0,978-5-86610-732-6,2029.0,View
+462,Spy and Lightning,Trevor Noah,Non-Fiction,Memoir,Audiobook,16.23,4.1,2101.0,2.0,Baker Books,2012.0,978-1-67872-881-5,1406.0,View
+463,The Deal Saga,Deepak Chopra,Non-Fiction,True Crime,Kindle Edition,5.72,4.1,838.0,4.0,Tor Books,2012.0,978-0-57128-892-6,2105.0,View
+464,Rising Queen,Ta-Nehisi Coates,Non-Fiction,Science / Nature,Hardcover,28.35,4.2,4712.0,2.0,Scribner,2016.0,978-4-23226-220-7,4705.0,View
+465,The Grace and Bone,Joyce Meyer,Non-Fiction,Health / Longevity,Paperback,13.65,4.2,514.0,9.0,Bloomsbury Publishing,2024.0,978-9-71732-369-0,1458.0,View
+466,Power of Fire,Arianna Huffington,Non-Fiction,Gift / Journal,Kindle Edition,10.88,4.3,339.0,6.0,Lioncrest Publishing,2026.0,978-9-90272-182-8,8776.0,View
+467,Admiral Blueprint,Bonnie Garmus,Fiction,Romantasy,Paperback,16.03,4.5,3157.0,11.0,Penguin Books,2024.0,978-8-73199-153-6,7114.0,View
+468,Star of Ice,Dean Koontz,Fiction,Science Fiction,Paperback,14.29,4.7,1910.0,7.0,Anchor Books,2025.0,978-9-16000-921-0,5030.0,View
+469,Beauty Forever Changed,Mary Karr,Non-Fiction,Productivity,Hardcover,18.58,4.6,4503.0,4.0,Baker Books,2022.0,978-5-38873-554-4,6949.0,View
+470,Garden Code,Orson Scott Card,Fiction,Children's Picture Book,Paperback,10.22,4.5,4317.0,4.0,Vintage,2019.0,978-3-26088-481-2,1527.0,View
+471,The Prince of Shadows,Carmen Maria Machado,Fiction,Children's Picture Book,Paperback,9.16,4.2,1888.0,4.0,Convergent Books,2021.0,978-6-79794-153-4,1454.0,View
+472,Fear and Lightning,Erik Larson,Non-Fiction,Memoir,Audiobook,33.75,4.6,3847.0,7.0,Riverhead Books,2023.0,978-8-44091-266-6,8600.0,View
+473,The Garden of Stars,Walter Isaacson,Non-Fiction,Biography,Paperback,14.92,4.5,151.0,2.0,Convergent Books,2020.0,978-5-44670-967-2,8217.0,View
+474,Between Choice,Thich Nhat Hanh,Non-Fiction,Biography,Paperback,9.57,4.0,1522.0,5.0,Avery,2025.0,978-4-74871-230-3,3806.0,View
+475,The House of Roses,Bonnie Garmus,Fiction,Space Opera,Board Book,14.93,4.4,2944.0,9.0,Workman Publishing,2024.0,978-3-55839-211-1,9255.0,View
+476,Shadow Letter,Oprah Winfrey,Non-Fiction,Self-Help,Kindle Edition,7.0,4.4,3393.0,15.0,St. Martin's Press,2024.0,978-4-91515-131-2,6986.0,View
+477,Signal System,Cassandra Clare,Fiction,Dark Romance,Kindle Edition,9.83,5.0,1889.0,10.0,Riverhead Books,2022.0,978-8-64798-651-1,9600.0,View
+478,Wild Choice,Daniel Pink,Non-Fiction,Psychology / Health,Hardcover,26.72,4.2,995.0,12.0,Thomas Nelson,2018.0,978-6-57432-181-5,9240.0,View
+479,Fierce Grace,Bryan Johnson,Non-Fiction,Productivity,Kindle Edition,7.06,4.6,4187.0,3.0,Rodale Books,2023.0,978-3-33581-997-7,1212.0,View
+480,The Code of Glass,Deepak Chopra,Non-Fiction,Politics / Society,Audiobook,33.08,4.6,2952.0,3.0,Vintage,2021.0,978-3-48455-221-5,6475.0,View
+481,The Letter Unbound,Mary Kubica,Fiction,Crime / Detective,Kindle Edition,12.24,4.5,113.0,10.0,WaterBrook,2023.0,978-7-59725-428-7,3857.0,View
+482,Broken Fire,Jeff Kinney,Fiction,Middle Grade,Paperback,15.81,4.4,1223.0,1.0,Baker Books,2025.0,978-3-66431-631-4,6114.0,View
+483,The Throne Revealed,Alastair Reynolds,Fiction,Space Opera,Paperback,9.85,4.1,1433.0,1.0,HarperCollins,2023.0,978-8-80505-918-3,1075.0,View
+484,Burning Queen,Isabel Wilkerson,Non-Fiction,Science / Nature,Hardcover,18.12,4.3,1170.0,5.0,Bloomsbury Publishing,2024.0,978-5-20363-862-3,2186.0,View
+485,Storm City,Matthew Stover,Fiction,Horror,Hardcover,28.4,4.7,115.0,4.0,Hoover Ink,2016.0,978-3-98257-300-4,8672.0,View
+486,The Shadow Undone,Arianna Huffington,Non-Fiction,Creativity / Art,Paperback,10.59,4.5,3475.0,12.0,Hoover Ink,2019.0,978-9-40764-753-5,8905.0,View
+487,The Doctor and Lightning,Tomi Adeyemi,Fiction,Space Opera,Board Book,14.27,4.4,3713.0,6.0,Plata Publishing,2018.0,978-1-33094-575-5,2834.0,View
+488,The Love Reimagined,Matthew Stover,Fiction,Science Fiction,Kindle Edition,6.34,4.1,2651.0,7.0,HarperOne,2021.0,978-6-62255-366-0,5372.0,View
+489,Rising Dream,Paul Tremblay,Fiction,YA Romance,Hardcover,29.34,4.6,2780.0,15.0,NavPress,2020.0,978-8-18318-770-0,9475.0,View
+490,Lost Throne,Robert Sapolsky,Non-Fiction,Creativity / Art,Audiobook,15.71,4.4,214.0,13.0,Scholastic Press,2026.0,978-8-62158-910-7,1672.0,View
+491,Captain Chronicles,Frank Herbert,Fiction,Fantasy,Hardcover,26.14,4.4,4487.0,10.0,Scholastic Press,2026.0,978-9-61265-298-9,6096.0,View
+492,Doctor Revealed,Malcolm Gladwell,Non-Fiction,True Crime,Paperback,12.65,4.3,2331.0,8.0,Howard Books,2019.0,978-8-76400-350-6,1266.0,View
+493,The River Saga,Daniel Kahneman,Non-Fiction,Gift / Journal,Hardcover,21.31,4.6,831.0,9.0,"Little, Brown",2017.0,978-9-42763-185-2,7591.0,View
+494,The Mountain Chronicles,Tony Robbins,Non-Fiction,Gift / Journal,Hardcover,17.06,3.8,1763.0,13.0,"Little, Brown",2023.0,978-8-75511-420-3,6260.0,View
+495,The Beauty and Thunder,Anthony Ryan,Fiction,YA Dystopian,Paperback,16.82,4.8,4106.0,3.0,Scribner,2024.0,978-7-28332-866-8,7840.0,View
+496,Storm Earth,Carmen Maria Machado,Fiction,Climate Fiction,Board Book,10.59,4.7,2108.0,8.0,Entangled: Red Tower Books,2022.0,978-2-31527-636-7,1152.0,View
+497,The Nurse Untold,Bonnie Garmus,Fiction,Literary Fiction,Hardcover,24.72,4.7,1901.0,6.0,Gallery Books,2024.0,978-4-47249-940-6,6003.0,View
+498,The Hate,Daniel Kahneman,Non-Fiction,Gift / Journal,Paperback,13.69,4.5,3187.0,6.0,Algonquin Books,2023.0,978-9-46338-926-9,8752.0,View
+499,Never Signal,David Eddings,Fiction,YA Romance,Kindle Edition,7.82,4.2,1010.0,4.0,Hoover Ink,2023.0,978-6-72190-463-4,9550.0,View
+500,The Ice of Stars,Isabel Wilkerson,Non-Fiction,Creativity / Art,Hardcover,19.3,4.4,3045.0,14.0,Convergent Books,2022.0,978-5-65584-318-9,4129.0,View

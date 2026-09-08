@@ -16,28 +16,27 @@ Each event card should use this compact structure:
 - `summary`: one sentence, max 110 characters.
 - `meta`: up to three chips: `Presencial`, `Comunidad`, `WhatsApp`.
 - `image`: one demo image from `docs/gemini-demo-image-specs.md`.
-- `cta`: short action, preferably `Reservar`.
+- `cta`: one section-level action after the rail, not one repeated action per card.
 
 Move long explanatory copy out of cards. Keep the section intro to one headline and one compact supporting sentence.
 
 ## Layout Direction
 
 - Use an image-first horizontal carousel with scroll snap.
-- Card ratio: 4:3 image area with a bottom overlay for title, summary, chips, and CTA.
+- Card ratio: 4:3 image area with a bottom overlay for title, summary, and chips.
 - Desktop card width: `min(420px, 82vw)`. Mobile width: `84vw`.
-- Keep one primary CTA per card and avoid secondary links inside the card.
+- Keep cards informational and place one primary CTA after the complete rail.
 - The right fade belongs to the scroll container only. It must not cover the heading, CTA, or active card text.
 - Fade width: `48px` desktop, `28px` mobile. Use `pointer-events: none`.
 - The fade should blend from transparent into `var(--color-hero)` or the section background token, not a hardcoded hex.
 
 ## Carousel Motion
 
-Use `800ms transition` for panel movement and opacity, not for autoplay frequency. The recommended automatic cadence is `4.8s dwell` per card.
+Use native horizontal scrolling with manual controls. Do not auto-advance.
 
-- Auto-advance only after the user has not interacted.
-- Pause on hover, focus, pointerdown, touch drag, or when the tab is hidden.
-- Disable auto-advance under `prefers-reduced-motion: reduce`.
-- Manual arrows and dots must remain available even when autoplay is disabled.
+- Manual arrows and dots must remain available.
+- Keyboard navigation must work while the rail is focused.
+- Under `prefers-reduced-motion: reduce`, use immediate scrolling.
 - Use transform and opacity only. Do not animate layout, width, height, or scroll-padding.
 - Interaction hover/focus transitions should stay in the existing 180-300ms budget.
 
@@ -55,13 +54,13 @@ Use `800ms transition` for panel movement and opacity, not for autoplay frequenc
 - Rail items: semantic list structure or equivalent grouped slides.
 - Controls: buttons with labels such as `Evento anterior`, `Siguiente evento`, and `Ir al evento 2`.
 - Touch targets: minimum `44px`.
-- Do not announce every autoplay move with `aria-live`; only announce manual changes if needed.
+- Do not announce passive state changes with `aria-live`; only announce manual changes if needed.
 
 ## Acceptance Criteria
 
 - The first event card is understandable without reading a paragraph.
 - Right fade is visually aligned with the rail edge on desktop and mobile.
-- Autoplay feels calm: `800ms transition`, `4.8s dwell`, and pauses on user interaction.
-- Reduced motion users receive a static, manually controlled rail.
+- The rail never advances without user intent.
+- Reduced motion users receive immediate, manually controlled scrolling.
 - All colors come from the Itinerante token system.
 - Harness tests cover the spec before implementation.

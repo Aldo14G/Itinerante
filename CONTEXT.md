@@ -2,15 +2,21 @@
 
 ## Domain Terms
 
-- **Primary Navbar**: fixed top module for brand identity and the highest-value contact action. It does not own section navigation.
-- **Chapter Navigation**: sticky module after the hero. It is the single owner of section links for the page narrative: `Experiencia`, `Agenda`, `Libros`, and `Visita`.
-- **Agenda Cultural**: events and workshops section anchored at `#eventos`.
-- **Catalog Discovery**: searchable and filterable book discovery section anchored at `#galeria`.
-- **Book Image Overlay**: metadata layer inside each real book image. It carries genre, availability, mood, tags, and WhatsApp consultation so cover images never become context-free decoration.
+- **Claude Cinematic Model**: composición editorial de `Itinerante Home cinematico.dc.html`; es la autoridad visual.
+- **Higgsfield Media Layer**: video, posters y mecánica de referencia de `d599d36a`, sin layout, copy, SDKs ni dependencias privadas.
+- **Scroll Scrub**: recorrido compartido por Entrada, Experiencia, Comunidad y Agenda; el tiempo del video responde al scroll nativo y siete fotogramas locales cubren carga, ahorro de datos y movimiento reducido.
+- **Agenda Cultural**: lista editorial anclada en `#eventos`, sin fechas o cupos no verificados.
+- **Catalog Discovery**: búsqueda conectada y taxonomía controlada ancladas en `#catalogo`.
+- **Iti IA**: diálogo contextual que usa el catálogo recuperado; no es otra interfaz pública.
 
 ## Architecture Decisions In Force
 
-- Section navigation has one owner: `chapter-nav`.
-- The primary navbar remains brand plus WhatsApp only.
-- Real book images in `#galeria` must include the Book Image Overlay.
+- `index.html` is the only official public web surface and the only home page.
+- Its canonical composition is the Claude Design cinematic model. The previous
+  monolith is archived in `_archive/models/` and must not receive new UI.
+- Do not add an alternate public HTML page or a Next.js UI.
+- `src/app/api`, `src/ai`, `src/lib`, `src/config`, `dataconnect`, and
+  `generated` are service/data code only; they do not own public presentation.
+- The numbered Claude chapter bar is the single section-navigation owner.
+- Catalog category chips mirror `data/taxonomy.controlled.json`.
 - The site remains static HTML, CSS tokens, local CSS, and vanilla JavaScript until real data needs justify a deeper migration. Tailwind CDN is intentionally not part of the runtime.

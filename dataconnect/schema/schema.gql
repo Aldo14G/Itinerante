@@ -1,0 +1,98 @@
+# Libreria Itinerante y Mas
+# Primer vertical: catalogo real y recuperacion semantica.
+# Los identificadores son estables para que la importacion pueda repetirse sin
+# duplicar registros. Los cambios de inventario solo se hacen desde Admin SDK.
+
+type Editorial @table {
+  id: String!
+  slug: String! @unique
+  name: String!
+  countryCode: String
+  website: String
+}
+
+type Author @table {
+  id: String!
+  slug: String! @unique
+  fullName: String!
+  bio: String
+  imageUrl: String
+}
+
+# Taxonomia editorial inspirada por ECRMNL: una categoria canonica contiene
+# subgeneros y cada edicion vendible apunta a un termino preferido.
+type Category @table {
+  id: String!
+  slug: String! @unique
+  name: String!
+  sourceLabel: String!
+}
+
+type Subgenre @table {
+  id: String!
+  slug: String! @unique
+  name: String!
+  category: Category!
+  sourceLabel: String!
+}
+
+type Book @table {
+  id: String!
+  slug: String! @unique
+  isbn13: String @unique
+  editorial: Editorial
+  subgenre: Subgenre!
+
+  title: String!
+  subtitle: String
+  description: String!
+  language: String! @default(value: "es")
+  pages: Int
+  publishedYear: Int
+  format: String
+
+  # El dinero se almacena como entero para evitar errores de punto flotante.
+  priceMxnCents: Int
+  stockQty: Int! @default(value: 0)
+  status: String! @default(value: "draft")
+  condition: String! @default(value: "new")
+  coverUrl: String
+  coverAlt: String
+  curatorNote: String
+
+  # Valores crudos de la fuente, conservados para auditar la normalizacion.
+  sourceCategory: String!
+  sourceSubGenre: String!
+  mood: String
+  tags: [String]
+
+  # Aisla inventario verificable de datasets locales de prueba.
+  datasetKey: String! @default(value: "inventory")
+  sourceKind: String! @default(value: "verified")
+  sourceLabel: String!
+  sourceRecordId: String
+
+  # Metricas opcionales conservadas de una fuente externa. No representan
+  # precio, existencia ni prueba social de Libreria Itinerante.
+  referencePriceUsdCents: Int
+  sourceRating: Float
+  sourceReviewCount: Int
+  sourceWeeksOnList: Int
+  sourceRank: Int
+  sourceBsr: Int
+
+  # Trazabilidad: cada ficha activa debe tener fuente y fecha de verificacion.
+  sourceUrl: String!
+  verifiedAt: Timestamp!
+
+  # Texto determinista del que se deriva el vector. Permite auditar y regenerar.
+  searchText: String!
+  embedding: Vector @col(size: 768)
+}
+
+type BookAuthor @table(key: ["book", "author", "role"]) {
+  book: Book!
+  author: Author!
+  role: String! @default(value: "author")
+  ord: Int! @default(value: 0)
+}

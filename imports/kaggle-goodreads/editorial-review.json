@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 1,
+  "scope": "Revisión parcial por campo. Ninguna ficha se admite como reviewed; las fuentes comerciales no acreditan inventario.",
+  "records": [
+    {
+      "id": "goodreads-10602457",
+      "rawSha256": "4fffde28b91931186862839e9375fb0b716653c622f6e1f016d99a1787510cc0",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "language",
+          "before": "es",
+          "after": "mul"
+        }
+      ],
+      "resolvedIssues": [],
+      "addedIssues": [
+        "edition-pagination-conflict"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.dykinson.com/libros/arte-poetica-9788498498837/",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "El ISBN 9788498498837 identifica Arte poética de Horacio, edición bilingüe de Juan Gil. La editorial declara 166 páginas; la candidata contiene 168."
+        },
+        {
+          "url": "https://www.dykinson.com/libros/clasicos-dykinson-cldykinson/",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "La colección identifica a Juan Gil Fernández como responsable de la edición bilingüe de Arte poética."
+        },
+        {
+          "url": "https://iiif.biblissima.fr/collections/manifest/e0946cc7f39aadfb886ac154f0c2cf76bdb8cf67",
+          "kind": "authority-reference",
+          "accessedOn": "2026-09-05",
+          "finding": "Biblissima reúne Horatius y Horácio, 65-8 a.C., bajo Horace. Es evidencia para tratar variantes de nombre, no para resolver todos los créditos de la edición Dykinson."
+        }
+      ],
+      "remainingChecks": [
+        "Confirmar los idiomas concretos en la edición; mul sólo registra que es bilingüe.",
+        "Representar Horatius/Horácio como variantes con el vínculo de autoridad Biblissima; no convertir dos etiquetas en dos autores distintos. Verificar los roles completos de Juan Gil.",
+        "Resolver 166 frente a 168 páginas; completar descripción y validar materias."
+      ]
+    },
+    {
+      "id": "goodreads-237815",
+      "rawSha256": "1da3d9f840072bf93173f3dc6bcced0dd81e4770c8685654b8f5d42dd18d059b",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "contributors.1.roles",
+          "before": [
+            "contributor"
+          ],
+          "after": [
+            "editor"
+          ]
+        },
+        {
+          "field": "contributors.2.roles",
+          "before": [
+            "contributor"
+          ],
+          "after": [
+            "editor"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "contributor-role-unresolved"
+      ],
+      "addedIssues": [
+        "edition-pagination-conflict"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.catedra.com/libro/letras-hispanicas/poema-del-cante-jondo-romancero-gitano-federico-garcia-lorca-9788437601144/",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "Cátedra distingue a Federico García Lorca como autor y a Allen Josephs y Juan Caballero como editores para el ISBN 9788437601144. Declara 320 páginas frente a las 317 de la candidata."
+        }
+      ],
+      "remainingChecks": [
+        "Verificar paginación y reimpresión concreta sin sustituir 317 por 320 automáticamente.",
+        "Contrastar idioma, descripción y clasificación antes de admitir la ficha."
+      ]
+    },
+    {
+      "id": "goodreads-50627133",
+      "rawSha256": "f5ab7156039c0425088d782955867eb8ea2ab45c7ff92c244cba5f8459bc6421",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "contributors.1.roles",
+          "before": [
+            "contributor"
+          ],
+          "after": [
+            "author"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "contributor-role-unresolved"
+      ],
+      "addedIssues": [
+        "poetry-topic-versus-form"
+      ],
+      "evidence": [
+        {
+          "url": "https://alphadecaytienda.com/producto/conversaciones-sobre-la-escritura-ursula-k-le-guin-y-david-naimon",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "La tienda oficial presenta el diálogo de Le Guin y Naimon sobre narrativa, poesía y ensayo, y atribuye la traducción a Núria Molines Galarza. La poesía es uno de los asuntos tratados; no demuestra forma de poemario."
+        },
+        {
+          "url": "https://www.todostuslibros.com/libros/conversaciones-sobre-la-escritura_978-84-120738-4-3",
+          "kind": "book-trade-catalog",
+          "accessedOn": "2026-09-05",
+          "finding": "La ficha del ISBN 9788412073843 enumera a Le Guin y Naimon como autores, a Molines como traductora, castellano y 104 páginas. Corrobora la tienda editorial, cuya página no muestra ISBN."
+        }
+      ],
+      "remainingChecks": [
+        "Revisar todas las materias; no admitir Poetry como forma por hablar sobre poesía.",
+        "Contrastar el contenido de la descripción y la edición antes de admitir la ficha."
+      ]
+    },
+    {
+      "id": "goodreads-77903",
+      "rawSha256": "205b7802dd0c592de50131b41b599d2691891741696414b9edd8dc2add82785f",
+      "status": "candidate",
+      "changes": [],
+      "resolvedIssues": [],
+      "addedIssues": [
+        "controlled-theatre-term-missing"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.catedra.com/libro/letras-hispanicas/bodas-de-sangre-federico-garcia-lorca-9788437605609/",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "Para el ISBN 9788437605609, Cátedra describe una obra teatral de poesía dramática, con Lorca como autor y Juan Caballero y Allen Josephs como editores. La ficha declara 176 páginas."
+        }
+      ],
+      "remainingChecks": [
+        "Decidir un término controlado para teatro: los 21 subgéneros actuales no lo incluyen.",
+        "Conservar el cruce Poetry/teatro hasta resolver forma y tema; no eliminar su carácter poético.",
+        "Confirmar idioma y descripción antes de admitir la ficha."
+      ]
+    },
+    {
+      "id": "goodreads-18586193",
+      "rawSha256": "e1bcaebf73f0904acb96cf6a70b34c6b0ce56c58c8aaee92fb09cf823e3c850e",
+      "status": "quarantined",
+      "changes": [],
+      "resolvedIssues": [],
+      "addedIssues": [
+        "edition-identity-conflict"
+      ],
+      "evidence": [
+        {
+          "url": "https://herdereditorial.com/la-noche-de-san-juan-9788425420436",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "Herder identifica La noche de San Juan de Mircea Eliade, traducción de Joaquín Garrigós, 616 páginas, ISBN 9788425420436. El ISBN difiere del 9789736753985 de la candidata."
+        },
+        {
+          "url": "https://carturesti.ro/carte/noaptea-de-sanziene-vol-1-54502",
+          "kind": "bookseller",
+          "accessedOn": "2026-09-05",
+          "finding": "El ISBN 9789736753985 se registra como Noaptea De Sanziene (vol.1), Mircea Eliade, Litera, lengua rumana y 336 páginas. Esta fuente comercial se utiliza sólo como corroboración bibliográfica."
+        }
+      ],
+      "remainingChecks": [
+        "Resolver qué edición representa el ID Goodreads; no sustituir el ISBN por el de Herder ni convertir la ficha a rumano automáticamente.",
+        "Contrastar con una biblioteca o la editorial Litera y separar registros si se confirma mezcla de ediciones.",
+        "Revisar roles, materias y descripción después de resolver la identidad."
+      ],
+      "retrievalAttempts": [
+        {
+          "url": "https://www.goodreads.com/book/show/18586193",
+          "accessedOn": "2026-09-05",
+          "result": "La apertura no devolvió ficha bibliográfica utilizable; no se marca recordUrlVerified."
+        }
+      ]
+    },
+    {
+      "id": "goodreads-19049001",
+      "rawSha256": "df310f80bd847e994f25c6f88a683ade06d71c3d427c577ae262530f177f50b1",
+      "status": "quarantined",
+      "changes": [],
+      "resolvedIssues": [],
+      "addedIssues": [
+        "edition-identity-conflict"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.publishersweekly.com/9780465031566",
+          "kind": "trade-review",
+          "accessedOn": "2026-09-05",
+          "finding": "La reseña del 14 de enero de 2013 identifica el ISBN 9780465031566 como The End of Power de Moisés Naím, sello Basic, 304 páginas. La candidata combina ese ISBN con El fin del poder, DEBATE, es y 313 páginas."
+        },
+        {
+          "url": "https://www.penguinrandomhouse.com/books/240539/el-fin-del-poder--the-end-of-power-by-moises-naim/9788499923000/",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "La editorial identifica una edición de El fin del poder con ISBN 9788499923000 y 440 páginas. Es una edición alternativa de contraste, no un ISBN de reemplazo."
+        },
+        {
+          "url": "https://catalog.freelibrary.org/Record/1881093",
+          "kind": "library-catalog",
+          "accessedOn": "2026-09-05",
+          "finding": "La Biblioteca de Filadelfia registra el ISBN 9780465031566 como The end of power, Basic Books, Nueva York, 2013, texto inglés y xiii, 306 páginas; MARC/OCLC 811598808 y LCCN 2012049642. Confirma la discrepancia con DEBATE/es de la candidata; no determina cuál era la edición pretendida por el ID Goodreads."
+        }
+      ],
+      "remainingChecks": [
+        "La identidad del ISBN de Basic Books queda contrastada; falta determinar la edición pretendida por Goodreads 19049001 antes de levantar cuarentena.",
+        "Verificar juntos ISBN, título, editorial, idioma y paginación antes de levantar la cuarentena.",
+        "Revisar materias, roles y descripción tras resolver la identidad."
+      ],
+      "retrievalAttempts": [
+        {
+          "url": "https://www.goodreads.com/book/show/19049001",
+          "accessedOn": "2026-09-05",
+          "result": "La apertura no devolvió ficha bibliográfica utilizable; no se marca recordUrlVerified."
+        }
+      ]
+    },
+    {
+      "id": "goodreads-25623",
+      "rawSha256": "250ad6d31afe6d7b320efe5d2a4735bcf33627b8078db685aa5f005a1fd30619",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "contributors.1.roles",
+          "before": [
+            "contributor"
+          ],
+          "after": [
+            "author"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "contributor-role-unresolved"
+      ],
+      "addedIssues": [
+        "edition-publisher-conflict"
+      ],
+      "evidence": [
+        {
+          "url": "https://oceano.mx/obras/amarse-con-los-ojos-abiertos-jorge-bucay-silvia-salinas-ebook-20113.aspx",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "Océano atribuye la obra a Jorge Bucay y Silvia Salinas. Se usa para coautoría, no para trasladar el ISBN o la edición digital a la candidata impresa."
+        },
+        {
+          "url": "https://latam.casadellibro.com/libro-amarse-con-los-ojos-abiertos/9788479019396/885797",
+          "kind": "bookseller",
+          "accessedOn": "2026-09-05",
+          "finding": "Para el ISBN 9788479019396 se enumeran ambos autores, castellano, 237 páginas y RBA Libros. La candidata declara Alfaguara; se registra discrepancia editorial sin cambiar automáticamente el sello."
+        }
+      ],
+      "remainingChecks": [
+        "Resolver Alfaguara frente a RBA contra el ejemplar o registro bibliotecario.",
+        "Revisar alcance de Psychology: la narración sobre relaciones no acredita un manual académico.",
+        "Verificar descripción y edición antes de admitir."
+      ]
+    },
+    {
+      "id": "goodreads-385544",
+      "rawSha256": "f473b5fc988abbf44947ea1d4c026a1b08e7cffa7bc1d8747a5b647d2e39bb43",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "contributors.1.roles",
+          "before": [
+            "contributor"
+          ],
+          "after": [
+            "author"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "contributor-role-unresolved"
+      ],
+      "addedIssues": [],
+      "evidence": [
+        {
+          "url": "https://www.gedisa.com/catalogo/GedisaCatalogo2017.pdf",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "Página PDF 79 (índice cero 78): Gedisa atribuye La aldea global a Marshall McLuhan y Bruce Powers. Es otra edición, ISBN 9788497849036; sólo corrobora la coautoría de la obra."
+        },
+        {
+          "url": "https://pergamo.unlam.edu.ar/pergamo/documento.php?id=PERGAMO.1.17547&recno=17547&ui=1",
+          "kind": "library-catalog",
+          "accessedOn": "2026-09-05",
+          "finding": "El catálogo de la Universidad Nacional de La Matanza registra La aldea global, Gedisa, 1996, ISBN-10 8474324033, con entrada para Powers. Ese ISBN-10 corresponde al ISBN-13 9788474324037 de la candidata."
+        }
+      ],
+      "remainingChecks": [
+        "Verificar la reimpresión de 1991 y sus 203 páginas; no copiar paginación de otra edición.",
+        "Contrastar la grafía Ferraris/Ferrari y los roles de traducción y dirección de colección.",
+        "Revisar materias y descripción antes de admitir."
+      ]
+    },
+    {
+      "id": "goodreads-1034888",
+      "rawSha256": "9b3ce70637d80e2d627f63dfa133651c6fd766d070a7936444ea2b08b06f62b9",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "description",
+          "before": null,
+          "after": "Novela de Elena Garro sobre la vida de oficina y los conflictos sindicales en México, atravesada por la soledad y una atmósfera de amenaza política.",
+          "basis": "editorial-summary",
+          "evidenceUrls": [
+            "https://www.elem.mx/autor/datos/421",
+            "https://www.elem.mx/obra/datos/124027"
+          ]
+        },
+        {
+          "field": "subjects",
+          "before": [],
+          "after": [
+            {
+              "subgenreId": "novela",
+              "categoryId": "fiction",
+              "name": "Novela",
+              "kind": "form",
+              "sourceLabel": "Narrativa - Novela",
+              "status": "proposed",
+              "basis": "editorial-evidence"
+            }
+          ],
+          "evidenceUrls": [
+            "https://www.elem.mx/obra/datos/124027"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "description-missing",
+        "subjects-unmapped"
+      ],
+      "addedIssues": [],
+      "evidence": [
+        {
+          "url": "https://www.elem.mx/obra/datos/124027",
+          "kind": "literary-reference",
+          "accessedOn": "2026-09-05",
+          "finding": "ELEM identifica la novela de Elena Garro, Grijalbo, 1991, ISBN-10 9700500403, equivalente al ISBN-13 9789700500409. Registra forma novela y español como lengua original."
+        },
+        {
+          "url": "https://www.elem.mx/autor/datos/421",
+          "kind": "literary-reference",
+          "accessedOn": "2026-09-05",
+          "finding": "El estudio sobre Garro sitúa Y Matarazo no llamó... en oficinas, conflictos sindicales mexicanos, soledad y tensión política. Se redacta una síntesis propia breve de la obra; no se copia una sinopsis editorial ni se afirma inspección del ejemplar."
+        }
+      ],
+      "remainingChecks": [
+        "Contrastar paginación y ejemplar de Grijalbo antes de admitir la edición.",
+        "Revisar la síntesis editorial propuesta; la materia Novela sigue en estado proposed."
+      ]
+    },
+    {
+      "id": "goodreads-1293796",
+      "rawSha256": "084aac3aa4779f8ac3de0fed9f624913edd7c403e6e98325bca9eba758f6737e",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "language",
+          "before": "und",
+          "after": "es"
+        },
+        {
+          "field": "subjects",
+          "before": [],
+          "after": [
+            {
+              "subgenreId": "novela",
+              "categoryId": "fiction",
+              "name": "Novela",
+              "kind": "form",
+              "sourceLabel": "Narrativa - Novela",
+              "status": "proposed",
+              "basis": "editorial-evidence"
+            }
+          ],
+          "evidenceUrls": [
+            "https://www.elem.mx/obra/datos/2566"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "language-unknown",
+        "subjects-unmapped"
+      ],
+      "addedIssues": [],
+      "evidence": [
+        {
+          "url": "https://ci.nii.ac.jp/ncid/BA22325829",
+          "kind": "library-catalog",
+          "accessedOn": "2026-09-05",
+          "finding": "La ficha indexada de CiNii registra Tinísima, Elena Poniatowska, Era, 1992, ISBN-10 9684113056, texto spa, 663 páginas y LCCN 92243337. La apertura directa falló; se conserva este alcance de consulta."
+        },
+        {
+          "url": "https://www.elem.mx/obra/datos/2566",
+          "kind": "literary-reference",
+          "accessedOn": "2026-09-05",
+          "finding": "La ficha indexada ELEM clasifica Tinísima como novela, primera edición Era 1992 y original en español. Vincula ISBN 9684113056/9789684113053 a una edición Era de 1999. La apertura directa falló; no se utiliza para cambiar fecha de edición."
+        },
+        {
+          "url": "https://openlibrary.org/books/OL1352581M/Tini%CC%81sima",
+          "kind": "bibliographic-aggregator",
+          "accessedOn": "2026-09-05",
+          "finding": "La ficha de edición de Open Library corrobora español, Era, ISBN-10 9684113056 y enlaza Goodreads 1293796; no se confunde con las traducciones que también enumera."
+        }
+      ],
+      "remainingChecks": [
+        "Resolver reimpresión/fecha concreta: las fuentes enumeran 1992 y 1999 bajo el mismo ISBN.",
+        "Verificar descripción y la clasificación completa antes de admitir; Novela permanece proposed."
+      ]
+    },
+    {
+      "id": "goodreads-7511615",
+      "rawSha256": "a1286aced58edb493ddf473fb6ad2edeac2c213f11fc7f193ef27aa0b6225235",
+      "status": "candidate",
+      "changes": [
+        {
+          "field": "description",
+          "before": null,
+          "after": "Poemario de Claudio Bertoni que explora la enfermedad, la muerte y el temor desde escenas cotidianas, con humor, repeticiones y referencias personales.",
+          "basis": "editorial-summary",
+          "evidenceUrls": [
+            "https://www.memoriachilena.gob.cl/602/w3-article-92862.html"
+          ]
+        }
+      ],
+      "resolvedIssues": [
+        "description-missing"
+      ],
+      "addedIssues": [],
+      "evidence": [
+        {
+          "url": "https://www.memoriachilena.gob.cl/602/w3-article-92862.html",
+          "kind": "national-library",
+          "accessedOn": "2026-09-05",
+          "finding": "Memoria Chilena estudia Harakiri como poemario de Bertoni sobre enfermedad y muerte, vida cotidiana, referencias personales y repetición humorística. Se redacta una síntesis propia de la obra."
+        },
+        {
+          "url": "https://www.bibliotecanacionaldigital.gob.cl/visor/BND%3A10181",
+          "kind": "national-library",
+          "accessedOn": "2026-09-05",
+          "finding": "La Biblioteca Nacional Digital registra Harakiri de Claudio Bertoni, Cuarto Propio, 2005, español y 313 páginas más nueve no numeradas. La ficha se usa como contraste, sin afirmar que esa segunda edición sea la candidata."
+        },
+        {
+          "url": "https://books.google.com/books/about/Harakiri.html?id=t2NlAAAAMAAJ",
+          "kind": "bibliographic-aggregator",
+          "accessedOn": "2026-09-05",
+          "finding": "Google Books vincula Harakiri de Bertoni, Cuarto Propio, 2004, con ISBN 956260313X/9789562603133 y 313 páginas."
+        }
+      ],
+      "remainingChecks": [
+        "Verificar año y reimpresión del ISBN; no transferir a la candidata la segunda edición digital de 2005.",
+        "Revisar la síntesis nueva y materias antes de admitir."
+      ]
+    },
+    {
+      "id": "goodreads-1827646",
+      "rawSha256": "0b32ccf24f022703259a50c2e1e23a17f37d4e64d548b5375fabb6958ecc5c53",
+      "status": "candidate",
+      "changes": [],
+      "resolvedIssues": [],
+      "addedIssues": [],
+      "evidence": [
+        {
+          "url": "https://promos.santillanausa.com/eMag_SecondarySpanishCatalog_2013-14/HTML/SecondarySpCat2013_14/assets/basic-html/page62.html",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "El catálogo de Santillana 2013-14 identifica la antología, ISBN 9789707310964, como varios autores. El extracto no proporciona una lista exhaustiva de roles y participantes."
+        },
+        {
+          "url": "https://search.worldcat.org/title/antologia-poetica-de-la-generacion-del-27/oclc/70549694?ht=edition&referer=di",
+          "kind": "library-catalog",
+          "accessedOn": "2026-09-05",
+          "finding": "WorldCat registra el ISBN, español, México, Suma de Letras, 2005 y a Cifo González. La mención no reemplaza el índice completo de los poemas."
+        }
+      ],
+      "remainingChecks": [
+        "Consultar índice y créditos de esta edición para resolver cada rol y la lista truncada.",
+        "No completar la lista copiando otra antología de título semejante o un registro social.",
+        "Verificar paginación y descripción antes de admitir."
+      ]
+    },
+    {
+      "id": "goodreads-323455",
+      "rawSha256": "d9fb4010876e624af20e14785cfae1ec5c698b347fb88068aec3023481e99356",
+      "status": "candidate",
+      "changes": [],
+      "resolvedIssues": [],
+      "addedIssues": [
+        "contributor-edition-unverified"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.rizzolilibri.it/content/uploads/2026/02/Catalogo2026.pdf",
+          "kind": "publisher",
+          "accessedOn": "2026-09-05",
+          "finding": "El catálogo BUR 2026 atribuye a Luca Scarlini la edición de De profundis, ISBN 9788817046299. Es otro sello y otro ISBN: no demuestra participación en la ficha Fontamara de 1993."
+        },
+        {
+          "url": "https://www.goodreads.com/work/editions/21904715-de-profundis?expanded=false",
+          "kind": "source-editions",
+          "accessedOn": "2026-09-05",
+          "finding": "El listado de ediciones de Goodreads muestra una Fontamara de 1993, 188 páginas y español, sin ISBN en el extracto consultado. No basta para asignar identificador ni trasladar créditos de BUR."
+        }
+      ],
+      "remainingChecks": [
+        "Verificar créditos de Fontamara 1993, incluidas las atribuciones a Lareau y Scarlini.",
+        "Obtener ISBN de la edición concreta; no sustituir el sentinel por el de otra edición.",
+        "Mantener los roles sin resolver hasta obtener evidencia sobre esa edición."
+      ]
+    }
+  ]
+}

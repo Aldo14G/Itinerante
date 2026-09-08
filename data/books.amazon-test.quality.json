@@ -1,0 +1,21 @@
+{
+  "datasetKey": "amazon-bestsellers-500",
+  "rows": 500,
+  "columns": 15,
+  "missingRequiredValues": 0,
+  "uniqueBooks": 500,
+  "uniqueCategories": 2,
+  "uniqueSubgenres": 48,
+  "uniqueAuthors": 168,
+  "uniqueEditorials": 56,
+  "validIsbn13": 41,
+  "invalidIsbn13": 459,
+  "usableSourceUrls": 0,
+  "derivedSourceUrls": 500,
+  "risks": [
+    "Los precios son referencias USD de la fuente y no precios de Libreria Itinerante.",
+    "status=test y stockQty=0 impiden confundir el dataset con inventario.",
+    "Las URLs de Amazon se derivan como busquedas porque la columna Amazon URL no contiene enlaces utilizables.",
+    "Los ISBN invalidos se conservan solo en sourceRecordId y no en el campo isbn13 validado."
+  ]
+}

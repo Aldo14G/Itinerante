@@ -1,0 +1,225 @@
+ La conexión a Gemini funciona, pero los modelos principal y de respaldo configurados no están respondiendo a tiempo. Probé otro
+  modelo disponible de Gemini y respondió en aproximadamente un segundo. Voy a usarlo como respaldo para que una consulta sencilla no
+  espere casi un minuto.
+
+⚠ Heads up, you have less than 5% of your 5h limit left. Run /status for a breakdown.
+
+• Ran node --input-type=module -e "import {loadLocalEnv} from './scripts/load-env.mjs';await loadLocalEnv();for(const k of
+  │ ['ITI_IA_MODEL','ITI_IA_FALLBACK_MODEL','ITI_IA_MODEL_TIMEOUT_MS']) console.log(k,process.env[k]??'(default)')"
+  └ ITI_IA_MODEL gemini-3.6-flash
+    ITI_IA_FALLBACK_MODEL (default)
+    ITI_IA_MODEL_TIMEOUT_MS (default)
+
+• Edited 3 files (+5 -5)
+  └ src\ai\genkit.ts (+1 -1)
+    4  export const itiIaModel = process.env.ITI_IA_MODEL ?? "gemini-3.6-flash";
+    5 -export const fallbackModelName = process.env.ITI_IA_FALLBACK_MODEL ?? "gemini-3.5-flash";
+    5 +export const fallbackModelName = process.env.ITI_IA_FALLBACK_MODEL ?? "gemini-3.1-flash-lite";
+    6  export const itiIaPrimaryModel = googleAI.model(itiIaModel);
+
+  └ src\ai\iti-ia.ts (+2 -2)
+    23  function modelTimeoutMs() {
+    24 -  const configured = Number(process.env.ITI_IA_MODEL_TIMEOUT_MS ?? 15_000);
+    25 -  return Number.isFinite(configured) ? Math.min(30_000, Math.max(3_000, configured)) : 15_000;
+    24 +  const configured = Number(process.env.ITI_IA_MODEL_TIMEOUT_MS ?? 5_000);
+    25 +  return Number.isFinite(configured) ? Math.min(30_000, Math.max(3_000, configured)) : 5_000;
+    26  }
+
+  └ tests\iti-ia.test.mjs (+2 -2)
+    121
+    122 -test("Iti IA usa 3.6 estable y 3.5 como contingencia acotada", () => {
+    122 +test("Iti IA usa 3.6 y un respaldo comprobado con espera acotada", () => {
+    123    const genkit = readFileSync(join(root, "src", "ai", "genkit.ts"), "utf8");
+    124    assert.match(genkit, /ITI_IA_MODEL\s*\?\?\s*"gemini-3\.6-flash"/);
+    125 -  assert.match(genkit, /ITI_IA_FALLBACK_MODEL\s*\?\?\s*"gemini-3\.5-flash"/);
+    125 +  assert.match(genkit, /ITI_IA_FALLBACK_MODEL\s*\?\?\s*"gemini-3\.1-flash-lite"/);
+    126    assert.match(flow, /isFallbackEligibleError/);
+
+• Hook failed
+  └ hook exited with code 1
+
+• Added tests\browser-local.mjs (+89 -0)
+     1 +// Run against the complete local stack; uses a real browser, media and API.
+     2 +// PLAYWRIGHT_MODULE may point to an already installed Playwright module.
+     3 +import { strict as assert } from 'node:assert';
+     4 +import { mkdir, writeFile } from 'node:fs/promises';
+     5 +const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+     6 +const origin = process.env.SITE_BASE_URL || 'http://127.0.0.1:8080';
+     7 +const output = '.tmp-audit/local-fix';
+     8 +await mkdir(output, { recursive: true });
+     9 +const browser = await chromium.launch({ headless: true });
+    10 +const results = [];
+    11 +try {
+    12 +  for (const [name, width, height] of [['desktop', 1440, 900], ['mobile', 390, 844], ['tablet', 820, 700], ['landscape', 844, 3
+        90], ['small', 320, 568]]) {
+    13 +    const page = await browser.newPage({ viewport: { width, height } });
+    14 +    const errors = [];
+    15 +    page.on('pageerror', error => errors.push(error.message));
+    16 +    await page.goto(origin, { waitUntil: 'domcontentloaded' });
+    17 +    await page.waitForFunction(() => document.querySelector('video').readyState >= 2);
+    18 +    const result = { name, seeks: [] };
+    19 +    for (const progress of [.2, .8, .35]) {
+    20 +      const start = Date.now();
+    21 +      await page.evaluate(p => {
+    22 +        const root = document.querySelector('[data-scroll-scrub]');
+    23 +        const stage = root.querySelector('.scroll-scrub__stage');
+    24 +        const top = root.getBoundingClientRect().top + scrollY;
+    25 +        scrollTo({ top: top + (root.offsetHeight - stage.clientHeight) * p, behavior: 'instant' });
+    26 +      }, progress);
+    27 +      await page.waitForFunction(p => {
+    28 +        const video = document.querySelector('video');
+    29 +        const eased = .88 * p + .12 * (4 * (p - .5) ** 3 + .5);
+    30 +        return !video.seeking && video.readyState >= 2 && Math.abs(video.currentTime - eased * video.duration * .999) < .05;
+    31 +      }, progress, { timeout: 8000 });
+    32 +      result.seeks.push(Date.now() - start);
+    33 +    }
+    34 +    for (const id of ['experiencia', 'eventos', 'catalogo', 'ubicacion']) {
+    35 +      await page.locator(`#${id}`).evaluate(e => e.scrollIntoView({ behavior: 'instant' }));
+    36 +      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${name}/${id}: overflo
+        w`);
+    37 +    }
+    38 +    await page.locator('#experiencia').evaluate(e => e.scrollIntoView({ behavior: 'instant' }));
+    39 +    assert.equal(await page.locator('.site-header').evaluate(e => e.getBoundingClientRect().bottom <= 0), true, 'header obstruc
+        ts story');
+    40 +    assert.equal(await page.locator('.chapter-nav').evaluate(e => e.getBoundingClientRect().bottom <= 0), true, 'chapters obstr
+        uct story');
+    41 +    assert.equal(await page.locator('.scroll-scrub__stage').evaluate(e => Math.abs(e.clientHeight - innerHeight) < 2), true, 's
+        tage differs from viewport');
+    42 +    await page.screenshot({ path: `${output}/${name}-story.png` });
+    43 +    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+    44 +    await page.screenshot({ path: `${output}/${name}-home.png` });
+    45 +    if (name === 'mobile') {
+    46 +      await page.locator('[data-iti-ia-open]').first().click();
+    47 +      await page.locator('#itiIaInput').fill('Literatura.');
+    48 +      const response = page.waitForResponse(r => r.url().endsWith('/api/ai/iti-ia') && r.request().method() === 'POST', { timeo
+        ut: 60000 });
+    49 +      await page.locator('#itiIaSubmit').click();
+    50 +      const api = await response;
+    51 +      assert.equal(api.status(), 200);
+    52 +      result.ai = await api.json();
+    53 +      await page.locator('#itiIaSubmit').waitFor({ state: 'visible' });
+    54 +      await page.waitForFunction(() => !document.getElementById('itiIaSubmit').disabled);
+    55 +      assert.ok(await page.locator('.iti-message[data-role="model"]').count(), 'no answer rendered');
+    56 +      assert.match(await page.locator('#itiIaMessages').innerText(), /Datos de prueba/);
+    57 +      assert.equal(await page.locator('#itiIaFallback').isVisible(), false);
+    58 +      const field = await page.locator('#itiIaInput').boundingBox();
+    59 +      assert.ok(field.y >= 0 && field.y + field.height <= height, 'composer outside viewport');
+    60 +      await page.screenshot({ path: `${output}/mobile-iti-ia.png` });
+    61 +      await page.keyboard.press('Escape');
+    62 +      await page.locator('#catalogo').evaluate(e => e.scrollIntoView({ behavior: 'instant' }));
+    63 +      await page.waitForFunction(() => document.querySelector('#bookGrid').getAttribute('aria-busy') === 'false');
+    64 +      const filtered = page.waitForResponse(r => r.url().includes('/api/catalog?') && r.url().includes('category=fiction'));
+    65 +      await page.locator('[data-filter="fiction"]').click();
+    66 +      assert.equal((await filtered).status(), 200);
+    67 +      await page.waitForFunction(() => document.querySelector('#bookGrid').getAttribute('aria-busy') === 'false');
+    68 +      assert.ok(await page.locator('.book-card').count());
+    69 +      await page.screenshot({ path: `${output}/mobile-catalog.png` });
+    70 +      await page.setViewportSize({ width: 844, height: 390 });
+    71 +      await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+    72 +      await page.waitForFunction(() => document.querySelector('video').currentSrc.includes('seek-desktop') && document.querySel
+        ector('video').readyState >= 2);
+    73 +    }
+    74 +    assert.deepEqual(errors, [], `${name}: browser errors`);
+    75 +    results.push(result);
+    76 +    console.log(name, JSON.stringify(result.seeks));
+    77 +    await page.close();
+    78 +  }
+    79 +  const reduced = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+    80 +  await reduced.goto(origin, { waitUntil: 'domcontentloaded' });
+    81 +  assert.equal(await reduced.locator('video').getAttribute('src'), null);
+    82 +  await reduced.locator('#eventos').evaluate(e => e.scrollIntoView({ behavior: 'instant' }));
+    83 +  await reduced.screenshot({ path: `${output}/reduced-motion.png` });
+    84 +  await reduced.close();
+    85 +} finally {
+    86 +  await writeFile(`${output}/results.json`, JSON.stringify(results, null, 2));
+    87 +  await browser.close();
+    88 +}
+    89 +console.log('Browser checks passed: video forward/reverse, viewport, navigation, catalog, Iti IA and reduced motion.');
+
+• Hook failed
+  └ hook exited with code 1
+
+• Ran $env:PLAYWRIGHT_MODULE='file:///C:/Users/aldog/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/
+  │ playwright/index.mjs'; node tests/browser-local.mjs
+  └ desktop [153,127,133]
+    mobile [104,92,102]
+    … +17 lines (ctrl + t to view transcript)
+
+    Node.js v22.14.0
+
+• Edited 3 files (+8 -2)
+  └ assets\css\higgsfield-site.css (+1 -1)
+    207    .book-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; back
+         ground: var(--line); }
+    208 -  .book-card { display: flex; min-height: 270px; flex-direction: column; padding: 28px; background: var(--paper-bright); }
+    208 +  .book-card { display: flex; min-height: 270px; flex-direction: column; padding: 28px; color: var(--ink); background: var(--p
+         aper-bright); }
+    209    .book-card__genre { color: var(--coral); font: 600 .7rem/1.3 var(--font-mono); text-transform: uppercase; }
+
+  └ scripts\local-stack.mjs (+3 -0)
+    161  if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+    162 +  const shutdown = async () => { await teardown(); process.exit(0); };
+    163 +  process.once('SIGINT', shutdown);
+    164 +  process.once('SIGTERM', shutdown);
+    165    main().catch((error) => {
+
+  └ tools\dev-with-dataconnect.mjs (+4 -1)
+     88        if (!catalog.ok) throw new Error('Catálogo pendiente');
+     89 +      const catalogData = await catalog.json();
+     90 +      if (!Array.isArray(catalogData.books)) throw new Error('Respuesta de catálogo inválida');
+     91        const ai = await fetch(`${origin}/api/ai/iti-ia`, {
+        ⋮
+     97        if (!ai.ok || !Array.isArray((await ai.json()).result)) throw new Error('Iti IA pendiente');
+     96 -      console.log(`Vista local lista: ${origin} · catálogo e Iti IA disponibles · datos de prueba, no inventario.`);
+     98 +      const mode = catalogData.mode === 'test' ? 'datos de prueba, no inventario' : 'inventario configurado';
+     99 +      console.log(`Vista local lista: ${origin} · catálogo e Iti IA disponibles · ${mode}.`);
+    100        break;
+
+• Hook failed
+  └ hook exited with code 1
+
+• Ran npm.cmd test; git diff --check -- index.html assets/css/higgsfield-site.css assets/js/higgsfield-site.js tools/static-server.mjs
+  │ tools/dev-with-dataconnect.mjs src/ai/genkit.ts src/ai/iti-ia.ts tests/runtime.test.mjs tests/site.test.mjs tests/iti-ia.test.mjs
+  │ tests/browser-local.mjs README.md
+  └
+    > libreria-itinerante-y-mas@1.0.0 test
+    … +330 lines (ctrl + t to view transcript)
+    warning: in the working copy of 'tests/site.test.mjs', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'tools/static-server.mjs', LF will be replaced by CRLF the next time Git touches it
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+• La prueba en navegador ya midió saltos del video de unos 80–150 ms en escritorio, móvil y tablet, tanto hacia delante como hacia
+  atrás. También pasó la consulta «Literatura.» desde el diálogo real. Queda un desbordamiento en pantallas de 320 px; lo estoy
+  corrigiendo antes de cerrar la comprobación.
+
+• Added .tmp-audit\probe-width.mjs (+8 -0)
+    1 +import { chromium } from 'file:///C:/Users/aldog/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/play
+       wright/index.mjs';
+    2 +const browser = await chromium.launch({ headless: true });
+    3 +try {
+    4 + const page = await browser.newPage({ viewport: { width: 320, height: 568 } });
+    5 + await page.goto('http://127.0.0.1:8080/', {waitUntil:'domcontentloaded'});
+    6 + await page.evaluate(() => document.fonts.ready);
+    7 + console.log(await page.evaluate(() => [...document.querySelectorAll('body *')].filter(e=>e.getClientRects().length).map(e=>({ta
+       g:e.tagName,cls:e.className,left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right})).filter(e=>e.right>inner
+       Width+1 && e.left>=0)));
+    8 +} finally {await browser.close();}
+
+• Hook failed
+  └ hook exited with code 1
+
+• Ran node .tmp-audit/probe-width.mjs; node --input-type=module -e "import{readFile}from'node:fs/promises';const a=JSON.parse(await
+  │ readFile('.tmp-audit/local-fix/
+  │ results.json','utf8')).find(r=>r.name==='mobile');console.log('AI:',JSON.stringify(a?.ai).slice(0,1500));"
+  └ [
+      { tag: 'A', cls: '', left: 292.453125, right: 365.234375 },
+    … +18 lines (ctrl + t to view transcript)
+    blanda · Andy Weir.","sourceUrl":"https://www.amazon.com/s?
+    k=9784303793205","verifiedAt":"2026-08-25T21:58:14.183000Z","datasetKey":"amazon-bestsellers-500","sourceLabel":"Amazon_Be
+
+• Viewed Image
+  └ .tmp-audit\local-fix\mobile-iti-ia.png
+
+■ You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to
+purchase more credits or try again at Sep 6th, 2026 12:56 AM.

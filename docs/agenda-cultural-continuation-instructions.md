@@ -43,7 +43,7 @@ Use the exact canonical paths. Do not wire image paths into `index.html` until t
    - `role="region"` with a clear `aria-label`.
    - Semantic list or grouped slides.
    - Previous, next, and dot controls with accessible labels.
-   - One WhatsApp CTA per card.
+   - One section-level CTA after the rail.
 3. Compress event copy:
    - Title: two short lines maximum.
    - Summary: max 110 characters.
@@ -57,11 +57,9 @@ Use the exact canonical paths. Do not wire image paths into `index.html` until t
    - Use `pointer-events: none`.
    - Use `var(--color-hero)`, not hardcoded hex.
 7. Add carousel behavior:
-   - `800ms transition` for panel movement.
-   - `4.8s dwell` for autoplay cadence.
-   - Pause on hover, focus, pointerdown, touch drag, and hidden tab.
-   - Disable autoplay under `prefers-reduced-motion: reduce`.
-   - Manual controls must always work.
+   - Manual arrows, dots, keyboard input, and native scrolling.
+   - No autoplay or interval timer.
+   - Use immediate scrolling under `prefers-reduced-motion: reduce`.
 
 ## Suggested Harness Checks
 
@@ -70,8 +68,8 @@ Add or extend tests for:
 - `#eventos` has `role="region"` and carousel controls.
 - Controls have labels: `Evento anterior`, `Siguiente evento`, `Ir al evento 1`.
 - Event cards use compact content fields and no long paragraph blocks.
-- Motion constants include `800` and `4800`.
-- Reduced motion disables autoplay logic.
+- No `setInterval` or autoplay dwell constant exists.
+- Reduced motion changes smooth scrolling to immediate scrolling.
 - Right fade CSS uses `pointer-events: none` and `var(--color-hero)`.
 - Local assets exist only after they are referenced.
 
@@ -108,7 +106,7 @@ docs/gemini-demo-image-specs.md, and this continuation file.
 Implement the next vertical slice with TDD:
 1. Add a failing harness test for the image-first event carousel.
 2. Refactor #eventos into an accessible carousel region with compact cards.
-3. Use 800ms transition and 4.8s dwell, pausing on interaction and reduced motion.
+3. Keep movement manual and switch to immediate scrolling under reduced motion.
 4. Keep token-based colors and a gradient fallback if demo images are not present.
 5. Run npm.cmd test and verify desktop/mobile layout.
 ```

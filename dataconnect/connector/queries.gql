@@ -1,0 +1,93 @@
+fragment BookOverview on Book {
+  id
+  slug
+  isbn13
+  title
+  subtitle
+  description
+  mood
+  priceMxnCents
+  stockQty
+  condition
+  coverUrl
+  coverAlt
+  curatorNote
+  tags
+  datasetKey
+  sourceKind
+  sourceLabel
+  sourceRecordId
+  referencePriceUsdCents
+  sourceRating
+  sourceReviewCount
+  sourceWeeksOnList
+  sourceRank
+  sourceBsr
+  sourceUrl
+  verifiedAt
+  editorial { name }
+  subgenre {
+    slug
+    name
+    category { slug name }
+  }
+  contributors: bookAuthors_on_book(orderBy: [{ ord: ASC }]) {
+    role
+    ord
+    author {
+      slug
+      fullName
+    }
+  }
+}
+
+# Catalogo publico: nunca expone borradores ni libros sin existencia.
+query BrowseCatalog(
+  $mood: String
+  $categorySlug: String
+  $subgenreSlug: String
+  $format: String
+  $maxPriceMxnCents: Int
+  $partialTitle: String
+  $limit: Int = 30
+) @auth(level: PUBLIC) {
+  books(
+    where: {
+      status: { eq: "active" }
+      stockQty: { gt: 0 }
+      datasetKey: { eq: "inventory" }
+      mood: { eq: $mood }
+      format: { eq: $format }
+      subgenre: {
+        slug: { eq: $subgenreSlug }
+        category: { slug: { eq: $categorySlug } }
+      }
+      priceMxnCents: { le: $maxPriceMxnCents }
+      title: { contains: $partialTitle }
+    }
+    orderBy: [{ title: ASC }]
+    limit: $limit
+  ) { ...BookOverview }
+}
+
+query BookDetailsPage($slug: String!) @auth(level: PUBLIC) {
+  books(
+    where: { slug: { eq: $slug }, status: { eq: "active" }, datasetKey: { eq: "inventory" } }
+    limit: 1
+  ) {
+    ...BookOverview
+    language
+    pages
+    publishedYear
+    format
+  }
+}
+
+query SearchBooksVector($query: String!, $limit: Int = 8)
+  @auth(level: PUBLIC) {
+  books: books_embedding_similarity(
+    compare_embed: { text: $query, model: "text-embedding-005" }
+    where: { status: { eq: "active" }, stockQty: { gt: 0 }, datasetKey: { eq: "inventory" } }
+    limit: $limit
+  ) { ...BookOverview }
+}

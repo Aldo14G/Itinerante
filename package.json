@@ -1,14 +1,61 @@
 {
-  "name": "itinerante-static-site",
-  "version": "0.1.0",
+  "name": "libreria-itinerante-y-mas",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "preview": "node tools/static-server.mjs 8080",
-    "test": "node --test tests/*.test.mjs",
-    "harness": "node --test tests/*.test.mjs"
+    "dev": "node tools/dev-with-dataconnect.mjs",
+    "preview": "node tools/dev-with-dataconnect.mjs",
+    "preview:static": "node tools/static-server.mjs",
+    "backend:dev": "next dev",
+    "backend:dev:emulator": "node tools/dev-with-dataconnect.mjs",
+    "backend:build": "next build",
+    "backend:start": "next start",
+    "test": "node --test tests/site.test.mjs tests/lib.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/catalog-ui.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs",
+    "harness": "npm run test",
+    "reference:check": "node --test tests/reference-search.test.mjs",
+    "filters:test": "node --import tsx/esm --test tests/query-filters.test.mjs",
+    "taxonomy:check": "node --test tests/taxonomy.test.mjs",
+    "taxonomy:seed": "node scripts/seed-taxonomy.mjs",
+    "taxonomy:seed:commit": "node scripts/seed-taxonomy.mjs --commit",
+    "taxonomy:verify": "node scripts/verify-taxonomy.mjs",
+    "taxonomy:local": "node scripts/local-stack.mjs",
+    "books:validate": "node scripts/import-books.mjs",
+    "books:import": "node scripts/import-books.mjs --commit",
+    "embeddings:check": "node scripts/check-gemini-embedding.mjs",
+    "amazon:etl": "node scripts/etl-amazon-books.mjs",
+    "amazon:etl:check": "node scripts/etl-amazon-books.mjs --check",
+    "amazon:covers": "node scripts/enrich-openlibrary-covers.mjs",
+    "amazon:enrich": "node scripts/enrich-google-books.mjs",
+    "rag:test": "node scripts/check-test-rag.mjs",
+    "rag:inventory": "node --import tsx/esm scripts/check-inventory-rag.mjs",
+    "dataconnect:generate": "firebase dataconnect:sdk:generate",
+    "dataconnect:verify": "node scripts/check-dataconnect-generated.mjs",
+    "genkit:ui": "genkit start -- tsx --watch src/ai/index.ts",
+    "emulators": "firebase emulators:start",
+    "emulators:dataconnect": "firebase emulators:start --only dataconnect"
+  },
+  "dependencies": {
+    "@genkit-ai/google-genai": "1.41.0",
+    "@genkit-ai/next": "1.41.0",
+    "@itinerante/data": "file:generated/data",
+    "firebase": "12.11.0",
+    "firebase-admin": "^13.2.0",
+    "genkit": "1.41.0",
+    "next": "15.5.21",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
   },
   "devDependencies": {
-    "@supabase/supabase-js": "^2.112.4"
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "firebase-tools": "15.28.1",
+    "genkit-cli": "1.41.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "@genkit-ai/google-cloud": "1.41.0"
   }
 }

@@ -1,0 +1,11 @@
+specVersion: "v1alpha"
+serviceId: "itinerante-service"
+location: "us-central1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "itinerante"
+      cloudSql:
+        instanceId: "itinerante-db"
+connectorDirs: ["./connector", "./tools"]

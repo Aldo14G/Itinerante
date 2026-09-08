@@ -2,13 +2,45 @@
   "firestore": {
     "rules": "firestore.rules"
   },
+  "dataconnect": {
+    "source": "dataconnect"
+  },
+  "emulators": {
+    "dataconnect": {
+      "port": 9399,
+      "dataDir": "dataconnect/.dataconnect/pgliteData"
+    }
+  },
   "hosting": {
     "public": ".",
     "ignore": [
       "firebase.json",
       ".firebaserc",
       ".claude/**",
-      "*.json"
+      ".agents/**",
+      "_archive/**",
+      "dataconnect/**",
+      "supabase/**",
+      "src/**",
+      "scripts/**",
+      "tools/**",
+      "tests/**",
+      "data/**",
+      "generated/**",
+      "imports/**",
+      "docs/**",
+      "design-system/**",
+      "node_modules/**",
+      ".next/**",
+      "public/**",
+      ".firebase/**",
+      "*.json",
+      "*.log",
+      "*.zip",
+      "*.pdf",
+      "*.csv",
+      "next.config.ts",
+      "tsconfig.json"
     ],
     "headers": [
       {

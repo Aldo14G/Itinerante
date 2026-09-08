@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "categories": [
+    {
+      "__template": true,
+      "id": "categoria-narrativa",
+      "slug": "categoria-narrativa",
+      "name": "Narrativa",
+      "sourceLabel": "Inventario autorizado de Libreria Itinerante"
+    }
+  ],
+  "subgenres": [
+    {
+      "__template": true,
+      "id": "subgenero-novela",
+      "slug": "subgenero-novela",
+      "name": "Novela",
+      "categoryId": "categoria-narrativa",
+      "sourceLabel": "Inventario autorizado de Libreria Itinerante"
+    }
+  ],
+  "editorials": [
+    {
+      "__template": true,
+      "id": "editorial-verificada",
+      "slug": "editorial-verificada",
+      "name": "Nombre editorial",
+      "countryCode": "MX",
+      "website": "https://example.invalid/editorial"
+    }
+  ],
+  "authors": [
+    {
+      "__template": true,
+      "id": "nombre-autora",
+      "slug": "nombre-autora",
+      "fullName": "Nombre de la autora",
+      "bio": null,
+      "imageUrl": null
+    }
+  ],
+  "books": [
+    {
+      "__template": true,
+      "id": "titulo-del-libro",
+      "slug": "titulo-del-libro",
+      "isbn13": "9780000000002",
+      "editorialId": "editorial-verificada",
+      "subgenreId": "subgenero-novela",
+      "title": "Titulo del libro",
+      "subtitle": null,
+      "description": "Descripcion factual verificada; no copie sin permiso una sinopsis extensa.",
+      "language": "es",
+      "pages": 200,
+      "publishedYear": 2026,
+      "format": "Tapa blanda",
+      "priceMxnCents": 35000,
+      "stockQty": 1,
+      "status": "active",
+      "condition": "new",
+      "coverUrl": null,
+      "coverAlt": "Portada de Titulo del libro",
+      "curatorNote": null,
+      "sourceCategory": "Narrativa",
+      "sourceSubGenre": "Novela",
+      "mood": "Reflexivo",
+      "tags": ["independiente"],
+      "sourceUrl": "https://example.invalid/ficha-verificada",
+      "verifiedAt": "2026-08-24T12:00:00.000Z"
+    }
+  ],
+  "bookAuthors": [
+    {
+      "__template": true,
+      "bookId": "titulo-del-libro",
+      "authorId": "nombre-autora",
+      "role": "author",
+      "ord": 0
+    }
+  ]
+}

@@ -1,12 +1,15 @@
 # Backend + Catálogo Dublin Core — Design Spec
 
-**Status:** ✅ BRAINSTORMING COMPLETO — listo para self-review + `superpowers:writing-plans`.
+**Status:** ARCHIVADO — sustituido por `CONTEXT.md` y
+`docs/ARCHITECTURE_AND_CONTEXT.md`; no implementar ni restaurar sus superficies
+alternas sin una nueva decision explicita de migracion.
 **Fecha inicio:** 2026-08-22
 **Última sesión:** 2026-08-23 (cerradas las 6 secciones; brainstorm terminal).
 **Owner:** Aldo
 **Contexto:** Librería Itinerante y Más (Monterrey). Amigo Roberto.
 
-> Spec cerrado. Próximo paso: spec self-review + invocar `superpowers:writing-plans` para el plan de implementación.
+> Documento historico. `catalogo.html` y las variantes de frontend descritas
+> abajo no pertenecen a la superficie oficial vigente.
 
 ---
 

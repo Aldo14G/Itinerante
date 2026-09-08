@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "datasetKey": "amazon-bestsellers-500",
+  "mode": "test",
+  "source": {
+    "kind": "fixture",
+    "path": "data/books.amazon-test.json",
+    "note": "Solo evalua recuperacion sobre el fixture; no describe inventario disponible."
+  },
+  "cases": [
+    {
+      "id": "science-fiction",
+      "query": "ciencia ficcion espacial",
+      "expectedSlugs": ["libro-project-hail-mary-andy-weir-ballantine-books-9784303-5e06bb4c"]
+    },
+    {
+      "id": "habits",
+      "query": "habitos y productividad",
+      "expectedSlugs": ["libro-atomic-habits-james-clear-avery-9787933209545-b595cae6"]
+    },
+    {
+      "id": "psychological-thriller",
+      "query": "misterio thriller psicologico",
+      "expectedSlugs": ["libro-the-dinner-party-freida-mcfadden-sourcebooks-landmar-90759ab3"]
+    },
+    {
+      "id": "graphic-novel",
+      "query": "libro infantil novela grafica",
+      "expectedSlugs": ["libro-dog-man-big-jim-believes-dav-pilkey-graphix-97881007-9da0fa34"]
+    },
+    {
+      "id": "memoir",
+      "query": "memorias y biografias",
+      "expectedSlugs": ["libro-memorial-days-alysia-abbott-norton-9782465095733-15e297bd"]
+    }
+  ],
+  "assertions": {
+    "status": "test",
+    "stockQty": 0,
+    "neverClaimInventory": true,
+    "neverInferPriceOrAvailability": true
+  }
+}

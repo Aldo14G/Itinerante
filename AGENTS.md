@@ -2,9 +2,9 @@
 
 ## Project Structure & Module Organization
 
-This repository is a static Firebase Hosting site for Libreria Itinerante y Mas. The main application lives in `index.html`, which contains markup, local CSS, and inline JavaScript. Static assets are stored at the repository root; currently `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
+This repository is a static Firebase Hosting site for Libreria Itinerante y Mas. The main application lives in `index.html`; its canonical composition is the adapted Higgsfield `d599d36a` model. Local styles and behavior live in `assets/css/higgsfield-site.css` and `assets/js/higgsfield-site.js`. The previous mixed model is read-only history under `_archive/models/`. Static assets are stored at the repository root; `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
 
-Avoid generated build output in the root. If the site grows, place reusable assets under `assets/` and split scripts or styles into `js/` and `css/` only when it reduces maintenance cost.
+Avoid generated build output in the root. Keep reusable styles and scripts under `assets/`; do not resume UI work in the archived mixed model.
 
 ## Build, Test, and Development Commands
 
@@ -19,7 +19,7 @@ There is no build step at present. `index.html` is served directly.
 
 Use 2-space indentation for HTML, CSS, and JavaScript. Keep copy in Spanish unless a section is intentionally bilingual. Prefer semantic sections with descriptive `id` values such as `#eventos`, `#contacto`, or `#catalogo`.
 
-CSS custom properties belong in `:root`; reuse brand, amber, paper, and text variables before adding colors. Keep critical layout, spacing, typography, and state styles in local CSS; do not reintroduce Tailwind CDN for isolated utility classes.
+CSS custom properties belong in `:root`; reuse the Higgsfield turquoise, ink, paper, and coral variables before adding colors. Keep critical layout, spacing, typography, and state styles in local CSS; do not reintroduce Tailwind CDN or Higgsfield SDK dependencies.
 
 Before UI changes, read `design-system/libreria-itinerante-y-mas/MASTER.md` and then `design-system/libreria-itinerante-y-mas/pages/home.md` for landing-specific rules.
 
