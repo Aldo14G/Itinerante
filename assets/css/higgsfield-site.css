@@ -114,7 +114,7 @@
   .scroll-scrub[data-video-ready="true"] .scroll-scrub__media video { opacity: 1; }
   .scroll-scrub__veil { z-index: 2; background: linear-gradient(90deg, rgba(6, 26, 24, .94) 0%, rgba(6, 26, 24, .78) 38%, rgba(6, 26, 24, .28) 68%, rgba(6, 26, 24, .42) 100%); pointer-events: none; }
   .scroll-scrub__progress { position: absolute; z-index: 7; top: 0; right: 0; left: 0; height: 3px; background: rgba(245, 241, 232, .18); }
-  .scroll-scrub__progress span { display: block; width: 100%; height: 100%; background: var(--coral); transform: scaleX(var(--hero-progress)); transform-origin: left center; }
+  .scroll-scrub__progress span { display: block; width: 100%; height: 100%; background: var(--coral); transform: scaleX(var(--hero-progress)); transform-origin: left center; will-change: transform; }
   .scroll-scrub__phases { position: absolute; z-index: 7; right: var(--gutter-end); bottom: 10px; left: var(--gutter-start); height: 20px; padding: 0; list-style: none; color: rgba(245, 241, 232, .82); font: 500 .7rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; pointer-events: none; }
   .scroll-scrub__phases li { position: absolute; width: 1px; height: 20px; background: rgba(245, 241, 232, .65); }
   .scroll-scrub__phases li:nth-child(1) { left: 8%; }
@@ -243,6 +243,9 @@
   .book-card__cover { position: relative; display: grid; aspect-ratio: 3 / 2; place-items: center; overflow: hidden; color: var(--paper); background: rgba(255, 255, 255, .06); }
   .book-card__cover img { width: 100%; height: 100%; object-fit: cover; }
   .book-card__cover span { max-width: 12ch; font-family: var(--font-display); font-size: 1.2rem; text-align: center; }
+  .cover-fallback { display: flex; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 18px; background: linear-gradient(150deg, rgba(13, 74, 69, .9), rgba(6, 26, 24, .95)); text-align: center; }
+  .cover-fallback strong { max-width: 14ch; font-family: var(--font-display); font-size: 1.15rem; line-height: 1.15; }
+  .cover-fallback small { color: var(--brand-light); font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .book-card__body { display: flex; flex: 1; flex-direction: column; padding: 20px; }
   .book-card__genre { color: var(--brand-light); font: 600 .7rem/1.3 var(--font-mono); text-transform: uppercase; }
   .book-card h3 { margin: 12px 0 8px; font-size: 1.35rem; line-height: 1.08; }
@@ -361,7 +364,8 @@
   .hero-title .line { display: block; overflow: hidden; transform: none; }
   .hero-title .line-one { color: #fff; }
   .hero-title .line-two { color: rgba(255, 255, 255, .95); }
-  .hero-title .line-reveal { display: block; will-change: transform; }
+  .hero-title .line-reveal { display: block; }
+  html.motion-pending .hero-title .line-reveal { will-change: transform; }
   .hero-title em { color: var(--brand-light); font-style: italic; }
   .hero-copy { width: min(560px, 100%); margin-top: var(--title-copy-gap); color: rgba(255, 255, 255, .94); font-size: var(--copy-size); font-weight: 400; letter-spacing: .01em; line-height: 1.65; text-shadow: 0 1px 2px rgba(0, 0, 0, .8), 0 2px 12px rgba(0, 0, 0, .5); }
   .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 26px 0 0; padding: 16px 0 0; border-top: 1px solid rgba(255, 255, 255, .16); list-style: none; }

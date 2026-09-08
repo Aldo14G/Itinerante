@@ -254,15 +254,21 @@
   function cover(book, className) {
     const container = document.createElement('div');
     container.className = className;
-    if (/^(\/|https:\/\/covers\.openlibrary\.org\/)/.test(book.coverUrl)) {
+    if (/^(\/|https?:\/\/)/.test(book.coverUrl)) {
       const image = document.createElement('img');
       image.src = book.coverUrl;
       image.alt = `Portada de ${book.title}`;
       image.loading = 'lazy';
+      image.decoding = 'async';
       container.append(image);
     } else {
-      const fallback = document.createElement('span');
-      fallback.textContent = book.title;
+      const fallback = document.createElement('div');
+      fallback.className = 'cover-fallback';
+      const title = document.createElement('strong');
+      title.textContent = book.title;
+      const author = document.createElement('small');
+      author.textContent = book.author;
+      fallback.append(title, author);
       container.append(fallback);
     }
     return container;

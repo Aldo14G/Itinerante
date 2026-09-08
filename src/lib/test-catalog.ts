@@ -3,6 +3,11 @@ import { adminApp } from "@/lib/firebase-admin";
 import { localTestEmbedding } from "@/lib/local-test-embedding";
 import { rankTestBooks } from "@/lib/local-test-search";
 import { loadLocalTestBooks } from "@/lib/local-dataset";
+import coversManifest from "../../data/books.amazon-test.covers.json";
+
+const coverBySlug = new Map<string, string>(
+  (coversManifest.books ?? []).filter((entry) => entry.slug && entry.coverUrl).map((entry) => [entry.slug, entry.coverUrl]),
+);
 
 export interface CatalogBookRecord {
   id: string;
@@ -261,6 +266,8 @@ export function toBookView(book: CatalogBookRecord, isTestData: boolean) {
   const { searchText: _searchText, ...publicBook } = book;
   return {
     ...publicBook,
+    coverUrl: publicBook.coverUrl || coverBySlug.get(publicBook.slug) || null,
+    coverAlt: publicBook.coverAlt || `Portada de ${publicBook.title}`,
     category: book.subgenre.category,
     genre: book.subgenre.category.name,
     subgenreName: book.subgenre.name,

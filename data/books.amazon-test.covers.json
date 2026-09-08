@@ -1,300 +1,1506 @@
 {
-  "provider": "Google Books / Open Library",
-  "count": 42,
+  "provider": "Open Library",
   "books": [
     {
+      "slug": "libro-a-admiral-greg-bear-ivp-books-9784824702625-febcf51d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14575006-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL7547462W"
+    },
+    {
       "slug": "libro-a-court-of-silver-flames-sarah-j-maas-bloomsbury-pub-3c7d5cbb",
-      "isbn13": "9781526635365",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10643508-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL21703979W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10643508-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21703979W"
     },
     {
       "slug": "libro-a-court-of-thorns-and-roses-sarah-j-maas-bloomsbury-c6660236",
-      "isbn13": "9782732472300",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8738585-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL17352669W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8738585-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17352669W"
+    },
+    {
+      "slug": "libro-a-ice-emily-st-john-mandel-plata-publishing-97865817-125a133c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8069308-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17062334W"
+    },
+    {
+      "slug": "libro-a-letter-david-goggins-little-brown-9781929415483-a9a6e51f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/705335-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL880062W"
+    },
+    {
+      "slug": "libro-a-town-anne-mccaffrey-tor-books-9788357463691-f10eeb72",
+      "coverUrl": "https://covers.openlibrary.org/b/id/489833-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2779741W"
+    },
+    {
+      "slug": "libro-above-kingdom-james-clear-waterbrook-9788263435150-01f401e5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3049590-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14940818W"
+    },
+    {
+      "slug": "libro-above-shadow-mark-lawrence-bloomsbury-publishing-978-51307103",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14898798-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL37790517W"
+    },
+    {
+      "slug": "libro-across-game-michael-j-sullivan-howard-books-97841287-2eee68d5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10135854-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20830548W"
+    },
+    {
+      "slug": "libro-across-king-terry-pratchett-algonquin-books-97829168-76a15242",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6755651-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL7537358W"
+    },
+    {
+      "slug": "libro-across-map-doris-kearns-goodwin-plata-publishing-978-9d3c54bd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8291426-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17561407W"
+    },
+    {
+      "slug": "libro-across-moon-kelly-link-park-row-9786701616783-034fa560",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12394502-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4225427W"
+    },
+    {
+      "slug": "libro-after-knight-n-k-jemisin-lioncrest-publishing-978113-ea33d65c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12750623-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25590130W"
+    },
+    {
+      "slug": "libro-after-world-dean-koontz-simon-schuster-9784208742470-6a524cc6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14549230-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL36149588W"
+    },
+    {
+      "slug": "libro-against-message-taylor-jenkins-reid-simon-schuster-9-7c3384d7",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9306775-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3718976W"
+    },
+    {
+      "slug": "libro-against-war-ben-greenfield-bloomsbury-publishing-978-387b20f6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7235292-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4278939W"
     },
     {
       "slug": "libro-atmosphere-taylor-jenkins-reid-ballantine-books-9787-37272618",
-      "isbn13": "9780593158715",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15098710-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL42412330W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15098710-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL42412330W"
     },
     {
       "slug": "libro-atomic-habits-james-clear-avery-9787933209545-b595cae6",
-      "isbn13": "9798998881152",
-      "coverUrl": "https://covers.openlibrary.org/b/id/12539702-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL17930368W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/12539702-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17930368W"
+    },
+    {
+      "slug": "libro-beauty-approach-isabel-wilkerson-workman-publishing-f71e2368",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12002940-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25306767W"
+    },
+    {
+      "slug": "libro-beauty-fallen-workman-publishing-thomas-nelson-97879-2c3870ed",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8193988-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17883416W"
+    },
+    {
+      "slug": "libro-before-book-gloria-steinem-harpercollins-97893900285-4936e0b7",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12590454-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20014818W"
+    },
+    {
+      "slug": "libro-before-knight-joyce-meyer-lioncrest-publishing-97856-1117fd50",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1308218-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8151799W"
+    },
+    {
+      "slug": "libro-before-war-ben-greenfield-doubleday-9789682261868-7922648c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/111916-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17208W"
+    },
+    {
+      "slug": "libro-below-empire-matt-haig-harriman-house-9787228445637-35de5bb0",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7852327-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17575680W"
+    },
+    {
+      "slug": "libro-below-house-anthony-ryan-howard-books-9783621006068-cd7459bf",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6799951-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15836147W"
+    },
+    {
+      "slug": "libro-beneath-sea-arianna-huffington-plata-publishing-9784-85be5826",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11980866-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25219259W"
+    },
+    {
+      "slug": "libro-between-choice-thich-nhat-hanh-avery-9784748712303-17659d18",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1663989-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL23790268W"
+    },
+    {
+      "slug": "libro-between-garden-matthew-walker-waterbrook-97858236815-263c9acb",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13853862-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18665763W"
+    },
+    {
+      "slug": "libro-beyond-captain-viktor-frankl-plata-publishing-978165-dddda1a3",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8295279-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL6346487W"
+    },
+    {
+      "slug": "libro-beyond-code-rick-rubin-vintage-9782674963499-e90f84b0",
+      "coverUrl": "https://covers.openlibrary.org/b/id/861828-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5826837W"
+    },
+    {
+      "slug": "libro-beyond-world-rick-warren-chronicle-books-97834807429-90ed2f76",
+      "coverUrl": "https://covers.openlibrary.org/b/id/5895767-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL47752W"
+    },
+    {
+      "slug": "libro-broken-fire-jeff-kinney-baker-books-9783664316314-db9f4723",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8597295-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19793296W"
+    },
+    {
+      "slug": "libro-broken-power-seth-godin-macmillan-publishers-9781312-a3d1f561",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9370379-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20695194W"
+    },
+    {
+      "slug": "libro-burning-queen-isabel-wilkerson-bloomsbury-publishing-770a8faf",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11284309-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21209137W"
     },
     {
       "slug": "libro-can-t-hurt-me-david-goggins-lioncrest-publishing-978-11cd0d15",
-      "isbn13": "9781544507859",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8305903-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL18108064W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8305903-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18108064W"
+    },
+    {
+      "slug": "libro-captain-chronicles-frank-herbert-scholastic-press-97-2f4a7499",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2989050-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8070904W"
+    },
+    {
+      "slug": "libro-chasing-sky-tamora-pierce-hay-house-9788458385257-01e9b33e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2769452-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9722725W"
+    },
+    {
+      "slug": "libro-chasing-teacher-cassandra-clare-putnam-9788604692174-9e99cc2e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13267433-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL7008977W"
+    },
+    {
+      "slug": "libro-city-and-snow-bob-woodward-chronicle-books-978011526-89ae80e8",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7597071-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17447407W"
+    },
+    {
+      "slug": "libro-city-chronicles-patrick-rothfuss-ballantine-books-97-a05456cb",
+      "coverUrl": "https://covers.openlibrary.org/b/id/21071-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5826877W"
+    },
+    {
+      "slug": "libro-cold-heart-rhonda-byrne-grand-central-publishing-978-883dd2bb",
+      "coverUrl": "https://covers.openlibrary.org/b/id/227486-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1873728W"
+    },
+    {
+      "slug": "libro-cold-hero-tamora-pierce-flatiron-books-9783217929359-33d1bef5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8559503-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19642632W"
+    },
+    {
+      "slug": "libro-cold-lie-viktor-frankl-vintage-9782124387428-c90e46e2",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7331460-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17089906W"
+    },
+    {
+      "slug": "libro-court-revealed-gloria-steinem-hay-house-978480989475-6c004e1e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/4220000-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4858307W"
     },
     {
       "slug": "libro-dad-i-want-to-hear-your-story-jeffrey-mason-hear-you-14b83895",
-      "isbn13": "9781955034746",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15094938-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL34159429W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15094938-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34159429W"
+    },
+    {
+      "slug": "libro-dark-empire-charlotte-mcconaghy-navpress-97879796522-632ad602",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9833301-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5538024W"
+    },
+    {
+      "slug": "libro-dark-warrior-tim-ferriss-independently-published-978-b00ab79e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/28265-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3578956W"
+    },
+    {
+      "slug": "libro-deal-chronicles-david-eddings-st-martin-s-press-9789-1977cb63",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7259601-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16805463W"
+    },
+    {
+      "slug": "libro-deal-undone-jeffrey-mason-chronicle-books-9780881542-6706b996",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9753841-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2095467W"
     },
     {
       "slug": "libro-dear-debbie-freida-mcfadden-sourcebooks-landmark-978-982a5d33",
-      "isbn13": "9781464249624",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15163694-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL44800712W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15163694-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL44800712W"
+    },
+    {
+      "slug": "libro-deep-beast-hernan-diaz-zondervan-9784655494855-b5513c9f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9680016-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8398430W"
+    },
+    {
+      "slug": "libro-deep-game-andy-weir-riverhead-books-9780327722973-239ff7ac",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2564463-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9443627W"
+    },
+    {
+      "slug": "libro-deep-shadow-edith-eger-scholastic-press-978270418997-b4541419",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6683095-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14963250W"
+    },
+    {
+      "slug": "libro-deep-world-various-scholastic-press-9787646439336-0159db1a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/405810-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1928078W"
+    },
+    {
+      "slug": "libro-desert-saga-james-dashner-scribner-9786399082416-5a0eb16f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8572904-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19660817W"
+    },
+    {
+      "slug": "libro-doctor-approach-octavia-butler-baker-books-978032946-a37db3f6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15043303-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL36774033W"
+    },
+    {
+      "slug": "libro-dream-legacy-vince-flynn-sourcebooks-landmark-978941-3b34afb6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12432164-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21147313W"
     },
     {
       "slug": "libro-dune-frank-herbert-ace-9787946598287-c665da2c",
-      "isbn13": "9780441007493",
-      "coverUrl": "https://covers.openlibrary.org/b/id/11481354-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL893414W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/11481354-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL893414W"
+    },
+    {
+      "slug": "libro-earth-of-glass-gillian-flynn-howard-books-9784825696-6c743f99",
+      "coverUrl": "https://covers.openlibrary.org/b/id/196022-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2941300W"
+    },
+    {
+      "slug": "libro-empire-of-glass-tomi-adeyemi-hachette-book-group-978-e5c6905c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14462684-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19735553W"
+    },
+    {
+      "slug": "libro-ender-s-game-orson-scott-card-tor-books-978855056535-f9434f9d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12996033-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL49488W"
+    },
+    {
+      "slug": "libro-faith-of-fire-dav-pilkey-harperone-9783127988056-da44e662",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2058302-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9048006W"
+    },
+    {
+      "slug": "libro-faith-revealed-thich-nhat-hanh-workman-publishing-97-5210d3d3",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9199292-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20557247W"
+    },
+    {
+      "slug": "libro-falling-beauty-matthew-stover-ballantine-books-97869-56b37850",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15005684-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL37588742W"
+    },
+    {
+      "slug": "libro-falling-earth-mark-manson-workman-publishing-9786244-f7331cda",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7267818-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15901468W"
+    },
+    {
+      "slug": "libro-falling-queen-tomi-adeyemi-entangled-red-tower-books-7c9bcd6f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13589278-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21617236W"
+    },
+    {
+      "slug": "libro-fear-and-lightning-erik-larson-riverhead-books-97884-586e1dab",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2863100-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL7902479W"
+    },
+    {
+      "slug": "libro-fear-theory-naomi-novik-lioncrest-publishing-9784476-e114e7d6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13756651-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25491882W"
+    },
+    {
+      "slug": "libro-fire-city-james-clear-howard-books-9787881462585-282d1a42",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7933241-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17660269W"
+    },
+    {
+      "slug": "libro-fire-of-stars-various-independently-published-978211-73c3eb8b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13260423-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28088048W"
+    },
+    {
+      "slug": "libro-fire-throne-kelly-link-anchor-books-9780978765534-73550116",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6934834-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15946464W"
+    },
+    {
+      "slug": "libro-fire-voice-mercedes-lackey-harperone-9781731987788-0f6f50fd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/940325-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2897786W"
+    },
+    {
+      "slug": "libro-fire-window-viola-davis-scholastic-press-97815754071-098ea474",
+      "coverUrl": "https://covers.openlibrary.org/b/id/909152-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3296797W"
+    },
+    {
+      "slug": "libro-first-choice-robin-diangelo-tor-books-9787739792156-37b08709",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10344912-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2954976W"
+    },
+    {
+      "slug": "libro-first-city-nassim-taleb-st-martin-s-press-9787836959-3a0936f7",
+      "coverUrl": "https://covers.openlibrary.org/b/id/602911-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL156936W"
+    },
+    {
+      "slug": "libro-first-detective-nora-roberts-flatiron-books-97844095-557bcbd4",
+      "coverUrl": "https://covers.openlibrary.org/b/id/69703-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1471336W"
+    },
+    {
+      "slug": "libro-first-key-jonathan-haidt-riverhead-books-97821856670-93040c2a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3174091-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5528165W"
+    },
+    {
+      "slug": "libro-forest-of-shadows-octavia-butler-viking-978114569174-54c25f00",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11164559-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24530620W"
+    },
+    {
+      "slug": "libro-found-captain-rick-rubin-harmony-9788561705070-2bb7e132",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15035441-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4713299W"
+    },
+    {
+      "slug": "libro-found-choice-brent-weeks-atria-books-9787873738293-8e317991",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9848806-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5003367W"
+    },
+    {
+      "slug": "libro-found-hope-kelly-link-ace-9789842994735-00078b83",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8451694-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19339475W"
     },
     {
       "slug": "libro-fourth-wing-rebecca-yarros-entangled-red-tower-books-5cedbb5d",
-      "isbn13": "9786073901802",
-      "coverUrl": "https://covers.openlibrary.org/b/id/14407898-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL29226517W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/14407898-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL29226517W"
+    },
+    {
+      "slug": "libro-game-and-rain-publications-international-sourcebooks-412c1ab1",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7164671-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8627377W"
+    },
+    {
+      "slug": "libro-game-of-stars-daniel-kahneman-convergent-books-97802-8ea7298b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8786521-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20136325W"
+    },
+    {
+      "slug": "libro-game-revealed-jon-meacham-ballantine-books-978367186-9daf7f30",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2939470-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8947670W"
+    },
+    {
+      "slug": "libro-game-theory-john-grisham-anchor-books-9785737824074-51800e46",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1099560-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2905631W"
+    },
+    {
+      "slug": "libro-garden-code-orson-scott-card-vintage-9783260884812-92951fe3",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1381359-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL757815W"
+    },
+    {
+      "slug": "libro-golden-throne-ryan-holiday-anchor-books-978423443623-65139937",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14630481-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL36060946W"
     },
     {
       "slug": "libro-greenlights-matthew-mcconaughey-crown-9785519046531-5b2e8caa",
-      "isbn13": "9781472280831",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10512439-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL21911019W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10512439-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21911019W"
+    },
+    {
+      "slug": "libro-hero-saga-brad-thor-hay-house-9785644602793-e8b901ac",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8743540-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19938238W"
+    },
+    {
+      "slug": "libro-hero-theory-freida-mcfadden-baker-books-978973795410-0c454f8e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11824166-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24916607W"
+    },
+    {
+      "slug": "libro-hidden-world-mary-kubica-tor-books-9789396476317-2419b6da",
+      "coverUrl": "https://covers.openlibrary.org/b/id/428038-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1837499W"
+    },
+    {
+      "slug": "libro-high-book-jeffrey-mason-howard-books-9789498558449-86f1e70e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9153741-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL97824W"
+    },
+    {
+      "slug": "libro-home-unleashed-arianna-huffington-hay-house-97811109-46b945a6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2547886-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2035336W"
+    },
+    {
+      "slug": "libro-hope-reckoning-james-dashner-howard-books-9788717128-78edc406",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11190229-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24547887W"
     },
     {
       "slug": "libro-house-of-flame-and-shadow-sarah-j-maas-bloomsbury-pu-969599ca",
-      "isbn13": "9781408884447",
-      "coverUrl": "https://covers.openlibrary.org/b/id/13525139-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL34780775W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/13525139-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34780775W"
+    },
+    {
+      "slug": "libro-house-of-glass-andy-weir-scholastic-press-9780483379-6056e45f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7319376-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4233176W"
+    },
+    {
+      "slug": "libro-house-reckoning-daniel-pink-navpress-9780830103732-26329e56",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8659846-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14912777W"
+    },
+    {
+      "slug": "libro-how-captain-cinda-williams-chima-sourcebooks-landmar-7e6fd34d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/810263-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL74278W"
+    },
+    {
+      "slug": "libro-how-strength-mercedes-lackey-harpercollins-978337710-1b32d82c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1761186-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3754170W"
+    },
+    {
+      "slug": "libro-how-to-draw-everything-angela-rizza-walter-foster-jr-9dc54716",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10468549-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL22474365W"
+    },
+    {
+      "slug": "libro-how-warrior-cal-newport-convergent-books-97851944750-795bf9ba",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13102368-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20018776W"
+    },
+    {
+      "slug": "libro-hunter-code-frank-herbert-entangled-red-tower-books-e9215122",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7480866-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17388981W"
+    },
+    {
+      "slug": "libro-into-choice-rhonda-byrne-crown-9789480868035-b91341f7",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12944510-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL6439175W"
+    },
+    {
+      "slug": "libro-into-door-gabor-mate-scholastic-press-9783488293325-97848b3a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10118264-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL59733W"
+    },
+    {
+      "slug": "libro-into-forest-angela-duckworth-hachette-book-group-978-75d4fbcc",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8349045-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3294077W"
+    },
+    {
+      "slug": "libro-into-hope-martin-seligman-waterbrook-9784890761413-e527411f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7735191-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17516746W"
+    },
+    {
+      "slug": "libro-into-love-vince-flynn-bloomsbury-publishing-97883005-c23b918b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6917162-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16042227W"
+    },
+    {
+      "slug": "libro-iron-captain-paula-hawkins-bloomsbury-publishing-978-308bf771",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8012486-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17733636W"
+    },
+    {
+      "slug": "libro-iron-day-daniel-kahneman-waterbrook-9788332831329-4c4da411",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14990707-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL31219524W"
     },
     {
       "slug": "libro-iron-flame-rebecca-yarros-entangled-red-tower-books-bf4dda32",
-      "isbn13": "9798874823658",
-      "coverUrl": "https://covers.openlibrary.org/b/id/14405746-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL34028551W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/14405746-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34028551W"
+    },
+    {
+      "slug": "libro-iron-heart-erik-larson-macmillan-publishers-97802700-036be6c5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10333174-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21177831W"
+    },
+    {
+      "slug": "libro-iron-sea-lauren-groff-harriman-house-9785516885634-39ce3a24",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10526520-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21907349W"
+    },
+    {
+      "slug": "libro-iron-soldier-nassim-taleb-rodale-books-9787937446921-227c873f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7613730-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17455749W"
     },
     {
       "slug": "libro-it-ends-with-us-colleen-hoover-atria-books-978863264-c406f268",
-      "isbn13": "9788820072940",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10473609-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL18020194W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10473609-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18020194W"
+    },
+    {
+      "slug": "libro-it-s-not-her-mary-kubica-park-row-9783508575085-dcd0c60d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15175031-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL44983777W"
     },
     {
       "slug": "libro-killers-of-the-flower-moon-david-grann-doubleday-978-c0e455cf",
-      "isbn13": "9781524755935",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8055064-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL17778665W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8055064-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17778665W"
+    },
+    {
+      "slug": "libro-king-of-roses-carol-dweck-viking-9783476551956-7b15396a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1948717-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4102096W"
+    },
+    {
+      "slug": "libro-knight-of-glass-nicholas-sparks-park-row-97867156156-2b69bdb8",
+      "coverUrl": "https://covers.openlibrary.org/b/id/5938120-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16784983W"
+    },
+    {
+      "slug": "libro-knight-of-ice-jon-meacham-entangled-red-tower-books-698a4120",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12443277-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25759244W"
+    },
+    {
+      "slug": "libro-land-of-thorns-peter-f-hamilton-harperone-9780184699-8b268311",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1473048-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5714495W"
+    },
+    {
+      "slug": "libro-land-reborn-robin-hobb-avery-9781651936008-b34959e7",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7098886-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2631828W"
+    },
+    {
+      "slug": "libro-land-revealed-peter-f-hamilton-entangled-red-tower-b-21691726",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2766048-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9711446W"
+    },
+    {
+      "slug": "libro-land-saga-robin-diangelo-sourcebooks-landmark-978114-f7e6d49f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8737387-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19912859W"
+    },
+    {
+      "slug": "libro-land-undone-peter-attia-ballantine-books-97876983610-72b4da48",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3054981-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15107804W"
+    },
+    {
+      "slug": "libro-last-doctor-jeffrey-mason-plata-publishing-978292178-506be15b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7614406-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17456087W"
+    },
+    {
+      "slug": "libro-last-ice-robin-diangelo-scholastic-press-97839198731-e7f66777",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2358905-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8041230W"
+    },
+    {
+      "slug": "libro-last-king-michael-j-sullivan-penguin-books-978992090-5ec52ec2",
+      "coverUrl": "https://covers.openlibrary.org/b/id/177915-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5738460W"
+    },
+    {
+      "slug": "libro-last-mirror-colleen-hoover-ivp-books-9787417978129-cdfbea16",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7135256-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15549W"
     },
     {
       "slug": "libro-lessons-in-chemistry-bonnie-garmus-doubleday-9784375-685f3d93",
-      "isbn13": "9788418681424",
-      "coverUrl": "https://covers.openlibrary.org/b/id/12725772-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL25344431W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/12725772-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25344431W"
+    },
+    {
+      "slug": "libro-lost-star-jeff-kinney-random-house-9780440379030-eaf1252a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/4141382-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL86429W"
+    },
+    {
+      "slug": "libro-lost-throne-robert-sapolsky-scholastic-press-9788621-df71e778",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11093612-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24480976W"
+    },
+    {
+      "slug": "libro-love-chronicles-viola-davis-independently-published-ab357004",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6616688-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL474447W"
+    },
+    {
+      "slug": "libro-love-reclaimed-kelly-link-scholastic-press-978459259-253cd6f4",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14365983-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL552544W"
+    },
+    {
+      "slug": "libro-love-revisited-jeannette-walls-grand-central-publish-427bbc25",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1045958-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5150397W"
     },
     {
       "slug": "libro-malibu-rising-taylor-jenkins-reid-ballantine-books-9-a4214dff",
-      "isbn13": "9781786331533",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10447065-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL22135561W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10447065-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL22135561W"
+    },
+    {
+      "slug": "libro-memorial-days-alysia-abbott-norton-9782465095733-15e297bd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7269068-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16810887W"
+    },
+    {
+      "slug": "libro-moon-of-ice-rhonda-byrne-ivp-books-9786265065120-7f8456ce",
+      "coverUrl": "https://covers.openlibrary.org/b/id/672342-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4978538W"
     },
     {
       "slug": "libro-never-never-colleen-hoover-hoover-ink-9785863506652-a4b28e6f",
-      "isbn13": "9781981426768",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10551706-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL28948986W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10551706-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28948986W"
+    },
+    {
+      "slug": "libro-night-saga-michael-pollan-independently-published-97-811cf1ff",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12371225-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL26416416W"
     },
     {
       "slug": "libro-november-9-colleen-hoover-atria-books-9784150142119-380d84af",
-      "isbn13": "9789041715913",
-      "coverUrl": "https://covers.openlibrary.org/b/id/9219001-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL20018811W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/9219001-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20018811W"
+    },
+    {
+      "slug": "libro-nurse-of-shadows-cinda-williams-chima-tor-books-9785-66449d0c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7521588-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17409399W"
     },
     {
       "slug": "libro-oh-the-places-you-ll-go-dr-seuss-random-house-978719-62f45d9b",
-      "isbn13": "9780679805274",
-      "coverUrl": "https://covers.openlibrary.org/b/id/5020952-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL261196W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/5020952-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL261196W"
+    },
+    {
+      "slug": "libro-out-of-land-michael-pollan-park-row-9781384371305-e1488bc5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3955756-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2428153W"
+    },
+    {
+      "slug": "libro-out-of-sky-joyce-meyer-penguin-books-9787237034026-86f3939d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10177519-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20861685W"
+    },
+    {
+      "slug": "libro-out-of-storm-gabor-mate-algonquin-books-978586610732-a8ba161d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2088127-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14848566W"
     },
     {
       "slug": "libro-outlive-peter-attia-harmony-9788890693257-482f4e8a",
-      "isbn13": "9780593236604",
-      "coverUrl": "https://covers.openlibrary.org/b/id/13191259-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL28148070W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/13191259-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28148070W"
+    },
+    {
+      "slug": "libro-power-approach-taylor-jenkins-reid-chronicle-books-9-cf7ed31c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8875057-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20222393W"
+    },
+    {
+      "slug": "libro-power-of-fire-arianna-huffington-lioncrest-publishin-4b1b9571",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10421531-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19671803W"
+    },
+    {
+      "slug": "libro-prince-of-ice-virginia-evans-entangled-red-tower-boo-854f4cdb",
+      "coverUrl": "https://covers.openlibrary.org/b/id/273719-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5687106W"
     },
     {
       "slug": "libro-project-hail-mary-andy-weir-ballantine-books-9784303-5e06bb4c",
-      "isbn13": "9786064310996",
-      "coverUrl": "https://covers.openlibrary.org/b/id/11200092-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL21745884W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/11200092-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21745884W"
     },
     {
       "slug": "libro-rich-dad-poor-dad-robert-kiyosaki-plata-publishing-9-11d3ae14",
-      "isbn13": "9782892254471",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8315603-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL2010879W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8315603-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2010879W"
+    },
+    {
+      "slug": "libro-rising-dream-paul-tremblay-navpress-9788183187700-7925e7ba",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8691408-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19885907W"
+    },
+    {
+      "slug": "libro-rising-forest-carol-dweck-algonquin-books-9788391169-eb3e1373",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6682466-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15668345W"
+    },
+    {
+      "slug": "libro-rising-queen-ta-nehisi-coates-scribner-9784232262207-9d043d86",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8797379-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19731642W"
+    },
+    {
+      "slug": "libro-river-of-roses-tony-robbins-tor-books-9786844985305-70518332",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3761246-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2328796W"
+    },
+    {
+      "slug": "libro-river-rising-james-patterson-crown-9782620412051-5bd2bd0f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/288557-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14914080W"
     },
     {
       "slug": "libro-same-as-ever-morgan-housel-harriman-house-9789895938-bba4d448",
-      "isbn13": "9781804090633",
-      "coverUrl": "https://covers.openlibrary.org/b/id/14157635-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL35156586W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/14157635-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL35156586W"
+    },
+    {
+      "slug": "libro-saving-deal-jack-reacher-scribner-9786787663143-7c7d5fe7",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2649404-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9608016W"
+    },
+    {
+      "slug": "libro-saving-garden-cinda-williams-chima-hay-house-9787479-a2517a24",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6917115-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4482537W"
+    },
+    {
+      "slug": "libro-saving-home-louise-hay-doubleday-9787491711806-93a71f41",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8055763-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9410360W"
+    },
+    {
+      "slug": "libro-saving-lie-publications-international-viking-9781473-870a5ad2",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1537840-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1392444W"
+    },
+    {
+      "slug": "libro-saving-room-adam-grant-chronicle-books-9781857841979-e3492578",
+      "coverUrl": "https://covers.openlibrary.org/b/id/691943-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27052W"
+    },
+    {
+      "slug": "libro-sea-and-bone-rick-rubin-rodale-books-9784643312798-ee0cc027",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7290681-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17048556W"
+    },
+    {
+      "slug": "libro-sea-legacy-brad-thor-waterbrook-9785427714094-59d990dd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15238795-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL45781134W"
+    },
+    {
+      "slug": "libro-sea-of-shadows-veronica-roth-scholastic-press-978069-5202a23c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8339544-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18178338W"
+    },
+    {
+      "slug": "libro-sea-revisited-various-viking-9782497891100-46a3923d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3788276-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2721116W"
+    },
+    {
+      "slug": "libro-secret-sky-dean-koontz-park-row-9782368906750-36539627",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10975331-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19983591W"
+    },
+    {
+      "slug": "libro-secret-throne-tamora-pierce-crown-9786341499450-ea07d2f6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13819847-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28626136W"
+    },
+    {
+      "slug": "libro-shadow-captain-robert-kiyosaki-lioncrest-publishing-473d06cf",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9063945-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20387787W"
+    },
+    {
+      "slug": "libro-shadow-mirror-liane-moriarty-harperone-9789106881810-e1074670",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6307042-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3585463W"
+    },
+    {
+      "slug": "libro-signal-system-cassandra-clare-riverhead-books-978864-7a760222",
+      "coverUrl": "https://covers.openlibrary.org/b/id/300885-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2710041W"
+    },
+    {
+      "slug": "libro-silent-city-carol-dweck-hay-house-9786335106033-514d3ae1",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12869435-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28014136W"
+    },
+    {
+      "slug": "libro-silent-home-peter-f-hamilton-macmillan-publishers-97-446ae7aa",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2969592-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL12494736M"
+    },
+    {
+      "slug": "libro-silent-sky-michael-pollan-bloomsbury-publishing-9785-502cb26e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9156053-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20498759W"
+    },
+    {
+      "slug": "libro-silent-truth-jodi-picoult-tor-books-9785572608595-08a9cc2c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6368886-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15079200W"
+    },
+    {
+      "slug": "libro-silver-book-daniel-kahneman-workman-publishing-97883-45b32878",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12824825-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21869850W"
+    },
+    {
+      "slug": "libro-silver-valley-rhonda-byrne-zondervan-9784614882059-64814eec",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12147966-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9574448W"
+    },
+    {
+      "slug": "libro-sky-of-ice-sabaa-tahir-convergent-books-978036201373-9e569db0",
+      "coverUrl": "https://covers.openlibrary.org/b/id/387318-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8129351W"
+    },
+    {
+      "slug": "libro-soul-reborn-j-k-rowling-riverhead-books-978276577205-58c88ef8",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12040957-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25689282W"
+    },
+    {
+      "slug": "libro-soul-unleashed-morgan-housel-macmillan-publishers-97-4610e0ed",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2719629-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9759224W"
     },
     {
       "slug": "libro-spare-prince-harry-random-house-9785271467524-58d437e3",
-      "isbn13": "9780593677865",
-      "coverUrl": "https://covers.openlibrary.org/b/id/13415348-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL29240850W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/13415348-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL29240850W"
+    },
+    {
+      "slug": "libro-spy-of-glass-malcolm-gladwell-knopf-9784112922006-67adbebe",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8372922-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18941934W"
+    },
+    {
+      "slug": "libro-spy-rising-cal-newport-riverhead-books-9789184767595-d8d4179e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/5778207-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9395052W"
+    },
+    {
+      "slug": "libro-star-of-ice-dean-koontz-anchor-books-9789160009210-5ff2c4cc",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8463813-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19351422W"
+    },
+    {
+      "slug": "libro-storm-and-rain-morgan-rhodes-little-brown-9786676828-eff4cd63",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2516968-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9439086W"
+    },
+    {
+      "slug": "libro-storm-city-matthew-stover-hoover-ink-9783982573004-0debc8dc",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6306198-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5846125W"
+    },
+    {
+      "slug": "libro-storm-earth-carmen-maria-machado-entangled-red-tower-0331f628",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6617260-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3955608W"
+    },
+    {
+      "slug": "libro-storm-of-ice-jonathan-haidt-chronicle-books-97871406-ef4724cf",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8595260-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17489309W"
+    },
+    {
+      "slug": "libro-storm-war-workman-publishing-knopf-9787488003707-6aae4ccd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8739000-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19740494W"
+    },
+    {
+      "slug": "libro-stress-relief-coloring-book-various-artists-independ-1283fa5f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11946933-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25032048W"
+    },
+    {
+      "slug": "libro-sun-of-fire-jack-reacher-scribner-9783650266030-6d855149",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8822346-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20175499W"
     },
     {
       "slug": "libro-the-anxious-generation-jonathan-haidt-penguin-press-53179a66",
-      "isbn13": "9788817189767",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15104803-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL37575384W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15104803-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL37575384W"
+    },
+    {
+      "slug": "libro-the-beast-and-snow-emily-st-john-mandel-knopf-978893-c78f2fc0",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2324907-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5703392W"
+    },
+    {
+      "slug": "libro-the-beauty-blueprint-matthew-stover-independently-pu-e4880858",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8316645-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15933517W"
     },
     {
       "slug": "libro-the-body-keeps-the-score-bessel-van-der-kolk-penguin-a53536ce",
-      "isbn13": "9780141978611",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8315367-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL18147687W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8315367-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18147687W"
+    },
+    {
+      "slug": "libro-the-captain-chronicles-nora-roberts-st-martin-s-pres-2b2142c5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9101593-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20434938W"
+    },
+    {
+      "slug": "libro-the-city-method-jonathan-haidt-random-house-97872789-99bf012b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6825373-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15654038W"
+    },
+    {
+      "slug": "libro-the-clock-system-tara-westover-anchor-books-97868401-f8542a40",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7164424-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16720997W"
+    },
+    {
+      "slug": "libro-the-court-revisited-martin-seligman-scholastic-press-dd10db0e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/4260223-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19566228W"
     },
     {
       "slug": "libro-the-creative-act-rick-rubin-penguin-press-9780140673-83de0c6c",
-      "isbn13": "9781838858636",
-      "coverUrl": "https://covers.openlibrary.org/b/id/13316390-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL27955361W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/13316390-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27955361W"
+    },
+    {
+      "slug": "libro-the-crown-rising-jeannette-walls-grand-central-publi-8e64930a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8738956-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19914930W"
+    },
+    {
+      "slug": "libro-the-day-rising-carmen-maria-machado-zondervan-978721-d2f554c3",
+      "coverUrl": "https://covers.openlibrary.org/b/id/518540-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2347418W"
+    },
+    {
+      "slug": "libro-the-deal-theory-eckhart-tolle-convergent-books-97853-4da015ef",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7679670-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17488933W"
+    },
+    {
+      "slug": "libro-the-desert-framework-morgan-housel-harriman-house-97-85476022",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9966246-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16895417W"
+    },
+    {
+      "slug": "libro-the-desert-of-fire-publications-international-plata-0620b3cd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7911919-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15376296W"
     },
     {
       "slug": "libro-the-dinner-party-freida-mcfadden-sourcebooks-landmar-90759ab3",
-      "isbn13": "9798254378488",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15235011-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL45702677W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15235011-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL45702677W"
+    },
+    {
+      "slug": "libro-the-doctor-and-lightning-tomi-adeyemi-plata-publishi-8383288d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7094273-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL7838975W"
+    },
+    {
+      "slug": "libro-the-doctor-of-ice-naomi-novik-riverhead-books-978641-092f35d8",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8441130-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19330000W"
+    },
+    {
+      "slug": "libro-the-dream-code-john-grisham-ivp-books-9781856742048-c8d8b710",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15245670-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL45885210W"
+    },
+    {
+      "slug": "libro-the-earth-of-fire-john-grisham-tor-books-97828654496-21a91fd8",
+      "coverUrl": "https://covers.openlibrary.org/b/id/827809-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2944263W"
+    },
+    {
+      "slug": "libro-the-empire-and-bone-mark-manson-hay-house-9789175318-ca766361",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12565949-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16126139W"
+    },
+    {
+      "slug": "libro-the-empire-of-glass-mark-manson-sourcebooks-landmark-afe0b62f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8644460-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5992174W"
+    },
+    {
+      "slug": "libro-the-faith-rising-kevin-j-anderson-thomas-nelson-9782-09788caa",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12444662-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL25467576W"
+    },
+    {
+      "slug": "libro-the-fear-saga-daniel-pink-zondervan-9786595923254-a90b2852",
+      "coverUrl": "https://covers.openlibrary.org/b/id/1334776-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL72236W"
+    },
+    {
+      "slug": "libro-the-fire-of-roses-malcolm-gladwell-hachette-book-gro-f0f2a233",
+      "coverUrl": "https://covers.openlibrary.org/b/id/387541-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL8149328W"
+    },
+    {
+      "slug": "libro-the-game-of-stars-michael-connelly-vintage-978999727-5ac80774",
+      "coverUrl": "https://covers.openlibrary.org/b/id/5543440-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL473254W"
+    },
+    {
+      "slug": "libro-the-game-saga-leigh-bardugo-atria-books-978314514791-41b744ff",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8747527-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL49494W"
+    },
+    {
+      "slug": "libro-the-garden-of-stars-walter-isaacson-convergent-books-59051489",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8154001-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2697531W"
+    },
+    {
+      "slug": "libro-the-grace-awakening-lee-child-harriman-house-9780446-c41a776d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7350122-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL485134W"
+    },
+    {
+      "slug": "libro-the-hate-chronicles-jeffrey-mason-penguin-books-9782-bd618899",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2111857-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14959819W"
+    },
+    {
+      "slug": "libro-the-hate-daniel-kahneman-algonquin-books-97894633892-1dcc7b2a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11521588-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17714701W"
+    },
+    {
+      "slug": "libro-the-hero-code-doris-kearns-goodwin-hoover-ink-978842-d602804c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10706514-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24232427W"
+    },
+    {
+      "slug": "libro-the-house-of-roses-bonnie-garmus-workman-publishing-2a8b4031",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12882390-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL28765351W"
     },
     {
       "slug": "libro-the-housemaid-freida-mcfadden-sourcebooks-landmark-9-fde1797a",
-      "isbn13": "9789032520335",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15105883-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL27729743W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15105883-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27729743W"
+    },
+    {
+      "slug": "libro-the-ice-method-rick-rubin-riverhead-books-9787703195-db217090",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7012442-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16455759W"
+    },
+    {
+      "slug": "libro-the-ice-of-stars-isabel-wilkerson-convergent-books-9-815548fe",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12539466-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL7990111W"
+    },
+    {
+      "slug": "libro-the-kingdom-code-tim-ferriss-crown-9782589296532-35b30531",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15092678-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL43485764W"
+    },
+    {
+      "slug": "libro-the-knight-and-bone-liane-moriarty-flatiron-books-97-daff1cf9",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8277438-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL451774W"
+    },
+    {
+      "slug": "libro-the-knight-fallen-joe-abercrombie-crown-978665028564-08c2a739",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9209401-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20567527W"
+    },
+    {
+      "slug": "libro-the-land-reckoning-trevor-noah-workman-publishing-97-2fe93510",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7913851-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17641369W"
     },
     {
       "slug": "libro-the-let-them-theory-mel-robbins-hay-house-9781132788-c53660dd",
-      "isbn13": "9781401971373",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15165806-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL39181496W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15165806-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL39181496W"
+    },
+    {
+      "slug": "libro-the-light-of-ice-david-grann-harmony-9781689549675-e2ec7055",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7535906-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17416657W"
+    },
+    {
+      "slug": "libro-the-map-method-bell-hooks-zondervan-9782481775390-dfa628d2",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2690921-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1952716W"
+    },
+    {
+      "slug": "libro-the-map-of-stars-mercedes-lackey-hoover-ink-97838555-83ab8f7d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10691043-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24227630W"
+    },
+    {
+      "slug": "libro-the-map-robin-hobb-thomas-nelson-9785114616668-0ec41a95",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14416012-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15837481W"
     },
     {
       "slug": "libro-the-message-ta-nehisi-coates-penguin-books-978777792-12ffd233",
-      "isbn13": "9780593230381",
-      "coverUrl": "https://covers.openlibrary.org/b/id/14750902-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL37983202W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/14750902-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL37983202W"
     },
     {
       "slug": "libro-the-midnight-library-matt-haig-viking-9780781469258-3bfec6cf",
-      "isbn13": "9788501304377",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10313767-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL20965973W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10313767-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20965973W"
+    },
+    {
+      "slug": "libro-the-mind-rising-v-e-schwab-workman-publishing-978848-125763e6",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8718058-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19901274W"
+    },
+    {
+      "slug": "libro-the-mirror-and-snow-ibram-x-kendi-entangled-red-towe-184534f5",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7763065-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17530706W"
+    },
+    {
+      "slug": "libro-the-mirror-of-fire-adam-grant-macmillan-publishers-9-d45d07ce",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6801940-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15838391W"
+    },
+    {
+      "slug": "libro-the-moon-rising-viola-davis-viking-9781278884347-df3d234f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/276490-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5698192W"
+    },
+    {
+      "slug": "libro-the-mountain-and-bone-patrick-rothfuss-park-row-9780-61cd4d80",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13224961-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL34314969W"
+    },
+    {
+      "slug": "libro-the-mountain-chronicles-tony-robbins-little-brown-97-d39456d0",
+      "coverUrl": "https://covers.openlibrary.org/b/id/711928-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5721844W"
+    },
+    {
+      "slug": "libro-the-night-code-charlotte-mcconaghy-waterbrook-978386-f1913c0e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8448173-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL816837W"
+    },
+    {
+      "slug": "libro-the-ocean-carmen-maria-machado-ace-9783704437534-e74d8395",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7258156-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16804661W"
+    },
+    {
+      "slug": "libro-the-ocean-method-virginia-evans-harperone-9785760368-f845dd83",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7131621-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16657130W"
+    },
+    {
+      "slug": "libro-the-prince-of-shadows-carmen-maria-machado-convergen-497cfdf2",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2819087-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4208159W"
+    },
+    {
+      "slug": "libro-the-princess-and-thunder-rebecca-yarros-putnam-97811-a6b142b0",
+      "coverUrl": "https://covers.openlibrary.org/b/id/13658737-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL32407077W"
+    },
+    {
+      "slug": "libro-the-princess-fallen-colleen-hoover-zondervan-9788611-4cd0d7fe",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11698780-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24847075W"
+    },
+    {
+      "slug": "libro-the-princess-of-ice-susanna-clarke-flatiron-books-97-f950030b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11698780-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24847075W"
     },
     {
       "slug": "libro-the-psychology-of-money-morgan-housel-harriman-house-182f711a",
-      "isbn13": "9789584299680",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10389354-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL21640039W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10389354-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21640039W"
+    },
+    {
+      "slug": "libro-the-queen-and-thunder-gillian-flynn-independently-pu-724be875",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3938988-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1968346W"
+    },
+    {
+      "slug": "libro-the-river-and-rain-michael-pollan-simon-schuster-978-151c1ffb",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8149743-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1849811W"
+    },
+    {
+      "slug": "libro-the-river-legacy-demi-moore-ivp-books-9781168842717-0ba40ea4",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15002188-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5648435W"
+    },
+    {
+      "slug": "libro-the-river-of-glass-matthew-stover-scribner-978393616-ad92bdee",
+      "coverUrl": "https://covers.openlibrary.org/b/id/6460654-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15342139W"
+    },
+    {
+      "slug": "libro-the-river-saga-daniel-kahneman-little-brown-97894276-1f7638bd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/639465-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14854769W"
+    },
+    {
+      "slug": "libro-the-sea-chronicles-patricia-a-mckillip-lioncrest-pub-b0f7ff62",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8671658-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL19867315W"
     },
     {
       "slug": "libro-the-seven-husbands-of-evelyn-hugo-taylor-jenkins-rei-7cf6548d",
-      "isbn13": "9788417981006",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8354226-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL18203673W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8354226-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL18203673W"
+    },
+    {
+      "slug": "libro-the-shadow-and-bone-trevor-noah-ivp-books-9782173453-738f852c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15157383-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27677539W"
+    },
+    {
+      "slug": "libro-the-shadow-legacy-demi-moore-scribner-9784208288446-4e31564d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/774072-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2352763W"
+    },
+    {
+      "slug": "libro-the-spy-lisa-jewell-ivp-books-9780972056960-8bbd84a1",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8245225-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL78075W"
+    },
+    {
+      "slug": "libro-the-star-unleashed-susanna-clarke-convergent-books-9-bba4e5ff",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11046303-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL1732961W"
+    },
+    {
+      "slug": "libro-the-storm-and-bone-suzanne-collins-st-martin-s-press-ec75351a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15157383-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27677539W"
+    },
+    {
+      "slug": "libro-the-storm-of-fire-cal-newport-navpress-9784785693065-38bfd99a",
+      "coverUrl": "https://covers.openlibrary.org/b/id/9638318-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL4465212W"
     },
     {
       "slug": "libro-the-subtle-art-of-not-giving-a-f-ck-mark-manson-harp-75d54bc6",
-      "isbn13": "9781760558772",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8231990-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL17590212W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8231990-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17590212W"
+    },
+    {
+      "slug": "libro-the-valley-revisited-brandon-sanderson-anchor-books-cc4215ed",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7137920-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16677640W"
     },
     {
       "slug": "libro-the-wager-david-grann-doubleday-9789800081276-846733d4",
-      "isbn13": "9788439744573",
-      "coverUrl": "https://covers.openlibrary.org/b/isbn/9788439744573-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL42430191W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/7304785-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL15563527W"
+    },
+    {
+      "slug": "libro-the-war-chronicles-tana-french-doubleday-97886606340-f6f9ff1e",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8842805-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20193100W"
+    },
+    {
+      "slug": "libro-the-war-of-roses-terry-pratchett-knopf-9781962409344-87de74a9",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11226901-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24573563W"
+    },
+    {
+      "slug": "libro-the-war-saga-robin-hobb-workman-publishing-978753082-b1de4e8c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10541579-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24143618W"
     },
     {
       "slug": "libro-the-woman-in-me-britney-spears-gallery-books-9782722-6295e9a8",
-      "isbn13": "9798890980205",
-      "coverUrl": "https://covers.openlibrary.org/b/id/14538012-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL29331033W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/14538012-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL29331033W"
+    },
+    {
+      "slug": "libro-the-world-and-ash-dalai-lama-algonquin-books-9788954-7c984659",
+      "coverUrl": "https://covers.openlibrary.org/b/id/2463834-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3331141W"
     },
     {
       "slug": "libro-think-again-adam-grant-viking-9787644961633-e9826974",
-      "isbn13": "9780593298749",
-      "coverUrl": "https://covers.openlibrary.org/b/id/10470266-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL22484556W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/10470266-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL22484556W"
+    },
+    {
+      "slug": "libro-through-day-robert-kiyosaki-convergent-books-9783424-0dc2a06b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/730247-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3344917W"
     },
     {
       "slug": "libro-tomorrow-and-tomorrow-and-tomorrow-gabrielle-zevin-k-bc254765",
-      "isbn13": "9780593321201",
-      "coverUrl": "https://covers.openlibrary.org/b/id/12859975-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL26004554W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/12859975-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL26004554W"
+    },
+    {
+      "slug": "libro-truth-and-lightning-david-eddings-independently-publ-185ec8af",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7798614-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17548494W"
     },
     {
       "slug": "libro-ugly-love-colleen-hoover-atria-books-9781601409930-dd137174",
-      "isbn13": "9781476753188",
-      "coverUrl": "https://covers.openlibrary.org/b/id/12856728-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL20577143W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/12856728-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20577143W"
+    },
+    {
+      "slug": "libro-valley-of-shadows-ta-nehisi-coates-viking-9784963336-57ffe7bd",
+      "coverUrl": "https://covers.openlibrary.org/b/id/14183078-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL27207865W"
     },
     {
       "slug": "libro-verity-colleen-hoover-grand-central-publishing-97854-cdd1e1b6",
-      "isbn13": "9783423230124",
-      "coverUrl": "https://covers.openlibrary.org/b/id/8747160-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL20068530W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/8747160-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20068530W"
+    },
+    {
+      "slug": "libro-voice-approach-dean-koontz-doubleday-9789566652591-9b335e24",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7743277-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17520783W"
+    },
+    {
+      "slug": "libro-voice-framework-naomi-novik-park-row-9786338786494-2b44bdda",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7725168-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17511723W"
+    },
+    {
+      "slug": "libro-voice-system-peter-f-hamilton-scholastic-press-97853-85c65185",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7231733-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16786000W"
+    },
+    {
+      "slug": "libro-warrior-of-ice-michael-j-sullivan-zondervan-97822059-5fc49e85",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10381031-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21540375W"
+    },
+    {
+      "slug": "libro-when-hate-bob-woodward-ballantine-books-978590769941-7270183d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10174346-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL20859335W"
+    },
+    {
+      "slug": "libro-when-river-isabel-wilkerson-vintage-9787169752932-27e02382",
+      "coverUrl": "https://covers.openlibrary.org/b/id/157568-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL5817444W"
+    },
+    {
+      "slug": "libro-when-window-rainbow-rowell-workman-publishing-978737-70acdd31",
+      "coverUrl": "https://covers.openlibrary.org/b/id/5588069-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL146899W"
+    },
+    {
+      "slug": "libro-where-beauty-pema-chodron-scholastic-press-978168153-0848e92b",
+      "coverUrl": "https://covers.openlibrary.org/b/id/15216954-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL14851677W"
+    },
+    {
+      "slug": "libro-where-clock-taylor-jenkins-reid-simon-schuster-97849-1c803178",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12906373-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL9663560W"
+    },
+    {
+      "slug": "libro-where-ice-peter-f-hamilton-macmillan-publishers-9782-b86eb774",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8419928-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3349520W"
+    },
+    {
+      "slug": "libro-where-message-rick-rubin-harmony-9784346882538-4637128d",
+      "coverUrl": "https://covers.openlibrary.org/b/id/10919236-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24385100W"
+    },
+    {
+      "slug": "libro-where-shadow-ta-nehisi-coates-park-row-9784560098286-cba9dd2f",
+      "coverUrl": "https://covers.openlibrary.org/b/id/67656-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL2903139W"
+    },
+    {
+      "slug": "libro-wild-choice-daniel-pink-thomas-nelson-9786574321815-2407680c",
+      "coverUrl": "https://covers.openlibrary.org/b/id/8126454-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17832997W"
     },
     {
       "slug": "libro-wild-dark-shore-charlotte-mcconaghy-flatiron-books-9-312c884d",
-      "isbn13": "9781837265930",
-      "coverUrl": "https://covers.openlibrary.org/b/id/15095727-L.jpg?default=false",
-      "sourceUrl": "https://openlibrary.org/works/OL42424992W",
-      "provider": "Open Library"
+      "coverUrl": "https://covers.openlibrary.org/b/id/15146235-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL42424992W"
+    },
+    {
+      "slug": "libro-wild-sky-andrew-huberman-waterbrook-9782510492203-8f01ae89",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12862198-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL21040223W"
+    },
+    {
+      "slug": "libro-within-warrior-gabor-mate-plata-publishing-978839984-e5336160",
+      "coverUrl": "https://covers.openlibrary.org/b/id/594037-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL3262082W"
+    },
+    {
+      "slug": "libro-within-window-neil-gaiman-navpress-9787820536231-37354ebc",
+      "coverUrl": "https://covers.openlibrary.org/b/id/11106946-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL24490373W"
+    },
+    {
+      "slug": "libro-world-and-bone-anthony-ryan-putnam-9787230142575-afb653b3",
+      "coverUrl": "https://covers.openlibrary.org/b/id/7609832-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL17453799W"
+    },
+    {
+      "slug": "libro-world-and-rain-gary-vaynerchuk-vintage-9786417843153-d74f25ac",
+      "coverUrl": "https://covers.openlibrary.org/b/id/3000196-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL11919362M"
+    },
+    {
+      "slug": "libro-world-unbound-seth-godin-baker-books-9780884964274-07b3d882",
+      "coverUrl": "https://covers.openlibrary.org/b/id/12741424-M.jpg?default=false",
+      "sourceUrl": "https://openlibrary.org/works/OL16532116W"
     }
-  ]
+  ],
+  "count": 300
 }

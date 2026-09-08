@@ -16,6 +16,11 @@
     "Los precios son referencias USD de la fuente y no precios de Libreria Itinerante.",
     "status=test y stockQty=0 impiden confundir el dataset con inventario.",
     "Las URLs de Amazon se derivan como busquedas porque la columna Amazon URL no contiene enlaces utilizables.",
-    "Los ISBN invalidos se conservan solo en sourceRecordId y no en el campo isbn13 validado."
-  ]
+    "Los ISBN invalidos se conservan solo en sourceRecordId y no en el campo isbn13 validado.",
+    "Las portadas de Open Library solo se aceptan con coincidencia exacta de titulo y autor; las demas usan cubierta editorial de marca."
+  ],
+  "coverProvider": "Open Library",
+  "coverMatches": 41,
+  "coverMissing": 459,
+  "coverLookupFailures": 2
 }

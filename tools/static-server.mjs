@@ -27,6 +27,16 @@ const contentTypes = {
   '.webm': 'video/webm'
 };
 
+const immutableExtensions = new Set(['.css', '.js', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.mp4', '.webm']);
+
+function cacheHeaders(filePath) {
+  if (filePath.endsWith('index.html')) return { 'Cache-Control': 'no-cache' };
+  if (immutableExtensions.has(extname(filePath))) {
+    return { 'Cache-Control': 'public, max-age=31536000, immutable' };
+  }
+  return {};
+}
+
 function backendUrl(origin, requestUrl) {
   const queryStart = requestUrl.indexOf('?');
   const pathname = queryStart === -1 ? requestUrl : requestUrl.slice(0, queryStart);
@@ -132,6 +142,7 @@ export function createPreviewServer({ root = defaultRoot, port = defaultPort, ba
         'Content-Type': contentTypes[extname(filePath)] || 'application/octet-stream',
         'Accept-Ranges': 'bytes',
         'Content-Length': file.size,
+        ...cacheHeaders(filePath),
       };
       let start = 0;
       let end = file.size - 1;
