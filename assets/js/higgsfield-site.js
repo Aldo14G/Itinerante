@@ -88,6 +88,10 @@
     let lowBattery = false;
     let inView = true;
     let engaged = false;
+    const fastNetwork = () => {
+      const type = navigator.connection?.effectiveType;
+      return !type || type === '4g';
+    };
     const videoEnabled = () => !reducedMotion.matches && !navigator.connection?.saveData && !lowBattery;
 
     const lingerEase = value => {
@@ -138,7 +142,8 @@
     };
 
     const loadVideo = () => {
-      if (loaded || !engaged || !videoEnabled()) return;
+      if (loaded || !videoEnabled()) return;
+      if (!engaged && !fastNetwork()) return;
       loaded = true;
       video.preload = 'auto';
       video.src = portrait.matches ? video.dataset.mobile : video.dataset.desktop;

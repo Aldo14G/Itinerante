@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { catalogDataset } from "@/config/catalog-mode";
+import { TEST_CATALOG_DATASET, catalogDataset } from "@/config/catalog-mode";
 import { parseCatalogFilters, vocabularyPayload } from "@/config/taxonomy";
 import {
+  CatalogUnavailableError,
   cachedList,
   catalogFacets,
   filterCatalogBooks,
@@ -37,21 +38,35 @@ export async function GET(request: Request) {
     maxPriceMxnCents: Number.isInteger(maxPrice) && maxPrice >= 0 ? maxPrice : undefined,
   };
 
+  const respond = (list: Awaited<ReturnType<typeof cachedList>>, testData: boolean, key: string) => {
+    const books = filterCatalogBooks(list, filters);
+    return NextResponse.json({
+      mode: testData ? "test" : "inventory",
+      datasetKey: key,
+      total: books.length,
+      facets: catalogFacets(books),
+      vocabulary: vocabularyPayload(),
+      books: books.slice(0, limit).map((book) => toBookView(book, testData)),
+    });
+  };
+
   try {
     const isTestData = datasetKey !== "inventory";
     const candidates = query
       ? (isTestData ? await recommendTestBooks(query, datasetKey, 500, filters) : await searchInventoryBooks(query, 500))
       : (isTestData ? await cachedList(datasetKey) : await listInventoryBooks());
-    const books = filterCatalogBooks(candidates, filters);
-    return NextResponse.json({
-      mode: isTestData ? "test" : "inventory",
-      datasetKey,
-      total: books.length,
-      facets: catalogFacets(books),
-      vocabulary: vocabularyPayload(),
-      books: books.slice(0, limit).map((book) => toBookView(book, isTestData)),
-    });
+    return respond(candidates, isTestData, datasetKey);
   } catch (error) {
+    if (datasetKey !== TEST_CATALOG_DATASET && error instanceof CatalogUnavailableError) {
+      try {
+        const fallback = query
+          ? await recommendTestBooks(query, TEST_CATALOG_DATASET, 500, filters)
+          : await cachedList(TEST_CATALOG_DATASET);
+        return respond(fallback, true, TEST_CATALOG_DATASET);
+      } catch {
+        // Sin dataset local: cae al 503 honesto de abajo.
+      }
+    }
     console.error("[catalog] Data Connect no disponible", error);
     return NextResponse.json(
       { error: { message: "El catálogo no está disponible en este momento." } },

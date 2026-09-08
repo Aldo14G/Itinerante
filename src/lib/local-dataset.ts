@@ -1,6 +1,8 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { CatalogBookRecord } from "@/lib/test-catalog";
+// Import estatico (no fs): Vercel solo empaqueta lo trazado por el bundle.
+// data/ existe en el repo y viaja con el deploy.
+import coversDoc from "../../data/books.amazon-test.covers.json";
+import datasetDoc from "../../data/books.amazon-test.json";
 
 interface RawBook {
   id: string;
@@ -44,8 +46,8 @@ interface RawDataset {
 
 let cache: { datasetKey: string; books: CatalogBookRecord[] } | null = null;
 
-function readJson<T>(file: string): T {
-  return JSON.parse(readFileSync(join(process.cwd(), "data", file), "utf8")) as T;
+function readJson<T>(value: unknown): T {
+  return value as T;
 }
 
 /**
@@ -54,18 +56,11 @@ function readJson<T>(file: string): T {
  */
 export function loadLocalTestBooks(datasetKey: string): CatalogBookRecord[] {
   if (cache && cache.datasetKey === datasetKey) return cache.books;
-  const dataset = readJson<RawDataset>("books.amazon-test.json");
+  const dataset = readJson<RawDataset>(datasetDoc);
   if (dataset.datasetKey !== datasetKey) return [];
-  let covers = new Map<string, string>();
-  try {
-    const coversDoc = readJson<{ books?: Array<{ slug: string; coverUrl: string }> }>(
-      "books.amazon-test.covers.json",
-    );
-    for (const entry of coversDoc.books ?? []) {
-      if (entry.slug && entry.coverUrl) covers.set(entry.slug, entry.coverUrl);
-    }
-  } catch {
-    covers = new Map();
+  const covers = new Map<string, string>();
+  for (const entry of readJson<{ books?: Array<{ slug: string; coverUrl: string }> }>(coversDoc).books ?? []) {
+    if (entry.slug && entry.coverUrl) covers.set(entry.slug, entry.coverUrl);
   }
   const categoryById = new Map(dataset.categories.map((item) => [item.id, item]));
   const subgenreById = new Map(dataset.subgenres.map((item) => [item.id, item]));
