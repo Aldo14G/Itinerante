@@ -1,0 +1,98 @@
+[
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-01.jpg",
+    "sourceSha256": "58116b88fbcfd972c86daf01b05c87ff71db183990f174d53c30d9be67e06c4f",
+    "output": "images/gallery/oficial-estantes.webp",
+    "width": 224,
+    "height": 298,
+    "bytes": 25130
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+    "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21",
+    "output": "images/gallery/oficial-rincon-480.webp",
+    "width": 480,
+    "height": 360,
+    "bytes": 40880
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+    "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21",
+    "output": "images/gallery/oficial-rincon-800.webp",
+    "width": 800,
+    "height": 600,
+    "bytes": 103766
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+    "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21",
+    "output": "images/gallery/oficial-rincon-1200.webp",
+    "width": 1200,
+    "height": 900,
+    "bytes": 196634
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+    "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21",
+    "output": "images/gallery/oficial-rincon-1600.webp",
+    "width": 1600,
+    "height": 1200,
+    "bytes": 302454
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-03.jpg",
+    "sourceSha256": "bde50cde45680c71d7fae76eef5b4743c488f85da0cc087524c8c564b5e7f90a",
+    "output": "images/gallery/oficial-encuentro.webp",
+    "width": 390,
+    "height": 326,
+    "bytes": 26680
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-04.jpg",
+    "sourceSha256": "a32e3bc6ffb177549a43d34b0553dc3ad6bf66a81d8deb7f44b0c2d5c14f1055",
+    "output": "images/gallery/oficial-sala.webp",
+    "width": 390,
+    "height": 488,
+    "bytes": 41170
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+    "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a",
+    "output": "images/gallery/oficial-mesa-480.webp",
+    "width": 480,
+    "height": 360,
+    "bytes": 46998
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+    "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a",
+    "output": "images/gallery/oficial-mesa-800.webp",
+    "width": 800,
+    "height": 600,
+    "bytes": 109172
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+    "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a",
+    "output": "images/gallery/oficial-mesa-1200.webp",
+    "width": 1200,
+    "height": 900,
+    "bytes": 201060
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+    "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a",
+    "output": "images/gallery/oficial-mesa-1600.webp",
+    "width": 1600,
+    "height": 1200,
+    "bytes": 291004
+  },
+  {
+    "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-06.jpg",
+    "sourceSha256": "88c7b8c16a87a622b82d62c603c826bbf48f48c3de1d2e3de3d79fe6331b0c48",
+    "output": "images/gallery/oficial-mesa-compartida.webp",
+    "width": 397,
+    "height": 298,
+    "bytes": 45590
+  }
+]

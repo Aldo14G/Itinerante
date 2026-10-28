@@ -8,19 +8,29 @@
   <meta property="og:title" content="Librería Itinerante y Más | Libros, café y cultura en Monterrey">
   <meta property="og:description" content="Una librería local para leer, conversar y encontrar tu próxima historia.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="images/cinematic/runtime/03-home-sala-central.webp">
+  <meta property="og:url" content="https://libreria-itineranteymas.web.app/">
+  <meta property="og:image" content="https://libreria-itineranteymas.web.app/images/og/libreria-itinerante-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Sala de Librería Itinerante y Más con libreros, mesas blancas y sillas turquesa">
+  <meta property="og:locale" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://libreria-itineranteymas.web.app/images/og/libreria-itinerante-og.jpg">
   <meta name="theme-color" content="#0d4a45">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data: blob: https://covers.openlibrary.org https://books.googleusercontent.com; media-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self'; img-src 'self' data:; media-src 'self'; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'none'">
   <title>Librería Itinerante y Más | Monterrey</title>
+  <link rel="canonical" href="https://libreria-itineranteymas.web.app/">
   <link rel="icon" href="Logo.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="preload" href="images/cinematic/runtime/bg-walkthrough-poster.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="assets/css/higgsfield-site.css?v=20260908-covers">
-  <script src="assets/js/higgsfield-site.js?v=20260908-covers" defer></script>
+  <link rel="preload" href="assets/fonts/inter-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/playfair-display-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/playfair-display-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/higgsfield-site.css?v=20261027-casa-3">
+  <script src="assets/js/higgsfield-site.js?v=20261027-casa-3" defer></script>
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BookStore","name":"Librería Itinerante y Más","url":"https://libreria-itineranteymas.web.app/","image":"https://libreria-itineranteymas.web.app/images/og/libreria-itinerante-og.jpg","logo":"https://libreria-itineranteymas.web.app/Logo.png","email":"libreriaitineranteymasmty@gmail.com","address":{"@type":"PostalAddress","streetAddress":"Mariano Matamoros Pte. 421","addressLocality":"Monterrey","addressRegion":"Nuevo León","addressCountry":"MX"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"20:00"}],"hasMap":"https://www.google.com/maps/search/?api=1&query=Libreria+Itinerante+y+Mas+Mariano+Matamoros+421+Monterrey","sameAs":["https://www.instagram.com/libreriaitineranteymasmty/","https://www.facebook.com/profile.php?id=100095548961064"]}
+</script>
 </head>
-<body data-canonical-model="claude-cinematic-higgsfield">
+<body data-canonical-model="claude-cinematic-higgsfield" data-composition="casa-editorial">
   <svg class="icon-sprite" aria-hidden="true">
     <defs>
       <symbol id="icon-arrow-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
@@ -32,21 +42,17 @@
 
   <header class="site-header" data-site-header>
     <a class="brand-lockup" href="#inicio" aria-label="Librería Itinerante y Más, inicio">
-      <img src="Logo.webp" alt="" width="44" height="44">
+      <img src="images/brand/logo-96.webp" alt="" width="44" height="44">
       <span>Librería<br>Itinerante y Más</span>
     </a>
     <div class="header-actions" id="site-navigation">
       <nav class="site-nav" aria-label="Capítulos">
         <a href="#inicio" aria-current="true">Inicio</a>
         <a href="#experiencia">Experiencia</a>
-        <a href="#eventos">Talleres</a>
-        <a href="#catalogo">Libros</a>
+        <a href="#eventos">Agenda</a>
+        <a href="#galeria">Galería</a>
         <a href="#ubicacion">Visita</a>
       </nav>
-      <div class="time-panel" aria-label="Ubicación y ambiente">
-        <span class="time-label">Centro Monterrey</span>
-        <span class="time-value">Libros · Café · Cultura</span>
-      </div>
       <nav aria-label="Acción principal">
         <a class="nav-action" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer">Consultar por WhatsApp</a>
       </nav>
@@ -62,240 +68,130 @@
         <div class="scroll-scrub__media" aria-hidden="true">
           <div class="scroll-scrub__frames">
             <picture class="is-active" data-frame="0"><source media="(max-width: 860px)" srcset="images/cinematic/runtime/01-entrada-pasillo-mobile.webp"><img src="images/cinematic/runtime/01-entrada-pasillo.webp" alt="" width="1600" height="900" fetchpriority="high" decoding="async"></picture>
-            <picture data-frame="1"><source media="(max-width: 860px)" srcset="images/cinematic/runtime/02-cruce-umbral-mobile.webp"><img src="images/cinematic/runtime/02-cruce-umbral.webp" alt="" width="1600" height="900" decoding="async"></picture>
-            <picture data-frame="2"><source media="(max-width: 860px)" srcset="images/cinematic/runtime/03-home-sala-central-mobile.webp"><img src="images/cinematic/runtime/03-home-sala-central.webp" alt="" width="1600" height="900" decoding="async"></picture>
-            <picture data-frame="3"><img src="images/cinematic/runtime/04-experiencia-libreros.webp" alt="" width="1200" height="675" loading="lazy" decoding="async"></picture>
-            <picture data-frame="4"><img src="images/cinematic/runtime/05-talleres-ajedrez.webp" alt="" width="1200" height="675" loading="lazy" decoding="async"></picture>
-            <picture data-frame="5"><img src="images/cinematic/runtime/06-comunidad-sonido.webp" alt="" width="1200" height="675" loading="lazy" decoding="async"></picture>
-            <picture data-frame="6"><img src="images/cinematic/runtime/07-transicion-libros.webp" alt="" width="1200" height="675" loading="lazy" decoding="async"></picture>
+            <picture data-frame="1"><source media="(max-width: 860px)" data-srcset="images/cinematic/runtime/02-cruce-umbral-mobile.webp"><img data-src="images/cinematic/runtime/02-cruce-umbral.webp" alt="" width="1600" height="900" decoding="async"></picture>
+            <picture data-frame="2"><source media="(max-width: 860px)" data-srcset="images/cinematic/runtime/03-home-sala-central-mobile.webp"><img data-src="images/cinematic/runtime/03-home-sala-central.webp" alt="" width="1600" height="900" decoding="async"></picture>
+            <picture data-frame="3"><source media="(max-width: 860px)" data-srcset="images/cinematic/runtime/04-experiencia-libreros-mobile.webp"><img data-src="images/cinematic/runtime/04-experiencia-libreros.webp" alt="" width="1200" height="675" decoding="async"></picture>
+            <picture data-frame="4"><source media="(max-width: 860px)" data-srcset="images/cinematic/runtime/05-talleres-ajedrez-mobile.webp"><img data-src="images/cinematic/runtime/05-talleres-ajedrez.webp" alt="" width="1200" height="675" decoding="async"></picture>
+            <picture data-frame="5"><source media="(max-width: 860px)" data-srcset="images/cinematic/runtime/06-comunidad-sonido-mobile.webp"><img data-src="images/cinematic/runtime/06-comunidad-sonido.webp" alt="" width="1200" height="675" decoding="async"></picture>
+            <picture data-frame="6"><source media="(max-width: 860px)" data-srcset="images/cinematic/runtime/07-transicion-libros-mobile.webp"><img data-src="images/cinematic/runtime/07-transicion-libros.webp" alt="" width="1200" height="675" decoding="async"></picture>
           </div>
-          <video muted playsinline preload="none" disablepictureinpicture tabindex="-1"
-            poster="images/cinematic/runtime/bg-walkthrough-poster.webp"
-            data-desktop="images/cinematic/runtime/bg-walkthrough-seek-desktop.mp4"
-            data-mobile="images/cinematic/runtime/bg-walkthrough-seek-mobile.mp4"
-            aria-hidden="true"></video>
+          <video muted playsinline preload="none" disablepictureinpicture tabindex="-1" data-poster="images/cinematic/runtime/bg-walkthrough-poster.webp" data-desktop="images/cinematic/runtime/bg-walkthrough-seek-desktop.mp4" data-mobile="images/cinematic/runtime/bg-walkthrough-seek-mobile.mp4" aria-hidden="true"></video>
         </div>
         <div class="scroll-scrub__veil" aria-hidden="true"></div>
         <div class="scroll-scrub__progress" aria-hidden="true"><span></span></div>
-        <ol class="scroll-scrub__phases" aria-hidden="true">
-          <li><span>Entrada</span></li>
-          <li><span>Experiencia</span></li>
-          <li><span>Comunidad</span></li>
-          <li><span>Agenda</span></li>
-        </ol>
       </div>
-
       <section id="inicio" class="cinematic-hero" aria-labelledby="hero-title">
-        <div class="hero-content">
-          <div class="cinematic-hero__copy">
-            <p class="hero-kicker">Librería independiente · Centro de Monterrey</p>
-            <h1 id="hero-title" class="hero-title">
-              <span class="line line-one"><span class="line-reveal">Una casa para leer,</span></span>
-              <span class="line line-two"><span class="line-reveal">conversar <em>y volver.</em></span></span>
-            </h1>
-            <p class="hero-copy">Libros curados, café para quedarse y talleres en Mariano Matamoros 421.<br>Hojea a tu ritmo y confirma existencia por WhatsApp<br>antes de venir.</p>
+        <ul class="hero-meta" aria-label="Datos para tu visita">
+          <li><strong>Matamoros 421</strong><span>Centro de Monterrey</span></li>
+          <li><strong>Lun a sáb · 11:00–20:00</strong><span>Domingo cerrado</span></li>
+        </ul>
+        <div class="hero-layout">
+          <div class="hero-content">
+            <h1 id="hero-title">Una casa para leer,<br>conversar <em>y volver.</em></h1>
+            <p class="hero-copy">Libros curados, café para quedarse y talleres en Mariano Matamoros 421. Hojea a tu ritmo y confirma existencia por WhatsApp antes de venir.</p>
             <div class="hero-actions">
-              <a class="button button--primary primary-cta" href="#catalogo"><span class="label">Consultar y apartar</span><span class="arrow-box" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-ne"/></svg></span></a>
-              <button class="button button--glass" type="button" data-iti-ia-open>Descubrir con Iti IA <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></button>
+              <a class="button button--primary primary-cta" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer">Escríbenos por WhatsApp <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
+              <a class="button button--glass" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer">Cómo llegar <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
             </div>
-            <ul class="hero-meta" aria-label="Datos para tu visita">
-              <li><strong>Matamoros 421</strong><span>Centro · entre Aldama y Rayón</span></li>
-              <li><strong>Para quedarse</strong><span>Café y mesas para hojear</span></li>
-              <li><strong>Agenda viva</strong><span>Solo fechas confirmadas</span></li>
-            </ul>
           </div>
+          <figure class="house-portrait">
+            <img src="images/gallery/oficial-sala.webp" alt="Sala con sofá turquesa, mesa redonda, libreros y piso ajedrezado junto a la ventana" width="390" height="488" loading="lazy" decoding="async">
+            <figcaption><span>La sala, por dentro.</span><a href="#experiencia" aria-label="Conoce la experiencia de la librería"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></a></figcaption>
+          </figure>
         </div>
-        <article class="demo-card" aria-label="Ver el recorrido de la librería">
-          <div class="demo-visual">
-            <img src="images/cinematic/runtime/03-home-sala-central.webp" alt="Sala principal de la librería con mesas, libreros y sillas" width="640" height="640" loading="eager" fetchpriority="high">
-            <button class="play" type="button" data-scroll-to="#experiencia" aria-label="Ver recorrido de la librería">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5v9l7-4.5z" fill="currentColor"/></svg>
-            </button>
-          </div>
-          <div class="demo-caption">
-            <strong>Sala principal</strong>
-            <span>Foto real · baja para recorrer</span>
-          </div>
-          <button class="watch-button" type="button" data-scroll-to="#experiencia"><span>Ver recorrido</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
-        </article>
+        <div class="hero-foot">
+          <a class="text-link" href="#experiencia">Conoce la casa <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></a>
+          <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false" hidden>Reducir movimiento</button>
+        </div>
       </section>
-
-    <div class="cinematic-spacer" aria-hidden="true"></div>
+      <div class="cinematic-spacer" aria-hidden="true"></div>
+    </div>
 
     <section id="experiencia" class="offer-section" aria-labelledby="offer-title">
-      <div class="section-heading">
-        <p class="section-kicker">La experiencia · Espacio real</p>
-        <h2 id="offer-title">Un lugar para leer, conversar y volver.</h2>
-        <p>Cuatro maneras de habitar una casa cultural compacta en el centro.</p>
+      <header class="section-heading">
+        <h2 id="offer-title">Cuatro maneras de<br>habitar la librería.</h2>
+        <p>Libros, café, agenda y comunidad dentro de una casa cultural del centro de Monterrey.</p>
+      </header>
+      <div class="editorial-spread">
+        <figure>
+          <img src="images/gallery/oficial-mesa-800.webp" srcset="images/gallery/oficial-mesa-480.webp 480w, images/gallery/oficial-mesa-800.webp 800w, images/gallery/oficial-mesa-1200.webp 1200w, images/gallery/oficial-mesa-1600.webp 1600w" sizes="(max-width: 760px) calc(100vw - 40px), 55vw" alt="Mesa de libros frente a la pared de piedra y un librero de la casa" width="1600" height="1200" loading="lazy" decoding="async">
+          <figcaption>La mesa de libros. Una invitación a mirar de cerca.</figcaption>
+        </figure>
+        <div class="editorial-copy">
+          <h3>Una lectura puede empezar aquí.</h3>
+          <p>Narrativa, poesía, ensayo, crónica e infantil: rutas para hojear a tu ritmo y abrir una conversación.</p>
+          <p>Si buscas un título, escríbenos. La existencia siempre se confirma directamente con la librería.</p>
+          <a class="text-link" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro." target="_blank" rel="noopener noreferrer">Pregunta por un libro <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
+        </div>
       </div>
-      <div class="experience-list">
-        <article><span class="exp-index">01</span><span>Libros</span><div><h3>Curaduría cercana</h3><p>Narrativa, poesía, ensayo, crónica e infantil ordenados como rutas de lectura, no como inventario frío.</p></div></article>
-        <article><span class="exp-index">02</span><span>Café</span><div><h3>Tiempo para estar</h3><p>Un espacio tranquilo para hojear, esperar a alguien o dejar que una recomendación encuentre su momento.</p></div></article>
-        <article><span class="exp-index">03</span><span>Agenda</span><div><h3>Agenda viva</h3><p>Lecturas, escritura, teatro, fotografía y conversación para que la librería también sea punto de encuentro.</p></div></article>
-        <article><span class="exp-index">04</span><span>Comunidad</span><div><h3>Vecindario lector</h3><p>Un punto del centro de Monterrey donde la lectura se comparte en voz alta y en compañía.</p></div></article>
-        <a class="chapter-next" href="#eventos"><small>Siguiente capítulo</small><strong>De la sala a la mesa comunitaria.</strong><span>Ver agenda cultural <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></span></a>
+      <div class="editorial-spread editorial-spread--reverse">
+        <figure>
+          <img src="images/gallery/oficial-rincon-800.webp" srcset="images/gallery/oficial-rincon-480.webp 480w, images/gallery/oficial-rincon-800.webp 800w, images/gallery/oficial-rincon-1200.webp 1200w, images/gallery/oficial-rincon-1600.webp 1600w" sizes="(max-width: 760px) calc(100vw - 40px), 55vw" alt="Rincón de lectura entre libreros, cuadros y paredes de piedra con detalles de madera" width="1600" height="1200" loading="lazy" decoding="async">
+          <figcaption>Piedra, madera y libros. Los detalles de la casa.</figcaption>
+        </figure>
+        <div class="editorial-copy">
+          <h3>Tiempo para estar.</h3>
+          <p>Un espacio para hojear, tomar un café, esperar a alguien o dejar que una recomendación encuentre su momento.</p>
+          <p>Y una mesa compartida para que la lectura también sea punto de encuentro.</p>
+          <a class="text-link" href="#eventos">Conoce la agenda cultural <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></a>
+        </div>
       </div>
     </section>
-
-    <aside class="community-bridge" aria-label="De la comunidad a la visita">
-      <blockquote>Ven a conocer la casa.</blockquote>
-      <p>Estamos en el centro de Monterrey. Hay libros, café y actividades culturales. Escríbenos y te contamos qué hay estos días.</p>
-      <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Libreria+Itinerante+y+Mas+Mariano+Matamoros+421+Monterrey" target="_blank" rel="noopener noreferrer">Conocer el lugar <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
-    </aside>
-
-    <div class="cinematic-spacer" aria-hidden="true"></div>
 
     <section id="eventos" class="agenda-section" aria-labelledby="agenda-title">
       <div class="agenda-copy">
-        <h2 id="agenda-title">Un espacio para leer, escribir y conversar.</h2>
-        <p>Pregunta por la próxima sesión: publicamos fechas sólo cuando están confirmadas.</p>
+        <h2 id="agenda-title">Talleres, lecturas<br>y conversación.</h2>
+        <p>Pregunta por la próxima sesión: publicamos fechas solo cuando están confirmadas.</p>
         <a class="text-link" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20conocer%20la%20pr%C3%B3xima%20actividad%20cultural." target="_blank" rel="noopener noreferrer">Consultar próxima fecha <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
+        <a class="text-link" href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Ver anuncios en Instagram <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
       </div>
       <div class="agenda-list">
-        <article><span>Escritura creativa</span><p>Voz, imagen, ritmo y estructura desde ejercicios breves.</p><b>Presencial</b></article>
-        <article><span>Círculos de lectura</span><p>Conversaciones sobre libros y temas contemporáneos.</p><b>Abierto</b></article>
-        <article><span>Teatro gestual</span><p>Presencia escénica y creación desde el cuerpo.</p><b>Laboratorio</b></article>
-        <article><span>Fotografía narrativa</span><p>Series visuales con intención, mirada y relato.</p><b>Proyecto breve</b></article>
+        <article><h3>Escritura creativa</h3><p>Voz, imagen, ritmo y estructura desde ejercicios breves.</p></article>
+        <article><h3>Círculos de lectura</h3><p>Conversaciones sobre libros y temas contemporáneos.</p></article>
+        <article><h3>Teatro gestual</h3><p>Presencia escénica y creación desde el cuerpo.</p></article>
+        <article><h3>Fotografía narrativa</h3><p>Series visuales con intención, mirada y relato.</p></article>
       </div>
     </section>
-
-    <div class="cinematic-spacer cinematic-spacer--final" aria-hidden="true"></div>
-    </div>
 
     <section id="galeria" class="gallery-section" aria-labelledby="gallery-title">
-      <div class="gallery-heading">
-        <h2 id="gallery-title">Un lugar para quedarse un rato.</h2>
-        <p>Piedra, madera, libros abiertos y mesas que se llenan de conversaciones.</p>
-      </div>
-      <div class="gallery-grid">
-        <figure class="gallery-card gallery-card--wide">
-          <img src="images/cinematic/runtime/03-home-sala-central.webp" alt="Sala principal de la librería con mesas, libreros y sillas" width="1600" height="900" loading="lazy">
-          <figcaption><strong>El interior</strong><small>Un refugio lleno de libros</small></figcaption>
-        </figure>
-        <figure class="gallery-card gallery-card--tall">
-          <img src="images/cinematic/runtime/05-talleres-ajedrez.webp" alt="Mesa comunitaria con un tablero de ajedrez frente a los libreros" width="1200" height="675" loading="lazy">
-          <figcaption><strong>La comunidad</strong><small>Leer también es encontrarse</small></figcaption>
-        </figure>
-        <figure class="gallery-card">
-          <img src="images/cinematic/runtime/04-experiencia-libreros.webp" alt="Libreros y ventana dentro de la sala principal" width="1200" height="675" loading="lazy">
-          <figcaption><strong>La pausa</strong><small>Tiempo para elegir</small></figcaption>
-        </figure>
-        <figure class="gallery-card">
-          <img src="images/cinematic/runtime/06-comunidad-sonido.webp" alt="Zona de lectura y encuentro junto al gong" width="1200" height="675" loading="lazy">
-          <figcaption><strong>Un rincón</strong><small>Para leer con calma</small></figcaption>
-        </figure>
-        <figure class="gallery-card gallery-card--wide gallery-card--accent">
-          <img src="images/cinematic/runtime/07-transicion-libros.webp" alt="Mesa con una selección de libros en primer plano" width="1200" height="675" loading="lazy">
-          <figcaption><strong>Los libros</strong><small>El inicio de cada ruta</small></figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section id="catalogo" class="catalog-section" aria-labelledby="catalog-title">
-      <header class="catalog-heading">
-        <p class="catalog-kicker">Biblioteca digital</p>
-        <h2 id="catalog-title">Encuentra tu próxima lectura.</h2>
-        <p>Explora por tema, busca por título o autor y abre cada ficha para conocer el libro; la existencia siempre se confirma directamente con la librería.</p>
-        <form class="catalog-search" id="catalogSearchForm" role="search">
-          <label for="catalogSearch">Buscar en el catálogo</label>
-          <div><input id="catalogSearch" name="q" type="search" maxlength="100" autocomplete="off" placeholder="Título, autor, género o tema" list="catalogSuggest"><button type="submit">Buscar</button></div>
-          <datalist id="catalogSuggest"></datalist>
-        </form>
+      <header class="section-heading">
+        <h2 id="gallery-title">La casa,<br>tal como es.</h2>
+        <p>Los libros, los rincones y las personas que se encuentran aquí. Fotografías reales del espacio.</p>
       </header>
-
-      <div class="catalog-browser">
-        <aside class="catalog-filters" aria-labelledby="catalog-filter-title">
-          <div class="catalog-filter-heading">
-            <h3 id="catalog-filter-title">Explorar</h3>
-            <button id="catalogFilterToggle" type="button" aria-expanded="false" aria-controls="catalogFilterList">Categorías</button>
-          </div>
-          <div id="catalogFilterList" class="genre-list" aria-label="Categorías del catálogo">
-            <button type="button" data-filter="all">Todos los libros</button>
-            <button type="button" data-filter="fiction">Literatura</button>
-            <button type="button" data-filter="essay">Ensayo</button>
-            <button type="button" data-filter="history">Historia</button>
-            <button type="button" data-filter="psychology">Psicología</button>
-            <button type="button" data-filter="children">Infantil</button>
-            <button type="button" data-filter="arts">Arte</button>
-            <button type="button" data-filter="science">Ciencia</button>
-          </div>
-          <button class="iti-ia-launch" type="button" data-iti-ia-open>Recomiéndame con Iti IA</button>
-        </aside>
-
-        <div class="catalog-results">
-          <div class="catalog-toolbar">
-            <p id="catalogStatus" class="catalog-status" role="status" aria-live="polite">Consultando el catálogo…</p>
-            <label>Ordenar
-              <select id="catalogSort">
-                <option value="relevance">Relevancia</option>
-                <option value="title">Título A–Z</option>
-                <option value="author">Autor A–Z</option>
-                <option value="newest">Novedades</option>
-                <option value="rating">Mejor valorados</option>
-              </select>
-            </label>
-            <div class="catalog-view" role="group" aria-label="Vista del catálogo">
-              <button type="button" data-catalog-view="grid" aria-pressed="true">Cuadrícula</button>
-              <button type="button" data-catalog-view="list" aria-pressed="false">Lista</button>
-            </div>
-          </div>
-          <div id="bookGrid" class="book-grid" aria-live="polite" aria-busy="false"></div>
-          <nav class="catalog-pager" id="catalogPager" aria-label="Paginación del catálogo" hidden>
-            <button id="catalogPrev" class="catalog-pager__prev" type="button">Anterior</button>
-            <p id="catalogPageStatus" class="catalog-pager__status" role="status"></p>
-            <button id="catalogMore" class="catalog-pager__next" type="button">Siguiente</button>
-          </nav>
-          <a id="catalogFallback" class="catalog-fallback" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer" hidden>Consultar por WhatsApp <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
-        </div>
+      <div class="gallery-grid">
+        <figure class="gallery-card gallery-card--room"><img src="images/gallery/oficial-sala.webp" alt="Vista de la sala con sofá turquesa, mesa y piso ajedrezado" width="390" height="488" loading="lazy" decoding="async"><figcaption>La sala de lectura.</figcaption></figure>
+        <figure class="gallery-card gallery-card--wide"><img src="images/gallery/oficial-mesa-800.webp" srcset="images/gallery/oficial-mesa-480.webp 480w, images/gallery/oficial-mesa-800.webp 800w, images/gallery/oficial-mesa-1200.webp 1200w, images/gallery/oficial-mesa-1600.webp 1600w" sizes="(max-width: 760px) calc(100vw - 40px), 55vw" alt="Libros sobre la mesa frente a la pared de piedra y los estantes" width="1600" height="1200" loading="lazy" decoding="async"><figcaption>Una mesa para descubrir lecturas.</figcaption></figure>
+        <figure class="gallery-card gallery-card--wide"><img src="images/gallery/oficial-rincon-800.webp" srcset="images/gallery/oficial-rincon-480.webp 480w, images/gallery/oficial-rincon-800.webp 800w, images/gallery/oficial-rincon-1200.webp 1200w, images/gallery/oficial-rincon-1600.webp 1600w" sizes="(max-width: 760px) calc(100vw - 40px), 55vw" alt="Libreros y cuadros en un rincón de piedra y madera" width="1600" height="1200" loading="lazy" decoding="async"><figcaption>Rincones con historia, libros y madera.</figcaption></figure>
+        <figure class="gallery-card gallery-card--people"><img src="images/gallery/oficial-encuentro.webp" alt="Personas reunidas alrededor de una mesa en la sala de la librería" width="390" height="326" loading="lazy" decoding="async"><figcaption>La conversación también tiene lugar.</figcaption></figure>
+        <figure class="gallery-card gallery-card--detail"><img src="images/gallery/oficial-estantes.webp" alt="Libros apilados junto a un pequeño librero contra la pared de piedra" width="224" height="298" loading="lazy" decoding="async"><figcaption>Un detalle de los estantes.</figcaption></figure>
+        <figure class="gallery-card gallery-card--table"><img src="images/gallery/oficial-mesa-compartida.webp" alt="Mesa compartida con mantel, libreros a un lado y banderines de colores al fondo" width="397" height="298" loading="lazy" decoding="async"><figcaption>La mesa compartida.</figcaption></figure>
+        <p class="gallery-note">Cada rincón,<br>otra forma de quedarse.</p>
       </div>
     </section>
-
-    <dialog id="bookDialog" class="book-dialog" aria-labelledby="bookDialogTitle">
-      <button class="book-dialog__close" type="button" data-book-close aria-label="Cerrar ficha"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button>
-      <div id="bookDialogContent"></div>
-    </dialog>
 
     <section id="ubicacion" class="visit-section" aria-labelledby="visit-title">
-      <div>
-        <h2 id="visit-title">Tu próxima lectura está en el Centro.</h2>
-      </div>
+      <div><h2 id="visit-title">Tu próxima lectura<br>está en el Centro.</h2></div>
       <div class="visit-details">
         <p><strong>Librería Itinerante y Más</strong></p>
         <p>Mariano Matamoros Pte. 421<br>Centro, Monterrey, Nuevo León<br>Entre Juan Aldama e Ignacio Rayón</p>
+        <dl class="visit-hours"><div><dt>Lunes a sábado</dt><dd>11:00–20:00</dd></div><div><dt>Domingo</dt><dd>Cerrado</dd></div></dl>
+        <p class="visit-note">En días festivos, confírmalo por WhatsApp.</p>
         <div class="visit-actions">
-          <a class="button button--ink" href="https://www.google.com/maps/search/?api=1&amp;query=Libreria+Itinerante+y+Mas+Mariano+Matamoros+421+Monterrey" target="_blank" rel="noopener noreferrer">Cómo llegar <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
-          <a class="button button--coral" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer">WhatsApp <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
+          <a class="button button--primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer">Cómo llegar <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
+          <a class="button button--glass" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer">WhatsApp <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
         </div>
       </div>
+      <iframe class="visit-map" src="https://www.google.com/maps/embed?origin=mfe&amp;pb=!1m2!2m1!1sLibrer%C3%ADa+Itinerante+y+M%C3%A1s,+Mariano+Matamoros+Pte.+421,+Centro,+Monterrey,+N.L." loading="lazy" referrerpolicy="no-referrer" title="Mapa: Librería Itinerante y Más en Mariano Matamoros Pte. 421, Centro de Monterrey" width="1200" height="640"></iframe>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="footer-brand"><img src="Logo.webp" alt="" width="48" height="48" loading="lazy"><p>Librería Itinerante y Más<br>Literatura, cultura y comunidad.</p></div>
+    <div class="footer-brand"><img src="images/brand/logo-96.webp" alt="" width="48" height="48" loading="lazy"><p>Librería Itinerante y Más<br>Literatura, cultura y comunidad.</p></div>
     <a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
     <a href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer">Facebook <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
     <a href="mailto:libreriaitineranteymasmty@gmail.com">Correo</a>
     <span>Monterrey, N.L. · © 2026</span>
   </footer>
 
-  <dialog id="itiIaDialog" class="iti-dialog" aria-labelledby="itiIaTitle">
-    <div class="iti-dialog__header">
-      <img src="Logo.webp" alt="" width="44" height="44" loading="lazy">
-      <div><h2 id="itiIaTitle">Iti IA</h2><p>Recomendaciones de la librería</p></div>
-      <button type="button" class="iti-dialog__close" data-iti-ia-close aria-label="Cerrar Iti IA"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button>
-    </div>
-    <p id="itiIaStatus" class="iti-status" role="status" aria-live="polite">Lista para conversar.</p>
-    <a id="itiIaFallback" class="iti-recovery" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer" hidden>Consultar directamente por WhatsApp <svg class="icon" aria-hidden="true"><use href="#icon-arrow-ne"/></svg></a>
-    <div id="itiIaMessages" class="iti-messages" aria-live="polite" aria-label="Historial de Iti IA"></div>
-    <div id="itiIaPredictions" class="iti-predictions" aria-label="Sugerencias de búsqueda" hidden></div>
-    <form id="itiIaForm" class="iti-form">
-      <label for="itiIaInput">¿Qué te gustaría leer?</label>
-      <div><input id="itiIaInput" name="question" type="text" required maxlength="240" autocomplete="off"><button id="itiIaSubmit" type="submit">Enviar</button></div>
-    </form>
-  </dialog>
-
-  <button id="itiFab" class="iti-fab" type="button" data-iti-ia-open aria-label="Preguntar a Iti IA sobre libros">
-    <img src="Logo.webp" alt="" width="32" height="32" loading="lazy"><span>Iti IA</span>
-  </button>
 </body>
 </html>

@@ -10,92 +10,94 @@ colors:
   ivory-paper: "#fdfcf8"
   bright-paper: "#ffffff"
   muted-teal: "#3d6660"
-  status-error: "#8a241d"
+  editorial-line: "rgba(13, 74, 69, .22)"
 typography:
   display:
     fontFamily: "Playfair Display, Georgia, serif"
-    fontSize: "clamp(3.2rem, 6.4vw, 6rem)"
-    fontWeight: 700
-    lineHeight: 0.94
+    fontSize: "clamp(3.5rem, 5.3vw, 5.75rem)"
+    fontWeight: 600
+    lineHeight: 1.04
     letterSpacing: "-0.025em"
   headline:
     fontFamily: "Playfair Display, Georgia, serif"
-    fontSize: "clamp(1.9rem, 1.2vw + 1.6rem, 2.9rem)"
-    fontWeight: 700
-    lineHeight: 1.08
+    fontSize: "clamp(2.1rem, 4vw, 4rem)"
+    fontWeight: 600
+    lineHeight: 1.12
     letterSpacing: "-0.025em"
   title:
     fontFamily: "Playfair Display, Georgia, serif"
-    fontSize: "1.5rem"
-    fontWeight: 700
-    lineHeight: 1.05
+    fontSize: "clamp(1.55rem, 2.5vw, 2.5rem)"
+    fontWeight: 600
+    lineHeight: 1.2
     letterSpacing: "-0.025em"
   body:
     fontFamily: "Inter, Segoe UI, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.5
-    letterSpacing: "normal"
+    lineHeight: 1.65
   label:
     fontFamily: "Inter, Segoe UI, sans-serif"
-    fontSize: "0.7rem"
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "0.08em"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.65
   action:
     fontFamily: "Inter, Segoe UI, sans-serif"
-    fontSize: "0.82rem"
-    fontWeight: 700
-    lineHeight: 1.5
-    letterSpacing: "normal"
+    fontSize: "0.875rem"
+    fontWeight: 600
+    lineHeight: 1.65
 rounded:
   none: "0"
   logo: "9px"
-  surface: "16px"
+  menu: "12px"
   pill: "999px"
 spacing:
   xs: "8px"
-  sm: "10px"
-  md: "14px"
-  lg: "18px"
-  xl: "24px"
-  surface: "30px"
-  page: "clamp(20px, 4vw, 64px)"
-  section: "clamp(72px, 10vw, 140px)"
+  sm: "12px"
+  md: "18px"
+  lg: "24px"
+  spread: "36px"
+  wide: "64px"
+  page: "clamp(20px, 5vw, 96px)"
+  section: "clamp(76px, 8vw, 136px)"
 components:
   button-primary:
     backgroundColor: "{colors.ivory-paper}"
     textColor: "{colors.night-ink}"
     typography: "{typography.action}"
     rounded: "{rounded.pill}"
-    padding: "0 18px"
-    height: "46px"
-  button-ghost:
-    backgroundColor: "transparent"
+    padding: "10px 22px"
+    height: "48px"
+  button-primary-hover:
+    backgroundColor: "{colors.mint-light}"
+    textColor: "{colors.night-ink}"
+  button-secondary:
+    backgroundColor: "{colors.night-ink}"
     textColor: "{colors.ivory-paper}"
     typography: "{typography.action}"
     rounded: "{rounded.pill}"
-    padding: "0 18px"
-    height: "46px"
+    padding: "10px 22px"
+    height: "48px"
   chapter-current:
     backgroundColor: "{colors.mint-light}"
     textColor: "{colors.night-ink}"
-    typography: "{typography.action}"
     rounded: "{rounded.pill}"
     padding: "8px 14px"
     height: "44px"
-  search-input:
-    backgroundColor: "rgba(255, 253, 248, 0.84)"
+  motion-toggle:
+    backgroundColor: "{colors.night-ink}"
+    textColor: "{colors.ivory-paper}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    padding: "8px 14px"
+    height: "44px"
+  editorial-surface:
+    backgroundColor: "{colors.ivory-paper}"
     textColor: "{colors.night-ink}"
-    typography: "{typography.body}"
     rounded: "{rounded.none}"
-    padding: "0 14px"
-    height: "48px"
-  book-card:
-    backgroundColor: "{colors.bright-paper}"
-    textColor: "{colors.night-ink}"
+  agenda-surface:
+    backgroundColor: "{colors.green-room}"
+    textColor: "{colors.ivory-paper}"
     rounded: "{rounded.none}"
-    padding: "28px"
 ---
 
 # Design System: Librería Itinerante y Más
@@ -104,165 +106,115 @@ components:
 
 **Creative North Star: "La Librería Habitada"**
 
-La interfaz debe sentirse como una estancia dentro de una librería real, no
-como un escaparate digital aislado. Su atmósfera es íntima, doméstica y pausada:
-la fotografía conserva la presencia material del lugar, la tipografía editorial
-ordena el relato y los controles permanecen claros y cercanos.
+La interfaz se siente como una estancia dentro de una librería real. La fotografía documental conserva la piedra, la madera, el piso ajedrezado y los muebles turquesa de la casa; la tipografía editorial ordena el relato y los controles permanecen claros y cercanos.
 
-La expresión visual evita el espectáculo gratuito. El movimiento acompaña la
-orientación espacial, mientras las capas de verde, papel y vidrio tenue permiten
-que el contenido se lea con calma. La identidad nunca adopta la retórica de una
-interfaz SaaS, un marketplace, una IA genérica o una plantilla saturada.
+Casa editorial, aprobada el 27-oct-2026, conserva esa identidad y cambia su expresión: un umbral audiovisual breve abre el recorrido; el papel recupera la lectura, el verde sostiene la agenda y la tinta reúne los datos de visita. El movimiento es una mejora opcional, mientras la fotografía real lleva la experiencia después del ingreso.
 
 **Key Characteristics:**
 
-- Presencia constante del espacio físico y sus materiales reales.
-- Jerarquía editorial con titulares serif y controles sans serif.
-- Superficies profundas, translúcidas y contenidas, sin ornamentación excesiva.
-- Ritmo espacioso que conduce a acciones concretas sin urgencia artificial.
-- Movimiento continuo y reversible que nunca sustituye al contenido.
+- Casa real y procedencia documental reconocible.
+- Titulares serif expresivos y controles sans serif claros.
+- Papel, verde profundo y tinta en superficies opacas.
+- Fotografía contenida por la resolución de sus originales.
+- Movimiento opcional con una ruta completa y calmada.
 
 ## Colors
 
-La paleta combina verdes domésticos y tinta profunda con papel cálido; la menta
-abre y orienta, mientras el ámbar aparece sólo como señal puntual.
+Verdes domésticos y tinta profunda se alternan con papel cálido; la menta orienta y el ámbar señala.
 
 ### Primary
 
-- **Menta librera:** identifica acciones seleccionadas, estados activos y
-  detalles que guían el recorrido.
-- **Verde sala:** sostiene las superficies principales y conecta la interfaz con
-  el interior físico de la librería.
-- **Tinta nocturna:** ofrece el contraste estructural para texto, fondos y
-  controles de máxima prioridad.
+- **Menta librera:** identidad, selección de texto contextual y detalles de orientación.
+- **Verde sala:** superficie de Agenda y respaldo tonal del mapa.
+- **Tinta nocturna:** texto sobre papel, cabecera opaca, ingreso y cierre de visita.
 
 ### Secondary
 
-- **Menta clara:** ilumina texto destacado, bordes activos y superficies
-  seleccionadas sin introducir otro lenguaje cromático.
+- **Menta clara:** texto secundario sobre fondos profundos, contornos interactivos y navegación activa.
 
 ### Tertiary
 
-- **Ámbar de señal:** marca progreso, metadatos y acciones puntuales; su rareza
-  conserva su capacidad de orientar.
+- **Ámbar de señal:** foco visible, selección y línea fina de progreso del umbral.
 
 ### Neutral
 
-- **Papel marfil:** islas de lectura y acción sobre la sala oscura (tarjetas de
-  libros, campos de búsqueda, diálogos modales), nunca grandes superficies de
-  sección; así se evita la fatiga visual del blanco sólido y galería + catálogo
-  permanecen en verde sala y tinta nocturna como el resto del recorrido.
-- **Papel luminoso:** reserva para tarjetas y superficies que necesitan máxima
-  claridad sobre el papel marfil.
-- **Verde apagado:** texto secundario sobre papel y transiciones de menor
-  contraste.
+- **Papel marfil:** fondo amplio de lectura en Experiencia y Galería, texto sobre superficies profundas y botón primario.
+- **Papel luminoso:** token de respaldo conservado; no define una superficie pública distinta en Casa editorial.
+- **Verde apagado:** texto secundario y pies de foto sobre papel.
+- **Línea editorial:** separaciones suaves disponibles en el sistema local.
 
-**The Signal Amber Rule.** El ámbar nunca llena grandes superficies ni compite
-con la menta; señala un momento, una categoría o una acción. Las etiquetas
-editoriales (Libros, Café, Agenda, Comunidad) usan papel tenue y el género de
-las fichas usa verde sala: el ámbar queda reservado a números de capítulo,
-galería y acciones puntuales.
+**The Signal Amber Rule.** El ámbar señala foco, selección o progreso; nunca domina una superficie de lectura.
 
 ## Typography
 
 **Display Font:** Playfair Display (con Georgia como respaldo)  
 **Body Font:** Inter (con Segoe UI como respaldo)
 
-**Character:** Playfair aporta la voz editorial y doméstica de la librería;
-Inter mantiene navegación, formularios y metadatos precisos. La pareja contrasta
-sin convertir la lectura en un gesto decorativo.
+**Character:** Playfair narra el espacio con peso medio y líneas breves; Inter permite leer, orientarse y actuar con calma. Las familias se autoalojan y el énfasis del titular conserva la cursiva editorial existente.
 
 ### Hierarchy
 
-- **Display:** reservado para el ingreso y las declaraciones de mayor escala;
-  líneas compactas y pocas palabras.
-- **Headline:** títulos de sección contenidos a una escala claramente menor
-  que Display (el Display queda reservado al hero), normalmente contenidos a una
-  anchura corta para conservar ritmo vertical.
-- **Title:** títulos de tarjetas, actividades y resultados editoriales.
-- **Body:** lectura continua con longitudes aproximadas de 39 a 58 caracteres
-  tipográficos por bloque según el contexto.
-- **Label:** metadatos y categorías en mayúsculas, nunca por debajo del piso de
-  legibilidad establecido.
-- **Action:** botones y navegación con peso firme, sin imitar titulares.
+- **Display:** titular de ingreso. En hasta 1100 px usa `clamp(3rem, 5.3vw, 4.5rem)`; en hasta 760 px, `clamp(2.5rem, 8.5vw, 3.7rem)`; la variante más compacta usa `2.2rem`. La medida de escritorio está en el frontmatter.
+- **Headline:** títulos de sección; escala fluida con interlínea corta.
+- **Title:** aperturas editoriales; la lista de Agenda ajusta sus títulos a `1.65rem`.
+- **Body:** texto continuo con interlínea amplia; el hero usa `1.7` y longitudes máximas entre 38 y 52ch según el bloque.
+- **Label:** pies de foto, horario y texto auxiliar. Se conservan desde `0.875rem`; solo los datos del hero más compacto llegan a `0.8rem`.
+- **Action:** botones con peso 600. La navegación usa peso 500; enlaces editoriales usan `0.9375rem` y peso 600.
 
-**The Two-Voice Rule.** Playfair narra; Inter orienta y permite actuar. No se
-intercambian esos papeles por conveniencia local.
+**The Two-Voice Rule.** Playfair narra; Inter orienta y permite actuar. No se intercambian esos papeles por conveniencia local.
 
 ## Layout
 
-El sistema usa una retícula editorial flexible: composiciones de dos columnas
-para relacionar relato y evidencia, mosaicos de doce columnas para fotografía y
-una sola columna cuando la pantalla o la tarea exige concentración. El contenido
-respira mediante rellenos de página y sección fluidos; los bloques internos
-repiten intervalos cortos y medianos en lugar de márgenes arbitrarios.
-Experiencia usa una sola columna: cabecera editorial sin caja (titular y
-descripción en fila) y mosaico de dos columnas para las cuatro maneras de
-habitar la librería, con el siguiente capítulo como pie de sección.
+El ancho de contenido es de 1320 px y los rellenos fluidos de página y sección están en el frontmatter. Las cabeceras editoriales se dividen en título y explicación; las aperturas alternan fotografía y texto en columnas desiguales, con espacio para que cada imagen conserve su escala. La galería usa doce columnas con figuras de anchura limitada por el original, sin recortarlas para forzar uniformidad.
 
-En pantallas estrechas las composiciones se apilan, la galería se convierte en
-una secuencia vertical y la navegación de capítulos conserva desplazamiento
-horizontal. Los controles mantienen una altura táctil mínima de 44px. El
-recorrido cinematográfico se adapta en duración y encuadre, pero no crea una
-segunda trayectoria espacial.
+A 1100 px aparece el menú compacto. A 760 px las aperturas, Agenda y Visita se apilan y la galería pasa a dos columnas, con imágenes amplias a todo el ancho. La navegación conserva sus cinco anchors; el menú no sustituye la estructura semántica cuando JavaScript falta. El retrato del ingreso tiene marco de papel y no supera 320 px; la sala original mide 390 px de ancho. En pantallas de hasta 600 px de altura y desde 761 px de ancho, el retrato no esencial se oculta, el texto ocupa una columna y el titular usa 2.5rem para conservar las acciones a la vista.
 
-**The Reading Before Spectacle Rule.** Catálogo, formularios e información de
-visita abandonan la composición cinematográfica cuando ésta pueda competir con
-la lectura o la acción.
+**The Reading Before Spectacle Rule.** La lectura, los datos de visita y las acciones conservan una ruta completa sin video.
 
 ## Elevation & Depth
 
-La profundidad es tonal y atmosférica antes que física. Paneles verde tinta con
-transparencia y desenfoque leve se separan de la fotografía mediante contraste y
-bordes claros de baja opacidad. Las tarjetas permanecen planas; la sombra amplia
-se reserva para el diálogo modal que debe separarse inequívocamente del fondo.
+La profundidad es tonal y espacial: papel, verde y tinta opacos, separación por aire y trazos finos. No hay sombras ambientales ni desenfoque en las superficies activas. Solo el velo del umbral usa un gradiente oscuro sobre los medios para proteger el texto; el foco combina contorno ámbar y un respaldo tinta de 6 px. No convertir ese respaldo de accesibilidad en una sombra decorativa.
 
-### Shadow Vocabulary
-
-- **Separación modal:** sombra ambiental amplia para el diálogo Iti IA; no se
-  reutiliza como tratamiento habitual de tarjetas.
-- **Profundidad tipográfica:** sombra mínima sobre el gran titular cuando la
-  fotografía necesita proteger su legibilidad.
-
-**The Shadow Is an Event Rule.** Una sombra visible comunica una capa temporal o
-modal, no decoración permanente.
+**The Opaque Reading Rule.** Las superficies de lectura mantienen su propio contraste y no dejan que un medio de fondo compita con el contenido.
 
 ## Shapes
 
-Las formas combinan superficies rectangulares de lectura con curvas contenidas.
-Paneles de vidrio usan esquinas suavemente redondeadas; botones de acción y
-navegación usan silueta de cápsula; campos, tarjetas de libros y mosaicos
-fotográficos conservan esquinas rectas. Logotipo y cierre modal son las únicas
-formas pequeñas con redondeo distintivo o circular.
+Fotografías, aperturas, mapa y secciones usan esquinas rectas. La cápsula identifica acciones y navegación; el logotipo conserva su radio pequeño y el menú compacto un radio contenido. El retrato del hero tiene una rotación de dos grados y un marco de papel de 8 px, sin extrapolar ese gesto a todas las fotografías.
 
-**The Shape Has a Job Rule.** La cápsula indica interacción; el rectángulo indica
-contenido; el radio intermedio indica una superficie ambiental.
+**The Shape Has a Job Rule.** La cápsula indica interacción; el rectángulo contiene fotografía y lectura.
 
 ## Components
 
-Los componentes son táctiles y sobrios: sus estados se reconocen por contraste,
-desplazamientos mínimos y foco visible, nunca por animaciones elásticas.
+Los componentes activos se extraen de `index.html`, `assets/css/higgsfield-site.css` y `assets/js/higgsfield-site.js`; los contratos de catálogo e Iti IA conservados más abajo están pausados y no aportan tokens activos.
 
 ### Buttons
 
-- **Shape:** cápsula para acciones generales; forma recta cuando el botón está
-  unido a un campo de búsqueda.
-- **Primary:** papel sobre tinta o tinta sobre papel, con peso firme y altura
-  táctil suficiente.
-- **Hover / Focus:** elevación vertical de uno o dos píxeles y contorno ámbar de
-  alto contraste; las transiciones nombran propiedades específicas.
-- **Ghost:** fondo transparente y borde claro para acciones secundarias sobre
-  superficies profundas.
+Cápsulas opacas con altura mínima de 48 px. El primario usa papel/tinta; el secundario usa tinta/papel y borde menta. Ambos invierten a menta/tinta en hover. Las transiciones de color y borde duran 180 ms; el foco común permanece visible. El estilo secundario conserva el nombre técnico histórico `button--glass`, pero ya no es vidrio.
 
-### Chips
+### Navigation
 
-- **Style:** rectangulares, transparentes y delineados sobre verde sala, en una
-  sola fila horizontal con desplazamiento; el título del grupo usa Inter en
-  mayúsculas, nunca serif.
-- **State:** el seleccionado invierte a menta clara con tinta nocturna; el estado
-  se comunica además mediante `aria-pressed`.
+Cabecera tinta opaca y lockup compacto. Los enlaces tienen altura mínima de 44 px, texto Inter y estado actual menta con `aria-current`; el hover usa papel. El menú compacto usa un botón nativo con `aria-expanded`, restaura foco con Escape y oculta sus enlaces mediante `inert` al cerrarse. No hay una segunda navegación de fases.
 
-### Paginador del catálogo
+### Editorial photographs
+
+Los seis originales oficiales se preservan en `_archive/reference-inputs/2026-10-27-official-interiors/`, fuera de `public/`. Sus doce derivados WebP `images/gallery/oficial-*` y dimensiones constan en `docs/official-photo-derivatives.json`; no se amplían originales. Rincón y mesa ofrecen 480/800/1200/1600; sala, encuentro, estantes y mesa compartida conservan sus tamaños pequeños. Los pies describen lo visible y ninguna portada acredita existencia actual.
+
+### Cinematic threshold and motion control
+
+Solo Inicio y su breve salida usan medios generados. La salida mide 38svh en escritorio y 18svh en móvil, y se elimina con `prefers-reduced-motion`. Los siete fotogramas se activan por scroll nativo y se cargan al necesitarlos; cada uno tiene encuadre móvil, incluidos 04–07. El primer fotograma ofrece respaldo desde la carga inicial. El video no tiene autoplay ni loop y requiere al menos 1024 px e interacción real; movimiento reducido, Save-Data o batería baja conservan el respaldo estático. El botón nativo «Reducir movimiento» usa `aria-pressed` y respeta la preferencia del sistema. Una línea ámbar fina comunica progreso; no hay tarjeta demo ni píldoras de fase.
+
+### Agenda
+
+Superficie verde profunda, lista plana con divisores menta y tipografía editorial. No introduce fechas, cupos ni estados sin evidencia. WhatsApp e Instagram conducen a información vigente.
+
+### Visita
+
+Tinta opaca sin video, horario en lista de definición, nota de festivos por confirmar, Cómo llegar y WhatsApp. El mapa de Google Maps tiene carga diferida y esquinas rectas.
+
+### Funciones pausadas
+
+Los contratos siguientes se conservan como referencia de `features/catalog-iti-ia/`. No se publican, no se enlazan, no aparecen en el sidecar activo y no autorizan reactivación ni nuevos claims comerciales.
+### Paginador del catálogo — En pausa (`features/catalog-iti-ia/`)
 
 El catálogo muestra nueve fichas por página con un paginador Anterior /
 Siguiente; la altura de la sección queda acotada y los filtros ya no desplazan
@@ -270,7 +222,7 @@ el resto de la página. El estado anuncia "Mostrando X–Y de Z" y la página
 actual. Durante la recarga se conserva el contenido anterior hasta tener datos
 nuevos: nunca se vacía la retícula antes de tiempo.
 
-### Descubrimiento (funciones Amazon adaptadas)
+### Descubrimiento (funciones Amazon adaptadas) — En pausa (`features/catalog-iti-ia/`)
 
 - **Sugerencias:** el buscador ofrece títulos y autores del resultado actual
   mediante `datalist`, sin llamadas extra.
@@ -282,41 +234,7 @@ nuevos: nunca se vacía la retícula antes de tiempo.
 - **Relacionados en ficha:** hasta tres libros del mismo subgénero que abren su
   propia ficha al tocarlos.
 
-### Cards / Containers
-
-- **Corner Style:** recto en tarjetas de contenido; suavemente curvo en paneles
-  ambientales.
-- **Background:** papel luminoso para tarjetas de libros (islas claras sobre la
-  sala oscura) y verde tinta translúcido sobre fotografía; los paneles de
-  filtros del catálogo usan la misma superficie oscura contenida que la lista
-  de experiencia.
-- **Shadow Strategy:** plano por defecto; la separación nace de tono, borde y
-  espacio.
-- **Internal Padding:** generoso y consistente, con títulos anclados al ritmo
-  vertical del contenido.
-
-### Inputs / Fields
-
-- **Style:** papel translúcido, tinta oscura, trazo fino y esquina recta.
-- **Focus:** contorno ámbar exterior que no cambia las dimensiones del campo.
-- **Error / Disabled:** el error usa rojo oscuro con lenguaje de recuperación;
-  los controles deshabilitados reducen opacidad y conservan legibilidad.
-
-### Navigation
-
-La cabecera y la barra de capítulos usan capas oscuras translúcidas. La barra
-nace solapada al pie del hero para leerse como su cierre y luego permanece
-fija; los enlaces mantienen 44px de altura, responden con cambios breves de
-opacidad o posición y el capítulo actual se convierte en una cápsula menta
-con tinta oscura.
-
-### Cinematic Progress
-
-Una línea ámbar y cuatro hitos discretos muestran la posición dentro del
-recorrido. En móvil se conservan todos los hitos, pero sólo se rotulan los
-extremos para evitar colisiones.
-
-### Iti IA Dialog
+### Iti IA Dialog — En pausa (`features/catalog-iti-ia/`)
 
 El diálogo es una superficie de papel claramente separada del fondo. La
 cabecera lleva el avatar real de la librería y una línea de propósito
@@ -330,18 +248,17 @@ de desplazamiento: se desvanecen al borde; los mensajes reservan el carril
 del scroll para no saltar. Las etiquetas TÚ / ITI IA aparecen solo en
 cambio de turno.
 
-### Iti IA Flotante
+### Iti IA Flotante — En pausa (`features/catalog-iti-ia/`)
 
 Una píldora fija abajo a la derecha (avatar real de la librería + "Iti IA",
 56px, tinta con borde menta, elevada sobre la zona segura) acompaña todo el
 recorrido y abre el mismo diálogo contextual; se oculta al bajar y reaparece
 al subir (conducta Meta, sin movimiento reducido). El diálogo nunca vive
-flotando, solo su acceso. Cada
-recomendado incluye "Ver ficha del libro" y siempre aterriza en la ficha de
-la obra: directo si ya está en el catálogo cargado, o buscando y abriendo el
-mejor resultado en caso contrario.
+flotando, solo su acceso. Cada recomendado incluye "Ver ficha del libro" y
+siempre aterriza en la ficha de la obra: directo si ya está en el catálogo
+cargado, o buscando y abriendo el mejor resultado en caso contrario.
 
-### Predicciones de búsqueda
+### Predicciones de búsqueda — En pausa (`features/catalog-iti-ia/`)
 
 Sobre el formulario, una fila de predicciones sugiere el siguiente paso sin
 escribir de más: al abrir, tres preguntas iniciales cálidas; al escribir,
@@ -352,22 +269,16 @@ temas que contienen lo escrito). Tocar una envía la consulta directo.
 
 ### Do:
 
-- **Do** conservar el espacio, la arquitectura y la fotografía reales como
-  referencia visual principal.
+- **Do** conservar el espacio, la arquitectura y la fotografía reales como referencia visual principal.
 - **Do** usar menta para orientar, ámbar para señalar y papel para leer.
-- **Do** mantener foco visible, objetivos táctiles suficientes y una ruta completa
-  sin movimiento.
-- **Do** elegir profundidad tonal y bordes sutiles antes de añadir sombras.
-- **Do** permitir que los títulos serif sean expresivos y que los controles sans
-  serif sean inequívocos.
+- **Do** mantener foco visible, objetivos táctiles suficientes y una ruta completa sin movimiento.
+- **Do** usar tono, espacio y proporción para ordenar superficies opacas.
+- **Do** respetar la resolución de cada original y distinguir fotografía de recreación generada.
 
 ### Don't:
 
-- **Don't** introducir estética SaaS, marketplace, IA genérica o plantilla
-  saturada.
-- **Don't** inventar nuevas habitaciones, materiales o fotografías que sustituyan
-  la identidad física del lugar.
+- **Don't** introducir estética SaaS, marketplace, IA genérica o plantilla saturada.
+- **Don't** inventar habitaciones, materiales, fotografías o claims que sustituyan la evidencia del lugar.
 - **Don't** usar ámbar como fondo dominante ni añadir colores sin un papel durable.
-- **Don't** aplicar cápsulas a tarjetas o contenido puramente editorial.
-- **Don't** secuestrar el desplazamiento, reproducir video automáticamente ni
-  depender de animación para comprender o usar la página.
+- **Don't** aplicar cápsulas a fotografías o contenido puramente editorial.
+- **Don't** secuestrar el desplazamiento, reproducir video automáticamente ni depender de animación para comprender o usar la página.

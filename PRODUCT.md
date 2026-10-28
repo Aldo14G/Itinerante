@@ -17,18 +17,19 @@ para ella y abrir una conversación útil antes de trasladarse.
 
 Librería Itinerante y Más conecta el descubrimiento editorial digital con una
 visita al espacio físico. La superficie pública presenta la librería, su vida
-cultural, una ruta de exploración del catálogo y medios directos para preguntar
-o planear una visita.
+cultural, los datos para visitarla (dirección, horario habitual y mapa) y medios
+directos para preguntar por un libro o planear una visita.
 
 El resultado buscado no es completar una compra en línea: es provocar una visita
 informada o una conversación concreta con la librería.
 
 ## Positioning
 
-La experiencia une un recorrido reconocible por el espacio real con un catálogo
-consultable e Iti IA, una ayuda contextual limitada a la información recuperada
-del propio catálogo. No se posiciona como marketplace, ecommerce ni asistente
-genérico.
+La experiencia une un recorrido reconocible por el espacio real con una
+conversación directa con la librería. El catálogo consultable e Iti IA (ayuda
+contextual limitada al propio catálogo) están en pausa hasta contar con
+inventario real y servicio publicado. No se posiciona como marketplace,
+ecommerce ni asistente genérico.
 
 ## Operating Context
 
@@ -36,21 +37,24 @@ genérico.
   existencias o detalles mediante WhatsApp.
 - La agenda cultural comunica la existencia de actividades sin presentar fechas,
   cupos o estados que todavía no estén verificados.
-- El catálogo y la conversación con Iti IA dependen de servicios internos que
-  pueden no estar disponibles durante una visita al sitio; la superficie pública
-  debe seguir orientando a la persona en esos estados.
-- El recorrido audiovisual acompaña la entrada, la experiencia, la comunidad y
-  la agenda; la lectura del catálogo y la información de visita deben permanecer
-  calmadas y operables.
+- El horario habitual (lunes a sábado de 11:00 a 20:00, domingo cerrado) lo
+  aportó Aldo el 27 de octubre de 2026 a partir de la ficha de Google Maps de la
+  librería; los días festivos se confirman por WhatsApp.
+- La composición Casa editorial aprobada el 27 de octubre de 2026 limita el
+  recorrido audiovisual a un umbral de entrada breve. Experiencia y Galería
+  usan papel y fotografía documental; Agenda usa verde profundo y Visita tinta
+  opaca, con información y acciones siempre operables sin video.
 
 ## Capabilities and Constraints
 
 - `index.html` es la única superficie web pública y permanece como sitio estático
   mantenible con CSS local y JavaScript nativo.
-- La búsqueda del catálogo usa una taxonomía controlada y el endpoint same-origin
-  `/api/catalog`.
-- Iti IA es una ayuda contextual del catálogo mediante `/api/ai/iti-ia`; no es una
-  interfaz pública independiente.
+- Solo se publica `public/`, generada por `npm run build:public` con una allowlist
+  de lo que `index.html` referencia; la raíz del repositorio nunca se publica.
+- Catálogo e Iti IA están en pausa en `features/catalog-iti-ia/`: no se publican
+  ni se enlazan. Vuelven solo con inventario real y backend publicado; al volver,
+  conservan la taxonomía controlada y los endpoints same-origin `/api/catalog` y
+  `/api/ai/iti-ia`.
 - No existe un checkout público. La existencia de un libro siempre se confirma
   con la librería.
 - No se publican precios, existencias, fechas, cupos, reseñas, alianzas o
@@ -65,14 +69,27 @@ genérico.
 - La voz es cálida, culta y práctica.
 - El espacio, su arquitectura y sus fotografías reales son parte de la identidad
   del producto y no deben sustituirse por una librería genérica.
-- Claude Design conserva la autoridad de composición; Higgsfield aporta medios y
-  movimiento, no producto, contenido ni arquitectura de interfaz.
+- La dirección Casa editorial aprobada en `.impeccable/direction-casa-editorial.md`
+  rige la composición vigente, conservando Playfair Display, Inter y la paleta
+  de la librería. Higgsfield aporta medios generados y movimiento, no producto,
+  contenido ni arquitectura de interfaz.
 
 ## Evidence on Hand
 
-- Fotografías del espacio real en `images/cinematic/real-space-*`.
+- Seis fotografías oficiales entregadas por Aldo: originales preservados en
+  `_archive/reference-inputs/2026-10-27-official-interiors/` y doce derivados
+  WebP sin ampliación en `images/gallery/oficial-*`. Dimensiones, rutas y hashes
+  de origen constan en `docs/official-photo-derivatives.json`. Los originales no
+  se publican. Las fotografías anteriores en `_archive/cinematic-process/real-space-*`
+  permanecen como referencia histórica; la landing vigente usa el lote oficial.
+  Solo las fotografías documentales pueden presentarse como «foto real».
 - Siete fotogramas aprobados y medios optimizados en
-  `images/cinematic/runtime/`.
+  `images/cinematic/runtime/`: son recreaciones generadas con Higgsfield a partir
+  de las fotos reales, y nunca se rotulan como fotografías. Los hitos posteriores
+  se cargan al necesitarlos, incluidos los encuadres móviles de 04 a 07. El video
+  es opcional desde 1024 px, después de interacción, sin autoplay ni loop; se
+  conserva respaldo estático con movimiento reducido, ahorro de datos o batería
+  baja y un control nativo para reducir movimiento.
 - Fuente entregada por el usuario en `Documentación del proyecto Iti.zip`,
   preservada fuera de la superficie desplegable.
 - Taxonomía controlada en `data/taxonomy.controlled.json`.
@@ -86,7 +103,7 @@ genérico.
 2. Mantener la experiencia anclada en el espacio y los materiales reales.
 3. Presentar únicamente información verificable y hacer visible la incertidumbre.
 4. Usar el movimiento para orientar, nunca para bloquear lectura o acción.
-5. Mantener catálogo e Iti IA útiles incluso cuando sus servicios fallen.
+5. No mostrar funciones que todavía no pueden cumplir lo que prometen.
 
 ## Accessibility & Inclusion
 

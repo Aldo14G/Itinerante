@@ -7,6 +7,7 @@
     "dev": "node tools/dev-with-dataconnect.mjs",
     "preview": "node tools/dev-with-dataconnect.mjs",
     "preview:static": "node tools/static-server.mjs",
+    "build:public": "node scripts/prepare-vercel-public.mjs",
     "backend:dev": "next dev",
     "backend:dev:emulator": "node tools/dev-with-dataconnect.mjs",
     "backend:build": "next build",
