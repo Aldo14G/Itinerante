@@ -1,0 +1,282 @@
+{
+ "base": {
+  "papel": [
+   "#f5f0e7",
+   "fondo principal; cal #e8e6e0 y cantera #d7c5ae aclaradas"
+  ],
+  "cal": [
+   "#e8e6e0",
+   "superficie alterna; muestreada (muros y mosaico claro)"
+  ],
+  "cantera": [
+   "#d7c5ae",
+   "fichas y marcos; muestreada (piedra clara)"
+  ],
+  "hollin": [
+   "#1d1411",
+   "texto; muestreada (sombras de madera y piedra)"
+  ],
+  "piedra": [
+   "#5a4037",
+   "texto secundario; muestreada"
+  ],
+  "madera": [
+   "#845635",
+   "notas al margen, filetes; muestreada"
+  ],
+  "turquesa": [
+   "#2d7a70",
+   "decoración y texto >=24px; muestreada (sillas y bancas)"
+  ],
+  "turquesa-tinta": [
+   "#236861",
+   "enlaces, botones y foco sobre claro; #2d7a70 oscurecida"
+  ],
+  "patio": [
+   "#5d7339",
+   "acento decorativo; muestreada (plantas del patio)"
+  ],
+  "mosaico": [
+   "#373731",
+   "fondo oscuro; muestreada (mosaico negro)"
+  ],
+  "menta-logo": [
+   "#5dc4b4",
+   "placa del logo; enlaces y foco sobre mosaico"
+  ]
+ },
+ "seasonal": {
+  "muertos-magenta": [
+   "#b74396",
+   "papel picado; muestreado de oficial-mesa-compartida"
+  ],
+  "muertos-azul": [
+   "#1c90c9",
+   "papel picado; muestreado"
+  ],
+  "muertos-morado": [
+   "#42327b",
+   "papel picado; muestreado"
+  ],
+  "muertos-cempasuchil": [
+   "#d19027",
+   "mantel naranja; muestreado"
+  ],
+  "muertos-rosa-viejo": [
+   "#893a4d",
+   "papel picado; muestreado"
+  ]
+ },
+ "pairs": [
+  [
+   "hollin",
+   "papel",
+   "texto",
+   15.94,
+   "AAA"
+  ],
+  [
+   "piedra",
+   "papel",
+   "texto",
+   8.32,
+   "AAA"
+  ],
+  [
+   "madera",
+   "papel",
+   "texto",
+   5.5,
+   "AA"
+  ],
+  [
+   "turquesa-tinta",
+   "papel",
+   "texto",
+   5.74,
+   "AA"
+  ],
+  [
+   "turquesa",
+   "papel",
+   "texto",
+   4.48,
+   "AA grande (>=24px o 18.66px bold)"
+  ],
+  [
+   "patio",
+   "papel",
+   "texto",
+   4.65,
+   "AA"
+  ],
+  [
+   "hollin",
+   "cal",
+   "texto",
+   14.5,
+   "AAA"
+  ],
+  [
+   "piedra",
+   "cal",
+   "texto",
+   7.57,
+   "AAA"
+  ],
+  [
+   "madera",
+   "cal",
+   "texto",
+   5.0,
+   "AA"
+  ],
+  [
+   "turquesa-tinta",
+   "cal",
+   "texto",
+   5.22,
+   "AA"
+  ],
+  [
+   "hollin",
+   "cantera",
+   "texto",
+   10.76,
+   "AAA"
+  ],
+  [
+   "piedra",
+   "cantera",
+   "texto",
+   5.62,
+   "AA"
+  ],
+  [
+   "madera",
+   "cantera",
+   "texto",
+   3.71,
+   "AA grande (>=24px o 18.66px bold)"
+  ],
+  [
+   "turquesa-tinta",
+   "cantera",
+   "texto",
+   3.87,
+   "AA grande (>=24px o 18.66px bold)"
+  ],
+  [
+   "papel",
+   "mosaico",
+   "texto",
+   10.55,
+   "AAA"
+  ],
+  [
+   "cantera",
+   "mosaico",
+   "texto",
+   7.12,
+   "AAA"
+  ],
+  [
+   "cal",
+   "mosaico",
+   "texto",
+   9.6,
+   "AAA"
+  ],
+  [
+   "menta-logo",
+   "mosaico",
+   "texto",
+   5.72,
+   "AA"
+  ],
+  [
+   "papel",
+   "turquesa-tinta",
+   "texto en botón",
+   5.74,
+   "AA"
+  ],
+  [
+   "papel",
+   "hollin",
+   "texto en botón",
+   15.94,
+   "AAA"
+  ],
+  [
+   "turquesa-tinta",
+   "papel",
+   "anillo de foco (no texto, 3:1)",
+   5.74,
+   "OK"
+  ],
+  [
+   "menta-logo",
+   "mosaico",
+   "anillo de foco sobre oscuro (3:1)",
+   5.72,
+   "OK"
+  ]
+ ],
+ "seasonal_pairs": [
+  [
+   "muertos-magenta",
+   "papel",
+   4.35,
+   "AA grande (>=24px o 18.66px bold)"
+  ],
+  [
+   "muertos-azul",
+   "papel",
+   3.15,
+   "AA grande (>=24px o 18.66px bold)"
+  ],
+  [
+   "muertos-morado",
+   "papel",
+   9.37,
+   "AAA"
+  ],
+  [
+   "muertos-cempasuchil",
+   "papel",
+   2.39,
+   "NO (solo decoración)"
+  ],
+  [
+   "muertos-rosa-viejo",
+   "papel",
+   6.66,
+   "AA"
+  ],
+  [
+   "papel",
+   "muertos-morado",
+   9.37,
+   "AAA"
+  ],
+  [
+   "muertos-cempasuchil",
+   "mosaico",
+   4.41,
+   "AA grande (>=24px o 18.66px bold)"
+  ],
+  [
+   "muertos-cempasuchil",
+   "hollin",
+   6.66,
+   "AA"
+  ],
+  [
+   "papel",
+   "muertos-magenta",
+   4.35,
+   "AA grande (>=24px o 18.66px bold)"
+  ]
+ ]
+}

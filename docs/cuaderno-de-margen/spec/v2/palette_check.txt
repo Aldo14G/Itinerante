@@ -1,0 +1,32 @@
+hollin          sobre papel     texto                             15.94 AAA
+piedra          sobre papel     texto                              8.32 AAA
+madera          sobre papel     texto                               5.5 AA
+turquesa-tinta  sobre papel     texto                              5.74 AA
+turquesa        sobre papel     texto                              4.48 AA grande (>=24px o 18.66px bold)
+patio           sobre papel     texto                              4.65 AA
+hollin          sobre cal       texto                              14.5 AAA
+piedra          sobre cal       texto                              7.57 AAA
+madera          sobre cal       texto                               5.0 AA
+turquesa-tinta  sobre cal       texto                              5.22 AA
+hollin          sobre cantera   texto                             10.76 AAA
+piedra          sobre cantera   texto                              5.62 AA
+madera          sobre cantera   texto                              3.71 AA grande (>=24px o 18.66px bold)
+turquesa-tinta  sobre cantera   texto                              3.87 AA grande (>=24px o 18.66px bold)
+papel           sobre mosaico   texto                             10.55 AAA
+cantera         sobre mosaico   texto                              7.12 AAA
+cal             sobre mosaico   texto                               9.6 AAA
+menta-logo      sobre mosaico   texto                              5.72 AA
+papel           sobre turquesa-tinta texto en botón                     5.74 AA
+papel           sobre hollin    texto en botón                    15.94 AAA
+turquesa-tinta  sobre papel     anillo de foco (no texto, 3:1)     5.74 OK
+menta-logo      sobre mosaico   anillo de foco sobre oscuro (3:1)   5.72 OK
+--- estacional
+muertos-magenta      sobre papel                  4.35 AA grande (>=24px o 18.66px bold)
+muertos-azul         sobre papel                  3.15 AA grande (>=24px o 18.66px bold)
+muertos-morado       sobre papel                  9.37 AAA
+muertos-cempasuchil  sobre papel                  2.39 NO (solo decoración)
+muertos-rosa-viejo   sobre papel                  6.66 AA
+papel                sobre muertos-morado         9.37 AAA
+muertos-cempasuchil  sobre mosaico                4.41 AA grande (>=24px o 18.66px bold)
+muertos-cempasuchil  sobre hollin                 6.66 AA
+papel                sobre muertos-magenta        4.35 AA grande (>=24px o 18.66px bold)

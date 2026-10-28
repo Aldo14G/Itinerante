@@ -1,0 +1,279 @@
+[
+ {
+  "seccion": "1 Portada",
+  "archivo": "ig-01.jpg",
+  "recorte": [
+   108,
+   0,
+   972,
+   1080
+  ],
+  "tam": "864x1080",
+  "foco": [
+   0.5,
+   0.42
+  ],
+  "max_css": 691,
+  "nitido_2x": 432,
+  "credito": "Foto: @sharonmirelesgong",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "3 La casa por dentro",
+  "archivo": "ig-04.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1080
+  ],
+  "tam": "1080x1080",
+  "foco": [
+   0.68,
+   0.55
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @sharonmirelesgong",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "3 La casa por dentro",
+  "archivo": "ig-03.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1080
+  ],
+  "tam": "1080x1080",
+  "foco": [
+   0.25,
+   0.5
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @sharonmirelesgong",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "3 La casa por dentro",
+  "archivo": "ig-02.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1080
+  ],
+  "tam": "1080x1080",
+  "foco": [
+   0.5,
+   0.5
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @sharonmirelesgong",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "3 La casa por dentro",
+  "archivo": "oficial-mesa-1600.webp",
+  "recorte": [
+   0,
+   0,
+   1600,
+   1200
+  ],
+  "tam": "1600x1200",
+  "foco": [
+   0.5,
+   0.6
+  ],
+  "max_css": 1280,
+  "nitido_2x": 800,
+  "credito": "Fuente por confirmar",
+  "alerta": "autor, fecha y permiso pendientes"
+ },
+ {
+  "seccion": "3 La casa por dentro",
+  "archivo": "oficial-rincon-1600.webp",
+  "recorte": [
+   0,
+   0,
+   1600,
+   1200
+  ],
+  "tam": "1600x1200",
+  "foco": [
+   0.45,
+   0.5
+  ],
+  "max_css": 1280,
+  "nitido_2x": 800,
+  "credito": "Fuente por confirmar",
+  "alerta": "autor, fecha y permiso pendientes"
+ },
+ {
+  "seccion": "4 Patio y café",
+  "archivo": "ig-12.jpg",
+  "recorte": [
+   0,
+   60,
+   1080,
+   1410
+  ],
+  "tam": "1080x1350",
+  "foco": [
+   0.62,
+   0.66
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @alfonso_boeta",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "4 Patio y café",
+  "archivo": "ig-07.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1080
+  ],
+  "tam": "1080x1080",
+  "foco": [
+   0.45,
+   0.72
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @sharonmirelesgong",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "4 Patio y café",
+  "archivo": "ig-08.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1080
+  ],
+  "tam": "1080x1080",
+  "foco": [
+   0.4,
+   0.55
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @sharonmirelesgong",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "4 Patio y café",
+  "archivo": "[pendiente: foto del menú actual]",
+  "recorte": null,
+  "tam": null,
+  "foco": null,
+  "max_css": 420,
+  "nitido_2x": null,
+  "credito": "[pendiente]",
+  "alerta": "hueco marcado, no se publica vacío"
+ },
+ {
+  "seccion": "4 Patio y café",
+  "archivo": "ig-13.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1440
+  ],
+  "tam": "1080x1440",
+  "foco": [
+   0.55,
+   0.4
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @alfonso_boeta",
+  "alerta": "[pendiente: permiso] · mural permanente · autor del mural pendiente"
+ },
+ {
+  "seccion": "4 Patio y café",
+  "archivo": "ig-10.jpg",
+  "recorte": [
+   0,
+   0,
+   1080,
+   1440
+  ],
+  "tam": "1080x1440",
+  "foco": [
+   0.5,
+   0.45
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @alfonso_boeta",
+  "alerta": "[pendiente: permiso] · mural permanente · autor del mural pendiente"
+ },
+ {
+  "seccion": "5 Agenda",
+  "archivo": "ig-09.jpg",
+  "recorte": [
+   0,
+   90,
+   1080,
+   1440
+  ],
+  "tam": "1080x1350",
+  "foco": [
+   0.5,
+   0.7
+  ],
+  "max_css": 864,
+  "nitido_2x": 540,
+  "credito": "Foto: @alfonso_boeta",
+  "alerta": "[pendiente: permiso]"
+ },
+ {
+  "seccion": "6 Visita",
+  "archivo": "maps-01.jpg",
+  "recorte": [
+   0,
+   0,
+   837,
+   1040
+  ],
+  "tam": "837x1040",
+  "foco": [
+   0.35,
+   0.45
+  ],
+  "max_css": 669,
+  "nitido_2x": 418,
+  "credito": "Imagen: Google, oct 2026",
+  "alerta": "BAJA RES · imagen de Google · [pendiente: permiso], mejor foto propia"
+ },
+ {
+  "seccion": "Capa de temporada (Día de Muertos)",
+  "archivo": "oficial-mesa-compartida.webp",
+  "recorte": [
+   0,
+   0,
+   397,
+   298
+  ],
+  "tam": "397x298",
+  "foco": [
+   0.5,
+   0.3
+  ],
+  "max_css": 317,
+  "nitido_2x": 198,
+  "credito": "Fuente por confirmar",
+  "alerta": "BAJA RES · solo en temporada · autor pendiente"
+ }
+]
