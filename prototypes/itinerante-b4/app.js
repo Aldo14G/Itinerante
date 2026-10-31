@@ -3,7 +3,6 @@
 const WA = 'https://wa.me/528180875940';
 const SEQ_COUNT = 145;
 const SEQ_MOBILE = 73;
-const SEQ_SECONDS = 12;
 
 export const TOPICS = {
   narrativa: { name: 'Narrativa', msg: 'narrativa', line: 'Una historia lleva a otra. Novela y cuento, de aquí y de otros lados.', img: 'libro-narrativa.webp', w: 900, h: 720, alt: 'Libros de portadas de colores sobre una repisa de madera, junto a un muro de piedra', kind: 'real', place: 'La repisa de la entrada' },
@@ -160,11 +159,7 @@ function boot() {
     const chars = splitChars(word);
     const fades = $$('.entry-row, .entry-facts', sec);
     const beat2 = $('[data-beat="2"]', sec);
-    const beat3 = $('[data-beat="3"]', sec);
-    const timeEl = $('[data-time]', sec);
-    const bar = $('[data-bar]', sec);
-    const chapters = $$('[data-chapter]', sec);
-    let top = 0, h = 1, sp = 0, frames = [], drawnK = -1, started = false, lastSec = -1, lastChapter = -1;
+    let top = 0, h = 1, sp = 0, frames = [], drawnK = -1, started = false;
 
     const mobile = () => vw <= 760;
     const pad = n => String(n).padStart(3, '0');
@@ -293,19 +288,13 @@ function boot() {
           c.style.opacity = w ? (1 - w).toFixed(3) : '';
         });
 
-        setBeat(beat2, smooth(0.3, 0.38, sp) * (1 - smooth(0.54, 0.62, sp)));
-        setBeat(beat3, smooth(0.68, 0.76, sp) * (1 - smooth(0.92, 0.99, sp)));
+        setBeat(beat2, smooth(0.34, 0.44, sp) * (1 - smooth(0.7, 0.8, sp)));
 
-        const secs = Math.round(sp * SEQ_SECONDS);
-        if (secs !== lastSec) { timeEl.textContent = `00:${String(secs).padStart(2, '0')}`; lastSec = secs; }
-        bar.style.transform = `scaleY(${sp.toFixed(4)})`;
-        const chapter = sp < 0.4 ? 0 : sp < 0.7 ? 1 : 2;
-        if (chapter !== lastChapter) { chapters.forEach((li, i) => li.classList.toggle('is-on', i === chapter)); lastChapter = chapter; }
         media.style.setProperty('--end', (smooth(0.88, 1, sp) * 0.6).toFixed(3));
         return Math.abs(sp - p) > 0.0004;
       },
       reset() {
-        [...chars, ...fades, beat2, beat3].forEach(el => { el.style.transform = ''; el.style.opacity = ''; el.style.pointerEvents = ''; });
+        [...chars, ...fades, beat2].forEach(el => { el.style.transform = ''; el.style.opacity = ''; el.style.pointerEvents = ''; });
         media.style.removeProperty('--end');
         sec.classList.remove('is-live');
       },
@@ -352,7 +341,11 @@ function boot() {
 
     const setIndex = p => {
       const idx = Math.round(p * (stills.length - 1));
-      if (idx !== lastIdx) { idxEl.textContent = String(idx + 1).padStart(2, '0'); lastIdx = idx; }
+      if (idx !== lastIdx) {
+        idxEl.textContent = String(idx + 1).padStart(2, '0');
+        stills.forEach((el, i) => el.classList.toggle('is-center', i === idx));
+        lastIdx = idx;
+      }
       bar.style.transform = `scaleX(${p.toFixed(4)})`;
     };
 
@@ -650,7 +643,16 @@ function boot() {
     items.forEach((d, i) => {
       d.addEventListener('toggle', () => { if (d.open) show(i); });
       const summary = $('summary', d);
-      summary.addEventListener('pointerenter', () => { if (fineMq.matches) show(i); });
+      let intent = 0, hovering = false;
+      const arm = () => { clearTimeout(intent); if (hovering && !d.open) intent = setTimeout(() => { d.open = true; }, 320); };
+      summary.addEventListener('pointerenter', () => {
+        if (!fineMq.matches) return;
+        hovering = true;
+        show(i);
+        arm();
+      });
+      summary.addEventListener('pointermove', arm);
+      summary.addEventListener('pointerleave', () => { hovering = false; clearTimeout(intent); });
       summary.addEventListener('focus', () => show(i));
     });
     $('.bill-list').addEventListener('pointerleave', () => {
@@ -702,13 +704,13 @@ function boot() {
       }
     };
 
-    function select(key) {
+    function select(key, quiet = false) {
       if (key === current || !TOPICS[key]) return;
       current = key;
       const t = TOPICS[key];
       const my = ++token;
       buttons.forEach(b => { const on = b.dataset.topic === key; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
-      live.textContent = `${t.name}. ${t.line}`;
+      if (!quiet) live.textContent = `${t.name}. ${t.line}`;
 
       const layer = document.createElement('div');
       layer.className = 'topic-layer';
@@ -738,10 +740,10 @@ function boot() {
       img.decode().catch(() => {}).then(() => {
         if (my !== token) return;
         layer.style.clipPath = '';
-        layer.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], { duration: 1000, easing: ease, fill: 'backwards' });
-        img.animate([{ transform: 'scale(1.18) translateX(5%)' }, { transform: 'none' }], { duration: 1400, easing: ease });
-        prev.forEach(p => p.firstElementChild.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'translateX(-9%)', filter: 'brightness(0.4)' }], { duration: 1000, easing: ease, fill: 'forwards' }));
-        setTimeout(() => prev.forEach(p => p.remove()), 1050);
+        layer.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], { duration: 700, easing: ease, fill: 'backwards' });
+        img.animate([{ transform: 'scale(1.18) translateX(5%)' }, { transform: 'none' }], { duration: 1000, easing: ease });
+        prev.forEach(p => p.firstElementChild.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'translateX(-9%)', filter: 'brightness(0.4)' }], { duration: 700, easing: ease, fill: 'forwards' }));
+        setTimeout(() => prev.forEach(p => p.remove()), 750);
       });
 
       const old = $$('.ch', nameEl);
@@ -749,25 +751,33 @@ function boot() {
       [lineEl, tagEl].forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }));
       setTimeout(() => {
         if (my !== token) return;
-        fillName(t.name).forEach((s, i) => s.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: 760, delay: i * 30, easing: ease, fill: 'backwards' }));
+        fillName(t.name).forEach((s, i) => s.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: 520, delay: i * 24, easing: ease, fill: 'backwards' }));
         lineEl.textContent = t.line;
         tagEl.replaceChildren(tag, ` ${t.place}`);
         [lineEl, tagEl].forEach((el, i) => {
           el.getAnimations().forEach(a => a.cancel());
-          el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 560, delay: 120 + i * 80, easing: ease, fill: 'backwards' });
+          el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 80 + i * 60, easing: ease, fill: 'backwards' });
         });
       }, 220 + old.length * 10);
 
       updateMessage(true);
     }
 
+    const topicsEl = $('.topics');
+    const preload = () => Object.values(TOPICS).forEach(t => { const pre = new Image(); pre.src = `assets/img/${t.img}`; });
+    ['pointerenter', 'focusin', 'touchstart'].forEach(ev => topicsEl.addEventListener(ev, preload, { once: true, passive: true }));
+
     buttons.forEach((b, i) => {
+      let intent = 0;
       b.addEventListener('click', () => select(b.dataset.topic));
-      b.addEventListener('pointerenter', () => {
-        if (!fineMq.matches) return;
-        const pre = new Image();
-        pre.src = `assets/img/${TOPICS[b.dataset.topic].img}`;
-      }, { once: true });
+      const arm = e => {
+        if (e.pointerType !== 'mouse' || !fineMq.matches) return;
+        clearTimeout(intent);
+        intent = setTimeout(() => select(b.dataset.topic, true), 250);
+      };
+      b.addEventListener('pointerenter', arm);
+      b.addEventListener('pointermove', arm);
+      b.addEventListener('pointerleave', () => clearTimeout(intent));
       b.addEventListener('keydown', e => {
         const dir = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
         if (!dir) return;
@@ -787,6 +797,9 @@ function boot() {
     const bootCatalog = () => import('./catalog.js').then(m => m.initCatalog({ isMotion })).catch(() => {
       const st = $('[data-cat-status]', catalogSection);
       if (st) st.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
+      $('[data-cat-grid]', catalogSection)?.replaceChildren();
+      $('[data-cat-grid]', catalogSection)?.removeAttribute('aria-busy');
+      $('[data-cat-filters]', catalogSection)?.replaceChildren();
     });
     if ('IntersectionObserver' in window) {
       const catIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { catIo.disconnect(); bootCatalog(); } }, { rootMargin: '900px 0px' });

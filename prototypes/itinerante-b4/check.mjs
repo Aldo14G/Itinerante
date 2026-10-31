@@ -102,7 +102,7 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen y rótu
   for (const f of await readdir(here('./assets/img'))) assert.ok(kind.has(`img/${f}`), `sin procedencia: img/${f}`);
   assert.ok([...kind.keys()].some(k => k.startsWith('seq/')) && [...kind.keys()].some(k => k.startsWith('seq-m/')));
   const stills = [...html.matchAll(/<li class="still">([\s\S]*?)<\/li>/g)].map(m => m[1]);
-  assert.equal(stills.length, 7);
+  assert.equal(stills.length, 6);
   for (const s of stills) {
     const file = s.match(/assets\/(img\/[^"]+)"/)[1];
     assert.ok(s.includes(kind.get(file) === 'real' ? 'tag--real' : 'tag--ai'), `rótulo incorrecto: ${file}`);
@@ -133,4 +133,22 @@ test('integridad del documento: ids únicos, anclas y referencias ARIA válidas'
 test('paridad sin JavaScript: lo que depende de JS se oculta bajo html:not(.js)', () => {
   assert.match(css, /html:not\(\.js\) :is\([^)]*\.menu-btn[^)]*\.topics[^)]*\.cat-layout/);
   assert.ok(/<noscript>[\s\S]*wa\.me/.test(html));
+});
+
+test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
+  for (const gone of ['entry-clock', 'entry-chapters', 'entry-bar', 'bill-state', 'ftr-fine', 'Higgsfield', 'Maqueta B.4', 'marquee-row--rev', 'manifesto-photo--b'])
+    assert.ok(!html.includes(gone), `sigue en el marcado: ${gone}`);
+  assert.equal([...html.matchAll(/class="marquee-row/g)].length, 1, 'una sola fila de marquesina');
+  assert.ok(!/id="call-title"[\s\S]*?<\/section>/.exec(html)[0].includes('class="btn '), 'el llamado no repite las acciones de la Visita');
+  const labels = [...html.matchAll(/class="bill-detail">[\s\S]*?class="btn btn--ink"[^>]*>([^<]+)</g)].map(m => m[1].trim());
+  assert.equal(new Set(labels).size, labels.length, 'los CTA de Cartelera son distintos');
+});
+
+test('curaduría: los textos de navegación traen pista y los esqueletos ocupan el lugar', () => {
+  assert.equal([...html.matchAll(/<a href="#[a-z]+" data-hint="[^"]+"><span>/g)].length, 5);
+  assert.equal([...html.matchAll(/class="card card--sk"/g)].length, 12);
+  assert.ok(/data-cat-grid aria-busy="true"/.test(html));
+  assert.ok(/\.card--sk/.test(css) && /@keyframes sk-sweep/.test(css));
+  assert.ok(/content: attr\(data-hint\) \/ ""/.test(css), 'la pista no debe entrar al nombre accesible');
+  assert.ok(/\.hdr-nav a:focus-visible::after/.test(css), 'el foco de teclado iguala al hover');
 });

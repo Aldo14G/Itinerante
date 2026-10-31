@@ -112,6 +112,9 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   } catch {
     status.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
     root.dataset.state = 'error';
+    $('[data-cat-grid]', root).replaceChildren();
+    $('[data-cat-grid]', root).removeAttribute('aria-busy');
+    $('[data-cat-filters]', root).replaceChildren();
     return;
   }
 
@@ -223,6 +226,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     const fresh = slice.slice(from).map(card);
     fresh.forEach(li => frag.append(li));
     if (!append) grid.replaceChildren();
+    grid.removeAttribute('aria-busy');
     grid.append(frag);
     if (isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: i * 28, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }));
     const left = results.length - slice.length;

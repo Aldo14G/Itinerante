@@ -3,12 +3,6 @@
   "rule": "Foto real = lote oficial entregado por Aldo. Recreación IA = medios generados con Higgsfield a partir de fotos del espacio; se rotulan siempre en la interfaz.",
   "real": [
     {
-      "file": "img/oficial-mesa-1600.webp",
-      "origin": "images/gallery/oficial-mesa-1600.webp",
-      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
-      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a"
-    },
-    {
       "file": "img/oficial-mesa-800.webp",
       "origin": "images/gallery/oficial-mesa-800.webp",
       "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
@@ -19,18 +13,6 @@
       "origin": "images/gallery/oficial-rincon-1600.webp",
       "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
       "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
-    },
-    {
-      "file": "img/oficial-rincon-800.webp",
-      "origin": "images/gallery/oficial-rincon-800.webp",
-      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
-      "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
-    },
-    {
-      "file": "img/oficial-sala.webp",
-      "origin": "images/gallery/oficial-sala.webp",
-      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-04.jpg",
-      "sourceSha256": "a32e3bc6ffb177549a43d34b0553dc3ad6bf66a81d8deb7f44b0c2d5c14f1055"
     },
     {
       "file": "img/libro-narrativa.webp",
@@ -83,10 +65,6 @@
     {
       "file": "img/06-comunidad-sonido.webp",
       "origin": "images/cinematic/runtime/06-comunidad-sonido.webp"
-    },
-    {
-      "file": "img/07-transicion-libros.webp",
-      "origin": "images/cinematic/runtime/07-transicion-libros.webp"
     },
     {
       "file": "seq/f001.webp … seq/f145.webp",

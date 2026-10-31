@@ -12,7 +12,7 @@ Abre http://127.0.0.1:8094/. El servidor solo sirve `index.html`, `style.css`, `
 node --test prototypes/itinerante-b4/check.mjs
 ```
 
-La prueba cubre los mensajes de WhatsApp, la codificación, el estado de apertura en hora de Monterrey, la existencia de los recursos y el rotulado de las recreaciones.
+La prueba cubre los mensajes de WhatsApp, la codificación, el estado de apertura en hora de Monterrey, la existencia de los recursos, el rotulado de las recreaciones, la poda de relleno y los esqueletos.
 
 - `BRIEF.md`: contrato de dirección.
 - `DESIGN.md`: sistema construido.

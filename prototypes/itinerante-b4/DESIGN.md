@@ -85,7 +85,7 @@ La anchura es también movimiento: el tema activo de Libros pasa de 62 % a 80 % 
 - **Botones:** cápsulas con barrido de relleno de abajo arriba (500 ms) y flecha que avanza 2 px. Variantes: tungsteno (primaria), fantasma, hueso, noche, línea, tinta turquesa. En dispositivos con puntero fino son magnéticos (±12 px).
 - **Etiquetas de procedencia:** «Foto real» (turquesa claro) y «Recreación IA» (tungsteno), en todas las imágenes, sin excepción.
 - **Fotogramas:** esquinas de 2 px y sin sombra. Las fotos entran con un revelado por máscara (clip-path de abajo arriba y escala 1.22 → 1).
-- **Cartelera:** acordeón exclusivo con `<details name>`. El título se desplaza 14 px al pasar el puntero o al abrirse. El escenario fijo cambia de imagen con una cortina vertical.
+- **Cartelera:** acordeón exclusivo con `<details name>`. Cada fila lleva un título (el tipo de actividad) y una línea; la procedencia «propuesta, sin fecha» la dice el encabezado una vez. Al detenerse 320 ms el detalle se abre solo; el título se desplaza 14 px. El escenario fijo cambia de imagen con una cortina vertical de 700 ms.
 - **Nota del mensaje:** tira de papel ligeramente girada (−0.8°) que muestra el texto exacto que abrirá WhatsApp.
 - **Estado:** punto verde con pulso (abierto) o terracota (cerrado). El texto se calcula con la hora de Monterrey.
 
@@ -93,13 +93,13 @@ La anchura es también movimiento: el tema activo de Libros pasa de 62 % a 80 % 
 
 | Tramo | Mecánica | Fallback |
 |---|---|---|
-| Entrada (320vh, 240vh móvil) | 145 fotogramas en canvas sincronizados al scroll (73 en móvil), carga progresiva por saltos 24→1. El nombre se abre desde el centro como una puerta. Dos rótulos de escena y un código de tiempo 00:00–00:12 | Póster fijo; texto y acciones visibles |
+| Entrada (260vh, 200vh móvil) | 145 fotogramas en canvas sincronizados al scroll (73 en móvil), carga progresiva por saltos 24→1. El nombre se abre desde el centro como una puerta. Un solo rótulo de escena | Póster fijo; texto y acciones visibles |
 | Intro | El escenario se abre de un recorte (inset) a pantalla completa. Las letras suben escalonadas cada 40 ms | Sin intro |
 | Manifiesto | Palabra a palabra, de 17 % a 100 % de opacidad. Las fotos se desplazan en paralaje vertical (±60 px) | Texto completo |
 | La casa | Tira horizontal fijada (vh + distancia / 1.6). Enfoque por distancia al centro: escala .91–1, velo de hasta 58 % y paralaje interno de ±6 % | Scroll lateral nativo con snap |
-| Cortinilla | Cuadrícula de 12×N (6×N en móvil). Cada cuadro crece con un retraso por fila, columna y paridad ajedrezada | Oculta |
-| Libros | Cortina lateral de 1 s. El nombre rueda letra a letra (salida 260 ms, entrada 760 ms) y el CTA cambia su texto con un desplazamiento vertical | Cambio inmediato |
-| Llamado | Marquesina de doble fila, en sentidos opuestos. La velocidad se acelera con el scroll y el sentido sigue su dirección | Estática |
+| Cortinilla (100svh) | Cuadrícula de 12×N (6×N en móvil). Cada cuadro crece con un retraso por fila, columna y paridad ajedrezada | Oculta |
+| Libros | Al pasar el cursor y quedarse (250 ms) el tema se activa y se queda. Cortina lateral de 700 ms; el nombre rueda letra a letra (salida 260 ms, entrada 520 ms) y el CTA cambia su texto con un desplazamiento vertical | Cambio inmediato |
+| Llamado | Una marquesina cuya velocidad se acelera con el scroll y cuyo sentido sigue su dirección, y el titular que da paso a la Visita. Sin acciones: las trae la Visita justo debajo | Estática |
 
 ## Accesibilidad y control
 
@@ -117,3 +117,21 @@ Sección `#catalogo` tras Libros. Datos: `assets/data/catalog.json` (500 registr
 - **Rejilla:** 24 por página y «Ver más»; al cargar más, el foco pasa a la primera ficha nueva. Las portadas son SVG locales o tarjetas tipográficas propias (tono por género); no se piden imágenes a terceros.
 - **Ficha:** `<dialog>` modal que entra desde la derecha (papel, ink): ficha técnica, mensaje exacto de WhatsApp con el título, y tres relacionados. Escape o clic fuera la cierra y el foco vuelve a la tarjeta.
 - **Estados:** carga, error, sin resultados (limpiar o preguntar por WhatsApp) y sin JavaScript (se oculta y queda el enlace a WhatsApp).
+
+## Texto que responde
+
+Todo texto que se puede señalar cambia de estado con el cursor y con el foco de teclado; en táctil el contenido ya está visible o se abre con un toque.
+
+- **Navegación y pie:** el texto sube y deja ver una pista del destino (La casa «6 vistas», Cartelera «3 ideas», Libros «6 temas», Catálogo «De muestra», Visita «Cómo llegar»; pie: «Novedades», «Síguenos», «81 8087 5940», «Escribir»). La pista sale por `content: attr(data-hint) / ""`, así no entra en el nombre accesible. Subrayado animado también con foco.
+- **La casa:** en la tira fijada, solo el cuarto central (`.is-center`) o el que está bajo el cursor muestra su frase; la etiqueta de procedencia siempre visible.
+- **Cartelera:** pasar el cursor abre el detalle (al detenerse 320 ms) y cambia el escenario.
+- **Libros:** pasar el cursor activa el tema (al detenerse 250 ms, solo ratón, sin anunciar en la región viva); clic, flechas y toque siguen igual. Las seis fotos se precargan al primer gesto sobre la lista.
+- **Tarjetas del catálogo:** al señalar, el renglón del autor cede su lugar a «Ver ficha →».
+
+## Esqueletos
+
+Cada región asíncrona reserva su forma antes de que llegue el contenido: 12 tarjetas y dos grupos de filtros en el catálogo (se sustituyen al pintar o se vacían si hay error), y un barrido de luz sobre el fondo de cada foto diferida (La casa, Cartelera, Libros, manifiesto, Visita). El barrido corre 6 ciclos como máximo, solo con movimiento activo, y está bajo la foto, que lo cubre al llegar. Al abrir el catálogo la altura de la página cambia 58 px (antes 1 903 px).
+
+## Qué se retiró en la curaduría
+
+Reloj, capítulos y barra del hero; crédito con nombre del proveedor; segunda frase de escena; horario repetido en el hero (queda el estado en vivo y la dirección); segunda foto del manifiesto y la «mesa de libros» de La casa (cada foto sale una vez); párrafo meta de La casa; etiqueta «Propuesta · sin fecha» por fila; segunda fila de marquesina y las acciones del Llamado (duplicaban la Visita); leyenda «Maqueta B.4» del pie. El catálogo y la Visita no se tocaron.
