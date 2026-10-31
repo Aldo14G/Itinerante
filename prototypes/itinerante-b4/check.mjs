@@ -8,6 +8,7 @@ import { score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, book
 const here = p => new URL(p, import.meta.url);
 const html = await readFile(here('./index.html'), 'utf8');
 const css = await readFile(here('./style.css'), 'utf8');
+const tokensCss = await readFile(here('./tokens.css'), 'utf8');
 const prov = JSON.parse(await readFile(here('./assets/provenance.json'), 'utf8'));
 const data = JSON.parse(await readFile(here('./assets/data/catalog.json'), 'utf8'));
 
@@ -154,7 +155,7 @@ test('curaduría: los textos de navegación traen pista y los esqueletos ocupan 
 });
 
 test('filetes: horario como filas técnicas, cruces de registro, botones de doble filete y cita atribuida', () => {
-  assert.ok(/--hair: 0\.5px/.test(css) && /min-resolution: 2dppx/.test(css), 'filete de 0.5 px en pantallas densas');
+  assert.ok(/--hair: 0\.5px/.test(tokensCss) && /min-resolution: 2dppx/.test(tokensCss), 'filete de 0.5 px en pantallas densas');
   assert.ok(/class="visit-side rx" data-rules/.test(html));
   assert.ok(/\.btn--ghost::before, \.btn--line::before, \.btn--line-ink::before/.test(css));
   assert.ok(/@keyframes celluloid/.test(css) && /prefers-reduced-motion: no-preference/.test(css));
@@ -164,3 +165,9 @@ test('filetes: horario como filas técnicas, cruces de registro, botones de dobl
   assert.equal([...quote.matchAll(/<blockquote>/g)].length, 1, 'una sola cita');
 });
 
+
+test('tokens: el CSS generado está al día y style.css no redeclara colores en :root', () => {
+  assert.ok(html.indexOf('href="tokens.css"') < html.indexOf('href="style.css"'), 'tokens.css va antes que style.css');
+  assert.ok(!/:root\s*\{[^}]*--(night|bone|tungsten|turq|terra|paper)/.test(css), 'colores solo en tokens.css');
+  assert.match(tokensCss, /GENERADO por scripts\/build-tokens\.mjs/);
+});

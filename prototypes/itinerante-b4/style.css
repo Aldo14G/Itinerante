@@ -1,37 +1,5 @@
 /* Itinerante B.4 · Función de la casa */
 
-:root {
-  --night: #100d0a;
-  --night-2: #17120e;
-  --stone: #241e18;
-  --bone: #f1e8d8;
-  --bone-dim: #b8aa95;
-  --line: rgb(241 232 216 / 0.14);
-  --line-strong: rgb(241 232 216 / 0.34);
-  --tungsten: #f0b357;
-  --tungsten-hi: #f7cc86;
-  --turq: #34b3a5;
-  --turq-ink: #062824;
-  --turq-light: #8fe0d5;
-  --terra: #c45a3c;
-  --terra-deep: #9e3f25;
-  --terra-ink: #7a2c16;
-  --paper: #efe6d5;
-  --paper-ink: #1a1510;
-  --paper-dim: #5e5245;
-
-  --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
-  --field: rgb(241 232 216 / 0.62);
-  --f-serif: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
-  --gutter: clamp(16px, 3.2vw, 48px);
-  --hdr-h: 68px;
-
-  color-scheme: dark;
-  interpolate-size: allow-keywords;
-}
-
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
@@ -864,7 +832,6 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* ---------- Impresión ---------- */
 
 @media print {
-  :root { --night: #fff; --night-2: #fff; --stone: #eee; --bone: #000; --bone-dim: #333; --tungsten: #000; --turq: #fff; --turq-ink: #000; --paper: #fff; --paper-ink: #000; --paper-dim: #333; --terra: #000; --terra-deep: #000; --terra-ink: #000; --line: #999; --line-strong: #666; }
   .hdr, .menu, .entry-canvas, .entry-beat, .wipe, .marquee, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer { display: none !important; }
   .entry, .house, .motion .entry { height: auto !important; min-height: 0 !important; }
   .entry-stage, .house-pin { position: static !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
@@ -995,9 +962,6 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 /* ---------- Filetes: líneas capilares, filas técnicas, cruces de registro, doble filete ---------- */
-
-:root { --hair: 1px; }
-@media (min-resolution: 2dppx) { :root { --hair: 0.5px; } }
 
 /* Cruces de registro en las esquinas de un bloque (marcas de corte). */
 .rx { position: relative; }

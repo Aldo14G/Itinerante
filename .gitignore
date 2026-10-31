@@ -28,3 +28,6 @@ supabase/.temp/
 # Cloudflare Workers
 .wrangler/
 .dev.vars*
+
+# Informe local del auditor de diseño
+design/report.json

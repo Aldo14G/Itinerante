@@ -1,0 +1,6 @@
+body { font-family: sans-serif; background: #ffffff; color: #111; }
+.faint { color: #bbbbbb; }
+.tiny { font-size: 8px; padding: 6px; }
+.small { width: 20px; height: 20px; transition: width 3s; border-radius: 3px; }
+.icon { display: block; width: 10px; height: 10px; background: #123456; }
+button:focus { outline: none; }

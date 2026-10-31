@@ -1,0 +1,104 @@
+/* GENERADO por scripts/build-tokens.mjs desde design/tokens.json. No editar a mano. */
+
+:root {
+  /* Color */
+  --night: #100d0a;
+  --night-2: #17120e;
+  --stone: #241e18;
+  --bone: #f1e8d8;
+  --bone-dim: #b8aa95;
+  --line: rgb(241 232 216 / 0.14);
+  --line-strong: rgb(241 232 216 / 0.34);
+  --field: rgb(241 232 216 / 0.62);
+  --tungsten: #f0b357;
+  --tungsten-hi: #f7cc86;
+  --turq: #34b3a5;
+  --turq-ink: #062824;
+  --turq-light: #8fe0d5;
+  --terra: #c45a3c;
+  --terra-deep: #9e3f25;
+  --terra-ink: #7a2c16;
+  --paper: #efe6d5;
+  --paper-ink: #1a1510;
+  --paper-dim: #5e5245;
+
+  /* Tipografía */
+  --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
+  --f-serif: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+
+  /* Escala tipográfica */
+  --fs-0: 0.75rem;
+  --fs-1: 0.875rem;
+  --fs-2: 1rem;
+  --fs-3: 1.125rem;
+  --fs-4: 1.375rem;
+  --fs-5: 1.75rem;
+  --fs-6: 2.25rem;
+  --fs-7: 3rem;
+
+  /* Espaciado (múltiplos de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* Radios */
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 8px;
+  --radius-4: 16px;
+  --radius-pill: 999px;
+
+  /* Movimiento */
+  --dur-instant: 120ms;
+  --dur-fast: 240ms;
+  --dur-base: 400ms;
+  --dur-slow: 700ms;
+  --dur-scene: 1200ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Distribución */
+  --gutter: clamp(16px, 3.2vw, 48px);
+  --hdr-h: 68px;
+
+  /* Objetivos y medida */
+  --target-fine: 24px;
+  --target-coarse: 44px;
+  --measure-max: 75ch;
+
+  --hair: 1px;
+  color-scheme: dark;
+  interpolate-size: allow-keywords;
+}
+
+@media (min-resolution: 2dppx) {
+  :root { --hair: 0.5px; }
+}
+
+@media print {
+  :root {
+    --night: #fff;
+    --night-2: #fff;
+    --stone: #eee;
+    --bone: #000;
+    --bone-dim: #333;
+    --tungsten: #000;
+    --turq: #fff;
+    --turq-ink: #000;
+    --paper: #fff;
+    --paper-ink: #000;
+    --paper-dim: #333;
+    --terra: #000;
+    --terra-deep: #000;
+    --terra-ink: #000;
+    --line: #999;
+    --line-strong: #666;
+  }
+}

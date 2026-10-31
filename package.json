@@ -36,7 +36,12 @@
     "emulators:dataconnect": "firebase emulators:start --only dataconnect",
     "cf:prepare": "node scripts/prepare-public.mjs",
     "cf:dev": "node scripts/prepare-public.mjs && wrangler dev",
-    "cf:deploy": "node scripts/prepare-public.mjs && wrangler deploy"
+    "cf:deploy": "node scripts/prepare-public.mjs && wrangler deploy",
+    "tokens": "node scripts/build-tokens.mjs",
+    "tokens:check": "node scripts/build-tokens.mjs --check",
+    "critique": "node scripts/critique.mjs",
+    "critique:static": "node scripts/critique.mjs --static-only",
+    "test:design": "node --test tests/critique.test.mjs prototypes/itinerante-b4/check.mjs"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "1.41.0",
