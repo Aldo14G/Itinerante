@@ -2,7 +2,9 @@
   "b4": {
     "token-space-grid": 99,
     "token-color-literal": 66,
-    "token-font-size": 59
+    "token-font-size": 59,
+    "a11y-font-small": 10,
+    "a11y-target": 9
   },
   "root": {
     "token-color-literal": 203,
@@ -10,6 +12,9 @@
     "token-font-size": 51,
     "token-duration": 29,
     "token-radius": 15,
-    "a11y-focus-removed": 1
+    "a11y-font-small": 13,
+    "a11y-target": 10,
+    "a11y-focus-removed": 1,
+    "copy-truth": 1
   }
 }

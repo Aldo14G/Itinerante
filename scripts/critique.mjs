@@ -51,6 +51,8 @@ const RULES = {
   'law-restorff': ['law', 'warn', 'Más de 2 botones primarios compitiendo en una vista (Von Restorff).'],
 };
 
+const BROWSER_RULES = new Set(Object.keys(RULES).filter(r => /^(a11y-(contrast|target|name|font-small|h1|overflow|console|heading-skip)|copy-(truth|label|repeat|measure)|law-)/.test(r)));
+
 // ---------- Estático: CSS ----------
 const blank = text => text.replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '));
 const lineAt = (text, idx) => text.slice(0, idx).split('\n').length;
@@ -379,8 +381,11 @@ for (const name of names) {
   if (!rows.length) console.log('sin hallazgos');
 
   if (flag('update-baseline')) {
+    // En modo --static-only las reglas del navegador no se midieron: se conserva su valor anterior.
+    const previous = baseline[name] ?? {};
     baseline[name] = {};
     for (const [rule, n] of rows) if ((RULES[rule]?.[1]) === 'error') baseline[name][rule] = n;
+    if (flag('static-only')) for (const [rule, n] of Object.entries(previous)) if (BROWSER_RULES.has(rule)) baseline[name][rule] = n;
   }
 }
 
