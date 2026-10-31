@@ -24,3 +24,7 @@ public/
 *.zip
 
 supabase/.temp/
+
+# Cloudflare Workers
+.wrangler/
+.dev.vars*

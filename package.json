@@ -11,7 +11,7 @@
     "backend:dev:emulator": "node tools/dev-with-dataconnect.mjs",
     "backend:build": "next build",
     "backend:start": "next start",
-    "test": "node --test tests/site.test.mjs tests/lib.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/catalog-ui.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs",
+    "test": "node --test tests/site.test.mjs tests/lib.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/catalog-ui.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs",
     "harness": "npm run test",
     "reference:check": "node --test tests/reference-search.test.mjs",
     "filters:test": "node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs",
@@ -33,7 +33,10 @@
     "dataconnect:verify": "node scripts/check-dataconnect-generated.mjs",
     "genkit:ui": "genkit start -- tsx --watch src/ai/index.ts",
     "emulators": "firebase emulators:start",
-    "emulators:dataconnect": "firebase emulators:start --only dataconnect"
+    "emulators:dataconnect": "firebase emulators:start --only dataconnect",
+    "cf:prepare": "node scripts/prepare-public.mjs",
+    "cf:dev": "node scripts/prepare-public.mjs && wrangler dev",
+    "cf:deploy": "node scripts/prepare-public.mjs && wrangler deploy"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "1.41.0",
@@ -53,7 +56,8 @@
     "firebase-tools": "15.28.1",
     "genkit-cli": "1.41.0",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "wrangler": "^4.156.0"
   },
   "overrides": {
     "@genkit-ai/google-cloud": "1.41.0"

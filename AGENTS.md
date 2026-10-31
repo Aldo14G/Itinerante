@@ -2,15 +2,17 @@
 
 ## Project Structure & Module Organization
 
-This repository is the static site for Libreria Itinerante y Mas plus a small internal Next.js API (`/api/catalog`, `/api/ai/iti-ia`). **Vercel is the deploy target of record** (`vercel.json`; it serves the static site and the API together). Firebase Hosting (`firebase.json`, project in `.firebaserc`) publishes only the static allow-list built into `public/` and has no `/api`, so the catalog and Iti IA show their "no disponible" state there. The main application lives in `index.html`; its canonical composition is the adapted Higgsfield `d599d36a` model. Local styles and behavior live in `assets/css/higgsfield-site.css` and `assets/js/higgsfield-site.js`. The previous mixed model is read-only history under `_archive/models/`. Static assets are stored at the repository root; `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
+This repository is the static site for Libreria Itinerante y Mas plus a small API. **Cloudflare is the deploy target**: `wrangler.jsonc` serves `public/` as Workers Static Assets and runs `worker/index.ts` only for `/api/*` (`/api/catalog`, `/api/ai/iti-ia`). Vercel (`vercel.json`, `src/app/api/*`) and Firebase Hosting (`firebase.json`) are legacy and kept only until Cloudflare is validated in production; the Next routes duplicate the Worker and will be deleted afterwards. The main application lives in `index.html`; its canonical composition is the adapted Higgsfield `d599d36a` model. Local styles and behavior live in `assets/css/higgsfield-site.css` and `assets/js/higgsfield-site.js`. The previous mixed model is read-only history under `_archive/models/`. Static assets are stored at the repository root; `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
 
 Avoid generated build output in the root. Keep reusable styles and scripts under `assets/`; do not resume UI work in the archived mixed model.
 
 ## Build, Test, and Development Commands
 
 - `firebase emulators:start --only hosting`: serves the site locally through Firebase Hosting behavior.
-- `firebase deploy --only hosting`: first runs `scripts/prepare-vercel-public.mjs` (predeploy) and publishes only `public/` (index.html, assets/, images/, logos) to the project in `.firebaserc`. Static fallback only; no API.
-- Iti IA protection: `src/lib/api-guard.ts` checks Origin, body size (8 KB) and rate (10/min per IP, 300/h global per instance). Tune with `ITI_IA_ALLOWED_ORIGINS`, `ITI_IA_RATE_PER_MINUTE`, `ITI_IA_RATE_PER_HOUR`, `ITI_IA_MAX_BODY_BYTES`. The limit is per serverless instance; a shared store is needed for a hard global cap.
+- `npm run cf:dev`: builds `public/` (allow-list: index.html, assets/, images/, logos, `_headers`) and serves site + API with `wrangler dev`.
+- `npm run cf:deploy`: builds `public/` and runs `wrangler deploy`. Optional secret: `npx wrangler secret put GEMINI_API_KEY` (without it Iti IA answers with the local ranking).
+- Legacy: `firebase deploy --only hosting` publishes the same `public/` with no API.
+- Iti IA protection (Worker): Origin and body-size check from `src/lib/api-guard.ts` (`ITI_IA_ALLOWED_ORIGINS`, `ITI_IA_MAX_BODY_BYTES`) plus Cloudflare Rate Limiting bindings `IA_PER_IP` (10/min) and `IA_GLOBAL` (120/min), enforced per Cloudflare location, not as a strict global cap. The Next route keeps the in-memory limiter.
 - `npm run preview`: serves the static site at `http://127.0.0.1:8080/`.
 - `npm test`: runs the Harness Engineering regression checks.
 

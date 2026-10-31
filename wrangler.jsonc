@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "libreria-itinerante",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-30",
+  "upload_source_maps": true,
+  "observability": { "enabled": true },
+  "assets": {
+    // public/ lo construye scripts/prepare-public.mjs (lista de permitidos: index.html, assets/, images/, logos).
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Solo /api/* pasa por el Worker; todo lo demás se sirve como asset sin invocar código.
+    "run_worker_first": ["/api/*"]
+  },
+  // Límites de Iti IA (por ubicación de Cloudflare; no son un tope global estricto).
+  "ratelimits": [
+    { "name": "IA_PER_IP", "namespace_id": "1101", "simple": { "limit": 10, "period": 60 } },
+    { "name": "IA_GLOBAL", "namespace_id": "1102", "simple": { "limit": 120, "period": 60 } }
+  ]
+  // Secretos opcionales (wrangler secret put): GEMINI_API_KEY. Sin ella Iti IA responde con el ranking local.
+  // Variables opcionales: ITI_IA_ALLOWED_ORIGINS (orígenes extra, separados por coma), ITI_IA_MODEL, ITI_IA_FALLBACK_MODEL.
+}

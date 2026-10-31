@@ -1,4 +1,4 @@
-import type { CatalogBookRecord } from "@/lib/test-catalog";
+import type { CatalogBookRecord } from "@/lib/catalog-core";
 // Import estatico (no fs): Vercel solo empaqueta lo trazado por el bundle.
 // data/ existe en el repo y viaja con el deploy.
 import coversDoc from "../../data/books.amazon-test.covers.json";

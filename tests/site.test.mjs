@@ -193,11 +193,11 @@ test('Iti IA restores a failed question without overwriting a new draft and perm
 test('Firebase publishes only the built allow-list (public/) and protects private files', () => {
   const firebase = JSON.parse(readFileSync(join(root, 'firebase.json'), 'utf8'));
   assert.equal(firebase.hosting.public, 'public');
-  assert.ok(firebase.hosting.predeploy.some(cmd => cmd.includes('prepare-vercel-public.mjs')), 'public/ is built before every deploy');
+  assert.ok(firebase.hosting.predeploy.some(cmd => cmd.includes('prepare-public.mjs')), 'public/ is built before every deploy');
   assert.ok(firebase.hosting.ignore.includes('**/.*'));
   assert.ok(firebase.hosting.ignore.includes('*.json'));
   assert.ok(firebase.hosting.ignore.includes('*.zip'));
-  const prep = readFileSync(join(root, 'scripts/prepare-vercel-public.mjs'), 'utf8');
+  const prep = readFileSync(join(root, 'scripts/prepare-public.mjs'), 'utf8');
   for (const internal of ['prototypes', 'web-intel', 'instagram-data', 'docs', 'AGENTS', 'DESIGN', 'Seguimiento', '.impeccable']) {
     assert.ok(!prep.includes(internal), `the public build must not copy ${internal}`);
   }

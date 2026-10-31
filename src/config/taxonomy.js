@@ -1,12 +1,5 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
-function loadTaxonomy() {
-  const path = join(process.cwd(), "data", "taxonomy.controlled.json");
-  return JSON.parse(readFileSync(path, "utf8"));
-}
-
-const taxonomy = loadTaxonomy();
+// JSON importado (sin fs) para que el mismo módulo corra en Next, Node y Cloudflare Workers.
+import taxonomy from "../../data/taxonomy.controlled.json" with { type: "json" };
 
 export const TAXONOMY_VERSION = taxonomy.schemaVersion;
 export const TAXONOMY_SOURCE = taxonomy.source;

@@ -51,7 +51,7 @@
       }
     ],
     "predeploy": [
-      "node scripts/prepare-vercel-public.mjs"
+      "node scripts/prepare-public.mjs"
     ]
   }
 }

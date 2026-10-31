@@ -50,19 +50,25 @@ export function originAllowed(headers: Headers, requestUrl: string, allowedOrigi
   return allowed.has(origin);
 }
 
-export function guardRequest(request: Request, env: GuardEnv = {}, now = Date.now()): GuardResult {
-  const perIp = env.perIpPerMinute ?? 10;
-  const perHour = env.globalPerHour ?? 300;
+/** Origen y tamaño: lo que no depende de estado. Lo usan la ruta de Next y el Worker de Cloudflare. */
+export function checkOriginAndSize(request: Request, env: GuardEnv = {}): GuardResult {
   const maxBytes = env.maxBodyBytes ?? 8_192;
-
   if (!originAllowed(request.headers, request.url, env.allowedOrigins)) {
     return { ok: false, status: 403, error: "Origen no permitido." };
   }
-
   const length = Number(request.headers.get("content-length") ?? 0);
   if (Number.isFinite(length) && length > maxBytes) {
     return { ok: false, status: 413, error: "La consulta es demasiado larga." };
   }
+  return { ok: true };
+}
+
+export function guardRequest(request: Request, env: GuardEnv = {}, now = Date.now()): GuardResult {
+  const perIp = env.perIpPerMinute ?? 10;
+  const perHour = env.globalPerHour ?? 300;
+
+  const stateless = checkOriginAndSize(request, env);
+  if (!stateless.ok) return stateless;
 
   const ip = clientIp(request.headers);
   const bucket = ipBuckets.get(ip) ?? { hits: [] };
@@ -98,4 +104,10 @@ export function guardEnvFromProcess(): GuardEnv {
     globalPerHour: num(process.env.ITI_IA_RATE_PER_HOUR),
     maxBodyBytes: num(process.env.ITI_IA_MAX_BODY_BYTES),
   };
+}
+
+/** Variante para entornos sin process.env (Cloudflare Workers): lee la configuración del objeto env. */
+export function guardEnvFromEnv(env: { ITI_IA_ALLOWED_ORIGINS?: string; ITI_IA_MAX_BODY_BYTES?: string }): GuardEnv {
+  const max = Number(env.ITI_IA_MAX_BODY_BYTES);
+  return { allowedOrigins: env.ITI_IA_ALLOWED_ORIGINS, maxBodyBytes: Number.isFinite(max) && max > 0 ? max : undefined };
 }

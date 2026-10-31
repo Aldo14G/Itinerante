@@ -1,5 +1,5 @@
-// Copia la superficie estatica (fuente de verdad en la raiz) a public/
-// para que Vercel la sirva byte-identica junto a las API routes de Next.
+// Copia la superficie estatica (fuente de verdad en la raiz) a public/: es la lista de permitidos
+// que publican Cloudflare (wrangler.jsonc), Firebase Hosting (predeploy) y Vercel (legado).
 import { cp, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -19,4 +19,5 @@ for (const file of ["Logo.png", "Logo.webp"]) {
     // Marca opcional; el HTML ya referencia Logo.webp con fallback.
   }
 }
-console.log("public/ listo para Vercel");
+await cp(join(root, "worker", "_headers"), join(publicDir, "_headers"));
+console.log("public/ listo");
