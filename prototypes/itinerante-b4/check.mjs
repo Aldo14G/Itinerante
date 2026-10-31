@@ -152,3 +152,15 @@ test('curaduría: los textos de navegación traen pista y los esqueletos ocupan 
   assert.ok(/content: attr\(data-hint\) \/ ""/.test(css), 'la pista no debe entrar al nombre accesible');
   assert.ok(/\.hdr-nav a:focus-visible::after/.test(css), 'el foco de teclado iguala al hover');
 });
+
+test('filetes: horario como filas técnicas, cruces de registro, botones de doble filete y cita atribuida', () => {
+  assert.ok(/--hair: 0\.5px/.test(css) && /min-resolution: 2dppx/.test(css), 'filete de 0.5 px en pantallas densas');
+  assert.ok(/class="visit-side rx" data-rules/.test(html));
+  assert.ok(/\.btn--ghost::before, \.btn--line::before, \.btn--line-ink::before/.test(css));
+  assert.ok(/@keyframes celluloid/.test(css) && /prefers-reduced-motion: no-preference/.test(css));
+  const quote = html.match(/<figure class="quote[\s\S]*?<\/figure>/)[0];
+  assert.match(quote, /Miguel de Cervantes/);
+  assert.match(quote, /Dominio público/);
+  assert.equal([...quote.matchAll(/<blockquote>/g)].length, 1, 'una sola cita');
+});
+

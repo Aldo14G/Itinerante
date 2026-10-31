@@ -135,3 +135,13 @@ Cada región asíncrona reserva su forma antes de que llegue el contenido: 12 ta
 ## Qué se retiró en la curaduría
 
 Reloj, capítulos y barra del hero; crédito con nombre del proveedor; segunda frase de escena; horario repetido en el hero (queda el estado en vivo y la dirección); segunda foto del manifiesto y la «mesa de libros» de La casa (cada foto sale una vez); párrafo meta de La casa; etiqueta «Propuesta · sin fecha» por fila; segunda fila de marquesina y las acciones del Llamado (duplicaban la Visita); leyenda «Maqueta B.4» del pie. El catálogo y la Visita no se tocaron.
+
+## Filetes (patrones de referencia, reescritos con nuestro código)
+
+Inspirados en el análisis de una página de producción cinematográfica; no se copia código ni estilos, solo el patrón.
+
+- **Filete capilar:** `--hair` es 1 px, y 0.5 px en pantallas de 2×. El horario de la Visita son filas técnicas (etiqueta pequeña en mayúsculas + valor) cuyo filete se dibuja fila por fila, la etiqueta antes que el valor.
+- **Cruces de registro:** `.rx` pone una cruz en dos esquinas opuestas (Visita y cita) que crece de 0 a 1.
+- **Botones de contorno** (`ghost`, `line`, `line-ink`): sin relleno al pasar el cursor; dos filetes (el de arriba entra de izquierda a derecha, el de abajo al revés) y una vibración de celuloide de 0.22 s, solo con puntero fino y sin reducción de movimiento. Los botones rellenos (tungsteno, noche, tinta) conservan el barrido.
+- **Cita sobre pentagrama:** entre Libros y Catálogo, una cita en dominio público (Cervantes, Quijote II, 58) con cinco filetes por renglón que se dibujan de arriba abajo y el texto que aparece después. El texto es provisional: debe ser una cita real y atribuida.
+

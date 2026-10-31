@@ -592,9 +592,9 @@ function boot() {
         io.unobserve(e.target);
       });
     }, { threshold: 0.2, rootMargin: '0px 0px -6% 0px' });
-    [...$$('[data-reveal], [data-lines]'), footMark].forEach(el => io.observe(el));
+    [...$$('[data-reveal], [data-lines], [data-rules]'), footMark].forEach(el => io.observe(el));
   } else {
-    [...$$('[data-reveal], [data-lines]'), footMark].forEach(el => el.classList.add('is-in'));
+    [...$$('[data-reveal], [data-lines], [data-rules]'), footMark].forEach(el => el.classList.add('is-in'));
   }
 
   // ---------- Menu ----------
