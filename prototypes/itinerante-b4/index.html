@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#100d0a">
+  <meta name="description" content="Librería Itinerante y Más: libros, café y talleres en una casa de piedra del centro de Monterrey. Mariano Matamoros Pte. 421.">
+  <title>Librería Itinerante y Más · Centro de Monterrey</title>
+  <link rel="icon" href="assets/img/logo-96.webp">
+  <link rel="preload" href="assets/fonts/archivo-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/seq/f001.webp" as="image" type="image/webp" fetchpriority="high">
+  <meta property="og:title" content="Librería Itinerante y Más · Centro de Monterrey">
+  <meta property="og:description" content="Libros, café y talleres en una casa de piedra del centro de Monterrey.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <script src="assets/js/boot.js"></script>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BookStore","name":"Librería Itinerante y Más","address":{"@type":"PostalAddress","streetAddress":"Mariano Matamoros Pte. 421","addressLocality":"Monterrey","addressRegion":"Nuevo León","addressCountry":"MX"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"20:00"}],"sameAs":["https://www.instagram.com/libreriaitineranteymasmty/"]}</script>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4.5 19.5 6 15.6A7.8 7.8 0 1 1 9 18.6Z"/></symbol>
+    <symbol id="i-tile" viewBox="0 0 24 24"><path d="M3 3h9v9H3zM12 12h9v9h-9z" fill="currentColor" stroke="none"/></symbol>
+  </svg>
+
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+
+  <header class="hdr" data-hdr>
+    <a class="hdr-brand" href="#inicio" aria-label="Librería Itinerante y Más, inicio">
+      <img src="assets/img/logo-96.webp" width="36" height="36" alt="">
+      <span>Librería Itinerante <i>y Más</i></span>
+    </a>
+    <nav class="hdr-nav" aria-label="Capítulos">
+      <a href="#casa">La casa</a>
+      <a href="#cartelera">Cartelera</a>
+      <a href="#libros">Libros</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#visita">Visita</a>
+    </nav>
+    <div class="hdr-end">
+      <p class="status" data-status title="Horario habitual. Días festivos: confirma por WhatsApp."><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></p>
+      <a class="btn btn--sm btn--light hdr-cta" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer">Cómo llegar <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-btn-label">Menú</span><span class="menu-btn-lines" aria-hidden="true"></span></button>
+    </div>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav aria-label="Menú principal">
+      <a href="#casa"><span>La casa</span></a>
+      <a href="#cartelera"><span>Cartelera</span></a>
+      <a href="#libros"><span>Libros</span></a>
+      <a href="#catalogo"><span>Catálogo</span></a>
+      <a href="#visita"><span>Visita</span></a>
+    </nav>
+    <div class="menu-foot">
+      <p>Mariano Matamoros Pte. 421, Centro, Monterrey<br><span data-status-text>Lun–sáb · 11:00–20:00</span></p>
+      <a class="btn btn--tungsten" href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer">Escríbenos por WhatsApp <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+    </div>
+  </div>
+
+  <main id="contenido">
+    <!-- Entrada: recorrido sincronizado al scroll -->
+    <section id="inicio" class="entry" data-scene="entry" aria-labelledby="entry-title">
+      <div class="entry-stage">
+        <div class="entry-media" aria-hidden="true">
+          <img class="entry-poster" src="assets/seq/f001.webp" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
+          <canvas class="entry-canvas"></canvas>
+          <div class="entry-shade"></div>
+        </div>
+
+        <p class="entry-credit"><span class="tag tag--ai">Recreación IA</span> Recorrido generado con Higgsfield a partir de fotos del espacio</p>
+
+        <div class="entry-clock" aria-hidden="true">
+          <span class="entry-time" data-time>00:00</span>
+          <ol class="entry-chapters">
+            <li data-chapter="0"><span>Pasillo</span></li>
+            <li data-chapter="1"><span>Umbral</span></li>
+            <li data-chapter="2"><span>Sala</span></li>
+          </ol>
+          <span class="entry-bar"><span data-bar></span></span>
+        </div>
+
+        <div class="entry-beat entry-beat--2" data-beat="2" aria-hidden="true"><p>Pasa. El pasillo de piedra <em>lleva a la sala.</em></p></div>
+        <div class="entry-beat entry-beat--3" data-beat="3" aria-hidden="true"><p>Una mesa, una ventana y libros <em>hasta el techo.</em></p></div>
+
+        <div class="entry-copy" data-beat="1">
+          <h1 id="entry-title" class="entry-title">
+            <span class="sr-only">Librería Itinerante y Más</span>
+            <span class="wordmark" aria-hidden="true" data-wordmark>Itinerante</span>
+          </h1>
+          <div class="entry-row">
+            <p class="entry-lede" data-intro>Libros, café y talleres en una casa de piedra del centro de Monterrey. Hojea a tu ritmo; confirma existencias por WhatsApp antes de venir.</p>
+            <div class="entry-actions" data-intro>
+              <a class="btn btn--tungsten" data-magnetic href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+              <a class="btn btn--ghost" data-magnetic href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Pregunta por un libro</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+            </div>
+          </div>
+          <ul class="entry-facts" data-intro aria-label="Datos para tu visita">
+            <li class="entry-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mariano Matamoros Pte. 421 · Centro</li>
+            <li>Lunes a sábado · 11:00–20:00</li>
+            <li>Domingo cerrado</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manifiesto -->
+    <section class="manifesto" data-scene="manifesto" aria-labelledby="manifesto-title">
+      <h2 id="manifesto-title" class="sr-only">Qué es Itinerante</h2>
+      <div class="manifesto-grid">
+        <p class="manifesto-text" data-words>No es una tienda de paso. Es una casa para hojear <em>sin prisa,</em> preguntar en voz alta y salir con el libro que no sabías que buscabas.</p>
+        <figure class="manifesto-photo manifesto-photo--a" data-drift="-60" data-reveal>
+          <div class="frame-clip"><img src="assets/img/oficial-mesa-800.webp" width="800" height="600" alt="Mesa con libros de portadas de colores frente a un muro de piedra" loading="lazy" decoding="async"></div>
+          <figcaption><span class="tag tag--real">Foto real</span> La mesa de la entrada</figcaption>
+        </figure>
+        <figure class="manifesto-photo manifesto-photo--b" data-drift="40" data-reveal>
+          <div class="frame-clip"><img src="assets/img/oficial-sala.webp" width="390" height="488" alt="Sala con sillón verde, mesa redonda y piso ajedrezado" loading="lazy" decoding="async"></div>
+          <figcaption><span class="tag tag--real">Foto real</span> La sala</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- La casa: tira de película -->
+    <section id="casa" class="house" data-scene="house" aria-labelledby="house-title">
+      <div class="house-pin">
+        <div class="house-head">
+          <h2 id="house-title" class="h2">La casa, <em>cuarto por cuarto</em></h2>
+          <p>Del pasillo de piedra a la mesa de ajedrez. Las fotos reales y las recreaciones están rotuladas para que sepas qué vas a encontrar.</p>
+          <div class="house-meter" aria-hidden="true"><span class="house-count"><b data-house-index>01</b> / 07</span><span class="house-progress"><span data-house-bar></span></span></div>
+        </div>
+        <ol class="house-track" data-house-track tabindex="0" aria-label="Fotografías de la casa, desplázate para ver más">
+          <li class="still"><figure><div class="still-img"><img src="assets/img/01-entrada-pasillo.webp" width="1600" height="900" alt="Pasillo de entrada con muros de piedra, fotografías enmarcadas y libreros turquesa" loading="lazy" decoding="async"></div><figcaption><b>El pasillo</b><span>Fotografías en la piedra y libros a los dos lados.</span><span class="tag tag--ai">Recreación IA</span></figcaption></figure></li>
+          <li class="still"><figure><div class="still-img"><img src="assets/img/03-home-sala-central.webp" width="1600" height="900" alt="Sala central con mesas redondas, sillas turquesa, libreros altos y piso ajedrezado" loading="lazy" decoding="async"></div><figcaption><b>La sala central</b><span>Una ventana enrejada y mesas para quedarse.</span><span class="tag tag--ai">Recreación IA</span></figcaption></figure></li>
+          <li class="still"><figure><div class="still-img"><img src="assets/img/oficial-rincon-1600.webp" width="1600" height="1200" alt="Rincón de lectura con libreros de madera, piedra aparente y cuadros" loading="lazy" decoding="async"></div><figcaption><b>El rincón de lectura</b><span>Madera, piedra y un cuadro en cada pared.</span><span class="tag tag--real">Foto real</span></figcaption></figure></li>
+          <li class="still"><figure><div class="still-img"><img src="assets/img/04-experiencia-libreros.webp" width="1200" height="675" alt="Libreros llenos junto a una ventana y una mesa con sillas turquesa" loading="lazy" decoding="async"></div><figcaption><b>Los libreros</b><span>Del piso al techo, junto a la ventana.</span><span class="tag tag--ai">Recreación IA</span></figcaption></figure></li>
+          <li class="still"><figure><div class="still-img"><img src="assets/img/oficial-mesa-1600.webp" width="1600" height="1200" alt="Mesa de libros con portadas de colores frente a muros de piedra" loading="lazy" decoding="async"></div><figcaption><b>La mesa de libros</b><span>Portadas a la vista para hojear sin prisa.</span><span class="tag tag--real">Foto real</span></figcaption></figure></li>
+          <li class="still"><figure><div class="still-img"><img src="assets/img/05-talleres-ajedrez.webp" width="1200" height="675" alt="Tablero de ajedrez de madera con piezas listas sobre una mesa" loading="lazy" decoding="async"></div><figcaption><b>La mesa de ajedrez</b><span>Piezas listas para la siguiente partida.</span><span class="tag tag--ai">Recreación IA</span></figcaption></figure></li>
+          <li class="still"><figure><div class="still-img"><img src="assets/img/06-comunidad-sonido.webp" width="1200" height="675" alt="Sala con piso ajedrezado, mesas, libreros y un gong" loading="lazy" decoding="async"></div><figcaption><b>La sala del gong</b><span>Piso ajedrezado y espacio para reunirse.</span><span class="tag tag--ai">Recreación IA</span></figcaption></figure></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Cortinilla: el piso ajedrezado -->
+    <div class="wipe" data-scene="wipe" aria-hidden="true"><div class="wipe-grid" data-wipe-grid></div></div>
+
+    <!-- Cartelera -->
+    <section id="cartelera" class="bill" data-theme="turq" aria-labelledby="bill-title">
+      <div class="bill-head">
+        <h2 id="bill-title" class="h2">Cartelera <em>de la casa</em></h2>
+        <p>Lecturas, partidas y talleres hacen de la librería un punto de encuentro. Estas son <strong>propuestas para la agenda</strong>: ninguna tiene fecha, cupo ni costo confirmados todavía.</p>
+      </div>
+      <div class="bill-body">
+        <figure class="bill-stage" data-bill-stage>
+          <div class="bill-layer is-active" data-layer="0"><img src="assets/img/cartelera-1.webp" width="720" height="900" alt="" loading="lazy" decoding="async"></div>
+          <div class="bill-layer" data-layer="1"><img src="assets/img/cartelera-2.webp" width="540" height="675" alt="" loading="lazy" decoding="async"></div>
+          <div class="bill-layer" data-layer="2"><img src="assets/img/cartelera-3.webp" width="960" height="1200" alt="" loading="lazy" decoding="async"></div>
+          <figcaption data-bill-caption><span class="tag tag--ai">Recreación IA</span> La sala central</figcaption>
+        </figure>
+        <div class="bill-list">
+          <details class="bill-item" name="cartelera" data-item="0" data-caption="La sala central" data-kind="ai" open>
+            <summary><span class="bill-kind">Círculo de lectura</span><span class="bill-title">Leer entre amigos</span><span class="bill-state">Propuesta · sin fecha</span><svg class="ic bill-ic" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+            <div class="bill-detail">
+              <p>Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
+              <a class="btn btn--ink" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20c%C3%ADrculo%20de%20lectura.%20%C2%BFTienen%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer">Preguntar por la próxima fecha <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+            </div>
+          </details>
+          <details class="bill-item" name="cartelera" data-item="1" data-caption="La mesa de ajedrez" data-kind="ai">
+            <summary><span class="bill-kind">Ajedrez en la casa</span><span class="bill-title">Una mesa, muchas partidas</span><span class="bill-state">Propuesta · sin fecha</span><svg class="ic bill-ic" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+            <div class="bill-detail">
+              <p>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
+              <a class="btn btn--ink" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesan%20las%20partidas%20de%20ajedrez.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer">Preguntar por la próxima fecha <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+            </div>
+          </details>
+          <details class="bill-item" name="cartelera" data-item="2" data-caption="El rincón de lectura" data-kind="real">
+            <summary><span class="bill-kind">Taller de escritura</span><span class="bill-title">Historias por escribir</span><span class="bill-state">Propuesta · sin fecha</span><svg class="ic bill-ic" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+            <div class="bill-detail">
+              <p>Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
+              <a class="btn btn--ink" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20taller%20de%20escritura.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer">Preguntar por la próxima fecha <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+            </div>
+          </details>
+          <p class="bill-foot">Las fechas confirmadas se anuncian en <a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Libros -->
+    <section id="libros" class="books" aria-labelledby="books-title">
+      <div class="books-head">
+        <h2 id="books-title" class="h2">Elige un tema. <em>Nosotros buscamos el libro</em></h2>
+        <p>Elige por dónde empezar y te preparamos la consulta para WhatsApp. La existencia de cada libro se confirma con la librería.</p>
+      </div>
+      <div class="books-grid">
+        <div class="topics" role="radiogroup" aria-label="Elige un tema de lectura">
+          <button type="button" class="topic" role="radio" data-topic="narrativa" aria-checked="true" tabindex="0">Narrativa</button>
+          <button type="button" class="topic" role="radio" data-topic="poesia" aria-checked="false" tabindex="-1">Poesía</button>
+          <button type="button" class="topic" role="radio" data-topic="ensayo" aria-checked="false" tabindex="-1">Ensayo</button>
+          <button type="button" class="topic" role="radio" data-topic="cronica" aria-checked="false" tabindex="-1">Crónica</button>
+          <button type="button" class="topic" role="radio" data-topic="infantil" aria-checked="false" tabindex="-1">Infantil</button>
+          <button type="button" class="topic" role="radio" data-topic="libre" aria-checked="false" tabindex="-1">Sin rumbo fijo</button>
+        </div>
+        <div class="topic-stage" data-topic-stage>
+          <div class="topic-layers" data-topic-layers>
+            <div class="topic-layer is-active"><img src="assets/img/libro-narrativa.webp" width="900" height="720" alt="Libros de portadas de colores sobre una repisa de madera, junto a un muro de piedra" decoding="async" loading="lazy"></div>
+          </div>
+          <div class="topic-card">
+            <p class="topic-name" data-topic-name>Narrativa</p>
+            <p class="topic-line" data-topic-line>Una historia lleva a otra. Novela y cuento, de aquí y de otros lados.</p>
+            <p class="topic-tag" data-topic-tag><span class="tag tag--real">Foto real</span> La repisa de la entrada</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="sr-only" aria-live="polite" data-topic-live></p>
+      <form class="composer" data-composer>
+        <div class="composer-field">
+          <label for="book-query">¿Ya tienes un título o autor en mente?</label>
+          <input id="book-query" name="q" type="text" maxlength="160" enterkeyhint="go" autocomplete="off" aria-describedby="composer-hint" placeholder="Título, autor o tema">
+          <p class="composer-hint" id="composer-hint">Se abre WhatsApp con el mensaje listo. Tú decides si lo envías.</p>
+        </div>
+        <figure class="note">
+          <figcaption>Tu mensaje</figcaption>
+          <p class="note-text" data-note>Hola, me gustaría preguntar por libros de narrativa. ¿Qué me recomiendan?</p>
+        </figure>
+        <a class="btn btn--tungsten btn--xl" data-magnetic data-book-cta href="https://wa.me/528180875940?text=Hola%2C%20me%20gustar%C3%ADa%20preguntar%20por%20libros%20de%20narrativa.%20%C2%BFQu%C3%A9%20me%20recomiendan%3F" target="_blank" rel="noopener noreferrer"><span data-cta-label>Preguntar por narrativa</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+      </form>
+    </section>
+
+    <!-- Catálogo de muestra -->
+    <section id="catalogo" class="cat" aria-labelledby="cat-title" data-state="idle">
+      <div class="cat-head">
+        <h2 id="cat-title" class="h2">Explora <em>la muestra</em></h2>
+        <p class="cat-seal" data-cat-seal>Datos de muestra · no es inventario</p>
+        <p class="cat-lede">500 títulos de ejemplo para ver cómo se podrá consultar el catálogo. Cada ficha termina en una pregunta a la librería: la existencia siempre se confirma con ellos.</p>
+      </div>
+      <form class="cat-bar" data-cat-form role="search" aria-label="Buscar en la muestra">
+        <div class="cat-search">
+          <label for="cat-q">Título, autor, ISBN o editorial</label>
+          <div class="cat-combo">
+            <input id="cat-q" data-cat-q type="search" role="combobox" aria-expanded="false" aria-controls="cat-suggest" aria-autocomplete="list" autocomplete="off" spellcheck="false" maxlength="120" placeholder="Prueba «Freida», «Penguin» o un ISBN">
+            <ul id="cat-suggest" class="cat-suggest" role="listbox" aria-label="Sugerencias" data-cat-suggest hidden></ul>
+          </div>
+        </div>
+        <div class="cat-sort">
+          <label for="cat-sort">Ordenar</label>
+          <select id="cat-sort" data-cat-sort>
+            <option value="rel">Relevancia</option>
+            <option value="az" selected>Título A–Z</option>
+            <option value="autor">Autor A–Z</option>
+            <option value="new">Más recientes</option>
+          </select>
+        </div>
+        <button type="button" class="cat-filters-btn" data-cat-filters-btn aria-expanded="false" aria-controls="cat-filters">Filtros <span data-cat-filters-count></span></button>
+      </form>
+      <div class="cat-layout">
+        <div class="cat-filters" id="cat-filters" data-cat-filters role="group" aria-label="Filtros"></div>
+        <div class="cat-main">
+          <p class="cat-status" role="status" aria-live="polite" data-cat-status>Cargando la muestra…</p>
+          <ul class="cat-chips" data-cat-chips hidden></ul>
+          <ul class="cat-grid" data-cat-grid></ul>
+          <div class="cat-empty" data-cat-empty hidden>
+            <p>No hay títulos de muestra con esa combinación.</p>
+            <button type="button" class="btn btn--ghost" data-cat-reset><span>Limpiar búsqueda y filtros</span></button>
+            <a class="btn btn--tungsten" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20que%20no%20encuentro%20en%20su%20sitio." target="_blank" rel="noopener noreferrer"><span>Pregúntanos por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+          </div>
+          <button type="button" class="btn btn--ghost cat-more" data-cat-more hidden></button>
+        </div>
+      </div>
+      <noscript><p class="cat-noscript">La muestra del catálogo necesita JavaScript. Mientras tanto, <a href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro." target="_blank" rel="noopener noreferrer">pregunta por un libro en WhatsApp</a>.</p></noscript>
+      <dialog class="drawer" id="cat-drawer" aria-labelledby="d-title">
+        <div class="drawer-body" data-d-scroll>
+          <button type="button" class="drawer-close" data-d-close aria-label="Cerrar ficha"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          <div class="drawer-cover" data-d-cover></div>
+          <p class="tag tag--ai drawer-tag">Registro de muestra</p>
+          <h3 id="d-title" data-d-title></h3>
+          <p class="drawer-author" data-d-author></p>
+          <dl class="drawer-facts" data-d-facts></dl>
+          <div class="drawer-ask">
+            <p class="drawer-msg-label">Tu mensaje</p>
+            <p class="drawer-msg" data-d-msg></p>
+            <a class="btn btn--tungsten" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Preguntar si lo tienen</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+            <p class="drawer-note">No es inventario: la librería confirma existencia y precio.</p>
+          </div>
+          <div class="drawer-related" data-d-related-wrap>
+            <h4>Del mismo género</h4>
+            <ul data-d-related></ul>
+          </div>
+        </div>
+      </dialog>
+    </section>
+
+    <!-- Llamado final -->
+    <section class="call" data-scene="call" data-theme="tungsten" aria-labelledby="call-title">
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-row" data-marquee="1"><span>Ven a hojear <svg class="ic"><use href="#i-tile"/></svg> Matamoros 421 <svg class="ic"><use href="#i-tile"/></svg> Centro de Monterrey <svg class="ic"><use href="#i-tile"/></svg>&nbsp;</span></div>
+      </div>
+      <div class="call-body">
+        <h2 id="call-title" class="call-title">Los libros se eligen mejor <em>en persona</em></h2>
+        <div class="call-actions">
+          <a class="btn btn--night btn--xl" data-magnetic href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+          <a class="btn btn--line" data-magnetic href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer"><span>Escríbenos por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+        </div>
+      </div>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-row marquee-row--rev" data-marquee="-1"><span>Lunes a sábado <svg class="ic"><use href="#i-tile"/></svg> 11:00 a 20:00 <svg class="ic"><use href="#i-tile"/></svg> Libros · café · talleres <svg class="ic"><use href="#i-tile"/></svg>&nbsp;</span></div>
+      </div>
+    </section>
+
+    <!-- Visita -->
+    <section id="visita" class="visit" data-theme="paper" aria-labelledby="visit-title">
+      <div class="visit-main">
+        <h2 id="visit-title" class="h2">Pasa por la casa <em>Matamoros 421</em></h2>
+        <address>
+          Mariano Matamoros Pte. 421<br>
+          Centro, Monterrey, Nuevo León<br>
+          <span>Entre Juan Aldama e Ignacio Rayón</span>
+        </address>
+        <p class="visit-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-long>Lunes a sábado de 11:00 a 20:00</span></p>
+        <div class="visit-actions">
+          <a class="btn btn--night" data-magnetic href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+          <a class="btn btn--line-ink" data-magnetic href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer"><span>Pedir informes</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+        </div>
+        <figure class="visit-arrival" data-reveal>
+          <div class="frame-clip"><img src="assets/img/llegada-sala.webp" width="1280" height="720" alt="Vista de la sala central al final del pasillo: mesa redonda, sillas turquesa y libreros altos" loading="lazy" decoding="async"></div>
+          <figcaption><span class="tag tag--ai">Recreación IA</span> Así se ve llegar a la sala</figcaption>
+        </figure>
+      </div>
+      <div class="visit-side">
+        <table class="hours">
+          <caption>Horario habitual</caption>
+          <tbody>
+            <tr data-day="1"><th scope="row">Lunes</th><td>11:00–20:00</td></tr>
+            <tr data-day="2"><th scope="row">Martes</th><td>11:00–20:00</td></tr>
+            <tr data-day="3"><th scope="row">Miércoles</th><td>11:00–20:00</td></tr>
+            <tr data-day="4"><th scope="row">Jueves</th><td>11:00–20:00</td></tr>
+            <tr data-day="5"><th scope="row">Viernes</th><td>11:00–20:00</td></tr>
+            <tr data-day="6"><th scope="row">Sábado</th><td>11:00–20:00</td></tr>
+            <tr data-day="0"><th scope="row">Domingo</th><td>Cerrado</td></tr>
+          </tbody>
+        </table>
+        <p class="visit-note">Días festivos: confirma por WhatsApp antes de venir.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ftr">
+    <p class="ftr-mark" aria-hidden="true" data-footmark>Itinerante</p>
+    <div class="ftr-row">
+      <p class="ftr-brand">Librería Itinerante <i>y Más</i><br><span>Mariano Matamoros Pte. 421, Centro, Monterrey</span></p>
+      <ul class="ftr-links">
+        <li><a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        <li><a href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+        <li><a href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+        <li><a href="mailto:libreriaitineranteymasmty@gmail.com">Correo</a></li>
+      </ul>
+      <button class="motion-btn" type="button" data-motion-toggle aria-pressed="false">Pausar el movimiento</button>
+    </div>
+    <p class="ftr-fine">Maqueta B.4. Las imágenes rotuladas «Recreación IA» se generaron con Higgsfield a partir de fotografías del espacio; «Foto real» identifica fotografías de la librería.</p>
+  </footer>
+</body>
+</html>

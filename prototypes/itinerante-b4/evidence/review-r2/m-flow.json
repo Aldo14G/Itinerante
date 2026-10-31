@@ -1,0 +1,85 @@
+{
+ "boot": {
+  "cls": "js motion",
+  "csp": true,
+  "h1First": "H1"
+ },
+ "initial": {
+  "state": "ready",
+  "cards": 24,
+  "status": "Mostrando 24 de 500 títulos de muestra.",
+  "seal": "Datos de muestra · no es inventario",
+  "groups": [
+   "Categoría",
+   "Género",
+   "Formato",
+   "Editorial"
+  ]
+ },
+ "covers": {
+  "imgCovers": 5,
+  "broken": 0,
+  "typographic": 19,
+  "total": 24
+ },
+ "suggest": {
+  "open": true,
+  "items": [
+   "Autor Freida McFadden",
+   "Autor Jeffrey Mason",
+   "Autor Oprah Winfrey",
+   "Autor Anne McCaffrey",
+   "Autor Tana French",
+   "Título The Dinner Party"
+  ],
+  "expanded": "true",
+  "status": "Mostrando 15 de 15 títulos de muestra."
+ },
+ "afterPick": {
+  "q": "Freida McFadden",
+  "chips": [
+   "Búsqueda: Freida McFadden×"
+  ],
+  "status": "Mostrando 5 de 5 títulos de muestra.",
+  "sort": "rel"
+ },
+ "moreHidden": "none",
+ "filtered": {
+  "chips": [
+   "Búsqueda: Freida McFadden×",
+   "Tapa blanda×"
+  ],
+  "status": "Mostrando 4 de 4 títulos de muestra.",
+  "counts": [
+   "Categoría: 4",
+   "Género: 3,1",
+   "Formato: 4,1",
+   "Editorial: 3,1"
+  ]
+ },
+ "more": {
+  "cards": 48,
+  "status": "Mostrando 48 de 500 títulos de muestra.",
+  "focusedIsCard": true
+ },
+ "drawer": {
+  "open": true,
+  "title": "A Admiral",
+  "facts": 5,
+  "cta": "https://wa.me/528180875940?text=Hola%2C+%C2%BFtienen+%C2%ABA+Admiral%C2%BB+de+Greg+Bear%3F+Vi+el+t%C3%ADtulo+en+su+sitio.",
+  "rel": 3
+ },
+ "afterClose": {
+  "open": false,
+  "focus": "card"
+ },
+ "empty": {
+  "emptyShown": true,
+  "status": "Ningún título de muestra coincide."
+ },
+ "overflow": {
+  "sw": 390,
+  "cw": 390
+ },
+ "problems": []
+}

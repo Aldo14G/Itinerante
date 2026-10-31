@@ -1,0 +1,140 @@
+{
+  "updated": "2026-10-30",
+  "rule": "Foto real = lote oficial entregado por Aldo. Recreación IA = medios generados con Higgsfield a partir de fotos del espacio; se rotulan siempre en la interfaz.",
+  "real": [
+    {
+      "file": "img/oficial-mesa-1600.webp",
+      "origin": "images/gallery/oficial-mesa-1600.webp",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a"
+    },
+    {
+      "file": "img/oficial-mesa-800.webp",
+      "origin": "images/gallery/oficial-mesa-800.webp",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a"
+    },
+    {
+      "file": "img/oficial-rincon-1600.webp",
+      "origin": "images/gallery/oficial-rincon-1600.webp",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+      "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
+    },
+    {
+      "file": "img/oficial-rincon-800.webp",
+      "origin": "images/gallery/oficial-rincon-800.webp",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+      "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
+    },
+    {
+      "file": "img/oficial-sala.webp",
+      "origin": "images/gallery/oficial-sala.webp",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-04.jpg",
+      "sourceSha256": "a32e3bc6ffb177549a43d34b0553dc3ad6bf66a81d8deb7f44b0c2d5c14f1055"
+    },
+    {
+      "file": "img/libro-narrativa.webp",
+      "origin": "recorte 900x720 de img/oficial-mesa-1600.webp (x700 y260)",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a"
+    },
+    {
+      "file": "img/libro-ensayo.webp",
+      "origin": "recorte 900x720 de img/oficial-mesa-1600.webp (x60 y480)",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a"
+    },
+    {
+      "file": "img/libro-cronica.webp",
+      "origin": "recorte 760x608 de img/oficial-rincon-1600.webp (x0 y100)",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+      "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
+    },
+    {
+      "file": "img/libro-libre.webp",
+      "origin": "recorte 760x608 de img/oficial-rincon-1600.webp (x840 y592)",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+      "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
+    },
+    {
+      "file": "img/cartelera-3.webp",
+      "origin": "recorte 960x1200 de img/oficial-rincon-1600.webp (x400 y0)",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-02.jpg",
+      "sourceSha256": "6112a9962902ea7a52373b1ae772eda31bdb968107615470b9f96a3b51071c21"
+    }
+  ],
+  "aiRecreation": [
+    {
+      "file": "img/01-entrada-pasillo.webp",
+      "origin": "images/cinematic/runtime/01-entrada-pasillo.webp"
+    },
+    {
+      "file": "img/03-home-sala-central.webp",
+      "origin": "images/cinematic/runtime/03-home-sala-central.webp"
+    },
+    {
+      "file": "img/04-experiencia-libreros.webp",
+      "origin": "images/cinematic/runtime/04-experiencia-libreros.webp"
+    },
+    {
+      "file": "img/05-talleres-ajedrez.webp",
+      "origin": "images/cinematic/runtime/05-talleres-ajedrez.webp"
+    },
+    {
+      "file": "img/06-comunidad-sonido.webp",
+      "origin": "images/cinematic/runtime/06-comunidad-sonido.webp"
+    },
+    {
+      "file": "img/07-transicion-libros.webp",
+      "origin": "images/cinematic/runtime/07-transicion-libros.webp"
+    },
+    {
+      "file": "seq/f001.webp … seq/f145.webp",
+      "origin": "images/cinematic/runtime/bg-walkthrough-seek-desktop.mp4 (commit 2b1e369, 1280×720, 24 fps, 289 fotogramas, 12.04 s)",
+      "originSha256": "36b70f843fad48935c9e26dcc137552562dc86ed6c87c79373601d082d0a9ad4",
+      "command": "ffmpeg -i bg-walkthrough-seek-desktop.mp4 -vf \"select='not(mod(n\\,2))',scale=1280:720:flags=lanczos\" -fps_mode vfr -c:v libwebp -quality 52 -compression_level 6 seq/f%03d.webp"
+    },
+    {
+      "file": "img/libro-poesia.webp",
+      "origin": "recorte 760x608 de img/07-transicion-libros.webp (x380 y30)"
+    },
+    {
+      "file": "img/libro-infantil.webp",
+      "origin": "recorte 760x608 de img/04-experiencia-libreros.webp (x300 y40)"
+    },
+    {
+      "file": "img/llegada-sala.webp",
+      "origin": "seq/f145.webp (último fotograma del recorrido)"
+    },
+    {
+      "file": "seq-m/m001.webp … seq-m/m073.webp",
+      "origin": "images/cinematic/runtime/bg-walkthrough-seek-desktop.mp4 (mismo sha256)",
+      "command": "ffmpeg -i bg-walkthrough-seek-desktop.mp4 -vf \"select='not(mod(n\\,4))',crop=405:720:507:0\" -fps_mode vfr -c:v libwebp -quality 58 -compression_level 6 seq-m/m%03d.webp",
+      "note": "encuadre vertical 405x720 para teléfonos"
+    },
+    {
+      "file": "img/cartelera-1.webp",
+      "origin": "recorte 720x900 de img/03-home-sala-central.webp (x520 y0)"
+    },
+    {
+      "file": "img/cartelera-2.webp",
+      "origin": "recorte 540x675 de img/05-talleres-ajedrez.webp (x400 y0)"
+    }
+  ],
+  "brand": [
+    {
+      "file": "img/logo-96.webp",
+      "origin": "images/brand/logo-96.webp"
+    }
+  ],
+  "fonts": "fonts/sources.json (Archivo y Bodoni Moda, Google Fonts, licencia OFL incluida)",
+  "sampleData": {
+    "file": "data/catalog.json",
+    "origin": "data/books.amazon-test.json (500 registros de prueba, Amazon_BestSelling_Books_500.csv)",
+    "note": "Sin precios ni existencias. Se rotula siempre como muestra, no inventario."
+  },
+  "covers": {
+    "file": "covers/*.svg",
+    "origin": "images/covers/*.svg (195 portadas generadas para el dataset de prueba); el resto usa covers.openlibrary.org"
+  }
+}
