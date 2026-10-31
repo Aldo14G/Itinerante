@@ -74,18 +74,20 @@ function staticCss(name, surface) {
     const isTokenFile = file === 'tokens.css';
     const rel = `${surface.dir}/${file}`.replace(/^\.\//, '');
     if (/prefers-reduced-motion/.test(text)) hasReduced = true;
-    const add = (rule, idx, detail) => findings.push({ rule, file: rel, line: lineAt(text, idx), detail });
+    const rawLines = raw.split('\n');
+    // Excepción justificada: `/* ci:<regla> motivo */` en la misma línea de la declaración.
+    const add = (rule, idx, detail) => { const line = lineAt(text, idx); if (rawLines[line - 1]?.includes(`ci:${rule}`)) return; findings.push({ rule, file: rel, line, detail }); };
 
     const re = /([^{}]+)\{([^{}]*)\}/g;
     let m;
     while ((m = re.exec(text))) {
       const selector = m[1].trim();
       const bodyStart = m.index + m[0].indexOf('{') + 1;
-      const isRoot = /(^|\s):root/.test(selector);
+      const isRoot = /(^|\s):root/.test(selector);
       if (selector.startsWith('@font-face')) continue;
       let offset = 0;
       for (const decl of m[2].split(';')) {
-        const at = bodyStart + offset;
+        const at = bodyStart + offset + decl.match(/^\s*/)[0].length;
         offset += decl.length + 1;
         const c = decl.indexOf(':');
         if (c < 0) continue;
@@ -124,8 +126,9 @@ function staticCss(name, surface) {
           usesMotion = true;
           const segments = prop.endsWith('-duration') ? [value] : value.split(/,(?![^(]*\))/);
           for (const seg of segments) {
+            if (/infinite/.test(seg)) continue; // bucles ambientales (pulso): su ritmo es propio
             const segBare = stripFns(seg);
-            const first = segBare.match(/(-?[\d.]+)(ms|s)\b/);
+            const first = /var\(--dur-/.test(seg) ? null : segBare.match(/(-?[\d.]+)(ms|s)\b/); // si la duración es un token, el primer literal es solo el retraso
             if (first) {
               const ms = parseFloat(first[1]) * (first[2] === 's' ? 1000 : 1);
               if (ms > 1200) add('motion-too-long', at, `${prop}: ${first[0]}`);
