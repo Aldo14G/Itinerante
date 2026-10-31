@@ -12,47 +12,46 @@
     }
   },
   "hosting": {
-    "public": ".",
+    "public": "public",
     "ignore": [
-      "firebase.json",
-      ".firebaserc",
-      ".claude/**",
-      ".agents/**",
+      "**/.*",
+      "**/node_modules/**",
       "_archive/**",
-      "dataconnect/**",
-      "supabase/**",
-      "src/**",
-      "scripts/**",
-      "tools/**",
-      "tests/**",
-      "data/**",
-      "generated/**",
-      "imports/**",
-      "docs/**",
-      "design-system/**",
-      "node_modules/**",
-      ".next/**",
-      "public/**",
-      ".firebase/**",
       "*.json",
-      "*.log",
       "*.zip",
-      "*.pdf",
+      "*.log",
       "*.csv",
-      "next.config.ts",
-      "tsconfig.json"
+      "*.pdf"
     ],
     "headers": [
       {
         "source": "**",
         "headers": [
-          { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
-          { "key": "X-Content-Type-Options",    "value": "nosniff" },
-          { "key": "X-Frame-Options",           "value": "SAMEORIGIN" },
-          { "key": "Referrer-Policy",           "value": "strict-origin-when-cross-origin" },
-          { "key": "Permissions-Policy",        "value": "geolocation=(), camera=(), microphone=()" }
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=31536000; includeSubDomains"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "SAMEORIGIN"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "geolocation=(), camera=(), microphone=()"
+          }
         ]
       }
+    ],
+    "predeploy": [
+      "node scripts/prepare-vercel-public.mjs"
     ]
   }
 }

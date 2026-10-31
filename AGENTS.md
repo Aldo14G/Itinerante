@@ -2,14 +2,15 @@
 
 ## Project Structure & Module Organization
 
-This repository is a static Firebase Hosting site for Libreria Itinerante y Mas. The main application lives in `index.html`; its canonical composition is the adapted Higgsfield `d599d36a` model. Local styles and behavior live in `assets/css/higgsfield-site.css` and `assets/js/higgsfield-site.js`. The previous mixed model is read-only history under `_archive/models/`. Static assets are stored at the repository root; `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
+This repository is the static site for Libreria Itinerante y Mas plus a small internal Next.js API (`/api/catalog`, `/api/ai/iti-ia`). **Vercel is the deploy target of record** (`vercel.json`; it serves the static site and the API together). Firebase Hosting (`firebase.json`, project in `.firebaserc`) publishes only the static allow-list built into `public/` and has no `/api`, so the catalog and Iti IA show their "no disponible" state there. The main application lives in `index.html`; its canonical composition is the adapted Higgsfield `d599d36a` model. Local styles and behavior live in `assets/css/higgsfield-site.css` and `assets/js/higgsfield-site.js`. The previous mixed model is read-only history under `_archive/models/`. Static assets are stored at the repository root; `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
 
 Avoid generated build output in the root. Keep reusable styles and scripts under `assets/`; do not resume UI work in the archived mixed model.
 
 ## Build, Test, and Development Commands
 
 - `firebase emulators:start --only hosting`: serves the site locally through Firebase Hosting behavior.
-- `firebase deploy --only hosting`: deploys the static site to the configured `itinerante-e428c` project.
+- `firebase deploy --only hosting`: first runs `scripts/prepare-vercel-public.mjs` (predeploy) and publishes only `public/` (index.html, assets/, images/, logos) to the project in `.firebaserc`. Static fallback only; no API.
+- Iti IA protection: `src/lib/api-guard.ts` checks Origin, body size (8 KB) and rate (10/min per IP, 300/h global per instance). Tune with `ITI_IA_ALLOWED_ORIGINS`, `ITI_IA_RATE_PER_MINUTE`, `ITI_IA_RATE_PER_HOUR`, `ITI_IA_MAX_BODY_BYTES`. The limit is per serverless instance; a shared store is needed for a hard global cap.
 - `npm run preview`: serves the static site at `http://127.0.0.1:8080/`.
 - `npm test`: runs the Harness Engineering regression checks.
 
