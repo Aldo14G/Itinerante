@@ -21,6 +21,8 @@ export const ROOT_FILES = [
   "motion.js",
   "scenes-desktop.js",
   "rail.js",
+  "sample.js",
+  "saved.js",
   "Logo.png",
   "Logo.webp",
   "robots.txt",

@@ -534,6 +534,11 @@ function boot() {
       holdHeader = performance.now() + 900;
       const href = link.getAttribute('href');
       landing = href.startsWith('#') ? $(href) : null;
+      if (href === '#catalogo') { // en móvil la muestra es una hoja: se abre cuando el menú termina de cerrarse
+        landing = null;
+        e.preventDefault();
+        dlg.addEventListener('close', () => document.dispatchEvent(new CustomEvent('iti:open-explorer')), { once: true });
+      }
       dlg.close();
       if (topic) setTimeout(() => $(`.topic[data-topic="${topic}"]`)?.click(), 350);
       if (bill !== undefined) setTimeout(() => { const t = $('.bill-track'), card = $$('.bill-item')[Number(bill)]; if (t && card) t.scrollTo({ left: card.offsetLeft - t.firstElementChild.offsetLeft, behavior: isMotion() ? 'smooth' : 'auto' }); }, 350);
@@ -761,6 +766,43 @@ function boot() {
     } else bootCatalog();
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
 
+    // Explorar la muestra: en móvil es una hoja a pantalla completa (la rejilla deja de alargar el capítulo);
+    // en escritorio el diálogo queda abierto en línea. El botón «atrás» del teléfono cierra la hoja.
+    const explorer = $('#explorer');
+    if (explorer) {
+      const phone = matchMedia('(max-width: 760px)');
+      let pushed = false;
+      const settle = () => {
+        if (phone.matches) { if (explorer.open && !explorer.matches(':modal')) explorer.close(); }
+        else { root.classList.remove('explorer-open'); if (explorer.matches(':modal')) explorer.close(); if (!explorer.open) explorer.show(); }
+      };
+      const openExplorer = async () => {
+        if (!phone.matches || explorer.open) return;
+        await bootCatalog();
+        explorer.showModal();
+        root.classList.add('explorer-open');
+        history.pushState({ explorer: 1 }, '', '#explorar');
+        pushed = true;
+        $('[data-ex-close]', explorer).focus({ preventScroll: true });
+      };
+      settle();
+      phone.addEventListener('change', settle);
+      explorer.addEventListener('close', () => {
+        root.classList.remove('explorer-open');
+        if (pushed) { pushed = false; if (history.state?.explorer) history.back(); }
+        if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true });
+      });
+      addEventListener('popstate', () => { if (explorer.open && phone.matches) { pushed = false; explorer.close(); } });
+      $('[data-ex-close]', explorer).addEventListener('click', () => explorer.close());
+      $('[data-ex-open]')?.addEventListener('click', openExplorer);
+      document.addEventListener('iti:open-explorer', openExplorer);
+      // Cualquier enlace a la muestra abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
+      document.addEventListener('click', e => {
+        const a = e.target.closest('a[href="#catalogo"]');
+        if (a && phone.matches && !a.closest('#sheet-menu')) { e.preventDefault(); openExplorer(); }
+      });
+    }
+
     // Carrusel de libros (capa 1 de Libros): se carga al acercarse y pide la ficha al catálogo al elegir un libro.
     const railEl = $('[data-rail]');
     if (railEl) {
@@ -771,6 +813,9 @@ function boot() {
       } else bootRail();
     }
   }
+
+  // ---------- Mi lista para la visita (en reposo: el menú y la cabecera muestran el conteo) ----------
+  (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
 
   // ---------- Magnetic buttons ----------
   $$('[data-magnetic]').forEach(btn => {

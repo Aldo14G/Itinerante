@@ -28,6 +28,8 @@
   <svg class="sprite" aria-hidden="true">
     <symbol id="i-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
     <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-mark" viewBox="0 0 24 24"><path d="M7.5 4h9A1.5 1.5 0 0 1 18 5.5V20l-6-4.2L6 20V5.5A1.5 1.5 0 0 1 7.5 4z"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4.5 19.5 6 15.6A7.8 7.8 0 1 1 9 18.6Z"/></symbol>
@@ -58,6 +60,7 @@
     </nav>
     <div class="hdr-end">
       <p class="status" data-status title="Horario habitual. Días festivos: confirma por WhatsApp."><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></p>
+      <button class="hdr-list" type="button" data-open-mylist data-saved-badge hidden aria-label="Abrir mi lista"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-saved-n>0</span></button>
       <button class="hdr-more" type="button" aria-expanded="false" aria-controls="sheet-menu" aria-label="Abrir menú"><svg class="ic" aria-hidden="true"><use href="#t-menu"/></svg></button>
       <a class="hdr-wa" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer" aria-label="Escribir por WhatsApp"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
       <a class="btn btn--sm btn--light hdr-cta" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer">Cómo llegar <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
@@ -90,6 +93,7 @@
           <button class="sm-row" type="button" aria-expanded="false" aria-controls="sm-horarios"><span class="sm-ic"><svg aria-hidden="true"><use href="#t-horario"/></svg></span><span class="sm-lb">Horarios<small class="sm-meta" data-status-text>Lun–sáb · 11:00–20:00</small></span><svg class="sm-caret" aria-hidden="true"><use href="#t-chevron"/></svg></button>
           <div class="sm-sub" id="sm-horarios" inert><div class="sm-sub-in"><p class="sm-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-long>Lunes a sábado de 11:00 a 20:00</span></p><dl class="sm-hours"><dt>Lunes a sábado</dt><dd>11:00–20:00</dd><dt>Domingo</dt><dd>Cerrado</dd></dl><p class="sm-note">Días festivos: confirma por WhatsApp antes de venir.</p></div></div>
         </li>
+        <li><button class="sm-row" type="button" data-open-mylist><span class="sm-ic"><svg aria-hidden="true"><use href="#i-mark"/></svg></span><span class="sm-lb">Mi lista<small class="sm-meta" data-saved-count>Vacía</small></span></button></li>
         <li><a class="sm-row" href="#casa"><span class="sm-ic"><svg aria-hidden="true"><use href="#t-casa"/></svg></span><span class="sm-lb">La casa</span></a></li>
         <li class="sm-group">
           <button class="sm-row" type="button" aria-expanded="false" aria-controls="sm-libros"><span class="sm-ic"><svg aria-hidden="true"><use href="#t-libros"/></svg></span><span class="sm-lb">Libros</span><svg class="sm-caret" aria-hidden="true"><use href="#t-chevron"/></svg></button>
@@ -102,6 +106,17 @@
       </ul>
     </nav>
     <div class="sm-foot"><a class="btn btn--tungsten" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Escribir por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a><p class="sm-social"><a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram</a> <a href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer">Facebook</a></p></div>
+  </dialog>
+
+  <dialog class="mylist" id="mylist" data-tone="light" aria-labelledby="mylist-title">
+    <div class="ml-head"><h2 class="ml-title" id="mylist-title">Mi lista para la visita</h2><button class="ml-close" type="button" data-ml-close aria-label="Cerrar mi lista"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+    <p class="ml-note">Se guarda solo en este dispositivo. La librería confirma existencia y precio.</p>
+    <ul class="ml-items" data-ml-items></ul>
+    <p class="ml-empty" data-ml-empty hidden>Aún no guardas libros. Toca el marcador en cualquier libro para anotarlo y llévalo a la visita.</p>
+    <div class="ml-actions">
+      <a class="btn btn--tungsten" data-ml-visit href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+      <a class="btn btn--line-ink" data-ml-wa href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer" hidden><span>Enviar mi lista por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+    </div>
   </dialog>
 
   <nav class="tabbar" aria-label="Secciones">
@@ -296,53 +311,60 @@
         <h3 id="cat-title" class="h2">Explora <em>la muestra</em></h3>
         <p class="cat-seal" data-cat-seal>Datos de muestra · no es inventario</p>
         <p class="cat-lede">500 títulos de ejemplo para ver cómo se podrá consultar el catálogo. Cada ficha termina en una pregunta a la librería: la existencia siempre se confirma con ellos.</p>
+        <button class="explore-open" type="button" data-ex-open aria-controls="explorer"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span>Buscar título, autor o ISBN</span></button>
       </div>
-      <form class="cat-bar" data-cat-form role="search" aria-label="Buscar en la muestra">
-        <div class="cat-search">
-          <label for="cat-q">Título, autor, ISBN o editorial</label>
-          <div class="cat-combo">
-            <input id="cat-q" data-cat-q type="search" role="combobox" aria-expanded="false" aria-controls="cat-suggest" aria-autocomplete="list" autocomplete="off" spellcheck="false" maxlength="120" placeholder="Prueba «Freida» o un ISBN">
-            <ul id="cat-suggest" class="cat-suggest" role="listbox" aria-label="Sugerencias" data-cat-suggest hidden></ul>
+      <dialog class="explorer" id="explorer" aria-labelledby="explorer-title">
+        <div class="ex-top">
+          <h4 class="ex-title" id="explorer-title">Explorar la muestra</h4>
+          <button class="ex-close" type="button" data-ex-close aria-label="Cerrar la exploración"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        </div>
+        <form class="cat-bar" data-cat-form role="search" aria-label="Buscar en la muestra">
+          <div class="cat-search">
+            <label for="cat-q">Título, autor, ISBN o editorial</label>
+            <div class="cat-combo">
+              <input id="cat-q" data-cat-q type="search" role="combobox" aria-expanded="false" aria-controls="cat-suggest" aria-autocomplete="list" autocomplete="off" spellcheck="false" maxlength="120" placeholder="Prueba «Freida» o un ISBN">
+              <ul id="cat-suggest" class="cat-suggest" role="listbox" aria-label="Sugerencias" data-cat-suggest hidden></ul>
+            </div>
+          </div>
+          <div class="cat-sort">
+            <label for="cat-sort">Ordenar</label>
+            <select id="cat-sort" data-cat-sort>
+              <option value="rel">Relevancia</option>
+              <option value="az" selected>Título A–Z</option>
+              <option value="autor">Autor A–Z</option>
+              <option value="new">Más recientes</option>
+            </select>
+          </div>
+          <button type="button" class="cat-filters-btn" data-cat-filters-btn aria-expanded="false" aria-controls="cat-filters">Filtros <span data-cat-filters-count></span></button>
+        </form>
+        <div class="cat-layout">
+          <div class="cat-filters" id="cat-filters" data-cat-filters role="group" aria-label="Filtros"><div class="sk-group" aria-hidden="true"><span class="sk-line sk-line--s"></span><span class="sk-line"></span><span class="sk-line"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></div><div class="sk-group" aria-hidden="true"><span class="sk-line sk-line--s"></span><span class="sk-line"></span><span class="sk-line"></span><span class="sk-line"></span></div></div>
+          <div class="cat-main">
+            <p class="cat-status" role="status" aria-live="polite" data-cat-status>Cargando la muestra…</p>
+            <ul class="cat-chips" data-cat-chips hidden></ul>
+            <ul class="cat-grid" data-cat-grid aria-busy="true">
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+              <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
+            </ul>
+            <div class="cat-empty" data-cat-empty hidden>
+              <p>No hay títulos de muestra con esa combinación.</p>
+              <button type="button" class="btn btn--ghost" data-cat-reset><span>Limpiar búsqueda y filtros</span></button>
+              <a class="btn btn--tungsten" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20que%20no%20encuentro%20en%20su%20sitio." target="_blank" rel="noopener noreferrer"><span>Pregúntanos por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+            </div>
+            <button type="button" class="btn btn--ghost cat-more" data-cat-more hidden></button>
           </div>
         </div>
-        <div class="cat-sort">
-          <label for="cat-sort">Ordenar</label>
-          <select id="cat-sort" data-cat-sort>
-            <option value="rel">Relevancia</option>
-            <option value="az" selected>Título A–Z</option>
-            <option value="autor">Autor A–Z</option>
-            <option value="new">Más recientes</option>
-          </select>
-        </div>
-        <button type="button" class="cat-filters-btn" data-cat-filters-btn aria-expanded="false" aria-controls="cat-filters">Filtros <span data-cat-filters-count></span></button>
-      </form>
-      <div class="cat-layout">
-        <div class="cat-filters" id="cat-filters" data-cat-filters role="group" aria-label="Filtros"><div class="sk-group" aria-hidden="true"><span class="sk-line sk-line--s"></span><span class="sk-line"></span><span class="sk-line"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></div><div class="sk-group" aria-hidden="true"><span class="sk-line sk-line--s"></span><span class="sk-line"></span><span class="sk-line"></span><span class="sk-line"></span></div></div>
-        <div class="cat-main">
-          <p class="cat-status" role="status" aria-live="polite" data-cat-status>Cargando la muestra…</p>
-          <ul class="cat-chips" data-cat-chips hidden></ul>
-          <ul class="cat-grid" data-cat-grid aria-busy="true">
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-            <li class="card card--sk" aria-hidden="true"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></li>
-          </ul>
-          <div class="cat-empty" data-cat-empty hidden>
-            <p>No hay títulos de muestra con esa combinación.</p>
-            <button type="button" class="btn btn--ghost" data-cat-reset><span>Limpiar búsqueda y filtros</span></button>
-            <a class="btn btn--tungsten" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20que%20no%20encuentro%20en%20su%20sitio." target="_blank" rel="noopener noreferrer"><span>Pregúntanos por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
-          </div>
-          <button type="button" class="btn btn--ghost cat-more" data-cat-more hidden></button>
-        </div>
-      </div>
+      </dialog>
       <noscript><p class="cat-noscript">La muestra del catálogo necesita JavaScript. Mientras tanto, <a href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro." target="_blank" rel="noopener noreferrer">pregunta por un libro en WhatsApp</a>.</p></noscript>
       <dialog class="drawer" id="cat-drawer" aria-labelledby="d-title">
         <div class="drawer-body" data-d-scroll>
@@ -352,6 +374,7 @@
           <p class="tag tag--ai drawer-tag">Registro de muestra</p>
           <h3 id="d-title" data-d-title></h3>
           <p class="drawer-author" data-d-author></p>
+          <button type="button" class="save save--wide" data-d-save aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-save-label>Guardar en mi lista</span></button>
           <dl class="drawer-facts" data-d-facts></dl>
           <div class="drawer-ask">
             <p class="drawer-msg-label">Pásate a verlo</p>

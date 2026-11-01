@@ -1189,3 +1189,66 @@ html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cov
   *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
   *:not(.progress), *:not(.progress)::before, *:not(.progress)::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }
+
+/* ---------- Guardar y «Mi lista para la visita» ---------- */
+.card-item, .rail-item { position: relative; container-type: inline-size; }
+/* El marcador va en la esquina inferior derecha de la portada (2:3 = 150 % del ancho) para no tapar el título. */
+.save {
+  position: absolute; top: calc(150cqw - var(--target-coarse) - var(--space-2)); right: var(--space-2); z-index: 2;
+  display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; cursor: pointer;
+  color: var(--paper-ink); background: color-mix(in srgb, var(--white) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: 50%;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
+}
+.save .ic { width: 22px; height: 22px; }
+.save:active { scale: 0.9; }
+.save[aria-pressed="true"] { color: var(--white); background: var(--terra-deep); border-color: transparent; }
+.save[aria-pressed="true"] .ic { fill: currentColor; }
+.save--wide {
+  position: static; display: inline-flex; gap: var(--space-2); justify-self: start; container-type: normal; width: auto; height: auto; min-height: var(--target-coarse);
+  padding: 0 var(--space-4); font: 650 var(--fs-1)/1 var(--f-sans); border-radius: var(--radius-pill);
+}
+.save--wide .ic { width: 20px; height: 20px; }
+.toast {
+  position: fixed; inset: auto auto calc(env(safe-area-inset-bottom) + var(--space-5)) 50%; margin: 0; translate: -50% 0;
+  display: none; align-items: center; gap: var(--space-3); width: max-content; max-width: min(92vw, 440px); padding: var(--space-2) var(--space-4);
+  color: var(--bone); font: 600 var(--fs-1)/1.3 var(--f-sans); background: var(--glass-solid); border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
+}
+.toast:popover-open { display: flex; }
+.toast-action { white-space: nowrap; min-height: var(--target-coarse); padding: 0 var(--space-2); color: var(--tungsten-hi); font: inherit; font-weight: 750; cursor: pointer; background: none; border: 0; }
+.hdr-list {
+  display: inline-flex; align-items: center; gap: var(--space-1); min-height: 40px; padding: 0 var(--space-3); color: inherit; cursor: pointer;
+  font: 700 var(--fs-1)/1 var(--f-sans); font-variant-numeric: tabular-nums; background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
+}
+.hdr-list[hidden] { display: none; }
+.hdr-list .ic { width: 18px; height: 18px; }
+.mylist {
+  display: none; width: min(92vw, 520px); max-height: min(86dvh, 720px); margin: auto; padding: var(--space-5);
+  color: var(--bone); background: var(--night); border: 1px solid var(--line-strong); border-radius: var(--radius-4);
+}
+.mylist[open] { display: flex; flex-direction: column; gap: var(--space-3); overflow: hidden; }
+.mylist::backdrop { background: color-mix(in srgb, var(--black) 55%, transparent); }
+.ml-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.ml-title { margin: 0; font: 780 var(--fs-5)/1 var(--f-sans); font-stretch: 74%; text-transform: uppercase; }
+.ml-close, .ml-remove {
+  display: grid; place-items: center; flex: none; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer;
+  background: none; border: 1px solid var(--line-strong); border-radius: 50%;
+}
+.ml-close .ic, .ml-remove .ic { width: 20px; height: 20px; rotate: 45deg; }
+.ml-note, .ml-empty { margin: 0; color: var(--bone-dim); font-size: var(--fs-1); }
+.ml-items { flex: 1; min-height: 0; margin: 0; padding: 0; overflow-y: auto; list-style: none; overscroll-behavior: contain; }
+.ml-items[hidden], .ml-empty[hidden] { display: none; }
+.ml-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--line); }
+.ml-text { display: grid; flex: 1; min-width: 0; font-size: var(--fs-1); color: var(--bone-dim); }
+.ml-text strong { color: var(--bone); font: 650 var(--fs-2)/1.25 var(--f-sans); }
+.ml-actions { display: grid; gap: var(--space-2); }
+.ml-actions [hidden] { display: none; }
+@media print { .save, .toast, .hdr-list, .mylist { display: none; } }
+
+/* ---------- Explorar la muestra ----------
+   En escritorio el diálogo queda abierto en línea (no modal). En móvil se abre a pantalla completa (mobile.css). */
+.explore-open, .ex-top { display: none; }
+.explorer { position: static; inset: auto; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; overflow: visible; color: inherit; background: none; border: 0; }
+.explorer:not([open]) { display: none; }
+html.explorer-open { overflow: hidden; }
+

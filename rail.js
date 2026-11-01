@@ -1,6 +1,8 @@
 // Carrusel de libros: una sola pieza para cualquier colección. Hoy muestra la muestra (rotulada);
 // cuando llegue el listado real basta con poner `ids` en assets/data/collections.json.
-import { coverTone, filterBooks, sortBooks, loadSample } from './catalog.js';
+import { coverTone, filterBooks, sortBooks } from './catalog.js';
+import { loadSample } from './sample.js';
+import { saveButton, initSaved } from './saved.js';
 
 export const RAIL_SIZE = 12;
 
@@ -35,7 +37,7 @@ function bookCard(b) {
   btn.setAttribute('aria-haspopup', 'dialog');
   btn.append(cover, make('span', 'card-t', b.t), make('span', 'card-a', b.a));
   const li = make('li', 'rail-item');
-  li.append(btn);
+  li.append(btn, saveButton(b));
   return li;
 }
 
@@ -43,6 +45,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const root = document.querySelector('[data-rail]');
   if (!root || root.dataset.ready) return;
   root.dataset.ready = '1';
+  initSaved();
   const $ = s => root.querySelector(s);
   const track = $('[data-rail-track]');
   const viewport = $('[data-rail-viewport]');

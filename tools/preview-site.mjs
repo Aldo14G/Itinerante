@@ -15,7 +15,7 @@ const types = {
   '.json': 'application/json; charset=utf-8', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2'
 };
 const gz = new Map();
-export const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/mobile.css', '/app.js', '/catalog.js', '/motion.js', '/scenes-desktop.js', '/rail.js', '/Logo.png', '/Logo.webp']);
+export const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/mobile.css', '/app.js', '/catalog.js', '/motion.js', '/scenes-desktop.js', '/rail.js', '/sample.js', '/saved.js', '/Logo.png', '/Logo.webp']);
 const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'";
 export const allowed = path => !/[\\\0]/.test(path) && (PAGES.has(path) || (path.startsWith('/assets/') && !path.endsWith('provenance.json') && !path.endsWith('sources.json') && extname(path) in types && !path.endsWith('.txt')));
 

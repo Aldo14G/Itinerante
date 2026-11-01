@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access, readdir } from 'node:fs/promises';
 import { pickBooks } from '../rail.js';
+import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
 import { coverTone, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
@@ -395,3 +396,48 @@ test('ritmo y movimiento: relleno de secciones con la escala de 4 px y movimient
   assert.ok(/\*:not\(\.progress\)/.test(css), 'la barra de progreso (ligada al scroll) queda fuera');
   assert.ok(!/animation: ping 2\.4s/.test(css), 'sin duraciones sueltas');
 });
+
+test('Mi lista: guardar, quitar, tope y mensaje de WhatsApp informativo', () => {
+  clearSaved();
+  assert.deepEqual(savedIds(), []);
+  assert.deepEqual(toggleSaved('a'), { ok: true, on: true });
+  toggleSaved('b');
+  assert.deepEqual(savedIds(), ['b', 'a'], 'lo más reciente primero');
+  assert.equal(isSaved('a'), true);
+  assert.deepEqual(toggleSaved('a'), { ok: true, on: false });
+  assert.deepEqual(savedIds(), ['b']);
+  clearSaved();
+  for (let i = 0; i < MAX_SAVED; i++) toggleSaved(`id-${i}`);
+  assert.deepEqual(toggleSaved('uno-mas'), { ok: false, on: false, full: true }, 'tope de la lista');
+  assert.equal(savedIds().length, MAX_SAVED);
+  clearSaved();
+  const books = Array.from({ length: 15 }, (_, i) => ({ t: `Título ${i + 1}`, a: i === 0 ? 'Autor no indicado' : `Autora ${i + 1}` }));
+  const msg = listMessage(books);
+  assert.ok(msg.startsWith('Hola, pienso visitarlos pronto.') && msg.includes('1. «Título 1»\n') &&!msg.includes('Autor no indicado'), 'mensaje informativo sin autor genérico');
+  assert.ok(msg.includes('12. «Título 12»') && !msg.includes('13. ') && msg.includes('…y 3 más.'), 'tope de 12 títulos con aviso del resto');
+  assert.ok(!/precio|\$|oferta|reserv|apart/i.test(msg), 'no promete precio ni apartado');
+  const url = new URL(listWaUrl(books));
+  assert.equal(url.origin + url.pathname, 'https://wa.me/528180875940');
+  assert.ok(url.href.length < 2000, 'el enlace cabe en un mensaje');
+});
+
+test('Mi lista y Explorar: marcado accesible, entradas coherentes y publicación', async () => {
+  const dlg = html.match(/<dialog class="mylist"[\s\S]*?<\/dialog>/)[0];
+  assert.ok(/aria-labelledby="mylist-title"/.test(dlg) && /data-ml-close/.test(dlg) && /data-ml-visit href="https:\/\/www\.google\.com\/maps\/dir\//.test(dlg), 'hoja con título, cierre y Cómo llegar');
+  assert.ok(/data-ml-wa[^>]*hidden/.test(dlg) && /data-ml-empty[^>]*hidden/.test(dlg), 'WhatsApp y estado vacío arrancan ocultos');
+  assert.ok(/class="sm-row" type="button" data-open-mylist/.test(html) && /data-saved-count/.test(html) && /class="hdr-list"[^>]*data-saved-badge[^>]*hidden/.test(html), 'entradas desde el menú y la cabecera');
+  assert.ok(/class="save save--wide" data-d-save[^>]*aria-pressed="false"/.test(html), 'la ficha trae su botón de guardar');
+  const ex = html.match(/<dialog class="explorer" id="explorer"[\s\S]*?\n {6}<\/dialog>/)[0];
+  assert.ok(/data-cat-q/.test(ex) && /data-cat-grid/.test(ex) && /data-cat-filters/.test(ex) && /data-ex-close/.test(ex) && /aria-labelledby="explorer-title"/.test(ex), 'el explorador contiene búsqueda, filtros y rejilla');
+  assert.ok(!/id="cat-drawer"/.test(ex), 'la ficha NO va dentro del explorador (un diálogo dentro de otro cerrado no se muestra)');
+  assert.ok(/data-ex-open aria-controls="explorer"/.test(html));
+  assert.ok(/\.explorer:modal \{[^}]*position: fixed; inset: 0/.test(mobileCss) && /html\.explorer-open \{ overflow: hidden; \}/.test(css), 'hoja a pantalla completa y scroll bloqueado');
+  const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+  assert.ok(/history\.pushState\(\{ explorer: 1 \}, '', '#explorar'\)/.test(app) && /addEventListener\('popstate'/.test(app), '«atrás» cierra la hoja');
+  assert.ok(/import\('\.\/saved\.js'\)/.test(app) && !/^import .*saved\.js/m.test(app), 'Mi lista se carga en reposo');
+  const prepare = await readFile(new URL('../scripts/prepare-public.mjs', import.meta.url), 'utf8');
+  const preview = await readFile(new URL('../tools/preview-site.mjs', import.meta.url), 'utf8');
+  for (const f of ['sample.js', 'saved.js', 'rail.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
+  assert.ok(/\.toast \{[^}]*width: max-content/.test(css) && /popover = 'manual'/.test(await readFile(new URL('../saved.js', import.meta.url), 'utf8')), 'el aviso va en la capa superior y no se parte');
+});
+

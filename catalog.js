@@ -1,5 +1,9 @@
 // Catálogo de muestra: búsqueda predictiva, filtros con conteo, rejilla y ficha.
 import { DUR, EASE, ms } from './motion.js';
+import { loadSample } from './sample.js';
+import { saveButton, bindSaveButton, initSaved } from './saved.js';
+
+export { loadSample };
 // La parte pura (sin DOM) se prueba con check.mjs; initCatalog() solo corre en el navegador.
 
 export const PAGE_SIZE = 24;
@@ -109,21 +113,13 @@ export function bookWaUrl(book) {
   return url.href;
 }
 
-// Carga única de la muestra: la comparten el catálogo y el carrusel de libros.
-let samplePromise;
-export function loadSample() {
-  samplePromise ??= fetch('assets/data/catalog.json')
-    .then(res => { if (!res.ok) throw new Error(String(res.status)); return res.json(); })
-    .catch(err => { samplePromise = undefined; throw err; });
-  return samplePromise;
-}
-
 // ---------------------------------------------------------------------------------------------
 export async function initCatalog({ isMotion = () => false } = {}) {
   const $ = (s, el = document) => el.querySelector(s);
   const root = $('#catalogo');
   if (!root || root.dataset.ready) return;
   root.dataset.ready = '1';
+  initSaved();
 
   const status = $('[data-cat-status]', root);
   let data;
@@ -239,7 +235,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       cover(b),
       el('span', { class: 'card-t' }, b.t),
       el('span', { class: 'card-a' }, b.a));
-    return el('li', {}, btn);
+    return el('li', { class: 'card-item' }, btn, saveButton(b));
   }
 
   let results = [];
@@ -397,6 +393,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       relWrap.hidden = !rel.length;
     });
     drawer.dataset.book = id;
+    bindSaveButton($('[data-d-save]', drawer), b);
     if (trigger) drawer.dataset.trigger = trigger;
     if (!drawer.open) { drawer.showModal(); document.documentElement.classList.add('sheet-open'); }
     drawer.scrollTop = 0;
