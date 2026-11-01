@@ -116,8 +116,9 @@ test('polished interaction states remain accessible and recoverable', () => {
 });
 
 test('visual contract uses the Claude editorial palette and motion remains bounded', () => {
+  const tokensCss = readFileSync(join(root, 'assets', 'css', 'tokens.css'), 'utf8');
   for (const token of ['--brand: #5dc4b4', '--brand-deep: #0d4a45', '--brand-ink: #061a18', '--amber: #e8a020']) {
-    assert.match(css, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    assert.match(tokensCss, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), 'la paleta vive en tokens.css (generado desde design/tokens.json)');
   }
   assert.match(css, /"Playfair Display"/);
   assert.match(css, /"Inter"/);

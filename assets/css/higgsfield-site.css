@@ -12,20 +12,9 @@
 
 @layer base {
   :root {
-    --brand: #5dc4b4;
-    --brand-deep: #0d4a45;
-    --brand-ink: #061a18;
-    --brand-light: #9de3da;
-    --amber: #e8a020;
     --turquoise: var(--brand);
-    --turquoise-deep: #3d6660;
     --ink: var(--brand-ink);
-    --status-error: #8a241d;
-    --status-error-light: #f0b3ab;
-    --paper: #fdfcf8;
-    --paper-bright: #ffffff;
     --coral: var(--amber);
-    --line: rgba(93, 196, 180, .2);
     --glass-surface: rgba(245, 241, 232, .14);
     --glass-surface-hover: rgba(245, 241, 232, .22);
     --glass-border: rgba(255, 255, 255, .42);

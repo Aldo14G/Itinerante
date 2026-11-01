@@ -1,0 +1,66 @@
+/* GENERADO por scripts/build-tokens.mjs desde design/tokens.json. No editar a mano. */
+
+:root {
+  /* Color */
+  --brand: #5dc4b4;
+  --brand-deep: #0d4a45;
+  --brand-ink: #061a18;
+  --brand-light: #9de3da;
+  --amber: #e8a020;
+  --turquoise-deep: #3d6660;
+  --status-error: #8a241d;
+  --status-error-light: #f0b3ab;
+  --paper: #fdfcf8;
+  --paper-bright: #ffffff;
+  --line: rgba(93, 196, 180, .2);
+  --black: #000000;
+  --white: #ffffff;
+
+  /* Escala tipográfica */
+  --fs-0: 0.75rem;
+  --fs-1: 0.875rem;
+  --fs-2: 1rem;
+  --fs-3: 1.125rem;
+  --fs-4: 1.375rem;
+  --fs-5: 1.75rem;
+  --fs-6: 2.25rem;
+  --fs-7: 3rem;
+  --fs-body: 1.0625rem;
+
+  /* Espaciado (múltiplos de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* Radios */
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 8px;
+  --radius-4: 16px;
+  --radius-pill: 999px;
+
+  /* Movimiento */
+  --dur-instant: 120ms;
+  --dur-fast: 240ms;
+  --dur-base: 400ms;
+  --dur-slow: 700ms;
+  --dur-scene: 1200ms;
+
+  /* Objetivos y medida */
+  --target-fine: 24px;
+  --target-coarse: 44px;
+  --measure-max: 75ch;
+
+  --hair: 1px;
+}
+
+@media (min-resolution: 2dppx) {
+  :root { --hair: 0.5px; }
+}

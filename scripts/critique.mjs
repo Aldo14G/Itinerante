@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep, dirname, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { renderB4, renderRoot } from './build-tokens.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const tokens = JSON.parse(readFileSync(join(root, 'design/tokens.json'), 'utf8'));
@@ -103,7 +104,7 @@ function staticCss(name, surface) {
           const lit = value.match(/#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?)\([^)]*\)/g);
           if (lit && !/^\s*url\(/.test(value)) lit.forEach(l => add('token-color-literal', at, `${prop}: ${l}`));
         }
-        if (!isTokenFile && isRoot && surface.theme === 'b4' && /^--(night|bone|tungsten|turq|terra|paper|stone|line|field)/.test(prop)) add('token-duplicate', at, prop);
+        if (!isTokenFile && isRoot && prop.startsWith('--') && Object.prototype.hasOwnProperty.call(themeColors, prop.slice(2))) add('token-duplicate', at, prop);
         // Escala tipográfica
         if (prop === 'font-size' || prop === 'font') {
           const sizes = prop === 'font-size' ? (/^-?[\d.]+(?:rem|px)$/.test(bare.trim()) ? [bare.trim().match(/([\d.]+)(rem|px)/)] : []) : [...bare.matchAll(/(?:^|\s)([\d.]+)(rem|px)\s*\//g)];
@@ -144,23 +145,23 @@ function staticCss(name, surface) {
         }
         // Foco
         if ((prop === 'outline' && /^(none|0)$/i.test(value)) || (prop === 'outline-style' && /none/i.test(value))) {
-          if (!/:not\(:focus-visible\)/.test(selector)) add('a11y-focus-removed', at, selector);
+          // Válido si el mismo selector define un estado :focus-visible propio (sombra, borde o contorno).
+          const first = selector.split(',')[0].trim().replace(/^.*\}\s*/, '');
+          const replaced = text.includes(`${first}:focus-visible`);
+          if (!/:not\(:focus-visible\)/.test(selector) && !replaced) add('a11y-focus-removed', at, selector);
         }
       }
     }
 
-    // Deriva del tema del sitio raíz: las variables de :root deben coincidir con tokens.json.
-    if (surface.theme === 'root' && !isTokenFile) {
-      const rootBlock = text.match(/:root\s*\{([^{}]*)\}/);
-      if (rootBlock) {
-        for (const [k, v] of Object.entries(themeColors)) {
-          const found = rootBlock[1].match(new RegExp(`--${k}\\s*:\\s*([^;]+);`));
-          const norm = s => s.replace(/\s+/g, '').toLowerCase();
-          if (!found) findings.push({ rule: 'token-drift', file: rel, line: 1, detail: `--${k} no existe en :root` });
-          else if (norm(found[1]) !== norm(v)) findings.push({ rule: 'token-drift', file: rel, line: lineAt(text, text.indexOf(`--${k}`)), detail: `--${k}: ${found[1].trim()} ≠ ${v}` });
-        }
-      }
-    }
+  }
+  // Deriva: el CSS de tokens generado debe coincidir con design/tokens.json.
+  const generated = surface.dir === 'tests/fixtures/critique-bad' ? null
+    : surface.theme === 'b4' ? ['prototypes/itinerante-b4/tokens.css', renderB4(tokens)]
+    : ['assets/css/tokens.css', renderRoot(tokens)];
+  if (generated) {
+    const file = join(root, generated[0]);
+    const current = existsSync(file) ? readFileSync(file, 'utf8').replace(/\r\n/g, '\n') : '';
+    if (current !== generated[1]) findings.push({ rule: 'token-drift', file: generated[0], line: 1, detail: 'desactualizado: ejecuta npm run tokens' });
   }
   if (usesMotion && !hasReduced) findings.push({ rule: 'motion-no-reduced', file: surface.dir, line: 1, detail: 'sin @media (prefers-reduced-motion)' });
   return findings;
@@ -271,7 +272,7 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
   const text = document.body.innerText;
   const truth = [
     [/\$\s?\d|\bMXN\b|\bUSD\b|\bpesos\b/i, 'precio'],
-    [/\b(en existencia|disponible ahora|últimas piezas|agotad[oa]|stock)\b/i, 'existencia'],
+    [/\b(en existencia|disponibles? en tienda|últimas piezas|agotad[oa]|stock)\b/i, 'existencia'],
     [/\b(oferta|descuento|promoci[oó]n|envío gratis|2x1)\b/i, 'oferta'],
     [/★|\breseñas?\b|\bcalificaci[oó]n\b|\bestrellas\b|\bopiniones\b/i, 'reseñas'],
     [/\b\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b/i, 'fecha'],
