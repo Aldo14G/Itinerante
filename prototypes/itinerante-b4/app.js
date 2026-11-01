@@ -35,10 +35,12 @@ export function waUrl(message) {
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
+let monterreyFormat;
 export function monterreyNow(date = new Date()) {
-  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+  monterreyFormat ??= new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Monterrey', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
-  }).formatToParts(date).map(part => [part.type, part.value]));
+  });
+  const parts = Object.fromEntries(monterreyFormat.formatToParts(date).map(part => [part.type, part.value]));
   return { day: DAYS[parts.weekday], mins: (Number(parts.hour) % 24) * 60 + Number(parts.minute) };
 }
 
@@ -259,10 +261,10 @@ function boot() {
     return {
       enable() { if (!mobile()) load(); if (frames[0]) sec.classList.add('is-live'); },
       measure() {
+        fitWord(word, chars); // escrituras antes que lecturas: evita un segundo layout completo
         top = absTop(sec);
         h = sec.offsetHeight;
-        fitWord(word, chars);
-        if (isMotion()) sizeCanvas();
+        if (isMotion() && !mobile()) sizeCanvas();
       },
       tick(dt, y) {
         if (!isMotion() || mobile()) return false; // en móvil el hero es un póster fijo
@@ -582,7 +584,7 @@ function boot() {
     toggle.textContent = 'Pausar el movimiento';
     toggle.setAttribute('aria-pressed', String(userOff));
   }
-  function applyMode() {
+  function applyMode({ measure = true } = {}) {
     const on = motionOn();
     root.classList.toggle('motion', on);
     root.classList.toggle('pin-house', on && pinMq.matches);
@@ -590,7 +592,7 @@ function boot() {
       root.classList.remove('intro');
       scenes.forEach(s => s.reset && s.reset());
     }
-    measureAll();
+    if (measure) measureAll();
     if (on) scenes.forEach(s => s.enable && s.enable());
     syncToggle();
   }
@@ -645,6 +647,50 @@ function boot() {
     if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); }
   });
   matchMedia('(min-width: 1101px)').addEventListener('change', e => { if (e.matches) setMenu(false); });
+
+  // ---------- Menú móvil (hoja lateral con categorías que se despliegan) ----------
+  (function sheetMenu() {
+    const dlg = $('#sheet-menu');
+    const opener = $('.hdr-more');
+    if (!dlg || !opener) return;
+    const phone = matchMedia('(max-width: 760px)');
+    const groups = $$('.sm-group', dlg);
+    const setGroup = (g, open) => {
+      const btn = $('.sm-row', g), sub = $('.sm-sub', g);
+      btn.setAttribute('aria-expanded', String(open));
+      sub.inert = !open; // fuera del orden de tabulación y del árbol de accesibilidad mientras está plegado
+    };
+    groups.forEach(g => $('.sm-row', g).addEventListener('click', () => {
+      const open = $('.sm-row', g).getAttribute('aria-expanded') !== 'true';
+      groups.forEach(o => setGroup(o, o === g ? open : false)); // acordeón exclusivo: una categoría abierta a la vez
+    }));
+    const close = () => { if (dlg.open) dlg.close(); };
+    opener.addEventListener('click', () => {
+      dlg.showModal();
+      opener.setAttribute('aria-expanded', 'true');
+      root.classList.add('sheet-open');
+      $('[data-sm-close]', dlg).focus({ preventScroll: true });
+    });
+    dlg.addEventListener('close', () => {
+      opener.setAttribute('aria-expanded', 'false');
+      root.classList.remove('sheet-open');
+      groups.forEach(g => setGroup(g, false));
+      opener.focus({ preventScroll: true });
+    });
+    $('[data-sm-close]', dlg).addEventListener('click', close);
+    dlg.addEventListener('click', e => {
+      if (e.target === dlg) return close(); // clic en el fondo
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const topic = link.dataset.topicGo, bill = link.dataset.billGo;
+      holdHeader = performance.now() + 900;
+      dlg.close();
+      if (topic) setTimeout(() => $(`.topic[data-topic="${topic}"]`)?.click(), 350);
+      if (bill !== undefined) setTimeout(() => { const t = $('.bill-track'), card = $$('.bill-item')[Number(bill)]; if (t && card) t.scrollTo({ left: card.offsetLeft - t.firstElementChild.offsetLeft, behavior: isMotion() ? 'smooth' : 'auto' }); }, 350);
+    });
+    phone.addEventListener('change', e => { if (!e.matches) close(); });
+    groups.forEach(g => setGroup(g, false));
+  })();
 
   // ---------- Cartelera ----------
   (function bill() {
@@ -875,21 +921,27 @@ function boot() {
   });
 
   // ---------- Fotos diferidas ----------
-  const markLoaded = img => img.classList.add('is-loaded');
+  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip, .topic-layer, .bill-layer')?.classList.add('is-loaded'); };
   $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
   document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
   document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
 
   // ---------- Start ----------
-  applyMode();
+  applyMode({ measure: false }); // la primera medición va después de fuentes y póster (abajo)
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const posterReady = $('.entry-poster').decode().catch(() => {});
   Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
     entry.fitOnly();
-    fitWord(footMark, footChars);
     measureAll();
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
   });
-  fontsReady.then(() => { fitWord(footMark, footChars); queueMeasure(); });
-  addEventListener('resize', () => fitWord(footMark, footChars));
+  // El nombre gigante del pie solo se ajusta cuando se acerca a la pantalla (cada ajuste fuerza un layout completo).
+  let footFitted = false;
+  const fitFoot = () => { footFitted = true; fitWord(footMark, footChars); };
+  if ('IntersectionObserver' in window) {
+    const footIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { footIo.disconnect(); fitFoot(); } }, { rootMargin: '600px 0px' });
+    footIo.observe(footMark);
+  } else fitFoot();
+  fontsReady.then(() => { if (footFitted) fitFoot(); });
+  addEventListener('resize', () => { if (footFitted) fitFoot(); });
 }

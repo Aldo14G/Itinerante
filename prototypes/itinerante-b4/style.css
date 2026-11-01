@@ -1091,7 +1091,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* ---------- Auditoría Playwright: ficha, buscador, error del catálogo ---------- */
 html { scrollbar-gutter: stable; }
-html:has(dialog.drawer[open]) { overflow: hidden; }
+html.sheet-open { overflow: hidden; }
 .cat-bar input[type="search"]::-webkit-search-cancel-button { filter: opacity(0.7); }
 .cat-error { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 24px; }
 /* En la ficha, la consulta a WhatsApp va antes de la ficha técnica para quedar sobre el pliegue. */
@@ -1105,11 +1105,14 @@ html:has(dialog.drawer[open]) { overflow: hidden; }
 .motion img[loading="lazy"]:not(.is-loaded) { opacity: 0; }
 .motion img.is-loaded[loading="lazy"] { animation: img-in var(--dur-base) var(--ease-out); }
 .motion .still-img::before, .motion .frame-clip::before, .motion .topic-layer::before, .motion .bill-layer::before { animation-iteration-count: infinite; }
-.still-img:has(img.is-loaded)::before, .frame-clip:has(img.is-loaded)::before, .topic-layer:has(img.is-loaded)::before, .bill-layer:has(img.is-loaded)::before { animation: none; opacity: 0; }
+.still-img.is-loaded::before, .frame-clip.is-loaded::before, .topic-layer.is-loaded::before, .bill-layer.is-loaded::before { animation: none; opacity: 0; }
 
 /* Elementos solo móviles: ocultos por defecto (mobile.css los muestra). */
-.tabbar, .hdr-wa, .stories, .drawer-grabber { display: none; }
+.tabbar, .hdr-wa, .hdr-more, .stories, .drawer-grabber { display: none; }
 
 /* Cartelera como carrusel (solo móvil): en escritorio la pista es transparente y las fotos de tarjeta no existen. */
 .bill-track { display: contents; }
 .bill-card-fig, .bill-dots { display: none; }
+
+/* Gama media o baja (boot.js marca data-glass="lite"): sin desenfoque en la cabecera. */
+html[data-glass="lite"] .hdr::before { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--night) 94%, transparent); }

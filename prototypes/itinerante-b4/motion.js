@@ -2,7 +2,13 @@
 // una sola fuente de verdad para CSS y WAAPI. Los valores de respaldo solo se usan si falta el CSS.
 const FALLBACK = { 'dur-instant': 120, 'dur-fast': 240, 'dur-base': 400, 'dur-slow': 700, 'dur-scene': 1200, 'stagger-char': 24, 'stagger-line': 60, 'intent-topic': 250, 'intent-disclosure': 320 };
 
-const token = name => (typeof document === 'undefined' ? '' : getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim());
+const cache = new Map();
+// Los tokens no cambian durante la sesión: se lee el estilo calculado una sola vez por nombre.
+const token = name => {
+  if (typeof document === 'undefined') return '';
+  if (!cache.has(name)) cache.set(name, getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim());
+  return cache.get(name);
+};
 
 /** Milisegundos de un token (--dur-*, --stagger-*, --intent-*). */
 export function ms(name) {

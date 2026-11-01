@@ -210,6 +210,20 @@ test('móvil: barra inferior con una pestaña por sección, iconos en el sprite 
   assert.ok(!/backdrop-filter:[^;]*\n?[^;]*\.entry-canvas/.test(mobileCss));
 });
 
+test('móvil: menú lateral con categorías desplegables accesibles y destinos reales', () => {
+  const dlg = html.match(/<dialog class="sheet-menu"[\s\S]*?<\/dialog>/)[0];
+  assert.ok(/<button class="hdr-more"[^>]*aria-expanded="false"[^>]*aria-controls="sheet-menu"/.test(html), 'botón del menú con aria-expanded y aria-controls');
+  assert.ok(/aria-labelledby="sheet-menu-title"/.test(dlg) && /data-sm-close/.test(dlg), 'diálogo con título y botón de cierre');
+  const rows = [...dlg.matchAll(/<button class="sm-row"[^>]*aria-expanded="false"[^>]*aria-controls="([a-z-]+)"/g)].map(m => m[1]);
+  assert.deepEqual(rows, ['sm-libros', 'sm-eventos', 'sm-horarios', 'sm-visita']);
+  for (const id of rows) assert.ok(new RegExp(`id="${id}" inert`).test(dlg), `${id} plegado e inerte`);
+  for (const m of dlg.matchAll(/href="#([a-z]+)"/g)) assert.ok(html.includes(`id="${m[1]}"`), `destino #${m[1]} inexistente`);
+  for (const m of dlg.matchAll(/data-topic-go="([a-z]+)"/g)) assert.ok(html.includes(`data-topic="${m[1]}"`), `tema ${m[1]} inexistente`);
+  for (const m of dlg.matchAll(/<use href="#(t-[a-z]+)"/g)) assert.ok(html.includes(`<symbol id="${m[1]}"`), `falta el icono ${m[1]}`);
+  assert.ok(/Lunes a s&aacute;bado|Lunes a sábado/.test(dlg) && /Domingo<\/dt><dd>Cerrado/.test(dlg), 'horario real');
+  assert.ok(/grid-template-rows: 0fr/.test(mobileCss) && /min-height: 48px/.test(mobileCss), 'despliegue sin saltos y filas de 48 px');
+});
+
 test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y los puntos coinciden', () => {
   const items = [...html.matchAll(/<details class="bill-item"[\s\S]*?<\/details>/g)].map(m => m[0]);
   assert.equal(items.length, 3);

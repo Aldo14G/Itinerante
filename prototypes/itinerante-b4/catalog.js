@@ -382,7 +382,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     relEl.replaceChildren(...rel.map(r => el('li', {}, el('button', { type: 'button', class: 'rel', 'data-id': r.id }, cover(r), el('span', {}, r.t)))));
     $('[data-d-related-wrap]', drawer).hidden = !rel.length;
     if (trigger) drawer.dataset.trigger = trigger;
-    if (!drawer.open) drawer.showModal();
+    if (!drawer.open) { drawer.showModal(); document.documentElement.classList.add('sheet-open'); }
     drawer.scrollTop = 0;
     $('[data-d-scroll]', drawer).scrollTop = 0;
   }
@@ -420,6 +420,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     drawer.addEventListener('pointercancel', end);
   })();
   drawer.addEventListener('close', () => {
+    document.documentElement.classList.remove('sheet-open');
     const t = drawer.dataset.trigger && grid.querySelector(`.card[data-id="${CSS.escape(drawer.dataset.trigger)}"]`);
     if (t) t.focus({ preventScroll: true });
   });
