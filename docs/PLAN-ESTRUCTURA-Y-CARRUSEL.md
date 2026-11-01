@@ -101,9 +101,11 @@ Es una galería de **71 animaciones, 36 transiciones y sitios 3D completos** con
 4. **Mejora progresiva** — profundidad/inercia solo escritorio. *Salida:* 0 impacto en móvil (misma métrica de la fase 3), reduced-motion respetado.
 5. **Datos reales** — al llegar el listado: colecciones reales, portadas (cuando existan fotos, rotuladas), y poner en `null` los 195 `coverUrl` locales de la API. *Salida:* ningún libro mostrado sin fuente; «Muestra» desaparece solo donde haya inventario verificado.
 
-## 7. Decisiones que necesito de Aldo
+## 7. Decisiones de Aldo (2026-11-01)
 
-1. ¿Fusionamos Libros y Catálogo en un capítulo (recomendado)?
-2. ¿Quién cura la «Selección de la casa» y con qué criterio (una línea por título)?
-3. ¿Existe algún dato real de «lo que más preguntan» (WhatsApp) para llamar a una colección así?
-4. Nombres finales de los cinco capítulos (propuesta: La casa · Cartelera · Libros · Visita, más Inicio).
+1. **Fusionar Libros y Catálogo en un capítulo:** sí (hecho, commit `e29395c`).
+2. **Listado de obras:** lo entregan ellos cuando se actualicen las ediciones y lleguen libros nuevos. Hasta entonces el carrusel usa la muestra, rotulada, y debe poder recibir una lista curada (`ids`) sin tocar código.
+3. **Tráfico a WhatsApp:** es solo informativo; no hay conteo útil de «lo que más preguntan». Ninguna colección se llama «más leídos» ni «lo que más preguntan».
+4. **Objetivo del sitio: que visiten la librería.** La acción primaria de cada pantalla es «Cómo llegar»; WhatsApp es apoyo informativo («confirma que lo tienen»). Pendiente de aplicar a los textos de la ficha y del compositor de consultas.
+
+Pendiente de Aldo: quién cura la «Selección de la casa» cuando llegue el listado, y los nombres finales de capítulos.

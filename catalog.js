@@ -100,13 +100,22 @@ export function relatedBooks(books, book, n = 3) {
 export function bookMessage(book) {
   const by = book.a && book.a !== 'Autor no indicado' ? ` de ${book.a}` : '';
   const isbn = book.n ? ` (ISBN ${book.n})` : '';
-  return `Hola, ¿tienen «${book.t}»${by}${isbn}? Vi el título en su sitio.`;
+  return `Hola, ¿tienen «${book.t}»${by}${isbn}? Vi el título en la muestra de su sitio.`;
 }
 
 export function bookWaUrl(book) {
   const url = new URL(`https://wa.me/${WA_NUMBER}`);
   url.searchParams.set('text', bookMessage(book));
   return url.href;
+}
+
+// Carga única de la muestra: la comparten el catálogo y el carrusel de libros.
+let samplePromise;
+export function loadSample() {
+  samplePromise ??= fetch('assets/data/catalog.json')
+    .then(res => { if (!res.ok) throw new Error(String(res.status)); return res.json(); })
+    .catch(err => { samplePromise = undefined; throw err; });
+  return samplePromise;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -119,9 +128,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   const status = $('[data-cat-status]', root);
   let data;
   try {
-    const res = await fetch('assets/data/catalog.json');
-    if (!res.ok) throw new Error(String(res.status));
-    data = await res.json();
+    data = await loadSample();
   } catch {
     status.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
     root.dataset.state = 'error';
@@ -396,6 +403,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     $('[data-d-scroll]', drawer).scrollTop = 0;
   }
   grid.addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openBook(c.dataset.id, { trigger: c.dataset.id }); });
+  // Otras piezas (el carrusel de libros) piden abrir una ficha sin conocer el diálogo.
+  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; openBook(e.detail.id); } });
   $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
   $('[data-d-close]', drawer).addEventListener('click', () => drawer.close());
   drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });

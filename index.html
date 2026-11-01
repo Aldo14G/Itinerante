@@ -228,6 +228,33 @@
         <h2 id="books-title" class="h2">Elige un tema. <em>Nosotros buscamos el libro</em></h2>
         <p>Elige por dónde empezar y te preparamos la consulta para WhatsApp.</p>
       </div>
+      <!-- Capa 1 de Libros: un vistazo (carrusel). Sin JS no se muestra; la muestra completa sigue más abajo. -->
+      <div class="rail" data-rail aria-labelledby="rail-title">
+        <div class="rail-head">
+          <h3 id="rail-title" class="rail-title h2">Un vistazo a <em>la muestra</em></h3>
+          <p class="rail-note" data-rail-note>Datos de muestra · no es inventario. Pásate a la casa para ver lo que hay hoy.</p>
+          <div class="rail-chips" role="radiogroup" aria-label="Colección" data-rail-chips></div>
+        </div>
+        <div class="rail-viewport" role="region" aria-roledescription="carrusel" aria-label="Libros de la colección" tabindex="0" data-rail-viewport>
+          <ul class="rail-track" data-rail-track aria-busy="true">
+            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></span></li>
+            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></span></li>
+            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></span></li>
+            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></span></li>
+            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="sk-line"></span><span class="sk-line sk-line--s"></span></span></li>
+          </ul>
+        </div>
+        <div class="rail-foot">
+          <div class="rail-progress" aria-hidden="true"><i data-rail-thumb></i></div>
+          <div class="rail-ctrl">
+            <button class="rail-btn" type="button" data-rail-prev aria-label="Libros anteriores"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></button>
+            <button class="rail-btn" type="button" data-rail-next aria-label="Libros siguientes"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></button>
+          </div>
+          <a class="rail-all" href="#catalogo"><span>Ver toda la muestra</span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
+        </div>
+        <p class="sr-only" aria-live="polite" data-rail-live></p>
+      </div>
+
       <div class="books-grid">
         <div class="topics" role="radiogroup" aria-label="Elige un tema de lectura">
           <button type="button" class="topic" role="radio" data-topic="narrativa" aria-checked="true" tabindex="0">Narrativa</button>
@@ -327,9 +354,12 @@
           <p class="drawer-author" data-d-author></p>
           <dl class="drawer-facts" data-d-facts></dl>
           <div class="drawer-ask">
-            <p class="drawer-msg-label">Tu mensaje</p>
+            <p class="drawer-msg-label">Pásate a verlo</p>
+            <p class="drawer-visit">Mariano Matamoros Pte. 421, Centro. La librería confirma si lo tienen y el precio.</p>
+            <a class="btn btn--tungsten" data-d-visit href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+            <p class="drawer-msg-label">¿Prefieres confirmar antes?</p>
             <p class="drawer-msg" data-d-msg></p>
-            <a class="btn btn--tungsten" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Preguntar si lo tienen</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+            <a class="btn btn--line-ink" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Preguntar si lo tienen</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
             <p class="drawer-note">No es inventario: la librería confirma existencia y precio.</p>
           </div>
           <div class="drawer-related" data-d-related-wrap>

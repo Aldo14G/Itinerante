@@ -745,18 +745,31 @@ function boot() {
   // ---------- Catálogo de muestra (carga al acercarse) ----------
   const catalogSection = $('#catalogo');
   if (catalogSection) {
-    const bootCatalog = () => import('./catalog.js').then(m => m.initCatalog({ isMotion })).catch(() => {
+    // Una sola promesa: el catálogo y el carrusel esperan lo mismo (la ficha existe cuando resuelve).
+    let catalogReady;
+    const bootCatalog = () => (catalogReady ??= import('./catalog.js').then(m => m.initCatalog({ isMotion })).catch(() => {
+      catalogReady = undefined;
       const st = $('[data-cat-status]', catalogSection);
       if (st) st.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
       $('[data-cat-grid]', catalogSection)?.replaceChildren();
       $('[data-cat-grid]', catalogSection)?.removeAttribute('aria-busy');
       $('[data-cat-filters]', catalogSection)?.replaceChildren();
-    });
+    }));
     if ('IntersectionObserver' in window) {
       const catIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { catIo.disconnect(); bootCatalog(); } }, { rootMargin: '900px 0px' });
       catIo.observe(catalogSection);
     } else bootCatalog();
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
+
+    // Carrusel de libros (capa 1 de Libros): se carga al acercarse y pide la ficha al catálogo al elegir un libro.
+    const railEl = $('[data-rail]');
+    if (railEl) {
+      const bootRail = () => import('./rail.js').then(m => m.initRail({ ensureCatalog: bootCatalog, isMotion })).catch(() => { railEl.hidden = true; });
+      if ('IntersectionObserver' in window) {
+        const railIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { railIo.disconnect(); bootRail(); } }, { rootMargin: '700px 0px' });
+        railIo.observe(railEl);
+      } else bootRail();
+    }
   }
 
   // ---------- Magnetic buttons ----------

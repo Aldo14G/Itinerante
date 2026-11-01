@@ -198,3 +198,12 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 
 /* Esqueletos estáticos en móvil: el destello infinito de fotos que nunca cargan (diferidas) mantenía un recálculo de estilo por fotograma. */
 .sk-line::before, .card--sk .cover::before, .still-img::before, .frame-clip::before, .topic-layer::before, .bill-layer::before { animation: none !important; }
+
+/* Carrusel de libros: 2.3 tarjetas por vista para que se note que sigue. */
+.rail-item { flex-basis: 42vw; }
+.rail-track { --rail-gap: var(--space-3); }
+.rail-chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter); scroll-padding-inline: var(--gutter); scrollbar-width: none; }
+.rail-chips::-webkit-scrollbar { display: none; }
+.rail-chip { flex: none; background: var(--glass-chip); border-color: var(--glass-edge); }
+.rail-chip[aria-checked="true"] { background: var(--bone); border-color: transparent; }
+

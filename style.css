@@ -793,9 +793,10 @@ p { text-wrap: pretty; }
 .drawer-facts dt, .drawer-facts dd { margin: 0; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, var(--paper-ink) 16%, transparent); }
 .drawer-facts dt { font: 760 var(--fs-0)/1.5 var(--f-sans); letter-spacing: 0.09em; text-transform: uppercase; color: var(--paper-dim); }
 .drawer-facts dd { font-weight: 560; font-variant-numeric: tabular-nums; }
-.drawer-ask { display: grid; gap: 12px; justify-items: start; margin-top: 20px; padding: 20px; background: var(--bone); border-radius: var(--radius-2); }
+.drawer-ask { display: grid; gap: 12px; justify-items: start; margin-top: 20px; padding: 20px; background: color-mix(in srgb, var(--white) 72%, var(--paper)); border-radius: var(--radius-2); }
 .drawer-msg-label { margin: 0; font: 750 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-dim); }
 .drawer-msg { margin: 0; font: 520 var(--fs-2)/1.45 var(--f-sans); }
+.drawer-visit { margin: 0; font: 520 var(--fs-1)/1.45 var(--f-sans); }
 .drawer-note { margin: 0; font-size: var(--fs-1); color: var(--paper-dim); }
 .drawer-related { margin-top: 20px; }
 .drawer-related h4 { margin: 0 0 12px; font: 780 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-dim); }
@@ -1134,4 +1135,47 @@ html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cov
   .progress { animation: progress-fill linear both; animation-timeline: scroll(root block); }
 }
 @keyframes progress-fill { to { transform: scaleX(1); } }
+
+/* ---------- Carrusel de libros (capa 1 de Libros) ----------
+   Lista horizontal con snap: sin autoplay, con el borde de la siguiente tarjeta a la vista. Las flechas solo con puntero fino. */
+.rail { --rail-gap: var(--space-4); margin-bottom: clamp(56px, 9vh, 112px); }
+.rail[hidden], html:not(.js) .rail { display: none; }
+.rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
+.rail-title.h2 { margin: 0; font-size: clamp(2rem, 4.4vw, 3.6rem); }
+.rail-note { margin: 0; max-width: 56ch; color: var(--bone-dim); font-size: var(--fs-1); }
+.rail-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.rail-chip {
+  min-height: var(--target-coarse); padding: 0 var(--space-4); color: inherit; cursor: pointer;
+  font: 650 var(--fs-1)/1 var(--f-sans); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast);
+}
+.rail-chip[aria-checked="true"] { color: var(--night); background: var(--bone); border-color: transparent; }
+.rail-viewport {
+  margin-inline: calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) var(--space-4);
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none;
+}
+.rail-viewport::-webkit-scrollbar { display: none; }
+.rail-viewport:focus-visible { outline-offset: -4px; }
+.rail-track { display: flex; gap: var(--rail-gap); margin: 0; padding: 0; list-style: none; }
+.rail-item { flex: 0 0 clamp(148px, 17vw, 210px); scroll-snap-align: start; }
+.rail-item .card { content-visibility: visible; }
+.rail-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.rail-progress { position: relative; flex: 1 1 120px; height: 3px; overflow: hidden; background: var(--line); border-radius: var(--radius-pill); }
+.rail-progress i { position: absolute; inset: 0 auto 0 0; width: 30%; background: var(--bone); border-radius: inherit; }
+.rail-ctrl { display: none; gap: var(--space-2); }
+@media (hover: hover) and (pointer: fine) { .rail-ctrl { display: flex; } }
+.rail-btn {
+  display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer;
+  background: none; border: 1px solid var(--line-strong); border-radius: 50%;
+  transition: background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast);
+}
+.rail-btn .ic { width: 20px; height: 20px; }
+.rail-btn[data-rail-prev] .ic { rotate: 90deg; }
+.rail-btn[data-rail-next] .ic { rotate: -90deg; }
+.rail-btn:hover:not(:disabled) { background: var(--glass-chip); }
+.rail-btn:disabled { opacity: 0.4; cursor: default; }
+.rail-all { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-coarse); margin-inline-start: auto; font: 650 var(--fs-1)/1 var(--f-sans); text-decoration: none; }
+.rail-all .ic { width: 18px; height: 18px; }
+.rail.is-static .rail-progress, .rail.is-static .rail-ctrl { display: none; }
+@media print { .rail { display: none; } }
 

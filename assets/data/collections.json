@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "kind": "sample",
+    "label": "Datos de muestra · no es inventario",
+    "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado."
+  },
+  "collections": [
+    { "id": "ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles, de muestra.", "filtro": { "g": ["fiction-science-fiction"] } },
+    { "id": "suspenso", "titulo": "Suspenso", "nota": "Para leer sin soltarlo, de muestra.", "filtro": { "g": ["fiction-psychological-thriller"] } },
+    { "id": "novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela, de muestra.", "filtro": { "g": ["fiction-historical-fiction"] } },
+    { "id": "memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona, de muestra.", "filtro": { "g": ["non-fiction-memoir"] } }
+  ]
+}

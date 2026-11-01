@@ -126,6 +126,8 @@ La anchura es también movimiento: el tema activo de Libros pasa de 62 % a 80 % 
 
 ## Catálogo de muestra
 
+**Carrusel de libros (capa 1 de Libros, `rail.js`):** lista horizontal con `scroll-snap-type: x mandatory`, sin autoplay; 2.3 tarjetas por vista en móvil (se asoma la siguiente) y 5 en escritorio; barra de progreso, flechas ≥ 44 px solo con puntero fino, teclado (Tab y flechas), `role="region"` + `aria-roledescription="carrusel"`, chips de colección como `radiogroup`. Tarjetas = portada tipográfica + título + autor; abren la ficha del catálogo. Colecciones en `assets/data/collections.json`: hoy filtros sobre la muestra (rotulada); con el listado real, `ids` curados. Ninguna colección se llama «más leídos» (no hay datos).
+
 Capa 3 del capítulo Libros (`#catalogo`, región con `<h3>` dentro de `#libros`, tono `light` sobre el `sand` del capítulo; desde 2026-11-01 Libros y Catálogo son un solo capítulo: temas y consulta → muestra completa). Datos: `assets/data/catalog.json` (500 registros de prueba, sin precios ni existencias; JSON estático, no consulta `/api/catalog`), rotulados con un sello terracota «Datos de muestra · no es inventario».
 
 - **Búsqueda:** combobox ARIA con sugerencias por autor, título, ISBN y editorial, sin acentos ni mayúsculas. El resultado se filtra mientras se escribe.

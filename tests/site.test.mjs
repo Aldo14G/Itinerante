@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access, readdir } from 'node:fs/promises';
+import { pickBooks } from '../rail.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
 import { coverTone, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
@@ -331,5 +332,37 @@ test('progreso de lectura: barra fija decorativa, ligada al scroll y sin JS', ()
   assert.ok(/@supports \(animation-timeline: scroll\(\)\)[\s\S]{0,120}animation-timeline: scroll\(root block\)/.test(css), 'animación ligada al scroll con detección de soporte');
   assert.ok(/\.progress \{[^}]*transform: scaleX\(0\)/.test(css), 'sin soporte la barra queda en cero');
   assert.ok(/@keyframes progress-fill/.test(css));
+});
+
+test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimentado por colecciones', async () => {
+  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  assert.ok(/data-rail-viewport[^>]*role="region"[^>]*aria-roledescription="carrusel"/.test(rail) || /role="region" aria-roledescription="carrusel"[^>]*data-rail-viewport/.test(rail), 'región con rol de carrusel');
+  assert.ok(/tabindex="0"/.test(rail) && /aria-label="Libros anteriores"/.test(rail) && /aria-label="Libros siguientes"/.test(rail), 'foco y botones con nombre');
+  assert.ok(/aria-live="polite" data-rail-live/.test(rail), 'aviso al cambiar de colección');
+  assert.ok(/html:not\(\.js\) \.rail \{?[^}]*display: none|\.rail\[hidden\], html:not\(\.js\) \.rail \{ display: none; \}/.test(css), 'sin JS no se muestra');
+  assert.ok(/scroll-snap-type: x mandatory/.test(css) && !/rail[^{]*\{[^}]*animation/.test(css), 'snap y sin animación automática');
+  assert.ok(/\(hover: hover\) and \(pointer: fine\) \{ \.rail-ctrl \{ display: flex; \}/.test(css), 'flechas solo con puntero fino');
+  const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+  assert.ok(/import\('\.\/rail\.js'\)/.test(app) && !/^import .*rail\.js/m.test(app), 'se carga bajo demanda');
+  const cols = JSON.parse(await readFile(new URL('../assets/data/collections.json', import.meta.url), 'utf8'));
+  const sample = JSON.parse(await readFile(new URL('../assets/data/catalog.json', import.meta.url), 'utf8'));
+  assert.equal(cols.meta.kind, 'sample');
+  for (const c of cols.collections) {
+    const list = pickBooks(sample.books, c);
+    assert.ok(list.length > 0 && list.length <= 12, `${c.id}: entre 1 y 12 libros`);
+    assert.deepEqual(list.map(b => b.t), [...list.map(b => b.t)].sort((a, b) => a.localeCompare(b, 'es')), `${c.id}: orden determinista por título`);
+  }
+  const ids = [sample.books[7].id, sample.books[3].id, 'no-existe', sample.books[9].id];
+  assert.deepEqual(pickBooks(sample.books, { ids }).map(b => b.id), [ids[0], ids[1], ids[3]], 'una lista curada respeta el orden y omite lo que no existe');
+  assert.equal(pickBooks(sample.books, { ids: sample.books.map(b => b.id) }).length, 12, 'tope de 12');
+});
+
+test('ficha: «Cómo llegar» es la acción primaria, WhatsApp confirma, y el recuadro es legible en el tono claro', () => {
+  const ask = html.match(/<div class="drawer-ask">[\s\S]*?<\/div>/)[0];
+  assert.ok(ask.indexOf('data-d-visit') > -1 && ask.indexOf('data-d-visit') < ask.indexOf('data-d-cta'), 'la visita va antes que WhatsApp');
+  assert.ok(/data-d-visit href="https:\/\/www\.google\.com\/maps\/dir\//.test(ask) && /btn btn--tungsten" data-d-visit/.test(ask), 'visita como botón principal');
+  assert.ok(/btn btn--line-ink" data-d-cta/.test(ask), 'WhatsApp como acción secundaria');
+  assert.ok(/\.drawer-ask \{[^}]*background: color-mix\(in srgb, var\(--white\)/.test(css), 'fondo claro propio: no hereda --bone, que en el tono claro es tinta');
+  assert.ok(/Vi el título en la muestra de su sitio/.test(bookMessage({ t: 'X', a: 'Y' })), 'el mensaje no afirma que el libro esté en el sitio como inventario');
 });
 
