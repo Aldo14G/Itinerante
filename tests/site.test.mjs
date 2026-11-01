@@ -148,7 +148,7 @@ test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
 });
 
 test('curaduría: los textos de navegación traen pista y los esqueletos ocupan el lugar', () => {
-  assert.equal([...html.matchAll(/<a href="#[a-z]+" data-hint="[^"]+"><span>/g)].length, 5);
+  assert.equal([...html.matchAll(/<a href="#[a-z]+" data-hint="[^"]+"><span>/g)].length, 4);
   assert.equal([...html.matchAll(/class="card card--sk"/g)].length, 12);
   assert.ok(/data-cat-grid aria-busy="true"/.test(html));
   assert.ok(/\.card--sk/.test(css) && /@keyframes sk-sweep/.test(css));
@@ -203,7 +203,7 @@ test('portadas: una sola familia visual, con el tono por categoría y género', 
 test('móvil: barra inferior con una pestaña por sección, iconos en el sprite y hoja de estilos solo móvil', () => {
   const nav = html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0];
   const hrefs = [...nav.matchAll(/href="#([a-z]+)"/g)].map(m => m[1]);
-  assert.deepEqual(hrefs, ['casa', 'cartelera', 'libros', 'catalogo', 'visita']);
+  assert.deepEqual(hrefs, ['casa', 'cartelera', 'libros', 'visita']);
   for (const m of nav.matchAll(/<use href="#(t-[a-z]+)"/g)) assert.ok(html.includes(`<symbol id="${m[1]}"`), `falta el icono ${m[1]}`);
   assert.ok(/<link rel="stylesheet" href="mobile\.css" media="\(max-width: 760px\)">/.test(html));
   assert.ok(/aria-label="Secciones"/.test(nav) && !/role="tablist"/.test(nav), 'navegación por anclas, no tablist');
@@ -238,8 +238,8 @@ test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y 
 test('tonos claros: las secciones de lectura usan cal y el pie ladrillo, con contraste suficiente', async () => {
   const expected = { 'id="inicio"': 'light', 'class="manifesto"': 'light', 'id="casa"': 'sand', 'id="libros"': 'sand', 'id="catalogo"': 'light' };
   for (const [sel, tone] of Object.entries(expected)) {
-    const tag = html.match(new RegExp(`<section[^>]*${sel}[^>]*>`))[0];
-    assert.ok(tag.includes(`data-tone="${tone}"`) && /data-theme="paper"/.test(tag), `${sel} sin tono ${tone}`);
+    const tag = html.match(new RegExp(`<(?:section|div)[^>]*${sel}[^>]*>`))[0];
+    assert.ok(tag.includes(`data-tone="${tone}"`) && (sel === 'id="catalogo"' || /data-theme="paper"/.test(tag)), `${sel} sin tono ${tone}`);
   }
   assert.ok(/<footer class="ftr" data-tone="brick">/.test(html));
   const lum = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
@@ -308,3 +308,21 @@ test('servidor de vista previa: lista de permitidos del sitio, sin código, prue
     assert.equal(res.headers.get('content-encoding'), 'gzip', 'comprime el texto como Cloudflare');
   } finally { server.closeAllConnections(); await new Promise(r => server.close(r)); }
 });
+
+test('Libros y Catálogo son un solo capítulo: tres capas, un punto de entrada y los mismos nombres en toda la navegación', () => {
+  const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
+  assert.ok(libros.includes('data-topic="narrativa"') && libros.includes('data-composer'), 'capa de temas y consulta dentro de Libros');
+  assert.ok(/<div id="catalogo" class="cat"[^>]*role="region"[^>]*aria-labelledby="cat-title"/.test(libros), 'el catálogo es una región dentro de Libros');
+  assert.ok(/<h3 id="cat-title"/.test(libros), 'jerarquía: h2 del capítulo y h3 de la muestra');
+  assert.equal([...html.matchAll(/<section[^>]*id="catalogo"/g)].length, 0, 'no queda una sección de Catálogo aparte');
+  assert.ok(html.indexOf('class="quote') > html.indexOf('id="catalogo"'), 'la cita va después del capítulo, no lo parte');
+  const names = block => [...block.matchAll(/href="#([a-z]+)"/g)].map(m => m[1]).filter(id => ['casa', 'cartelera', 'libros', 'visita', 'catalogo'].includes(id));
+  const desktopNav = html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0];
+  const phoneMenu = html.match(/<div class="menu" id="menu"[\s\S]*?<\/nav>/)[0];
+  const tabbar = html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0];
+  for (const [name, block] of [['cabecera', desktopNav], ['menú', phoneMenu], ['barra inferior', tabbar]]) {
+    assert.deepEqual(names(block), ['casa', 'cartelera', 'libros', 'visita'], `${name}: cuatro capítulos con los mismos nombres`);
+  }
+  assert.ok(/class="sm-link" href="#catalogo">Buscar en la muestra/.test(html), 'el menú lateral llega a la muestra desde Libros');
+});
+

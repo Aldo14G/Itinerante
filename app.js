@@ -519,7 +519,7 @@ function boot() {
       root.classList.remove('sheet-open');
       groups.forEach(g => setGroup(g, false));
       if (landing) { // la navegación lleva el foco al título de la sección, no de vuelta al botón
-        const h = $('h1, h2', landing) || landing;
+        const h = $('h1, h2, h3', landing) || landing;
         h.tabIndex = -1;
         h.focus({ preventScroll: true });
         landing = null;

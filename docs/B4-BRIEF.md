@@ -31,6 +31,6 @@ Encargo de Aldo: la mayoría de la gente verá el sitio en el teléfono, así qu
 
 - **Se conserva** en escritorio todo el recorrido cinematográfico.
 - **En móvil se reemplaza** el recorrido de fotogramas por un póster fijo (1 petición en lugar de 73, 1.0 MB menos), sin cortinilla ajedrezada. `app.js` no descarga `scenes-desktop.js` (recorrido y cortinilla) con ≤ 760 px.
-- **Capa de controles** (única con vidrio): barra inferior de cinco pestañas, icono de WhatsApp en la cabecera, hoja de la ficha. Nunca sobre el contenido ni sobre el canvas.
+- **Capa de controles** (única con vidrio): barra inferior de cuatro pestañas, icono de WhatsApp en la cabecera, hoja de la ficha. Nunca sobre el contenido ni sobre el canvas.
 - Investigación y receta: ver DESIGN.md → «Móvil».
 - Rendimiento móvil: `content-visibility: auto` solo en `.call` y `.visit`; esqueletos estáticos (sin destello) y vidrio sólido en gama media o baja.

@@ -466,7 +466,9 @@ p { text-wrap: pretty; }
 
 /* ---------- Libros ---------- */
 
-.books { background: var(--night); padding: clamp(110px, 16vh, 190px) var(--gutter) clamp(96px, 14vh, 160px); }
+.books { background: var(--night); padding: clamp(110px, 16vh, 190px) var(--gutter) 0; }
+/* Capa 3 del capítulo: la muestra completa ocupa todo el ancho dentro de Libros. */
+.books > .cat { margin: clamp(80px, 12vh, 150px) calc(-1 * var(--gutter)) 0; }
 .books-head { display: grid; justify-items: end; gap: 24px; margin-bottom: clamp(44px, 7vh, 88px); text-align: right; }
 .books-head .h2 { max-width: 14ch; }
 .books-head p { margin: 0; max-width: 46ch; color: var(--bone-dim); font-size: var(--fs-body); }

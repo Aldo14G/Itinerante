@@ -36,7 +36,7 @@ El sitio no tiene paso de build: los archivos de la raíz se sirven tal cual. Lo
 
 ## Coding Style & Naming Conventions
 
-Usa 2 espacios en HTML, CSS y JavaScript. Copy en español salvo secciones bilingües intencionales. Secciones semánticas con `id` descriptivo (`#casa`, `#cartelera`, `#libros`, `#catalogo`, `#visita`).
+Usa 2 espacios en HTML, CSS y JavaScript. Copy en español salvo secciones bilingües intencionales. Secciones semánticas con `id` descriptivo (`#casa`, `#cartelera`, `#libros`, `#visita`; `#catalogo` es la capa «Explora la muestra» dentro de `#libros`).
 
 Las variables de color, tipografía, espaciado y movimiento salen de `design/tokens.json`; edita ahí y corre `npm run tokens`. No escribas milisegundos a mano en JS: usa `motion.js`. Reutiliza los tonos (`data-tone="light|sand|brick"`) antes de añadir colores. Estilos críticos de layout, tipografía y estado van en CSS local; no reintroduzcas Tailwind CDN, SDKs de Higgsfield ni dependencias externas en runtime.
 
