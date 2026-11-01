@@ -171,3 +171,11 @@ test('tokens: el CSS generado está al día y style.css no redeclara colores en 
   assert.ok(!/:root\s*\{[^}]*--(night|bone|tungsten|turq|terra|paper)/.test(css), 'colores solo en tokens.css');
   assert.match(tokensCss, /GENERADO por scripts\/build-tokens\.mjs/);
 });
+
+test('referencia SP: fila «Ver los N resultados» en la búsqueda y documento de la extracción', async () => {
+  const catalogSrc = await readFile(here('./catalog.js'), 'utf8');
+  assert.ok(/sg-all/.test(catalogSrc) && /Ver los \$\{total\} resultados/.test(catalogSrc));
+  assert.ok(/\.sg-all/.test(css));
+  const doc = await readFile(new URL('../../docs/REFERENCIA-SP-CATALOGO.md', import.meta.url), 'utf8');
+  assert.match(doc, /No se importa ningún dato/);
+});

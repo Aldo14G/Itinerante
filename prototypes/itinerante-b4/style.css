@@ -715,6 +715,7 @@ p { text-wrap: pretty; }
 .cat-suggest[hidden] { display: none; }
 .cat-suggest li { display: flex; align-items: baseline; gap: 12px; padding: 11px 12px; border-radius: var(--radius-2); cursor: pointer; font-weight: 560; }
 .cat-suggest li[aria-selected="true"], .cat-suggest li:hover { background: var(--tungsten); color: var(--night); }
+.cat-suggest .sg-all { justify-content: space-between; margin-top: var(--space-1); border-top: var(--hair) solid var(--line-strong); border-radius: 0 0 var(--radius-2) var(--radius-2); font-weight: 700; }
 .sg-k { flex: none; min-width: 5.4em; font: 760 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
 .cat-sort select, .cat-filters-btn {
   min-height: 48px; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 999px;
@@ -918,7 +919,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .card-a { display: block; position: relative; overflow: hidden; }
 @media (hover: hover) {
   .card-a::after {
-    content: "Ver ficha →"; content: "Ver ficha →" / ""; position: absolute; inset: 0; background: var(--night);
+    content: "Ver ficha"; content: "Ver ficha" / ""; position: absolute; inset: 0; background: var(--night);
     color: var(--tungsten); font-weight: 650; translate: 0 100%; transition: translate var(--dur-base) var(--ease-out);
   }
   .card:hover .card-a::after, .card:focus-visible .card-a::after { translate: 0 0; }

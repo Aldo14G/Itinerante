@@ -254,18 +254,24 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   function renderSuggest() {
     const items = suggest(books, input.value);
     if (!items.length) { closeSuggest(); return; }
-    list.replaceChildren(...items.map((s, i) => el('li', { role: 'option', id: `cat-s-${i}`, 'data-text': s.text, 'aria-selected': 'false' }, el('span', { class: 'sg-k' }, s.kind), ` ${s.text}`)));
+    const q = input.value.trim();
+    const total = filterBooks(books, { q }).length;
+    const rows = items.map((s, i) => el('li', { role: 'option', id: `cat-s-${i}`, 'data-text': s.text, 'aria-selected': 'false' }, el('span', { class: 'sg-k' }, s.kind), ` ${s.text}`));
+    // Patrón de referencia (buscador de SP): una última fila que lleva a todos los resultados.
+    if (total > items.length) rows.push(el('li', { role: 'option', id: 'cat-s-all', class: 'sg-all', 'data-text': q, 'data-all': '1', 'aria-selected': 'false' }, `Ver los ${total} resultados`));
+    list.replaceChildren(...rows);
     list.hidden = false;
     input.setAttribute('aria-expanded', 'true');
     active = -1;
   }
-  function pick(text) {
+  function pick(text, { all = false } = {}) {
     input.value = text;
     state.q = text;
     if (state.sort === 'az') state.sort = 'rel';
     sortEl.value = state.sort;
     closeSuggest();
     refresh();
+    if (all) status.scrollIntoView({ block: 'center', behavior: isMotion() ? 'smooth' : 'auto' });
   }
   input.addEventListener('input', () => {
     renderSuggest();
@@ -284,10 +290,10 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       input.setAttribute('aria-activedescendant', opts[active].id);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (active >= 0 && opts[active]) pick(opts[active].dataset.text); else closeSuggest();
+      if (active >= 0 && opts[active]) pick(opts[active].dataset.text, { all: !!opts[active].dataset.all }); else closeSuggest();
     } else if (e.key === 'Escape' && !list.hidden) { e.preventDefault(); closeSuggest(); }
   });
-  list.addEventListener('pointerdown', e => { const li = e.target.closest('li'); if (li) { e.preventDefault(); pick(li.dataset.text); } });
+  list.addEventListener('pointerdown', e => { const li = e.target.closest('li'); if (li) { e.preventDefault(); pick(li.dataset.text, { all: !!li.dataset.all }); } });
   input.addEventListener('blur', () => setTimeout(closeSuggest, 120));
   $('[data-cat-form]', root).addEventListener('submit', e => { e.preventDefault(); closeSuggest(); });
 

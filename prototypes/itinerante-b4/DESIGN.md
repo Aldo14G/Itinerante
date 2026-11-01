@@ -126,7 +126,7 @@ Todo texto que se puede señalar cambia de estado con el cursor y con el foco de
 - **La casa:** en la tira fijada, solo el cuarto central (`.is-center`) o el que está bajo el cursor muestra su frase; la etiqueta de procedencia siempre visible.
 - **Cartelera:** pasar el cursor abre el detalle (al detenerse 320 ms) y cambia el escenario.
 - **Libros:** pasar el cursor activa el tema (al detenerse 250 ms, solo ratón, sin anunciar en la región viva); clic, flechas y toque siguen igual. Las seis fotos se precargan al primer gesto sobre la lista.
-- **Tarjetas del catálogo:** al señalar, el renglón del autor cede su lugar a «Ver ficha →».
+- **Tarjetas del catálogo:** al señalar, el renglón del autor cede su lugar a «Ver ficha».
 
 ## Esqueletos
 
