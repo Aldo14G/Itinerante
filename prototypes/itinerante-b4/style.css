@@ -596,7 +596,7 @@ p { text-wrap: pretty; }
 .ftr-brand span { font-weight: 500; color: var(--bone-dim); font-size: var(--fs-1); }
 .ftr-links { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; padding: 0; list-style: none; }
 .motion-btn {
-  min-height: 42px; padding: 0 16px;
+  min-height: var(--target-coarse); padding: 0 16px;
   border: 1px solid var(--line-strong); border-radius: 999px;
   background: none; color: var(--bone); font: 620 var(--fs-1)/1 var(--f-sans); cursor: pointer;
   transition: border-color var(--dur-fast), background-color var(--dur-fast);
@@ -1048,3 +1048,9 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
   .rx::before, .rx::after, .hours :is(th, td), .btn--ghost::before, .btn--line::before, .btn--line-ink::before { transition-duration: 0.01ms; }
 }
 @media print { .rx::before, .rx::after, .btn::before { display: none; } }
+
+/* Las cruces de registro de la Visita no deben salirse del ancho de la pantalla. */
+@media (max-width: 760px) {
+  .visit-side.rx::before { top: -24px; left: 0; }
+  .visit-side.rx::after { right: 0; bottom: -24px; }
+}

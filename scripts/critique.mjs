@@ -189,7 +189,7 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
   const add = (rule, el, detail) => out.push({ rule, sel: sel(el), detail });
   const visible = el => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
   const hiddenTree = el => !!el.closest('[aria-hidden="true"], .sr-only, [hidden], script, style, noscript, svg');
-  const parse = s => { const m = s.match(/[\d.]+/g); if (!m) return [0, 0, 0, 0]; return [+m[0], +m[1], +m[2], m[3] === undefined ? 1 : +m[3]]; };
+  const parse = s => { const m = s.match(/[\d.]+/g); if (!m) return [0, 0, 0, 0]; const k = /^color\(/.test(s) ? 255 : 1; const a = s.includes('/') ? +m[m.length - 1] : (m[3] === undefined ? 1 : +m[3]); return [+m[0] * k, +m[1] * k, +m[2] * k, k === 255 ? (s.includes('/') ? a : 1) : a]; };
   const over = (top, under) => { const a = top[3]; return [top[0] * a + under[0] * (1 - a), top[1] * a + under[1] * (1 - a), top[2] * a + under[2] * (1 - a), 1]; };
   const lum = ([r, g, b]) => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
   const ratio = (a, b) => { const l1 = lum(a), l2 = lum(b); return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); };
@@ -329,6 +329,7 @@ async function auditInBrowser(name, surface) {
     for (const vp of [{ label: 'escritorio', w: 1440, h: 900, coarse: false }, { label: 'móvil', w: 390, h: 844, coarse: true }]) {
       problems = [];
       await send('Emulation.setDeviceMetricsOverride', { width: vp.w, height: vp.h, deviceScaleFactor: 1, mobile: vp.coarse });
+      await send('Emulation.setTouchEmulationEnabled', { enabled: vp.coarse, maxTouchPoints: vp.coarse ? 5 : 1 });
       await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
       await send('Page.navigate', { url: `http://127.0.0.1:${port}/${surface.html}` });
       await sleep(2500);
@@ -336,6 +337,13 @@ async function auditInBrowser(name, surface) {
       await ev(`(async()=>{const h=document.documentElement.scrollHeight; for(let y=0;y<h;y+=Math.max(300,innerHeight*0.8)){scrollTo(0,y); await new Promise(r=>setTimeout(r,120));} scrollTo(0,0); await new Promise(r=>setTimeout(r,500)); return 1})()`);
       const raw = await ev(PAGE_AUDIT({ coarse: vp.coarse, labels: surface.labels, target: tokens.scales.target, measure: tokens.scales.measure, contrast: tokens.scales.contrast }));
       (raw || []).forEach(f => findings.push({ ...f, viewport: vp.label }));
+      // Segunda pasada con movimiento activo: las transformaciones de las escenas también pueden desbordar la página.
+      await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
+      await send('Page.navigate', { url: `http://127.0.0.1:${port}/${surface.html}` });
+      await sleep(2500);
+      await ev(`(async()=>{const h=document.documentElement.scrollHeight; for(let y=0;y<h;y+=Math.max(300,innerHeight*0.8)){scrollTo(0,y); await new Promise(r=>setTimeout(r,100));} await new Promise(r=>setTimeout(r,500)); return 1})()`);
+      const motionWidth = await ev('document.documentElement.scrollWidth - innerWidth');
+      if (motionWidth > 1) findings.push({ rule: 'a11y-overflow', sel: 'document', detail: `${motionWidth}px de desborde con movimiento activo`, viewport: vp.label });
       problems.forEach(p => findings.push({ rule: 'a11y-console', sel: 'consola', detail: p.slice(0, 160), viewport: vp.label }));
     }
     ws.close();

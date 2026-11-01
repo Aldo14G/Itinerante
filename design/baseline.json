@@ -1,7 +1,5 @@
 {
-  "b4": {
-    "a11y-target": 9
-  },
+  "b4": {},
   "root": {
     "token-color-literal": 203,
     "token-space-grid": 110,
