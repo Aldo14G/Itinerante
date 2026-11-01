@@ -683,6 +683,33 @@ function boot() {
       // Al salir con el teclado, la imagen vuelve al item que sigue abierto
       summary.addEventListener('blur', () => { const open = items.findIndex(x => x.open); if (open >= 0) show(open); });
     });
+    // Móvil: carrusel. Todas las tarjetas quedan abiertas (sin acordeón exclusivo) y los puntos siguen el desplazamiento.
+    const track = $('.bill-track');
+    const dots = $$('.bill-dots i');
+    const phone = matchMedia('(max-width: 760px)');
+    const carousel = () => {
+      items.forEach(d => {
+        const summary = $('summary', d);
+        if (phone.matches) {
+          if (d.hasAttribute('name')) { d.dataset.name = d.getAttribute('name'); d.removeAttribute('name'); }
+          d.open = true;
+          summary.tabIndex = -1;
+        } else {
+          if (d.dataset.name) d.setAttribute('name', d.dataset.name);
+          summary.removeAttribute('tabindex');
+        }
+      });
+      if (!phone.matches) items.forEach((d, i) => { d.open = i === 0; });
+    };
+    carousel();
+    phone.addEventListener('change', carousel);
+    track.addEventListener('scroll', () => {
+      if (!phone.matches) return;
+      const step = items[0].offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0);
+      const idx = clamp(Math.round(track.scrollLeft / step), 0, items.length - 1);
+      dots.forEach((dot, i) => dot.classList.toggle('is-on', i === idx));
+    }, { passive: true });
+    dots[0]?.classList.add('is-on');
     $('.bill-list').addEventListener('pointerleave', () => {
       const open = items.findIndex(d => d.open);
       if (open >= 0) show(open);

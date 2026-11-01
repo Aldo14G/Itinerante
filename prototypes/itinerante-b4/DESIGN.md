@@ -166,3 +166,4 @@ Hoja de estilos aparte, con `media="(max-width: 760px)"`: el escritorio no la ap
 - **La casa:** barra segmentada tipo historias (un segmento por foto) y toque a izquierda o derecha para cambiar de foto; scroll nativo con `scroll-snap`.
 - **Hojas inferiores:** la ficha sube desde abajo con resorte (`--spring`, `linear()`), tiene asa y se arrastra para cerrarla (umbral de 120 px o velocidad > 0.7 px/ms); el fondo se atenúa sin desenfoque.
 - **Carga:** `content-visibility: auto` en las secciones bajo el hero.
+- **Cartelera:** carrusel horizontal de tarjetas (foto cuadrada con su rótulo de procedencia, título, descripción y acción), con `scroll-snap`, todas abiertas (sin acordeón exclusivo) y puntos que siguen el desplazamiento. En escritorio sigue el acordeón con escenario fijo.

@@ -110,3 +110,28 @@ html:has(dialog[open]) .tabbar { translate: 0 calc(100% + 24px); }
   .tabbar, .tab-ic, .hdr-wa, .topic, .stories i { transition-duration: 0.01ms; }
   .motion .drawer { transition: opacity var(--dur-instant) linear, display var(--dur-instant) allow-discrete; translate: none; opacity: 1; }
 }
+
+/* Cartelera: carrusel horizontal de tarjetas con foto, título, descripción y acción; todas abiertas. */
+.bill-stage, .bill-ic { display: none; }
+.bill-body { display: block; }
+.bill-list { border-top: 0; }
+.bill-track {
+  display: flex; gap: var(--space-3); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+  margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 8px; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.bill-track::-webkit-scrollbar { display: none; }
+.bill-item {
+  flex: 0 0 min(82vw, 340px); scroll-snap-align: start; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--turq-ink) 22%, transparent); border-radius: var(--radius-4);
+  background: color-mix(in srgb, var(--white) 26%, transparent);
+}
+.bill-item summary { display: block; padding: 0; pointer-events: none; }
+.bill-card-fig { display: block; }
+.bill-card-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.bill-card-cap { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); font: 600 var(--fs-1)/1.2 var(--f-sans); }
+.bill-title { display: block; padding: var(--space-3) var(--space-4) 0; font-size: var(--fs-5); transition: none; }
+.bill-sub { display: block; padding: var(--space-1) var(--space-4) 0; }
+.bill-detail { padding: var(--space-3) var(--space-4) var(--space-5); }
+.bill-dots { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-3); }
+.bill-dots i { width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--turq-ink) 28%, transparent); transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast); }
+.bill-dots i.is-on { background: var(--turq-ink); scale: 1.5; }

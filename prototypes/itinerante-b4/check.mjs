@@ -209,3 +209,13 @@ test('móvil: barra inferior con una pestaña por sección, iconos en el sprite 
   assert.ok(/prefers-reduced-transparency: reduce/.test(mobileCss) && /@supports \(\(-webkit-backdrop-filter/.test(mobileCss), 'vidrio con degradación');
   assert.ok(!/backdrop-filter:[^;]*\n?[^;]*\.entry-canvas/.test(mobileCss));
 });
+
+test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y los puntos coinciden', () => {
+  const items = [...html.matchAll(/<details class="bill-item"[\s\S]*?<\/details>/g)].map(m => m[0]);
+  assert.equal(items.length, 3);
+  for (const it of items) {
+    assert.match(it, /class="bill-card-fig"/);
+    assert.match(it, /<span class="tag tag--(real|ai)">(Foto real|Recreación IA)<\/span>/);
+  }
+  assert.equal([...html.matchAll(/<div class="bill-dots"[^>]*>([\s\S]*?)<\/div>/g)][0][1].match(/<i>/g).length, items.length);
+});

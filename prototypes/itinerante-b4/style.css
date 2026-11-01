@@ -1109,3 +1109,7 @@ html:has(dialog.drawer[open]) { overflow: hidden; }
 
 /* Elementos solo móviles: ocultos por defecto (mobile.css los muestra). */
 .tabbar, .hdr-wa, .stories, .drawer-grabber { display: none; }
+
+/* Cartelera como carrusel (solo móvil): en escritorio la pista es transparente y las fotos de tarjeta no existen. */
+.bill-track { display: contents; }
+.bill-card-fig, .bill-dots { display: none; }
