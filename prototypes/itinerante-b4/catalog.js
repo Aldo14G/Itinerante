@@ -112,6 +112,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   } catch {
     status.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
     root.dataset.state = 'error';
+    delete root.dataset.ready; // permite reintentar (p. ej. al volver a #catalogo)
     $('[data-cat-grid]', root).replaceChildren();
     $('[data-cat-grid]', root).removeAttribute('aria-busy');
     $('[data-cat-filters]', root).replaceChildren();

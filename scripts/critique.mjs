@@ -53,7 +53,7 @@ const RULES = {
   'law-restorff': ['law', 'warn', 'Más de 2 botones primarios compitiendo en una vista (Von Restorff).'],
 };
 
-const BROWSER_RULES = new Set(Object.keys(RULES).filter(r => /^(a11y-(contrast|target|name|font-small|h1|overflow|console|heading-skip)|copy-(truth|label|repeat|measure)|law-)/.test(r)));
+const BROWSER_RULES = new Set(Object.keys(RULES).filter(r => /^(a11y-(contrast|target|name|font-small|h1|overflow|console|heading-skip)|copy-(truth|label|repeat|measure|glued)|law-)/.test(r)));
 
 // ---------- Estático: CSS ----------
 const blank = text => text.replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '));
@@ -273,7 +273,7 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
   const text = document.body.innerText;
   const truth = [
     [/\$\s?\d|\bMXN\b|\bUSD\b|\bpesos\b/i, 'precio'],
-    [/\b(en existencia|disponibles? en tienda|últimas piezas|agotad[oa]|stock)\b/i, 'existencia'],
+    [/(?<![\p{L}])(en existencia|disponibles? en tienda|últimas piezas|agotad[oa]|stock)(?![\p{L}])/iu, 'existencia'],
     [/\b(oferta|descuento|promoci[oó]n|envío gratis|2x1)\b/i, 'oferta'],
     [/★|\breseñas?\b|\bcalificaci[oó]n\b|\bestrellas\b|\bopiniones\b/i, 'reseñas'],
     [/\b\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b/i, 'fecha'],
@@ -362,7 +362,9 @@ async function auditInBrowser(name, surface) {
 }
 
 // ---------- Orquestación ----------
-const names = (opt('surface', 'all') === 'all' ? Object.keys(SURFACES).filter(n => !SURFACES[n].hidden) : [opt('surface')]).filter(n => SURFACES[n]);
+const wanted = opt('surface', 'all');
+if (wanted !== 'all' && !SURFACES[wanted]) { console.error(`Superficie desconocida: «${wanted}». Opciones: ${Object.keys(SURFACES).filter(n => !SURFACES[n].hidden).join(', ')}, all.`); process.exit(2); }
+const names = wanted === 'all' ? Object.keys(SURFACES).filter(n => !SURFACES[n].hidden) : [wanted];
 const baselinePath = join(root, 'design/baseline.json');
 const baseline = existsSync(baselinePath) ? JSON.parse(readFileSync(baselinePath, 'utf8')) : {};
 const report = { generatedAt: new Date().toISOString(), surfaces: {} };

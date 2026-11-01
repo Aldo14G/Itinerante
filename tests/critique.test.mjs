@@ -5,11 +5,14 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { existsSync as exists } from 'node:fs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const hasChrome = Boolean(process.env.CHROME_PATH) || ['C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/bin/google-chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].some(exists);
+const browser = { skip: hasChrome ? false : 'sin Chrome (define CHROME_PATH)' };
 const run = (...args) => spawnSync(process.execPath, ['scripts/critique.mjs', ...args], { cwd: root, encoding: 'utf8' });
 
-test('el auditor detecta cada familia de defectos en el fixture malo', () => {
+test('el auditor detecta cada familia de defectos en el fixture malo', browser, () => {
   const out = join(mkdtempSync(join(tmpdir(), 'crit-')), 'report.json');
   const res = run('--surface', 'fixture', '--out', out, '--top', '0');
   assert.equal(res.status, 1, 'un fixture malo debe fallar');
@@ -28,4 +31,10 @@ test('los tokens generados están al día y el baseline existe', () => {
   const check = spawnSync(process.execPath, ['scripts/build-tokens.mjs', '--check'], { cwd: root, encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
   assert.ok(existsSync(join(root, 'design/baseline.json')));
+});
+
+test('una superficie desconocida falla en lugar de salir en verde', () => {
+  const res = run('--surface', 'no-existe', '--static-only');
+  assert.equal(res.status, 2);
+  assert.match(res.stderr, /Superficie desconocida/);
 });

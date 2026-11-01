@@ -164,6 +164,7 @@ function boot() {
     const mobile = () => vw <= 760;
     const pad = n => String(n).padStart(3, '0');
     const inflight = new Set();
+    const failed = new Set(); // fotogramas que fallaron: no se reintentan en cada tick
     const keys = new Set();
     let keysOn = false, cur = 0, framePath = null, count = 0, keyStride = 12;
 
@@ -200,7 +201,7 @@ function boot() {
     }
 
     function ensure(k) {
-      if (k < 0 || k >= count || frames[k] || inflight.has(k) || inflight.size >= 4) return;
+      if (k < 0 || k >= count || frames[k] || failed.has(k) || inflight.has(k) || inflight.size >= 4) return;
       inflight.add(k);
       const img = new Image();
       img.decoding = 'async';
@@ -212,7 +213,7 @@ function boot() {
         if (Math.abs(k - cur) < 2) drawnK = -1;
         evict();
         kick();
-      }).catch(() => {}).finally(() => { inflight.delete(k); kick(); });
+      }).catch(() => { failed.add(k); }).finally(() => { inflight.delete(k); kick(); });
     }
 
     // Conserva los fotogramas clave y una ventana alrededor del actual; el resto se libera.
@@ -255,7 +256,7 @@ function boot() {
     };
 
     return {
-      enable() { load(); },
+      enable() { load(); if (frames[0]) sec.classList.add('is-live'); },
       measure() {
         top = absTop(sec);
         h = sec.offsetHeight;

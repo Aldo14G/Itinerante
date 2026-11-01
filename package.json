@@ -11,7 +11,7 @@
     "backend:dev:emulator": "node tools/dev-with-dataconnect.mjs",
     "backend:build": "next build",
     "backend:start": "next start",
-    "test": "node --test tests/site.test.mjs tests/lib.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/catalog-ui.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs",
+    "test": "node --test tests/site.test.mjs tests/lib.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/catalog-ui.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs && node --test tests/critique.test.mjs prototypes/itinerante-b4/check.mjs",
     "harness": "npm run test",
     "reference:check": "node --test tests/reference-search.test.mjs",
     "filters:test": "node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs",

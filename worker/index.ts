@@ -26,6 +26,7 @@ export default {
       if (!guard.ok) return json({ error: guard.error }, guard.status);
 
       // Rate Limiting de Cloudflare: por IP y global (por ubicación). Si no hay binding (pruebas locales), no limita.
+      if (env.GEMINI_API_KEY && !(env.IA_PER_IP && env.IA_GLOBAL)) console.warn("Iti IA sin límite de ritmo: faltan los bindings IA_PER_IP / IA_GLOBAL.");
       const ip = clientIp(request.headers);
       const [perIp, global] = await Promise.all([
         env.IA_PER_IP?.limit({ key: ip }) ?? { success: true },

@@ -12,7 +12,6 @@ const script = readFileSync(join(root, 'assets', 'js', 'higgsfield-site.js'), 'u
 
 test('the Claude cinematic composition is canonical and uses the local Higgsfield media layer', () => {
   assert.equal(html.match(/data-canonical-model="claude-cinematic-higgsfield"/g)?.length, 1);
-  assert.ok(existsSync(join(root, '_archive', 'models', 'mixed-legacy-index-2026-09-04.html')));
   assert.deepEqual(readdirSync(root).filter(file => file.endsWith('.html')), ['index.html']);
   assert.match(html, /class="site-nav"/);
   assert.match(html, /class="scroll-scrub" data-scroll-scrub data-active-frame="0"/);

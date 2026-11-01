@@ -30,9 +30,35 @@ function prune(bucket: Bucket, now: number, windowMs: number) {
   while (bucket.hits.length && now - bucket.hits[0] >= windowMs) bucket.hits.shift();
 }
 
+/**
+ * IP del cliente. `cf-connecting-ip` lo fija Cloudflare y el cliente no puede falsearlo; `x-forwarded-for`
+ * solo sirve como respaldo en desarrollo, porque su primer valor lo controla quien envía la petición.
+ */
 export function clientIp(headers: Headers) {
+  const cloudflare = headers.get("cf-connecting-ip")?.trim();
+  if (cloudflare) return cloudflare;
   const forwarded = headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   return forwarded || headers.get("x-real-ip")?.trim() || "unknown";
+}
+
+/** Lee el cuerpo como texto con un tope en bytes (no confía en content-length: también cubre chunked). */
+export async function readLimitedText(request: Request, maxBytes: number): Promise<string | null> {
+  if (!request.body) return "";
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let total = 0;
+  let text = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return text + decoder.decode();
 }
 
 export function originAllowed(headers: Headers, requestUrl: string, allowedOrigins = "") {

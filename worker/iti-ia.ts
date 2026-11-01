@@ -1,6 +1,7 @@
 // POST /api/ai/iti-ia en el Worker. Misma salida que el flujo de Genkit ({ result: [mensaje] }):
 // la recuperación es local y la selección con Gemini es opcional (sin GEMINI_API_KEY queda el ranking local).
 import { extractControlledFilters } from "../src/ai/query-filters";
+import { readLimitedText } from "../src/lib/api-guard";
 import { buildQuestionMessage, buildRecommendationMessage } from "../src/ai/iti-ia-response.js";
 import { rankTestBooks } from "../src/lib/local-test-search.js";
 import { filterCatalogBooks, type CatalogBookRecord } from "../src/lib/catalog-core";
@@ -97,8 +98,11 @@ export async function chooseSlugs(env: Env, query: string, candidates: CatalogBo
 
 export async function handleItiIa(request: Request, env: Env): Promise<Response> {
   let messages: Message[];
+  const maxBytes = Number(env.ITI_IA_MAX_BODY_BYTES) > 0 ? Number(env.ITI_IA_MAX_BODY_BYTES) : 8_192;
+  const raw = await readLimitedText(request, maxBytes);
+  if (raw === null) return Response.json({ error: "La consulta es demasiado larga." }, { status: 413, headers: NO_STORE });
   try {
-    const body = (await request.json()) as { data?: { messages?: Message[] } };
+    const body = JSON.parse(raw) as { data?: { messages?: Message[] } };
     messages = body?.data?.messages ?? [];
   } catch {
     return Response.json({ error: "Solicitud no válida." }, { status: 400, headers: NO_STORE });

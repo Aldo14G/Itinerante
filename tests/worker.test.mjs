@@ -64,6 +64,9 @@ test('Iti IA: límite de Cloudflare por IP y global responde 429', async () => {
   let key;
   await post(ask('poesía'), {}, { IA_PER_IP: { limit: async o => { key = o.key; return { success: true }; } }, IA_GLOBAL: allow });
   assert.equal(key, '203.0.113.7');
+  // Con cf-connecting-ip (lo fija Cloudflare) el x-forwarded-for falsificado no cambia la clave del límite.
+  await post(ask('poesía'), { 'cf-connecting-ip': '198.51.100.20', 'x-forwarded-for': '1.2.3.4' }, { IA_PER_IP: { limit: async o => { key = o.key; return { success: true }; } }, IA_GLOBAL: allow });
+  assert.equal(key, '198.51.100.20');
 });
 
 test('Iti IA: sin GEMINI_API_KEY recomienda con ranking local y rotula datos de prueba', async () => {
@@ -100,4 +103,10 @@ test('Iti IA: consulta corta pide aclaración y el modelo solo reordena slugs re
   } finally {
     globalThis.fetch = realFetch;
   }
+});
+
+test('Iti IA: un cuerpo grande sin content-length (chunked) también se rechaza', async () => {
+  const big = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('x'.repeat(5000))); c.enqueue(new TextEncoder().encode('x'.repeat(5000))); c.close(); } });
+  const res = await worker.fetch(new Request(ORIGIN + '/api/ai/iti-ia', { method: 'POST', headers: { origin: ORIGIN }, body: big, duplex: 'half' }), {});
+  assert.equal(res.status, 413);
 });
