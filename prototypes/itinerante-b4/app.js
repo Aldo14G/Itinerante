@@ -366,6 +366,8 @@ function boot() {
     return {
       measure() {
         pinned = root.classList.contains('pin-house');
+        track.tabIndex = pinned ? -1 : 0;
+        if (pinned) track.removeAttribute('aria-label'); else track.setAttribute('aria-label', 'Fotografías de la casa, desplázate para ver más');
         track.style.transform = '';
         if (pinned) {
           const last = stills[stills.length - 1];
@@ -476,6 +478,7 @@ function boot() {
     };
   }
 
+  let holdHeader = 0; // hasta este instante (performance.now) el encabezado no se oculta
   function headerScene() {
     const hdr = $('[data-hdr]');
     const themed = $$('main [data-theme]');
@@ -493,7 +496,7 @@ function boot() {
         const r = ranges.find(range => probe >= range.top && probe < range.bottom);
         const on = r ? r.theme : '';
         if ((hdr.dataset.on || '') !== on) { if (on) hdr.dataset.on = on; else delete hdr.dataset.on; }
-        if (hdr.classList.contains('is-menu') || hdr.contains(document.activeElement) || y < vh * 0.6) hidden = false;
+        if (hdr.classList.contains('is-menu') || hdr.contains(document.activeElement) || y < vh * 0.6 || performance.now() < holdHeader) hidden = false;
         else if (vel > 60) hidden = true;
         else if (vel < -60) hidden = false;
         hdr.classList.toggle('is-hidden', hidden);
@@ -619,11 +622,12 @@ function boot() {
     hdr.classList.toggle('is-menu', open);
     $('main').inert = open;
     $('.ftr').inert = open;
+    $('.skip').inert = open;
     document.body.style.overflow = open ? 'hidden' : '';
     if (open) $('nav a', menu).focus();
   }
   menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
-  menu.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+  menu.addEventListener('click', e => { if (e.target.closest('a')) { setMenu(false); holdHeader = performance.now() + 900; } });
   addEventListener('keydown', e => {
     if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); }
   });
@@ -651,8 +655,8 @@ function boot() {
     items.forEach((d, i) => {
       d.addEventListener('toggle', () => { if (d.open) show(i); });
       const summary = $('summary', d);
-      let intent = 0, hovering = false;
-      const arm = () => { clearTimeout(intent); if (hovering && !d.open) intent = setTimeout(() => { d.open = true; }, 320); };
+      let intent = 0, hovering = false, suppressed = false;
+      const arm = () => { clearTimeout(intent); if (hovering && !suppressed && !d.open) intent = setTimeout(() => { d.open = true; }, 320); };
       summary.addEventListener('pointerenter', () => {
         if (!fineMq.matches) return;
         hovering = true;
@@ -660,8 +664,11 @@ function boot() {
         arm();
       });
       summary.addEventListener('pointermove', arm);
-      summary.addEventListener('pointerleave', () => { hovering = false; clearTimeout(intent); });
+      summary.addEventListener('pointerleave', () => { hovering = false; suppressed = false; clearTimeout(intent); });
+      summary.addEventListener('click', () => { suppressed = true; clearTimeout(intent); });
       summary.addEventListener('focus', () => show(i));
+      // Al salir con el teclado, la imagen vuelve al item que sigue abierto
+      summary.addEventListener('blur', () => { const open = items.findIndex(x => x.open); if (open >= 0) show(open); });
     });
     $('.bill-list').addEventListener('pointerleave', () => {
       const open = items.findIndex(d => d.open);

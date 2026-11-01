@@ -27,7 +27,8 @@ export function score(book, query) {
     if (h.t.startsWith(word)) s = 4;
     else if (h.t.includes(` ${word}`)) s = 3;
     else if (h.t.includes(word)) s = 2;
-    else if (h.a.includes(word)) s = 3;
+    else if (h.a.startsWith(word) || h.a.includes(` ${word}`)) s = 3;
+    else if (h.a.includes(word)) s = 1;
     else if (h.p.includes(word)) s = 1;
     else if (h.n.includes(word)) s = 1;
     if (!s) return 0;
@@ -74,7 +75,8 @@ export function suggest(books, query, limit = 6) {
     if (/^\d+$/.test(q)) add(b.n, 'ISBN');
     else if (h.t.includes(q)) add(b.t, 'Título');
   }
-  for (const [, b] of ranked) if (haystack(b).a.includes(q)) add(b.a, 'Autor');
+  const byPrefix = x => (haystack(x).a.startsWith(q) || haystack(x).a.includes(` ${q}`) ? 0 : 1);
+  for (const [, b] of [...ranked].sort((x, y) => byPrefix(x[1]) - byPrefix(y[1]))) if (haystack(b).a.includes(q)) add(b.a, 'Autor');
   for (const [, b] of ranked) if (haystack(b).p.includes(q) && b.p) add(b.p, 'Editorial');
   for (const [, b] of ranked.slice(0, 40)) if (out.length < limit) add(b.t, 'Título');
   return out;
@@ -116,6 +118,19 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     $('[data-cat-grid]', root).replaceChildren();
     $('[data-cat-grid]', root).removeAttribute('aria-busy');
     $('[data-cat-filters]', root).replaceChildren();
+    // Salida clara: WhatsApp y reintento; los controles de busqueda no hacen nada sin datos.
+    const controls = [$('[data-cat-q]', root), $('[data-cat-sort]', root)];
+    controls.forEach(c => { c.disabled = true; });
+    const box = document.createElement('div');
+    box.className = 'cat-error';
+    box.innerHTML = `<a class="btn btn--tungsten" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, estoy buscando un libro.')}" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span></a> <button type="button" class="btn btn--ghost"><span>Reintentar</span></button>`;
+    status.after(box);
+    box.querySelector('button').addEventListener('click', () => {
+      box.remove();
+      controls.forEach(c => { c.disabled = false; });
+      status.textContent = 'Cargando la muestra…';
+      initCatalog({ isMotion });
+    });
     return;
   }
 
@@ -189,7 +204,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (chips.length > 1) chipsEl.append(el('li', {}, el('button', { type: 'button', class: 'cat-clear', 'data-clear': '' }, 'Limpiar todo')));
     chipsEl.hidden = !chips.length;
     const n = state.k.size + state.g.size + state.f.size + state.p.size;
-    $('[data-cat-filters-count]', root).textContent = n ? `(${n})` : '';
+    $('[data-cat-filters-count]', root).textContent = `${n ? `(${n}) · ` : ''}${results.length}`;
   }
 
   // ----- rejilla -----
@@ -286,7 +301,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       if (list.hidden) { renderSuggest(); return; }
       e.preventDefault();
-      active = (active + (e.key === 'ArrowDown' ? 1 : -1) + opts.length) % opts.length;
+      active = e.key === 'ArrowDown' ? (active + 1) % opts.length : (active <= 0 ? opts.length - 1 : active - 1);
       opts.forEach((o, i) => o.setAttribute('aria-selected', String(i === active)));
       input.setAttribute('aria-activedescendant', opts[active].id);
     } else if (e.key === 'Enter') {
@@ -321,15 +336,17 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       const dim = chip.dataset.chipDim;
       if (dim === 'q') { state.q = ''; input.value = ''; if (state.sort === 'rel') { state.sort = 'az'; sortEl.value = 'az'; } } else state[dim].delete(chip.dataset.chipValue);
       refresh();
-      input.focus({ preventScroll: true });
+      if (dim === 'q') input.focus({ preventScroll: true }); else restFocus();
     } else if (e.target.closest('[data-clear]')) clearAll();
   });
   function clearAll() {
     state.q = ''; input.value = ''; state.k.clear(); state.g.clear(); state.f.clear(); state.p.clear();
     state.sort = 'az'; sortEl.value = 'az';
     refresh();
-    input.focus({ preventScroll: true });
+    restFocus();
   }
+  // Tras quitar un filtro el foco va al estado de resultados (no al buscador, que abriria el teclado en movil).
+  function restFocus() { status.tabIndex = -1; status.focus({ preventScroll: true }); }
   filtersBtn.addEventListener('click', () => {
     const open = filtersBtn.getAttribute('aria-expanded') !== 'true';
     filtersBtn.setAttribute('aria-expanded', String(open));
@@ -361,13 +378,13 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     const relEl = $('[data-d-related]', drawer);
     relEl.replaceChildren(...rel.map(r => el('li', {}, el('button', { type: 'button', class: 'rel', 'data-id': r.id }, cover(r), el('span', {}, r.t)))));
     $('[data-d-related-wrap]', drawer).hidden = !rel.length;
-    drawer.dataset.trigger = trigger || '';
+    if (trigger) drawer.dataset.trigger = trigger;
     if (!drawer.open) drawer.showModal();
     drawer.scrollTop = 0;
     $('[data-d-scroll]', drawer).scrollTop = 0;
   }
   grid.addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openBook(c.dataset.id, { trigger: c.dataset.id }); });
-  $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) openBook(r.dataset.id); });
+  $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
   $('[data-d-close]', drawer).addEventListener('click', () => drawer.close());
   drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });
   drawer.addEventListener('close', () => {

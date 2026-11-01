@@ -179,3 +179,11 @@ test('referencia SP: fila «Ver los N resultados» en la búsqueda y documento d
   const doc = await readFile(new URL('../../docs/REFERENCIA-SP-CATALOGO.md', import.meta.url), 'utf8');
   assert.match(doc, /No se importa ningún dato/);
 });
+
+test('sugerencias: los autores que empiezan por la consulta van antes que las coincidencias a mitad de palabra', () => {
+  const rows = suggest(data.books, 'fre').filter(s => s.kind === 'Autor');
+  assert.ok(rows.length >= 2);
+  const starts = s => { const a = norm(s.text); return a.startsWith('fre') || a.includes(' fre'); };
+  const firstMid = rows.findIndex(s => !starts(s));
+  assert.ok(firstMid === -1 || rows.slice(firstMid).every(s => !starts(s)), 'ningún prefijo detrás de una coincidencia interna');
+});

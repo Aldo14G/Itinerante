@@ -1088,3 +1088,14 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
   .drawer:not([open]) { opacity: 0; }
   @starting-style { .drawer[open] { opacity: 0; } }
 }
+
+/* ---------- Auditoría Playwright: ficha, buscador, error del catálogo ---------- */
+html { scrollbar-gutter: stable; }
+html:has(dialog.drawer[open]) { overflow: hidden; }
+.cat-bar input[type="search"]::-webkit-search-cancel-button { filter: opacity(0.7); }
+.cat-error { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 24px; }
+/* En la ficha, la consulta a WhatsApp va antes de la ficha técnica para quedar sobre el pliegue. */
+.drawer-ask { order: 1; }
+.drawer-facts { order: 2; }
+.drawer-related { order: 3; }
+@media (max-width: 760px) { .topics { gap: 8px 16px; } }
