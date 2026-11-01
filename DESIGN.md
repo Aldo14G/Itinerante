@@ -7,9 +7,9 @@ colors:
   stone: "#241e18"
   bone: "#f1e8d8"
   bone-dim: "#b8aa95"
-  tungsten: "#f0b357"
+  tungsten: "#e3bd8a"
   tungsten-hi: "#f7cc86"
-  turq: "#34b3a5"
+  turq: "#79b1a9"
   turq-ink: "#062824"
   turq-light: "#8fe0d5"
   terra: "#c45a3c"
@@ -20,13 +20,13 @@ colors:
   paper-dim: "#5e5245"
   tone-light-bg: "#fbf8f2"
   tone-light-ink: "#2a1d14"
-  tone-light-accent: "#a8432a"
+  tone-light-accent: "#954b34"
   tone-light-turq: "#176b62"
   tone-sand-bg: "#efe3cc"
   tone-sand-ink: "#2a1d14"
   tone-sand-accent: "#9a3b24"
   tone-sand-turq: "#14625a"
-  tone-brick-bg: "#8a3720"
+  tone-brick-bg: "#693926"
   tone-brick-ink: "#f7f0e4"
 typography:
   wordmark:
@@ -82,7 +82,7 @@ motion:
 
 ## Mundo
 
-La casa a media tarde, con la luz de la calle en la pared. **El sitio es claro de punta a punta**, incluido el hero: la entrada se lee sobre cal clara (tono `light`: fondo `#fbf8f2`, texto café tabaco `#2a1d14`) y la foto del pasillo se funde hacia ese fondo con un velo en la base. Siguen la arena (tono `sand`, `#efe3cc`) en La casa, la cortinilla y Libros, de nuevo cal (`light`) en el manifiesto y el catálogo, y el ladrillo (tono `brick`, `#8a3720`, texto `#f7f0e4`) en la cita y el pie. Los acentos sobre tonos claros son ladrillo (`#a8432a` en `light`, `#9a3b24` en `sand`) y el turquesa de los libreros oscurecido (`#176b62` y `#14625a`) para texto. Las secciones sin tono usan los colores base de `:root`: el turquesa ocupa un capítulo entero (Cartelera), el tungsteno una banda (llamado final) y la Visita va en papel (`#efe6d5`). Quien llega buscando la dirección encuentra un sitio luminoso y con contraste alto, no una cueva.
+La casa a media tarde, con la luz de la calle en la pared. **El sitio es claro de punta a punta**, incluido el hero: la entrada se lee sobre cal clara (tono `light`: fondo `#fbf8f2`, texto café tabaco `#2a1d14`) y la foto del pasillo se funde hacia ese fondo con un velo en la base. Siguen la arena (tono `sand`, `#efe3cc`) en La casa, la cortinilla y Libros, de nuevo cal (`light`) en el manifiesto y el catálogo, y el ladrillo apagado (tono `brick`, `#693926`, texto `#f7f0e4`) en la cita y el pie. Los acentos sobre tonos claros son terracota (`#954b34` en `light`, `#8c4732` en `sand`) y el turquesa de los libreros oscurecido (`#176b62` y `#14625a`) para texto. Las secciones sin tono usan los colores base de `:root`: el turquesa apagado (`#79b1a9`) ocupa un capítulo entero (Cartelera) y el ocre (`#e3bd8a`) una banda (llamado final) y la Visita va en papel (`#efe6d5`). **Criterio de saturación (medido el 2026-11-01):** las paredes de las fotos del local tienen croma OKLCH de 0.02 a 0.085 (piedra gris cálida, yeso rosado, ladrillo ocre y madera). Los campos de color a ancho completo no pasan de 0.085 (crema 0.01, arena 0.03, turquesa 0.06, ocre 0.08, ladrillo 0.075); solo los acentos pequeños (botones, enlaces, barra de progreso) llegan a 0.105. Quien llega buscando la dirección encuentra un sitio luminoso y con contraste alto, no una cueva.
 
 **La paleta nocturna** (`night #100d0a`, `bone #f1e8d8`, `stone`…) ya no pinta ninguna sección. Sigue definida en `:root` como base de los tokens que cada tono redefine (el nombre `night` significa «fondo»), y como historia de la dirección original B.4 («solo la entrada es de noche»). Queda un resto: `index.html` aún declara `theme-color #100d0a`, que no coincide con el hero claro.
 

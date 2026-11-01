@@ -366,3 +366,32 @@ test('ficha: «Cómo llegar» es la acción primaria, WhatsApp confirma, y el re
   assert.ok(/Vi el título en la muestra de su sitio/.test(bookMessage({ t: 'X', a: 'Y' })), 'el mensaje no afirma que el libro esté en el sitio como inventario');
 });
 
+test('paleta: los campos de color a ancho completo no superan el croma de las paredes del local; los acentos, un poco más', async () => {
+  const tk = JSON.parse(await readFile(new URL('../design/tokens.json', import.meta.url), 'utf8')).themes.b4;
+  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const chroma = hex => {
+    const [r, g, b] = [1, 3, 5].map(i => lin(parseInt(hex.slice(i, i + 2), 16)));
+    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return Math.hypot(1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.782771766 * m - 0.8086757660 * s);
+  };
+  const FILL_MAX = 0.09; // el muro más saturado de las fotos (ladrillo ocre) mide 0.085
+  const ACCENT_MAX = 0.11;
+  const fills = { 'cal': tk.tones.light.night, 'arena': tk.tones.sand.night, 'ladrillo': tk.tones.brick.night, 'turquesa (Cartelera)': tk.color.turq, 'ocre (llamado)': tk.color.tungsten, 'papel': tk.color.paper };
+  for (const [name, hex] of Object.entries(fills)) assert.ok(chroma(hex) <= FILL_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${FILL_MAX}`);
+  const accents = { 'terracota (cal)': tk.tones.light.tungsten, 'terracota (arena)': tk.tones.sand.tungsten, 'turquesa texto (cal)': tk.tones.light.turq, 'turquesa texto (arena)': tk.tones.sand.turq };
+  for (const [name, hex] of Object.entries(accents)) assert.ok(chroma(hex) <= ACCENT_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${ACCENT_MAX}`);
+  assert.equal(tk.color['turq-base'], tk.color.turq, 'la cortinilla termina exactamente en el color de Cartelera');
+});
+
+test('ritmo y movimiento: relleno de secciones con la escala de 4 px y movimiento reducido sin desplazamientos', () => {
+  assert.ok(/--sec-sm: var\(--space-7\); --sec-md: var\(--space-9\)/.test(css) && /--sec-sm: var\(--space-8\); --sec-md: var\(--space-10\)/.test(css), 'dos pasos de ritmo, móvil y escritorio');
+  for (const sel of ['manifesto', 'bill', 'books', 'quote', 'visit', 'ftr', 'cat', 'call']) {
+    const rule = css.match(new RegExp(`\.${sel} \{[^}]*\}`))[0];
+    assert.ok(/var\(--sec-(sm|md)\)/.test(rule) && !/clamp\([^)]*vh/.test(rule), `.${sel} usa el ritmo de la escala y no el alto de la pantalla`);
+  }
+  assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\*, \*::before, \*::after \{ transition-duration: 0\.01ms !important/.test(css), 'regla general de movimiento reducido');
+  assert.ok(/\*:not\(\.progress\)/.test(css), 'la barra de progreso (ligada al scroll) queda fuera');
+  assert.ok(!/animation: ping 2\.4s/.test(css), 'sin duraciones sueltas');
+});

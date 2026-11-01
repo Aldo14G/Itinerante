@@ -2,6 +2,10 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Ritmo vertical: dos pasos de la escala de 4 px (no dependen del alto de la pantalla). Móvil 48 / 96, escritorio 64 / 128. */
+:root { --sec-sm: var(--space-7); --sec-md: var(--space-9); }
+@media (min-width: 1025px) { :root { --sec-sm: var(--space-8); --sec-md: var(--space-10); } }
+
 html {
   background: var(--night);
   scroll-padding-top: calc(var(--hdr-h) + 8px);
@@ -193,7 +197,7 @@ p { text-wrap: pretty; }
 .motion [data-open="true"] .status-dot::after {
   content: ""; position: absolute; inset: -4px; border-radius: 50%;
   border: 1px solid var(--open); opacity: 0;
-  animation: ping 2.4s var(--ease-out) infinite;
+  animation: ping calc(var(--dur-scene) * 2) var(--ease-out) infinite;
 }
 [data-open="false"] .status-dot { background: var(--terra); }
 @keyframes ping { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.8); opacity: 0; } }
@@ -326,7 +330,7 @@ p { text-wrap: pretty; }
 
 /* ---------- Manifiesto ---------- */
 
-.manifesto { position: relative; padding: clamp(110px, 18vh, 220px) var(--gutter) clamp(110px, 16vh, 200px); background: var(--night); }
+.manifesto { position: relative; padding: var(--sec-md) var(--gutter); background: var(--night); }
 .manifesto-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0 24px; align-items: start; }
 .manifesto-text {
   grid-column: 1 / span 8; grid-row: 1 / span 2;
@@ -411,7 +415,7 @@ p { text-wrap: pretty; }
 
 /* ---------- Cartelera ---------- */
 
-.bill { background: var(--turq); color: var(--turq-ink); padding: clamp(96px, 14vh, 170px) var(--gutter) clamp(96px, 14vh, 160px); }
+.bill { background: var(--turq); color: var(--turq-ink); padding: var(--sec-md) var(--gutter); }
 .bill .h2 em { color: var(--turq-ink); }
 .bill-head { display: grid; gap: 28px; margin-bottom: clamp(48px, 8vh, 96px); }
 .bill-head .h2 { font-size: clamp(3.2rem, 9vw, 9rem); }
@@ -466,9 +470,9 @@ p { text-wrap: pretty; }
 
 /* ---------- Libros ---------- */
 
-.books { background: var(--night); padding: clamp(110px, 16vh, 190px) var(--gutter) 0; }
+.books { background: var(--night); padding: var(--sec-md) var(--gutter) 0; }
 /* Capa 3 del capítulo: la muestra completa ocupa todo el ancho dentro de Libros. */
-.books > .cat { margin: clamp(80px, 12vh, 150px) calc(-1 * var(--gutter)) 0; }
+.books > .cat { margin: var(--sec-md) calc(-1 * var(--gutter)) 0; }
 .books-head { display: grid; justify-items: end; gap: 24px; margin-bottom: clamp(44px, 7vh, 88px); text-align: right; }
 .books-head .h2 { max-width: 14ch; }
 .books-head p { margin: 0; max-width: 46ch; color: var(--bone-dim); font-size: var(--fs-body); }
@@ -537,7 +541,7 @@ p { text-wrap: pretty; }
 
 /* ---------- Llamado ---------- */
 
-.call { background: var(--tungsten); color: var(--night); padding: clamp(36px, 6vh, 64px) 0; overflow: hidden; }
+.call { background: var(--tungsten); color: var(--night); padding: var(--sec-sm) 0; overflow: hidden; }
 .marquee { overflow: hidden; white-space: nowrap; }
 .marquee-row { display: flex; width: max-content; }
 .motion .marquee-row { will-change: transform; }
@@ -561,7 +565,7 @@ p { text-wrap: pretty; }
 
 .visit {
   display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 56px clamp(40px, 6vw, 110px);
-  padding: clamp(100px, 15vh, 180px) var(--gutter);
+  padding: var(--sec-md) var(--gutter);
   background: var(--paper); color: var(--paper-ink);
 }
 .visit .h2 em { color: var(--terra-deep); }
@@ -590,7 +594,7 @@ p { text-wrap: pretty; }
 
 /* ---------- Footer ---------- */
 
-.ftr { padding: clamp(64px, 10vh, 120px) var(--gutter) 32px; background: var(--night); overflow: hidden; }
+.ftr { padding: var(--sec-md) var(--gutter) var(--space-6); background: var(--night); overflow: hidden; }
 .ftr-mark { margin: 0 0 clamp(28px, 5vh, 56px); color: var(--bone); }
 .motion .ftr-mark { clip-path: inset(-20% -4% 0 -4%); }
 .motion .ftr-mark .ch > span { transform: translateY(105%); transition: transform var(--dur-scene) var(--ease-out); transition-delay: calc(var(--i, 0) * 50ms); }
@@ -690,7 +694,7 @@ p { text-wrap: pretty; }
 
 /* ---------- Catálogo de muestra ---------- */
 
-.cat { background: var(--night); padding: clamp(64px, 9vh, 110px) var(--gutter) clamp(96px, 14vh, 160px); border-top: 1px solid var(--line); }
+.cat { background: var(--night); padding: var(--sec-sm) var(--gutter) var(--sec-md); border-top: 1px solid var(--line); }
 .cat-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; align-items: end; margin-bottom: clamp(36px, 6vh, 64px); }
 .cat-head .h2 { font-size: clamp(2.6rem, 6.4vw, 6.4rem); }
 .cat-seal {
@@ -1022,7 +1026,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 /* Cita sobre pentagrama: cinco filetes por renglón, que se dibujan de arriba abajo. */
-.quote { margin: 0; padding: clamp(80px, 13vh, 150px) var(--gutter); background: var(--night); border-top: 1px solid var(--line); }
+.quote { margin: 0; padding: var(--sec-md) var(--gutter); background: var(--night); border-top: 1px solid var(--line); }
 .quote.rx::before { top: 28px; left: var(--gutter); }
 .quote.rx::after { bottom: 28px; right: var(--gutter); }
 .quote blockquote {
@@ -1138,7 +1142,7 @@ html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cov
 
 /* ---------- Carrusel de libros (capa 1 de Libros) ----------
    Lista horizontal con snap: sin autoplay, con el borde de la siguiente tarjeta a la vista. Las flechas solo con puntero fino. */
-.rail { --rail-gap: var(--space-4); margin-bottom: clamp(56px, 9vh, 112px); }
+.rail { --rail-gap: var(--space-4); margin-bottom: var(--sec-sm); }
 .rail[hidden], html:not(.js) .rail { display: none; }
 .rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
 .rail-title.h2 { margin: 0; font-size: clamp(2rem, 4.4vw, 3.6rem); }
@@ -1179,3 +1183,9 @@ html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cov
 .rail.is-static .rail-progress, .rail.is-static .rail-ctrl { display: none; }
 @media print { .rail { display: none; } }
 
+/* Movimiento reducido, regla general: ningún cambio de estado se anima ni se desplaza (los fundidos y los
+   desplazamientos se vuelven instantáneos). La barra de progreso va ligada al scroll, no al tiempo: queda fuera. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+  *:not(.progress), *:not(.progress)::before, *:not(.progress)::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+}

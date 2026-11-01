@@ -109,3 +109,30 @@ Es una galería de **71 animaciones, 36 transiciones y sitios 3D completos** con
 4. **Objetivo del sitio: que visiten la librería.** La acción primaria de cada pantalla es «Cómo llegar»; WhatsApp es apoyo informativo («confirma que lo tienen»). Pendiente de aplicar a los textos de la ficha y del compositor de consultas.
 
 Pendiente de Aldo: quién cura la «Selección de la casa» cuando llegue el listado, y los nombres finales de capítulos.
+
+## 8. Medición del 2026-11-01 y plan móvil «red social» (no catálogo genérico)
+
+**Medido (Chromium, 390×844 y 1280×800, CPU 4× donde aplica):**
+
+| Qué | Resultado |
+|---|---|
+| Paredes de las fotos del local | croma OKLCH 0.02–0.085 (piedra gris cálida, yeso rosado, ladrillo ocre, madera); saturación media de tonos medios ≈ 23 % |
+| Paleta antes | campos a ancho completo con croma 0.11–0.14 (turquesa Cartelera, ámbar del llamado, ladrillo del pie y la cita) |
+| Paleta ahora | todos los campos ≤ 0.085; solo los acentos pequeños llegan a 0.105. Una prueba lo fija |
+| Movimiento | todas las duraciones del DOM salen de los tokens (240/400/700/1200 ms); en movimiento reducido ya no queda ninguna transición ni animación (antes 74 + 96 elementos seguían a 240/400 ms) |
+| Ritmo vertical | antes 5 rellenos distintos y fuera de la cuadrícula en móvil (51, 110, 127, 135, 152 px); ahora 2 pasos: 48/96 móvil, 64/128 escritorio |
+| **Largo del recorrido móvil** | **15.4 pantallas; Libros ocupa 8.4** (la rejilla de 24 portadas iguales es casi toda la página) |
+
+**Diagnóstico móvil.** La estructura ya tiene lo que usan las redes (barra inferior, hojas, historias en La casa, carrusel), pero la parte de libros sigue leyéndose como un catálogo: 24 tarjetas idénticas de un solo color, sin nada «nuevo», sin una acción propia de la persona y sin relato.
+
+**Qué implementar (solo con datos reales o claramente rotulados):**
+
+1. **Explorar la muestra en una hoja a pantalla completa** (como la búsqueda de Instagram): el capítulo Libros deja solo el carrusel y un campo «Buscar»; al tocarlo se abre una hoja con búsqueda fija, filtros como chips y la rejilla. Objetivo: Libros de 8.4 a ≤ 3 pantallas.
+2. **Guardar y «Mi lista para la visita».** Corazón/marcador en cada libro (solo en el dispositivo, sin cuenta) y una hoja que lista lo guardado con «Cómo llegar» y «Enviar la lista por WhatsApp» (informativo) y modo «Enseñar en mostrador». Es la acción propia que convierte el catálogo en visita.
+3. **Novedades.** Módulo `Recién llegados` que lee una colección con `ids` (y la fecha de ingreso real cuando exista). Sin listado no se muestra (nunca se simula). Insignia «Nuevo» solo con dato.
+4. **Encabezado como perfil.** Logo, nombre, estado de hoy, dirección y dos acciones (Cómo llegar, WhatsApp), con círculos de destacados (La casa, Cartelera, Libros, Visita) que abren las historias.
+5. **Cartelera como publicaciones.** Cada propuesta como tarjeta de foto con pie, rótulo (IA/real), «Me interesa» (local) y «Compartir» (Web Share).
+6. **Movimiento de feed.** Entrada escalonada de tarjetas y enfoque de la tarjeta central en el carrusel; sin efectos pesados.
+
+**Referencias que se aplican:** LUCENT/CHAPTER (carrusel y entrada escalonada), SUMMIT/PASSAGE (cambio de capítulo), patrones de Instagram/Meta ya documentados (hojas, historias, destacados, guardar). Leyes: Goal-Gradient (progreso), Zeigarnik (lo guardado queda a medias), Peak-End (la lista termina en «Cómo llegar»), Hick (una sola puerta a la búsqueda), Jakob (guardar/compartir como en las apps).
+
