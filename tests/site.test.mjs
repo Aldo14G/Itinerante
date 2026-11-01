@@ -326,3 +326,10 @@ test('Libros y Catálogo son un solo capítulo: tres capas, un punto de entrada 
   assert.ok(/class="sm-link" href="#catalogo">Buscar en la muestra/.test(html), 'el menú lateral llega a la muestra desde Libros');
 });
 
+test('progreso de lectura: barra fija decorativa, ligada al scroll y sin JS', () => {
+  assert.ok(/<div class="progress" aria-hidden="true"><\/div>/.test(html), 'barra decorativa fuera del árbol de accesibilidad');
+  assert.ok(/@supports \(animation-timeline: scroll\(\)\)[\s\S]{0,120}animation-timeline: scroll\(root block\)/.test(css), 'animación ligada al scroll con detección de soporte');
+  assert.ok(/\.progress \{[^}]*transform: scaleX\(0\)/.test(css), 'sin soporte la barra queda en cero');
+  assert.ok(/@keyframes progress-fill/.test(css));
+});
+

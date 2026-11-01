@@ -837,7 +837,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* ---------- Impresión ---------- */
 
 @media print {
-  .hdr, .menu, .entry-canvas, .entry-beat, .wipe, .marquee, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer { display: none !important; }
+  .progress, .hdr, .menu, .entry-canvas, .entry-beat, .wipe, .marquee, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer { display: none !important; }
   .entry, .house, .motion .entry { height: auto !important; min-height: 0 !important; }
   .entry-stage, .house-pin { position: static !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
   .entry-copy { position: static !important; }
@@ -1122,3 +1122,16 @@ html.sheet-open { overflow: hidden; }
 html[data-glass="lite"] .hdr::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in srgb, var(--night) 94%, transparent); }
 html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cover::before, html[data-glass="lite"] .still-img::before, html[data-glass="lite"] .frame-clip::before, html[data-glass="lite"] .topic-layer::before, html[data-glass="lite"] .bill-layer::before { animation: none !important; }
+
+/* Progreso de lectura (Goal-Gradient): una línea fija que se llena con el scroll. Sin JS: animación ligada al desplazamiento;
+   donde no se soporta, la barra queda en cero y no estorba. */
+.progress {
+  position: fixed; inset: 0 0 auto 0; z-index: 60; height: 3px; pointer-events: none;
+  background: var(--terra-deep); transform: scaleX(0); transform-origin: 0 50%;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--white) 55%, transparent);
+}
+@supports (animation-timeline: scroll()) {
+  .progress { animation: progress-fill linear both; animation-timeline: scroll(root block); }
+}
+@keyframes progress-fill { to { transform: scaleX(1); } }
+
