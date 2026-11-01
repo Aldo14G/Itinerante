@@ -1,5 +1,7 @@
 import { strict as assert } from 'node:assert';
-import { readFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createServer as createHttpServer, request as httpRequest } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
@@ -30,11 +32,16 @@ function rawStatus(port, path) {
 }
 
 test('preview serves seekable media ranges, HEAD, suffixes and invalid ranges', async t => {
-  const preview = createPreviewServer();
+  // Medio de prueba propio: la prueba no depende de ningún archivo del sitio.
+  const root = await mkdtemp(join(tmpdir(), 'iti-preview-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(join(root, 'media'));
+  await writeFile(join(root, 'media', 'clip.mp4'), Buffer.from(Array.from({ length: 4096 }, (_, i) => (i * 7) % 251)));
+  const preview = createPreviewServer({ root });
   const port = await listen(preview);
   t.after(() => close(preview));
-  const path = '/images/cinematic/runtime/bg-walkthrough-desktop.mp4';
-  const bytes = await readFile(new URL(`..${path}`, import.meta.url));
+  const path = '/media/clip.mp4';
+  const bytes = await readFile(join(root, 'media', 'clip.mp4'));
   const head = await fetch(`http://127.0.0.1:${port}${path}`, { method: 'HEAD' });
   assert.equal(head.headers.get('content-length'), String(bytes.length));
   assert.equal((await head.arrayBuffer()).byteLength, 0);
@@ -189,4 +196,24 @@ test('Iti IA eval is fixture-only and references existing catalog records', asyn
   assert.equal(evalSet.assertions.stockQty, 0);
   assert.equal(evalSet.assertions.neverClaimInventory, true);
   assert.ok(evalSet.cases.every(({ expectedSlugs }) => expectedSlugs.every(slug => slugs.has(slug))));
+});
+
+test('preview revalida el texto, cachea medios y no sirve archivos ocultos ni dependencias', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'iti-preview-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(join(root, 'node_modules'));
+  await Promise.all([
+    writeFile(join(root, 'style.css'), 'body{}'),
+    writeFile(join(root, 'pic.webp'), 'x'),
+    writeFile(join(root, '.env'), 'SECRETO=1'),
+    writeFile(join(root, 'node_modules', 'dep.js'), 'x'),
+  ]);
+  const preview = createPreviewServer({ root });
+  const port = await listen(preview);
+  t.after(() => close(preview));
+  const get = path => fetch(`http://127.0.0.1:${port}${path}`);
+  assert.equal((await get('/style.css')).headers.get('cache-control'), 'no-cache');
+  assert.equal((await get('/pic.webp')).headers.get('cache-control'), 'public, max-age=604800');
+  assert.equal((await get('/.env')).status, 404);
+  assert.equal((await get('/node_modules/dep.js')).status, 404);
 });

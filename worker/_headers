@@ -1,4 +1,17 @@
-# Cabeceras de los assets estáticos (Cloudflare las aplica a lo servido desde public/).
+# Cabeceras de los archivos estaticos (Cloudflare las aplica a lo servido desde public/).
+#
+# Cache-Control: ningun archivo del sitio lleva huella de contenido en su nombre (style.css, app.js,
+# f001.webp...), asi que ninguno es realmente "immutable"; un cambio con el mismo nombre debe llegar
+# al visitante. Criterio:
+#   - HTML, CSS, JS (modulos ES incluidos) y catalog.json: se revalidan siempre (max-age=0 + ETag, la
+#     respuesta es un 304 barato). Asi un despliegue nunca mezcla app.js nuevo con motion.js viejo.
+#   - Fuentes .woff2: son subconjuntos vendidos que no se editan; 1 año + immutable. Si cambia una,
+#     hay que renombrarla (y fonts.css).
+#   - Imagenes y fotogramas (assets/img, assets/seq, assets/seq-m) y logos: 7 dias, sin immutable.
+#   - robots.txt y sitemap.xml: 1 hora.
+# En Cloudflare, si varias reglas coinciden con una ruta, sus valores de una misma cabecera se UNEN con
+# coma. Por eso las reglas de Cache-Control de abajo no se solapan: cada archivo cae en una sola.
+
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
@@ -7,8 +20,41 @@
   Permissions-Policy: geolocation=(), camera=(), microphone=()
   Content-Security-Policy: frame-ancestors 'self'
 
-/assets/*
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/fonts/*.woff2
   Cache-Control: public, max-age=31536000, immutable
 
-/images/*
-  Cache-Control: public, max-age=31536000, immutable
+/assets/img/*
+  Cache-Control: public, max-age=604800
+
+/assets/seq/*
+  Cache-Control: public, max-age=604800
+
+/assets/seq-m/*
+  Cache-Control: public, max-age=604800
+
+/Logo.png
+  Cache-Control: public, max-age=604800
+
+/Logo.webp
+  Cache-Control: public, max-age=604800
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600

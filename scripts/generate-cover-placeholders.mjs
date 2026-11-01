@@ -1,6 +1,9 @@
 // Cubiertas editoriales SVG locales para libros sin portada real.
 // Diseno de marca uniforme; mismas proporciones 2:3 que las portadas.
 // Uso: node scripts/generate-cover-placeholders.mjs
+// Alcance: solo alimenta el conjunto de prueba del backend (data/books.amazon-test*.json, que sirve /api/catalog e Iti IA).
+// El sitio vigente (raíz) no usa estas portadas: dibuja las suyas (catalog.js) y trae su propio assets/data/catalog.json.
+// Las SVG se escriben en images/covers/, carpeta que ya no se publica con el sitio.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 

@@ -1,3 +1,33 @@
+# Continuidad de Itinerante — 2026-11-01
+
+## Último avance: B.4 «Función de la casa» sustituye al sitio raíz
+
+**Decisión de Aldo (2026-11-01):** el prototipo B.4 sustituye al sitio raíz anterior (Higgsfield `d599d36a`). Hay una sola home.
+
+Qué se movió:
+
+- A la raíz: `index.html`, `style.css`, `mobile.css`, `tokens.css` (generado), `app.js`, `catalog.js`, `motion.js`, `scenes-desktop.js`, `assets/{data,fonts,img,js/boot.js,seq,seq-m,provenance.json}` y `DESIGN.md` (el de B.4).
+- `prototypes/itinerante-b4/check.mjs` pasó a `tests/site.test.mjs`; `preview.mjs` a `tools/preview-site.mjs`; `BRIEF.md` y `README.md` a `docs/B4-BRIEF.md` y `docs/B4-README.md`; `evidence/` a `docs/evidence/`. El directorio `prototypes/` ya no existe.
+- El sitio anterior quedó en `_archive/models/higgsfield-d599d36a/` (`index.html`, `assets/`, `images/`, `DESIGN.md`, `tests/site.test.mjs`). Esa carpeta está ignorada por git; la historia de git es la copia recuperable (el último estado del sitio anterior está en los commits previos a esta promoción).
+
+Documentación ajustada en esta pasada: `AGENTS.md`, `CONTEXT.md`, `PRODUCT.md`, `README.md`, `DESIGN.md`, `docs/B4-BRIEF.md`, `docs/B4-README.md`, `docs/ARCHITECTURE_AND_CONTEXT.md`, `docs/premium-site-architecture.md` (marcada como histórica) y, con nota de estado, `design-system/libreria-itinerante-y-mas/MASTER.md` y `pages/home.md`. La documentación de las secciones de abajo (septiembre) describe el sitio anterior y el catálogo con Iti IA en la interfaz; ya no corresponde a la UI publicada.
+
+Estado real del sitio B.4: el catálogo es un JSON de muestra estático (500 registros de prueba) con búsqueda local; Iti IA existe como API en el Worker pero no está conectada a la interfaz. No se hizo commit, push ni deploy.
+
+### Sigue pendiente (auditoría del 2026-11-01)
+
+- **Contrato de datos del catálogo**: JSON de muestra estático de B.4 frente a `/api/catalog` con taxonomía controlada. Falta decidir y unificar.
+- **Iti IA** no está integrada en la UI.
+- **Límites de ritmo del Worker** (`IA_PER_IP`, `IA_GLOBAL`): sin validar en preview; `limit()` sin try/catch.
+- **La API expone** calificación, reseñas y precio de referencia de Amazon, contra la regla de no publicar datos sin fuente.
+- Los filtros `category`/`subgenre` de la API son incoherentes con las facetas; `condition` está fijo en `nuevo`.
+- Sin inventario real, sin Data Connect conectado al Worker y sin Go.
+- Restos de Supabase en el repositorio.
+- Dominio de producción sin confirmar para `canonical`, `og:url` y sitemap; `index.html` conserva `noindex,nofollow` y `theme-color #100d0a` (hero ahora claro).
+- Sin desplegar. Cloudflare es el destino; Vercel, Firebase y Next son legado.
+
+---
+
 # Continuidad de Itinerante — 2026-09-07
 
 ## Último avance: patrón Liquid Glass unificado

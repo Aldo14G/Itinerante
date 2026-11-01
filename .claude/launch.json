@@ -8,9 +8,9 @@
       "port": 3000
     },
     {
-      "name": "itinerante-b4",
+      "name": "itinerante-site",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["prototypes/itinerante-b4/preview.mjs"],
+      "runtimeArgs": ["tools/preview-site.mjs"],
       "port": 8094
     }
   ]

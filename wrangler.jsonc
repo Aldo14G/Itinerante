@@ -6,7 +6,9 @@
   "upload_source_maps": true,
   "observability": { "enabled": true },
   "assets": {
-    // public/ lo construye scripts/prepare-public.mjs (lista de permitidos: index.html, assets/, images/, logos).
+    // public/ lo regenera desde cero scripts/prepare-public.mjs (lista de permitidos: index.html, CSS/JS de la raiz,
+    // assets/ sin provenance.json ni sources.json, logos, robots.txt y worker/_headers como _headers). `cf:dev` y `cf:deploy`
+    // lo ejecutan antes de wrangler y se abortan si falla, asi que nunca se publica un public/ viejo.
     "directory": "./public",
     "binding": "ASSETS",
     // Solo /api/* pasa por el Worker; todo lo demás se sirve como asset sin invocar código.

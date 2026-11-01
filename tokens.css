@@ -1,0 +1,198 @@
+/* GENERADO por scripts/build-tokens.mjs desde design/tokens.json. No editar a mano. */
+
+:root {
+  /* Color */
+  --night: #100d0a;
+  --night-2: #17120e;
+  --stone: #241e18;
+  --bone: #f1e8d8;
+  --bone-dim: #b8aa95;
+  --cover-ink: #f1e8d8;
+  --cover-ink-dim: #b8aa95;
+  --line: rgb(241 232 216 / 0.14);
+  --line-strong: rgb(241 232 216 / 0.34);
+  --field: rgb(241 232 216 / 0.62);
+  --tungsten: #f0b357;
+  --tungsten-hi: #f7cc86;
+  --turq: #34b3a5;
+  --turq-base: #34b3a5;
+  --turq-ink: #062824;
+  --turq-light: #8fe0d5;
+  --terra: #c45a3c;
+  --terra-deep: #9e3f25;
+  --terra-ink: #7a2c16;
+  --paper: #efe6d5;
+  --paper-ink: #1a1510;
+  --paper-dim: #5e5245;
+  --black: #000000;
+  --white: #ffffff;
+  --open: #5fd1a0;
+  --idle: #8d8273;
+  --stone-hi: #4a3f33;
+  --terra-light: #ee9a80;
+  --cover-0-a: #0a4f48;
+  --cover-0-b: #062824;
+  --cover-1-a: #7a2c16;
+  --cover-1-b: #2a110a;
+  --cover-2-a: #5a4416;
+  --cover-2-b: #1d1608;
+  --cover-3-a: #34332c;
+  --cover-3-b: #12110d;
+  --cover-4-a: #1d3d52;
+  --cover-4-b: #0a1822;
+  --cover-5-a: #4a2b43;
+  --cover-5-b: #1a0f18;
+  --glass-tint: rgb(30 20 14 / 0.78);
+  --glass-solid: rgb(30 20 14 / 0.94);
+  --glass-edge: rgb(255 255 255 / 0.12);
+  --glass-chip: rgb(255 255 255 / 0.08);
+
+  /* Tipografía */
+  --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
+  --f-serif: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+
+  /* Escala tipográfica */
+  --fs-0: 0.75rem;
+  --fs-1: 0.875rem;
+  --fs-2: 1rem;
+  --fs-3: 1.125rem;
+  --fs-4: 1.375rem;
+  --fs-5: 1.75rem;
+  --fs-6: 2.25rem;
+  --fs-7: 3rem;
+  --fs-body: 1.0625rem;
+
+  /* Espaciado (múltiplos de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* Radios */
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 8px;
+  --radius-4: 16px;
+  --radius-pill: 999px;
+
+  /* Movimiento */
+  --dur-instant: 120ms;
+  --dur-fast: 240ms;
+  --dur-base: 400ms;
+  --dur-slow: 700ms;
+  --dur-scene: 1200ms;
+  --stagger-char: 24ms;
+  --stagger-line: 60ms;
+  --intent-topic: 250ms;
+  --intent-disclosure: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --spring: linear(0, 0.42 8%, 0.86 16%, 1.04 26%, 1.05 32%, 0.99 46%, 1.002 62%, 1);
+
+  /* Distribución */
+  --gutter: clamp(16px, 3.2vw, 48px);
+  --hdr-h: 68px;
+  --tabbar-h: 64px;
+  --glass-blur: 18px;
+  --glass-saturate: 1.6;
+
+  /* Objetivos y medida */
+  --target-fine: 24px;
+  --target-coarse: 44px;
+  --measure-max: 75ch;
+
+  --hair: 1px;
+  color-scheme: dark;
+  interpolate-size: allow-keywords;
+}
+
+[data-tone="light"] {
+  color-scheme: light;
+  --night: #fbf8f2;
+  --night-2: #f3ede1;
+  --stone: #ebe2d0;
+  --stone-hi: #cdbfa6;
+  --bone: #2a1d14;
+  --bone-dim: #65523f;
+  --line: rgb(42 29 20 / 0.14);
+  --line-strong: rgb(42 29 20 / 0.34);
+  --field: rgb(42 29 20 / 0.62);
+  --tungsten: #a8432a;
+  --tungsten-hi: #8f3a22;
+  --turq: #176b62;
+  --turq-light: #176b62;
+  --terra-light: #8a3720;
+  --glass-edge: rgb(42 29 20 / 0.14);
+  --glass-chip: rgb(42 29 20 / 0.06);
+  background: var(--night);
+  color: var(--bone);
+}
+
+[data-tone="sand"] {
+  color-scheme: light;
+  --night: #efe3cc;
+  --night-2: #e6d8bd;
+  --stone: #dccba9;
+  --stone-hi: #bfa982;
+  --bone: #2a1d14;
+  --bone-dim: #5c4a38;
+  --line: rgb(42 29 20 / 0.14);
+  --line-strong: rgb(42 29 20 / 0.34);
+  --field: rgb(42 29 20 / 0.62);
+  --tungsten: #9a3b24;
+  --tungsten-hi: #7f3220;
+  --turq: #14625a;
+  --turq-light: #14625a;
+  --terra-light: #7a2c16;
+  --glass-edge: rgb(42 29 20 / 0.14);
+  --glass-chip: rgb(42 29 20 / 0.06);
+  background: var(--night);
+  color: var(--bone);
+}
+
+[data-tone="brick"] {
+  color-scheme: dark;
+  --night: #8a3720;
+  --night-2: #7a2c16;
+  --stone: #6e2813;
+  --stone-hi: #a8553a;
+  --bone: #f7f0e4;
+  --bone-dim: #ecd5c6;
+  --line: rgb(247 240 228 / 0.2);
+  --line-strong: rgb(247 240 228 / 0.4);
+  --field: rgb(247 240 228 / 0.7);
+  background: var(--night);
+  color: var(--bone);
+}
+
+@media (min-resolution: 2dppx) {
+  :root { --hair: 0.5px; }
+}
+
+@media print {
+  :root {
+    --night: #fff;
+    --night-2: #fff;
+    --stone: #eee;
+    --bone: #000;
+    --bone-dim: #333;
+    --tungsten: #000;
+    --turq: #fff;
+    --turq-ink: #000;
+    --paper: #fff;
+    --paper-ink: #000;
+    --paper-dim: #333;
+    --terra: #000;
+    --terra-deep: #000;
+    --terra-ink: #000;
+    --line: #999;
+    --line-strong: #666;
+  }
+  [data-tone] { background: #fff; color: #000; }
+}

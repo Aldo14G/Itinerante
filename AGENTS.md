@@ -2,46 +2,62 @@
 
 ## Project Structure & Module Organization
 
-This repository is the static site for Libreria Itinerante y Mas plus a small API. **Cloudflare is the deploy target**: `wrangler.jsonc` serves `public/` as Workers Static Assets and runs `worker/index.ts` only for `/api/*` (`/api/catalog`, `/api/ai/iti-ia`). Vercel (`vercel.json`, `src/app/api/*`) and Firebase Hosting (`firebase.json`) are legacy and kept only until Cloudflare is validated in production; the Next routes duplicate the Worker and will be deleted afterwards. The main application lives in `index.html`; its canonical composition is the adapted Higgsfield `d599d36a` model. Local styles and behavior live in `assets/css/higgsfield-site.css` and `assets/js/higgsfield-site.js`. The previous mixed model is read-only history under `_archive/models/`. Static assets are stored at the repository root; `Logo.png` is the favicon and `Logo.webp` is the lightweight visible brand image. Firebase config is in `firebase.json` and `.firebaserc`. Harness docs live in `docs/`, design rules in `design-system/`, and regression checks in `tests/`.
+Este repositorio es el sitio estático de Librería Itinerante y Más más una API pequeña. **El sitio canónico es el prototipo B.4 «Función de la casa», promovido a la raíz el 2026-11-01** (decisión de Aldo; ver `CONTEXT.md`). Sustituye al sitio anterior (Higgsfield `d599d36a`), que quedó archivado y no recibe trabajo nuevo. No hay segunda home.
 
-Avoid generated build output in the root. Keep reusable styles and scripts under `assets/`; do not resume UI work in the archived mixed model.
+**Cloudflare es el destino de deploy**: `wrangler.jsonc` sirve `public/` como Workers Static Assets y ejecuta `worker/index.ts` solo para `/api/*` (`/api/catalog`, `/api/ai/iti-ia`). Vercel (`vercel.json`, `src/app/api/*`) y Firebase Hosting (`firebase.json`) son legado y se conservan hasta validar Cloudflare en producción; las rutas Next duplican el Worker y se borrarán después. Hoy el sitio **no está desplegado** con B.4.
+
+Archivos del sitio, todos en la raíz:
+
+- `index.html`: la única página pública. Un solo documento, copy en español.
+- `tokens.css`: **generado** desde `design/tokens.json` por `scripts/build-tokens.mjs`. No se edita a mano.
+- `style.css` (escritorio y base) y `mobile.css` (`media="(max-width: 760px)"`): estilos locales.
+- `app.js`: escenas de scroll, menú, Libros, mensajes de WhatsApp y estado de apertura en hora de Monterrey. `scenes-desktop.js`: recorrido de fotogramas del hero y cortinilla; `app.js` lo carga con `import()` solo con movimiento y pantalla de escritorio. `catalog.js`: catálogo de muestra, se carga al acercarse a `#catalogo`. `motion.js`: lee las duraciones y curvas de los tokens CSS.
+- `assets/`: `data/catalog.json` (500 registros de prueba), `fonts/`, `img/`, `seq/` (145 fotogramas de escritorio), `seq-m/` (versión vertical; en móvil solo se usa el primero como póster), `js/boot.js` (estado previo al primer render) y `provenance.json` (origen de cada imagen).
+- `DESIGN.md` y `design/tokens.json`: sistema de diseño vigente. `PRODUCT.md`: producto y límites de verdad. `CONTEXT.md`: términos y decisiones.
+- `docs/`: documentación y continuidad (`docs/B4-BRIEF.md`, `docs/B4-README.md`, `docs/evidence/`). `design-system/`: canon anterior, solo referencia histórica. `tests/`: pruebas. `tools/`: servidores locales.
+- API y datos (servicio, sin presentación): `worker/`, `src/lib`, `src/ai`, `src/config`, `src/app/api` (legado), `dataconnect/`, `generated/`.
+- Archivo: `_archive/models/higgsfield-d599d36a/` guarda el sitio anterior (`index.html`, `assets/`, `images/`, `DESIGN.md`, `tests/site.test.mjs`). Está ignorado por git; la historia de git es la copia recuperable. `Logo.png` y `Logo.webp` siguen en la raíz.
+
+Evita salida de build en la raíz. No retomes trabajo de UI en `_archive/`.
 
 ## Build, Test, and Development Commands
 
-- `firebase emulators:start --only hosting`: serves the site locally through Firebase Hosting behavior.
-- `npm run cf:dev`: builds `public/` (allow-list: index.html, assets/, images/, logos, `_headers`) and serves site + API with `wrangler dev`.
-- `npm run cf:deploy`: builds `public/` and runs `wrangler deploy`. Optional secret: `npx wrangler secret put GEMINI_API_KEY` (without it Iti IA answers with the local ranking).
-- Legacy: `firebase deploy --only hosting` publishes the same `public/` with no API.
-- Iti IA protection (Worker): Origin and body-size check from `src/lib/api-guard.ts` (`ITI_IA_ALLOWED_ORIGINS`, `ITI_IA_MAX_BODY_BYTES`) plus Cloudflare Rate Limiting bindings `IA_PER_IP` (10/min) and `IA_GLOBAL` (120/min), enforced per Cloudflare location, not as a strict global cap. The Next route keeps the in-memory limiter.
-- `npm run preview`: serves the static site at `http://127.0.0.1:8080/`.
-- `npm test`: runs the Harness Engineering regression checks.
+- `npm test`: regresión del repositorio, incluida la prueba del sitio B.4 (`tests/site.test.mjs`), pruebas del Worker, API, taxonomía y diseño.
+- `node tools/preview-site.mjs`: sirve solo el sitio (index, CSS, JS y `assets/`, con la CSP de producción y gzip) en `http://127.0.0.1:8094/` (variable `PORT` para cambiarlo). No sirve la API ni `docs/`.
+- `npm run preview` / `npm run dev`: arrancan Data Connect, el backend Next y una vista previa en `http://127.0.0.1:8080/` (flujo anterior con API local). `npm run preview:static` sirve la raíz sin allow-list en el puerto 8080 y reenvía `/api/*` a un backend aparte.
+- `npm run cf:dev`: arma `public/` con `scripts/prepare-public.mjs` y sirve sitio y API con `wrangler dev`.
+- `npm run cf:deploy`: arma `public/` y ejecuta `wrangler deploy`. Secreto opcional: `npx wrangler secret put GEMINI_API_KEY` (sin él Iti IA responde con el ranking local). **No ejecutes un deploy sin que Aldo lo pida.**
+- `npm run tokens`: regenera `tokens.css` desde `design/tokens.json`. `npm run tokens:check` falla si el CSS generado está desactualizado.
+- `npm run critique` y `npm run critique:static`: revisión de diseño contra los tokens.
+- Legado: `firebase deploy --only hosting` publica `public/` sin API; `firebase emulators:start --only hosting` lo sirve local.
+- Protección de Iti IA (Worker): comprobación de Origin y tamaño de cuerpo desde `src/lib/api-guard.ts` (`ITI_IA_ALLOWED_ORIGINS`, `ITI_IA_MAX_BODY_BYTES`) y bindings de Rate Limiting `IA_PER_IP` (10/min) y `IA_GLOBAL` (120/min), aplicados por ubicación de Cloudflare, no como tope global estricto. Pendiente: validarlos en preview y envolver `limit()` en try/catch. La ruta Next conserva su limitador en memoria.
 
-There is no build step at present. `index.html` is served directly.
+El sitio no tiene paso de build: los archivos de la raíz se sirven tal cual. Lo único generado es `tokens.css` y la carpeta `public/`.
 
 ## Coding Style & Naming Conventions
 
-Use 2-space indentation for HTML, CSS, and JavaScript. Keep copy in Spanish unless a section is intentionally bilingual. Prefer semantic sections with descriptive `id` values such as `#eventos`, `#contacto`, or `#catalogo`.
+Usa 2 espacios en HTML, CSS y JavaScript. Copy en español salvo secciones bilingües intencionales. Secciones semánticas con `id` descriptivo (`#casa`, `#cartelera`, `#libros`, `#catalogo`, `#visita`).
 
-CSS custom properties belong in `:root`; reuse the Higgsfield turquoise, ink, paper, and coral variables before adding colors. Keep critical layout, spacing, typography, and state styles in local CSS; do not reintroduce Tailwind CDN or Higgsfield SDK dependencies.
+Las variables de color, tipografía, espaciado y movimiento salen de `design/tokens.json`; edita ahí y corre `npm run tokens`. No escribas milisegundos a mano en JS: usa `motion.js`. Reutiliza los tonos (`data-tone="light|sand|brick"`) antes de añadir colores. Estilos críticos de layout, tipografía y estado van en CSS local; no reintroduzcas Tailwind CDN, SDKs de Higgsfield ni dependencias externas en runtime.
 
-Before UI changes, read `design-system/libreria-itinerante-y-mas/MASTER.md` and then `design-system/libreria-itinerante-y-mas/pages/home.md` for landing-specific rules.
+Antes de cambiar la UI, lee `DESIGN.md` y `PRODUCT.md`. `design-system/libreria-itinerante-y-mas/MASTER.md` describe el canon anterior (Claude Design/Higgsfield) y es solo referencia histórica.
 
 ## Testing Guidelines
 
-Node's built-in test runner powers the Harness Engineering checks in `tests/site.test.mjs`. Before deployment, run `npm test` and manually verify:
+El runner nativo de Node ejecuta las comprobaciones en `tests/`. La prueba del sitio es `tests/site.test.mjs`. Antes de un deploy corre `npm test` y verifica a mano:
 
-- Desktop and mobile layouts render correctly.
-- Navigation anchors scroll to the intended sections.
-- Images load from local paths allowed by the CSP.
-- Browser console has no errors.
-- Firebase headers and CSP do not block required assets.
+- Escritorio y móvil se ven bien (con y sin movimiento; pausa en el pie).
+- Las anclas llevan a la sección correcta.
+- Las imágenes cargan desde rutas locales permitidas por la CSP.
+- La consola del navegador no tiene errores.
+- Los encabezados y la CSP de Cloudflare (`worker/_headers`) no bloquean recursos necesarios.
 
-Use Lighthouse or browser accessibility checks for major visual changes.
+Usa Lighthouse o revisiones de accesibilidad del navegador para cambios visuales grandes.
 
 ## Commit & Pull Request Guidelines
 
-This folder does not currently contain Git history, so use clear imperative commits such as `Update contact section` or `Tighten Firebase security headers`. Pull requests should include a short description, screenshots for visual changes, test notes, and any Firebase configuration impact.
+Usa commits imperativos y claros, como `Update contact section` o `Tighten Cloudflare headers`. Las PR llevan descripción breve, capturas para cambios visuales, notas de prueba y el impacto en la configuración de Cloudflare o Firebase. No hagas commit, push ni deploy sin que se pida.
 
 ## Security & Configuration Tips
 
-Do not expose service-account credentials in public hosting. `firebase.json` already ignores `*.json` during deploy; keep credentials out of screenshots, issues, and client-side code.
+No expongas credenciales de cuenta de servicio en el hosting público. `firebase.json` ya ignora `*.json` en el deploy legado; mantén credenciales fuera de capturas, issues y código del cliente. Los secretos del Worker se cargan con `wrangler secret put`, nunca en el repositorio.

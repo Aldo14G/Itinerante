@@ -17,7 +17,6 @@ import { buildTaxonomyMutations, validateTaxonomy } from '../scripts/seed-taxono
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const taxonomy = JSON.parse(readFileSync(join(root, 'data', 'taxonomy.controlled.json'), 'utf8'));
-const html = readFileSync(join(root, 'index.html'), 'utf8');
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SOURCE = 'Librería Itinerante · taxonomía controlada v1';
@@ -33,14 +32,6 @@ test('controlled taxonomy has seven canonical categories', () => {
   }
   const ids = taxonomy.categories.map(({ id }) => id);
   assert.equal(new Set(ids).size, ids.length);
-});
-
-test('controlled category slugs match the index filter chips', () => {
-  const chips = [...html.matchAll(/data-filter="([^"]+)"/g)].map(([, slug]) => slug);
-  assert.ok(chips.includes('all'));
-  for (const { slug } of taxonomy.categories) {
-    assert.ok(chips.includes(slug), `chip missing for category: ${slug}`);
-  }
 });
 
 test('controlled subgenres resolve to canonical categories', () => {

@@ -1,14 +1,12 @@
-// Genera los CSS de tokens desde design/tokens.json:
-//   prototypes/itinerante-b4/tokens.css (tema b4) y assets/css/tokens.css (tema root).
-// Uso: node scripts/build-tokens.mjs [--check]  (--check falla si algún archivo generado está desactualizado)
+// Genera tokens.css (raíz del repo) desde design/tokens.json: un solo tema de sitio.
+// Uso: node scripts/build-tokens.mjs [--check]  (--check falla si el archivo generado está desactualizado)
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const TOKENS_PATH = join(root, 'design/tokens.json');
-export const B4_CSS_PATH = join(root, 'prototypes/itinerante-b4/tokens.css');
-export const ROOT_CSS_PATH = join(root, 'assets/css/tokens.css');
+export const SITE_CSS_PATH = join(root, 'tokens.css');
 
 const HEADER = '/* GENERADO por scripts/build-tokens.mjs desde design/tokens.json. No editar a mano. */';
 
@@ -22,19 +20,15 @@ function groups() {
   return { lines, group };
 }
 
-function shared(group, s) {
-  group('Escala tipográfica', Object.entries(s.type).map(([k, v]) => [`fs-${k}`, v]));
-  group('Espaciado (múltiplos de 4)', Object.entries(s.space).map(([k, v]) => [`space-${k}`, `${v}px`]));
-  group('Radios', Object.entries(s.radius).map(([k, v]) => [`radius-${k}`, v]));
-}
-
-export function renderB4(tokens) {
+export function renderSite(tokens) {
   const { scales: s, themes } = tokens;
   const t = themes.b4;
   const { lines, group } = groups();
   group('Color', Object.entries(t.color));
   group('Tipografía', Object.entries(t.font));
-  shared(group, s);
+  group('Escala tipográfica', Object.entries(s.type).map(([k, v]) => [`fs-${k}`, v]));
+  group('Espaciado (múltiplos de 4)', Object.entries(s.space).map(([k, v]) => [`space-${k}`, `${v}px`]));
+  group('Radios', Object.entries(s.radius).map(([k, v]) => [`radius-${k}`, v]));
   group('Movimiento', [...Object.entries(s.duration).map(([k, v]) => [`dur-${k}`, v]), ...Object.entries(s.stagger).map(([k, v]) => [`stagger-${k}`, v]), ...Object.entries(s.intent).map(([k, v]) => [`intent-${k}`, v]), ...Object.entries(t.ease)]);
   group('Distribución', Object.entries(t.layout));
   group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
@@ -49,21 +43,9 @@ export function renderB4(tokens) {
   return `${HEADER}\n\n:root {\n${lines.join('\n')}\n}\n\n${tones}\n@media (min-resolution: 2dppx) {\n  :root { --hair: ${s.hair.dense}; }\n}\n\n@media print {\n  :root {\n${print}\n  }\n  [data-tone] { background: #fff; color: #000; }\n}\n`;
 }
 
-// Sitio raíz: mismas escalas y su propio tema de color.
-export function renderRoot(tokens) {
-  const { scales: s, themes } = tokens;
-  const { lines, group } = groups();
-  group('Color', Object.entries(themes.root.color));
-  shared(group, s);
-  group('Movimiento', Object.entries(s.duration).map(([k, v]) => [`dur-${k}`, v]));
-  group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
-  lines.push(`  --hair: ${s.hair.base};`);
-  return `${HEADER}\n\n:root {\n${lines.join('\n')}\n}\n\n@media (min-resolution: 2dppx) {\n  :root { --hair: ${s.hair.dense}; }\n}\n`;
-}
-
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const tokens = JSON.parse(readFileSync(TOKENS_PATH, 'utf8'));
-  const targets = [[B4_CSS_PATH, renderB4(tokens)], [ROOT_CSS_PATH, renderRoot(tokens)]];
+  const targets = [[SITE_CSS_PATH, renderSite(tokens)]];
   if (process.argv.includes('--check')) {
     const read = path => (existsSync(path) ? readFileSync(path, 'utf8').replace(/\r\n/g, '\n') : '');
     const stale = targets.filter(([path, css]) => read(path) !== css);

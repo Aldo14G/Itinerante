@@ -1,3 +1,5 @@
+> **Nota de estado (2026-11-01).** El sistema de diseño vigente del sitio publicado es `DESIGN.md` + `design/tokens.json` (prototipo B.4 «Función de la casa», promovido a la raíz). Este archivo describe la home del canon anterior (orden de secciones, anclas `#experiencia`, `#eventos`, `#galeria`, `#ubicacion`, video compartido y Iti IA en la UI) que ya no existe; las secciones vigentes son Entrada, La casa, Cartelera, Libros, Catálogo, Llamado y Visita (`#inicio`, `#casa`, `#cartelera`, `#libros`, `#catalogo`, `#visita`) y se conserva solo como referencia histórica. No lo uses para decidir cambios de UI; su contenido de abajo no se actualizó y puede contradecir el sitio actual.
+
 # Home Page Override
 
 Aplica a `index.html`, única superficie pública oficial.

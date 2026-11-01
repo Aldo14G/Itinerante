@@ -1,0 +1,4 @@
+# Todo el sitio es publico. Sin linea Sitemap: aun no hay dominio de produccion verificado en el repo.
+User-agent: *
+Allow: /
+Disallow: /api/

@@ -1,3 +1,5 @@
+> **Documento histórico (cambió el 2026-11-01).** Este plano describía el sitio anterior (capítulos numerados, agenda, FAQ, Firebase Hosting). El 2026-11-01 el prototipo B.4 «Función de la casa» pasó a la raíz y sustituyó a ese sitio. Hoy no hay barra de capítulos numerados ni FAQ: la navegación es la cabecera (escritorio) y la barra inferior con menú lateral (móvil); el hosting es Cloudflare. Vigente: `DESIGN.md`, `PRODUCT.md` y `CONTEXT.md`. Se conserva como referencia de intención.
+
 # Web Component Intelligence Adaptation
 
 This blueprint adapts the premium product-page grammar from `web-component-intelligence` to Libreria Itinerante y Mas. It is not a clone of any third-party page. Do not copy proprietary code, media, copy, marks, APIs, or protected assets.

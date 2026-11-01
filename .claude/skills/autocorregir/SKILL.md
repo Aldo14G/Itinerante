@@ -5,11 +5,11 @@ description: Loop de autocorrección de diseño para Librería Itinerante. Mide 
 
 # /autocorregir
 
-Loop de crítica y corrección sobre **B.4** (`prototypes/itinerante-b4`) y el **sitio raíz** (`index.html` + `assets/css/higgsfield-site.css`). No hace falta que la persona señale cada detalle: tú mides, corriges y verificas.
+Loop de crítica y corrección sobre el **sitio** (B.4, promovido a la raíz el 2026-11-01: `index.html`, `style.css`, `mobile.css`, `tokens.css`). No hace falta que la persona señale cada detalle: tú mides, corriges y verificas.
 
 ## Piezas
 
-- `design/tokens.json`: fuente de verdad (escalas compartidas + temas `b4` y `root`). `npm run tokens` genera `prototypes/itinerante-b4/tokens.css`; el tema `root` solo se verifica.
+- `design/tokens.json`: fuente de verdad (escalas compartidas + un solo tema de sitio, `themes.b4`, con tonos `light|sand|brick`). `npm run tokens` genera `tokens.css` en la raíz.
 - `scripts/critique.mjs` (`npm run critique`, `npm run critique:static`): reglas deterministas, informe en `design/report.json`. Las de severidad **error** no pueden superar `design/baseline.json` (ratchet: solo baja). Las **warn** son críticas a revisar.
 - Familias: `tokens` (color, escala tipográfica, cuadrícula de 4 px, radios, duraciones), `a11y` (contraste AA, objetivos 44/24 px, nombres, foco, h1, 12 px mínimo, desborde, consola), `motion` (≤1.2 s, sin animar layout, `prefers-reduced-motion`), `copy` (verdad comercial, rótulos Foto real / Recreación IA, repeticiones, medida), `law` (Hick, Miller, Von Restorff, interlineado).
 
@@ -24,12 +24,12 @@ Loop de crítica y corrección sobre **B.4** (`prototypes/itinerante-b4`) y el *
 ## Ronda (máximo 5)
 
 1. **Preflight (solo la primera vez):** árbol limpio, rama distinta de `main`, `npm run tokens:check`.
-2. **Medir:** `npm run critique -- --surface b4` (y `root`). Lee `design/report.json`; ordena por familia: a11y → tokens → motion → copy → law.
+2. **Medir:** `npm run critique` (superficie `site`). Lee `design/report.json`; ordena por familia: a11y → tokens → motion → copy → law.
 3. **Elegir un lote coherente** (≤ 30 hallazgos, una causa común): por ejemplo, «todos los radios de 3 px a `--radius-2`», «duraciones de 0.3 s a `--dur-fast`», «tamaños de texto a `--fs-*`».
    - Para un valor que falta en las escalas, agrégalo a `design/tokens.json` primero y corre `npm run tokens`.
    - Cada sustitución debe conservar el aspecto: elige el token más cercano; si el salto es visible, registra por qué.
 4. **Crítica visual (una vez por ronda):** captura escritorio 1440×900 y móvil 390×844 de lo tocado (CDP o navegador integrado), mira las imágenes y critica color, estilo, animación y texto como director de diseño. Anota hallazgos que las reglas no miden; arregla los que estén dentro de las reglas de seguridad.
-5. **Verificar:** `node --test prototypes/itinerante-b4/check.mjs`, `node --test tests/critique.test.mjs`, `npm test` (hoy falla 1 prueba previa que depende de `_archive/`; no cuenta como regresión), y vuelve a correr `npm run critique`.
+5. **Verificar:** `node --test tests/site.test.mjs`, `node --test tests/critique.test.mjs`, `npm test` (hoy falla 1 prueba previa que depende de `_archive/`; no cuenta como regresión), y vuelve a correr `npm run critique`.
 6. **Decidir:**
    - Si una regla *error* subió, una prueba nueva falla o la captura se ve rota → revierte la ronda (`git checkout -- .` de lo que tocaste) y prueba un lote más pequeño.
    - Si todo baja o se mantiene → `node scripts/critique.mjs --update-baseline` (solo si bajó), y **un commit por ronda**: `fix(design): ronda N · <causa común>` con el recuento antes/después en el cuerpo.

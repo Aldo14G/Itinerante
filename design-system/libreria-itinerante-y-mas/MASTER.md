@@ -1,3 +1,5 @@
+> **Nota de estado (2026-11-01).** El sistema de diseño vigente del sitio publicado es `DESIGN.md` + `design/tokens.json` (prototipo B.4 «Función de la casa», promovido a la raíz). Este archivo describe el canon anterior (Claude Design/Higgsfield: turquesa `#5dc4b4`, Playfair Display e Inter, capítulos numerados) y se conserva solo como referencia histórica. No lo uses para decidir cambios de UI; su contenido de abajo no se actualizó y puede contradecir el sitio actual.
+
 # Librería Itinerante Design Standard
 
 > Fuente de verdad visual. La composición canónica es el prototipo `Itinerante Home cinematico.dc.html` de Claude Design. Higgsfield aporta únicamente el recorrido, los posters y el movimiento, sin reemplazar la identidad ni la arquitectura local.

@@ -1,8 +1,10 @@
 # Arquitectura y contexto
 
+> **Nota 2026-11-01:** el `index.html` de la raíz es ahora el sitio B.4 «Función de la casa», que sustituyó al sitio anterior (archivado en `_archive/models/higgsfield-d599d36a/`). La interfaz B.4 **no consume `/api/catalog` ni `/api/ai/iti-ia`**: su catálogo es un JSON de muestra estático. La arquitectura de datos descrita abajo corresponde al servicio (Worker/Next) y no está conectada a la UI. Ver `CONTEXT.md` para los pendientes.
+
 ## Estado comprobado al 29 de agosto de 2026
 
-`index.html` sigue siendo la única superficie pública de Librería Itinerante y
+`index.html` es la única superficie pública de Librería Itinerante y
 Más. El runtime Next.js existe únicamente para `/api/catalog` y
 `/api/ai/iti-ia`; no contiene otra home ni un catálogo visual paralelo.
 

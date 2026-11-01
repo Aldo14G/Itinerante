@@ -22,7 +22,7 @@ test('el auditor detecta cada familia de defectos en el fixture malo', browser, 
   }
 });
 
-test('ratchet: B.4 y el sitio raíz no superan el baseline', () => {
+test('ratchet: el sitio no supera el baseline', () => {
   const res = run('--static-only', '--out', join(mkdtempSync(join(tmpdir(), 'crit-')), 'r.json'), '--top', '0');
   assert.equal(res.status, 0, res.stdout.split('CRÍTICA')[0].slice(-600));
 });

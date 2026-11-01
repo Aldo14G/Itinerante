@@ -27,14 +27,18 @@ const contentTypes = {
   '.webm': 'video/webm'
 };
 
-const immutableExtensions = new Set(['.css', '.js', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.mp4', '.webm']);
+// Ningún archivo del sitio lleva huella en su nombre (style.css, app.js...): el texto se revalida siempre y los
+// medios duran 7 días. Es el mismo criterio que worker/_headers, para que la vista local se comporte como producción.
+const mediaExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.svg', '.woff2', '.mp4', '.webm']);
 
 function cacheHeaders(filePath) {
-  if (filePath.endsWith('index.html')) return { 'Cache-Control': 'no-cache' };
-  if (immutableExtensions.has(extname(filePath))) {
-    return { 'Cache-Control': 'public, max-age=31536000, immutable' };
-  }
-  return {};
+  if (mediaExtensions.has(extname(filePath))) return { 'Cache-Control': 'public, max-age=604800' };
+  return { 'Cache-Control': 'no-cache' };
+}
+
+// Herramienta local: nunca sirve archivos ocultos (.env, .git...) ni dependencias.
+function isHidden(filePath, root) {
+  return filePath.slice(root.length).split(sep).some(part => part.startsWith('.') || part === 'node_modules');
 }
 
 function backendUrl(origin, requestUrl) {
@@ -133,6 +137,11 @@ export function createPreviewServer({ root = defaultRoot, port = defaultPort, ba
       if (!filePath) {
         response.writeHead(403);
         response.end('Forbidden');
+        return;
+      }
+      if (isHidden(filePath, root)) {
+        response.writeHead(404);
+        response.end('Not found');
         return;
       }
 

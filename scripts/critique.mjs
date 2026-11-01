@@ -1,5 +1,5 @@
 // Auditor de diseño determinista: tokens, accesibilidad, movimiento y copy/verdad, con leyes UX medibles.
-// Uso: node scripts/critique.mjs [--surface b4|root|all] [--static-only] [--update-baseline] [--top N]
+// Uso: node scripts/critique.mjs [--surface site|all] [--static-only] [--update-baseline] [--top N]
 // Sale con 1 si alguna regla de severidad "error" supera el baseline (ratchet: solo puede bajar).
 import { readFileSync, writeFileSync, existsSync, mkdirSync, mkdtempSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -7,7 +7,8 @@ import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep, dirname, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderB4, renderRoot } from './build-tokens.mjs';
+import { renderSite } from './build-tokens.mjs';
+import { allowed as siteAllowed } from '../tools/preview-site.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const tokens = JSON.parse(readFileSync(join(root, 'design/tokens.json'), 'utf8'));
@@ -16,8 +17,7 @@ const flag = name => argv.includes(`--${name}`);
 const opt = (name, fallback) => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : fallback; };
 
 const SURFACES = {
-  b4: { dir: 'prototypes/itinerante-b4', html: 'index.html', css: ['tokens.css', 'style.css', 'mobile.css'], theme: 'b4', labels: true },
-  root: { dir: '.', html: 'index.html', css: ['assets/css/higgsfield-site.css'], theme: 'root', labels: false },
+  site: { dir: '.', html: 'index.html', css: ['tokens.css', 'style.css', 'mobile.css'], theme: 'b4', labels: true },
   fixture: { dir: 'tests/fixtures/critique-bad', html: 'index.html', css: ['style.css'], theme: 'b4', labels: false, hidden: true },
 };
 
@@ -156,9 +156,7 @@ function staticCss(name, surface) {
 
   }
   // Deriva: el CSS de tokens generado debe coincidir con design/tokens.json.
-  const generated = surface.dir === 'tests/fixtures/critique-bad' ? null
-    : surface.theme === 'b4' ? ['prototypes/itinerante-b4/tokens.css', renderB4(tokens)]
-    : ['assets/css/tokens.css', renderRoot(tokens)];
+  const generated = surface.hidden ? null : ['tokens.css', renderSite(tokens)];
   if (generated) {
     const file = join(root, generated[0]);
     const current = existsSync(file) ? readFileSync(file, 'utf8').replace(/\r\n/g, '\n') : '';
@@ -173,13 +171,14 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=u
 
 function serve(dir) {
   const base = resolve(root, dir);
+  const isSite = base === resolve(root); // la raíz solo sirve la lista de permitidos del sitio (la de tools/preview-site.mjs)
   const server = createServer((req, res) => {
     const url = new URL(req.url, 'http://x');
     if (url.pathname.startsWith('/api/')) return res.writeHead(503, { 'Content-Type': 'application/json' }).end('{"error":"sin API en la auditoría"}');
     let p = posix.normalize(decodeURIComponent(url.pathname));
     if (p.endsWith('/')) p += 'index.html';
     const file = resolve(base, `.${p}`);
-    if (!file.startsWith(base + sep) || !existsSync(file) || /\.(md|mjs)$/.test(file) && !file.includes('assets')) return res.writeHead(404).end('no');
+    if (!file.startsWith(base + sep) || !existsSync(file) || (isSite ? !siteAllowed(p) : /\.(md|mjs)$/.test(file) && !file.includes('assets'))) return res.writeHead(404).end('no');
     try { res.writeHead(200, { 'Content-Type': MIME[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' }).end(readFileSync(file)); } catch { res.writeHead(404).end('no'); }
   });
   return new Promise(r => server.listen(0, '127.0.0.1', () => r({ server, port: server.address().port })));
