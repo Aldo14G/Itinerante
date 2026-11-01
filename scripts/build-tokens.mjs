@@ -41,7 +41,12 @@ export function renderB4(tokens) {
   lines.push(`  --hair: ${s.hair.base};`);
   Object.entries(t.root).forEach(([k, v]) => lines.push(`  ${k}: ${v};`));
   const print = Object.entries(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');
-  return `${HEADER}\n\n:root {\n${lines.join('\n')}\n}\n\n@media (min-resolution: 2dppx) {\n  :root { --hair: ${s.hair.dense}; }\n}\n\n@media print {\n  :root {\n${print}\n  }\n}\n`;
+  // Tonos por sección: el hero es oscuro; el resto redefine los mismos tokens (data-tone) y pinta su fondo.
+  const tones = Object.entries(t.tones ?? {}).map(([name, vars]) => {
+    const body = Object.entries(vars).map(([k, v]) => (k === 'color-scheme' ? `  ${k}: ${v};` : `  --${k}: ${v};`)).join('\n');
+    return `[data-tone="${name}"] {\n${body}\n  background: var(--night);\n  color: var(--bone);\n}\n`;
+  }).join('\n');
+  return `${HEADER}\n\n:root {\n${lines.join('\n')}\n}\n\n${tones}\n@media (min-resolution: 2dppx) {\n  :root { --hair: ${s.hair.dense}; }\n}\n\n@media print {\n  :root {\n${print}\n  }\n  [data-tone] { background: #fff; color: #000; }\n}\n`;
 }
 
 // Sitio raíz: mismas escalas y su propio tema de color.

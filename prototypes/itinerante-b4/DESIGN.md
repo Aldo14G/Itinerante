@@ -70,7 +70,9 @@ motion:
 
 ## Mundo
 
-La casa de noche, iluminada con lámpara. El fondo es piedra en penumbra (`night`), el texto es hueso, y la luz cálida de tungsteno marca lo accionable. El turquesa de los libreros es el único color que ocupa un capítulo entero (Cartelera). La terracota del piso aparece como acento en el llamado final. El papel (`paper`) solo se usa para leer datos prácticos: la nota del mensaje y la Visita.
+La casa a media tarde, con la luz de la calle en la pared. Solo la entrada (el hero) es de noche: piedra en penumbra (`night`) con la luz cálida de tungsteno. Todo lo demás se lee sobre cal cálida (tono `light`: fondo `#f7f0e4`, texto café tabaco `#2a1d14`), con el ladrillo como acento (`#a8432a`) y el turquesa de los libreros oscurecido (`#176b62`) para texto. El turquesa ocupa un capítulo entero (Cartelera), el tungsteno una banda (llamado final) y el pie va en ladrillo (tono `brick`, `#8a3720`). Quien llega buscando la dirección encuentra un sitio luminoso y con contraste alto, no una cueva.
+
+**Tonos por sección.** `data-tone="light|brick"` redefine los mismos tokens (`night`, `bone`, `line`, `tungsten`, `turq`…) dentro de la sección y pinta su fondo; ningún componente cambia. Se generan desde `design/tokens.json` (`themes.b4.tones`). En un tono claro, `night` significa «fondo» y `bone` «tinta»: los pares garantizan ≥ 4.5:1 y lo comprueba `check.mjs`.
 
 El único motivo gráfico es el piso ajedrezado de la sala. Aparece como cortinilla entre La casa y la Cartelera, y como cuadro separador en la marquesina.
 

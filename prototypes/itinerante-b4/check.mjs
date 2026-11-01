@@ -233,3 +233,21 @@ test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y 
   }
   assert.equal([...html.matchAll(/<div class="bill-dots"[^>]*>([\s\S]*?)<\/div>/g)][0][1].match(/<i>/g).length, items.length);
 });
+
+test('tonos claros: las secciones de lectura usan cal y el pie ladrillo, con contraste suficiente', async () => {
+  const expected = { 'id="inicio"': 'light', 'class="manifesto"': 'light', 'id="casa"': 'sand', 'id="libros"': 'sand', 'id="catalogo"': 'light' };
+  for (const [sel, tone] of Object.entries(expected)) {
+    const tag = html.match(new RegExp(`<section[^>]*${sel}[^>]*>`))[0];
+    assert.ok(tag.includes(`data-tone="${tone}"`) && /data-theme="paper"/.test(tag), `${sel} sin tono ${tone}`);
+  }
+  assert.ok(/<footer class="ftr" data-tone="brick">/.test(html));
+  const lum = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const tokens = JSON.parse(await readFile(here('../../design/tokens.json'), 'utf8')).themes.b4.tones;
+  for (const [name, t] of Object.entries(tokens)) {
+    assert.ok(ratio(t.bone, t.night) >= 7, `${name}: texto sobre fondo`);
+    assert.ok(ratio(t['bone-dim'], t.night) >= 4.5, `${name}: texto atenuado`);
+    if (name !== 'brick') for (const k of ['tungsten', 'tungsten-hi', 'turq', 'terra-light']) assert.ok(ratio(t[k], t.night) >= 4.5, `${name}: ${k} sobre fondo`);
+  }
+  assert.ok(/\[data-tone="light"\]/.test(tokensCss) && /\[data-tone="sand"\]/.test(tokensCss) && /\[data-tone="brick"\]/.test(tokensCss));
+});

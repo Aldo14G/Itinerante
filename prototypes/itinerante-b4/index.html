@@ -79,7 +79,7 @@
     </div>
   </div>
 
-  <dialog class="sheet-menu" id="sheet-menu" aria-labelledby="sheet-menu-title">
+  <dialog class="sheet-menu" data-tone="light" id="sheet-menu" aria-labelledby="sheet-menu-title">
     <div class="sm-head"><h2 class="sm-title" id="sheet-menu-title">Menú</h2><button class="sm-close" type="button" data-sm-close aria-label="Cerrar menú"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
     <nav class="sm-nav" aria-label="Menú principal">
       <ul class="sm-list">
@@ -116,7 +116,7 @@
 
   <main id="contenido">
     <!-- Entrada: recorrido sincronizado al scroll -->
-    <section id="inicio" class="entry" data-scene="entry" aria-labelledby="entry-title">
+    <section id="inicio" class="entry" data-scene="entry" data-tone="light" data-theme="paper" aria-labelledby="entry-title">
       <div class="entry-stage">
         <div class="entry-media" aria-hidden="true">
           <picture><source media="(max-width: 760px)" srcset="assets/seq-m/m001.webp"><img class="entry-poster" src="assets/seq/f001.webp" width="1280" height="720" alt="" fetchpriority="high" decoding="async"></picture>
@@ -149,7 +149,7 @@
     </section>
 
     <!-- Manifiesto -->
-    <section class="manifesto" data-scene="manifesto" aria-labelledby="manifesto-title">
+    <section class="manifesto" data-scene="manifesto" data-tone="light" data-theme="paper" aria-labelledby="manifesto-title">
       <h2 id="manifesto-title" class="sr-only">Qué es Itinerante</h2>
       <div class="manifesto-grid">
         <p class="manifesto-text" data-words>No es una tienda de paso. Es una casa para hojear <em>sin prisa,</em> preguntar en voz alta y salir con el libro que no sabías que buscabas.</p>
@@ -161,7 +161,7 @@
     </section>
 
     <!-- La casa: tira de película -->
-    <section id="casa" class="house" data-scene="house" aria-labelledby="house-title">
+    <section id="casa" class="house" data-scene="house" data-tone="sand" data-theme="paper" aria-labelledby="house-title">
       <div class="house-pin">
         <div class="house-head">
           <h2 id="house-title" class="h2">La casa, <em>cuarto por cuarto</em></h2>
@@ -180,7 +180,7 @@
     </section>
 
     <!-- Cortinilla: el piso ajedrezado -->
-    <div class="wipe" data-scene="wipe" aria-hidden="true"><div class="wipe-grid" data-wipe-grid></div></div>
+    <div class="wipe" data-scene="wipe" data-tone="sand" aria-hidden="true"><div class="wipe-grid" data-wipe-grid></div></div>
 
     <!-- Cartelera -->
     <section id="cartelera" class="bill" data-theme="turq" aria-labelledby="bill-title">
@@ -226,7 +226,7 @@
     </section>
 
     <!-- Libros -->
-    <section id="libros" class="books" aria-labelledby="books-title">
+    <section id="libros" class="books" data-tone="sand" data-theme="paper" aria-labelledby="books-title">
       <div class="books-head">
         <h2 id="books-title" class="h2">Elige un tema. <em>Nosotros buscamos el libro</em></h2>
         <p>Elige por dónde empezar y te preparamos la consulta para WhatsApp.</p>
@@ -268,13 +268,13 @@
     </section>
 
     <!-- Cita -->
-    <figure class="quote rx" data-rules>
+    <figure class="quote rx" data-rules data-tone="brick">
       <blockquote><p>La libertad, Sancho, es uno de los más preciosos dones que a los hombres dieron los cielos.</p></blockquote>
       <figcaption>Miguel de Cervantes, <cite>Don Quijote de la Mancha</cite>, parte II, cap. 58. Dominio público.</figcaption>
     </figure>
 
     <!-- Catálogo de muestra -->
-    <section id="catalogo" class="cat" aria-labelledby="cat-title" data-state="idle">
+    <section id="catalogo" class="cat" data-tone="light" data-theme="paper" aria-labelledby="cat-title" data-state="idle">
       <div class="cat-head">
         <h2 id="cat-title" class="h2">Explora <em>la muestra</em></h2>
         <p class="cat-seal" data-cat-seal>Datos de muestra · no es inventario</p>
@@ -397,7 +397,7 @@
     </section>
   </main>
 
-  <footer class="ftr">
+  <footer class="ftr" data-tone="brick">
     <p class="ftr-mark" aria-hidden="true" data-footmark>Itinerante</p>
     <div class="ftr-row">
       <p class="ftr-brand">Librería Itinerante <i>y Más</i><br><span>Mariano Matamoros Pte. 421, Centro, Monterrey</span></p>

@@ -253,7 +253,7 @@ p { text-wrap: pretty; }
 .entry-shade {
   position: absolute; inset: 0;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--night) 60%, transparent) 0%, color-mix(in srgb, var(--night) 0%, transparent) 20%, color-mix(in srgb, var(--night) 0%, transparent) 38%, color-mix(in srgb, var(--night) 72%, transparent) 68%, color-mix(in srgb, var(--night) 96%, transparent) 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--night) 78%, transparent) 0%, color-mix(in srgb, var(--night) 0%, transparent) 24%, color-mix(in srgb, var(--night) 0%, transparent) 36%, color-mix(in srgb, var(--night) 84%, transparent) 58%, color-mix(in srgb, var(--night) 95%, transparent) 76%, color-mix(in srgb, var(--night) 98%, transparent) 100%),
     radial-gradient(130% 95% at 55% 38%, transparent 52%, color-mix(in srgb, var(--night) 50%, transparent));
 }
 .entry-media::after {
@@ -405,7 +405,7 @@ p { text-wrap: pretty; }
   display: grid; grid-template-columns: repeat(var(--cols, 12), 1fr); grid-auto-rows: 1fr;
   overflow: hidden;
 }
-.wipe-grid i { display: block; background: var(--turq); transform: scale(0); }
+.wipe-grid i { display: block; background: var(--turq-base); transform: scale(0); }
 
 /* ---------- Cartelera ---------- */
 
@@ -602,7 +602,7 @@ p { text-wrap: pretty; }
   transition: border-color var(--dur-fast), background-color var(--dur-fast);
 }
 .motion-btn:hover { border-color: var(--bone); }
-.motion-btn:disabled { opacity: 0.6; cursor: default; }
+.motion-btn:disabled { opacity: 0.8; cursor: default; }
 
 /* ---------- Heading line reveal ---------- */
 
@@ -726,7 +726,7 @@ p { text-wrap: pretty; }
 .cat-filters-btn[aria-expanded="true"] { background: var(--bone); color: var(--night); }
 
 .cat-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: clamp(28px, 4vw, 64px); align-items: start; padding-top: 32px; }
-.cat-filters { position: sticky; top: calc(var(--hdr-h) + 20px); display: grid; gap: 28px; max-height: calc(100svh - var(--hdr-h) - 40px); overflow-y: auto; padding-right: 8px; scrollbar-width: thin; }
+.cat-filters { position: sticky; top: calc(var(--hdr-h) + 20px); display: grid; gap: 28px; max-height: calc(100svh - var(--hdr-h) - 40px); overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--stone-hi) transparent; }
 .cat-group { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
 .cat-group legend { padding: 0; margin-bottom: 12px; font: 780 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--tungsten); }
 .cat-opt { position: relative; }
@@ -1070,7 +1070,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* Velo local tras el texto del hero para que no se pierda contra la ventana brillante. */
 .entry-beat::before {
   content: ""; position: absolute; inset: -1.5em -1em; z-index: -1; pointer-events: none;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--night) 70%, transparent), transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--night) 88%, transparent) 55%, transparent);
 }
 
 /* Entrada y salida del menú móvil y salida más corta de la ficha. */
