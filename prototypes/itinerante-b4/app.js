@@ -296,9 +296,9 @@ function boot() {
           c.style.opacity = w ? (1 - w).toFixed(3) : '';
         });
 
-        setBeat(beat2, smooth(0.34, 0.44, sp) * (1 - smooth(0.7, 0.8, sp)));
+        setBeat(beat2, smooth(0.30, 0.38, sp) * (1 - smooth(0.50, 0.58, sp)));
 
-        media.style.setProperty('--end', (smooth(0.88, 1, sp) * 0.6).toFixed(3));
+        media.style.setProperty('--end', (smooth(0.93, 1, sp) * 0.5).toFixed(3));
         return Math.abs(sp - p) > 0.0004;
       },
       reset() {

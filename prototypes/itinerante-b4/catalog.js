@@ -220,7 +220,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     results = sortBooks(filterBooks(books, state), state.sort === 'rel' && !state.q ? 'az' : state.sort, state.q);
   }
 
-  function renderGrid({ append = false } = {}) {
+  function renderGrid({ append = false, animate = true } = {}) {
     const slice = results.slice(0, state.shown);
     const from = append ? grid.children.length : 0;
     const frag = document.createDocumentFragment();
@@ -229,7 +229,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (!append) grid.replaceChildren();
     grid.removeAttribute('aria-busy');
     grid.append(frag);
-    if (isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: i * 28, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }));
+    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: i * 28, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }));
     const left = results.length - slice.length;
     moreBtn.hidden = left <= 0;
     moreBtn.textContent = `Ver ${Math.min(PAGE_SIZE, left)} más · quedan ${left}`;
@@ -241,12 +241,12 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     return fresh;
   }
 
-  function refresh({ keepShown = false } = {}) {
+  function refresh({ keepShown = false, animate = true } = {}) {
     if (!keepShown) state.shown = PAGE_SIZE;
     compute();
     renderFilters();
     renderChips();
-    renderGrid();
+    renderGrid({ animate });
   }
 
   // ----- sugerencias (combobox) -----
@@ -279,7 +279,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     state.q = input.value.trim();
     state.sort = state.q ? (state.sort === 'az' ? 'rel' : state.sort) : (state.sort === 'rel' ? 'az' : state.sort);
     sortEl.value = state.sort;
-    refresh();
+    refresh({ animate: false }); // al teclear no se repite la entrada de las tarjetas
   });
   input.addEventListener('keydown', e => {
     const opts = [...list.children];

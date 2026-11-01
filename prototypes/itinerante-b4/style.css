@@ -1054,3 +1054,37 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
   .visit-side.rx::before { top: -24px; left: 0; }
   .visit-side.rx::after { right: 0; bottom: -24px; }
 }
+
+/* ---------- Auditoría de movimiento: foco, pulsación, movimiento reducido y entrada/salida ---------- */
+
+/* La ficha es papel: el anillo tungsteno (1.5:1) no se lee, así que usa tinta. */
+.drawer :focus-visible { outline-color: var(--paper-ink); }
+
+/* Pulsación: respuesta inmediata en táctil y puntero. */
+.btn:active, .topic:active, .cat-chip:active, .drawer-close:active { scale: 0.97; }
+.card:active .cover { scale: 0.98; }
+@media (hover: none) {
+  .card:hover .cover { translate: none; box-shadow: none; }
+}
+
+/* Velo local tras el texto del hero para que no se pierda contra la ventana brillante. */
+.entry-beat::before {
+  content: ""; position: absolute; inset: -1.5em -1em; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--night) 70%, transparent), transparent);
+}
+
+/* Entrada y salida del menú móvil y salida más corta de la ficha. */
+.motion .menu { transition: opacity var(--dur-base) var(--ease-out), display var(--dur-base) allow-discrete; }
+.motion .menu[hidden] { opacity: 0; }
+@starting-style { .motion .menu { opacity: 0; } }
+.motion .drawer:not([open]) { transition-duration: var(--dur-fast); transition-timing-function: var(--ease-io); }
+.motion .drawer:not([open])::backdrop { transition-duration: var(--dur-fast); transition-timing-function: var(--ease-io); }
+
+/* Movimiento reducido: sin desplazamiento, pero con un fundido que confirma el cambio de estado. */
+@media (prefers-reduced-motion: reduce) {
+  .card:hover .cover, .card:focus-visible .cover { translate: none; }
+  .btn:active, .topic:active, .cat-chip:active, .drawer-close:active, .card:active .cover { scale: none; }
+  .drawer { transition: opacity var(--dur-instant) linear, display var(--dur-instant) allow-discrete; opacity: 1; }
+  .drawer:not([open]) { opacity: 0; }
+  @starting-style { .drawer[open] { opacity: 0; } }
+}

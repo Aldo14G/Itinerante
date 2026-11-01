@@ -48,7 +48,7 @@ typography:
   label:
     fontFamily: "Archivo"
     fontWeight: 700
-    fontSize: "0.72rem"
+    fontSize: "0.75rem"
     letterSpacing: "0.07em"
     textTransform: "uppercase"
 rounded:
@@ -82,7 +82,7 @@ La anchura es también movimiento: el tema activo de Libros pasa de 62 % a 80 % 
 
 ## Componentes
 
-- **Botones:** cápsulas con barrido de relleno de abajo arriba (500 ms) y flecha que avanza 2 px. Variantes: tungsteno (primaria), fantasma, hueso, noche, línea, tinta turquesa. En dispositivos con puntero fino son magnéticos (±12 px).
+- **Botones:** cápsulas con barrido de relleno de abajo arriba (--dur-base, 400 ms) y flecha que avanza 2 px. Variantes: tungsteno (primaria), fantasma, hueso, noche, línea, tinta turquesa. En dispositivos con puntero fino son magnéticos (±12 px).
 - **Etiquetas de procedencia:** «Foto real» (turquesa claro) y «Recreación IA» (tungsteno), en todas las imágenes, sin excepción.
 - **Fotogramas:** esquinas de 2 px y sin sombra. Las fotos entran con un revelado por máscara (clip-path de abajo arriba y escala 1.22 → 1).
 - **Cartelera:** acordeón exclusivo con `<details name>`. Cada fila lleva un título (el tipo de actividad) y una línea; la procedencia «propuesta, sin fecha» la dice el encabezado una vez. Al detenerse 320 ms el detalle se abre solo; el título se desplaza 14 px. El escenario fijo cambia de imagen con una cortina vertical de 700 ms.
@@ -93,7 +93,7 @@ La anchura es también movimiento: el tema activo de Libros pasa de 62 % a 80 % 
 
 | Tramo | Mecánica | Fallback |
 |---|---|---|
-| Entrada (260vh, 200vh móvil) | 145 fotogramas en canvas sincronizados al scroll (73 en móvil), carga progresiva por saltos 24→1. El nombre se abre desde el centro como una puerta. Un solo rótulo de escena | Póster fijo; texto y acciones visibles |
+| Entrada (260vh, 200vh móvil) | 145 fotogramas en canvas sincronizados al scroll (73 en móvil), carga progresiva (claves cada 12 fotogramas, 6 en móvil; ventana de ±10 y como máximo 36 fotogramas intermedios en memoria). El nombre se abre desde el centro como una puerta. Un solo rótulo de escena | Póster fijo; texto y acciones visibles |
 | Intro | El escenario se abre de un recorte (inset) a pantalla completa. Las letras suben escalonadas cada 40 ms | Sin intro |
 | Manifiesto | Palabra a palabra, de 17 % a 100 % de opacidad. Las fotos se desplazan en paralaje vertical (±60 px) | Texto completo |
 | La casa | Tira horizontal fijada (vh + distancia / 1.6). Enfoque por distancia al centro: escala .91–1, velo de hasta 58 % y paralaje interno de ±6 % | Scroll lateral nativo con snap |

@@ -113,6 +113,6 @@
   },
   "covers": {
     "file": "covers/*.svg",
-    "origin": "images/covers/*.svg (195 portadas generadas para el dataset de prueba); el resto usa covers.openlibrary.org"
+    "origin": "images/covers/*.svg (195 portadas generadas para el dataset de prueba); el resto se resuelve en el navegador como portadas tipográficas propias (sin imágenes de terceros)"
   }
 }
