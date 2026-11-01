@@ -179,13 +179,15 @@ function boot() {
       if (k !== -1) draw(k);
     }
 
-    function draw(k) {
+    function draw(k, alpha = 1) {
       const img = frames[k];
       if (!img) return;
+      ctx.globalAlpha = alpha;
       const cw = canvas.width, ch = canvas.height, iw = img.naturalWidth, ih = img.naturalHeight;
       const scale = Math.max(cw / iw, ch / ih);
       const dw = iw * scale, dh = ih * scale;
       ctx.drawImage(img, (cw - dw) * (mobile() ? 0.5 : 0.58), (ch - dh) * 0.5, dw, dh);
+      ctx.globalAlpha = 1;
       drawnK = k;
     }
 
@@ -267,10 +269,15 @@ function boot() {
         sp = damp(sp, p, 8, dt);
 
         if (frames.length) {
-          cur = Math.round(sp * (count - 1));
+          const pos = sp * (count - 1);
+          cur = Math.round(pos);
           pump();
-          const k = nearest(cur);
-          if (k !== -1 && k !== drawnK) draw(k);
+          // Fundido entre fotogramas contiguos: el recorrido fluye en lugar de saltar de imagen en imagen.
+          const lo = Math.floor(pos), mix = pos - lo;
+          const a = nearest(lo), b = nearest(Math.min(count - 1, lo + 1));
+          const steps = a !== -1 && b !== a && Math.abs(b - a) <= 2 && mix > 0.04 ? Math.round(mix * 16) : 0;
+          const key = `${a}:${b}:${steps}`;
+          if (a !== -1 && key !== drawnK) { draw(a); if (steps) draw(b, steps / 16); drawnK = key; }
         }
 
         const a = smooth(0, 0.15, sp);
