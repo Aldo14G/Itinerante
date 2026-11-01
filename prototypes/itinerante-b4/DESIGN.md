@@ -153,3 +153,16 @@ Inspirados en el análisis de una página de producción cinematográfica; no se
 - **Fotos diferidas:** entran con un fundido de `--dur-base` cuando llegan; hasta entonces el esqueleto se mueve (y se apaga en cuanto la foto está). Sin JS o con movimiento reducido las fotos se ven siempre.
 - **Portadas del catálogo:** una sola familia (tarjeta tipográfica). El tono lo da la categoría (ficción cálida: terracota, ámbar, ciruela; no ficción fría: turquesa, piedra, azul) y dentro de ella el género, de modo que un género siempre se ve igual. Se retiraron las 195 portadas SVG (~900 KB).
 - **Movimiento en JS:** `motion.js` lee `--dur-*`, `--stagger-*`, `--intent-*` y las curvas de los tokens; ya no hay milisegundos escritos a mano en `app.js` ni `catalog.js`.
+
+## Móvil (≤ 760 px, `mobile.css`)
+
+Hoja de estilos aparte, con `media="(max-width: 760px)"`: el escritorio no la aplica.
+
+- **Vidrio ligero:** sólido por defecto (`--glass-solid`), translúcido bajo `@supports (backdrop-filter)` (`--glass-tint`, desenfoque de 18 px, saturación 1.6, borde de luz de 1 px y reflejo estático), de nuevo sólido con `prefers-reduced-transparency` y borde de 2 px con `prefers-contrast: more`. El desenfoque no se anima y solo hay dos superficies de vidrio (barra y icono de la cabecera). El tinte no baja de 0.74 para que el texto crema mantenga ≥ 4.5:1.
+- **Barra inferior:** píldora flotante de 64 px, cinco pestañas con icono propio de 24 px (trazo de 1.75 px, esquinas redondeadas) y etiqueta de 12 px. La activa lleva un contenedor translúcido turquesa y el icono relleno. `<nav aria-label="Secciones">` con `aria-current="location"`; respeta el área segura inferior.
+- **Cabecera:** marca más un icono de WhatsApp en círculo translúcido de 44 px; se oculta al bajar y reaparece al subir. El menú de hamburguesa se retira en móvil.
+- **Hero:** póster fijo vertical (sin canvas ni 73 fotogramas) y sin cortinilla.
+- **Libros:** los temas son chips deslizables con ajuste de scroll; el activo va en tungsteno.
+- **La casa:** barra segmentada tipo historias (un segmento por foto) y toque a izquierda o derecha para cambiar de foto; scroll nativo con `scroll-snap`.
+- **Hojas inferiores:** la ficha sube desde abajo con resorte (`--spring`, `linear()`), tiene asa y se arrastra para cerrarla (umbral de 120 px o velocidad > 0.7 px/ms); el fondo se atenúa sin desenfoque.
+- **Carga:** `content-visibility: auto` en las secciones bajo el hero.

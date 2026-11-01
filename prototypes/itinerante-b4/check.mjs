@@ -9,6 +9,7 @@ const here = p => new URL(p, import.meta.url);
 const html = await readFile(here('./index.html'), 'utf8');
 const css = await readFile(here('./style.css'), 'utf8');
 const tokensCss = await readFile(here('./tokens.css'), 'utf8');
+const mobileCss = await readFile(here('./mobile.css'), 'utf8');
 const prov = JSON.parse(await readFile(here('./assets/provenance.json'), 'utf8'));
 const data = JSON.parse(await readFile(here('./assets/data/catalog.json'), 'utf8'));
 
@@ -196,4 +197,15 @@ test('portadas: una sola familia visual, con el tono por categoría y género', 
   }
   const a = data.books.find(b => b.k === 'fiction');
   assert.equal(coverTone(a), coverTone({ ...a, t: 'otro' }), 'el mismo género da el mismo tono');
+});
+
+test('móvil: barra inferior con una pestaña por sección, iconos en el sprite y hoja de estilos solo móvil', () => {
+  const nav = html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0];
+  const hrefs = [...nav.matchAll(/href="#([a-z]+)"/g)].map(m => m[1]);
+  assert.deepEqual(hrefs, ['casa', 'cartelera', 'libros', 'catalogo', 'visita']);
+  for (const m of nav.matchAll(/<use href="#(t-[a-z]+)"/g)) assert.ok(html.includes(`<symbol id="${m[1]}"`), `falta el icono ${m[1]}`);
+  assert.ok(/<link rel="stylesheet" href="mobile\.css" media="\(max-width: 760px\)">/.test(html));
+  assert.ok(/aria-label="Secciones"/.test(nav) && !/role="tablist"/.test(nav), 'navegación por anclas, no tablist');
+  assert.ok(/prefers-reduced-transparency: reduce/.test(mobileCss) && /@supports \(\(-webkit-backdrop-filter/.test(mobileCss), 'vidrio con degradación');
+  assert.ok(!/backdrop-filter:[^;]*\n?[^;]*\.entry-canvas/.test(mobileCss));
 });

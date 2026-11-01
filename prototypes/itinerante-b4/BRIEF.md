@@ -21,3 +21,12 @@ Encargo de Aldo, 29-oct-2026: llevar la maqueta B.3 a una presentación de nivel
 - Horario habitual lun–sáb 11:00–20:00, domingo cerrado; festivos por WhatsApp.
 - Sin precios, reseñas, métricas, inventario ni stock. El catálogo usa el dataset de prueba (500 registros de Amazon_BestSelling) y se rotula «Datos de muestra · no es inventario»; ninguna ficha afirma existencia. La existencia de un libro se confirma con la librería.
 - Movimiento reducido / ahorro de datos: fotograma fijo, sin fijaciones ni marquesina; todo el contenido y las acciones visibles sin JS.
+
+## Cambio de dirección móvil (31-oct-2026)
+
+Encargo de Aldo: la mayoría de la gente verá el sitio en el teléfono, así que en móvil (≤760 px) la experiencia pasa de «función de cine» a **app ligera con estilo liquid glass**, con patrones públicos de las apps de Meta/Instagram y de iOS (barra inferior, hojas, historias, chips), reconstruidos con nuestras fuentes e iconos. No se copia código, iconos ni tipografía de Meta (Instagram Sans es propietaria).
+
+- **Se conserva** en escritorio todo el recorrido cinematográfico.
+- **En móvil se reemplaza** el recorrido de fotogramas por un póster fijo (1 petición en lugar de 73, 1.0 MB menos), sin cortinilla ajedrezada.
+- **Capa de controles** (única con vidrio): barra inferior de cinco pestañas, icono de WhatsApp en la cabecera, hoja de la ficha. Nunca sobre el contenido ni sobre el canvas.
+- Investigación y receta: ver DESIGN.md → «Móvil».

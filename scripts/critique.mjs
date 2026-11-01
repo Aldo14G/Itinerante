@@ -16,7 +16,7 @@ const flag = name => argv.includes(`--${name}`);
 const opt = (name, fallback) => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : fallback; };
 
 const SURFACES = {
-  b4: { dir: 'prototypes/itinerante-b4', html: 'index.html', css: ['tokens.css', 'style.css'], theme: 'b4', labels: true },
+  b4: { dir: 'prototypes/itinerante-b4', html: 'index.html', css: ['tokens.css', 'style.css', 'mobile.css'], theme: 'b4', labels: true },
   root: { dir: '.', html: 'index.html', css: ['assets/css/higgsfield-site.css'], theme: 'root', labels: false },
   fixture: { dir: 'tests/fixtures/critique-bad', html: 'index.html', css: ['style.css'], theme: 'b4', labels: false, hidden: true },
 };

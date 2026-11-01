@@ -39,6 +39,10 @@
   --cover-4-b: #0a1822;
   --cover-5-a: #4a2b43;
   --cover-5-b: #1a0f18;
+  --glass-tint: rgb(14 17 25 / 0.74);
+  --glass-solid: rgb(14 17 25 / 0.94);
+  --glass-edge: rgb(255 255 255 / 0.12);
+  --glass-chip: rgb(255 255 255 / 0.08);
 
   /* Tipografía */
   --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
@@ -86,10 +90,14 @@
   --intent-disclosure: 320ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --spring: linear(0, 0.42 8%, 0.86 16%, 1.04 26%, 1.05 32%, 0.99 46%, 1.002 62%, 1);
 
   /* Distribución */
   --gutter: clamp(16px, 3.2vw, 48px);
   --hdr-h: 68px;
+  --tabbar-h: 64px;
+  --glass-blur: 18px;
+  --glass-saturate: 1.6;
 
   /* Objetivos y medida */
   --target-fine: 24px;

@@ -1,0 +1,112 @@
+/* Itinerante B.4 · móvil con estilo de app (liquid glass ligero).
+   Se carga solo con (max-width: 760px). Patrones: barra inferior flotante, cabecera translúcida,
+   iconos en contenedor translúcido, hojas inferiores, historias y chips. Todo propio: sin fuentes,
+   iconos ni CSS de terceros. Reglas de vidrio: solo en la capa de controles, nunca sobre el contenido. */
+
+:root { --hdr-h: 60px; }
+html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
+
+/* Vidrio: sólido por defecto; translúcido donde el navegador lo soporta; sólido otra vez si se pide. */
+.tabbar, .hdr-wa { background: var(--glass-solid); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .tabbar { background: var(--glass-tint); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
+  .hdr-wa { background: var(--glass-chip); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .tabbar, .hdr-wa { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .tabbar, .hdr-wa { border-width: 2px; background: var(--glass-solid); }
+}
+
+/* Barra inferior: píldora flotante de cinco pestañas con icono y etiqueta. */
+.tabbar {
+  position: fixed; z-index: 48; display: flex; gap: 2px;
+  inset: auto 12px calc(env(safe-area-inset-bottom) + 8px) 12px;
+  height: var(--tabbar-h); padding: 4px;
+  border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
+  box-shadow: inset 0 1px 0 var(--glass-edge), 0 12px 32px -8px color-mix(in srgb, var(--black) 55%, transparent);
+  transition: translate var(--dur-base) var(--spring);
+}
+.tabbar::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(120% 80% at 20% 0, color-mix(in srgb, var(--white) 14%, transparent), transparent 55%);
+}
+.tabbar a {
+  position: relative; z-index: 1; flex: 1; min-width: 44px; display: grid; place-items: center; align-content: center; gap: 2px;
+  color: color-mix(in srgb, var(--bone) 72%, transparent); text-decoration: none; border-radius: var(--radius-pill);
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-ic {
+  display: grid; place-items: center; width: 52px; height: 28px; border-radius: var(--radius-pill);
+  transition: background-color var(--dur-fast) var(--ease-out), scale var(--dur-fast) var(--spring);
+}
+.tab-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.tab-lb { font: 650 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.01em; }
+.tabbar a[aria-current="location"] { color: var(--bone); }
+.tabbar a[aria-current="location"] .tab-ic { background: color-mix(in srgb, var(--turq) 30%, transparent); }
+.tabbar a[aria-current="location"] .tab-ic svg { fill: currentColor; fill-opacity: 0.9; }
+.tabbar a:active .tab-ic { scale: 0.92; }
+.tabbar a:focus-visible { outline-offset: -2px; }
+/* La barra se retira mientras la ficha o el menú ocupan la pantalla. */
+html:has(dialog[open]) .tabbar { translate: 0 calc(100% + 24px); }
+
+/* Espacio para que la barra no tape el final de la página. */
+.ftr { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 40px); }
+
+/* Cabecera: marca y un icono de WhatsApp en contenedor translúcido. */
+.menu-btn, .menu { display: none; }
+.hdr-wa {
+  display: grid; place-items: center; width: 44px; height: 44px; color: var(--bone); text-decoration: none;
+  border: 1px solid var(--glass-edge); border-radius: 50%; box-shadow: inset 0 1px 0 var(--glass-edge);
+  transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast);
+}
+.hdr-wa .ic { width: 22px; height: 22px; }
+.hdr-wa:active { scale: 0.92; }
+.hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa { color: var(--bone); background: var(--glass-solid); }
+
+/* Hero móvil: póster fijo, sin recorrido por fotogramas ni cortinilla (menos bytes y menos trabajo). */
+.motion .entry { height: auto; }
+.motion .entry-stage { position: relative; height: 100svh; min-height: 560px; }
+.entry-canvas, .entry-beat, .wipe { display: none !important; }
+
+/* Hojas inferiores: la ficha sube desde abajo y se arrastra para cerrarla. */
+.drawer {
+  inset: auto 0 0 0; width: 100%; max-width: 100%; height: min(88dvh, calc(100dvh - 48px)); max-height: none;
+  border-radius: var(--radius-4) var(--radius-4) 0 0;
+}
+.motion .drawer { translate: 0 100%; transition: translate var(--dur-slow) var(--spring), overlay var(--dur-slow) allow-discrete, display var(--dur-slow) allow-discrete; }
+.motion .drawer[open] { translate: 0 0; }
+@starting-style { .motion .drawer[open] { translate: 0 100%; } }
+.drawer-grabber { display: block; justify-self: center; width: 36px; height: 5px; margin: -16px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--paper-ink) 28%, transparent); touch-action: none; }
+.drawer-body { touch-action: pan-y; overscroll-behavior: contain; }
+.drawer-close { background: color-mix(in srgb, var(--paper-ink) 8%, transparent); border-color: transparent; }
+
+/* Historias de La casa: barra segmentada y fotos que se pasan con un toque. */
+.stories { display: flex; gap: 4px; margin: 4px 0 8px; }
+.stories i { flex: 1; height: 3px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--bone) 24%, transparent); transition: background-color var(--dur-base) var(--ease-out); }
+.stories i.is-seen { background: var(--bone); }
+.house-meter { display: none; }
+.house-track { scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); overscroll-behavior-x: contain; scrollbar-width: none; }
+.house-track::-webkit-scrollbar { display: none; }
+.still { scroll-snap-align: center; }
+
+/* Libros: los temas son chips deslizables (como los destacados), no una lista grande. */
+.topics { flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter); scroll-snap-type: x proximity; scroll-padding-inline: var(--gutter); scrollbar-width: none; }
+.topics::-webkit-scrollbar { display: none; }
+.topic {
+  flex: none; min-height: var(--target-coarse); padding: 0 var(--space-4); scroll-snap-align: start;
+  font: 700 var(--fs-1)/1 var(--f-sans); font-stretch: 100%; text-transform: none; letter-spacing: 0;
+  color: var(--bone); background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
+}
+.topic[aria-checked="true"] { color: var(--night); background: var(--tungsten); border-color: transparent; font-stretch: 100%; }
+.topic:hover:not([aria-checked="true"]) { color: var(--bone); }
+
+/* Feed: las secciones de contenido se pintan solo al acercarse. */
+.manifesto, .bill, .books, .cat, .call, .visit { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tabbar, .tab-ic, .hdr-wa, .topic, .stories i { transition-duration: 0.01ms; }
+  .motion .drawer { transition: opacity var(--dur-instant) linear, display var(--dur-instant) allow-discrete; translate: none; opacity: 1; }
+}

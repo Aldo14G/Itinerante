@@ -1106,3 +1106,6 @@ html:has(dialog.drawer[open]) { overflow: hidden; }
 .motion img.is-loaded[loading="lazy"] { animation: img-in var(--dur-base) var(--ease-out); }
 .motion .still-img::before, .motion .frame-clip::before, .motion .topic-layer::before, .motion .bill-layer::before { animation-iteration-count: infinite; }
 .still-img:has(img.is-loaded)::before, .frame-clip:has(img.is-loaded)::before, .topic-layer:has(img.is-loaded)::before, .bill-layer:has(img.is-loaded)::before { animation: none; opacity: 0; }
+
+/* Elementos solo móviles: ocultos por defecto (mobile.css los muestra). */
+.tabbar, .hdr-wa, .stories, .drawer-grabber { display: none; }

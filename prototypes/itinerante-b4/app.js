@@ -257,7 +257,7 @@ function boot() {
     };
 
     return {
-      enable() { load(); if (frames[0]) sec.classList.add('is-live'); },
+      enable() { if (!mobile()) load(); if (frames[0]) sec.classList.add('is-live'); },
       measure() {
         top = absTop(sec);
         h = sec.offsetHeight;
@@ -265,7 +265,7 @@ function boot() {
         if (isMotion()) sizeCanvas();
       },
       tick(dt, y) {
-        if (!isMotion()) return false;
+        if (!isMotion() || mobile()) return false; // en móvil el hero es un póster fijo
         const p = clamp((y - top) / Math.max(1, h - vh));
         if (y > top + h || y + vh < top) { sp = p; return false; }
         sp = damp(sp, p, 8, dt);
@@ -348,9 +348,11 @@ function boot() {
     const bar = $('[data-house-bar]', sec);
     let top = 0, h = 1, dist = 0, sp = 0, pinned = false, centers = [], lastIdx = -1;
 
+    const bars = $$('.stories i', sec);
     const setIndex = p => {
       const idx = Math.round(p * (stills.length - 1));
       if (idx !== lastIdx) {
+        bars.forEach((b, i) => b.classList.toggle('is-seen', i <= idx));
         idxEl.textContent = String(idx + 1).padStart(2, '0');
         stills.forEach((el, i) => el.classList.toggle('is-center', i === idx));
         lastIdx = idx;
@@ -358,6 +360,13 @@ function boot() {
       bar.style.transform = `scaleX(${p.toFixed(4)})`;
     };
 
+    // Toque a la izquierda o a la derecha para pasar de foto, como en las historias.
+    track.addEventListener('click', e => {
+      if (pinned || vw > 760 || e.target.closest('a, button')) return;
+      const r = track.getBoundingClientRect();
+      const next = clamp((lastIdx < 0 ? 0 : lastIdx) + (e.clientX - r.left > r.width * 0.35 ? 1 : -1), 0, stills.length - 1);
+      track.scrollTo({ left: stills[next].offsetLeft - stills[0].offsetLeft, behavior: isMotion() ? 'smooth' : 'auto' });
+    });
     track.addEventListener('scroll', () => {
       if (pinned) return;
       const max = track.scrollWidth - track.clientWidth;
@@ -368,6 +377,7 @@ function boot() {
       measure() {
         pinned = root.classList.contains('pin-house');
         track.tabIndex = pinned ? -1 : 0;
+        if (!pinned) { const max = track.scrollWidth - track.clientWidth; setIndex(max > 0 ? clamp(track.scrollLeft / max) : 0); }
         if (pinned) track.removeAttribute('aria-label'); else track.setAttribute('aria-label', 'Fotografías de la casa, desplázate para ver más');
         track.style.transform = '';
         if (pinned) {
@@ -484,6 +494,7 @@ function boot() {
     const hdr = $('[data-hdr]');
     const themed = $$('main [data-theme]');
     const navLinks = $$('.hdr-nav a');
+    const tabLinks = $$('.tabbar a');
     const chapters = navLinks.map(a => $(a.getAttribute('href')));
     let ranges = [], chapterRanges = [], hidden = false, current = '';
     return {
@@ -505,6 +516,7 @@ function boot() {
         const id = idx >= 0 ? String(idx) : '';
         if (id !== current) {
           navLinks.forEach((a, i) => { if (String(i) === id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+          tabLinks.forEach((a, i) => { if (String(i) === id) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
           current = id;
         }
         return false;

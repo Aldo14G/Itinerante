@@ -390,6 +390,35 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
   $('[data-d-close]', drawer).addEventListener('click', () => drawer.close());
   drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });
+  // Hoja inferior (móvil): se arrastra desde el asa o la parte alta y se cierra al soltar pasado un umbral.
+  (function sheetDrag() {
+    const grab = $('[data-d-grab]', drawer);
+    const scroller = $('[data-d-scroll]', drawer);
+    let startY = 0, dy = 0, t0 = 0, active = false;
+    const sheetMode = () => matchMedia('(max-width: 760px)').matches;
+    drawer.addEventListener('pointerdown', e => {
+      if (!sheetMode() || e.target.closest('a, button:not([data-d-grab])') || (scroller.scrollTop > 0 && e.target !== grab)) return;
+      if (e.target !== grab && e.clientY - drawer.getBoundingClientRect().top > 72) return;
+      active = true; startY = e.clientY; dy = 0; t0 = performance.now();
+      drawer.setPointerCapture(e.pointerId);
+      drawer.style.transition = 'none';
+    });
+    drawer.addEventListener('pointermove', e => {
+      if (!active) return;
+      dy = Math.max(0, e.clientY - startY);
+      drawer.style.translate = `0 ${dy}px`;
+    });
+    const end = () => {
+      if (!active) return;
+      active = false;
+      const speed = dy / Math.max(1, performance.now() - t0);
+      drawer.style.transition = '';
+      drawer.style.translate = '';
+      if (dy > 120 || speed > 0.7) drawer.close();
+    };
+    drawer.addEventListener('pointerup', end);
+    drawer.addEventListener('pointercancel', end);
+  })();
   drawer.addEventListener('close', () => {
     const t = drawer.dataset.trigger && grid.querySelector(`.card[data-id="${CSS.escape(drawer.dataset.trigger)}"]`);
     if (t) t.focus({ preventScroll: true });
