@@ -2,8 +2,6 @@
   "b4": {
     "token-space-grid": 99,
     "token-color-literal": 66,
-    "token-font-size": 59,
-    "a11y-font-small": 10,
     "a11y-target": 9
   },
   "root": {
