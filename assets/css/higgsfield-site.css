@@ -523,3 +523,10 @@
     html.motion-pending .hero-title .line-reveal { animation: none; transform: none; }
   }
 }
+
+/* Objetivos mínimos (Fitts): 24 px con puntero fino y 44 px en táctil. */
+.site-footer a { display: inline-block; padding-block: 4px; }
+@media (pointer: coarse) {
+  .site-footer a, .text-link, .catalog-view button, #catalogSort, .brand-lockup { display: inline-flex; align-items: center; min-height: var(--target-coarse); }
+  .brand-lockup { min-width: var(--target-coarse); }
+}
