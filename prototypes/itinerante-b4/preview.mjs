@@ -11,7 +11,7 @@ const types = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.woff2': 'font/woff2'
 };
-const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/app.js', '/catalog.js']);
+const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/app.js', '/catalog.js', '/motion.js']);
 const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'";
 const allowed = path => PAGES.has(path) || (path.startsWith('/assets/') && !path.endsWith('provenance.json') && !path.endsWith('sources.json') && extname(path) in types && !path.endsWith('.txt'));
 

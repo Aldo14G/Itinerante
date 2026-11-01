@@ -1,4 +1,5 @@
 // Itinerante B.4 · escenas sincronizadas al scroll, sin dependencias.
+import { DUR, EASE, EASE_IO, ms } from './motion.js';
 
 const WA = 'https://wa.me/528180875940';
 const SEQ_COUNT = 145;
@@ -656,7 +657,7 @@ function boot() {
       d.addEventListener('toggle', () => { if (d.open) show(i); });
       const summary = $('summary', d);
       let intent = 0, hovering = false, suppressed = false;
-      const arm = () => { clearTimeout(intent); if (hovering && !suppressed && !d.open) intent = setTimeout(() => { d.open = true; }, 320); };
+      const arm = () => { clearTimeout(intent); if (hovering && !suppressed && !d.open) intent = setTimeout(() => { d.open = true; }, ms('intent-disclosure')); };
       summary.addEventListener('pointerenter', () => {
         if (!fineMq.matches) return;
         hovering = true;
@@ -689,7 +690,7 @@ function boot() {
     const cta = $('[data-book-cta]');
     const ctaLabel = $('[data-cta-label]');
     const form = $('[data-composer]');
-    const ease = 'cubic-bezier(0.16, 1, 0.3, 1)';
+    const ease = EASE();
     let current = 'narrativa';
     let token = 0;
 
@@ -710,12 +711,12 @@ function boot() {
       const label = ctaText(current, input.value);
       if (note.textContent !== msg) {
         note.textContent = msg;
-        if (animate && isMotion()) note.animate([{ opacity: 0.3, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: ease });
+        if (animate && isMotion()) note.animate([{ opacity: 0.3, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('fast'), easing: ease });
       }
       cta.href = waUrl(msg);
       if (ctaLabel.textContent !== label) {
         ctaLabel.textContent = label;
-        if (animate && isMotion()) ctaLabel.animate([{ opacity: 0, transform: 'translateY(70%)' }, { opacity: 1, transform: 'none' }], { duration: 480, easing: ease });
+        if (animate && isMotion()) ctaLabel.animate([{ opacity: 0, transform: 'translateY(70%)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), easing: ease });
       }
     };
 
@@ -755,25 +756,25 @@ function boot() {
       img.decode().catch(() => {}).then(() => {
         if (my !== token) return;
         layer.style.clipPath = '';
-        layer.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], { duration: 700, easing: ease, fill: 'backwards' });
-        img.animate([{ transform: 'scale(1.18) translateX(5%)' }, { transform: 'none' }], { duration: 1000, easing: ease });
-        prev.forEach(p => p.firstElementChild.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'translateX(-9%)', filter: 'brightness(0.4)' }], { duration: 700, easing: ease, fill: 'forwards' }));
-        setTimeout(() => prev.forEach(p => p.remove()), 750);
+        layer.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], { duration: DUR('slow'), easing: ease, fill: 'backwards' });
+        img.animate([{ transform: 'scale(1.18) translateX(5%)' }, { transform: 'none' }], { duration: DUR('scene'), easing: ease });
+        prev.forEach(p => p.firstElementChild.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'translateX(-9%)', filter: 'brightness(0.4)' }], { duration: DUR('slow'), easing: ease, fill: 'forwards' }));
+        setTimeout(() => prev.forEach(p => p.remove()), DUR('slow') + 50);
       });
 
       const old = $$('.ch', nameEl);
-      old.forEach((c, i) => c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-105%)', opacity: 0 }], { duration: 260, delay: i * 14, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards' }));
-      [lineEl, tagEl].forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }));
+      old.forEach((c, i) => c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-105%)', opacity: 0 }], { duration: DUR('fast'), delay: i * ms('stagger-char') * 0.6, easing: EASE_IO(), fill: 'forwards' }));
+      [lineEl, tagEl].forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: DUR('instant'), fill: 'forwards' }));
       setTimeout(() => {
         if (my !== token) return;
-        fillName(t.name).forEach((s, i) => s.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: 520, delay: i * 24, easing: ease, fill: 'backwards' }));
+        fillName(t.name).forEach((s, i) => s.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: ease, fill: 'backwards' }));
         lineEl.textContent = t.line;
         tagEl.replaceChildren(tag, ` ${t.place}`);
         [lineEl, tagEl].forEach((el, i) => {
           el.getAnimations().forEach(a => a.cancel());
-          el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 80 + i * 60, easing: ease, fill: 'backwards' });
+          el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: DUR('instant') * 0.6 + i * ms('stagger-line'), easing: ease, fill: 'backwards' });
         });
-      }, 220 + old.length * 10);
+      }, DUR('fast') - 20 + old.length * 10);
 
       updateMessage(true);
     }
@@ -788,7 +789,7 @@ function boot() {
       const arm = e => {
         if (e.pointerType !== 'mouse' || !fineMq.matches) return;
         clearTimeout(intent);
-        intent = setTimeout(() => select(b.dataset.topic, true), 250);
+        intent = setTimeout(() => select(b.dataset.topic, true), ms('intent-topic'));
       };
       b.addEventListener('pointerenter', arm);
       b.addEventListener('pointermove', arm);
@@ -833,6 +834,12 @@ function boot() {
     });
     btn.addEventListener('pointerleave', () => { btn.style.removeProperty('--mx'); btn.style.removeProperty('--my'); });
   });
+
+  // ---------- Fotos diferidas ----------
+  const markLoaded = img => img.classList.add('is-loaded');
+  $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
+  document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
+  document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
 
   // ---------- Start ----------
   applyMode();

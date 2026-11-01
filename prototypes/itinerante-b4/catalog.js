@@ -1,8 +1,19 @@
 // Catálogo de muestra: búsqueda predictiva, filtros con conteo, rejilla y ficha.
+import { DUR, EASE, ms } from './motion.js';
 // La parte pura (sin DOM) se prueba con check.mjs; initCatalog() solo corre en el navegador.
 
 export const PAGE_SIZE = 24;
 export const WA_NUMBER = '528180875940';
+
+// Tono de portada: ficción en la familia cálida (terracota, ámbar, ciruela) y no ficción en la fría
+// (turquesa, piedra, azul). Dentro de la familia el género decide el tono, así un género siempre se ve igual.
+const TONES = { fiction: [1, 2, 5], 'non-fiction': [0, 3, 4] };
+export function coverTone(book) {
+  const family = TONES[book.k] ?? TONES['non-fiction'];
+  let h = 0;
+  for (const ch of book.g) h = (h * 31 + ch.charCodeAt(0)) % 997;
+  return family[h % family.length];
+}
 
 const CATEGORY_ES = { fiction: 'Ficción', 'non-fiction': 'No ficción' };
 const FORMAT_ES = { 'Libro electronico': 'Libro electrónico', 'Board Book': 'Libro de cartón' };
@@ -208,18 +219,10 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   }
 
   // ----- rejilla -----
-  // Portada local (SVG) o tarjeta tipográfica propia: no se piden imágenes a terceros.
-  function cover(b) {
-    if (b.c) {
-      const img = el('img', { src: `assets/${b.c}`, alt: '', width: '200', height: '300', loading: 'lazy', decoding: 'async' });
-      return el('span', { class: 'cover' }, img);
-    }
-    return blankCover(b);
-  }
+  // Una sola familia de portadas: tarjeta tipográfica propia (sin imágenes de terceros ni SVG heterogéneos).
+  function cover(b) { return blankCover(b); }
   function blankCover(b) {
-    let h = 0;
-    for (const ch of b.g) h = (h * 31 + ch.charCodeAt(0)) % 6;
-    return el('span', { class: `cover cover--blank tone-${h}` }, el('span', { class: 'cover-title', 'aria-hidden': 'true' }, b.t), el('span', { class: 'cover-author', 'aria-hidden': 'true' }, b.a));
+    return el('span', { class: `cover cover--blank tone-${coverTone(b)}` }, el('span', { class: 'cover-title', 'aria-hidden': 'true' }, b.t), el('span', { class: 'cover-author', 'aria-hidden': 'true' }, b.a));
   }
 
   function card(b) {
@@ -244,7 +247,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (!append) grid.replaceChildren();
     grid.removeAttribute('aria-busy');
     grid.append(frag);
-    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: i * 28, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }));
+    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: EASE(), fill: 'backwards' }));
     const left = results.length - slice.length;
     moreBtn.hidden = left <= 0;
     moreBtn.textContent = `Ver ${Math.min(PAGE_SIZE, left)} más · quedan ${left}`;
@@ -310,7 +313,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     } else if (e.key === 'Escape' && !list.hidden) { e.preventDefault(); closeSuggest(); }
   });
   list.addEventListener('pointerdown', e => { const li = e.target.closest('li'); if (li) { e.preventDefault(); pick(li.dataset.text, { all: !!li.dataset.all }); } });
-  input.addEventListener('blur', () => setTimeout(closeSuggest, 120));
+  input.addEventListener('blur', () => setTimeout(closeSuggest, DUR('instant')));
   $('[data-cat-form]', root).addEventListener('submit', e => { e.preventDefault(); closeSuggest(); });
 
   sortEl.addEventListener('change', () => { state.sort = sortEl.value; refresh(); });

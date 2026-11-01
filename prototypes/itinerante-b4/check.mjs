@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access, readdir } from 'node:fs/promises';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from './app.js';
-import { score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from './catalog.js';
+import { coverTone, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from './catalog.js';
 
 const here = p => new URL(p, import.meta.url);
 const html = await readFile(here('./index.html'), 'utf8');
@@ -186,4 +186,14 @@ test('sugerencias: los autores que empiezan por la consulta van antes que las co
   const starts = s => { const a = norm(s.text); return a.startsWith('fre') || a.includes(' fre'); };
   const firstMid = rows.findIndex(s => !starts(s));
   assert.ok(firstMid === -1 || rows.slice(firstMid).every(s => !starts(s)), 'ningún prefijo detrás de una coincidencia interna');
+});
+
+test('portadas: una sola familia visual, con el tono por categoría y género', () => {
+  const warm = new Set([1, 2, 5]), cool = new Set([0, 3, 4]);
+  for (const b of data.books) {
+    assert.equal(b.c ?? null, null, 'ya no hay SVG de portada');
+    assert.ok((b.k === 'fiction' ? warm : cool).has(coverTone(b)), `tono fuera de su familia: ${b.g}`);
+  }
+  const a = data.books.find(b => b.k === 'fiction');
+  assert.equal(coverTone(a), coverTone({ ...a, t: 'otro' }), 'el mismo género da el mismo tono');
 });

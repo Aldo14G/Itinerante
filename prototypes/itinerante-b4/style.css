@@ -1099,3 +1099,10 @@ html:has(dialog.drawer[open]) { overflow: hidden; }
 .drawer-facts { order: 2; }
 .drawer-related { order: 3; }
 @media (max-width: 760px) { .topics { gap: 8px 16px; } }
+
+/* Fotos diferidas: entran con un fundido al llegar y el esqueleto se mueve solo mientras faltan. */
+@keyframes img-in { from { opacity: 0; } }
+.motion img[loading="lazy"]:not(.is-loaded) { opacity: 0; }
+.motion img.is-loaded[loading="lazy"] { animation: img-in var(--dur-base) var(--ease-out); }
+.motion .still-img::before, .motion .frame-clip::before, .motion .topic-layer::before, .motion .bill-layer::before { animation-iteration-count: infinite; }
+.still-img:has(img.is-loaded)::before, .frame-clip:has(img.is-loaded)::before, .topic-layer:has(img.is-loaded)::before, .bill-layer:has(img.is-loaded)::before { animation: none; opacity: 0; }

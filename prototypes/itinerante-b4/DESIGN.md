@@ -114,7 +114,7 @@ Sección `#catalogo` tras Libros. Datos: `assets/data/catalog.json` (500 registr
 
 - **Búsqueda:** combobox ARIA con sugerencias por autor, título, ISBN y editorial, sin acentos ni mayúsculas. El resultado se filtra mientras se escribe.
 - **Filtros:** categoría, género (10 + ver todos), formato y editorial; casillas con conteo por faceta calculado sin la propia dimensión. Chips activos con «Limpiar todo». En móvil se abren con el botón Filtros.
-- **Rejilla:** 24 por página y «Ver más»; al cargar más, el foco pasa a la primera ficha nueva. Las portadas son SVG locales o tarjetas tipográficas propias (tono por género); no se piden imágenes a terceros.
+- **Rejilla:** 24 por página y «Ver más»; al cargar más, el foco pasa a la primera ficha nueva. Las portadas son una sola familia: tarjetas tipográficas propias. El tono sale del género dentro de una familia por categoría (ficción cálida, no ficción fría); no hay imágenes de portada ni SVG de terceros.
 - **Ficha:** `<dialog>` modal que entra desde la derecha (papel, ink): ficha técnica, mensaje exacto de WhatsApp con el título, y tres relacionados. Escape o clic fuera la cierra y el foco vuelve a la tarjeta.
 - **Estados:** carga, error, sin resultados (limpiar o preguntar por WhatsApp) y sin JavaScript (se oculta y queda el enlace a WhatsApp).
 
@@ -145,3 +145,11 @@ Inspirados en el análisis de una página de producción cinematográfica; no se
 - **Botones de contorno** (`ghost`, `line`, `line-ink`): sin relleno al pasar el cursor; dos filetes (el de arriba entra de izquierda a derecha, el de abajo al revés) y una vibración de celuloide de 0.22 s, solo con puntero fino y sin reducción de movimiento. Los botones rellenos (tungsteno, noche, tinta) conservan el barrido.
 - **Cita sobre pentagrama:** entre Libros y Catálogo, una cita en dominio público (Cervantes, Quijote II, 58) con cinco filetes por renglón que se dibujan de arriba abajo y el texto que aparece después. El texto es provisional: debe ser una cita real y atribuida.
 
+
+## Imágenes y carga
+
+- **Tira de La casa:** cada foto tiene una variante de 800 px (`*-800.webp`, derivada con ffmpeg y registrada en `provenance.json`) y se sirve con `srcset` y `sizes="(max-width: 760px) 84vw, min(54vw, 880px)"`: el teléfono pide la de 800 px y las pantallas densas de escritorio la grande.
+- **Póster del hero:** `<picture>` con el primer fotograma vertical en teléfono (`seq-m/m001`) y precarga con `media` para cada tamaño: el móvil ya no descarga el póster de escritorio.
+- **Fotos diferidas:** entran con un fundido de `--dur-base` cuando llegan; hasta entonces el esqueleto se mueve (y se apaga en cuanto la foto está). Sin JS o con movimiento reducido las fotos se ven siempre.
+- **Portadas del catálogo:** una sola familia (tarjeta tipográfica). El tono lo da la categoría (ficción cálida: terracota, ámbar, ciruela; no ficción fría: turquesa, piedra, azul) y dentro de ella el género, de modo que un género siempre se ve igual. Se retiraron las 195 portadas SVG (~900 KB).
+- **Movimiento en JS:** `motion.js` lee `--dur-*`, `--stagger-*`, `--intent-*` y las curvas de los tokens; ya no hay milisegundos escritos a mano en `app.js` ni `catalog.js`.

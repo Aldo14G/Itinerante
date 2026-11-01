@@ -35,7 +35,7 @@ export function renderB4(tokens) {
   group('Color', Object.entries(t.color));
   group('Tipografía', Object.entries(t.font));
   shared(group, s);
-  group('Movimiento', [...Object.entries(s.duration).map(([k, v]) => [`dur-${k}`, v]), ...Object.entries(t.ease)]);
+  group('Movimiento', [...Object.entries(s.duration).map(([k, v]) => [`dur-${k}`, v]), ...Object.entries(s.stagger).map(([k, v]) => [`stagger-${k}`, v]), ...Object.entries(s.intent).map(([k, v]) => [`intent-${k}`, v]), ...Object.entries(t.ease)]);
   group('Distribución', Object.entries(t.layout));
   group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
   lines.push(`  --hair: ${s.hair.base};`);
