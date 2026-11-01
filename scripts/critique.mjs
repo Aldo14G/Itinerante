@@ -44,6 +44,7 @@ const RULES = {
   'a11y-heading-skip': ['a11y', 'warn', 'Salto de nivel de encabezado.'],
   'copy-truth': ['copy', 'error', 'Afirmación comercial sin fuente (precio, existencia, fecha, reseña o cifra).'],
   'copy-label': ['copy', 'error', 'Imagen sin rótulo «Foto real» / «Recreación IA».'],
+  'copy-glued': ['copy', 'error', 'Palabras pegadas (falta un espacio, p. ej. un <br> oculto en móvil).'],
   'copy-repeat': ['copy', 'warn', 'Frase repetida en la página.'],
   'copy-measure': ['copy', 'warn', 'Línea de lectura de más de 75 caracteres.'],
   'law-lineheight': ['law', 'warn', 'Interlineado de lectura menor a 1.35.'],
@@ -280,6 +281,14 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
     [/\b(garantizad[oa]|el mejor|premiad[oa]|más vendid[oa])\b/i, 'superlativo'],
   ];
   truth.forEach(([re, what]) => { const m = text.match(re); if (m) out.push({ rule: 'copy-truth', sel: 'texto', detail: `${what}: «${m[0]}»` }); });
+  // Palabras pegadas: un <br> oculto (p. ej. en móvil) entre texto sin espacio a ninguno de sus lados.
+  document.querySelectorAll('br').forEach(br => {
+    if (getComputedStyle(br).display !== 'none') return;
+    const prev = br.previousSibling, next = br.nextSibling;
+    if (prev && next && prev.nodeType === 3 && next.nodeType === 3 && !/\s$/.test(prev.textContent) && !/^\s/.test(next.textContent)) {
+      out.push({ rule: 'copy-glued', sel: sel(br.parentElement), detail: `«${prev.textContent.slice(-12)}|${next.textContent.slice(0, 12)}»` });
+    }
+  });
   const counts = new Map();
   text.split(/(?<=[.!?])\s+|\n+/).map(s => s.trim().toLowerCase().replace(/\s+/g, ' ')).filter(s => s.split(' ').length >= 5).forEach(s => counts.set(s, (counts.get(s) || 0) + 1));
   counts.forEach((n, s) => { if (n > 1) out.push({ rule: 'copy-repeat', sel: 'texto', detail: `×${n} «${s.slice(0, 60)}»` }); });

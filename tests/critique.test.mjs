@@ -14,7 +14,7 @@ test('el auditor detecta cada familia de defectos en el fixture malo', () => {
   const res = run('--surface', 'fixture', '--out', out, '--top', '0');
   assert.equal(res.status, 1, 'un fixture malo debe fallar');
   const { counts } = JSON.parse(readFileSync(out, 'utf8')).surfaces.fixture;
-  for (const rule of ['token-color-literal', 'token-font-size', 'token-space-grid', 'token-radius', 'token-duration', 'motion-too-long', 'motion-layout-prop', 'motion-no-reduced', 'a11y-focus-removed', 'a11y-font-small', 'a11y-contrast', 'a11y-target', 'a11y-name', 'a11y-h1', 'copy-truth']) {
+  for (const rule of ['token-color-literal', 'token-font-size', 'token-space-grid', 'token-radius', 'token-duration', 'motion-too-long', 'motion-layout-prop', 'motion-no-reduced', 'a11y-focus-removed', 'a11y-font-small', 'a11y-contrast', 'a11y-target', 'a11y-name', 'a11y-h1', 'copy-truth', 'copy-glued']) {
     assert.ok(counts[rule] > 0, `no detectó ${rule}`);
   }
 });

@@ -4,3 +4,4 @@ body { font-family: sans-serif; background: #ffffff; color: #111; }
 .small { width: 20px; height: 20px; transition: width 3s; border-radius: 3px; }
 .icon { display: block; width: 10px; height: 10px; background: #123456; }
 button:focus { outline: none; }
+@media (max-width: 3000px) { .stack br { display: none; } }
