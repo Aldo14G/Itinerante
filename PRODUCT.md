@@ -41,6 +41,14 @@ genérico.
   estado abierto o cerrado se calcula con la hora de Monterrey.
 - La Cartelera comunica la existencia de actividades como propuestas, sin
   fechas, cupos o estados que todavía no estén verificados.
+- En el teléfono la primera vista es un perfil (nombre, estado de hoy, dirección
+  y «Cómo llegar» como única acción de contacto) con destacados que abren historias hechas solo con
+  las fotos que ya existen, cada una rotulada «Recreación IA» o «Foto real». En
+  Cartelera, «Me interesa» y «Compartir» son locales: no envían nada ni muestran
+  contadores, reseñas o reacciones, porque no hay datos que los respalden.
+- «Recién llegados» (Novedades) existe solo si la librería entrega una lista de
+  `ids`; sin ella el módulo, su ancla y sus enlaces no aparecen. No es un ranking
+  ni una promesa de existencia.
 - El catálogo es una muestra estática de 500 registros de prueba con búsqueda
   local; no depende de ningún servicio para funcionar.
 - El recorrido audiovisual acompaña la entrada y las secciones de la casa; la

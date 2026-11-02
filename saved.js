@@ -1,6 +1,8 @@
 // Mi lista para la visita: libros que la persona anota en este dispositivo (sin cuenta, sin servidor).
 // Sirve al objetivo del sitio: que lleguen a la librería sabiendo qué quieren ver y puedan preguntarlo.
 import { loadSample } from './sample.js';
+import { openDialog, topDialog } from './sheets.js';
+import { afterPaint } from './motion.js';
 
 const KEY = 'iti-saved-v1';
 export const MAX_SAVED = 30;
@@ -123,6 +125,10 @@ function toast(text, withAction = true) {
     toastEl.append(act);
   }
   if (toastEl.matches(':popover-open')) toastEl.hidePopover();
+  // Un modal vuelve inerte todo lo que no esté dentro de él (también la capa superior): con una hoja abierta el aviso
+  // se mueve a ella para que «Ver mi lista» pueda tocarse.
+  const host = topDialog() || document.body;
+  if (toastEl.parentElement !== host) host.append(toastEl);
   toastEl.showPopover?.();
   clearTimeout(toastTimer);
   toastTimer = setTimeout(hideToast, 4500);
@@ -158,8 +164,10 @@ async function renderList(dlg) {
   wa.hidden = books.length === 0;
 }
 
-function syncAll() {
-  document.querySelectorAll('.save[data-save-id]').forEach(paint);
+// Con `detail.id` solo se repintan los botones de ese libro (un toque no debe recorrer los de todas las tarjetas).
+function syncAll(e) {
+  const id = e?.detail?.id;
+  document.querySelectorAll(id ? `.save[data-save-id="${CSS.escape(id)}"]` : '.save[data-save-id]').forEach(paint);
   const n = savedIds().length;
   document.querySelectorAll('[data-saved-count]').forEach(el => { el.textContent = countText(n); });
   document.querySelectorAll('[data-saved-badge]').forEach(el => { el.hidden = n === 0; const c = el.querySelector('[data-saved-n]'); if (c) c.textContent = String(n); });
@@ -172,8 +180,7 @@ function openList() {
   if (!dlg || dlg.open) return;
   const open = () => {
     renderList(dlg);
-    dlg.showModal();
-    document.documentElement.classList.add('sheet-open');
+    openDialog(dlg);
     dlg.querySelector('[data-ml-close]')?.focus({ preventScroll: true });
   };
   const menu = document.getElementById('sheet-menu');
@@ -191,10 +198,12 @@ export function initSaved() {
     const save = e.target.closest('.save[data-save-id]');
     if (save) {
       e.preventDefault();
-      const res = toggleSaved(save.dataset.saveId);
-      if (res.full) toast(`Tu lista llegó a ${MAX_SAVED} libros: quita alguno para sumar otro.`, true);
-      else if (res.on) toast('Guardado en tu lista para la visita.');
-      else toast('Quitado de tu lista.', false);
+      const res = toggleSaved(save.dataset.saveId); // el marcador cambia de estado en este fotograma
+      afterPaint(() => { // el aviso (capa superior) va después de pintar
+        if (res.full) toast(`Tu lista llegó a ${MAX_SAVED} libros: quita alguno para sumar otro.`, true);
+        else if (res.on) toast('Guardado en tu lista para la visita.');
+        else toast('Quitado de tu lista.', false);
+      });
       return;
     }
     if (e.target.closest('[data-open-mylist]')) { e.preventDefault(); hideToast(); openList(); return; }
@@ -204,9 +213,11 @@ export function initSaved() {
     if (dlg?.open && (e.target === dlg || e.target.closest('[data-ml-close]'))) dlg.close();
   });
   document.getElementById('mylist')?.addEventListener('close', () => {
-    document.documentElement.classList.remove('sheet-open');
     document.querySelector('[data-open-mylist]:not(.toast-action)')?.focus?.({ preventScroll: true });
   });
 }
+
+// Aviso breve sin acción (lo usan los botones de Cartelera: «Enlace copiado», «Anotado en este dispositivo»).
+export const notify = text => toast(text, false);
 
 export { MAPS };

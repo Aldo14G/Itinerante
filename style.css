@@ -79,6 +79,18 @@ p { text-wrap: pretty; }
 }
 .h2 .ln { display: block; }
 
+/* Titular de capa interna (una capa dentro de un capítulo): un escalón por debajo del H2 del capítulo, así el capítulo tiene un solo titular grande. */
+.layer-title {
+  margin: 0; font: 780 clamp(2.25rem, 3.4vw, 3.5rem)/0.95 var(--f-sans); font-stretch: 70%;
+  letter-spacing: -0.015em; text-transform: uppercase; text-wrap: balance;
+}
+.layer-title em {
+  display: block; margin-top: 0.2em; font: 380 clamp(1.125rem, 1.6vw, 1.5rem)/1.15 var(--f-sans); font-stretch: 125%;
+  letter-spacing: -0.02em; text-transform: none; color: var(--tungsten);
+}
+.ask { margin-top: var(--sec-sm); padding-top: var(--space-6); border-top: 1px solid var(--line); }
+.ask > .layer-title { margin-bottom: var(--space-6); }
+
 .tag {
   display: inline-flex; align-items: center; gap: 0.4em;
   padding: 0.42em 0.6em 0.38em;
@@ -128,18 +140,15 @@ p { text-wrap: pretty; }
 .btn .ic { width: 1.05em; height: 1.05em; transition: transform var(--dur-base) var(--ease-out); }
 .btn:hover .ic, .btn:focus-visible .ic { transform: translate(2px, -2px); }
 
-.btn--tungsten { background: var(--tungsten); color: var(--night); --sweep: var(--bone); }
+/* Acción primaria (siempre «Cómo llegar»): una sola clase, el mismo terracota con tinta clara sobre cualquier fondo. */
+.btn--tungsten { background: var(--terra-deep); color: var(--white); --sweep: var(--terra); }
 .btn--ghost { color: var(--bone); border-color: var(--line-strong); background: color-mix(in srgb, var(--night) 28%, transparent); --sweep: var(--bone); }
 .btn--ghost:hover, .btn--ghost:focus-visible { color: var(--night); border-color: var(--bone); }
-.btn--light { background: var(--bone); color: var(--night); --sweep: var(--tungsten); }
-.btn--night { background: var(--night); color: var(--bone); --sweep: var(--terra); }
 .btn--line { color: var(--night); border-color: var(--night); --sweep: var(--night); }
 .btn--line:hover, .btn--line:focus-visible { color: var(--tungsten); }
 .btn--line-ink { color: var(--paper-ink); border-color: color-mix(in srgb, var(--paper-ink) 50%, transparent); --sweep: var(--paper-ink); }
 .btn--line-ink:hover, .btn--line-ink:focus-visible { color: var(--paper); }
-.btn--ink { background: var(--turq-ink); color: var(--bone); --sweep: var(--night); }
 .btn--sm { min-height: 40px; padding: 0 1em; font-size: var(--fs-1); }
-.btn--xl { min-height: 64px; padding: 0 1.8em; font-size: var(--fs-body); }
 
 /* ---------- Header ---------- */
 
@@ -167,13 +176,15 @@ p { text-wrap: pretty; }
 .hdr.is-menu { color: var(--bone); transform: none; }
 .hdr.is-menu::before { opacity: 0; }
 .hdr.is-menu .hdr-cta, .hdr.is-menu .status { visibility: hidden; }
+/* Una sola primaria por pantalla: la de la cabecera se retira mientras otra «Cómo llegar» está a la vista (app.js pone has-primary). */
+.hdr-cta { transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast), translate var(--dur-slow) var(--ease-out), opacity var(--dur-fast) var(--ease-out), visibility var(--dur-fast); }
+.hdr.has-primary .hdr-cta { opacity: 0; visibility: hidden; }
 .hdr[data-on="turq"] { color: var(--turq-ink); }
 .hdr[data-on="turq"]::before { background: color-mix(in srgb, var(--turq) 92%, transparent); border-color: color-mix(in srgb, var(--turq-ink) 20%, transparent); }
 .hdr[data-on="paper"] { color: var(--paper-ink); }
 .hdr[data-on="paper"]::before { background: color-mix(in srgb, var(--paper) 92%, transparent); border-color: color-mix(in srgb, var(--paper-ink) 12%, transparent); }
 .hdr[data-on="tungsten"] { color: var(--night); }
 .hdr[data-on="tungsten"]::before { background: color-mix(in srgb, var(--tungsten) 94%, transparent); border-color: color-mix(in srgb, var(--night) 15%, transparent); }
-.hdr[data-on="turq"] .btn--light, .hdr[data-on="paper"] .btn--light, .hdr[data-on="tungsten"] .btn--light { background: var(--night); color: var(--bone); }
 
 .hdr-brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font: 720 var(--fs-2)/1.05 var(--f-sans); font-stretch: 88%; }
 .hdr-brand img { width: 36px; height: 36px; border-radius: 8px; }
@@ -300,6 +311,8 @@ p { text-wrap: pretty; }
 .entry-status { display: none !important; }
 .entry-facts .ic { color: var(--tungsten); }
 .entry-title { order: 3; margin: 0; font-size: var(--fs-2); }
+/* Perfil y destacados: solo móvil (mobile.css los muestra). */
+.profile-av, .hl { display: none; }
 
 .wordmark, .ftr-mark {
   display: flex; justify-content: space-between;
@@ -417,7 +430,7 @@ p { text-wrap: pretty; }
 
 .bill { background: var(--turq); color: var(--turq-ink); padding: var(--sec-md) var(--gutter); }
 .bill .h2 em { color: var(--turq-ink); }
-.bill-head { display: grid; gap: 28px; margin-bottom: clamp(48px, 8vh, 96px); }
+.bill-head { display: grid; gap: 28px; margin-bottom: var(--space-7); }
 .bill-head .h2 { font-size: clamp(3.2rem, 9vw, 9rem); }
 .bill-head p { margin: 0; max-width: 62ch; padding-top: 20px; border-top: 2px solid var(--turq-ink); font-size: var(--fs-body); }
 .bill-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
@@ -473,8 +486,8 @@ p { text-wrap: pretty; }
 .books { background: var(--night); padding: var(--sec-md) var(--gutter) 0; }
 /* Capa 3 del capítulo: la muestra completa ocupa todo el ancho dentro de Libros. */
 .books > .cat { margin: var(--sec-md) calc(-1 * var(--gutter)) 0; }
-.books-head { display: grid; justify-items: end; gap: 24px; margin-bottom: clamp(44px, 7vh, 88px); text-align: right; }
-.books-head .h2 { max-width: 14ch; }
+.books-head { display: grid; justify-items: start; gap: var(--space-5); margin-bottom: var(--space-7); text-align: left; }
+.books-head .h2 { max-width: 16ch; }
 .books-head p { margin: 0; max-width: 46ch; color: var(--bone-dim); font-size: var(--fs-body); }
 .books-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
 
@@ -516,7 +529,7 @@ p { text-wrap: pretty; }
 
 .composer {
   display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto; gap: 28px clamp(24px, 3vw, 48px); align-items: end;
-  margin-top: clamp(56px, 9vh, 104px); padding-top: 36px; border-top: 1px solid var(--line);
+  margin-top: var(--space-7); padding-top: var(--space-6); border-top: 1px solid var(--line);
 }
 .composer-field label { display: block; margin-bottom: 12px; font: 700 var(--fs-body)/1.3 var(--f-sans); }
 .composer input {
@@ -656,7 +669,6 @@ p { text-wrap: pretty; }
   .still figcaption { grid-template-columns: minmax(0, 1fr) auto; }
   .still figcaption span:not(.tag) { grid-column: 1 / -1; grid-row: 2; }
 
-  .books-head { justify-items: start; text-align: left; }
   .bill-body { grid-template-columns: 1fr; }
   .bill-stage { position: relative; top: 0; aspect-ratio: 4 / 3; }
   .bill-item summary { padding: 20px 0 20px; }
@@ -695,8 +707,7 @@ p { text-wrap: pretty; }
 /* ---------- Catálogo de muestra ---------- */
 
 .cat { background: var(--night); padding: var(--sec-sm) var(--gutter) var(--sec-md); border-top: 1px solid var(--line); }
-.cat-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; align-items: end; margin-bottom: clamp(36px, 6vh, 64px); }
-.cat-head .h2 { font-size: clamp(2.6rem, 6.4vw, 6.4rem); }
+.cat-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; align-items: end; margin-bottom: var(--space-7); }
 .cat-seal {
   margin: 0; padding: 12px 20px; border: 2px solid var(--terra); border-radius: 4px; rotate: 2deg;
   color: var(--terra-light); font: 780 var(--fs-0)/1.2 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; text-align: center;
@@ -867,8 +878,8 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .cover--blank { display: grid; align-content: space-between; gap: 12px; padding: 16px 16px 16px; text-align: left; }
 .cover-author { font: 600 var(--fs-0)/1.2 var(--f-sans); letter-spacing: 0.04em; color: var(--cover-ink-dim); }
 .cover-title { text-align: left; font-size: clamp(1.05rem, 1.7vw, 1.5rem); line-height: 0.98; }
-.tone-0 { background: linear-gradient(165deg, var(--cover-0-a), var(--turq-ink)); }
-.tone-1 { background: linear-gradient(165deg, var(--terra-ink), var(--cover-1-b)); }
+.tone-0 { background: linear-gradient(165deg, var(--cover-0-a), var(--cover-0-b)); }
+.tone-1 { background: linear-gradient(165deg, var(--cover-1-a), var(--cover-1-b)); }
 .tone-2 { background: linear-gradient(165deg, var(--cover-2-a), var(--cover-2-b)); }
 .tone-3 { background: linear-gradient(165deg, var(--cover-3-a), var(--cover-3-b)); }
 .tone-4 { background: linear-gradient(165deg, var(--cover-4-a), var(--cover-4-b)); }
@@ -890,6 +901,14 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .rel .cover--blank::before { display: none; }
 .cover--blank .cover-author { padding-right: 48px; }
 .rel .cover--blank .cover-author { padding-right: 0; }
+/* Composición de la portada de plantilla (el hash del título elige una de cuatro; 0 = título arriba y autor abajo, centrados; 1 y 2 a la izquierda; 3 al centro). No cambia color ni contraste. */
+.cover--blank[data-cover-layout="1"], .cover--blank[data-cover-layout="2"] { justify-items: start; }
+.cover--blank[data-cover-layout="1"] { grid-template-rows: 1fr auto; }
+.cover--blank[data-cover-layout="1"] .cover-title { align-self: center; }
+.cover--blank[data-cover-layout="2"] .cover-author { order: -1; padding-right: 0; }
+.cover--blank[data-cover-layout="2"] .cover-title { padding-right: 48px; } /* abajo, junto al botón de guardar y al adorno */
+.cover--blank[data-cover-layout="3"] { align-content: center; justify-items: center; gap: 16px; text-align: center; }
+.cover--blank[data-cover-layout="3"] .cover-title, .cover--blank[data-cover-layout="3"] .cover-author { text-align: center; padding-right: 0; }
 
 /* ---------- Curaduría: textos que responden y esqueletos ---------- */
 
@@ -938,22 +957,20 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .cat-chip:focus-visible { background: var(--tungsten); color: var(--night); }
 .motion-btn:focus-visible { border-color: var(--bone); }
 
-/* Esqueletos: ocupan el lugar exacto del contenido hasta que llega. */
+/* Esqueletos: ocupan el lugar exacto del contenido hasta que llega. Una sola regla para móvil y escritorio: quietos (sin destello;
+   un barrido por foto diferida mantenía un recálculo de estilo por fotograma) y con colores de los tokens. */
 .sk-line { position: relative; display: block; height: 12px; overflow: hidden; border-radius: 2px; background: color-mix(in srgb, var(--bone) 9%, transparent); }
 .sk-line--s { width: 55%; }
 .sk-group { display: grid; gap: 12px; padding: 16px 0 28px; }
-.card--sk { cursor: default; pointer-events: none; content-visibility: visible; }
+.card--sk, .card--sk .card { cursor: default; pointer-events: none; content-visibility: visible; }
+/* Una sola regla de alto para la tarjeta de libro y su esqueleto: portada 2:3 (150 % del ancho del contenedor)
+   + título de hasta dos líneas + autor. El contenido llega al lugar exacto del esqueleto aunque el título ocupe 1 o 2 líneas. */
+.rail-item, .card-item { --card-h: calc(150cqw + 2 * var(--space-3) + 2 * 1.2 * var(--fs-2) + 1.5 * var(--fs-1)); }
+:is(.rail-item, .card-item) > .card { min-height: var(--card-h); align-content: start; }
+.sk-chip { flex: none; box-sizing: border-box; width: 112px; height: var(--target-coarse); border-radius: var(--radius-pill); background: color-mix(in srgb, var(--bone) 9%, transparent); }
 .card--sk .cover { overflow: hidden; }
 .frame-clip { position: relative; }
 .still-img img, .frame-clip img, .topic-layer img, .bill-layer img { position: relative; }
-.sk-line::before, .card--sk .cover::before, .still-img::before, .frame-clip::before, .topic-layer::before, .bill-layer::before {
-  content: ""; position: absolute; inset: 0; translate: -100% 0;
-  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--bone) 8%, transparent) 50%, transparent 70%);
-}
-.motion .sk-line::before, .motion .card--sk .cover::before, .motion .still-img::before, .motion .frame-clip::before, .motion .topic-layer::before, .motion .bill-layer::before {
-  animation: sk-sweep var(--dur-scene) linear 6;
-}
-@keyframes sk-sweep { to { translate: 100% 0; } }
 .cat-grid[aria-busy="true"] .card--sk .cover { background: var(--stone); }
 
 /* Objetivos táctiles de 44 px. */
@@ -964,7 +981,6 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 @media (prefers-reduced-motion: reduce) {
   .hdr-nav a > span, .ftr-links a > span, .hdr-nav a::before, .ftr-links a::before, .ftr-links a::after, .card-a::after,
   .motion.pin-house .still figcaption span:not(.tag), .bill-sub { transition-duration: 0.01ms; }
-  .sk-line::before, .card--sk .cover::before, .still-img::before, .frame-clip::before, .topic-layer::before, .bill-layer::before { animation: none !important; }
 }
 
 @media print {
@@ -1025,32 +1041,18 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
   .motion .btn--ghost:hover > span, .motion .btn--line:hover > span, .motion .btn--line-ink:hover > span { animation: celluloid var(--dur-fast) steps(1, end) 2; }
 }
 
-/* Cita sobre pentagrama: cinco filetes por renglón, que se dibujan de arriba abajo. */
+/* Cita: tipografía sola sobre ladrillo. Sin filetes por renglón (cruzaban las letras); solo entra el texto. */
 .quote { margin: 0; padding: var(--sec-md) var(--gutter); background: var(--night); border-top: 1px solid var(--line); }
 .quote.rx::before { top: 28px; left: var(--gutter); }
 .quote.rx::after { bottom: 28px; right: var(--gutter); }
 .quote blockquote {
-  --q-h: 2.1;
   position: relative; margin: 0 auto; width: min(100%, 50rem);
-  font: 380 clamp(1.5rem, 3.4vw, 3rem)/var(--q-h) var(--f-sans); font-stretch: 112%; letter-spacing: -0.01em; text-wrap: balance;
-}
-.quote blockquote::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background:
-    linear-gradient(to bottom,
-      transparent 0 18%, color-mix(in srgb, var(--bone) 30%, transparent) 18% calc(18% + var(--hair)),
-      transparent calc(18% + var(--hair)) 34%, color-mix(in srgb, var(--bone) 30%, transparent) 34% calc(34% + var(--hair)),
-      transparent calc(34% + var(--hair)) 50%, color-mix(in srgb, var(--bone) 30%, transparent) 50% calc(50% + var(--hair)),
-      transparent calc(50% + var(--hair)) 66%, color-mix(in srgb, var(--bone) 30%, transparent) 66% calc(66% + var(--hair)),
-      transparent calc(66% + var(--hair)) 82%, color-mix(in srgb, var(--bone) 30%, transparent) 82% calc(82% + var(--hair)),
-      transparent calc(82% + var(--hair))) 0 0 / 100% calc(1em * var(--q-h)) repeat-y;
+  font: 380 clamp(1.5rem, 3.4vw, 3rem)/1.3 var(--f-sans); font-stretch: 112%; letter-spacing: -0.01em; text-wrap: balance;
 }
 .quote blockquote p { position: relative; margin: 0; }
 .quote figcaption { width: min(100%, 50rem); margin: 32px auto 0; font: 560 var(--fs-1)/1.4 var(--f-sans); color: var(--bone-dim); }
 .quote cite { font-style: normal; color: var(--bone); }
-.motion .quote blockquote::before { transition: clip-path var(--dur-scene) var(--ease-out); }
-.motion .quote blockquote p, .motion .quote figcaption { transition: opacity var(--dur-slow) var(--ease-out) 0.5s, translate var(--dur-scene) var(--ease-out) 0.5s; }
-.motion .quote:not(.is-in) blockquote::before { clip-path: inset(0 0 100% 0); }
+.motion .quote blockquote p, .motion .quote figcaption { transition: opacity var(--dur-slow) var(--ease-out) var(--dur-base), translate var(--dur-scene) var(--ease-out) var(--dur-base); }
 .motion .quote:not(.is-in) blockquote p, .motion .quote:not(.is-in) figcaption { opacity: 0; translate: 0 0.4em; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1071,7 +1073,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* Pulsación: respuesta inmediata en táctil y puntero. */
 .btn:active, .topic:active, .cat-chip:active, .drawer-close:active { scale: 0.97; }
-.card:active .cover { scale: 0.98; }
+.card:active .cover, .card[data-opening] .cover { scale: 0.98; }
 @media (hover: none) {
   .card:hover .cover { translate: none; box-shadow: none; }
 }
@@ -1088,13 +1090,15 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 @starting-style { .motion .menu { opacity: 0; } }
 .motion .drawer:not([open]) { transition-duration: var(--dur-fast); transition-timing-function: var(--ease-io); }
 .motion .drawer:not([open])::backdrop { transition-duration: var(--dur-fast); transition-timing-function: var(--ease-io); }
+.motion .drawer.is-closing { translate: 100% 0; transition-duration: var(--dur-fast); transition-timing-function: var(--ease-io); } /* cierre desde el botón: sale ya, el cierre real corre después (closeDialog) */
+.motion .drawer.is-closing::backdrop { opacity: 0; transition-duration: var(--dur-fast); transition-timing-function: var(--ease-io); }
 
 /* Movimiento reducido: sin desplazamiento, pero con un fundido que confirma el cambio de estado. */
 @media (prefers-reduced-motion: reduce) {
   .card:hover .cover, .card:focus-visible .cover { translate: none; }
-  .btn:active, .topic:active, .cat-chip:active, .drawer-close:active, .card:active .cover { scale: none; }
+  .btn:active, .topic:active, .cat-chip:active, .drawer-close:active, .card:active .cover, .card[data-opening] .cover { scale: none; }
   .drawer { transition: opacity var(--dur-instant) linear, display var(--dur-instant) allow-discrete; opacity: 1; }
-  .drawer:not([open]) { opacity: 0; }
+  .drawer:not([open]), .drawer.is-closing { opacity: 0; }
   @starting-style { .drawer[open] { opacity: 0; } }
 }
 
@@ -1109,12 +1113,10 @@ html.sheet-open { overflow: hidden; }
 .drawer-related { order: 3; }
 @media (max-width: 760px) { .topics { gap: 8px 16px; } }
 
-/* Fotos diferidas: entran con un fundido al llegar y el esqueleto se mueve solo mientras faltan. */
+/* Fotos diferidas: entran con un fundido al llegar; mientras faltan, el marco queda quieto con su color de fondo. */
 @keyframes img-in { from { opacity: 0; } }
 .motion img[loading="lazy"]:not(.is-loaded) { opacity: 0; }
 .motion img.is-loaded[loading="lazy"] { animation: img-in var(--dur-base) var(--ease-out); }
-.motion .still-img::before, .motion .frame-clip::before, .motion .topic-layer::before, .motion .bill-layer::before { animation-iteration-count: infinite; }
-.still-img.is-loaded::before, .frame-clip.is-loaded::before, .topic-layer.is-loaded::before, .bill-layer.is-loaded::before { animation: none; opacity: 0; }
 
 /* Elementos solo móviles: ocultos por defecto (mobile.css los muestra). */
 .tabbar, .hdr-wa, .hdr-more, .stories, .drawer-grabber { display: none; }
@@ -1126,7 +1128,6 @@ html.sheet-open { overflow: hidden; }
 /* Gama media o baja (boot.js marca data-glass="lite"): sin desenfoque en la cabecera. */
 html[data-glass="lite"] .hdr::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in srgb, var(--night) 94%, transparent); }
-html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cover::before, html[data-glass="lite"] .still-img::before, html[data-glass="lite"] .frame-clip::before, html[data-glass="lite"] .topic-layer::before, html[data-glass="lite"] .bill-layer::before { animation: none !important; }
 
 /* Progreso de lectura (Goal-Gradient): una línea fija que se llena con el scroll. Sin JS: animación ligada al desplazamiento;
    donde no se soporta, la barra queda en cero y no estorba. */
@@ -1145,7 +1146,6 @@ html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cov
 .rail { --rail-gap: var(--space-4); margin-bottom: var(--sec-sm); }
 .rail[hidden], html:not(.js) .rail { display: none; }
 .rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
-.rail-title.h2 { margin: 0; font-size: clamp(2rem, 4.4vw, 3.6rem); }
 .rail-note { margin: 0; max-width: 56ch; color: var(--bone-dim); font-size: var(--fs-1); }
 .rail-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .rail-chip {
@@ -1252,3 +1252,23 @@ html[data-glass="lite"] .sk-line::before, html[data-glass="lite"] .card--sk .cov
 .explorer:not([open]) { display: none; }
 html.explorer-open { overflow: hidden; }
 
+/* ---------- Publicaciones de Cartelera: «Me interesa» y «Compartir» (locales: no se envía nada, sin contadores) ---------- */
+.bill-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.act {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-coarse); padding: 0 var(--space-4);
+  color: inherit; cursor: pointer; font: 650 var(--fs-1)/1 var(--f-sans); background: none;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent); border-radius: var(--radius-pill);
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
+}
+.act .ic { width: 20px; height: 20px; }
+.act:active { scale: 0.96; }
+.act[aria-pressed="true"] { color: var(--bone); background: var(--turq-ink); border-color: transparent; }
+.act[aria-pressed="true"] .ic { fill: currentColor; }
+html:not(.js) .bill-acts { display: none; }
+.bill-visit { margin-top: var(--space-5); }
+.books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec-sm) 0; }
+.books-foot p { margin: 0; max-width: 46ch; color: var(--bone-dim); font-size: var(--fs-body); }
+
+/* ---------- Novedades (Recién llegados): sin datos no existe ---------- */
+.news[hidden] { display: none; }
+.bill-detail .btn { min-height: var(--target-coarse); font-size: var(--fs-1); }

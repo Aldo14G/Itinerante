@@ -1,8 +1,9 @@
 // Carrusel de libros: una sola pieza para cualquier colección. Hoy muestra la muestra (rotulada);
 // cuando llegue el listado real basta con poner `ids` en assets/data/collections.json.
-import { coverTone, filterBooks, sortBooks } from './catalog.js';
-import { loadSample } from './sample.js';
+import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf } from './catalog.js';
+import { loadSample, loadCollections } from './sample.js';
 import { saveButton, initSaved } from './saved.js';
+import { afterPaint, confirmThen } from './motion.js';
 
 export const RAIL_SIZE = 12;
 
@@ -24,8 +25,11 @@ const make = (tag, cls, text) => {
   return n;
 };
 
-function bookCard(b) {
-  const cover = make('span', `cover cover--blank tone-${coverTone(b)}`);
+// `tone` lo da la lista (coverTones: sin vecinas del mismo tono); sin él, el tono propio del libro.
+export function bookCard(b, tone = coverTone(b)) {
+  const cover = make('span', `cover cover--blank tone-${tone}`);
+  cover.dataset.coverTone = tone;
+  cover.dataset.coverLayout = coverLayout(b);
   const title = make('span', 'cover-title', b.t);
   const author = make('span', 'cover-author', b.a);
   title.setAttribute('aria-hidden', 'true');
@@ -39,6 +43,20 @@ function bookCard(b) {
   const li = make('li', 'rail-item');
   li.append(btn, saveButton(b));
   return li;
+}
+
+// La ficha vive en el catálogo: se asegura que esté cargado y se le pide abrirla (carrusel y Novedades comparten esto).
+export function wireBookOpen(track, ensureCatalog) {
+  track.addEventListener('click', e => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    confirmThen(card, async () => { // la tarjeta confirma el toque ya; abrir la hoja (lo caro) va después de pintar
+      try { await ensureCatalog?.(); } catch { return; }
+      const drawer = document.getElementById('cat-drawer');
+      if (drawer) drawer.addEventListener('close', () => card.isConnected && card.focus({ preventScroll: true }), { once: true });
+      document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: card.dataset.id, tone: toneOf(card) } }));
+    });
+  });
 }
 
 export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
@@ -60,7 +78,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   try {
     const [sample, collections] = await Promise.all([
       loadSample(),
-      fetch('assets/data/collections.json').then(r => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+      loadCollections()
     ]);
     books = sample.books;
     cols = collections.collections.filter(c => pickBooks(books, c).length);
@@ -88,18 +106,31 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const go = dir => viewport.scrollBy({ left: dir * Math.max(step(), viewport.clientWidth * 0.85), behavior: isMotion() ? 'smooth' : 'auto' });
 
   let current = null;
-  function show(id, announce) {
+  let paintId = 0; // el último cambio de colección gana si se toca otro chip antes de terminar de pintar
+  const FIRST_CHUNK = 6; // lo que se ve al llegar; el resto se pinta en el fotograma siguiente para no hacer una tarea larga
+  // `immediate` (primera carga) pinta de una vez. Al tocar un chip, el chip confirma ya y las tarjetas se cambian después de pintar.
+  async function show(id, announce, immediate = false) {
     const col = cols.find(c => c.id === id) ?? cols[0];
     current = col.id;
+    chipsEl.querySelectorAll('.rail-chip').forEach(c => c.setAttribute('aria-checked', String(c.dataset.id === col.id)));
+    const mine = ++paintId;
+    if (!immediate) await afterPaint();
+    if (mine !== paintId) return;
     const list = pickBooks(books, col);
-    track.replaceChildren(...list.map(bookCard));
+    const tones = coverTones(list);
+    const cards = list.map((b, i) => bookCard(b, tones[i]));
+    track.replaceChildren(...cards.slice(0, FIRST_CHUNK));
     track.removeAttribute('aria-busy');
     viewport.scrollTo({ left: 0, behavior: 'auto' });
     viewport.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
     noteEl.textContent = col.nota || '';
     noteEl.hidden = !col.nota;
-    chipsEl.querySelectorAll('.rail-chip').forEach(c => c.setAttribute('aria-checked', String(c.dataset.id === col.id)));
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`;
+    if (cards.length > FIRST_CHUNK) {
+      if (!immediate) await afterPaint();
+      if (mine !== paintId) return;
+      track.append(...cards.slice(FIRST_CHUNK));
+    }
     sync();
   }
 
@@ -135,19 +166,10 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   });
   if ('ResizeObserver' in window) new ResizeObserver(sync).observe(viewport);
 
-  // La ficha vive en el catálogo: se asegura que esté cargado y se le pide abrirla.
-  track.addEventListener('click', async e => {
-    const card = e.target.closest('.card');
-    if (!card) return;
-    const opener = card;
-    try { await ensureCatalog?.(); } catch { return; }
-    const drawer = document.getElementById('cat-drawer');
-    if (drawer) drawer.addEventListener('close', () => opener.isConnected && opener.focus({ preventScroll: true }), { once: true });
-    document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: card.dataset.id } }));
-  });
+  wireBookOpen(track, ensureCatalog);
 
   chipsEl.querySelector('.rail-chip').tabIndex = 0;
   chipsEl.querySelectorAll('.rail-chip:not(:first-child)').forEach(c => { c.tabIndex = -1; });
-  show(cols[0].id, false);
+  show(cols[0].id, false, true);
   root.classList.add('is-ready');
 }

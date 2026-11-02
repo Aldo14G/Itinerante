@@ -5,7 +5,10 @@ import { readFile, access, readdir } from 'node:fs/promises';
 import { pickBooks } from '../rail.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
-import { coverTone, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { newsPlan, NEWS_SIZE } from '../news.js';
+import { STORY_KEYS, readInterest } from '../feed.js';
+import { KIND_LABEL, validKind } from '../tag.js';
+import { PAGE_SIZE, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -145,15 +148,19 @@ test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
     assert.ok(!html.includes(gone), `sigue en el marcado: ${gone}`);
   assert.equal([...html.matchAll(/class="marquee-row/g)].length, 1, 'una sola fila de marquesina');
   assert.ok(!/id="call-title"[\s\S]*?<\/section>/.exec(html)[0].includes('class="btn '), 'el llamado no repite las acciones de la Visita');
-  const labels = [...html.matchAll(/class="bill-detail">[\s\S]*?class="btn btn--ink"[^>]*>([^<]+)</g)].map(m => m[1].trim());
+  const labels = [...html.matchAll(/class="bill-detail">[\s\S]*?class="btn btn--line-ink"[^>]*>([^<]+)</g)].map(m => m[1].trim());
   assert.equal(new Set(labels).size, labels.length, 'los CTA de Cartelera son distintos');
 });
 
 test('curaduría: los textos de navegación traen pista y los esqueletos ocupan el lugar', () => {
   assert.equal([...html.matchAll(/<a href="#[a-z]+" data-hint="[^"]+"><span>/g)].length, 4);
-  assert.equal([...html.matchAll(/class="card card--sk"/g)].length, 12);
+  assert.equal([...html.matchAll(/class="card-item card--sk"/g)].length, PAGE_SIZE, 'un esqueleto por tarjeta de la primera página');
+  assert.ok(/--card-h: calc\(150cqw/.test(css) && /:is\(\.rail-item, \.card-item\) > \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto');
+  assert.ok(/data-rail-chips>(<span class="sk-chip" aria-hidden="true"><\/span>){3,}<\/div>/.test(html), 'el esqueleto del carrusel reserva la fila de chips');
   assert.ok(/data-cat-grid aria-busy="true"/.test(html));
-  assert.ok(/\.card--sk/.test(css) && /@keyframes sk-sweep/.test(css));
+  assert.ok(/\.card--sk/.test(css));
+  assert.ok(!/sk-sweep/.test(css + mobileCss), 'los esqueletos no se animan (una sola regla para móvil y escritorio)');
+  assert.ok(!/(sk-line|card--sk|still-img|frame-clip|topic-layer|bill-layer)[^{}]*::before[^{}]*\{[^}]*animation/.test(css + mobileCss), 'ningún esqueleto ni marco de foto declara animación');
   assert.ok(/content: attr\(data-hint\) \/ ""/.test(css), 'la pista no debe entrar al nombre accesible');
   assert.ok(/\.hdr-nav a:focus-visible::after/.test(css), 'el foco de teclado iguala al hover');
 });
@@ -192,14 +199,71 @@ test('sugerencias: los autores que empiezan por la consulta van antes que las co
   assert.ok(firstMid === -1 || rows.slice(firstMid).every(s => !starts(s)), 'ningún prefijo detrás de una coincidencia interna');
 });
 
-test('portadas: una sola familia visual, con el tono por categoría y género', () => {
+test('portadas: una sola familia visual, con el tono por categoría y por título', async () => {
   const warm = new Set([1, 2, 5]), cool = new Set([0, 3, 4]);
   for (const b of data.books) {
     assert.equal(b.c ?? null, null, 'ya no hay SVG de portada');
     assert.ok((b.k === 'fiction' ? warm : cool).has(coverTone(b)), `tono fuera de su familia: ${b.g}`);
   }
   const a = data.books.find(b => b.k === 'fiction');
-  assert.equal(coverTone(a), coverTone({ ...a, t: 'otro' }), 'el mismo género da el mismo tono');
+  assert.equal(coverTone(a), coverTone({ ...a }), 'el mismo libro da siempre el mismo tono');
+  assert.equal(coverTone(a), coverTone({ ...a, g: 'otro-genero' }), 'el tono sale del título, no del género');
+  // Cada familia usa sus tres tonos en todo el catálogo...
+  for (const [k, family] of [['fiction', warm], ['non-fiction', cool]]) {
+    const used = new Set(data.books.filter(b => b.k === k).map(coverTone));
+    assert.deepEqual([...used].sort(), [...family].sort(), `la familia ${k} usa sus tres tonos`);
+  }
+  // ...y cada colección de 12 del carrusel (un solo género) muestra al menos tres tonos distintos.
+  const { collections } = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
+  for (const col of collections) {
+    const books = pickBooks(data.books, col);
+    assert.equal(books.length, 12, `${col.id}: 12 libros`);
+    const tones = new Set(books.map(coverTone));
+    assert.ok(tones.size >= 3, `${col.id}: ${tones.size} tonos (mínimo 3)`);
+    const family = books[0].k === 'fiction' ? warm : cool;
+    for (const t of tones) assert.ok(family.has(t), `${col.id}: tono ${t} fuera de su familia`);
+  }
+});
+
+test('portadas: en cada colección de 12 no hay vecinas del mismo tono, ninguno pasa de 5 y la composición varía', async () => {
+  const { collections } = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
+  assert.equal(collections.length, 4);
+  const warm = new Set([1, 2, 5]), cool = new Set([0, 3, 4]);
+  for (const col of collections) {
+    const books = pickBooks(data.books, col);
+    assert.equal(books.length, 12, `${col.id}: 12 libros`);
+    const tones = coverTones(books);
+    assert.equal(tones.length, 12);
+    for (let i = 1; i < tones.length; i++) assert.notEqual(tones[i], tones[i - 1], `${col.id}: las portadas ${i} y ${i + 1} repiten tono`);
+    const count = new Map();
+    for (const t of tones) count.set(t, (count.get(t) ?? 0) + 1);
+    assert.ok(Math.max(...count.values()) <= 5, `${col.id}: un tono pasa de 5 de 12 (${[...count]})`);
+    assert.ok(count.size >= 3, `${col.id}: ${count.size} tonos (mínimo 3)`);
+    const family = books[0].k === 'fiction' ? warm : cool;
+    for (const t of tones) assert.ok(family.has(t), `${col.id}: tono ${t} fuera de su familia`);
+    assert.deepEqual(coverTones(books), tones, `${col.id}: el reparto es estable`);
+    assert.deepEqual(coverTones(books.map(b => ({ ...b }))), tones, `${col.id}: el mismo libro da el mismo tono en la misma lista`);
+    const layouts = new Set(books.map(coverLayout));
+    assert.ok(layouts.size >= 3, `${col.id}: ${layouts.size} composiciones (mínimo 3)`);
+    for (const l of layouts) assert.ok(Number.isInteger(l) && l >= 0 && l < COVER_LAYOUTS);
+  }
+  // Con listas arbitrarias del catálogo (ventanas de 12) las vecinas tampoco repiten.
+  for (let from = 0; from + 12 <= data.books.length; from += 7) {
+    const tones = coverTones(data.books.slice(from, from + 12));
+    for (let i = 1; i < tones.length; i++) assert.notEqual(tones[i], tones[i - 1], `ventana ${from}: vecinas repiten tono`);
+  }
+  assert.deepEqual(coverTones([]), []);
+  assert.deepEqual(coverTones([data.books[0]]), [coverTone(data.books[0])]);
+});
+
+test('portadas: la ficha repite el tono de la tarjeta pulsada y la composición vive en CSS', async () => {
+  const [cat, rail, news] = await Promise.all(['catalog.js', 'rail.js', 'news.js'].map(f => readFile(here(`./${f}`), 'utf8')));
+  assert.ok(/data-cover-tone/.test(cat) && /dataset\.coverTone/.test(cat) && /dataset\.coverTone/.test(rail), 'la tarjeta guarda su tono');
+  assert.ok(/openBook\(id, \{ trigger, tone \}/.test(cat) && /cover\(b, tone\)/.test(cat), 'la ficha usa el tono recibido');
+  assert.ok(/iti:open-book[\s\S]{0,160}tone: toneOf\(card\)/.test(rail), 'el carrusel manda el tono con la petición');
+  assert.ok(/coverTones\(list\)/.test(rail) && /coverTones\(plan\.books\)/.test(news), 'carrusel y Novedades reparten tonos por lista');
+  for (let i = 1; i < COVER_LAYOUTS; i++) assert.ok(css.includes(`[data-cover-layout="${i}"]`), `falta la composición ${i}`);
+  assert.ok(!/data-cover-layout[^{}]*\{[^}]*(color|background)\s*:/.test(css), 'la composición no toca color');
 });
 
 test('móvil: barra inferior con una pestaña por sección, iconos en el sprite y hoja de estilos solo móvil', () => {
@@ -218,7 +282,17 @@ test('móvil: menú lateral con categorías desplegables accesibles y destinos r
   assert.ok(/<button class="hdr-more"[^>]*aria-expanded="false"[^>]*aria-controls="sheet-menu"/.test(html), 'botón del menú con aria-expanded y aria-controls');
   assert.ok(/aria-labelledby="sheet-menu-title"/.test(dlg) && /data-sm-close/.test(dlg), 'diálogo con título y botón de cierre');
   const rows = [...dlg.matchAll(/<button class="sm-row"[^>]*aria-expanded="false"[^>]*aria-controls="([a-z-]+)"/g)].map(m => m[1]);
-  assert.deepEqual(rows, ['sm-visita', 'sm-horarios', 'sm-libros', 'sm-cartelera']);
+  assert.deepEqual(rows, ['sm-cartelera', 'sm-libros', 'sm-visita'], 'acordeones en el orden de la barra inferior; Horarios vive dentro de Visita');
+  const order = [...dlg.matchAll(/<(?:a|button) class="sm-row"[^>]*>[\s\S]*?<span class="sm-lb">([^<]+)/g)].map(m => m[1]);
+  assert.deepEqual(order, ['La casa', 'Cartelera', 'Libros', 'Visita', 'Mi lista'], 'mismo orden y nombres que la cabecera y la barra; Mi lista aparte al final');
+  const bar = [...html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0].matchAll(/<span class="tab-lb">([^<]+)/g)].map(m => m[1]);
+  assert.deepEqual(order.slice(0, 4), bar, 'las cuatro primeras filas repiten la barra inferior');
+  const foot = dlg.match(/<div class="sm-foot">[\s\S]*?<\/div>/)[0];
+  assert.equal((foot.match(/btn--tungsten/g) || []).length, 1, 'una sola acción primaria en el menú');
+  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost"[^>]*wa\.me[\s\S]*Escribir por WhatsApp/.test(foot), '«Cómo llegar» es el primario y WhatsApp el secundario');
+  assert.ok(/id="sm-visita"[\s\S]*?<dl class="sm-hours"><dt>Lunes a sábado<\/dt><dd>11:00–20:00<\/dd><dt>Domingo<\/dt><dd>Cerrado/.test(dlg), 'Horarios dentro de Visita');
+  assert.equal((dlg.match(/Cómo llegar/g) || []).length, 1, '«Cómo llegar» aparece una sola vez en el menú (el botón primario del pie)');
+  assert.ok(!/Horario y dirección/.test(dlg), 'Visita no repite el horario con un enlace');
   for (const id of rows) assert.ok(new RegExp(`id="${id}" inert`).test(dlg), `${id} plegado e inerte`);
   for (const m of dlg.matchAll(/href="#([a-z]+)"/g)) assert.ok(html.includes(`id="${m[1]}"`), `destino #${m[1]} inexistente`);
   for (const m of dlg.matchAll(/data-topic-go="([a-z]+)"/g)) assert.ok(html.includes(`data-topic="${m[1]}"`), `tema ${m[1]} inexistente`);
@@ -255,13 +329,31 @@ test('tonos claros: las secciones de lectura usan cal y el pie ladrillo, con con
   assert.ok(/\[data-tone="light"\]/.test(tokensCss) && /\[data-tone="sand"\]/.test(tokensCss) && /\[data-tone="brick"\]/.test(tokensCss));
 });
 
-test('portadas y cabecera: tinta fija sobre superficies oscuras, también dentro de tonos claros', () => {
+test('portadas y cabecera: tinta fija sobre superficies oscuras, también dentro de tonos claros', async () => {
   assert.ok(/\.cover--blank \.cover-title \{ color: var\(--cover-ink\); \}/.test(css) && /\.cover-author \{[^}]*var\(--cover-ink-dim\)/.test(css), 'portadas con tinta propia');
-  assert.ok(/--cover-ink: #f1e8d8/.test(tokensCss) && /--cover-ink-dim: #b8aa95/.test(tokensCss));
+  assert.ok(/--cover-ink: #f1e8d8/.test(tokensCss) && /--cover-ink-dim: #c8bda5/.test(tokensCss));
   assert.ok(!/html\[data-glass="lite"\] \.hdr::before \{[^}]*background/.test(css), 'lite no pisa el tinte por sección de la cabecera');
   assert.ok(/\.entry-credit \{[^}]*background: color-mix/.test(css.replaceAll('\n', ' ')), 'crédito del hero sobre chip sólido');
-  assert.ok(/\.entry-copy \{ padding-bottom: calc\(var\(--tabbar-h\)/.test(mobileCss), 'el hero reserva espacio para la barra inferior');
-  assert.ok(!/\.manifesto, \.bill, \.books, \.cat[^{]*\{ content-visibility/.test(mobileCss), 'secciones destino de anclas sin content-visibility');
+  assert.ok(/html\.at-top \.tabbar \{ translate: 0 calc\(100% \+ 24px\); \}/.test(mobileCss), 'la barra inferior espera fuera de la primera vista (el perfil no la reserva)');
+  assert.ok(/html\.at-top \.tabbar \{ visibility: hidden; \}/.test(mobileCss) && /\.tabbar \{[^}]*transition: translate var\(--dur-base\) var\(--spring\), visibility var\(--dur-base\);/.test(mobileCss.replaceAll('\n', ' ')), 'fuera de pantalla la barra inferior no recibe foco (visibility, con la duración de la salida)');
+  assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileCss), 'sin JavaScript la barra inferior no tapa los destacados: la cabecera ya trae los cuatro enlaces');
+  assert.ok(/\.hdr-brand, \.bill-foot a \{ min-height: 44px; \}/.test(mobileCss) && /\(min-width: 360px\) \{ \.hdr-brand span \{ white-space: nowrap; \} \}/.test(mobileCss), 'marca de la cabecera y enlace del pie de Cartelera de 44 px en móvil; nombre en un renglón desde 360 px');
+  assert.ok(/at-top/.test(await readFile(new URL('../assets/js/boot.js', import.meta.url), 'utf8')) && /classList\.toggle\('at-top'/.test(await readFile(new URL('../app.js', import.meta.url), 'utf8')), 'at-top lo fija boot.js y lo mantiene app.js');
+  // R01: bajo el perfil nada se maqueta hasta acercarse; cada sección lleva la altura de su contenido para que el largo y las anclas no se muevan.
+  for (const sel of ['manifesto', 'house', 'bill', 'books', 'quote', 'call', 'visit', 'ftr']) {
+    assert.ok(new RegExp(String.raw`\.${sel} \{ content-visibility: auto; contain-intrinsic-size: auto \d+px; \}`).test(mobileCss), `.${sel} con content-visibility: auto y altura estimada (móvil)`);
+  }
+  assert.ok(!/\.entry[^{]*\{[^}]*content-visibility/.test(mobileCss), 'el perfil (LCP) nunca se salta');
+});
+
+test('cita sin filetes, barra inferior opaca (móvil)', async () => {
+  const quoteCss = css.slice(css.indexOf('.quote {'), css.indexOf('.quote cite'));
+  assert.ok(!/blockquote::before/.test(quoteCss) && !/clip-path/.test(quoteCss) && !/linear-gradient/.test(quoteCss), 'la cita es tipografía sola: sin filetes por renglón ni animación decorativa');
+  assert.ok(!/@keyframes/.test(quoteCss) && !/--q-h/.test(quoteCss));
+  assert.ok(!/blockquote::before/.test(css), 'ninguna regla vieja de los filetes de la cita');
+  const tint = Number(tokensCss.match(/--glass-tint: rgb\(30 20 14 \/ ([0-9.]+)\)/)[1]);
+  const solid = Number(tokensCss.match(/--glass-solid: rgb\(30 20 14 \/ ([0-9.]+)\)/)[1]);
+  assert.ok(tint >= 0.96 && solid >= 0.98, `la barra no deja ver contenido bajo las etiquetas (tinte ${tint}, sólido ${solid})`);
 });
 
 test('división de app.js: el módulo de escritorio existe, se sirve, se importa bajo demanda y falla sin romper la página', async () => {
@@ -383,7 +475,24 @@ test('paleta: los campos de color a ancho completo no superan el croma de las pa
   for (const [name, hex] of Object.entries(fills)) assert.ok(chroma(hex) <= FILL_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${FILL_MAX}`);
   const accents = { 'terracota (cal)': tk.tones.light.tungsten, 'terracota (arena)': tk.tones.sand.tungsten, 'turquesa texto (cal)': tk.tones.light.turq, 'turquesa texto (arena)': tk.tones.sand.turq };
   for (const [name, hex] of Object.entries(accents)) assert.ok(chroma(hex) <= ACCENT_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${ACCENT_MAX}`);
+  // Ningún token de color hexadecimal (base, portadas, estado abierto/cerrado ni tonos) pasa del límite de acentos.
+  const all = [...Object.entries(tk.color), ...Object.entries(tk.tones).flatMap(([t, o]) => Object.entries(o).map(([k, v]) => [`${t}.${k}`, v]))];
+  for (const [name, hex] of all.filter(([, v]) => /^#[0-9a-f]{6}$/i.test(v))) assert.ok(chroma(hex) <= ACCENT_MAX, `token ${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${ACCENT_MAX}`);
   assert.equal(tk.color['turq-base'], tk.color.turq, 'la cortinilla termina exactamente en el color de Cartelera');
+});
+
+test('portadas: el autor y el título se leen sobre la parada más clara de cada degradado', async () => {
+  const tk = JSON.parse(await readFile(new URL('../design/tokens.json', import.meta.url), 'utf8')).themes.b4.color;
+  const lum = hex => { const [r, g, b] = [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16) / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  for (let i = 0; i < 6; i++) {
+    for (const stop of ['a', 'b']) {
+      const bg = tk[`cover-${i}-${stop}`];
+      assert.ok(ratio(tk['cover-ink-dim'], bg) >= 4.5, `autor sobre cover-${i}-${stop}: ${ratio(tk['cover-ink-dim'], bg).toFixed(2)}:1`);
+      assert.ok(ratio(tk['cover-ink'], bg) >= 4.5, `título sobre cover-${i}-${stop}: ${ratio(tk['cover-ink'], bg).toFixed(2)}:1`);
+    }
+    assert.ok(css.includes(`.tone-${i} { background: linear-gradient(165deg, var(--cover-${i}-a), var(--cover-${i}-b)); }`), `tone-${i} usa solo los tokens de su portada`);
+  }
 });
 
 test('ritmo y movimiento: relleno de secciones con la escala de 4 px y movimiento reducido sin desplazamientos', () => {
@@ -433,11 +542,235 @@ test('Mi lista y Explorar: marcado accesible, entradas coherentes y publicación
   assert.ok(/data-ex-open aria-controls="explorer"/.test(html));
   assert.ok(/\.explorer:modal \{[^}]*position: fixed; inset: 0/.test(mobileCss) && /html\.explorer-open \{ overflow: hidden; \}/.test(css), 'hoja a pantalla completa y scroll bloqueado');
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
-  assert.ok(/history\.pushState\(\{ explorer: 1 \}, '', '#explorar'\)/.test(app) && /addEventListener\('popstate'/.test(app), '«atrás» cierra la hoja');
+  assert.ok(/openDialog\(explorer, \{ lock: 'explorer-open', url: '#explorar' \}\)/.test(app), 'Explorar se abre por el módulo de hojas, con su entrada #explorar');
   assert.ok(/import\('\.\/saved\.js'\)/.test(app) && !/^import .*saved\.js/m.test(app), 'Mi lista se carga en reposo');
   const prepare = await readFile(new URL('../scripts/prepare-public.mjs', import.meta.url), 'utf8');
   const preview = await readFile(new URL('../tools/preview-site.mjs', import.meta.url), 'utf8');
-  for (const f of ['sample.js', 'saved.js', 'rail.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
+  for (const f of ['sample.js', 'saved.js', 'rail.js', 'sheets.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
   assert.ok(/\.toast \{[^}]*width: max-content/.test(css) && /popover = 'manual'/.test(await readFile(new URL('../saved.js', import.meta.url), 'utf8')), 'el aviso va en la capa superior y no se parte');
 });
 
+
+test('hojas: un solo módulo lleva el historial y el bloqueo de scroll (menú, Mi lista, ficha, Explorar)', async () => {
+  const read = f => readFile(new URL(`../${f}`, import.meta.url), 'utf8');
+  const [sheets, app, cat, saved] = await Promise.all(['sheets.js', 'app.js', 'catalog.js', 'saved.js'].map(read));
+  // el comportamiento de sheets.js (contador de bloqueo, «atrás») se prueba en tests/sheets.test.mjs; aquí, quién usa qué
+  // nadie más toca las clases de bloqueo ni empuja historial por su cuenta
+  for (const [name, src] of Object.entries({ app, cat, saved })) {
+    assert.ok(!/classList\.(add|remove)\('(sheet-open|explorer-open)'\)/.test(src), `${name}: el bloqueo de scroll es de sheets.js`);
+    assert.ok(!/history\.pushState/.test(src), `${name}: el historial es de sheets.js`);
+  }
+  assert.ok(/openDialog\(dlg\)/.test(app) && /openDialog\(drawer\)/.test(cat) && /openDialog\(dlg\)/.test(saved), 'menú, ficha y Mi lista se abren por openDialog');
+  assert.ok(/pushSheet\(\{ close: \(\) => setMenu\(false\), lock: null \}\)/.test(app), 'el menú de tableta también responde a «atrás»');
+  // el aviso vive dentro de la hoja modal abierta (lo que queda fuera de un modal es inerte y no se podría tocar «Ver mi lista»)
+  assert.ok(/topDialog\(\) \|\| document\.body/.test(saved), 'el aviso se mueve a la hoja modal');
+  // escritorio: Explorar en línea no enfoca el campo ni desplaza la página al cargar (show() ejecuta los pasos de enfoque)
+  assert.ok(/explorer\.open = true/.test(app) && !/explorer\.show\(\)/.test(app), 'Explorar en línea se abre sin enfocar');
+});
+
+// ---------------------------------------------------------------------------------------------
+// Móvil tipo red social, Novedades y una sola acción primaria (agente ux-movil-feed)
+
+const SAMPLE_META = { kind: 'sample', label: 'Datos de muestra · no es inventario' };
+
+test('Novedades: sin datos el plan no muestra nada, ni siquiera todo el catálogo', async () => {
+  const shipped = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
+  assert.deepEqual(shipped.novedades.ids, [], 'el listado real llegará después: hoy la colección está vacía');
+  assert.ok(!shipped.collections.some(c => /novedades/i.test(c.id)), 'el carrusel de libros no recibe la colección de Novedades');
+  const sinDatos = [shipped, { meta: SAMPLE_META }, { meta: SAMPLE_META, novedades: {} }, { meta: SAMPLE_META, novedades: { ids: [] } }, { meta: SAMPLE_META, novedades: { ids: ['no-existe', 'tampoco'] } }, { novedades: { ids: 'x' } }, null, undefined];
+  for (const d of sinDatos) {
+    const plan = newsPlan(data.books, d);
+    assert.equal(plan.show, false, JSON.stringify(d)?.slice(0, 60));
+    assert.deepEqual(plan.books, [], 'sin ids no se arma ninguna tarjeta (pickBooks sin ids devolvería todo el catálogo)');
+  }
+});
+
+test('Novedades: con ids se muestra en el orden dado y con el rótulo de muestra', () => {
+  const [a, b, c] = [data.books[5], data.books[2], data.books[9]];
+  const plan = newsPlan([a, b, c], { meta: SAMPLE_META, novedades: { titulo: 'Recién llegados', ids: [c.id, 'no-existe', b.id, a.id] } });
+  assert.equal(plan.show, true);
+  assert.deepEqual(plan.books.map(x => x.id), [c.id, b.id, a.id], 'orden de la lista; omite lo que no existe');
+  assert.equal(plan.note, 'Datos de muestra · no es inventario');
+  // con inventario verificado (meta distinto de «sample») el rótulo de muestra se retira
+  assert.equal(newsPlan([a], { meta: { kind: 'inventario' }, novedades: { ids: [a.id] } }).note, '');
+  // tope
+  assert.equal(newsPlan(data.books, { meta: SAMPLE_META, novedades: { ids: data.books.slice(0, 40).map(x => x.id) } }).books.length, NEWS_SIZE);
+});
+
+test('Novedades: nace oculta en el documento y con un solo enlace', () => {
+  const markup = html.match(/<section id="novedades"[\s\S]*?<\/section>/)[0];
+  assert.ok(/<section id="novedades" class="news rail" data-news[^>]*\bhidden>/.test(markup), 'nace oculta (sin JS y sin datos no existe)');
+  assert.ok(/<li data-news-link hidden><a class="sm-link" href="#novedades">/.test(html), 'el enlace del menú nace oculto');
+  assert.equal([...html.matchAll(/href="#novedades"/g)].length, 1, 'un solo enlace a la sección');
+});
+
+test('Novedades: nada se presenta como ranking ni como inventario', async () => {
+  const files = await Promise.all(['index.html', 'app.js', 'news.js', 'feed.js', 'rail.js', 'catalog.js', 'saved.js'].map(f => readFile(here(`./${f}`), 'utf8')));
+  for (const [i, src] of files.entries()) assert.ok(!/m[aá]s le[ií]dos|lo m[aá]s preguntado|best ?seller|m[aá]s vendid/i.test(src), `ranking inventado en el archivo ${i}`);
+  const news = await readFile(here('./news.js'), 'utf8');
+  assert.ok(/Datos de muestra · no es inventario/.test(news) && /meta\?\.kind === 'sample'/.test(news), 'el rótulo de muestra viene de los datos');
+  const app = await readFile(here('./app.js'), 'utf8');
+  assert.ok(/import\('\.\/news\.js'\)/.test(app) && !/^import .*news\.js/m.test(app), 'Novedades se carga bajo demanda');
+  const prepare = await readFile(here('./scripts/prepare-public.mjs'), 'utf8');
+  const preview = await readFile(here('./tools/preview-site.mjs'), 'utf8');
+  for (const f of ['feed.js', 'news.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
+});
+
+test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única acción de la primera vista y destacados con historias rotuladas', () => {
+  const copy = html.match(/<div class="entry-copy"[\s\S]*?<\/nav>/)[0];
+  assert.ok(/class="profile-av" src="assets\/img\/logo-96\.webp"[^>]*alt=""/.test(copy), 'avatar decorativo con el logo');
+  assert.ok(/<h1 id="entry-title"[\s\S]*Librería Itinerante <i>y Más<\/i>/.test(copy), 'el h1 es el nombre del perfil');
+  assert.ok(/data-status-text/.test(copy) && /Mariano Matamoros Pte\. 421/.test(copy), 'estado en vivo y dirección');
+  const actions = [...copy.matchAll(/<a class="(btn [^"]*)"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)];
+  assert.equal(actions.length, 2);
+  assert.ok(/btn--tungsten/.test(actions[0][1]) && /google\.com\/maps/.test(actions[0][2]) && /Cómo llegar/.test(actions[0][3]), 'primaria: Cómo llegar');
+  assert.ok(/btn--ghost/.test(actions[1][1]) && /wa\.me/.test(actions[1][2]) && /Pregunta por un libro/.test(actions[1][3]), 'WhatsApp existe como secundaria (escritorio)');
+  assert.ok(/\.entry-actions \.btn--ghost \{ display: none; \}/.test(mobileCss) && /\.entry-actions \{ grid-template-columns: 1fr; \}/.test(mobileCss), 'en móvil «Escribir» sale de la primera vista (Hick: <= 6 acciones); WhatsApp queda en la cabecera al desplazar, Cartelera, Libros y Visita');
+  assert.ok(!/only-phone|hide-phone/.test(html + css + mobileCss), 'sin variantes de texto solo móvil');
+  const hl = [...copy.matchAll(/<a class="hl-item" href="#([a-z]+)" data-story="([a-z]+)" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets\/(img\/[^"]+)"[^>]*alt=""[^>]*><span class="hl-kind( hl-kind--real)?" aria-hidden="true">([^<]+)</g)];
+  assert.deepEqual(hl.map(m => m[2]), STORY_KEYS, 'cuatro destacados, uno por capítulo');
+  assert.ok(hl.every(m => m[1] === m[2]) && hl.length >= 3, 'sin JavaScript cada destacado lleva a su capítulo');
+  const kind = new Map([...prov.real.map(f => [f.file, 'real']), ...prov.aiRecreation.map(f => [f.file, 'ai'])]);
+  for (const m of hl) { // la miniatura tiene procedencia y su micro-rótulo dice lo mismo
+    assert.ok(kind.has(m[3]), `sin procedencia: ${m[3]}`);
+    assert.equal(m[4] ? 'real' : 'ai', kind.get(m[3]), `rótulo de ${m[3]}`);
+    assert.equal(m[5], kind.get(m[3]) === 'real' ? 'Foto' : 'IA');
+  }
+  assert.deepEqual(KIND_LABEL, { ai: 'Recreación IA', real: 'Foto real' }, 'las historias se rotulan con las mismas palabras que el resto del sitio');
+  assert.ok(/\.profile-av, \.hl \{ display: none; \}/.test(css) && /\.hl \{ display: block; grid-area: hl; \}/.test(mobileCss), 'el perfil y los destacados son solo móvil');
+  assert.ok(/\.hl-item \{[^}]*min-width: 64px/.test(mobileCss) && /\.hl-ring \{[^}]*width: 68px; height: 68px/.test(mobileCss), 'destacados de ≥ 44 px');
+  assert.ok(/\.js \.hdr:not\(\.is-solid\) :is\(\.hdr-brand, \.hdr-wa\) \{ opacity: 0; visibility: hidden; \}/.test(mobileCss), 'al inicio la cabecera solo deja el menú; sin JS la marca sigue visible');
+});
+
+test('historias: el visor es un diálogo modal con foco, cierre, flechas y rótulo de procedencia en cada foto', async () => {
+  const feed = await readFile(here('./feed.js'), 'utf8');
+  const app = await readFile(here('./app.js'), 'utf8');
+  assert.ok(/openDialog\(v\.dlg\)/.test(feed) && /v\.close\.focus\(/.test(feed), 'modal por openDialog y foco inicial en el cierre');
+  assert.ok(/opener\?\.focus/.test(feed), 'el foco vuelve al destacado');
+  assert.ok(/ArrowRight/.test(feed) && /ArrowLeft/.test(feed), 'flechas');
+  assert.equal(validKind('ai'), 'ai');
+  assert.equal(validKind('real'), 'real');
+  for (const x of [undefined, null, '', 'toString', 'constructor', 'AI', 'otro']) assert.equal(validKind(x), null, `«${x}» no es una procedencia: sin rótulo no hay foto`);
+  assert.ok(!/'real' : 'ai'/.test(feed + await readFile(here('./app.js'), 'utf8')), 'ninguna imagen se rotula IA o real por omisión');
+  assert.ok(!/setInterval|setTimeout/.test(feed), 'sin avance automático (WCAG 2.2.2)');
+  assert.ok(/import\('\.\/feed\.js'\)/.test(app) && !/^import .*feed\.js/m.test(app), 'el visor se carga bajo demanda');
+  assert.ok(/catch\(\(\) => \{ location\.hash = hl\.getAttribute\('href'\); \}\)/.test(app), 'si el módulo no llega, el destacado lleva al capítulo');
+  // cada historia sale de fotos que ya están en la página y todas llevan rótulo
+  assert.equal(html.match(/<li class="still">/g).length, 6);
+  assert.ok(Object.values(TOPICS).every(t => KIND_LABEL[t.kind]), 'los temas de Libros traen su rótulo');
+  assert.ok(/\.story:modal \{[^}]*position: fixed; inset: 0/.test(mobileCss), 'pantalla completa');
+});
+
+test('Cartelera como publicaciones: foto, pie, rótulo, «Me interesa» y «Compartir» locales, sin contadores ni fechas', async () => {
+  const items = [...html.matchAll(/<details class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/details>/g)];
+  assert.equal(items.length, 3);
+  for (const [block, id] of items) {
+    assert.ok(/<img class="bill-card-img"/.test(block) && /class="tag tag--(ai|real)"/.test(block), `${id}: foto y rótulo`);
+    assert.ok(new RegExp(`<button class="act" type="button" data-interest="${id}" data-title="[^"]+" aria-pressed="false">`).test(block), `${id}: «Me interesa» con aria-pressed`);
+    assert.ok(new RegExp(`<button class="act" type="button" data-share="${id}" data-title="[^"]+">`).test(block), `${id}: «Compartir»`);
+    assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
+  }
+  for (const id of ['i-heart', 'i-share']) assert.ok(html.includes(`<symbol id="${id}"`), `icono ${id}`);
+  assert.ok(/\.act \{[^}]*min-height: var\(--target-coarse\)/.test(css.replaceAll('\n', ' ')) && /\.act\[aria-pressed="true"\]/.test(css), 'botones de ≥ 44 px con estado');
+  assert.ok(/html:not\(\.js\) \.bill-acts \{ display: none; \}/.test(css), 'sin JavaScript no se muestran botones que no funcionan');
+  const feed = await readFile(here('./feed.js'), 'utf8');
+  assert.ok(/navigator\.share/.test(feed) && /AbortError/.test(feed) && /clipboard\.writeText/.test(feed), 'Web Share con respaldo de copiar enlace; cancelar no copia');
+  assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(feed), '«Me interesa» no envía nada');
+  assert.ok(/const store = \(\) => \{ try \{ return globalThis\.localStorage/.test(feed), 'el almacenamiento va en try/catch');
+  // lectura tolerante del almacenamiento
+  assert.deepEqual(readInterest(), [], 'sin almacenamiento');
+  Object.defineProperty(globalThis, 'localStorage', { get() { throw new Error('bloqueado'); }, configurable: true });
+  assert.deepEqual(readInterest(), [], 'almacenamiento bloqueado');
+  Object.defineProperty(globalThis, 'localStorage', { value: { getItem: () => '["circulo", 3, null, "taller"]' }, configurable: true });
+  assert.deepEqual(readInterest(), ['circulo', 'taller'], 'ignora lo que no es texto');
+  Object.defineProperty(globalThis, 'localStorage', { value: { getItem: () => '{rota' }, configurable: true });
+  assert.deepEqual(readInterest(), [], 'JSON roto');
+  delete globalThis.localStorage;
+});
+
+test('una sola acción primaria («Cómo llegar») con la misma clase y WhatsApp siempre secundario', async () => {
+  const all = [...html.matchAll(/<a class="([^"]*\bbtn\b[^"]*)"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)];
+  const primary = all.filter(m => /btn--tungsten/.test(m[1]));
+  assert.ok(primary.length >= 9, 'cabecera, menú, hoja, Mi lista, hero, Cartelera, Libros, ficha y Visita');
+  for (const m of primary) {
+    assert.ok(/google\.com\/maps\/dir/.test(m[2]), `la primaria siempre abre la ruta: ${m[2].slice(0, 50)}`);
+    assert.ok(/Cómo llegar/.test(m[3]), `la primaria siempre dice «Cómo llegar»: ${m[3].slice(0, 40)}`);
+  }
+  for (const m of all.filter(m => /wa\.me/.test(m[2]))) assert.ok(!/btn--tungsten|btn--xl/.test(m[1]), `WhatsApp es secundario: ${m[1]}`);
+  for (const gone of ['btn--light', 'btn--night', 'btn--ink', 'btn--xl']) assert.ok(!html.includes(gone) && !css.includes(`.${gone}`) && !mobileCss.includes(`.${gone}`), `ya no existe ${gone}`);
+  assert.ok(/\.btn--tungsten \{ background: var\(--terra-deep\); color: var\(--white\)/.test(css), 'un solo color para la primaria, sobre cualquier fondo');
+  // al pie de Cartelera y de Libros hay «Cómo llegar»
+  assert.ok(/class="btn btn--tungsten bill-visit"[^>]*>\s*<span>Cómo llegar/.test(html), 'pie de Cartelera');
+  assert.ok(/<div class="books-foot">[\s\S]*?class="btn btn--tungsten"[^>]*>\s*<span>Cómo llegar/.test(html), 'pie de Libros');
+  // Libros: la consulta por WhatsApp es secundaria y no más grande que la primaria
+  assert.ok(/class="btn btn--line-ink" data-book-cta/.test(html), 'la consulta de Libros es un botón de línea');
+  assert.ok(/hdr\.classList\.toggle\('has-primary'/.test(await readFile(here('./app.js'), 'utf8')) && /\.hdr\.has-primary \.hdr-cta \{ opacity: 0; visibility: hidden; \}/.test(css), 'la primaria de la cabecera cede cuando hay otra a la vista');
+});
+
+test('INP: los botones confirman primero y la hoja se abre o se cierra después de pintar', async () => {
+  const [motion, sheets, rail, cat, app] = await Promise.all(['motion.js', 'sheets.js', 'rail.js', 'catalog.js', 'app.js'].map(f => readFile(here(f), 'utf8')));
+  assert.ok(/export function afterPaint/.test(motion) && /requestAnimationFrame\(\(\) => setTimeout\(run, 0\)\)/.test(motion), 'afterPaint cede el hilo hasta después del fotograma');
+  assert.ok(!/setTimeout\([^)]*,\s*\[1-9]d*\)/.test(motion), 'motion.js no escribe milisegundos a mano');
+  assert.ok(/export function closeDialog/.test(sheets) && /is-closing/.test(sheets), 'el cierre desde un botón empieza a salir antes del cierre real');
+  assert.ok(/export async function confirmThen/.test(motion) && /data-opening/.test(motion), 'una sola guarda «marcar, pintar, abrir»');
+  assert.ok(/confirmThen\(opener/.test(app) && /closeDialog\(dlg\)/.test(app), 'el menú lateral abre y cierra después de pintar');
+  assert.ok(/confirmThen\(card/.test(rail) && /confirmThen\(c,/.test(cat), 'la tarjeta confirma el toque y la ficha se abre después');
+  assert.ok(!/hasAttribute\('data-opening'\)|dataset\.opening/.test(app + rail + cat), 'ninguna pieza lleva su propia guarda de doble toque');
+  assert.ok(/closeDialog\(drawer\)/.test(cat), 'la ficha se cierra por closeDialog');
+  assert.ok(/\.motion \.sheet-menu\.is-closing/.test(mobileCss) && /\.motion \.drawer\.is-closing/.test(css) && /\.motion \.drawer\.is-closing/.test(mobileCss), 'cada hoja define su salida en CSS');
+  assert.ok(/FIRST_CHUNK/.test(rail) && /if \(mine !== paintId\) return;/.test(rail), 'el chip confirma ya y las tarjetas se cambian después, por tandas');
+});
+
+test('barra inferior: el vidrio es lo bastante opaco para que no se vea contenido bajo las etiquetas', () => {
+  const m = tokensCss.match(/--glass-tint:\s*rgb\(\d+ \d+ \d+ \/ ([\d.]+)\)/);
+  assert.ok(m && Number(m[1]) >= 0.92, 'glass-tint con opacidad >= 0.92');
+});
+
+test('horario de Visita: dos filas (lunes a sábado y domingo), hoy se marca por día y sin JavaScript se lee igual', async () => {
+  const table = html.match(/<table class="hours">[\s\S]*?<\/table>/)[0];
+  const rows = [...table.matchAll(/<tr data-days="([0-6 ]+)"><th scope="row">([^<]+)<\/th><td>([^<]+)<\/td><\/tr>/g)];
+  assert.deepEqual(rows.map(r => [r[1], r[2], r[3]]), [['1 2 3 4 5 6', 'Lunes a sábado', '11:00–20:00'], ['0', 'Domingo', 'Cerrado']], 'dos filas con el horario real');
+  assert.equal((table.match(/11:00–20:00/g) || []).length, 1, 'el horario no se repite fila por fila');
+  const days = rows.flatMap(r => r[1].split(' ')).sort();
+  assert.deepEqual(days, ['0', '1', '2', '3', '4', '5', '6'], 'cada día cae en una sola fila: hoy siempre se marca una');
+  const app = await readFile(here('./app.js'), 'utf8');
+  assert.ok(/tr\.dataset\.days\.split\(' '\)\.includes\(String\(now\.day\)\)/.test(app), 'is-today sale de la lista de días de la fila');
+});
+
+test('Libros: un solo titular grande, una sola fila de chips al inicio, el carrusel como respuesta y lo demás debajo', () => {
+  const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
+  assert.equal((libros.match(/class="h2"/g) || []).length, 1, 'un solo H2 visual en el capítulo');
+  assert.equal((libros.match(/<h2[\s>]/g) || []).length, 1, 'un solo h2 en el marcado');
+  assert.ok(!/class="[^"]*h2[^"]*"/.test(libros.replace(/class="h2"/, '')), 'las capas internas usan layer-title, no h2');
+  const chips = [...libros.matchAll(/role="radiogroup"[^>]*aria-label="([^"]+)"/g)].map(m => m[1]);
+  assert.deepEqual(chips, ['Colección', 'Elige un tema de lectura'], 'primero la elección de colección; los temas son la capa de consulta de abajo');
+  const at = k => libros.indexOf(k);
+  assert.ok(at('id="books-title"') < at('data-rail-chips') && at('data-rail-chips') < at('data-rail-viewport') && at('data-rail-viewport') < at('id="ask-title"'), 'orden: titular, chips, carrusel, consulta');
+  assert.ok(at('id="ask-title"') < at('data-topic="narrativa"') && at('data-composer') < at('id="catalogo"'), 'temas y consulta de WhatsApp debajo del carrusel y antes de la muestra');
+  assert.ok(/<h3 id="rail-title" class="sr-only">/.test(libros), 'el carrusel conserva su nombre accesible sin segundo titular visible');
+  assert.ok(/\.books-head \{[^}]*justify-items: start[^}]*text-align: left/.test(css) && !/\.books-head \{[^}]*text-align: right/.test(css), 'titulares alineados a la izquierda en escritorio y móvil');
+  assert.ok(/data-ex-open/.test(libros) && /data-open-mylist/.test(html) && /href="#catalogo"/.test(libros), 'siguen las rutas a Explorar y a Mi lista');
+});
+
+test('cierre de Libros: una frase y «Cómo llegar» en el mismo bloque, sin vacío tras el buscador ni rellenos con vh', () => {
+  const foot = html.match(/<div class="books-foot">[\s\S]*?<\/div>/)[0];
+  assert.ok(/<p>[^<]+<\/p>/.test(foot) && (foot.match(/btn--tungsten/g) || []).length === 1, 'frase + una sola primaria');
+  assert.ok(/\.cat \{ padding-bottom: var\(--sec-sm\); \}/.test(mobileCss), 'tras el buscador un solo escalón de ritmo');
+  for (const rule of ['.books-head', '.cat-head', '.composer', '.bill-head']) {
+    const m = css.match(new RegExp(`${rule.replace('.', '\.')} \{[^}]*\}`));
+    assert.ok(m && !/vh/.test(m[0]), `${rule} sin clamp(vh)`);
+  }
+});
+
+test('largo móvil: la cita, el cierre de Visita y el pie usan --sec-sm; Cartelera junta «Me interesa» y «Compartir»', () => {
+  assert.ok(/\.quote \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss) && /\.visit \{ padding-bottom: var\(--sec-sm\); \}/.test(mobileCss) && /\.ftr \{ padding-top: var\(--sec-sm\); \}/.test(mobileCss));
+  assert.ok(/\.bill-acts \.act \{ flex: 1 1 auto/.test(mobileCss));
+});
+
+test('visor de historias: foto a pantalla completa (cover), velo corto en la base y botón en minúscula a mitad de frase', async () => {
+  const feed = await readFile(here('./feed.js'), 'utf8');
+  assert.ok(/\.story-fig \{ position: absolute; inset: 0;/.test(mobileCss) && /\.story-img \{[^}]*object-fit: cover/.test(mobileCss), 'la foto cubre la pantalla');
+  assert.ok(!/object-fit: contain/.test(mobileCss.match(/\.story-img \{[^}]*\}/)[0]), 'sin bandas negras');
+  assert.ok(/\.story-fig::after \{[\s\S]*?linear-gradient\(0deg/.test(mobileCss), 'velo en la base para el rótulo y los botones');
+  assert.ok(/STORY_GO = \{ casa: 'la casa'[^}]*\}/.test(feed) && /Ver \$\{STORY_GO\[key\]\} en la página/.test(feed) && !/Ver \$\{STORY_TITLE/.test(feed), '«Ver la casa en la página»');
+});

@@ -1,5 +1,7 @@
 // Itinerante B.4 · escenas sincronizadas al scroll, sin dependencias.
-import { DUR, EASE, EASE_IO, ms } from './motion.js';
+import { DUR, EASE, EASE_IO, ms, confirmThen } from './motion.js';
+import { openDialog, closeDialog, pushSheet, navigateFromSheet } from './sheets.js';
+import { kindTag } from './tag.js';
 
 const WA = 'https://wa.me/528180875940';
 
@@ -143,7 +145,7 @@ function boot() {
     $$('[data-status]').forEach(el => { el.dataset.open = String(st.open); });
     $$('[data-status-text]').forEach(el => { el.textContent = st.short; });
     $$('[data-status-long]').forEach(el => { el.textContent = st.long; });
-    $$('.hours tr').forEach(tr => tr.classList.toggle('is-today', Number(tr.dataset.day) === now.day));
+    $$('.hours tr').forEach(tr => tr.classList.toggle('is-today', tr.dataset.days.split(' ').includes(String(now.day))));
   }
   updateStatus();
   setInterval(updateStatus, 60_000);
@@ -328,6 +330,7 @@ function boot() {
       },
       tick(dt, y) {
         hdr.classList.toggle('is-solid', y > 24);
+        root.classList.toggle('at-top', y < Math.min(240, vh * 0.3)); // móvil: la barra inferior espera a que se salga del perfil
         const probe = y + 34;
         const r = ranges.find(range => probe >= range.top && probe < range.bottom);
         const on = r ? r.theme : '';
@@ -471,7 +474,10 @@ function boot() {
   const menu = $('#menu');
   const menuLabel = $('.menu-btn-label', menuBtn);
   $$('nav a', menu).forEach((a, i) => a.style.setProperty('--i', i));
+  let releaseMenu = null; // entrada de historial del menú de tableta: «atrás» lo cierra
   function setMenu(open) {
+    if (open && !releaseMenu) releaseMenu = pushSheet({ close: () => setMenu(false), lock: null });
+    else if (!open && releaseMenu) { releaseMenu(); releaseMenu = null; }
     menuBtn.setAttribute('aria-expanded', String(open));
     menuLabel.textContent = open ? 'Cerrar' : 'Menú';
     menu.hidden = !open;
@@ -482,6 +488,15 @@ function boot() {
     $('.skip').inert = open;
     document.body.style.overflow = open ? 'hidden' : '';
     if (open) $('nav a', menu).focus();
+  }
+  // «Cómo llegar» es la única acción primaria: la de la cabecera (escritorio) cede el sitio cuando hay otra a la vista.
+  if ('IntersectionObserver' in window) {
+    const onScreen = new Set();
+    const primaryIo = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) onScreen.add(e.target); else onScreen.delete(e.target); });
+      hdr.classList.toggle('has-primary', onScreen.size > 0);
+    });
+    $$('main .btn--tungsten').forEach(b => primaryIo.observe(b));
   }
   menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
   menu.addEventListener('click', e => { if (e.target.closest('a')) { setMenu(false); holdHeader = performance.now() + 900; } });
@@ -507,16 +522,17 @@ function boot() {
       groups.forEach(o => setGroup(o, o === g ? open : false)); // acordeón exclusivo: una categoría abierta a la vez
     }));
     let landing = null; // sección a enfocar al cerrar tras elegir un destino
-    const close = () => { if (dlg.open) dlg.close(); };
+    const close = () => closeDialog(dlg); // botón y fondo: sale primero, el cierre real corre después del fotograma
     opener.addEventListener('click', () => {
-      dlg.showModal();
-      opener.setAttribute('aria-expanded', 'true');
-      root.classList.add('sheet-open');
-      $('[data-sm-close]', dlg).focus({ preventScroll: true });
+      if (dlg.open) return;
+      opener.setAttribute('aria-expanded', 'true'); // el botón confirma el toque en este fotograma
+      confirmThen(opener, () => { // volver inerte toda la página (showModal) es lo caro: va después de pintar
+        openDialog(dlg);
+        $('[data-sm-close]', dlg).focus({ preventScroll: true });
+      });
     });
     dlg.addEventListener('close', () => {
       opener.setAttribute('aria-expanded', 'false');
-      root.classList.remove('sheet-open');
       groups.forEach(g => setGroup(g, false));
       if (landing) { // la navegación lleva el foco al título de la sección, no de vuelta al botón
         const h = $('h1, h2, h3', landing) || landing;
@@ -538,7 +554,7 @@ function boot() {
         landing = null;
         e.preventDefault();
         dlg.addEventListener('close', () => document.dispatchEvent(new CustomEvent('iti:open-explorer')), { once: true });
-      }
+      } else if (landing) { e.preventDefault(); navigateFromSheet(href); } // la entrada de historial de la hoja pasa a ser la del destino
       dlg.close();
       if (topic) setTimeout(() => $(`.topic[data-topic="${topic}"]`)?.click(), 350);
       if (bill !== undefined) setTimeout(() => { const t = $('.bill-track'), card = $$('.bill-item')[Number(bill)]; if (t && card) t.scrollTo({ left: card.offsetLeft - t.firstElementChild.offsetLeft, behavior: isMotion() ? 'smooth' : 'auto' }); }, 350);
@@ -561,10 +577,7 @@ function boot() {
       });
       shown = i;
       const item = items[i];
-      const tag = document.createElement('span');
-      tag.className = `tag tag--${item.dataset.kind}`;
-      tag.textContent = item.dataset.kind === 'ai' ? 'Recreación IA' : 'Foto real';
-      caption.replaceChildren(tag, ` ${item.dataset.caption}`);
+      caption.replaceChildren(kindTag(item.dataset.kind) ?? '', ` ${item.dataset.caption}`);
     };
     items.forEach((d, i) => {
       d.addEventListener('toggle', () => { if (d.open) show(i); });
@@ -680,9 +693,7 @@ function boot() {
       if (motion) layer.style.clipPath = 'inset(0 100% 0 0)';
       layersWrap.append(layer);
 
-      const tag = document.createElement('span');
-      tag.className = `tag tag--${t.kind}`;
-      tag.textContent = t.kind === 'ai' ? 'Recreación IA' : 'Foto real';
+      const tag = kindTag(t.kind) ?? '';
 
       if (!motion) {
         prev.forEach(p => p.remove());
@@ -771,42 +782,52 @@ function boot() {
     const explorer = $('#explorer');
     if (explorer) {
       const phone = matchMedia('(max-width: 760px)');
-      let pushed = false;
+      let opening = false;
+      // En escritorio el diálogo queda abierto en línea. Se abre con el atributo y no con show(): show() ejecuta los pasos de
+      // enfoque del diálogo, que mandan el foco (y el scroll) al campo de búsqueda al cargar la página.
       const settle = () => {
         if (phone.matches) { if (explorer.open && !explorer.matches(':modal')) explorer.close(); }
-        else { root.classList.remove('explorer-open'); if (explorer.matches(':modal')) explorer.close(); if (!explorer.open) explorer.show(); }
+        else { if (explorer.matches(':modal')) explorer.close(); explorer.open = true; }
       };
       const openExplorer = async () => {
+        if (!phone.matches || explorer.open || opening) return;
+        opening = true;
+        try { await bootCatalog(); } finally { opening = false; }
         if (!phone.matches || explorer.open) return;
-        await bootCatalog();
-        explorer.showModal();
-        root.classList.add('explorer-open');
-        history.pushState({ explorer: 1 }, '', '#explorar');
-        pushed = true;
+        openDialog(explorer, { lock: 'explorer-open', url: '#explorar' }); // bloquea el scroll y empuja la entrada que «atrás» consume
         $('[data-ex-close]', explorer).focus({ preventScroll: true });
+      };
+      // En escritorio el campo solo recibe el foco cuando la persona llega a #catalogo (enlace o URL), nunca al cargar.
+      const focusSearch = async () => {
+        if (phone.matches) return;
+        await bootCatalog();
+        if (!phone.matches) $('[data-cat-q]', explorer)?.focus({ preventScroll: true });
       };
       settle();
       phone.addEventListener('change', settle);
-      explorer.addEventListener('close', () => {
-        root.classList.remove('explorer-open');
-        if (pushed) { pushed = false; if (history.state?.explorer) history.back(); }
-        if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true });
-      });
-      addEventListener('popstate', () => { if (explorer.open && phone.matches) { pushed = false; explorer.close(); } });
+      explorer.addEventListener('close', () => { if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true }); });
       $('[data-ex-close]', explorer).addEventListener('click', () => explorer.close());
       $('[data-ex-open]')?.addEventListener('click', openExplorer);
       document.addEventListener('iti:open-explorer', openExplorer);
       // Cualquier enlace a la muestra abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href="#catalogo"]');
-        if (a && phone.matches && !a.closest('#sheet-menu')) { e.preventDefault(); openExplorer(); }
+        if (!a || a.closest('#sheet-menu')) return;
+        if (phone.matches) { e.preventDefault(); openExplorer(); } else focusSearch();
       });
+      addEventListener('hashchange', () => { if (location.hash === '#catalogo') focusSearch(); });
+      if (location.hash === '#catalogo') focusSearch();
+      // Recargar con #explorar en móvil: la hoja vuelve a abrirse con su propia entrada de historial.
+      if (phone.matches && location.hash === '#explorar') { history.replaceState(null, '', location.pathname + location.search); openExplorer(); }
     }
 
     // Carrusel de libros (capa 1 de Libros): se carga al acercarse y pide la ficha al catálogo al elegir un libro.
     const railEl = $('[data-rail]');
     if (railEl) {
-      const bootRail = () => import('./rail.js').then(m => m.initRail({ ensureCatalog: bootCatalog, isMotion })).catch(() => { railEl.hidden = true; });
+      const bootRail = () => {
+        import('./news.js').then(m => m.initNews({ ensureCatalog: bootCatalog })).catch(() => {}); // Novedades: sin datos queda oculta
+        return import('./rail.js').then(m => m.initRail({ ensureCatalog: bootCatalog, isMotion })).catch(() => { railEl.hidden = true; });
+      };
       if ('IntersectionObserver' in window) {
         const railIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { railIo.disconnect(); bootRail(); } }, { rootMargin: '700px 0px' });
         railIo.observe(railEl);
@@ -816,6 +837,21 @@ function boot() {
 
   // ---------- Mi lista para la visita (en reposo: el menú y la cabecera muestran el conteo) ----------
   (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
+
+  // ---------- Perfil y publicaciones (móvil): historias de los destacados, «Me interesa» y «Compartir» ----------
+  let feedLoad;
+  const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => { feedLoad = undefined; throw err; }));
+  document.addEventListener('click', e => {
+    const hl = e.target.closest('[data-story]');
+    if (hl) {
+      e.preventDefault();
+      loadFeed().then(m => m.openStory(hl.dataset.story, hl, TOPICS)).catch(() => { location.hash = hl.getAttribute('href'); }); // sin módulo: lleva al capítulo
+      return;
+    }
+    const act = e.target.closest('[data-interest], [data-share]');
+    if (act) loadFeed().then(m => m.onAct(act)).catch(() => {});
+  });
+  (window.requestIdleCallback || (cb => setTimeout(cb, 800)))(() => loadFeed().then(m => m.initFeed()).catch(() => {}), { timeout: 4000 });
 
   // ---------- Magnetic buttons ----------
   $$('[data-magnetic]').forEach(btn => {

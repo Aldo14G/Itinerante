@@ -50,6 +50,15 @@
       "derivedFrom": "img/oficial-rincon-1600.webp",
       "command": "ffmpeg -i oficial-rincon-1600.webp -vf scale=800:-2 -c:v libwebp -quality 78 oficial-rincon-800.webp",
       "sha256": "bdecb4611aa033366103a07260f3a0335f49880c60c7c1dde9e0bb7236505703"
+    },
+    {
+      "file": "img/hl-libros.webp",
+      "origin": "recorte cuadrado 144x144 de img/libro-narrativa.webp (destacado de Libros)",
+      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
+      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a",
+      "derivedFrom": "img/libro-narrativa.webp",
+      "command": "sharp resize 144x144 cover centre, webp q78",
+      "sha256": "54e63173b4363010e84e26632f4fc803cf02c510386368ef875a99dd25dabdb9"
     }
   ],
   "aiRecreation": [
@@ -139,6 +148,27 @@
       "derivedFrom": "img/06-comunidad-sonido.webp",
       "command": "ffmpeg -i 06-comunidad-sonido.webp -vf scale=800:-2 -c:v libwebp -quality 78 06-comunidad-sonido-800.webp",
       "sha256": "5f0de7739da783c20b09c78087c96651d0088711ffd27708f603bb05ec44e8f8"
+    },
+    {
+      "file": "img/hl-casa.webp",
+      "origin": "recorte cuadrado 144x144 de img/01-entrada-pasillo-800.webp (destacado de La casa)",
+      "derivedFrom": "img/01-entrada-pasillo-800.webp",
+      "command": "sharp resize 144x144 cover centre, webp q78",
+      "sha256": "45b904d826db3f5b9ebd21e281bc9180a78f34cf1601e5805e36e07b0c956202"
+    },
+    {
+      "file": "img/hl-cartelera.webp",
+      "origin": "recorte cuadrado 144x144 de img/cartelera-1.webp (destacado de Cartelera)",
+      "derivedFrom": "img/cartelera-1.webp",
+      "command": "sharp resize 144x144 cover centre, webp q78",
+      "sha256": "2d29ffcd005b06d4281de07a3a6ea90dda85efb4da177b52331f9bf54511ad71"
+    },
+    {
+      "file": "img/hl-visita.webp",
+      "origin": "recorte cuadrado 144x144 de img/llegada-sala.webp (destacado de Visita)",
+      "derivedFrom": "img/llegada-sala.webp",
+      "command": "sharp resize 144x144 cover centre, webp q78",
+      "sha256": "9801869fe0ac1cdac94d36d1d239510cdfd27efe2ff338873f6533c86498a217"
     }
   ],
   "brand": [

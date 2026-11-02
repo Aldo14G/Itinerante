@@ -1,9 +1,11 @@
-// Carga única de la muestra (assets/data/catalog.json): la comparten el catálogo, el carrusel y «Mi lista».
-let samplePromise;
-
-export function loadSample() {
-  samplePromise ??= fetch('assets/data/catalog.json')
+// Cargas únicas de los datos de muestra: las comparten el catálogo, el carrusel, Novedades y «Mi lista».
+const once = url => {
+  let promise;
+  return () => (promise ??= fetch(url)
     .then(res => { if (!res.ok) throw new Error(String(res.status)); return res.json(); })
-    .catch(err => { samplePromise = undefined; throw err; });
-  return samplePromise;
-}
+    .catch(err => { promise = undefined; throw err; }));
+};
+
+export const loadSample = once('assets/data/catalog.json');
+// Colecciones del carrusel y la tira «Recién llegados» (`novedades`): assets/data/collections.json.
+export const loadCollections = once('assets/data/collections.json');

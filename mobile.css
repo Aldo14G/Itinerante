@@ -26,7 +26,7 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
   height: var(--tabbar-h); padding: 4px;
   border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
   box-shadow: inset 0 1px 0 var(--glass-edge), 0 12px 32px -8px color-mix(in srgb, var(--black) 55%, transparent);
-  transition: translate var(--dur-base) var(--spring);
+  transition: translate var(--dur-base) var(--spring), visibility var(--dur-base);
 }
 .tabbar::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
@@ -53,6 +53,14 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 
 /* Espacio para que la barra no tape el final de la página. */
 .ftr { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 40px); }
+/* Ritmo móvil: los capítulos conservan --sec-md; la cita, el cierre de Visita y el pie (bloques de pausa) usan --sec-sm. Largo de página (U02). */
+.quote { padding-block: var(--sec-sm); }
+.visit { padding-bottom: var(--sec-sm); }
+.ftr { padding-top: var(--sec-sm); }
+
+/* Marca y enlace Instagram del pie de Cartelera: 44 px de alto en cualquier puntero (style.css solo lo pedia con puntero tactil). El nombre cabe en un renglon desde 360 px. */
+.hdr-brand, .bill-foot a { min-height: 44px; }
+@media (min-width: 360px) { .hdr-brand span { white-space: nowrap; } }
 
 /* Cabecera: marca y un icono de WhatsApp en contenedor translúcido. */
 .menu-btn, .menu { display: none; }
@@ -63,11 +71,53 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 }
 .hdr-wa .ic, .hdr-more .ic { width: 22px; height: 22px; }
 .hdr-more { padding: 0; cursor: pointer; font: inherit; }
-.hdr-wa:active, .hdr-more:active { scale: 0.92; }
+.hdr-wa:active, .hdr-more:active, .hdr-more[aria-expanded="true"] { scale: 0.92; }
 .hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-more, .hdr[data-on="turq"] .hdr-more, .hdr[data-on="tungsten"] .hdr-more { color: var(--bone); background: var(--glass-solid); }
 
 /* Hero móvil: póster fijo, sin recorrido por fotogramas ni cortinilla (menos bytes y menos trabajo). */
-.entry-copy { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--space-5)); }
+/* Primera vista = perfil (patrón de red social): avatar, nombre, estado de hoy y dirección; el párrafo hace de biografía;
+   «Cómo llegar» es la acción primaria y «Escribir» la secundaria; los destacados abren historias con fotos de la casa.
+   Ley de proximidad / región común: todo vive en un solo bloque pegado al pie de la foto, sobre un velo propio. */
+.entry-shade { background: linear-gradient(180deg, color-mix(in srgb, var(--night) 70%, transparent) 0%, transparent 22%); }
+.entry-copy {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-4) var(--space-3);
+  grid-template-areas: "av name" "av facts" "row row" "hl hl";
+  padding-top: var(--space-7);
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-5)); /* la barra inferior espera fuera de la primera vista (html.at-top) */
+  /* El velo vive detrás del texto, no sobre toda la foto: crece con el bloque, así que el párrafo queda sobre fondo claro
+     en cualquier alto de pantalla (antes seguía porcentajes de la altura y en pantallas cortas caía en la parte transparente). */
+  background: linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--night) 90%, transparent) var(--space-7), color-mix(in srgb, var(--night) 97%, transparent) 100%);
+}
+.profile-av { display: block; grid-area: av; width: 56px; height: 56px; border-radius: 50%; }
+.entry-title { grid-area: name; align-self: end; font: 780 var(--fs-3)/1.15 var(--f-sans); font-stretch: 88%; }
+.entry-title .sr-only { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; }
+.entry-title i { font-style: normal; font-weight: 400; font-stretch: 112%; }
+.wordmark { display: none; }
+.entry-facts { grid-area: facts; align-self: start; flex-direction: column; flex-wrap: nowrap; align-items: flex-start; gap: 2px; margin: 0; font-size: var(--fs-1); }
+.entry-facts li { align-items: center; }
+.entry-row { grid-area: row; gap: var(--space-4); margin: 0; }
+/* Una sola acción en la primera vista (Hick, <= 6 acciones): «Escribir» sale del perfil; WhatsApp sigue en la cabecera al desplazar, en Cartelera, en Libros y en Visita. */
+.entry-actions { grid-template-columns: 1fr; }
+.entry-actions .btn { min-height: var(--target-coarse); }
+.entry-actions .btn--ghost { display: none; }
+.hl { display: block; grid-area: hl; }
+.hl-list { display: flex; justify-content: space-between; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.hl-item { display: grid; justify-items: center; gap: var(--space-1); min-width: 64px; color: var(--bone); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.hl-ring { position: relative; display: block; width: 68px; height: 68px; padding: 4px; border-radius: 50%; background: linear-gradient(135deg, var(--tungsten), var(--terra)); transition: scale var(--dur-fast) var(--spring); }
+.hl-img { width: 100%; height: 100%; object-fit: cover; border: 2px solid var(--night); border-radius: 50%; }
+.hl-item.is-seen .hl-ring { background: var(--line-strong); }
+.hl-item:active .hl-ring { scale: 0.94; }
+.hl-kind { position: absolute; right: -4px; bottom: -2px; padding: 4px 8px; border-radius: var(--radius-pill); color: var(--tungsten-hi); background: var(--night); border: 1px solid currentColor; font: 700 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.04em; text-transform: uppercase; }
+.hl-kind--real { color: var(--turq-light); }
+.hl-lb { font: 650 var(--fs-0)/1.2 var(--f-sans); }
+/* Cabecera: al inicio solo el menú (el perfil ya dice quién es); marca y WhatsApp aparecen al bajar. */
+.js .hdr:not(.is-solid) :is(.hdr-brand, .hdr-wa) { opacity: 0; visibility: hidden; }
+.hdr-brand, .hdr-wa { transition: opacity var(--dur-fast) var(--ease-out), visibility var(--dur-fast), scale var(--dur-fast) var(--spring), background-color var(--dur-fast); }
+/* La barra inferior entra al salir del perfil: en la primera vista no compite con los destacados (Hick). */
+html.at-top .tabbar { translate: 0 calc(100% + 24px); }
+/* Fuera de pantalla tampoco recibe foco (visibility pasa a hidden al terminar la salida). Sin JavaScript la cabecera ya trae los cuatro enlaces y la barra taparia los destacados. */
+html.at-top .tabbar { visibility: hidden; }
+html:not(.js) .tabbar { display: none; }
 .motion .entry { height: auto; }
 .motion .entry-stage { position: relative; height: 100svh; min-height: 560px; }
 .entry-canvas, .entry-beat, .wipe { display: none !important; }
@@ -80,6 +130,7 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .motion .drawer { translate: 0 100%; transition: translate var(--dur-slow) var(--spring), overlay var(--dur-slow) allow-discrete, display var(--dur-slow) allow-discrete; }
 .motion .drawer[open] { translate: 0 0; }
 @starting-style { .motion .drawer[open] { translate: 0 100%; } }
+.motion .drawer.is-closing { translate: 0 100%; } /* cierre desde el botón: ver closeDialog en sheets.js */
 .drawer-grabber { display: block; justify-self: center; width: 36px; height: 5px; margin: -16px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--paper-ink) 28%, transparent); touch-action: none; }
 .drawer-body { touch-action: pan-y; overscroll-behavior: contain; }
 .drawer-close { background: color-mix(in srgb, var(--paper-ink) 8%, transparent); border-color: transparent; }
@@ -105,8 +156,17 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .topic[aria-checked="true"] { color: var(--night); background: var(--tungsten); border-color: transparent; font-stretch: 100%; }
 .topic:hover:not([aria-checked="true"]) { color: var(--bone); }
 
-/* Feed: solo las secciones del final se pintan al acercarse; las anteriores son destino de anclas y deben medir lo real. */
-.call, .visit { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+/* Primer pintado (R01): bajo el perfil nada se maqueta hasta acercarse; con CPU 4x el primer diseño de toda la página tardaba ~1.8 s y
+   solo se ve el perfil. El navegador recuerda la altura real al mostrar cada sección (`auto`). Las cifras son la altura del contenido
+   (sin relleno) medida a 360-414 px de ancho: así el largo de la página y las anclas casi no se mueven mientras tanto. */
+.manifesto { content-visibility: auto; contain-intrinsic-size: auto 440px; }
+.house { content-visibility: auto; contain-intrinsic-size: auto 560px; }
+.bill { content-visibility: auto; contain-intrinsic-size: auto 1180px; }
+.books { content-visibility: auto; contain-intrinsic-size: auto 2400px; }
+.quote { content-visibility: auto; contain-intrinsic-size: auto 190px; }
+.call { content-visibility: auto; contain-intrinsic-size: auto 224px; }
+.visit { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+.ftr { content-visibility: auto; contain-intrinsic-size: auto 390px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tabbar, .tab-ic, .hdr-wa, .topic, .stories i { transition-duration: 0.01ms; }
@@ -134,6 +194,8 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .bill-title { display: block; padding: var(--space-3) var(--space-4) 0; font-size: var(--fs-5); transition: none; }
 .bill-sub { display: block; padding: var(--space-1) var(--space-4) 0; }
 .bill-detail { padding: var(--space-3) var(--space-4) var(--space-5); }
+/* «Me interesa» y «Compartir» comparten renglón (proximidad: son las dos acciones de la publicación); si no caben, bajan. */
+.bill-acts .act { flex: 1 1 auto; justify-content: center; padding: 0 var(--space-3); gap: var(--space-1); }
 .bill-dots { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-3); }
 .bill-dots i { width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--turq-ink) 28%, transparent); transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast); }
 .bill-dots i.is-on { background: var(--turq-ink); scale: 1.5; }
@@ -156,6 +218,8 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .motion .sheet-menu::backdrop { transition: opacity var(--dur-base), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; opacity: 0; }
 .motion .sheet-menu[open]::backdrop { opacity: 1; }
 @starting-style { .motion .sheet-menu[open]::backdrop { opacity: 0; } }
+.motion .sheet-menu.is-closing { translate: -100% 0; }
+.motion .sheet-menu.is-closing::backdrop { opacity: 0; }
 .sm-head { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-4); padding-top: calc(var(--space-3) + env(safe-area-inset-top)); border-bottom: 1px solid var(--line); }
 .sm-title { margin: 0; font: 780 var(--fs-5)/1 var(--f-sans); font-stretch: 74%; text-transform: uppercase; }
 .sm-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; cursor: pointer; }
@@ -168,6 +232,7 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
   -webkit-tap-highlight-color: transparent;
 }
 .sm-row:active { background: var(--glass-chip); }
+.sm-list--aside { margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--line); }
 .sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; }
 .sm-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .sm-lb { flex: 1; }
@@ -196,9 +261,6 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .sm-lb { display: grid; gap: 2px; }
 .sm-meta { font: 500 var(--fs-0)/1.3 var(--f-sans); color: var(--bone-dim); }
 
-/* Esqueletos estáticos en móvil: el destello infinito de fotos que nunca cargan (diferidas) mantenía un recálculo de estilo por fotograma. */
-.sk-line::before, .card--sk .cover::before, .still-img::before, .frame-clip::before, .topic-layer::before, .bill-layer::before { animation: none !important; }
-
 /* Carrusel de libros: 2.3 tarjetas por vista para que se note que sigue. */
 .rail-item { flex-basis: 42vw; }
 .rail-track { --rail-gap: var(--space-3); }
@@ -220,6 +282,10 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 @starting-style { .motion .mylist[open] { translate: 0 100%; } }
 
 /* Explorar la muestra: el capítulo Libros deja un campo de búsqueda y la exploración abre a pantalla completa. */
+/* Cierre de Libros: tras el buscador solo queda un escalón de ritmo (--sec-sm), no el doble, y el bloque final lleva su frase. */
+.cat { padding-bottom: var(--sec-sm); }
+.cat-head { margin-bottom: 0; } /* la hoja de exploración está cerrada: no hay nada debajo del buscador que separar */
+.topic-stage { aspect-ratio: 4 / 3; }
 .explore-open {
   display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: 0 var(--space-4); color: var(--bone-dim); cursor: pointer;
   font: 560 var(--fs-2)/1 var(--f-sans); text-align: left; background: var(--glass-chip); border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
@@ -243,3 +309,41 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 .motion .explorer[open] { translate: 0 0; }
 @starting-style { .motion .explorer[open] { translate: 0 100%; } }
 
+/* Historias: los destacados del perfil abren las fotos de cada capítulo a pantalla completa. Se pasan con un toque a la
+   izquierda o a la derecha (o con las flechas); la procedencia de cada foto va siempre en el pie. Sin avance automático. */
+.story:modal {
+  position: fixed; inset: 0; width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; overflow: hidden;
+  color: var(--bone); background: var(--night); border: 0;
+}
+/* Inmersivo: la foto cubre toda la pantalla (object-fit: cover) y barra, perfil, pie y botones flotan encima. Un velo corto arriba y otro en la base
+   (donde viven el rótulo de procedencia y los botones) mantienen el texto legible sin bandas negras; el centro de la foto queda limpio. */
+.story[open] { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; }
+.story .stories, .story-top, .story-cap, .story-foot { position: relative; z-index: 1; }
+.story .stories { margin: 0; padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-3) 0; pointer-events: none; }
+.story-top { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); pointer-events: none; }
+.story-top .story-close { pointer-events: auto; }
+.story-av { width: 36px; height: 36px; border-radius: 50%; }
+.story-who { display: grid; flex: 1; margin: 0; font: 600 var(--fs-1)/1.25 var(--f-sans); }
+.story-who span { color: var(--bone-dim); font-weight: 500; }
+.story-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; }
+.story-close .ic { width: 22px; height: 22px; rotate: 45deg; }
+.story-fig { position: absolute; inset: 0; z-index: 0; }
+.story-fig::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--night) 94%, transparent) 0, color-mix(in srgb, var(--night) 88%, transparent) var(--veil-solid, 208px), transparent var(--veil-end, 336px)),
+    linear-gradient(180deg, color-mix(in srgb, var(--night) 64%, transparent) 0, transparent 128px);
+}
+.story-img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.story-nav { position: absolute; top: 0; bottom: 0; padding: 0; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.story-nav--prev { left: 0; width: 35%; }
+.story-nav--next { right: 0; width: 65%; }
+.story-nav:disabled { cursor: default; }
+.story-nav:focus-visible { outline-offset: -4px; }
+.story-cap { grid-row: 4; display: grid; justify-items: start; gap: var(--space-1); padding: var(--space-3) var(--space-4) 0; pointer-events: none; }
+.story-t { font: 700 var(--fs-3)/1.2 var(--f-sans); }
+.story-x { color: var(--bone-dim); font-size: var(--fs-1); }
+.story-foot { grid-row: 5; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom)); }
+.story-foot .btn { padding: 0 0.9em; font-size: var(--fs-1); min-height: var(--target-coarse); }
+@media (max-width: 360px) { .story-foot { grid-template-columns: 1fr; } .story-fig { --veil-solid: 280px; --veil-end: 400px; } } /* botones apilados: el pie crece 56 px y el velo con él */
+.story::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }

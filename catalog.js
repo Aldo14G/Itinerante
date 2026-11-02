@@ -1,7 +1,8 @@
 // Catálogo de muestra: búsqueda predictiva, filtros con conteo, rejilla y ficha.
-import { DUR, EASE, ms } from './motion.js';
+import { DUR, EASE, ms, confirmThen } from './motion.js';
 import { loadSample } from './sample.js';
 import { saveButton, bindSaveButton, initSaved } from './saved.js';
+import { openDialog, closeDialog } from './sheets.js';
 
 export { loadSample };
 // La parte pura (sin DOM) se prueba con check.mjs; initCatalog() solo corre en el navegador.
@@ -10,14 +11,43 @@ export const PAGE_SIZE = 24;
 export const WA_NUMBER = '528180875940';
 
 // Tono de portada: ficción en la familia cálida (terracota, ámbar, ciruela) y no ficción en la fría
-// (turquesa, piedra, azul). Dentro de la familia el género decide el tono, así un género siempre se ve igual.
+// (turquesa, piedra, azul). Dentro de la familia el tono sale del título (hash estable, FNV-1a), no del género:
+// una colección suele ser de un solo género y así sus portadas no salen todas del mismo color.
 const TONES = { fiction: [1, 2, 5], 'non-fiction': [0, 3, 4] };
+const titleHash = book => {
+  let h = 2166136261;
+  for (const ch of String(book.t ?? '')) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
+  return h >>> 0;
+};
 export function coverTone(book) {
   const family = TONES[book.k] ?? TONES['non-fiction'];
-  let h = 0;
-  for (const ch of book.g) h = (h * 31 + ch.charCodeAt(0)) % 997;
-  return family[h % family.length];
+  return family[titleHash(book) % family.length];
 }
+
+// Tonos de una lista (una colección del carrusel, Novedades): parte de coverTone, pero sin dos vecinas del mismo tono
+// y sin que un tono pase de ⌈n/3⌉ + 1 (5 de 12). Es determinista: el mismo libro da el mismo tono siempre que la lista sea la misma.
+// La ficha no recalcula: usa el tono de la tarjeta que se pulsó (data-cover-tone).
+export function coverTones(books) {
+  const cap = Math.ceil(books.length / 3) + 1;
+  const used = new Map();
+  let prev = -1;
+  return books.map(book => {
+    const family = TONES[book.k] ?? TONES['non-fiction'];
+    const start = family.indexOf(coverTone(book));
+    const order = family.map((_, i) => family[(start + i) % family.length]);
+    const tone = order.find(t => t !== prev && (used.get(t) ?? 0) < cap) ?? order.find(t => t !== prev);
+    used.set(tone, (used.get(tone) ?? 0) + 1);
+    prev = tone;
+    return tone;
+  });
+}
+
+// Tono de una tarjeta ya pintada (`data-cover-tone`): viaja con la petición de abrir la ficha para que ésta lo repita.
+export const toneOf = node => { const t = Number(node.querySelector('.cover')?.dataset.coverTone); return Number.isInteger(t) ? t : undefined; };
+
+// Composición de la portada de plantilla (4 variantes en CSS: [data-cover-layout]); sale del título, no del tono ni del género.
+export const COVER_LAYOUTS = 4;
+export const coverLayout = book => (titleHash(book) >>> 11) % COVER_LAYOUTS;
 
 const CATEGORY_ES = { fiction: 'Ficción', 'non-fiction': 'No ficción' };
 const FORMAT_ES = { 'Libro electronico': 'Libro electrónico', 'Board Book': 'Libro de cartón' };
@@ -137,7 +167,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     controls.forEach(c => { c.disabled = true; });
     const box = document.createElement('div');
     box.className = 'cat-error';
-    box.innerHTML = `<a class="btn btn--tungsten" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, estoy buscando un libro.')}" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span></a> <button type="button" class="btn btn--ghost"><span>Reintentar</span></button>`;
+    box.innerHTML = `<a class="btn btn--ghost" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, estoy buscando un libro.')}" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span></a> <button type="button" class="btn btn--ghost"><span>Reintentar</span></button>`;
     status.after(box);
     box.querySelector('button').addEventListener('click', () => {
       box.remove();
@@ -225,9 +255,13 @@ export async function initCatalog({ isMotion = () => false } = {}) {
 
   // ----- rejilla -----
   // Una sola familia de portadas: tarjeta tipográfica propia (sin imágenes de terceros ni SVG heterogéneos).
-  function cover(b) { return blankCover(b); }
-  function blankCover(b) {
-    return el('span', { class: `cover cover--blank tone-${coverTone(b)}` }, el('span', { class: 'cover-title', 'aria-hidden': 'true' }, b.t), el('span', { class: 'cover-author', 'aria-hidden': 'true' }, b.a));
+  function cover(b, tone = coverTone(b), layout = true) {
+    return blankCover(b, tone, layout);
+  }
+  function blankCover(b, tone, layout) {
+    const attrs = { class: `cover cover--blank tone-${tone}`, 'data-cover-tone': tone };
+    if (layout) attrs['data-cover-layout'] = coverLayout(b);
+    return el('span', attrs, el('span', { class: 'cover-title', 'aria-hidden': 'true' }, b.t), el('span', { class: 'cover-author', 'aria-hidden': 'true' }, b.a));
   }
 
   function card(b) {
@@ -371,10 +405,10 @@ export async function initCatalog({ isMotion = () => false } = {}) {
 
   // ----- ficha (drawer) -----
   function row(k, v) { return v ? [el('dt', {}, k), el('dd', {}, String(v))] : []; }
-  function openBook(id, { trigger } = {}) {
+  function openBook(id, { trigger, tone } = {}) {
     const b = byId.get(id);
     if (!b) return;
-    $('[data-d-cover]', drawer).replaceChildren(cover(b));
+    $('[data-d-cover]', drawer).replaceChildren(cover(b, tone)); // el tono de la tarjeta pulsada; sin él, el del libro
     $('[data-d-title]', drawer).textContent = b.t;
     $('[data-d-author]', drawer).textContent = b.a;
     $('[data-d-facts]', drawer).replaceChildren(
@@ -389,22 +423,26 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     requestAnimationFrame(() => {
       if (!drawer.open || drawer.dataset.book !== id) return;
       const rel = relatedBooks(books, b);
-      $('[data-d-related]', drawer).replaceChildren(...rel.map(r => el('li', {}, el('button', { type: 'button', class: 'rel', 'data-id': r.id }, cover(r), el('span', {}, r.t)))));
+      const relTones = coverTones(rel);
+      $('[data-d-related]', drawer).replaceChildren(...rel.map((r, i) => el('li', {}, el('button', { type: 'button', class: 'rel', 'data-id': r.id }, cover(r, relTones[i], false), el('span', {}, r.t)))));
       relWrap.hidden = !rel.length;
     });
     drawer.dataset.book = id;
     bindSaveButton($('[data-d-save]', drawer), b);
     if (trigger) drawer.dataset.trigger = trigger;
-    if (!drawer.open) { drawer.showModal(); document.documentElement.classList.add('sheet-open'); }
+    if (!drawer.open) openDialog(drawer);
     drawer.scrollTop = 0;
     $('[data-d-scroll]', drawer).scrollTop = 0;
   }
-  grid.addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openBook(c.dataset.id, { trigger: c.dataset.id }); });
+  grid.addEventListener('click', e => {
+    const c = e.target.closest('.card');
+    if (c) confirmThen(c, () => openBook(c.dataset.id, { trigger: c.dataset.id, tone: toneOf(c) })); // confirma ya; la hoja (lo caro) va después de pintar
+  });
   // Otras piezas (el carrusel de libros) piden abrir una ficha sin conocer el diálogo.
-  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; openBook(e.detail.id); } });
-  $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
-  $('[data-d-close]', drawer).addEventListener('click', () => drawer.close());
-  drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });
+  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; openBook(e.detail.id, { tone: e.detail.tone }); } });
+  $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id, { tone: toneOf(r) }); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
+  $('[data-d-close]', drawer).addEventListener('click', () => closeDialog(drawer)); // sale primero; el cierre real corre después del fotograma
+  drawer.addEventListener('click', e => { if (e.target === drawer) closeDialog(drawer); });
   // Hoja inferior (móvil): se arrastra desde el asa o la parte alta y se cierra al soltar pasado un umbral.
   (function sheetDrag() {
     const grab = $('[data-d-grab]', drawer);
@@ -435,7 +473,6 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     drawer.addEventListener('pointercancel', end);
   })();
   drawer.addEventListener('close', () => {
-    document.documentElement.classList.remove('sheet-open');
     const t = drawer.dataset.trigger && grid.querySelector(`.card[data-id="${CSS.escape(drawer.dataset.trigger)}"]`);
     if (t) t.focus({ preventScroll: true });
   });
