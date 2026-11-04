@@ -75,9 +75,14 @@ function paint(btn) {
   const on = isSaved(btn.dataset.saveId);
   const title = btn.dataset.saveTitle || 'este libro';
   btn.setAttribute('aria-pressed', String(on));
-  btn.setAttribute('aria-label', on ? `Quitar «${title}» de mi lista` : `Guardar «${title}» en mi lista`);
   const label = btn.querySelector('[data-save-label]');
-  if (label) label.textContent = on ? 'Guardado en mi lista · Quitar' : 'Guardar en mi lista';
+  if (label) { // con texto visible, el nombre accesible lo contiene (WCAG 2.5.3): el título va oculto detrás, no en aria-label
+    label.textContent = on ? 'Guardado en mi lista · Quitar' : 'Guardar en mi lista';
+    btn.removeAttribute('aria-label');
+    let sr = btn.querySelector('[data-save-title]');
+    if (!sr) { sr = document.createElement('span'); sr.className = 'sr-only'; sr.dataset.saveTitle = ''; btn.append(sr); }
+    sr.textContent = `: «${title}»`;
+  } else btn.setAttribute('aria-label', on ? `Quitar «${title}» de mi lista` : `Guardar «${title}» en mi lista`);
 }
 
 export function saveButton(book, { wide = false } = {}) {

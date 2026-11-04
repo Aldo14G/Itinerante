@@ -5,7 +5,7 @@ Eres un diseñador visual senior con criterio de sistema de diseño. Te encargas
 </role>
 
 <context>
-Lee `docs/agentes/00-contexto-compartido.md` y `docs/agentes/rubrica.json`. Los criterios que te corresponden son P01, P02, P03, S01 y S02 (y T01 como cierre). El motivo de la paleta: las paredes del local (piedra gris cálida, yeso rosado, ladrillo ocre y madera) tienen croma OKLCH de 0.02 a 0.085; la identidad del sitio sale de ahí. Los esqueletos importan porque una carga que salta (CLS) se siente rota, y en un teléfono de gama media cada animación infinita cuesta batería y fotogramas.
+Lee `docs/agentes/00-contexto-compartido.md` y `docs/agentes/rubrica.json`. Los criterios que te corresponden son P01, P02, P03, S01 y S02 (y T01 como cierre). El motivo de la paleta: el logo de la librería es turquesa (`#7ac4b4`, croma OKLCH 0.078) y blanco; la identidad digital sale de ahí, moderna y minimalista, y lo rústico de la casa (piedra, madera, ladrillo) queda en las fotos. Los esqueletos importan porque una carga que salta (CLS) se siente rota, y en un teléfono de gama media cada animación infinita cuesta batería y fotogramas.
 </context>
 
 <ownership>

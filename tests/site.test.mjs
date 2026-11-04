@@ -323,27 +323,27 @@ test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y 
   assert.equal([...html.matchAll(/<div class="bill-dots"[^>]*>([\s\S]*?)<\/div>/g)][0][1].match(/<i>/g).length, items.length);
 });
 
-test('tonos claros: las secciones de lectura usan cal y el pie ladrillo, con contraste suficiente', async () => {
-  const expected = { 'id="inicio"': 'light', 'class="manifesto"': 'light', 'id="casa"': 'sand', 'id="libros"': 'sand', 'id="catalogo"': 'light' };
+test('tonos claros: las secciones de lectura usan blanco y bruma y el pie el tono profundo, con contraste suficiente', async () => {
+  const expected = { 'id="inicio"': 'light', 'class="manifesto"': 'light', 'id="casa"': 'mist', 'id="libros"': 'mist', 'id="catalogo"': 'light' };
   for (const [sel, tone] of Object.entries(expected)) {
     const tag = html.match(new RegExp(`<(?:section|div)[^>]*${sel}[^>]*>`))[0];
     assert.ok(tag.includes(`data-tone="${tone}"`) && (sel === 'id="catalogo"' || /data-theme="paper"/.test(tag)), `${sel} sin tono ${tone}`);
   }
-  assert.ok(/<footer class="ftr" data-tone="brick">/.test(html));
+  assert.ok(/<footer class="ftr" data-tone="deep">/.test(html));
   const lum = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
   const tokens = JSON.parse(await readFile(here('./design/tokens.json'), 'utf8')).themes.b4.tones;
   for (const [name, t] of Object.entries(tokens)) {
     assert.ok(ratio(t.bone, t.night) >= 7, `${name}: texto sobre fondo`);
     assert.ok(ratio(t['bone-dim'], t.night) >= 4.5, `${name}: texto atenuado`);
-    if (name !== 'brick') for (const k of ['tungsten', 'tungsten-hi', 'turq', 'terra-light']) assert.ok(ratio(t[k], t.night) >= 4.5, `${name}: ${k} sobre fondo`);
+    if (name !== 'deep') for (const k of ['tungsten', 'tungsten-hi', 'turq', 'terra-light']) assert.ok(ratio(t[k], t.night) >= 4.5, `${name}: ${k} sobre fondo`);
   }
-  assert.ok(/\[data-tone="light"\]/.test(tokensCss) && /\[data-tone="sand"\]/.test(tokensCss) && /\[data-tone="brick"\]/.test(tokensCss));
+  assert.ok(/\[data-tone="light"\]/.test(tokensCss) && /\[data-tone="mist"\]/.test(tokensCss) && /\[data-tone="deep"\]/.test(tokensCss));
 });
 
 test('portadas y cabecera: tinta fija sobre superficies oscuras, también dentro de tonos claros', async () => {
   assert.ok(/\.cover--blank \.cover-title \{ color: var\(--cover-ink\); \}/.test(css) && /\.cover-author \{[^}]*var\(--cover-ink-dim\)/.test(css), 'portadas con tinta propia');
-  assert.ok(/--cover-ink: #f1e8d8/.test(tokensCss) && /--cover-ink-dim: #c8bda5/.test(tokensCss));
+  assert.ok(/--cover-ink: #f8f8f8/.test(tokensCss) && /--cover-ink-dim: #cfe3df/.test(tokensCss));
   assert.ok(!/html\[data-glass="lite"\] \.hdr::before \{[^}]*background/.test(css), 'lite no pisa el tinte por sección de la cabecera');
   assert.ok(/\.entry-credit \{[^}]*background: color-mix/.test(css.replaceAll('\n', ' ')), 'crédito del hero sobre chip sólido');
   assert.ok(/html\.at-top \.tabbar \{ translate: 0 calc\(100% \+ 24px\); \}/.test(mobileCss), 'la barra inferior espera fuera de la primera vista (el perfil no la reserva)');
@@ -363,8 +363,8 @@ test('cita sin filetes, barra inferior opaca (móvil)', async () => {
   assert.ok(!/blockquote::before/.test(quoteCss) && !/clip-path/.test(quoteCss) && !/linear-gradient/.test(quoteCss), 'la cita es tipografía sola: sin filetes por renglón ni animación decorativa');
   assert.ok(!/@keyframes/.test(quoteCss) && !/--q-h/.test(quoteCss));
   assert.ok(!/blockquote::before/.test(css), 'ninguna regla vieja de los filetes de la cita');
-  const tint = Number(tokensCss.match(/--glass-tint: rgb\(30 20 14 \/ ([0-9.]+)\)/)[1]);
-  const solid = Number(tokensCss.match(/--glass-solid: rgb\(30 20 14 \/ ([0-9.]+)\)/)[1]);
+  const tint = Number(tokensCss.match(/--glass-tint: rgb\(15 39 36 \/ ([0-9.]+)\)/)[1]);
+  const solid = Number(tokensCss.match(/--glass-solid: rgb\(15 39 36 \/ ([0-9.]+)\)/)[1]);
   assert.ok(tint >= 0.96 && solid >= 0.98, `la barra no deja ver contenido bajo las etiquetas (tinte ${tint}, sólido ${solid})`);
 });
 
@@ -496,7 +496,7 @@ test('historias: el foco del teclado se dibuja en un indicador de 44 px, no sobr
   assert.ok(/\.story-nav--next \{ right: 0; width: 65%; \}/.test(mobileCss), 'la zona de toque conserva su tamaño');
 });
 
-test('paleta: los campos de color a ancho completo no superan el croma de las paredes del local; los acentos, un poco más', async () => {
+test('paleta: los campos de color a ancho completo no superan el croma del turquesa del logo; los acentos, un poco más', async () => {
   const tk = JSON.parse(await readFile(new URL('../design/tokens.json', import.meta.url), 'utf8')).themes.b4;
   const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
   const chroma = hex => {
@@ -506,12 +506,12 @@ test('paleta: los campos de color a ancho completo no superan el croma de las pa
     const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
     return Math.hypot(1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.782771766 * m - 0.8086757660 * s);
   };
-  const FILL_MAX = 0.09; // el muro más saturado de las fotos (ladrillo ocre) mide 0.085
+  const FILL_MAX = 0.09; // el turquesa del logo (#7ac4b4) mide 0.078: ningún campo lo supera; lo rústico de la casa queda en las fotos
   const ACCENT_MAX = 0.11;
-  const fills = { 'cal': tk.tones.light.night, 'arena': tk.tones.sand.night, 'ladrillo': tk.tones.brick.night, 'turquesa (Cartelera)': tk.color.turq, 'ocre (llamado)': tk.color.tungsten, 'papel': tk.color.paper };
+  const fills = { 'blanco': tk.tones.light.night, 'bruma': tk.tones.mist.night, 'profundo': tk.tones.deep.night, 'turquesa (Cartelera)': tk.color.turq, 'turquesa (llamado)': tk.color.tungsten, 'papel': tk.color.paper };
   for (let i = 0; i < 10; i++) for (const stop of ['a', 'b']) fills[`portada ${i}${stop}`] = tk.color[`cover-${i}-${stop}`]; // las portadas son campos de color: mismo límite que las paredes
   for (const [name, hex] of Object.entries(fills)) assert.ok(chroma(hex) <= FILL_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${FILL_MAX}`);
-  const accents = { 'terracota (cal)': tk.tones.light.tungsten, 'terracota (arena)': tk.tones.sand.tungsten, 'turquesa texto (cal)': tk.tones.light.turq, 'turquesa texto (arena)': tk.tones.sand.turq };
+  const accents = { 'primaria (blanco)': tk.tones.light.tungsten, 'primaria (bruma)': tk.tones.mist.tungsten, 'turquesa texto (blanco)': tk.tones.light.turq, 'turquesa texto (bruma)': tk.tones.mist.turq, 'estado abierto': tk.color.open };
   for (const [name, hex] of Object.entries(accents)) assert.ok(chroma(hex) <= ACCENT_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${ACCENT_MAX}`);
   // Ningún token de color hexadecimal (base, portadas, estado abierto/cerrado ni tonos) pasa del límite de acentos.
   const all = [...Object.entries(tk.color), ...Object.entries(tk.tones).flatMap(([t, o]) => Object.entries(o).map(([k, v]) => [`${t}.${k}`, v]))];
@@ -538,9 +538,9 @@ test('portadas: el autor y el título se leen sobre la parada más clara de cada
   }
 });
 
-test('portadas: la familia cálida (ficción) queda en el rango de tono de las paredes del local', async () => {
-  // Paredes medidas con tools/qa/oklch.py: piedra, yeso, ladrillo y madera, tono OKLCH 36 a 77. La familia cálida no sale de ahí
-  // (con margen hasta 30 y 90 por las crema y el ámbar oscuro); un neutro (croma < 0.02) no tiene tono que medir.
+test('portadas: las dos familias son frías o neutras (turquesa, azul, gris): nada rústico fuera de las fotos', async () => {
+  // El logo es turquesa (tono OKLCH 179). Las portadas van de turquesa a azul (150 a 255) o son neutras (croma < 0.02):
+  // lo cálido y rústico (madera, ladrillo, ocre) queda en las fotos de la casa.
   const tk = JSON.parse(await readFile(new URL('../design/tokens.json', import.meta.url), 'utf8')).themes.b4.color;
   const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
   const hue = hex => {
@@ -549,9 +549,9 @@ test('portadas: la familia cálida (ficción) queda en el rango de tono de las p
     const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, bb = 0.0259040371 * l + 0.782771766 * m - 0.808675766 * s;
     return { c: Math.hypot(a, bb), h: (Math.atan2(bb, a) * 180 / Math.PI + 360) % 360 };
   };
-  for (const i of TONES.fiction) for (const stop of ['a', 'b']) {
+  for (const i of [...TONES.fiction, ...TONES['non-fiction']]) for (const stop of ['a', 'b']) {
     const { c, h } = hue(tk[`cover-${i}-${stop}`]);
-    assert.ok(c < 0.02 || (h >= 30 && h <= 90), `portada ${i}${stop}: tono ${h.toFixed(0)} fuera del rango de las paredes (30 a 90)`);
+    assert.ok(c < 0.02 || (h >= 150 && h <= 255), `portada ${i}${stop}: tono ${h.toFixed(0)} fuera de la familia fría (150 a 255)`);
   }
 });
 

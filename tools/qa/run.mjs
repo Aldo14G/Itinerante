@@ -9,7 +9,7 @@ const PORT = process.env.QA_PORT || '8599';
 const URL = `http://127.0.0.1:${PORT}/`;
 const root = resolve(import.meta.dirname, '..', '..');
 const work = mkdtempSync(join(tmpdir(), 'iti-qa-'));
-const SCRIPTS = ['explorer', 'saved', 'rail', 'skeleton', 'contrast', 'ficha'];
+const SCRIPTS = ['explorer', 'saved', 'rail', 'skeleton', 'contrast', 'ficha', 'axe'];
 
 const server = spawn(process.execPath, [join(root, 'tools', 'preview-site.mjs')], { cwd: root, env: { ...process.env, PORT }, stdio: 'ignore' });
 const stop = () => server.kill();

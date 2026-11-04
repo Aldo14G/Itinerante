@@ -53,7 +53,7 @@ test("cabecera de index.html: indexable, tema claro, sin dominio inventado", asy
   const html = await readFile(join(out, "index.html"), "utf8");
   const head = html.slice(0, html.indexOf("</head>"));
   assert.ok(!/noindex|nofollow/i.test(head), "el sitio debe ser indexable");
-  assert.match(head, /<meta name="theme-color" content="#fbf8f2">/);
+  assert.match(head, /<meta name="theme-color" content="#ffffff">/);
   assert.match(head, /<link rel="icon" href="Logo\.png"/);
   assert.match(head, /<title>[^<]+<\/title>/);
   assert.match(head, /<meta name="description" content="[^"]{40,}"/);

@@ -82,9 +82,10 @@ genérico.
 - La voz es cálida, culta y práctica.
 - El espacio, su arquitectura y sus fotografías reales son parte de la identidad
   del producto y no deben sustituirse por una librería genérica.
-- El sistema visual vigente es B.4 (`DESIGN.md`): cal cálida, ladrillo,
-  turquesa de los libreros y tungsteno, con Archivo y una voz literaria en
-  Bodoni Moda cursiva. El canon anterior (Claude Design y Higgsfield) es
+- El sistema visual vigente es B.4 (`DESIGN.md`): la paleta del logo,
+  turquesa (#7ac4b4) y blanco, con un tono profundo para el pie; lo rústico
+  de la casa vive en las fotos, no en los tokens. Archivo y una voz literaria
+  en Bodoni Moda cursiva. El canon anterior (Claude Design y Higgsfield) es
   historia.
 
 ## Evidence on Hand

@@ -4,7 +4,8 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 
 | Script | Qué comprueba | Falla (código ≠ 0) |
 |---|---|---|
-| `run.mjs` | Levanta su propia vista previa y corre explorer, saved, rail, skeleton, contrast y ficha (`npm run test:browser`). | sí |
+| `run.mjs` | Levanta su propia vista previa y corre explorer, saved, rail, skeleton, contrast, ficha y axe (`npm run test:browser`). | sí |
+| `axe.mjs URL` | axe-core (WCAG 2.x A/AA y buenas prácticas) en inicio, manifiesto revelado, menú con acordeón, Explorar, ficha, Mi lista y catálogo en línea, en 390 y 1280. `AXE_ALL=1` lista también las moderadas y leves. | sí (violaciones serias o críticas) |
 | `contrast.mjs URL` | Contraste de texto en todos los estados (secciones, menú, acordeones, ficha, Mi lista, Explorar, aviso) y de las portadas. | sí |
 | `skeleton.mjs URL` | Esqueletos del tamaño del contenido y CLS de la carga diferida. | sí |
 | `motion.mjs URL` | Transiciones y animaciones disparadas, duraciones frente a tokens y pasada de movimiento reducido. | informa |

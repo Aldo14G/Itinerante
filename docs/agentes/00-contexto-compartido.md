@@ -21,18 +21,39 @@ Estas reglas no se negocian: la librería confirma la existencia y el precio de 
 </truth_rules>
 
 <design_system>
-- Paleta tomada de las paredes del local, apagada: campos de color a ancho completo con croma OKLCH ≤ 0.085 (los muros de las fotos miden 0.02–0.085); acentos pequeños hasta 0.105. Tonos por sección: `data-tone="light|sand|brick"`.
+- Paleta del logo: turquesa `#7ac4b4` y blanco `#f8f8f8`. Dirección: **moderno y minimalista en lo digital frente a rústico y clásico en la casa**: la piedra, la madera y el ladrillo viven solo en las fotos; ningún token es cálido. Campos de color a ancho completo con croma OKLCH ≤ 0.09 (el turquesa del logo mide 0.078); acentos pequeños hasta 0.11. Tinta `#10201e`; primaria «Cómo llegar» turquesa profundo `#176b62` con texto blanco. Tonos por sección: `data-tone="light|mist|deep"`.
 - Ritmo vertical: `--sec-sm` y `--sec-md` (48/96 px en móvil, 64/128 en escritorio). Cuadrícula de 4 px. Nada de `clamp(...vh)` para rellenos de sección.
 - Movimiento: duraciones solo de los tokens (`--dur-instant` 120, `--dur-fast` 240, `--dur-base` 400, `--dur-slow` 700, `--dur-scene` 1200 ms); en JS, `motion.js`. Con `prefers-reduced-motion: reduce` no queda ninguna transición ni animación (regla general al final de `style.css`).
 - CSP estricta: sin estilos ni scripts en línea, sin orígenes externos. Se puede asignar estilos por CSSOM desde JS.
 - Los colores, tamaños y duraciones se cambian en `design/tokens.json` y se regenera con `npm run tokens`.
 </design_system>
 
+<como_evitarlo>
+Errores típicos de productos hechos por agentes y la regla comprobable que los evita. Las fuentes se verificaron el 2026-11-04 (todas respondieron HTTP 200); cada regla dice con qué se mide aquí. Ninguna de estas cifras se relaja para que una prueba pase.
+
+| Anti-patrón | Regla comprobable | Se mide con | Fuente |
+|---|---|---|---|
+| Texto gris sobre gris, bajo contraste | Texto ≥ 4.5:1; texto grande (≥ 24 px, o ≥ 18.66 px en negrita) ≥ 3:1 | `contrast.mjs` (todos los estados), `axe.mjs`, `critique.mjs` (`a11y-contrast`) | [WCAG 2.2 · 1.4.3](https://www.w3.org/TR/WCAG22/#contrast-minimum) |
+| Iconos, bordes de campos y anillo de foco que no se ven | Componentes de interfaz y gráficos ≥ 3:1 contra lo adyacente | `axe.mjs`, crítico con capturas | [WCAG 2.2 · 1.4.11](https://www.w3.org/TR/WCAG22/#non-text-contrast) |
+| Objetivos táctiles diminutos | Mínimo WCAG AA: 24×24 px CSS o espaciado equivalente (2.5.8). **Aquí el estándar es 44×44 px** para todo lo táctil y para la navegación también con puntero fino (criterio de Apple HIG; Fitts). Cita correcta: 2.5.5 (44 px) es AAA, no el mínimo | `e2e.mjs`, `rail.mjs`, `saved.mjs`, `ficha.mjs` | [WCAG 2.2 · 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html); [Apple HIG · Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility); [Fitts](https://lawsofux.com/fittss-law/) |
+| Foco invisible (`outline: none`) o tapado por una barra fija | Foco siempre visible (2.4.7) y nunca oculto del todo (2.4.11); ideal perímetro ≥ 2 px y 3:1 (2.4.13, AAA). Se comprueba con Tab real, no con `focus()` | `e2e.mjs` (Tab en menú), `rail.mjs` (24 paradas), `ficha.mjs` | [WCAG 2.2 · 2.4.7](https://www.w3.org/TR/WCAG22/#focus-visible), [2.4.11](https://www.w3.org/TR/WCAG22/#focus-not-obscured-minimum), [2.4.13](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html) |
+| Acciones sin respuesta; pantallas sin estado de carga, vacío o error | Toda acción responde en < 400 ms con algo visible (Doherty) e INP ≤ 200 ms; cada región asíncrona reserva su forma (esqueletos del tamaño final) y tiene estado vacío y de error con salida (reintentar, WhatsApp); los avisos llevan `role="status"` o `alert` | `inp.mjs` (CPU 4×), `skeleton.mjs`, `explorer.mjs` (red lenta), revisión manual del vacío y el error | [Doherty](https://lawsofux.com/doherty-threshold/); [web.dev INP](https://web.dev/articles/inp); [NN/g #1](https://www.nngroup.com/articles/ten-usability-heuristics/); [WCAG 4.1.3](https://www.w3.org/TR/WCAG22/#status-messages) |
+| Errores de formulario solo con color o en un aviso que desaparece | El error se anuncia (`aria-live`/`role`), dice el problema y la salida en lenguaje llano, no depende solo del color; en formularios largos, resumen arriba con foco y «Error:» en el título | revisión manual + `axe.mjs` | [GOV.UK · Validation](https://design-system.service.gov.uk/patterns/validation/); [NN/g #9](https://www.nngroup.com/articles/ten-usability-heuristics/) |
+| Carga lenta, saltos de diseño | LCP ≤ 2.5 s y CLS ≤ 0.1 en el p75 de campo (aquí: CLS ≤ 0.05 y LCP ≤ 3.5 s con CPU 4× y 4G lenta, criterio R01); toda imagen con `width` y `height` | `e2e.mjs`, `skeleton.mjs`, perfil CDP | [web.dev · Core Web Vitals](https://web.dev/articles/vitals) |
+| Animación forzada | Con `prefers-reduced-motion: reduce` no queda ninguna transición ni animación (salvo el progreso ligado al scroll); las duraciones salen de los tokens | `motion.mjs` (pasada de movimiento reducido) | [WCAG 2.3.3](https://www.w3.org/TR/WCAG22/#animation-from-interactions); [MDN · prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) |
+| `div` clicables, ARIA inventado, widgets sin teclado | HTML nativo primero (`<button>`, `<dialog>`, `<details>`, `inert`); «No ARIA is better than Bad ARIA»; cada widget sigue la tabla de teclado del patrón APG (Tab, flechas, Enter, Esc); el nombre accesible contiene el texto visible (2.5.3) | `axe.mjs` (sin violaciones serias ni críticas en los estados principales), `explorer.mjs`, `saved.mjs`, `e2e.mjs` | [APG · Read Me First](https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/); [WCAG 2.5.3](https://www.w3.org/TR/WCAG22/#label-in-name) |
+| Jerarquía plana, sobrecarga de opciones | Una sola acción primaria por pantalla; ≤ 7 elementos por grupo de navegación; quitar lo irrelevante | `critique.mjs` (`law-hick`, `law-miller`, `law-restorff`), crítico | [Hick](https://lawsofux.com/hicks-law/); [NN/g #8](https://www.nngroup.com/articles/ten-usability-heuristics/) |
+| Patrones inventados donde hay convenciones | Usar lo que la gente ya conoce: diálogo nativo, hoja inferior, barra de pestañas, acordeón | crítico (Jakob) | [Jakob](https://lawsofux.com/jakobs-law/); [GOV.UK Design System](https://design-system.service.gov.uk/) |
+| Errores que se podían prevenir | Valores por defecto, restricciones y confirmación en acciones destructivas | revisión manual | [NN/g #5](https://www.nngroup.com/articles/ten-usability-heuristics/) |
+
+Herramientas: además del arnés propio, `axe.mjs` corre axe-core (WCAG 2.x A/AA y buenas prácticas) en inicio, manifiesto revelado, menú con acordeón, Explorar, ficha, Mi lista y catálogo en línea. Lighthouse no está instalado: LCP, CLS e INP se miden por CDP (`e2e.mjs`, `inp.mjs`).
+</como_evitarlo>
+
 <tools>
 Verificación (todas aceptan una URL y salen con código ≠ 0 si fallan):
 - `npm test` (regresión completa), `npm run test:design`, `node scripts/critique.mjs` (reglas de diseño con ratchet en `design/baseline.json`; nunca subir un conteo).
 - Vista previa: `PORT=<puerto> node tools/preview-site.mjs` (sirve el sitio con la CSP de producción; deténla al terminar).
-- Arnés de Chromium en `tools/qa/` (ver `tools/qa/README.md`): `contrast.mjs`, `skeleton.mjs`, `motion.mjs`, `spacing.mjs`, `rail.mjs`, `saved.mjs`, `explorer.mjs`, `e2e.mjs`, `strip.mjs` (capturas móviles), `palette.py`/`oklch.py` (croma de paredes).
+- Arnés de Chromium en `tools/qa/` (ver `tools/qa/README.md`): `contrast.mjs`, `skeleton.mjs`, `motion.mjs`, `spacing.mjs`, `rail.mjs`, `saved.mjs`, `explorer.mjs`, `e2e.mjs`, `strip.mjs` (capturas móviles), `palette.py`/`oklch.py` (croma de las fotos frente a la paleta), `axe.mjs` (axe-core en los estados principales).
 Cada agente usa su propio puerto (ver su spec) para no chocar con los demás.
 </tools>
 

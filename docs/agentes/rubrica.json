@@ -1,28 +1,202 @@
 {
   "version": 1,
-  "descripcion": "Criterios de aceptación de la maqueta. El orquestador solo declara terminado cuando todos están en 'passing' y no quedan defectos de severidad alta o media. 'medir' dice con qué herramienta se comprueba; 'dueño' es el agente responsable de arreglarlo.",
+  "descripcion": "Criterios de aceptación de la maqueta. El orquestador solo declara terminado cuando todos están en 'passing' y no quedan defectos de severidad alta o media. 'medir' dice con qué herramienta se comprueba; 'dueño' es el agente responsable de arreglarlo. Las reglas de «cómo evitarlo» del contexto compartido fijan los umbrales (WCAG 2.2, web.dev, Laws of UX, NN/g, APG, GOV.UK).",
   "criterios": [
-    { "id": "P01", "area": "paleta", "enunciado": "Los campos de color a ancho completo no superan croma OKLCH 0.09; los acentos pequeños, 0.11.", "medir": "npm test (prueba de paleta) y python tools/qa/palette.py", "dueño": "paleta-skeletons" },
-    { "id": "P02", "area": "paleta", "enunciado": "Todo texto visible en todos los estados (secciones, menú, acordeones, ficha, Mi lista, Explorar, aviso) cumple 4.5:1 (3:1 si es grande), incluidas las portadas.", "medir": "node tools/qa/contrast.mjs URL", "dueño": "paleta-skeletons" },
-    { "id": "P03", "area": "paleta", "enunciado": "Las portadas tipográficas de una colección de 12 muestran al menos 3 tonos distintos dentro de la paleta y se leen sin parecer un menú genérico.", "medir": "capturas (crítico) + prueba unitaria de coverTone", "dueño": "paleta-skeletons" },
-    { "id": "S01", "area": "esqueletos", "enunciado": "Cada esqueleto ocupa exactamente el lugar del contenido final (±8 px de ancho y alto) y el CLS de la carga diferida del carrusel y del catálogo es ≤ 0.02 / 0.05.", "medir": "node tools/qa/skeleton.mjs URL", "dueño": "paleta-skeletons" },
-    { "id": "S02", "area": "esqueletos", "enunciado": "Los esqueletos usan solo colores de los tokens, no se animan en móvil ni en gama baja, y desaparecen sin parpadeo al llegar el contenido.", "medir": "skeleton.mjs + critique.mjs", "dueño": "paleta-skeletons" },
-    { "id": "M01", "area": "movimiento", "enunciado": "Todas las duraciones del DOM salen de los tokens; no hay duraciones sueltas.", "medir": "node tools/qa/motion.mjs URL", "dueño": "movimiento" },
-    { "id": "M02", "area": "movimiento", "enunciado": "Con prefers-reduced-motion no queda ninguna transición ni animación (excepto el progreso ligado al scroll).", "medir": "motion.mjs (pasada de movimiento reducido)", "dueño": "movimiento" },
-    { "id": "M03", "area": "movimiento", "enunciado": "Cada animación tiene un propósito (orientar, confirmar, relacionar) y sigue un vocabulario único: una firma (suelo ajedrezado) y una transición simple; sin efectos pesados en gama media.", "medir": "crítico + motion.mjs", "dueño": "movimiento" },
-    { "id": "M04", "area": "movimiento", "enunciado": "INP ≤ 200 ms con CPU 4× en menú, chips del carrusel, guardar y abrir la ficha; sin tareas largas > 200 ms provocadas por una interacción.", "medir": "node tools/qa/e2e.mjs y perfil con CPU 4×", "dueño": "movimiento" },
-    { "id": "D01", "area": "desplegables", "enunciado": "Menú lateral, acordeones, Explorar, ficha y Mi lista: foco inicial correcto, Tab atrapado en lo modal, Escape cierra, el foco vuelve al origen, aria-expanded/aria-controls válidos.", "medir": "e2e.mjs, explorer.mjs, saved.mjs", "dueño": "navegacion-desplegables" },
-    { "id": "D02", "area": "desplegables", "enunciado": "El botón «atrás» del teléfono cierra la hoja abierta; ningún flujo deja el scroll bloqueado ni lo libera con una hoja abierta (menú → Mi lista, ficha sobre Explorar, redimensionar).", "medir": "explorer.mjs y saved.mjs", "dueño": "navegacion-desplegables" },
-    { "id": "D03", "area": "desplegables", "enunciado": "Los desplegables se abren y cierran con animación de altura de los tokens, sin saltos de contenido, y quedan inertes cuando están plegados.", "medir": "e2e.mjs + motion.mjs", "dueño": "navegacion-desplegables" },
-    { "id": "U01", "area": "ux", "enunciado": "Cuatro capítulos con los mismos nombres en cabecera, menú y barra inferior; una sola acción primaria por pantalla («Cómo llegar»).", "medir": "npm test + crítico", "dueño": "ux-movil-feed" },
-    { "id": "U02", "area": "ux", "enunciado": "Móvil: la página mide ≤ 11 pantallas, Libros ≤ 3.5, y la primera vista tiene ≤ 6 acciones visibles.", "medir": "node tools/qa/spacing.mjs URL y critique.mjs (law-hick)", "dueño": "ux-movil-feed" },
-    { "id": "U03", "area": "ux", "enunciado": "Móvil con sensación de red social: encabezado tipo perfil con destacados que abren las historias, Cartelera como publicaciones (foto, pie, rótulo, «Me interesa» y «Compartir» locales), Guardar y Mi lista.", "medir": "crítico + e2e propios", "dueño": "ux-movil-feed" },
-    { "id": "U04", "area": "ux", "enunciado": "Módulo «Novedades» (Recién llegados) que lee una colección con ids y se oculta por completo si no hay datos; nunca se simula ni se llama «más leídos».", "medir": "prueba unitaria + crítico", "dueño": "ux-movil-feed" },
-    { "id": "U05", "area": "ux", "enunciado": "Las leyes de UX aplicables (Hick, Miller, Fitts, Jakob, Goal-Gradient, Zeigarnik, Peak-End, Serial Position, Von Restorff, proximidad/región común) se cumplen y el crítico lo justifica con evidencia.", "medir": "crítico (puntaje ≥ 4 de 5 en cada dimensión)", "dueño": "ux-movil-feed" },
-    { "id": "U06", "area": "ux", "enunciado": "Objetivos táctiles ≥ 44 px; sin desborde horizontal de 360 a 1920 px; sin errores de consola.", "medir": "e2e.mjs", "dueño": "ux-movil-feed" },
-    { "id": "V01", "area": "verdad", "enunciado": "Se cumplen las reglas de verdad: rótulos de IA/real, «Datos de muestra», sin precios/existencias/fechas/reseñas, horario y WhatsApp correctos.", "medir": "npm test + crítico", "dueño": "ux-movil-feed" },
-    { "id": "R01", "area": "rendimiento", "enunciado": "Móvil con CPU 4× y 4G lenta: LCP ≤ 3.5 s, CLS ≤ 0.05, TBT ≤ 2.5 s; sin regresión de escritorio.", "medir": "node tools/qa/e2e.mjs y perf con CDP", "dueño": "movimiento" },
-    { "id": "T01", "area": "calidad", "enunciado": "npm test y npm run test:design en verde; critique.mjs no supera el baseline; tokens al día.", "medir": "npm test; npm run test:design; node scripts/critique.mjs; npm run tokens -- --check", "dueño": "todos" },
-    { "id": "T02", "area": "calidad", "enunciado": "DESIGN.md, AGENTS.md y docs reflejan lo implementado (sin valores desfasados).", "medir": "revisión del crítico", "dueño": "todos" }
+    {
+      "id": "P01",
+      "area": "paleta",
+      "enunciado": "Los campos de color a ancho completo no superan croma OKLCH 0.09 (el turquesa del logo mide 0.078); los acentos pequeños, 0.11. Ningún token es cálido: lo rústico de la casa vive en las fotos.",
+      "medir": "npm test (prueba de paleta) y python tools/qa/palette.py",
+      "dueño": "paleta-skeletons"
+    },
+    {
+      "id": "P02",
+      "area": "paleta",
+      "enunciado": "Todo texto visible en todos los estados (secciones, menú, acordeones, ficha, Mi lista, Explorar, aviso) cumple 4.5:1 (3:1 si es grande), incluidas las portadas.",
+      "medir": "node tools/qa/contrast.mjs URL",
+      "dueño": "paleta-skeletons"
+    },
+    {
+      "id": "P03",
+      "area": "paleta",
+      "enunciado": "Las portadas tipográficas de una colección de 12 muestran al menos 3 tonos distintos de la familia fría del logo (turquesa, azul, gris) y se leen sin parecer un menú genérico.",
+      "medir": "capturas (crítico) + prueba unitaria de coverTone",
+      "dueño": "paleta-skeletons"
+    },
+    {
+      "id": "S01",
+      "area": "esqueletos",
+      "enunciado": "Cada esqueleto ocupa exactamente el lugar del contenido final (±8 px de ancho y alto) y el CLS de la carga diferida del carrusel y del catálogo es ≤ 0.02 / 0.05.",
+      "medir": "node tools/qa/skeleton.mjs URL",
+      "dueño": "paleta-skeletons"
+    },
+    {
+      "id": "S02",
+      "area": "esqueletos",
+      "enunciado": "Los esqueletos usan solo colores de los tokens, no se animan en móvil ni en gama baja, y desaparecen sin parpadeo al llegar el contenido.",
+      "medir": "skeleton.mjs + critique.mjs",
+      "dueño": "paleta-skeletons"
+    },
+    {
+      "id": "M01",
+      "area": "movimiento",
+      "enunciado": "Todas las duraciones del DOM salen de los tokens; no hay duraciones sueltas.",
+      "medir": "node tools/qa/motion.mjs URL",
+      "dueño": "movimiento"
+    },
+    {
+      "id": "M02",
+      "area": "movimiento",
+      "enunciado": "Con prefers-reduced-motion no queda ninguna transición ni animación (excepto el progreso ligado al scroll).",
+      "medir": "motion.mjs (pasada de movimiento reducido)",
+      "dueño": "movimiento"
+    },
+    {
+      "id": "M03",
+      "area": "movimiento",
+      "enunciado": "Cada animación tiene un propósito (orientar, confirmar, relacionar) y sigue un vocabulario único: una firma (suelo ajedrezado) y una transición simple; sin efectos pesados en gama media.",
+      "medir": "crítico + motion.mjs",
+      "dueño": "movimiento"
+    },
+    {
+      "id": "M04",
+      "area": "movimiento",
+      "enunciado": "INP ≤ 200 ms con CPU 4× en menú, chips del carrusel, guardar y abrir la ficha; sin tareas largas > 200 ms provocadas por una interacción.",
+      "medir": "node tools/qa/e2e.mjs y perfil con CPU 4×",
+      "dueño": "movimiento"
+    },
+    {
+      "id": "D01",
+      "area": "desplegables",
+      "enunciado": "Menú lateral, acordeones, Explorar, ficha y Mi lista: foco inicial correcto, Tab atrapado en lo modal, Escape cierra, el foco vuelve al origen, aria-expanded/aria-controls válidos.",
+      "medir": "e2e.mjs, explorer.mjs, saved.mjs",
+      "dueño": "navegacion-desplegables"
+    },
+    {
+      "id": "D02",
+      "area": "desplegables",
+      "enunciado": "El botón «atrás» del teléfono cierra la hoja abierta; ningún flujo deja el scroll bloqueado ni lo libera con una hoja abierta (menú → Mi lista, ficha sobre Explorar, redimensionar).",
+      "medir": "explorer.mjs y saved.mjs",
+      "dueño": "navegacion-desplegables"
+    },
+    {
+      "id": "D03",
+      "area": "desplegables",
+      "enunciado": "Los desplegables se abren y cierran con animación de altura de los tokens, sin saltos de contenido, y quedan inertes cuando están plegados.",
+      "medir": "e2e.mjs + motion.mjs",
+      "dueño": "navegacion-desplegables"
+    },
+    {
+      "id": "U01",
+      "area": "ux",
+      "enunciado": "Cuatro capítulos con los mismos nombres en cabecera, menú y barra inferior; una sola acción primaria por pantalla («Cómo llegar»).",
+      "medir": "npm test + crítico",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "U02",
+      "area": "ux",
+      "enunciado": "Móvil: la página mide ≤ 11 pantallas, Libros ≤ 3.5, y la primera vista tiene ≤ 6 acciones visibles.",
+      "medir": "node tools/qa/spacing.mjs URL y critique.mjs (law-hick)",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "U03",
+      "area": "ux",
+      "enunciado": "Móvil con sensación de red social: encabezado tipo perfil con destacados que abren las historias, Cartelera como publicaciones (foto, pie, rótulo, «Me interesa» y «Compartir» locales), Guardar y Mi lista.",
+      "medir": "crítico + e2e propios",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "U04",
+      "area": "ux",
+      "enunciado": "Módulo «Novedades» (Recién llegados) que lee una colección con ids y se oculta por completo si no hay datos; nunca se simula ni se llama «más leídos».",
+      "medir": "prueba unitaria + crítico",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "U05",
+      "area": "ux",
+      "enunciado": "Las leyes de UX aplicables (Hick, Miller, Fitts, Jakob, Goal-Gradient, Zeigarnik, Peak-End, Serial Position, Von Restorff, proximidad/región común) se cumplen y el crítico lo justifica con evidencia.",
+      "medir": "crítico (puntaje ≥ 4 de 5 en cada dimensión)",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "U06",
+      "area": "ux",
+      "enunciado": "Objetivos táctiles ≥ 44 px (estándar de Apple HIG y de este sitio; el mínimo WCAG 2.2 AA, 2.5.8, es 24 px: no se cita 44 como mínimo WCAG); sin desborde horizontal de 360 a 1920 px; sin errores de consola.",
+      "medir": "e2e.mjs",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "V01",
+      "area": "verdad",
+      "enunciado": "Se cumplen las reglas de verdad: rótulos de IA/real, «Datos de muestra», sin precios/existencias/fechas/reseñas, horario y WhatsApp correctos.",
+      "medir": "npm test + crítico",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "R01",
+      "area": "rendimiento",
+      "enunciado": "Móvil con CPU 4× y 4G lenta: LCP ≤ 3.5 s, CLS ≤ 0.05, TBT ≤ 2.5 s; sin regresión de escritorio.",
+      "medir": "node tools/qa/e2e.mjs y perf con CDP",
+      "dueño": "movimiento"
+    },
+    {
+      "id": "T01",
+      "area": "calidad",
+      "enunciado": "npm test y npm run test:design en verde; critique.mjs no supera el baseline; tokens al día.",
+      "medir": "npm test; npm run test:design; node scripts/critique.mjs; npm run tokens -- --check",
+      "dueño": "todos"
+    },
+    {
+      "id": "T02",
+      "area": "calidad",
+      "enunciado": "DESIGN.md, AGENTS.md y docs reflejan lo implementado (sin valores desfasados).",
+      "medir": "revisión del crítico",
+      "dueño": "todos"
+    },
+    {
+      "id": "A01",
+      "area": "accesibilidad",
+      "enunciado": "Contraste no textual ≥ 3:1: iconos, bordes de campos, chips y anillo de foco contra lo adyacente (WCAG 1.4.11); texto ≥ 4.5:1 / 3:1 sigue en P02.",
+      "medir": "node tools/qa/axe.mjs URL (color-contrast) + capturas del crítico",
+      "dueño": "paleta-skeletons"
+    },
+    {
+      "id": "A02",
+      "area": "accesibilidad",
+      "enunciado": "Foco visible y nunca tapado con Tab real en todo el sitio (WCAG 2.4.7 y 2.4.11): menú, carrusel, hojas, barra inferior fija y cabecera fija no ocultan el elemento enfocado.",
+      "medir": "e2e.mjs (Tab en menú), rail.mjs (24 paradas), ficha.mjs; revisión manual a 360 px",
+      "dueño": "navegacion-desplegables"
+    },
+    {
+      "id": "A03",
+      "area": "accesibilidad",
+      "enunciado": "Cada región asíncrona (catálogo, carrusel, Novedades, Mi lista, Explorar) tiene estados de carga (esqueleto del tamaño final), vacío y error con salida; los avisos se anuncian con role=\"status\" o \"alert\" (WCAG 4.1.3).",
+      "medir": "skeleton.mjs, explorer.mjs con red retenida, revisión manual del vacío y del error (catalog.json ausente)",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "A04",
+      "area": "accesibilidad",
+      "enunciado": "axe-core sin violaciones serias ni críticas en los estados principales (390 y 1280): nombres accesibles que contienen el texto visible (2.5.3), HTML nativo antes que ARIA, patrones de teclado APG en diálogo, menú y acordeón.",
+      "medir": "node tools/qa/axe.mjs URL (FALLAN 0)",
+      "dueño": "navegacion-desplegables"
+    },
+    {
+      "id": "A05",
+      "area": "accesibilidad",
+      "enunciado": "Errores y resultados de búsqueda o consulta se anuncian (aria-live), dicen el problema y la salida en lenguaje llano y no dependen solo del color (GOV.UK, NN/g #9).",
+      "medir": "revisión manual + axe.mjs",
+      "dueño": "ux-movil-feed"
+    },
+    {
+      "id": "A06",
+      "area": "respuesta",
+      "enunciado": "Toda acción (chip, guardar, abrir hoja, buscar) muestra una respuesta visible en < 400 ms (Doherty) aunque la red tarde; INP ≤ 200 ms con CPU 4× sigue en M04.",
+      "medir": "inp.mjs; explorer.mjs y prueba con catalog.json retenido 2.5 s",
+      "dueño": "movimiento"
+    }
   ]
 }
