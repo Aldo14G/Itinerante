@@ -2,13 +2,13 @@
   "meta": {
     "kind": "sample",
     "label": "Datos de muestra · no es inventario",
-    "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado. La clave «novedades» alimenta la tira «Recién llegados»: mientras `ids` esté vacío no se muestra nada (ni sección, ni ancla, ni enlaces); con ids aparece, con el rótulo de muestra mientras `meta.kind` sea «sample»."
+    "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado. La clave opcional `tema` de cada colección (narrativa, poesia, ensayo, cronica, infantil, libre) la une con el tema de consulta de Pregúntanos: al elegir ese tema el carrusel marca la primera colección que lo trae. La nota de cada colección no repite el rótulo de muestra: ese rótulo es fijo en la página. La clave «novedades» alimenta la tira «Recién llegados»: mientras `ids` esté vacío no se muestra nada (ni sección, ni ancla, ni enlaces); con ids aparece, con el rótulo de muestra mientras `meta.kind` sea «sample»."
   },
   "collections": [
-    { "id": "ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles, de muestra.", "filtro": { "g": ["fiction-science-fiction"] } },
-    { "id": "suspenso", "titulo": "Suspenso", "nota": "Para leer sin soltarlo, de muestra.", "filtro": { "g": ["fiction-psychological-thriller"] } },
-    { "id": "novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela, de muestra.", "filtro": { "g": ["fiction-historical-fiction"] } },
-    { "id": "memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona, de muestra.", "filtro": { "g": ["non-fiction-memoir"] } }
+    { "id": "ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles.", "tema": "narrativa", "filtro": { "g": ["fiction-science-fiction"] } },
+    { "id": "suspenso", "titulo": "Suspenso", "nota": "Para leer sin soltarlo.", "tema": "narrativa", "filtro": { "g": ["fiction-psychological-thriller"] } },
+    { "id": "novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela.", "tema": "narrativa", "filtro": { "g": ["fiction-historical-fiction"] } },
+    { "id": "memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona.", "tema": "cronica", "filtro": { "g": ["non-fiction-memoir"] } }
   ],
   "novedades": { "titulo": "Recién llegados", "ids": [] }
 }

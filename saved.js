@@ -1,8 +1,8 @@
 // Mi lista para la visita: libros que la persona anota en este dispositivo (sin cuenta, sin servidor).
 // Sirve al objetivo del sitio: que lleguen a la librería sabiendo qué quieren ver y puedan preguntarlo.
 import { loadSample } from './sample.js';
-import { openDialog, topDialog } from './sheets.js';
-import { afterPaint } from './motion.js';
+import { openDialog, closeDialog, topDialog } from './sheets.js';
+import { afterPaint, confirmThen } from './motion.js';
 
 const KEY = 'iti-saved-v1';
 export const MAX_SAVED = 30;
@@ -170,7 +170,13 @@ function syncAll(e) {
   document.querySelectorAll(id ? `.save[data-save-id="${CSS.escape(id)}"]` : '.save[data-save-id]').forEach(paint);
   const n = savedIds().length;
   document.querySelectorAll('[data-saved-count]').forEach(el => { el.textContent = countText(n); });
-  document.querySelectorAll('[data-saved-badge]').forEach(el => { el.hidden = n === 0; const c = el.querySelector('[data-saved-n]'); if (c) c.textContent = String(n); });
+  // Chip de la cabecera: existe solo con libros guardados y su nombre accesible lleva el conteo («Mi lista, 3 libros»).
+  document.querySelectorAll('[data-saved-badge]').forEach(el => {
+    el.hidden = n === 0;
+    const c = el.querySelector('[data-saved-n]');
+    if (c) c.textContent = String(n);
+    el.setAttribute('aria-label', `Mi lista, ${countText(n)}`);
+  });
   const dlg = document.getElementById('mylist');
   if (dlg?.open) renderList(dlg);
 }
@@ -206,14 +212,17 @@ export function initSaved() {
       });
       return;
     }
-    if (e.target.closest('[data-open-mylist]')) { e.preventDefault(); hideToast(); openList(); return; }
+    const opener = e.target.closest('[data-open-mylist]');
+    if (opener) { e.preventDefault(); hideToast(); confirmThen(opener, openList); return; } // confirma el toque; la hoja (lo caro) va después de pintar
     const rm = e.target.closest('[data-ml-remove]');
     if (rm) { toggleSaved(rm.dataset.mlRemove); return; }
     const dlg = document.getElementById('mylist');
-    if (dlg?.open && (e.target === dlg || e.target.closest('[data-ml-close]'))) dlg.close();
+    if (dlg?.open && (e.target === dlg || e.target.closest('[data-ml-close]'))) closeDialog(dlg); // sale primero; el cierre real corre después del fotograma
   });
+  // Al cerrar, el foco vuelve al primer abridor visible (el chip de la cabecera) o, si ya no hay libros, al botón del menú.
   document.getElementById('mylist')?.addEventListener('close', () => {
-    document.querySelector('[data-open-mylist]:not(.toast-action)')?.focus?.({ preventScroll: true });
+    const back = [...document.querySelectorAll('[data-open-mylist]:not(.toast-action)')].find(b => b.offsetParent !== null) || document.querySelector('.hdr-more');
+    back?.focus?.({ preventScroll: true });
   });
 }
 

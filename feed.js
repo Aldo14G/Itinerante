@@ -192,6 +192,12 @@ export function onAct(btn) {
   else if (btn.matches('[data-share]')) return shareItem(btn);
 }
 
+// Nombre accesible de «Compartir»: el texto visible (la etiqueta del botón) más el título de la publicación, como «Me interesa «título»».
+// Sin esto las tres publicaciones tenían el mismo nombre para un lector de pantalla.
+export const shareName = title => `Compartir «${title || 'esta propuesta'}»`;
+const paintShare = btn => btn.setAttribute('aria-label', shareName(btn.dataset.title));
+
 export function initFeed() {
   document.querySelectorAll('[data-interest]').forEach(paintInterest);
+  document.querySelectorAll('[data-share]').forEach(paintShare);
 }

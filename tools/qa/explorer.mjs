@@ -54,8 +54,35 @@ const op = await ev(`(() => { const ex = document.getElementById('explorer'); co
 ck('móvil: abre a pantalla completa como diálogo modal con foco en cerrar y el scroll bloqueado', op.open && op.modal && op.full[0] === 390 && op.full[1] === 844 && op.lock && op.focus && op.input && op.cards > 0, JSON.stringify(op));
 ck('móvil: la URL refleja la hoja (#explorar) para que «atrás» la cierre', op.hash === '#explorar');
 
+// Verdad (regla 3): la hoja a pantalla completa lleva el sello de muestra en su cabecera fija, en una sola línea a 390, 360 y 320 px.
+for (const w of [390, 360, 320]) {
+  await send('Emulation.setDeviceMetricsOverride', { width: w, height: 800, deviceScaleFactor: 1, mobile: true }); await sleep(500);
+  const sl = await ev(`(() => { const ex = document.getElementById('explorer'); const s = ex.querySelector('.ex-top [data-cat-seal]'); const top = ex.querySelector('.ex-top').getBoundingClientRect(); const b = s.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(s); const close = ex.querySelector('[data-ex-close]').getBoundingClientRect(); return { text: s.textContent.trim(), lines: range.getClientRects().length, inTop: b.top >= top.top && b.bottom <= top.bottom + 1, right: Math.round(b.right), closeLeft: Math.round(close.left), vis: getComputedStyle(s).visibility, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, topH: Math.round(top.height) }; })()`);
+  ck(`móvil ${w}: la cabecera de Explorar lleva «Datos de muestra · no es inventario» en una línea, sin cortarse ni chocar con cerrar`, sl.text === 'Datos de muestra · no es inventario' && sl.lines === 1 && sl.inTop && sl.right <= sl.closeLeft && sl.vis === 'visible' && sl.sw === sl.cw, JSON.stringify(sl));
+  if (w === 390) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-390.jpg', Buffer.from(shot.result.data, 'base64')); }
+  if (w === 360) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-360.jpg', Buffer.from(shot.result.data, 'base64')); }
+}
+await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true }); await sleep(500);
+
+// «Filtros» no promete 500 filtros: sin filtros activos va a secas; con filtros, el número de activos. Géneros en español (CR-07).
+const fl = await ev(`(async () => { const ex = document.getElementById('explorer'); const btn = ex.querySelector('[data-cat-filters-btn]'); const w = x => new Promise(r => setTimeout(r, x));
+  const idle = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
+  btn.click(); await w(400);
+  const more = ex.querySelector('[data-expand="g"]'); if (more) { more.click(); await w(300); }
+  const genres = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género');
+  const labels = [...genres.querySelectorAll('label')].map(l => l.firstChild.textContent);
+  const cb = genres.querySelector('input[type=checkbox]'); cb.click(); await w(500);
+  const again = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género'); again.querySelectorAll('input[type=checkbox]')[1].click(); await w(500); // el panel se vuelve a pintar tras cada filtro
+  const active = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
+  for (let i = 0; i < 6 && ex.querySelector('[data-chip-dim]'); i++) { ex.querySelector('[data-chip-dim]').click(); await w(300); }
+  return { idle, active, back: btn.textContent.trim(), labels };
+})()`);
+const EN = /Science Fiction|Middle Grade|Self-Help|Fiction|Romance(?!\s+(contempor|oscuro|paranormal|juvenil|y fantas))|Thriller|Mystery|History|Memoir|Parenting|True Crime|Business|Cooking|Health|Politics|Productivity|Spirituality|Biography|Fantasy|Horror|Dystopian|Graphic Novel/;
+ck('móvil: el botón dice «Filtros» sin número, con 2 filtros «Filtros 2» y vuelve a «Filtros» al limpiar (nunca 500)', fl.idle.text === 'Filtros' && fl.idle.label === 'Filtros' && fl.active.text === 'Filtros 2' && /2 activos/.test(fl.active.label) && fl.back === 'Filtros' && !/500/.test(JSON.stringify(fl.idle) + fl.active.text), JSON.stringify({ ...fl, labels: undefined }));
+ck('móvil: la barra Género de la hoja no muestra etiquetas en inglés (Science Fiction, Middle Grade, Self-Help…)', fl.labels.length >= 40 && !fl.labels.some(l => EN.test(l) || /(Science Fiction|Middle Grade|Self-Help)/.test(l)) && fl.labels.includes('Ciencia ficción') && fl.labels.includes('Superación personal'), JSON.stringify(fl.labels.filter(l => EN.test(l)).slice(0, 8)) + ' ' + fl.labels.length);
+
 // búsqueda dentro de la hoja
-const se = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.focus(); q.value = 'Freida'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 1200)); return { cards: ex.querySelectorAll('button.card').length, status: ex.querySelector('[data-cat-status]').textContent, first: ex.querySelector('button.card .card-t')?.textContent }; })()`);
+const se = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.focus(); q.value = 'Freida'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 1200)); return { cards: ex.querySelectorAll('button.card').length, status: ex.querySelector('[data-cat-status]').textContent, first: ex.querySelector('button.card .cover-title')?.textContent }; })()`);
 ck('móvil: buscar «Freida» dentro de la hoja filtra la muestra (5 de 500)', se.cards >= 1 && se.cards < 24 && /de 5 títulos|Mostrando 5/.test(se.status), JSON.stringify(se));
 
 // ficha encima de la hoja

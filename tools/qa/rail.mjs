@@ -26,7 +26,7 @@ await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'
 const out = [];
 const ck = (n, ok, d = '') => out.push([ok ? '✓' : '✗', n, ok ? '' : d]);
 
-for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1280, 800, false]]) {
+for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 360, 740, true], ['escritorio', 1280, 800, false]]) {
   errs.length = 0;
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 0 });
@@ -74,11 +74,39 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
     ck('escritorio: de 4 a 6 tarjetas completas', st.visible >= 4 && st.visible <= 6, String(st.visible));
   }
   const col = await ev(`(async () => {
-    const r = document.querySelector('[data-rail]'); const first = r.querySelector('.rail-item .card-t').textContent;
+    const r = document.querySelector('[data-rail]'); const first = r.querySelector('.rail-item .cover-title').textContent;
     r.querySelectorAll('.rail-chip')[1].click(); await new Promise(x => setTimeout(x, 500));
-    return { changed: r.querySelector('.rail-item .card-t').textContent !== first, label: r.querySelector('[data-rail-viewport]').getAttribute('aria-label'), live: r.querySelector('[data-rail-live]').textContent, n: r.querySelectorAll('.rail-item').length, sl: r.querySelector('[data-rail-viewport]').scrollLeft };
+    return { changed: r.querySelector('.rail-item .cover-title').textContent !== first, label: r.querySelector('[data-rail-viewport]').getAttribute('aria-label'), live: r.querySelector('[data-rail-live]').textContent, n: r.querySelectorAll('.rail-item').length, sl: r.querySelector('[data-rail-viewport]').scrollLeft };
   })()`);
   ck(name + ': cambiar de colección renueva libros, etiqueta y aviso', col.changed && /Suspenso/.test(col.label) && /Suspenso/.test(col.live) && col.n > 0 && col.sl === 0, JSON.stringify(col));
+  // Verdad (regla 3): el rótulo exacto de muestra sigue visible junto al carrusel con cada colección, y la nota de la colección es otra línea.
+  const seal = await ev(`(async () => {
+    const r = document.querySelector('[data-rail]'); const out = [];
+    for (const chip of r.querySelectorAll('.rail-chip')) {
+      chip.click(); await new Promise(x => setTimeout(x, 700));
+      const s = r.querySelector('[data-rail-seal]'); const n = r.querySelector('[data-rail-note]'); const b = s.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(s);
+      out.push({ col: chip.textContent, text: s.textContent.trim(), shown: b.width > 0 && b.height > 0 && getComputedStyle(s).visibility === 'visible' && !s.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, sep: s !== n && !n.contains(s) && !s.contains(n), inBody: document.body.innerText.includes('Datos de muestra · no es inventario'), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
+    }
+    return out;
+  })()`);
+  ck(name + ': con las 4 colecciones el rótulo «Datos de muestra · no es inventario.» sigue visible, en una línea, antes del carrusel y aparte de la nota', seal.length === 4 && seal.every(s => s.text === 'Datos de muestra · no es inventario.' && s.shown && s.lines === 1 && s.sep && s.inBody && s.above && s.note && !/inventario/.test(s.note)), JSON.stringify(seal));
+  // Una sola taxonomía a la vista: elegir un tema de consulta marca la colección equivalente y el estado activo es el mismo.
+  const link = await ev(`(async () => {
+    const r = document.querySelector('[data-rail]'); const t = document.querySelector('.topic[data-topic="cronica"]');
+    r.querySelectorAll('.rail-chip')[0].click(); await new Promise(x => setTimeout(x, 600));
+    t.click(); await new Promise(x => setTimeout(x, 1200));
+    const on = r.querySelector('.rail-chip[aria-checked=true]');
+    const bg = e => getComputedStyle(e).backgroundColor;
+    const first = document.querySelector('.topic[aria-checked=true]'); const cta = document.querySelector('.btn--tungsten');
+    const out = { chip: on && on.textContent, topic: first && first.dataset.topic, chipBg: bg(on), topicBg: bg(first), ctaBg: bg(cta), chipFg: getComputedStyle(on).color, topicFg: getComputedStyle(first).color };
+    document.querySelector('.topic[data-topic="poesia"]').click(); await new Promise(x => setTimeout(x, 800));
+    out.sinEquivalente = r.querySelector('.rail-chip[aria-checked=true]').textContent;
+    document.querySelector('.topic[data-topic="narrativa"]').click(); await new Promise(x => setTimeout(x, 800));
+    out.narrativa = r.querySelector('.rail-chip[aria-checked=true]').textContent;
+    return out;
+  })()`);
+  ck(name + ': elegir el tema Crónica marca Memorias, Poesía (sin equivalente) la deja y Narrativa vuelve a una colección de narrativa', link.chip === 'Memorias' && link.topic === 'cronica' && link.sinEquivalente === 'Memorias' && ['Ciencia ficción', 'Suspenso', 'Novela histórica'].includes(link.narrativa), JSON.stringify(link));
+  if (mobile) ck('móvil: el chip activo del carrusel y el del tema comparten fondo y tinta, y no son el terracota de «Cómo llegar»', link.chipBg === link.topicBg && link.chipFg === link.topicFg && link.chipBg !== link.ctaBg, JSON.stringify(link));
   await ev(`document.querySelector('[data-rail-viewport]').scrollTo({ left: 600, behavior: 'instant' })`);
   await sleep(500);
   const sc = await ev(`(() => { const r = document.querySelector('[data-rail]'); return { tr: getComputedStyle(r.querySelector('[data-rail-thumb]')).transform, prev: r.querySelector('[data-rail-prev]').disabled, next: r.querySelector('[data-rail-next]').disabled }; })()`);
@@ -92,7 +120,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
     const c = document.querySelector('[data-rail] .rail-item .card'); c.focus(); c.click();
     for (let i = 0; i < 40; i++) { await new Promise(r => setTimeout(r, 200)); const d = document.getElementById('cat-drawer'); if (d && d.open) break; }
     const d = document.getElementById('cat-drawer'); const tt = d && d.querySelector('[data-d-title]').textContent;
-    return { open: !!(d && d.open), same: tt === c.querySelector('.card-t').textContent, sheet: document.documentElement.classList.contains('sheet-open') };
+    return { open: !!(d && d.open), same: tt === c.querySelector('.cover-title').textContent, sheet: document.documentElement.classList.contains('sheet-open') };
   })()`);
   ck(name + ': el libro abre la ficha del catálogo', fich.open && fich.same && fich.sheet, JSON.stringify(fich));
   await key('Escape', 'Escape', 27);

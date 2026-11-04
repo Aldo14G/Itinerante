@@ -10,7 +10,8 @@ export const meta = {
   ]
 }
 
-const MAX = (args && args.maxRounds) || 4
+const MAX = (args && args.maxRounds) || 5
+const MAX_TRIES = 3 // intentos por agente y ronda hasta cerrar todas sus tareas
 const REPO = 'C:\\Proyectos\\Itinerante\\.claude\\worktrees\\modest-ritchie-a471dc'
 
 const AGENTS = {
@@ -39,10 +40,11 @@ const WORKER_SCHEMA = {
     no_resueltas: { type: 'array', items: { type: 'object', properties: { id_defecto: { type: 'string' }, por_que: { type: 'string' } }, required: ['id_defecto', 'por_que'] } },
     archivos: { type: 'array', items: { type: 'string' } },
     comandos_verificados: { type: 'array', items: { type: 'object', properties: { comando: { type: 'string' }, resultado: { type: 'string' } }, required: ['comando', 'resultado'] } },
+    autoevaluacion: { type: 'object', properties: { todas_cerradas: { type: 'boolean' }, checklist: { type: 'array', items: { type: 'object', properties: { punto: { type: 'string' }, cumple: { type: 'boolean' }, evidencia: { type: 'string' } }, required: ['punto', 'cumple', 'evidencia'] } } }, required: ['todas_cerradas', 'checklist'] },
     notas_para_humano: { type: 'array', items: { type: 'string' } },
     riesgos: { type: 'array', items: { type: 'string' } }
   },
-  required: ['agente', 'hechas', 'no_resueltas', 'archivos', 'comandos_verificados']
+  required: ['agente', 'hechas', 'no_resueltas', 'archivos', 'comandos_verificados', 'autoevaluacion']
 }
 
 const DEFECT = { type: 'object', properties: { id: { type: 'string' }, severidad: { type: 'string', enum: ['alta', 'media', 'baja'] }, criterio: { type: 'string' }, resumen: { type: 'string' }, evidencia: { type: 'string' }, dueño_probable: { type: 'string' } }, required: ['id', 'severidad', 'resumen', 'evidencia'] }
@@ -52,7 +54,7 @@ const PLAN_SCHEMA = { type: 'object', properties: { terminado: { type: 'boolean'
 
 const verifyQA = (round) => agent(`${COMMON}
 <rol>Eres el agente "qa". Tu spec: docs/agentes/06-qa.md (léela entera y síguela). Puerto de vista previa: 8521. Ronda: ${round}.</rol>
-<tarea>Mide el estado actual del sitio con el arnés de tools/qa/ y las pruebas del repositorio, decide el estado de cada criterio de la rúbrica con evidencia, y reporta los defectos por causa raíz. Guarda el informe completo en .tmp-audit/agentes/ronda-${round}/qa.json y devuelve el mismo contenido como respuesta estructurada.</tarea>`,
+<tarea>Mide el estado actual del sitio con el arnés de tools/qa/ (incluye npm run test:browser) y las pruebas del repositorio, decide el estado de cada criterio de la rúbrica con evidencia, y reporta los defectos por causa raíz. Guarda el informe completo en .tmp-audit/agentes/ronda-${round}/qa.json y devuelve el mismo contenido como respuesta estructurada.</tarea>`,
   { label: `qa:ronda${round}`, phase: 'Verificar', schema: QA_SCHEMA })
 
 const verifyCritic = (round) => agent(`${COMMON}
@@ -89,18 +91,45 @@ Actualiza .tmp-audit/agentes/tests.json, defects.json y progress.md antes de res
   phase('Construir')
   const ordered = [...plan.asignaciones].sort((a, b) => ORDER.indexOf(a.agente) - ORDER.indexOf(b.agente))
   const roundResults = []
+  const idOf = t => t.id_defecto || t.que_hacer
   for (const a of ordered) {
     const cfg = AGENTS[a.agente]
     if (!cfg) continue
-    const res = await agent(`${COMMON}
-<rol>Eres el agente "${a.agente}". Tu spec: docs/agentes/${cfg.file} (léela entera y síguela). Puerto de vista previa: ${cfg.port}. Ronda: ${round}.</rol>
-<round_task>${JSON.stringify(a.tareas, null, 2)}</round_task>
+    let pendientes = a.tareas
+    const intentos = []
+    for (let intento = 1; intento <= MAX_TRIES && pendientes.length; intento++) {
+      const res = await agent(`${COMMON}
+<rol>Eres el agente "${a.agente}". Tu spec: docs/agentes/${cfg.file} (léela entera y síguela). Puerto de vista previa: ${cfg.port}. Ronda: ${round}. Intento: ${intento} de ${MAX_TRIES}.</rol>
+<round_task>${JSON.stringify(pendientes, null, 2)}</round_task>
 <contexto_de_la_ronda>${plan.notas || ''}</contexto_de_la_ronda>
-Trabaja las tareas una por una hasta cerrarlas con medición; actualiza .tmp-audit/agentes/defects.json y progress.md; verifica con npm test y las herramientas de tu área; devuelve el resultado estructurado.`,
-      { label: `${a.agente}:ronda${round}`, phase: 'Construir', schema: WORKER_SCHEMA })
-    roundResults.push({ agente: a.agente, resultado: res })
+${intento > 1 ? `<intento_anterior>Tu intento anterior dejó tareas abiertas. Revisa por qué (no repitas el mismo enfoque): ${clip(intentos.at(-1)?.no_resueltas || [], 4000)}</intento_anterior>` : ''}
+<cierre_obligatorio>
+No respondas con trabajo a medias. Antes de responder, autoevalúate con esta lista y corrige lo que falle (y vuelve a medir) hasta que todo cumpla:
+1. Cada tarea tiene su medición antes y después con la herramienta indicada en «como_medir», y el resultado cumple el criterio de la rúbrica.
+2. npm test, npm run test:design, npm run tokens:check y npm run test:browser están en verde (si algo falla por tu cambio, arréglalo; si es un falso positivo documentado en el contexto compartido, dilo con evidencia).
+3. No quedan archivos temporales, procesos ni puertos abiertos tuyos; git status solo muestra cambios que pertenecen a tus tareas.
+4. DESIGN.md, AGENTS.md y los comentarios que describían lo que cambiaste reflejan lo nuevo.
+5. Verificaste en navegador (capturas a 390 y 1280 px) todo cambio visible, y miraste las imágenes.
+Si una tarea es realmente imposible o exige una decisión de Aldo, no la dejes en silencio: declárala en no_resueltas con lo intentado, la medición y qué decisión falta. Rellena «autoevaluacion» con cada punto y su evidencia; «todas_cerradas» solo es verdadero si cada tarea de esta lista quedó cerrada con medición.
+</cierre_obligatorio>
+Trabaja las tareas una por una hasta cerrarlas; actualiza .tmp-audit/agentes/defects.json y progress.md; devuelve el resultado estructurado.`,
+        { label: `${a.agente}:ronda${round}.${intento}`, phase: 'Construir', schema: WORKER_SCHEMA })
+      intentos.push(res || { no_resueltas: pendientes.map(t => ({ id_defecto: idOf(t), por_que: 'el agente no devolvió resultado' })), hechas: [], autoevaluacion: { todas_cerradas: false, checklist: [] } })
+      const r = intentos.at(-1)
+      const hechas = new Set((r.hechas || []).map(h => h.id_defecto))
+      const abiertas = new Set((r.no_resueltas || []).map(h => h.id_defecto))
+      pendientes = pendientes.filter(t => !hechas.has(idOf(t)) || abiertas.has(idOf(t))).filter(() => true)
+      if (!pendientes.length && !(r.autoevaluacion && r.autoevaluacion.todas_cerradas)) pendientes = a.tareas.filter(t => abiertas.has(idOf(t))) // dice no estar cerrado: se revisa
+      log(`${a.agente} ronda ${round} intento ${intento}: ${(r.hechas || []).length} hechas, ${pendientes.length} abiertas`)
+    }
+    roundResults.push({
+      agente: a.agente,
+      intentos: intentos.length,
+      abandonadas: pendientes.map(t => ({ id_defecto: idOf(t), por_que: (intentos.at(-1)?.no_resueltas || []).find(x => x.id_defecto === idOf(t))?.por_que || 'sin cerrar tras los intentos permitidos' })),
+      resultado: { hechas: intentos.flatMap(i => i.hechas || []), no_resueltas: intentos.at(-1)?.no_resueltas || [], riesgos: intentos.flatMap(i => i.riesgos || []) }
+    })
   }
-  history[history.length - 1].trabajo = roundResults.map(r => ({ agente: r.agente, hechas: (r.resultado?.hechas || []).length, no_resueltas: r.resultado?.no_resueltas || [], riesgos: r.resultado?.riesgos || [] }))
+  history[history.length - 1].trabajo = roundResults.map(r => ({ agente: r.agente, intentos: r.intentos, hechas: (r.resultado?.hechas || []).length, abandonadas: r.abandonadas, riesgos: r.resultado?.riesgos || [] }))
 
   // --- Verificar: solo lectura, en paralelo ---
   phase('Verificar')

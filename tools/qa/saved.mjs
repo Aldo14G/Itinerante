@@ -56,10 +56,48 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   ck(name + ': guardar persiste en el dispositivo y actualiza etiquetas, aviso y conteo', sv.ls === 2 && sv.pressed === 2 && /^Quitar «/.test(sv.label) && sv.toast === true && /Ver mi lista/.test(sv.toastText) && sv.count === '2 libros', JSON.stringify(sv));
   if (!mobile) ck('escritorio: el chip de la cabecera aparece con el conteo', sv.badge === true && (await ev(`document.querySelector('.hdr-list [data-saved-n]').textContent`)) === '2');
 
+  // Indicador persistente (U03): con 3 libros guardados el chip de la cabecera se ve sin abrir el menú, con objetivo >= 44 px y nombre accesible con el conteo.
+  await ev(`document.querySelectorAll('[data-rail] .save')[2].click()`); await sleep(600);
+  const chipState = () => ev(`(() => { const b = document.querySelector('.hdr-list'); const r = b.getBoundingClientRect(); const cs = getComputedStyle(b); return { hidden: b.hidden, display: cs.display, vis: cs.visibility, w: Math.round(r.width), h: Math.round(r.height), n: b.querySelector('[data-saved-n]').textContent, label: b.getAttribute('aria-label'), inView: r.width > 0 && r.top >= 0 && r.bottom <= innerHeight && r.right <= innerWidth, menuOpen: document.getElementById('sheet-menu').open }; })()`);
+  // La cabecera se esconde al bajar y vuelve al subir: se sube con la rueda, como lo haría la persona.
+  for (let i = 0; i < 12 && (await ev(`document.querySelector('[data-hdr]').classList.contains('is-hidden')`)); i++) { await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: w / 2, y: h / 2, deltaX: 0, deltaY: -160 }); await sleep(120); }
+  await sleep(600);
+  const c3 = await chipState();
+  ck(name + ': con 3 guardados el chip de la cabecera se ve sin abrir el menú, >=44px y con nombre "Mi lista, 3 libros"', !c3.hidden && c3.display !== 'none' && c3.vis === 'visible' && c3.inView && c3.w >= 44 && c3.h >= 44 && c3.n === '3' && c3.label === 'Mi lista, 3 libros' && !c3.menuOpen, JSON.stringify(c3));
+  const shotChip = await send('Page.captureScreenshot', { format: 'png', clip: { x: 0, y: await ev('scrollY'), width: w, height: Math.min(h, 180), scale: 2 } }); // el clip va en coordenadas de documento
+  writeFileSync(`saved-chip-${name}.png`, Buffer.from(shotChip.result.data, 'base64'));
+  await ev(`document.querySelectorAll('[data-rail] .save')[2].click()`); await sleep(600);
+  const c2 = await chipState();
+  ck(name + ': quitar uno actualiza el conteo del chip ("Mi lista, 2 libros")', !c2.hidden && c2.n === '2' && c2.label === 'Mi lista, 2 libros', JSON.stringify(c2));
+
   // persistencia al recargar
   await send('Page.navigate', { url: URL_ });
   await sleep(4500);
   ck(name + ': la lista sobrevive a recargar', (await ev(`JSON.parse(localStorage.getItem('iti-saved-v1') || '[]').length`)) === 2 && (await ev(`document.querySelector('#sheet-menu [data-saved-count]')?.textContent`)) === '2 libros');
+
+  // el chip de la cabecera abre Mi lista con un clic real, Escape la cierra y devuelve el foco al chip
+  const chipPos = await ev(`(() => { const r = document.querySelector('.hdr-list').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
+  await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: chipPos[0], y: chipPos[1], button: 'left', clickCount: 1 });
+  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: chipPos[0], y: chipPos[1], button: 'left', clickCount: 1 });
+  await sleep(1500);
+  const viaChip = await ev(`(() => ({ open: document.getElementById('mylist').open, modal: document.getElementById('mylist').matches(':modal'), items: document.querySelectorAll('#mylist .ml-item').length, lock: document.documentElement.classList.contains('sheet-open') }))()`);
+  ck(name + ': el chip abre Mi lista como hoja modal con 2 libros', viaChip.open && viaChip.modal && viaChip.items === 2 && viaChip.lock, JSON.stringify(viaChip));
+  await key('Escape', 'Escape', 27); await sleep(900);
+  const afterChip = await ev(`({ open: document.getElementById('mylist').open, lock: document.documentElement.classList.contains('sheet-open'), focus: document.activeElement.className })`);
+  ck(name + ': Escape cierra, libera el scroll y devuelve el foco al chip', !afterChip.open && !afterChip.lock && /hdr-list/.test(afterChip.focus), JSON.stringify(afterChip));
+
+  if (mobile) {
+    // Girar el teléfono (o agrandar la ventana) con la hoja abierta: Escape debe seguir cerrándola y el explorador en línea vuelve después.
+    await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: chipPos[0], y: chipPos[1], button: 'left', clickCount: 1 });
+    await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: chipPos[0], y: chipPos[1], button: 'left', clickCount: 1 });
+    await sleep(1200);
+    await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false }); await sleep(900);
+    const wide = await ev(`({ list: document.getElementById('mylist').open, explorerOpen: document.getElementById('explorer').open })`);
+    await key('Escape', 'Escape', 27); await sleep(900);
+    const wide2 = await ev(`({ list: document.getElementById('mylist').open, lock: document.documentElement.classList.contains('sheet-open'), explorerOpen: document.getElementById('explorer').open, explorerModal: document.getElementById('explorer').matches(':modal') })`);
+    ck(name + ': Mi lista abierta + cambiar a ancho de escritorio: Escape la cierra, libera el scroll y el explorador queda en línea', wide.list && !wide.explorerOpen && !wide2.list && !wide2.lock && wide2.explorerOpen && !wide2.explorerModal, JSON.stringify({ wide, wide2 }));
+    await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: true }); await sleep(900);
+  }
 
   // abrir Mi lista desde el aviso o el menú
   if (mobile) { await ev(`document.querySelector('.hdr-more').click()`); await sleep(800); await ev(`document.querySelector('#sheet-menu [data-open-mylist]').click()`); }
@@ -78,6 +116,8 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   await ev(`document.querySelector('[data-ml-remove]').click()`); await sleep(800);
   const empty = await ev(`(() => ({ empty: !document.querySelector('[data-ml-empty]').hidden, waHidden: document.querySelector('[data-ml-wa]').hidden }))()`);
   ck(name + ': lista vacía muestra el estado vacío y oculta WhatsApp', empty.empty && empty.waHidden, JSON.stringify(empty));
+  const c0 = await ev(`(() => { const b = document.querySelector('.hdr-list'); return { hidden: b.hidden, display: getComputedStyle(b).display }; })()`);
+  ck(name + ': con 0 guardados el chip de la cabecera desaparece', c0.hidden && c0.display === 'none', JSON.stringify(c0));
   await key('Escape', 'Escape', 27); await sleep(700);
   ck(name + ': Escape cierra y libera el scroll', (await ev(`!document.getElementById('mylist').open && !document.documentElement.classList.contains('sheet-open')`)));
 

@@ -30,16 +30,13 @@ export function bookCard(b, tone = coverTone(b)) {
   const cover = make('span', `cover cover--blank tone-${tone}`);
   cover.dataset.coverTone = tone;
   cover.dataset.coverLayout = coverLayout(b);
-  const title = make('span', 'cover-title', b.t);
-  const author = make('span', 'cover-author', b.a);
-  title.setAttribute('aria-hidden', 'true');
-  author.setAttribute('aria-hidden', 'true');
-  cover.append(title, author);
+  // Título y autor van una sola vez, dentro de la portada; son también el nombre accesible del botón.
+  cover.append(make('span', 'cover-title', b.t), make('span', 'cover-author', b.a));
   const btn = make('button', 'card');
   btn.type = 'button';
   btn.dataset.id = b.id;
   btn.setAttribute('aria-haspopup', 'dialog');
-  btn.append(cover, make('span', 'card-t', b.t), make('span', 'card-a', b.a));
+  btn.append(cover);
   const li = make('li', 'rail-item');
   li.append(btn, saveButton(b));
   return li;
@@ -123,8 +120,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     track.removeAttribute('aria-busy');
     viewport.scrollTo({ left: 0, behavior: 'auto' });
     viewport.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
-    noteEl.textContent = col.nota || '';
-    noteEl.hidden = !col.nota;
+    noteEl.textContent = col.nota || ''; // la nota de la colección va aparte: el rótulo de muestra es fijo (vive en el marcado) y nunca se toca
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`;
     if (cards.length > FIRST_CHUNK) {
       if (!immediate) await afterPaint();
@@ -154,6 +150,14 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   });
   chipsEl.addEventListener('focusin', e => { // un solo punto de tabulación: la colección activa
     chipsEl.querySelectorAll('.rail-chip').forEach(c => { c.tabIndex = c === e.target ? 0 : -1; });
+  });
+
+  // Elegir un tema en «Pregúntanos» marca la colección equivalente (`tema` en collections.json): una sola taxonomía a la vista, no dos sin relación.
+  // Sin colección para ese tema no pasa nada, y si la colección visible ya es de ese tema se queda como está. Sin aviso: la persona está en la consulta.
+  document.addEventListener('iti:topic', e => {
+    const tema = e.detail?.tema;
+    const col = cols.find(c => c.tema === tema);
+    if (col && cols.find(c => c.id === current)?.tema !== tema) show(col.id, false);
   });
 
   prev.addEventListener('click', () => go(-1));

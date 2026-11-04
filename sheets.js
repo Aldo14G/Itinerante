@@ -61,20 +61,40 @@ export function pushSheet({ close, lock: cls = 'sheet-open', url = '', dlg = nul
 // Abre un <dialog> como modal y lo registra. Se libera solo con su evento `close` (Escape, botón, fondo, atrás).
 // Ocultar el fondo (content-visibility) mientras la hoja está abierta se midió con CPU 4x en el teléfono emulado, alternando
 // con y sin ocultarlo: abrir→pintar 108 ms frente a 90 ms y cerrar 118 frente a 121 ms. No ayudaba, así que no se hace.
-export function openDialog(dlg, opts = {}) {
+// `defer`: la hoja abre en dos tareas. showModal() vuelve inerte toda la página (recalcula el estilo de ~600 elementos) y,
+// si el contenido ya está maquetado, el enfoque obliga además a calcular su diseño en esa misma tarea: con CPU 4x sumaban
+// 180-280 ms seguidos. Con `defer` el contenido espera (`is-filling`, content-visibility: hidden) y se muestra tras el
+// siguiente fotograma, de modo que cada tarea queda por debajo de 200 ms. La promesa se resuelve con el contenido ya
+// visible: lo que dependa de que sea enfocable (llevar el foco dentro) va después de ella.
+export function openDialog(dlg, { defer = false, ...opts } = {}) {
+  if (defer) dlg.classList.add('is-filling');
   dlg.showModal();
   const release = pushSheet({ ...opts, dlg, close: () => dlg.close() });
   // En captura: corre antes que los `close` de cada hoja, que enfocan cosas.
   dlg.addEventListener('close', release, { once: true, capture: true });
+  return defer ? afterPaint(() => dlg.classList.remove('is-filling')) : Promise.resolve();
 }
 
-// Cierre desde un botón: la hoja empieza a salir en el siguiente fotograma (clase `is-closing`, mismo destino que el estado
-// cerrado) y el cierre real —que vuelve a activar toda la página detrás y cuesta cientos de ms en gama media— corre después.
-// Escape, «atrás» y el fondo siguen cerrando de inmediato por su propio camino.
+// Cierre desde un botón, en tres tiempos para que ninguna tarea pase de ~100 ms con CPU 4x:
+//  1. La hoja empieza a salir en el siguiente fotograma (clase `is-closing`, mismo destino que el estado cerrado).
+//  2. Cuando terminó de salir (ya no se ve), su contenido se omite (`is-filling`, content-visibility: hidden). Cerrar con
+//     la rejilla de Explorar (~340 elementos) montada costaba 170-320 ms de una sola tarea; con el contenido omitido,
+//     60-160 ms: close() ya no tiene que desmontar ese diseño además de reactivar la página.
+//  3. Un fotograma después corre el cierre real, que vuelve a activar toda la página detrás (cientos de ms en gama media).
+// Escape, «atrás» y el fondo de las hojas siguen cerrando de inmediato por su propio camino. Si la hoja se cierra por otra
+// vía mientras tanto, el evento `close` limpia las clases y los pasos pendientes no hacen nada.
 export function closeDialog(dlg) {
   if (!dlg.open || dlg.classList.contains('is-closing')) return;
   dlg.classList.add('is-closing');
-  afterPaint(() => { if (dlg.open) dlg.close(); dlg.classList.remove('is-closing'); });
+  let live = true;
+  dlg.addEventListener('close', () => { live = false; dlg.classList.remove('is-closing', 'is-filling'); }, { once: true });
+  const exited = () => Promise.race([
+    Promise.allSettled(dlg.getAnimations().map(a => a.finished)), // la salida y, con movimiento reducido, su fundido instantáneo
+    new Promise(resolve => setTimeout(resolve, DUR('base'))), // respaldo: una animación que no termina no debe dejar la hoja abierta
+  ]);
+  afterPaint(exited)
+    .then(() => { if (!live) return; if (dlg.matches(':modal')) dlg.classList.add('is-filling'); return afterPaint(); })
+    .then(() => { if (live && dlg.open) dlg.close(); });
 }
 
 // Una hoja cuyo enlace lleva a una sección del mismo documento reutiliza su entrada de historial como entrada del destino

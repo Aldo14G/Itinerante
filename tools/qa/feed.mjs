@@ -2,7 +2,7 @@
 // node feed.mjs <url> [outDir]   Sale con código ≠ 0 si algo falla.
 //  1. Primera vista (390x844): perfil (nombre, estado, dirección, «Cómo llegar» como única acción de contacto) y ≥ 3 destacados visibles; ≤ 6 acciones visibles en 390x844, 360x740 y 375x667 (U02/D11); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
 //  2. Cada destacado abre una historia: modal, foco en el cierre, rótulo de procedencia en cada foto, flechas, Escape y «atrás» cierran, el foco vuelve.
-//  3. Cartelera como publicaciones: «Me interesa» (aria-pressed, persistente) y «Compartir» (Web Share y respaldo de copiar) de ≥ 44 px.
+//  3. Cartelera como publicaciones: encabezado → foto → acciones → texto (DOM y pantalla), «Me interesa» (aria-pressed, persistente) y «Compartir» (Web Share y respaldo de copiar) de ≥ 44 px, con nombre accesible propio.
 //  4. Novedades: sin datos no queda ningún nodo visible ni espacio; con ids se pinta con el rótulo de muestra.
 //  5. Barrido de acciones primarias en 390x844 y 1280x800: a lo sumo una por pantalla, siempre «Cómo llegar», y ningún WhatsApp mayor que ella.
 import { spawn } from 'node:child_process';
@@ -143,6 +143,17 @@ const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => {
   const rect = e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
   return { id: it.dataset.id, photo: !!q('.bill-card-img'), tag: q('.bill-card-cap .tag')?.textContent, title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim() }; })`);
 check('cartelera', '3 publicaciones con foto, rótulo, título, «Me interesa» y «Compartir» de ≥ 44 px', posts.length === 3 && posts.every(p => p.photo && /^(Recreación IA|Foto real)$/.test(p.tag) && p.title && p.iTxt === 'Me interesa' && p.sTxt === 'Compartir' && p.interest[1] >= 44 && p.interest[0] >= 44 && p.share[1] >= 44 && p.share[0] >= 44 && p.pressed === 'false'), JSON.stringify(posts));
+// Publicación reconocible (CR-13): encabezado → foto → acciones → texto, tanto en el DOM como en la pantalla; el título se ve una sola vez.
+const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-post-head', '.bill-card-img', '.bill-acts', '.bill-cap', '.bill-detail > p'].map(q);
+  const dom = els.every((e, i) => e && (i === 0 || (els[i - 1].compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)));
+  const tops = els.map(e => e ? Math.round(e.getBoundingClientRect().top) : null); const vis = tops.every((t, i) => t !== null && (i === 0 || t >= tops[i - 1]));
+  return { id: it.dataset.id, dom, vis, tops, who: q('.bill-post-who')?.textContent.trim(), once: [...it.querySelectorAll('.bill-title, .bill-cap-t')].filter(e => e.getBoundingClientRect().height > 0).length }; })`);
+check('cartelera', 'orden del DOM y de la pantalla: encabezado → foto → acciones → texto; «Itinerante · propuesta»; el título se ve una sola vez', order.length === 3 && order.every(o => o.dom && o.vis && o.who === 'Itinerante · propuesta' && o.once === 1), JSON.stringify(order));
+// Nombres accesibles (árbol de accesibilidad del navegador): los tres «Compartir» y los tres «Me interesa» llevan el título de su publicación.
+await send('Accessibility.enable');
+const ax = (await send('Accessibility.getFullAXTree')).result.nodes.filter(n => n.role?.value === 'button' && /^(Compartir|Me interesa)/.test(n.name?.value || '')).map(n => n.name.value);
+const shareNames = ax.filter(n => n.startsWith('Compartir')), likeNames = ax.filter(n => n.startsWith('Me interesa'));
+check('cartelera', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos que llevan el título (y 3 «Me interesa» igual)', shareNames.length === 3 && new Set(shareNames).size === 3 && shareNames.every(n => /^Compartir «.+»$/.test(n)) && likeNames.length === 3 && new Set(likeNames).size === 3, JSON.stringify(ax));
 await ev(`document.querySelector('.bill-item').scrollIntoView({block:'start'}); scrollBy(0, 120)`); await sleep(600);
 await shot('03-cartelera-publicacion.jpg');
 await clickSel('[data-interest]', 0); await sleep(500);

@@ -10,10 +10,11 @@ export { loadSample };
 export const PAGE_SIZE = 24;
 export const WA_NUMBER = '528180875940';
 
-// Tono de portada: ficción en la familia cálida (terracota, ámbar, ciruela) y no ficción en la fría
-// (turquesa, piedra, azul). Dentro de la familia el tono sale del título (hash estable, FNV-1a), no del género:
-// una colección suele ser de un solo género y así sus portadas no salen todas del mismo color.
-const TONES = { fiction: [1, 2, 5], 'non-fiction': [0, 3, 4] };
+// Tono de portada: ficción en la familia cálida (terracota, ámbar, cacao, crema y yeso rosado) y no ficción en la fría
+// (turquesa oscuro, piedra, azul, arena y turquesa apagado). Cada familia mezcla portadas oscuras y claras (tonos 6 a 9: tinta
+// oscura propia, `--cover-N-ink`) para que una fila no sea un muro de marrones. Dentro de la familia el tono sale del título
+// (hash estable, FNV-1a), no del género: una colección suele ser de un solo género y así sus portadas no salen todas del mismo color.
+export const TONES = { fiction: [1, 2, 5, 6, 9], 'non-fiction': [0, 3, 4, 7, 8] };
 const titleHash = book => {
   let h = 2166136261;
   for (const ch of String(book.t ?? '')) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
@@ -24,19 +25,24 @@ export function coverTone(book) {
   return family[titleHash(book) % family.length];
 }
 
-// Tonos de una lista (una colección del carrusel, Novedades): parte de coverTone, pero sin dos vecinas del mismo tono
-// y sin que un tono pase de ⌈n/3⌉ + 1 (5 de 12). Es determinista: el mismo libro da el mismo tono siempre que la lista sea la misma.
+// Tonos de una lista (una colección del carrusel, Novedades, la rejilla): parte de coverTone, pero sin dos vecinas del mismo tono,
+// sin repetir el de la anterior a la anterior (nada de patrones A-B-A) mientras quede otra opción, y sin que un tono pase de ⌈n/familia⌉ + 1
+// (4 de 12). Cada libro recorre su familia desde su tono propio y con un salto propio, así el reparto sigue al título y no cae en un ciclo fijo.
+// Es determinista: el mismo libro da el mismo tono siempre que la lista sea la misma.
 // La ficha no recalcula: usa el tono de la tarjeta que se pulsó (data-cover-tone).
 export function coverTones(books) {
-  const cap = Math.ceil(books.length / 3) + 1;
   const used = new Map();
-  let prev = -1;
+  let prev = -1, prev2 = -1;
   return books.map(book => {
     const family = TONES[book.k] ?? TONES['non-fiction'];
+    const cap = Math.ceil(books.length / family.length) + 1;
     const start = family.indexOf(coverTone(book));
-    const order = family.map((_, i) => family[(start + i) % family.length]);
-    const tone = order.find(t => t !== prev && (used.get(t) ?? 0) < cap) ?? order.find(t => t !== prev);
+    const step = 1 + (titleHash(book) >>> 9) % (family.length - 1); // el salto también sale del título: dos libros con el mismo tono propio no toman la misma alternativa
+    const order = family.map((_, i) => family[(start + i * step) % family.length]);
+    const free = t => (used.get(t) ?? 0) < cap;
+    const tone = order.find(t => t !== prev && t !== prev2 && free(t)) ?? order.find(t => t !== prev && free(t)) ?? order.find(t => t !== prev);
     used.set(tone, (used.get(tone) ?? 0) + 1);
+    prev2 = prev;
     prev = tone;
     return tone;
   });
@@ -52,6 +58,61 @@ export const coverLayout = book => (titleHash(book) >>> 11) % COVER_LAYOUTS;
 const CATEGORY_ES = { fiction: 'Ficción', 'non-fiction': 'No ficción' };
 const FORMAT_ES = { 'Libro electronico': 'Libro electrónico', 'Board Book': 'Libro de cartón' };
 export const formatLabel = f => FORMAT_ES[f] || f;
+
+// Géneros de la muestra en español, por el id estable del subgénero (la verdad del dato, catalog.json, sigue en inglés y no se toca:
+// esto es solo la capa de presentación). Un id sin traducción conocida cae al nombre original del dato y, sin él, al id: nada se rompe.
+// Títulos y autores no se traducen nunca.
+export const GENRE_ES = {
+  'fiction-children-s-graphic-novel': 'Novela gráfica infantil',
+  'fiction-children-s-picture-book': 'Libro ilustrado infantil',
+  'fiction-climate-fiction': 'Ficción climática',
+  'fiction-contemporary-romance': 'Romance contemporáneo',
+  'fiction-cozy-mystery': 'Misterio acogedor',
+  'fiction-crime-detective': 'Novela negra y de detectives',
+  'fiction-dark-romance': 'Romance oscuro',
+  'fiction-fantasy': 'Fantasía',
+  'fiction-graphic-novel': 'Novela gráfica',
+  'fiction-historical-fiction': 'Novela histórica',
+  'fiction-horror': 'Terror',
+  'fiction-literary-fiction': 'Narrativa literaria',
+  'fiction-middle-grade': 'Para preadolescentes',
+  'fiction-paranormal-romance': 'Romance paranormal',
+  'fiction-psychological-thriller': 'Suspenso psicológico',
+  'fiction-romantasy': 'Romance y fantasía',
+  'fiction-science-fiction': 'Ciencia ficción',
+  'fiction-space-opera': 'Ópera espacial',
+  'fiction-urban-fantasy': 'Fantasía urbana',
+  'fiction-ya-dystopian': 'Distopía juvenil',
+  'fiction-ya-romance': 'Romance juvenil',
+  'non-fiction-activity-coloring': 'Actividades y colorear',
+  'non-fiction-art-activity': 'Arte y actividades',
+  'non-fiction-biography': 'Biografía',
+  'non-fiction-business-finance': 'Negocios y finanzas',
+  'non-fiction-business-leadership': 'Negocios y liderazgo',
+  'non-fiction-business-psychology': 'Negocios y psicología',
+  'non-fiction-celebrity-memoir': 'Memorias de famosos',
+  'non-fiction-cooking-food': 'Cocina y alimentos',
+  'non-fiction-creativity-art': 'Creatividad y arte',
+  'non-fiction-gift-journal': 'Regalo y diarios',
+  'non-fiction-health-longevity': 'Salud y longevidad',
+  'non-fiction-history': 'Historia',
+  'non-fiction-history-adventure': 'Historia y aventura',
+  'non-fiction-memoir': 'Memorias',
+  'non-fiction-parenting': 'Crianza',
+  'non-fiction-personal-finance': 'Finanzas personales',
+  'non-fiction-politics-society': 'Política y sociedad',
+  'non-fiction-productivity': 'Productividad',
+  'non-fiction-psychology-health': 'Psicología y salud',
+  'non-fiction-psychology-society': 'Psicología y sociedad',
+  'non-fiction-science-nature': 'Ciencia y naturaleza',
+  'non-fiction-self-help': 'Superación personal',
+  'non-fiction-self-help-memoir': 'Superación y memorias',
+  'non-fiction-self-help-productivity': 'Superación y productividad',
+  'non-fiction-spirituality-religion': 'Espiritualidad y religión',
+  'non-fiction-true-crime': 'Crimen real',
+  'non-fiction-true-crime-history': 'Crimen real e historia'
+};
+export const genreLabel = (id, original) => (Object.hasOwn(GENRE_ES, id) ? GENRE_ES[id] : original || id);
 
 export const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
@@ -195,7 +256,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   const state = { q: '', k: new Set(), g: new Set(), f: new Set(), p: new Set(), sort: 'az', shown: PAGE_SIZE, expandG: false };
   const names = {
     k: id => CATEGORY_ES[id] || data.categories[id] || id,
-    g: id => data.subgenres[id]?.n || id,
+    g: id => genreLabel(id, data.subgenres[id]?.n),
     f: formatLabel,
     p: id => id,
   };
@@ -250,31 +311,36 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (chips.length > 1) chipsEl.append(el('li', {}, el('button', { type: 'button', class: 'cat-clear', 'data-clear': '' }, 'Limpiar todo')));
     chipsEl.hidden = !chips.length;
     const n = state.k.size + state.g.size + state.f.size + state.p.size;
-    $('[data-cat-filters-count]', root).textContent = `${n ? `(${n}) · ` : ''}${results.length}`;
+    // «Filtros» a secas hasta que haya filtros puestos; entonces, cuántos (nunca el total de la muestra: «Filtros 500» se leía como 500 filtros).
+    $('[data-cat-filters-count]', root).textContent = n ? String(n) : '';
+    filtersBtn.setAttribute('aria-label', n ? `Filtros, ${n} ${n === 1 ? 'activo' : 'activos'}` : 'Filtros');
   }
 
   // ----- rejilla -----
   // Una sola familia de portadas: tarjeta tipográfica propia (sin imágenes de terceros ni SVG heterogéneos).
-  function cover(b, tone = coverTone(b), layout = true) {
-    return blankCover(b, tone, layout);
+  // Título y autor van una sola vez, dentro de la portada: en la tarjeta de la rejilla son el nombre accesible del botón;
+  // en la ficha y en «Relacionados» ya hay un encabezado aparte y la portada los oculta a los lectores de pantalla.
+  function cover(b, tone = coverTone(b), layout = true, named = false) {
+    return blankCover(b, tone, layout, named);
   }
-  function blankCover(b, tone, layout) {
+  function blankCover(b, tone, layout, named) {
     const attrs = { class: `cover cover--blank tone-${tone}`, 'data-cover-tone': tone };
     if (layout) attrs['data-cover-layout'] = coverLayout(b);
-    return el('span', attrs, el('span', { class: 'cover-title', 'aria-hidden': 'true' }, b.t), el('span', { class: 'cover-author', 'aria-hidden': 'true' }, b.a));
+    const hidden = named ? {} : { 'aria-hidden': 'true' };
+    return el('span', attrs, el('span', { class: 'cover-title', ...hidden }, b.t), el('span', { class: 'cover-author', ...hidden }, b.a));
   }
 
   function card(b) {
-    const btn = el('button', { type: 'button', class: 'card', 'data-id': b.id, 'aria-haspopup': 'dialog' },
-      cover(b),
-      el('span', { class: 'card-t' }, b.t),
-      el('span', { class: 'card-a' }, b.a));
+    const btn = el('button', { type: 'button', class: 'card', 'data-id': b.id, 'aria-haspopup': 'dialog' }, cover(b, tones.get(b.id), true, true));
     return el('li', { class: 'card-item' }, btn, saveButton(b));
   }
 
   let results = [];
+  let tones = new Map(); // tono de cada resultado según su lugar en la lista (coverTones): vecinas distintas en la rejilla
   function compute() {
     results = sortBooks(filterBooks(books, state), state.sort === 'rel' && !state.q ? 'az' : state.sort, state.q);
+    const list = coverTones(results);
+    tones = new Map(results.map((b, i) => [b.id, list[i]]));
   }
 
   function renderGrid({ append = false, animate = true } = {}) {
@@ -430,9 +496,14 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     drawer.dataset.book = id;
     bindSaveButton($('[data-d-save]', drawer), b);
     if (trigger) drawer.dataset.trigger = trigger;
-    if (!drawer.open) openDialog(drawer);
+    const fresh = !drawer.open;
+    const shown = fresh ? openDialog(drawer, { defer: true }) : Promise.resolve(); // el contenido se maqueta en otra tarea (ver openDialog)
     drawer.scrollTop = 0;
     $('[data-d-scroll]', drawer).scrollTop = 0;
+    if (fresh) shown.then(() => {
+      $('[data-d-scroll]', drawer).scrollTop = 0;
+      if (drawer.open && document.activeElement === drawer) $('[data-d-close]', drawer).focus({ preventScroll: true }); // el foco entra como antes: al botón de cerrar
+    });
   }
   grid.addEventListener('click', e => {
     const c = e.target.closest('.card');
@@ -483,12 +554,12 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (!(img instanceof HTMLImageElement) || !img.closest('.cover') || img.dataset.failed) return;
     img.dataset.failed = '1';
     const holder = img.closest('.cover');
-    const title = holder.closest('.card, .rel, dialog')?.querySelector('.card-t, .rel span, [data-d-title]')?.textContent || '';
+    const title = holder.closest('.card, .rel, dialog')?.querySelector('.rel span, [data-d-title]')?.textContent || '';
     holder.classList.add('cover--blank');
     holder.replaceChildren(el('span', { class: 'cover-title', 'aria-hidden': 'true' }, title));
   }, true);
 
-  $('[data-cat-seal]', root).textContent = seal;
+  document.querySelectorAll('[data-cat-seal]').forEach(n => { n.textContent = seal; }); // el sello de la sección y el de la hoja Explorar
   sortEl.value = state.sort;
   root.dataset.state = 'ready';
   // Primero lo que se ve (rejilla y filtros activos); las facetas, que recorren los 500 títulos, esperan a un momento libre.

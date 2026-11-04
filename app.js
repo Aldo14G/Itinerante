@@ -56,9 +56,13 @@ export function openingStatus({ day, mins }) {
   return { open: false, short: `Cerrado · abre ${when} 11:00`, long: `Cerrado ahora. Abrimos ${when} a las 11:00.` };
 }
 
+// El arranque se reparte en tareas cortas (cada tramo por debajo de ~50 ms con CPU 4×): entre una y otra el navegador puede
+// pintar y atender un toque. El orden de los tramos es el de siempre; nada depende de que boot() termine de una vez.
+const yieldNow = () => (globalThis.scheduler?.yield ? globalThis.scheduler.yield() : new Promise(r => setTimeout(r)));
+
 if (typeof document !== 'undefined') boot();
 
-function boot() {
+async function boot() {
   const root = document.documentElement;
   const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
   const fineMq = matchMedia('(hover: hover) and (pointer: fine)');
@@ -147,7 +151,8 @@ function boot() {
     $$('[data-status-long]').forEach(el => { el.textContent = st.long; });
     $$('.hours tr').forEach(tr => tr.classList.toggle('is-today', tr.dataset.days.split(' ').includes(String(now.day))));
   }
-  updateStatus();
+  // El HTML ya trae el horario habitual; la hora de Monterrey (Intl con zona horaria cuesta ~50 ms de CPU la primera vez) se calcula en reposo.
+  (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(updateStatus, { timeout: 2000 });
   setInterval(updateStatus, 60_000);
 
   // ---------- Scenes ----------
@@ -168,8 +173,7 @@ function boot() {
         if (full) full.measure();
       },
       tick(dt, y) { return full ? full.tick(dt, y) : false; },
-      reset() { if (full) full.reset(); },
-      fitOnly() { fitWord(word, chars); }
+      reset() { if (full) full.reset(); }
     };
   }
 
@@ -178,18 +182,26 @@ function boot() {
     const text = $('[data-words]', sec);
     const words = splitWords(text);
     const drifts = $$('[data-drift]', sec).map(el => ({ el, amt: Number(el.dataset.drift) }));
-    let top = 0, h = 1, start = 0, end = 1, lit = -1;
+    let top = 0, h = 1, start = 0, end = 1, lit = -1, inner = false;
+    // Las medidas del texto (descendiente) solo hacen falta con la sección a la vista: pedirlas antes obliga al navegador a
+    // maquetar un subárbol que `content-visibility: auto` (móvil) se salta. Aquí solo se mide la sección.
+    const measureInner = () => {
+      const tTop = absTop(text);
+      start = tTop - vh * 0.85;
+      end = tTop + text.offsetHeight - vh * 0.42;
+      lit = -1;
+      inner = true;
+    };
     return {
       measure() {
         top = absTop(sec);
         h = sec.offsetHeight;
-        const tTop = absTop(text);
-        start = tTop - vh * 0.85;
-        end = tTop + text.offsetHeight - vh * 0.42;
-        lit = -1;
+        inner = false;
+        if (scrollY + vh >= top && scrollY <= top + h) measureInner();
       },
       tick(dt, y) {
         if (!isMotion() || y + vh < top || y > top + h) return false;
+        if (!inner) measureInner();
         const n = Math.round(clamp((y - start) / Math.max(1, end - start)) * words.length);
         if (n !== lit) { words.forEach((w, i) => w.classList.toggle('is-lit', i < n)); lit = n; }
         if (vw > 760) {
@@ -208,7 +220,7 @@ function boot() {
     const stills = $$('.still', track);
     const idxEl = $('[data-house-index]', sec);
     const bar = $('[data-house-bar]', sec);
-    let top = 0, h = 1, dist = 0, sp = 0, pinned = false, centers = [], lastIdx = -1;
+    let top = 0, h = 1, dist = 0, sp = 0, pinned = false, centers = [], lastIdx = -1, inner = false;
 
     const bars = $$('.stories i', sec);
     const setIndex = p => {
@@ -235,11 +247,17 @@ function boot() {
       setIndex(max > 0 ? clamp(track.scrollLeft / max) : 0);
     }, { passive: true });
 
+    // Carrusel suelto (móvil): el índice inicial depende del ancho del carril, que solo se pide con la sección a la vista.
+    const measureLoose = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      setIndex(max > 0 ? clamp(track.scrollLeft / max) : 0);
+      inner = true;
+    };
+
     return {
       measure() {
         pinned = root.classList.contains('pin-house');
         track.tabIndex = pinned ? -1 : 0;
-        if (!pinned) { const max = track.scrollWidth - track.clientWidth; setIndex(max > 0 ? clamp(track.scrollLeft / max) : 0); }
         if (pinned) track.removeAttribute('aria-label'); else track.setAttribute('aria-label', 'Fotografías de la casa, desplázate para ver más');
         track.style.transform = '';
         if (pinned) {
@@ -253,10 +271,14 @@ function boot() {
         }
         top = absTop(sec);
         h = sec.offsetHeight;
-        centers = stills.map(s => s.offsetLeft + s.offsetWidth / 2);
+        // Fijada (escritorio, sin content-visibility) se mide todo; suelta (móvil) la medida del carrusel espera a que la sección se vea.
+        inner = pinned;
+        if (pinned) centers = stills.map(s => s.offsetLeft + s.offsetWidth / 2);
+        else if (scrollY + vh >= top && scrollY <= top + h) measureLoose();
       },
       tick(dt, y) {
-        if (!pinned || y + vh < top || y > top + h) return false;
+        if (!pinned) { if (!inner && y + vh >= top && y <= top + h) measureLoose(); return false; }
+        if (y + vh < top || y > top + h) return false;
         const p = clamp((y - top) / Math.max(1, h - vh));
         sp = damp(sp, p, 9, dt);
         const x = -sp * dist;
@@ -292,15 +314,23 @@ function boot() {
       for (let i = 0; i < 3; i++) row.append(span.cloneNode(true));
       return { row, span, dir: Number(row.dataset.marquee), x: 0, w: 1 };
     });
-    let top = 0, h = 1, sign = 1;
+    let top = 0, h = 1, sign = 1, shown = true, inner = false;
+    const measureInner = () => {
+      rows.forEach(r => { r.w = r.span.offsetWidth || 1; });
+      shown = rows.some(r => r.row.offsetWidth > 0); // en móvil la marquesina no se muestra (mobile.css): no se anima
+      inner = true;
+    };
     return {
       measure() {
         top = absTop(sec);
         h = sec.offsetHeight;
-        rows.forEach(r => { r.w = r.span.offsetWidth || 1; });
+        inner = false; // las filas son descendientes: se miden con la sección a la vista (ver manifestoScene)
+        if (scrollY + vh >= top && scrollY <= top + h) measureInner();
       },
       tick(dt, y) {
         if (!isMotion() || y + vh < top || y > top + h) return false;
+        if (!inner) measureInner();
+        if (!shown) return false;
         if (vel > 30) sign = 1; else if (vel < -30) sign = -1;
         const speed = 48 + Math.min(Math.abs(vel) * 0.32, 900);
         rows.forEach(r => {
@@ -371,6 +401,13 @@ function boot() {
     });
   }
 
+  // ---------- Fotos diferidas ----------
+  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip, .topic-layer, .bill-layer')?.classList.add('is-loaded'); };
+  $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
+  document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
+  document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
+
+  await yieldNow();
   // ---------- Loop ----------
   let raf = 0, lastT = 0, lastY = scrollY, lastScrollAt = 0;
   function loop(t) {
@@ -450,6 +487,7 @@ function boot() {
   });
   reduceMq.addEventListener('change', applyMode);
 
+  await yieldNow();
   // ---------- Reveals ----------
   $$('.h2, .call-title').forEach(splitLines);
   const footMark = $('[data-footmark]');
@@ -468,6 +506,7 @@ function boot() {
     [...$$('[data-reveal], [data-lines], [data-rules]'), footMark].forEach(el => el.classList.add('is-in'));
   }
 
+  await yieldNow();
   // ---------- Menu ----------
   const hdr = $('[data-hdr]');
   const menuBtn = $('.menu-btn');
@@ -505,6 +544,7 @@ function boot() {
   });
   matchMedia('(min-width: 1101px)').addEventListener('change', e => { if (e.matches) setMenu(false); });
 
+  await yieldNow();
   // ---------- Menú móvil (hoja lateral con categorías que se despliegan) ----------
   (function sheetMenu() {
     const dlg = $('#sheet-menu');
@@ -526,9 +566,9 @@ function boot() {
     opener.addEventListener('click', () => {
       if (dlg.open) return;
       opener.setAttribute('aria-expanded', 'true'); // el botón confirma el toque en este fotograma
-      confirmThen(opener, () => { // volver inerte toda la página (showModal) es lo caro: va después de pintar
-        openDialog(dlg);
-        $('[data-sm-close]', dlg).focus({ preventScroll: true });
+      confirmThen(opener, async () => { // volver inerte toda la página (showModal) es lo caro: va después de pintar
+        await openDialog(dlg, { defer: true }); // el contenido se maqueta en otra tarea (ver openDialog)
+        if (dlg.open) $('[data-sm-close]', dlg).focus({ preventScroll: true });
       });
     });
     dlg.addEventListener('close', () => {
@@ -563,6 +603,7 @@ function boot() {
     groups.forEach(g => setGroup(g, false));
   })();
 
+  await yieldNow();
   // ---------- Cartelera ----------
   (function bill() {
     const items = $$('.bill-item');
@@ -630,6 +671,7 @@ function boot() {
     });
   })();
 
+  await yieldNow();
   // ---------- Libros ----------
   (function books() {
     const buttons = $$('.topic');
@@ -679,7 +721,10 @@ function boot() {
       const t = TOPICS[key];
       const my = ++token;
       buttons.forEach(b => { const on = b.dataset.topic === key; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
-      if (!quiet) live.textContent = `${t.name}. ${t.line}`;
+      if (!quiet) {
+        live.textContent = `${t.name}. ${t.line}`;
+        document.dispatchEvent(new CustomEvent('iti:topic', { detail: { tema: key } })); // el carrusel marca la colección equivalente (rail.js)
+      }
 
       const layer = document.createElement('div');
       layer.className = 'topic-layer';
@@ -758,6 +803,7 @@ function boot() {
     form.addEventListener('submit', e => { e.preventDefault(); cta.focus(); });
   })();
 
+  await yieldNow();
   // ---------- Catálogo de muestra (carga al acercarse) ----------
   const catalogSection = $('#catalogo');
   if (catalogSection) {
@@ -777,6 +823,7 @@ function boot() {
     } else bootCatalog();
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
 
+    await yieldNow();
     // Explorar la muestra: en móvil es una hoja a pantalla completa (la rejilla deja de alargar el capítulo);
     // en escritorio el diálogo queda abierto en línea. El botón «atrás» del teléfono cierra la hoja.
     const explorer = $('#explorer');
@@ -787,15 +834,22 @@ function boot() {
       // enfoque del diálogo, que mandan el foco (y el scroll) al campo de búsqueda al cargar la página.
       const settle = () => {
         if (phone.matches) { if (explorer.open && !explorer.matches(':modal')) explorer.close(); }
-        else { if (explorer.matches(':modal')) explorer.close(); explorer.open = true; }
+        else {
+          if (explorer.matches(':modal')) explorer.close();
+          // Con otra hoja modal abierta (p. ej. Mi lista al girar el teléfono), abrir el explorador en línea pondría su vigilante de
+          // cierre por encima y Escape dejaría de cerrar esa hoja: se espera a que se cierre.
+          const over = [...document.querySelectorAll('dialog:modal')].find(d => d !== explorer);
+          if (over) over.addEventListener('close', () => setTimeout(settle, 0), { once: true });
+          else explorer.open = true;
+        }
       };
       const openExplorer = async () => {
         if (!phone.matches || explorer.open || opening) return;
         opening = true;
         try { await bootCatalog(); } finally { opening = false; }
         if (!phone.matches || explorer.open) return;
-        openDialog(explorer, { lock: 'explorer-open', url: '#explorar' }); // bloquea el scroll y empuja la entrada que «atrás» consume
-        $('[data-ex-close]', explorer).focus({ preventScroll: true });
+        await openDialog(explorer, { lock: 'explorer-open', url: '#explorar', defer: true }); // bloquea el scroll y empuja la entrada que «atrás» consume; la rejilla se maqueta en otra tarea (ver openDialog)
+        if (explorer.open) $('[data-ex-close]', explorer).focus({ preventScroll: true });
       };
       // En escritorio el campo solo recibe el foco cuando la persona llega a #catalogo (enlace o URL), nunca al cargar.
       const focusSearch = async () => {
@@ -806,14 +860,14 @@ function boot() {
       settle();
       phone.addEventListener('change', settle);
       explorer.addEventListener('close', () => { if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true }); });
-      $('[data-ex-close]', explorer).addEventListener('click', () => explorer.close());
-      $('[data-ex-open]')?.addEventListener('click', openExplorer);
+      $('[data-ex-close]', explorer).addEventListener('click', () => closeDialog(explorer)); // el cierre real (volver a activar la página) corre después del fotograma
+      $('[data-ex-open]')?.addEventListener('click', e => confirmThen(e.currentTarget, openExplorer)); // confirma el toque; la hoja (lo caro) va después de pintar
       document.addEventListener('iti:open-explorer', openExplorer);
       // Cualquier enlace a la muestra abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href="#catalogo"]');
         if (!a || a.closest('#sheet-menu')) return;
-        if (phone.matches) { e.preventDefault(); openExplorer(); } else focusSearch();
+        if (phone.matches) { e.preventDefault(); confirmThen(a, openExplorer); } else focusSearch();
       });
       addEventListener('hashchange', () => { if (location.hash === '#catalogo') focusSearch(); });
       if (location.hash === '#catalogo') focusSearch();
@@ -821,6 +875,7 @@ function boot() {
       if (phone.matches && location.hash === '#explorar') { history.replaceState(null, '', location.pathname + location.search); openExplorer(); }
     }
 
+    await yieldNow();
     // Carrusel de libros (capa 1 de Libros): se carga al acercarse y pide la ficha al catálogo al elegir un libro.
     const railEl = $('[data-rail]');
     if (railEl) {
@@ -838,6 +893,7 @@ function boot() {
   // ---------- Mi lista para la visita (en reposo: el menú y la cabecera muestran el conteo) ----------
   (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
 
+  await yieldNow();
   // ---------- Perfil y publicaciones (móvil): historias de los destacados, «Me interesa» y «Compartir» ----------
   let feedLoad;
   const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => { feedLoad = undefined; throw err; }));
@@ -864,19 +920,13 @@ function boot() {
     btn.addEventListener('pointerleave', () => { btn.style.removeProperty('--mx'); btn.style.removeProperty('--my'); });
   });
 
-  // ---------- Fotos diferidas ----------
-  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip, .topic-layer, .bill-layer')?.classList.add('is-loaded'); };
-  $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
-  document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
-  document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
-
+  await yieldNow();
   // ---------- Start ----------
   applyMode({ measure: false }); // la primera medición va después de fuentes y póster (abajo)
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const posterReady = $('.entry-poster').decode().catch(() => {});
   Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
-    entry.fitOnly();
-    measureAll();
+    measureAll(); // entry.measure() ajusta el nombre antes de leer nada: un solo ajuste y un solo maquetado
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
   });
   // El nombre gigante del pie solo se ajusta cuando se acerca a la pantalla (cada ajuste fuerza un layout completo).

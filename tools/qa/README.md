@@ -4,7 +4,7 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 
 | Script | Qué comprueba | Falla (código ≠ 0) |
 |---|---|---|
-| `run.mjs` | Levanta su propia vista previa y corre explorer, saved, rail, skeleton y contrast (`npm run test:browser`). | sí |
+| `run.mjs` | Levanta su propia vista previa y corre explorer, saved, rail, skeleton, contrast y ficha (`npm run test:browser`). | sí |
 | `contrast.mjs URL` | Contraste de texto en todos los estados (secciones, menú, acordeones, ficha, Mi lista, Explorar, aviso) y de las portadas. | sí |
 | `skeleton.mjs URL` | Esqueletos del tamaño del contenido y CLS de la carga diferida. | sí |
 | `motion.mjs URL` | Transiciones y animaciones disparadas, duraciones frente a tokens y pasada de movimiento reducido. | informa |
@@ -15,8 +15,9 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 | `e2e.mjs URL DIR` | Auditoría general (desbordes, consola, menú, tonos, barra inferior, cartelera, catálogo, movimiento reducido, rendimiento). | informa |
 | `desk.mjs URL` | Escenas de escritorio frente a móvil (qué módulos se descargan). | informa |
 | `hero.mjs URL [DIR]` | Contraste real del párrafo del hero móvil con muestreo de píxeles (320×640, 360×640, 375×667, 390×844): captura con el texto transparente y compara los píxeles de cada línea con la tinta; `HERO_SELECTORS` cambia qué texto medir. | sí |
-| `feed.mjs URL [DIR]` | Perfil y destacados (≥ 3 visibles), historias (modal, foco, rótulo en cada foto, Escape, atrás), Cartelera como publicaciones («Me interesa» y «Compartir»), Novedades (oculta sin datos, pintada con ids; intercepta `collections.json`) y barrido de acciones primarias en 390×844 y 1280×800. | sí |
+| `feed.mjs URL [DIR]` | Perfil y destacados (≥ 3 visibles), historias (modal, foco, rótulo en cada foto, Escape, atrás), Cartelera como publicaciones (orden encabezado → foto → acciones → texto en el DOM y en pantalla, «Me interesa» y «Compartir» con nombre accesible propio según el árbol de accesibilidad), Novedades (oculta sin datos, pintada con ids; intercepta `collections.json`) y barrido de acciones primarias en 390×844 y 1280×800. | sí |
 | `inp.mjs URL [corridas] [cpu] [ancho] [alto]` | INP con CPU limitada (4× por defecto): clics reales en menú (abrir y cerrar), chip del carrusel, guardar y ficha (abrir y cerrar), en frío y con la página en reposo; muestra tareas largas y, con `INP_DETAIL=1`, el desglose de `long-animation-frame`. | sí (> 200 ms o tarea larga > 200 ms al abrir la ficha) |
+| `ficha.mjs URL [DIR]` | Ficha móvil con clic real en la tarjeta 2 del carrusel a 360×740, 375×667, 320×640 y 390×844: «Cómo llegar» dentro del primer pliegue sin desplazar la hoja, sello literal sin partir, foco inicial y Escape; foco de teclado real en «Foto siguiente» de una historia (indicador de 44 px, sin marco sobre la zona); sin JavaScript (menú oculto, cuatro capítulos alcanzables). | sí |
 | `strip.mjs URL` | Capturas móviles por capítulo (`strip-NN-*.jpg`). | no |
 | `palette.py` / `oklch.py` | Croma de las paredes (fotos) frente a la paleta. | no |
 
