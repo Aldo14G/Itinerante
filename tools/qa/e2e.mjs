@@ -41,7 +41,7 @@ async function open(width, height, { mobile = true, reduced = false } = {}) {
   await sleep(3500);
 }
 
-const overflow = () => ev(`(()=>{const d=document.documentElement; return {sw:d.scrollWidth, cw:d.clientWidth, wide:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(); return r.width>0 && r.right>d.clientWidth+1 && getComputedStyle(e).position!=='absolute' && !e.closest('.bill-track, .rail-viewport, .topics, .house-track, .marquee, .entry-media, .ftr, .wipe, dialog, .tabbar')}).slice(0,4).map(e=>(e.className||e.tagName)+' <'+(e.parentElement&&e.parentElement.className)+'>')}})()`);
+const overflow = () => ev(`(()=>{const d=document.documentElement; return {sw:d.scrollWidth, cw:d.clientWidth, wide:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(); return r.width>0 && r.right>d.clientWidth+1 && getComputedStyle(e).position!=='absolute' && !e.closest('.bill-track, .rail-chips, .rail-viewport, .topics, .house-track, .marquee, .entry-media, .ftr, .wipe, dialog, .tabbar')}).slice(0,4).map(e=>(e.className||e.tagName)+' <'+(e.parentElement&&e.parentElement.className)+'>')}})()`);
 
 // ---------- 1. Desbordes en varios anchos ----------
 for (const [w, h, mobile] of [[360, 740, true], [390, 844, true], [414, 896, true], [768, 1024, true], [1280, 800, false], [1920, 1080, false]]) {
@@ -119,6 +119,8 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
   check('tonos ' + tag, 'sin franjas oscuras fuera del tema (salvo ninguna)', !darkBands.length, JSON.stringify(darkBands));
   const hints = await ev(`[...document.querySelectorAll('a[data-hint]')].filter(a => a.getBoundingClientRect().width > 0).map(a => [a.textContent.trim(), Math.round(a.getBoundingClientRect().width), Math.round(parseFloat(getComputedStyle(a, '::before').width))]).filter(x => x[2] > x[1] + 1)`);
   check('pistas ' + tag, 'ninguna pista es más ancha que su enlace (no pisa al vecino en hover ni con foco)', !hints.length, JSON.stringify(hints));
+  const rule = await ev(`[...document.querySelectorAll('a[data-hint]')].filter(a => a.getBoundingClientRect().width > 0).map(a => [a.textContent.trim(), getComputedStyle(a, '::after').content, getComputedStyle(a.querySelector('span')).backgroundImage, getComputedStyle(a, '::before').backgroundImage]).filter(x => x[1] !== 'none' || !/linear-gradient/.test(x[2]) || !/linear-gradient/.test(x[3]))`);
+  check('pistas ' + tag, 'el filete se pinta sobre la palabra (fondo de etiqueta y pista), no sobre la celda del enlace', !rule.length, JSON.stringify(rule));
 }
 
 // ---------- 4. Barra inferior, cartelera, hero (móvil) ----------

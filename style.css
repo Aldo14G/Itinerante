@@ -191,13 +191,8 @@ p { text-wrap: pretty; }
 .hdr-brand i, .ftr-brand i { font-style: normal; font-weight: 400; font-stretch: 112%; }
 
 .hdr-nav { display: flex; gap: 32px; margin-inline: auto; }
-.hdr-nav a { --pad: calc((var(--target-coarse) - var(--fs-1)) / 2); position: relative; margin-inline: calc(-1 * var(--space-1)); padding: var(--pad) var(--space-1); text-decoration: none; font: 620 var(--fs-1)/1 var(--f-sans); } /* objetivo ≥ 44 px también con puntero fino: alto por relleno vertical, ancho con 4 px por lado que el margen negativo devuelve; el texto no se mueve */
-.hdr-nav a::after {
-  content: ""; position: absolute; left: var(--space-1); right: var(--space-1); bottom: calc(var(--pad) - 6px); height: 1px;
-  background: currentColor; transform: scaleX(0); transform-origin: right;
-  transition: transform var(--dur-base) var(--ease-out);
-}
-.hdr-nav a:hover::after, .hdr-nav a[aria-current="true"]::after { transform: scaleX(1); transform-origin: left; }
+.hdr-nav a { --pad: calc((var(--target-coarse) - var(--fs-1)) / 2); --ul-gap: 6px; position: relative; margin-inline: calc(-1 * var(--space-1)); padding: var(--pad) var(--space-1); text-decoration: none; font: 620 var(--fs-1)/1 var(--f-sans); } /* objetivo ≥ 44 px también con puntero fino: alto por relleno vertical, ancho con 4 px por lado que el margen negativo devuelve; el texto no se mueve */
+.hdr-nav a[aria-current="true"] > span { background-size: 100% 1px; } /* el capítulo actual lleva el filete bajo su nombre (ver «Enlaces») */
 
 .hdr-end { display: flex; align-items: center; gap: 16px; margin-inline-start: auto; }
 @media (min-width: 1101px) { .hdr-nav + .hdr-end { margin-inline-start: 0; } }
@@ -872,7 +867,8 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* ---------- Colores forzados (Windows alto contraste) ---------- */
 
 @media (forced-colors: active) {
-  .hdr-nav a::after, .topic::before { background: Highlight; }
+  .topic::before { background: Highlight; }
+  .hdr-nav a[aria-current="true"] > span, .hdr-nav a:hover::before, .hdr-nav a:focus-visible::before, .ftr-links a:hover::before, .ftr-links a:focus-visible::before { text-decoration: underline; text-underline-offset: 0.35em; } /* el filete pintado con fondo no sobrevive a los colores forzados */
   .topic[aria-checked="true"] { color: Highlight; forced-color-adjust: none; }
   .btn, .cat-chip, .cat-filters-btn, .card { border: 1px solid ButtonText; }
   .cover { border: 1px solid CanvasText; }
@@ -928,26 +924,23 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* ---------- Curaduría: textos que responden y esqueletos ---------- */
 
 /* Enlaces: el texto sube y deja ver una pista del destino (la pista no entra en el nombre accesible).
-   Etiqueta y pista comparten la misma celda de la retícula: el enlace mide la más ancha de las dos y la pista nunca pisa al vecino. */
+   Etiqueta y pista comparten la misma celda de la retícula: el enlace mide la más ancha de las dos y la pista nunca pisa al vecino.
+   El filete se pinta bajo la palabra visible (etiqueta o pista), a --ul-gap del texto, y mide exactamente lo que mide la palabra:
+   crece de izquierda a derecha como el filete de los botones de línea. */
 .hdr-nav a, .ftr-links a { position: relative; display: grid; justify-items: start; align-items: center; }
-.hdr-nav a > span, .ftr-links a > span { grid-area: 1 / 1; display: inline-block; transition: translate var(--dur-base) var(--ease-out), opacity var(--dur-base); }
-.hdr-nav a::before, .ftr-links a::before {
-  content: attr(data-hint); content: attr(data-hint) / ""; grid-area: 1 / 1; white-space: nowrap;
-  opacity: 0; translate: 0 70%; pointer-events: none;
-  transition: translate var(--dur-base) var(--ease-out), opacity var(--dur-base);
+.hdr-nav a > span, .ftr-links a > span, .hdr-nav a::before, .ftr-links a::before {
+  grid-area: 1 / 1; padding-bottom: var(--ul-gap); margin-bottom: calc(-1 * var(--ul-gap));
+  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+  transition: translate var(--dur-base) var(--ease-out), opacity var(--dur-base), background-size var(--dur-base) var(--ease-out);
 }
-.ftr-links a { padding: 12px 0; text-decoration: none; font-weight: 620; }
-.ftr-links a::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 8px; height: 1px; background: currentColor;
-  transform: scaleX(0); transform-origin: right; transition: transform var(--dur-base) var(--ease-out);
-}
-.hdr-nav a:focus-visible::after, .ftr-links a:focus-visible::after { transform: scaleX(1); transform-origin: left; }
-.hdr-nav a:focus-visible > span, .ftr-links a:focus-visible > span { translate: 0 -70%; opacity: 0; }
-.hdr-nav a:focus-visible::before, .ftr-links a:focus-visible::before { opacity: 1; translate: 0 0; }
+.hdr-nav a > span, .ftr-links a > span { display: inline-block; }
+.hdr-nav a::before, .ftr-links a::before { content: attr(data-hint); content: attr(data-hint) / ""; white-space: nowrap; opacity: 0; translate: 0 0.7em; pointer-events: none; }
+.ftr-links a { --ul-gap: 4px; padding: 12px 0; text-decoration: none; font-weight: 620; }
+.hdr-nav a:focus-visible > span, .ftr-links a:focus-visible > span { translate: 0 -0.7em; opacity: 0; }
+.hdr-nav a:focus-visible::before, .ftr-links a:focus-visible::before { opacity: 1; translate: 0 0; background-size: 100% 1px; }
 @media (hover: hover) {
-  .ftr-links a:hover::after { transform: scaleX(1); transform-origin: left; }
-  .hdr-nav a:hover > span, .ftr-links a:hover > span { translate: 0 -70%; opacity: 0; }
-  .hdr-nav a:hover::before, .ftr-links a:hover::before { opacity: 1; translate: 0 0; }
+  .hdr-nav a:hover > span, .ftr-links a:hover > span { translate: 0 -0.7em; opacity: 0; }
+  .hdr-nav a:hover::before, .ftr-links a:hover::before { opacity: 1; translate: 0 0; background-size: 100% 1px; }
 }
 
 /* La casa: en la tira fijada, la frase del cuarto aparece en el que está al centro o bajo el cursor. */
@@ -984,7 +977,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hdr-nav a > span, .ftr-links a > span, .hdr-nav a::before, .ftr-links a::before, .ftr-links a::after,
+  .hdr-nav a > span, .ftr-links a > span, .hdr-nav a::before, .ftr-links a::before,
   .motion.pin-house .still figcaption span:not(.tag), .bill-sub { transition-duration: 0.01ms; }
 }
 
