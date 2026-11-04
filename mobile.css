@@ -123,6 +123,8 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .wordmark { display: none; }
 .entry-facts { grid-area: facts; align-self: start; flex-direction: column; flex-wrap: nowrap; align-items: flex-start; gap: 2px; margin: 0; font-size: var(--fs-1); }
 .entry-facts li { align-items: center; }
+.entry-facts li:has(> .ic) { align-items: start; } /* si la dirección parte en dos líneas (360 px), el pin se queda en la primera, no flotando entre ambas */
+.entry-facts li:has(> .ic) > .ic { margin-top: 2px; margin-top: calc((1lh - 1em) / 2); }
 .entry-row { grid-area: row; gap: var(--space-4); margin: 0; }
 /* Una sola acción en la primera vista (Hick, <= 6 acciones): «Escribir» sale del perfil; WhatsApp sigue en la cabecera al desplazar, en Cartelera, en Libros y en Visita. */
 .entry-actions { grid-template-columns: 1fr; }

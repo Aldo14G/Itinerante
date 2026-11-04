@@ -692,6 +692,7 @@ test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única ac
   assert.ok(/class="profile-av" src="assets\/img\/logo-96\.webp"[^>]*alt=""/.test(copy), 'avatar decorativo con el logo');
   assert.ok(/<h1 id="entry-title"[\s\S]*Librería Itinerante <i>y Más<\/i>/.test(copy), 'el h1 es el nombre del perfil');
   assert.ok(/data-status-text/.test(copy) && /Mariano Matamoros Pte\. 421/.test(copy), 'estado en vivo y dirección');
+  assert.ok(/Pte\. 421&nbsp;·&nbsp;Centro<\/li>/.test(copy) && /\.entry-facts li:has\(> \.ic\) \{ align-items: start; \}/.test(mobileCss) && /\.entry-facts li:has\(> \.ic\) > \.ic \{ margin-top: 2px; margin-top: calc\(\(1lh - 1em\) \/ 2\); \}/.test(mobileCss), 'si la dirección parte en dos líneas, «421 · Centro» va junto y el pin se queda en la primera línea');
   const actions = [...copy.matchAll(/<a class="(btn [^"]*)"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)];
   assert.equal(actions.length, 2);
   assert.ok(/btn--tungsten/.test(actions[0][1]) && /google\.com\/maps/.test(actions[0][2]) && /Cómo llegar/.test(actions[0][3]), 'primaria: Cómo llegar');
