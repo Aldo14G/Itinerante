@@ -1,3 +1,10 @@
+# Continuidad de Itinerante — 2026-11-04 (ronda 5, sesión en la nube)
+
+- **CR4-01 cerrado:** Visita cierra en móvil con `--sec-sm` (48 + 48 del pie = 96, el tope de CR-14); la cruz de registro queda a 24 px del ladrillo y a 11 del rótulo (medido a 360, 390 y 414). Regla de ritmo actualizada en DESIGN.md.
+- **CR4-02 cerrado:** desde 1600 px la columna derecha de Visita se fija en 560 px; a 1920 la izquierda termina 119 px antes que la derecha (antes 203), con la foto al ancho exacto de la tabla de horario.
+- Verificación: `npm test`, `test:design`, crítica en baseline, tokens; `e2e.mjs` 97/97.
+- Crítico (ronda 5, acotado a Visita): CR4-01 y CR4-02 cerrados; ritmo y espaciado 5, jerarquía y composición 4 (a 1920 el aire entre titular y horario sube a ~570 px: convención del sitio sin contenedor máximo; si se limita, que sea global). Sin defectos nuevos.
+
 # Continuidad de Itinerante — 2026-11-04 (ronda 4, sesión en la nube)
 
 - **CR3-05 cerrado:** la foto de llegada de Visita pasa a la columna derecha, bajo el horario y la nota de festivos (`index.html`; `.visit-arrival` con margen superior `--space-6`). Medido a 1280, 1440 y 1920: las dos columnas terminan a la misma altura y ya no quedan ~800 px vacíos junto a la foto; a 390 el capítulo cierra con la foto. Nota en DESIGN.md («Visita (escritorio)»).

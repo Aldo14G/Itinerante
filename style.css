@@ -1000,6 +1000,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .rx::after { right: -8px; bottom: -8px; }
 .visit-side.rx::before { top: -28px; left: -28px; }
 .visit-side.rx::after { right: -28px; bottom: -28px; }
+@media (min-width: 1600px) { .visit { grid-template-columns: minmax(0, 1fr) 560px; } } /* en pantallas anchas la columna del horario y la foto no crece con la ventana: la izquierda termina menos lejos de la derecha */
 .motion .rx[data-rules]:not(.is-in)::before, .motion .rx[data-rules]:not(.is-in)::after { scale: 0; }
 
 /* Horario como filas técnicas: etiqueta pequeña + valor, con un filete que se dibuja fila por fila. */

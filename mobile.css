@@ -59,7 +59,7 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .books { padding-top: var(--sec-sm); }
 .house-pin { padding-block: var(--sec-sm); } /* sin clamp(vh): el relleno no depende de la altura de la pantalla */
 .house-track { padding-bottom: 0; } /* la barra de desplazamiento no se muestra en móvil: sin los 8 px de reserva */
-.visit { padding-block: var(--sec-sm) var(--space-6); }
+.visit { padding-block: var(--sec-sm); } /* cierra con 48 px (48 + 48 del pie = 96, el tope): la cruz de registro queda a 24 px del ladrillo, no en la costura */
 .books > .cat { margin-top: var(--sec-sm); }
 .books-foot { padding-block: var(--space-6); }
 .visit-note { margin-bottom: 0; }
