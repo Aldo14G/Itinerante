@@ -76,7 +76,7 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 /* Cierre (CR-10): la dirección con un «Cómo llegar» de texto (no compite con la primaria de Visita), las redes en una sola fila con el correo y «Pausar el movimiento» como enlace discreto. Todo de 44 px. */
 .ftr-row { gap: var(--space-2); padding: var(--space-5) 0 0; }
 .ftr-links { flex-wrap: nowrap; justify-content: space-between; gap: var(--space-2); }
-.ftr-links a { display: inline-flex; align-items: center; min-width: var(--target-coarse); min-height: var(--target-coarse); padding: 0; font-size: var(--fs-1); }
+.ftr-links a { min-width: var(--target-coarse); min-height: var(--target-coarse); padding: 0; font-size: var(--fs-1); }
 .ftr-links a::after { bottom: 12px; }
 .motion-btn { justify-self: start; min-height: var(--target-coarse); padding: 0; border: 0; border-radius: 0; color: var(--bone-dim); font: 560 var(--fs-1)/1 var(--f-sans); text-decoration: underline; text-underline-offset: 0.25em; text-decoration-thickness: 1px; }
 
@@ -95,7 +95,7 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .hdr-more { padding: 0; cursor: pointer; font: inherit; }
 /* Sin JavaScript el botón no abre nada (boot.js no puso `js`): se oculta; los cuatro capítulos quedan en la franja de enlaces de la cabecera (style.css, html:not(.js)). */
 html:not(.js) .hdr-more { display: none; }
-html:not(.js) .hdr-nav a { display: inline-flex; align-items: center; min-height: var(--target-coarse); }
+html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .hdr-wa:active, .hdr-more:active, .hdr-more[aria-expanded="true"] { scale: 0.92; }
 .hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-more, .hdr[data-on="turq"] .hdr-more, .hdr[data-on="tungsten"] .hdr-more, .hdr[data-on="paper"] .hdr-list, .hdr[data-on="turq"] .hdr-list, .hdr[data-on="tungsten"] .hdr-list { color: var(--bone); background: var(--glass-solid); }
 

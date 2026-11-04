@@ -115,6 +115,8 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
   for (const [sel, v] of Object.entries(t)) check('tonos ' + tag, `${sel}: tono, fondo claro/ladrillo y contraste ≥7`, v.tone && v.ratio >= 7, JSON.stringify(v));
   const darkBands = await ev(`[...document.querySelectorAll('main > *:not(.wipe), footer')].filter(s=>{const m=getComputedStyle(s).backgroundColor.match(/[\\d.]+/g).map(Number); return s.getBoundingClientRect().height>40 && (m[0]+m[1]+m[2])/3<60}).map(s=>s.id||s.className)`);
   check('tonos ' + tag, 'sin franjas oscuras fuera del tema (salvo ninguna)', !darkBands.length, JSON.stringify(darkBands));
+  const hints = await ev(`[...document.querySelectorAll('a[data-hint]')].filter(a => a.getBoundingClientRect().width > 0).map(a => [a.textContent.trim(), Math.round(a.getBoundingClientRect().width), Math.round(parseFloat(getComputedStyle(a, '::before').width))]).filter(x => x[2] > x[1] + 1)`);
+  check('pistas ' + tag, 'ninguna pista es más ancha que su enlace (no pisa al vecino en hover ni con foco)', !hints.length, JSON.stringify(hints));
 }
 
 // ---------- 4. Barra inferior, cartelera, hero (móvil) ----------
