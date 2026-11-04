@@ -1,3 +1,29 @@
+# Continuidad de Itinerante — 2026-11-04 (ronda 3 del bucle de maqueta, sesión en la nube)
+
+Rama: `claude/cool-turing-37uiqt`, sobre `claude/maqueta-bucle-ronda3` (0f7e2b4). Seis commits: 41d1655, 55a0004, 3f0465d, ece8a79 y los dos siguientes. El estado efímero de los agentes (`.tmp-audit/agentes/`) no viaja entre máquinas: esta entrada lo resume.
+
+## Cerrado con medición
+
+- **QA1-04** · Tab en el carrusel: la tarjeta asomada recibía el foco sin desplazarse y quedaba recortada (390, 360 y 1280). `rail.js` la alinea al inicio con un oyente `focusin`; `tools/qa/rail.mjs` recorre las 24 paradas con Tab real (49/49).
+- **CR-17** · Enlaces de capítulo de la cabecera de escritorio: de 30 a 44 px de alto (y ≥ 45 de ancho) con el texto centrado; el `hdr` sigue en 68 px.
+- **CR3-01** · La pista (`data-hint`) pisaba al vecino («Temas y muestra» sobre Visita, «81 8087 5940» sobre Correo): etiqueta y pista comparten una celda de retícula y el enlace mide la más ancha. La pista de Libros pasa a «6 temas» (DESIGN.md ya la definía así).
+- **QA3-01** · Regresión del anterior: el filete sobraba bajo «Visita». Ahora se pinta como fondo de la palabra visible y mide lo que mide el texto; con colores forzados es subrayado real.
+- **CR3-02** · Explorar abre al toque con esqueletos y «Cargando la muestra…»; el catálogo se pide después. Con `catalog.json` retenido 2.5 s: hoja en 96 ms, tarjetas a los 4.3 s.
+- **CR3-03** · Menú lateral: el acordeón abierto se lleva a la vista y el pie de la lista se funde (`data-more`) mientras haya más abajo (Visita y Mi lista en 360×740).
+- **CR3-06** · Lista de pistas de DESIGN.md al día. **QA3-04** · `e2e.mjs` ya no marca `.sk-chip` como desborde. **CR3-07** · Dirección del perfil parte limpia en 360 px con el pin en la primera línea.
+
+Verificación final: `npm test` 132 + 18 + 4, `test:design` 72, `critique.mjs` en baseline (sigue el aviso heredado de interlineado 1.03), tokens al día, `npm run test:browser` completo en verde (Chromium como root necesita `CHROME_PATH` con `--no-sandbox`), `e2e.mjs` 97 comprobaciones con solo los 4 falsos positivos documentados (IMG en `.frame-clip`).
+
+## Abierto (decisión o ronda siguiente)
+
+- **CR3-05 (baja, ux-movil-feed):** Visita en escritorio deja ~800 px vacíos junto a la foto de llegada (`.tmp-audit` de esta sesión: `d1280-05b-visita-2.png`). Propuesta del crítico: foto bajo el horario o a ancho completo.
+- **CR3-04 (baja, paleta):** cabecera móvil con alfa 0.92 sin desenfoque; el documento la describe opaca. Decidir si se vuelve opaca o se documenta.
+- **QA3-02 (baja):** con puntero fino quedan objetivos < 44 px: CTA de cabecera 134×40, Instagram en Cartelera 105×26, «Ver los 48 géneros» 144×30, filas de filtro 262×36, marca 222×36.
+- **QA3-05 (baja):** a 320×640 la página mide 11.5 pantallas (el umbral ≤ 11 se mide a 390, donde da 8.7).
+- **Miller:** el submenú Libros tiene 7 filas; reducir a ≤ 5 es decisión editorial.
+- **CR-16** (registros de prueba A-Z) y el azul de portadas frías (tono 240) siguen siendo decisiones de Aldo.
+- QA3-03 no aplica: el `AGENTS.md` de la rama ya describe B.4; `docs/AVANCES-Y-RAZONAMIENTO.md` es bitácora histórica.
+
 # Continuidad de Itinerante — 2026-11-01
 
 ## Último avance: B.4 «Función de la casa» sustituye al sitio raíz
