@@ -164,6 +164,7 @@ test('curaduría: los textos de navegación traen pista y los esqueletos ocupan 
   assert.ok(!/(sk-line|card--sk|still-img|frame-clip|topic-layer|bill-layer)[^{}]*::before[^{}]*\{[^}]*animation/.test(css + mobileCss), 'ningún esqueleto ni marco de foto declara animación');
   assert.ok(/content: attr\(data-hint\) \/ ""/.test(css), 'la pista no debe entrar al nombre accesible');
   assert.ok(/\.hdr-nav a:focus-visible::after/.test(css), 'el foco de teclado iguala al hover');
+  assert.ok(/\.hdr-nav a \{ --pad: calc\(\(var\(--target-coarse\) - var\(--fs-1\)\) \/ 2\);[^}]*margin-inline: calc\(-1 \* var\(--space-1\)\); padding: var\(--pad\) var\(--space-1\);/.test(css) && /\.hdr-nav a::after \{[^}]*left: var\(--space-1\); right: var\(--space-1\)/.test(css) && /\.hdr-nav a::after \{[^}]*bottom: calc\(var\(--pad\) - 6px\)/.test(css) && /top: var\(--pad, 8px\)/.test(css), 'enlaces de capítulo de 44 px en escritorio, con subrayado y pista a la misma distancia del texto');
 });
 
 test('filetes: horario como filas técnicas, cruces de registro, botones de doble filete y cita atribuida', () => {
@@ -443,6 +444,8 @@ test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimenta
   assert.ok(/\(hover: hover\) and \(pointer: fine\) \{ \.rail-ctrl \{ display: flex; \}/.test(css), 'flechas solo con puntero fino');
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
   assert.ok(/import\('\.\/rail\.js'\)/.test(app) && !/^import .*rail\.js/m.test(app), 'se carga bajo demanda');
+  const railJs = await readFile(new URL('../rail.js', import.meta.url), 'utf8');
+  assert.ok(/track\.addEventListener\('focusin'[\s\S]{0,500}scrollPaddingInlineStart[\s\S]{0,300}viewport\.scrollBy\(\{ left: b\.left - v\.left - pad, behavior: isMotion\(\)/.test(railJs), 'Tab: la tarjeta enfocada que asoma recortada se alinea dentro del carrusel');
   const cols = JSON.parse(await readFile(new URL('../assets/data/collections.json', import.meta.url), 'utf8'));
   const sample = JSON.parse(await readFile(new URL('../assets/data/catalog.json', import.meta.url), 'utf8'));
   assert.equal(cols.meta.kind, 'sample');

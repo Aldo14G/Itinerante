@@ -168,6 +168,16 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   });
+  // Tab: el navegador no desplaza una tarjeta asomada (recortada) al enfocarla; se alinea al inicio, donde la deja el snap.
+  track.addEventListener('focusin', e => {
+    const item = e.target.closest('.rail-item');
+    if (!item) return;
+    const pad = parseFloat(getComputedStyle(viewport).scrollPaddingInlineStart) || 0;
+    const v = viewport.getBoundingClientRect();
+    const b = item.getBoundingClientRect();
+    if (b.left >= v.left + pad - 1 && b.right <= v.right - pad + 1) return;
+    viewport.scrollBy({ left: b.left - v.left - pad, behavior: isMotion() ? 'smooth' : 'auto' });
+  });
   if ('ResizeObserver' in window) new ResizeObserver(sync).observe(viewport);
 
   wireBookOpen(track, ensureCatalog);

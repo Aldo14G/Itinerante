@@ -116,6 +116,16 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
   await key('ArrowRight', 'ArrowRight', 39);
   await sleep(700);
   ck(name + ': flecha derecha desplaza', (await ev(`document.querySelector('[data-rail-viewport]').scrollLeft`)) > 40);
+  // Tab recorre las 12 tarjetas y sus «Guardar»: la enfocada nunca queda recortada por el borde del carrusel.
+  await ev(`(() => { const vp = document.querySelector('[data-rail-viewport]'); vp.scrollTo({ left: 0, behavior: 'instant' }); vp.focus(); })()`);
+  const clipped = []; let stops = 0;
+  for (let i = 0; i < 30; i++) {
+    await key('Tab', 'Tab', 9); await sleep(450);
+    const st = await ev(`(() => { const a = document.activeElement; const it = a.closest('[data-rail-track] .rail-item'); if (!it) return null; const b = it.getBoundingClientRect(); const r = document.querySelector('[data-rail-viewport]').getBoundingClientRect(); return { t: a.getAttribute('aria-label') || a.textContent.trim().slice(0, 30), ok: b.left >= r.left - 1 && b.right <= r.right + 1 }; })()`);
+    if (!st) break;
+    stops += 1; if (!st.ok) clipped.push(st.t);
+  }
+  ck(name + ': Tab recorre las 24 paradas del carrusel sin dejar recortada la tarjeta enfocada', stops === 24 && !clipped.length, JSON.stringify({ stops, clipped }));
   const fich = await ev(`(async () => {
     const c = document.querySelector('[data-rail] .rail-item .card'); c.focus(); c.click();
     for (let i = 0; i < 40; i++) { await new Promise(r => setTimeout(r, 200)); const d = document.getElementById('cat-drawer'); if (d && d.open) break; }
