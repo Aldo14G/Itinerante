@@ -1,3 +1,9 @@
+# Continuidad de Itinerante — 2026-11-04 (ronda 4, sesión en la nube)
+
+- **CR3-05 cerrado:** la foto de llegada de Visita pasa a la columna derecha, bajo el horario y la nota de festivos (`index.html`; `.visit-arrival` con margen superior `--space-6`). Medido a 1280, 1440 y 1920: las dos columnas terminan a la misma altura y ya no quedan ~800 px vacíos junto a la foto; a 390 el capítulo cierra con la foto. Nota en DESIGN.md («Visita (escritorio)»).
+- **`e2e.mjs` sin falsos positivos:** la comprobación de desborde ignora lo que recorta un antepasado con `overflow: hidden/clip` que cabe en la ventana (la IMG escalada 1.22 al revelarse). 97/97. Actualizados `tools/qa/README.md` y `docs/agentes/06-qa.md`.
+- Verificación: `npm test` 132 + 18 + 4, `test:design` 72, crítica en baseline, tokens al día.
+
 # Continuidad de Itinerante — 2026-11-04 (ronda 3 del bucle de maqueta, sesión en la nube)
 
 Rama: `claude/cool-turing-37uiqt`, sobre `claude/maqueta-bucle-ronda3` (0f7e2b4). Seis commits: 41d1655, 55a0004, 3f0465d, ece8a79 y los dos siguientes. El estado efímero de los agentes (`.tmp-audit/agentes/`) no viaja entre máquinas: esta entrada lo resume.

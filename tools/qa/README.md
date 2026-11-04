@@ -23,5 +23,5 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 
 Notas de fiabilidad:
 - Los clics que abren diálogos usan `Input.dispatchMouseEvent`: Chromium agrupa los diálogos abiertos sin activación del usuario y una tecla Escape cierra todo el grupo. Un `element.click()` de JavaScript no cuenta como activación.
-- `e2e.mjs` marca 4 falsos positivos de «desborde horizontal» por una `IMG` dentro de `.frame-clip` (recortada por su contenedor). Sus métricas de FCP/LCP pueden salir en cero si la máquina está cargada: repite o usa CDP directo.
+- `e2e.mjs` ya no marca como desborde una `IMG` dentro de `.frame-clip` (escalada 1.22 al revelarse y recortada por su contenedor): ignora lo que recorta un antepasado con `overflow: hidden/clip` que cabe en la ventana. Un fallo de «sin desborde horizontal» es real. Sus métricas de FCP/LCP pueden salir en cero si la máquina está cargada: repite o usa CDP directo.
 - `contrast.mjs` omite cabecera, barra inferior y aviso (su fondo es un pseudoelemento o vidrio) y el texto sobre foto: eso lo juzga el crítico con capturas.
