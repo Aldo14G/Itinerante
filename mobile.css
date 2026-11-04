@@ -276,6 +276,7 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .sm-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; cursor: pointer; }
 .sm-close .ic { width: 22px; height: 22px; rotate: 45deg; }
 .sm-nav { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-2) var(--space-3); }
+.sm-nav[data-more="1"] { mask-image: linear-gradient(to bottom, var(--black) calc(100% - var(--space-7)), transparent); } /* hay más abajo: el pie de la lista se funde (app.js pone data-more) */
 .sm-list { margin: 0; padding: 0; list-style: none; }
 .sm-row {
   display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 48px; padding: var(--space-1) var(--space-2);

@@ -823,6 +823,9 @@ test('INP: los botones confirman primero y la hoja se abre o se cierra después 
   // Explorar y Mi lista también confirman primero (su INP era toda la apertura: 250-540 ms con CPU 4x)
   const savedSrc = await readFile(here('saved.js'), 'utf8');
   assert.ok(/confirmThen\(e\.currentTarget, openExplorer\)/.test(app) && /closeDialog\(explorer\)/.test(app), 'Explorar abre y cierra después de pintar');
+  const openEx = /const openExplorer = async \(\) => \{[\s\S]*?\n      \};/.exec(app)[0];
+  assert.ok(openEx.indexOf('await openDialog(explorer') < openEx.indexOf('bootCatalog()') && !/await bootCatalog/.test(openEx), 'Explorar abre la hoja con sus esqueletos antes de pedir el catálogo: la respuesta no espera a la red');
+  assert.ok(/nav\.dataset\.more = nav\.scrollTop \+ nav\.clientHeight < nav\.scrollHeight/.test(app) && /sub\.scrollIntoView\(\{ block: 'nearest'/.test(app) && /\.sm-nav\[data-more="1"\] \{ mask-image: linear-gradient\(to bottom, var\(--black\) calc\(100% - var\(--space-7\)\), transparent\); \}/.test(mobileCss), 'menú lateral: el acordeón abierto queda a la vista y el pie de la lista se funde cuando hay más abajo');
   assert.ok(/confirmThen\(opener, openList\)/.test(savedSrc) && /closeDialog\(dlg\)/.test(savedSrc), 'Mi lista abre y cierra después de pintar');
   // El fondo no se tapa (content-visibility: hidden en los bloques de la página): se pidió revertirlo, ver DESIGN.md «Fondo tras la hoja»
   assert.ok(!/is-behind/.test(css + mobileCss) && !/\buncover\b|contentVisibility/.test(sheets), 'sheets.js no oculta la página tras la hoja');

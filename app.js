@@ -552,10 +552,22 @@ async function boot() {
     if (!dlg || !opener) return;
     const phone = matchMedia('(max-width: 760px)');
     const groups = $$('.sm-group', dlg);
+    const nav = $('.sm-nav', dlg);
+    // Pista de que hay más abajo (en 360×740, Libros abierto deja Visita y Mi lista bajo el pie fijo): el pie de la lista se funde
+    // mientras se pueda bajar (data-more; la máscara vive en mobile.css).
+    const more = () => { nav.dataset.more = nav.scrollTop + nav.clientHeight < nav.scrollHeight - 2 ? '1' : '0'; };
+    nav.addEventListener('scroll', more, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(more).observe(nav); else dlg.addEventListener('toggle', more);
     const setGroup = (g, open) => {
       const btn = $('.sm-row', g), sub = $('.sm-sub', g);
       btn.setAttribute('aria-expanded', String(open));
       sub.inert = !open; // fuera del orden de tabulación y del árbol de accesibilidad mientras está plegado
+      if (open) sub.addEventListener('transitionend', function shown(e) { // al terminar de desplegarse, la lista entera queda a la vista
+        if (e.target !== sub) return;
+        sub.removeEventListener('transitionend', shown);
+        sub.scrollIntoView({ block: 'nearest', behavior: isMotion() ? 'smooth' : 'auto' });
+        more();
+      });
     };
     groups.forEach(g => $('.sm-row', g).addEventListener('click', () => {
       const open = $('.sm-row', g).getAttribute('aria-expanded') !== 'true';
@@ -843,13 +855,16 @@ async function boot() {
           else explorer.open = true;
         }
       };
+      // La hoja abre al toque, con sus esqueletos (la rejilla nace con aria-busy): la respuesta no espera a la red. El catálogo
+      // (módulo y datos) se pide después y rellena la hoja ya abierta; con 4G lenta antes pasaban 1-3 s sin cambio visible.
       const openExplorer = async () => {
         if (!phone.matches || explorer.open || opening) return;
         opening = true;
-        try { await bootCatalog(); } finally { opening = false; }
-        if (!phone.matches || explorer.open) return;
-        await openDialog(explorer, { lock: 'explorer-open', url: '#explorar', defer: true }); // bloquea el scroll y empuja la entrada que «atrás» consume; la rejilla se maqueta en otra tarea (ver openDialog)
-        if (explorer.open) $('[data-ex-close]', explorer).focus({ preventScroll: true });
+        try {
+          await openDialog(explorer, { lock: 'explorer-open', url: '#explorar', defer: true }); // bloquea el scroll y empuja la entrada que «atrás» consume; la rejilla se maqueta en otra tarea (ver openDialog)
+          if (explorer.open) $('[data-ex-close]', explorer).focus({ preventScroll: true });
+        } finally { opening = false; }
+        if (explorer.open) bootCatalog();
       };
       // En escritorio el campo solo recibe el foco cuando la persona llega a #catalogo (enlace o URL), nunca al cargar.
       const focusSearch = async () => {
