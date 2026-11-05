@@ -143,13 +143,27 @@ async function renderList(dlg) {
   const items = dlg.querySelector('[data-ml-items]');
   const empty = dlg.querySelector('[data-ml-empty]');
   const wa = dlg.querySelector('[data-ml-wa]');
+  const status = dlg.querySelector('[data-ml-status]');
+  const errBox = dlg.querySelector('[data-ml-error]');
   const ids = savedIds();
   empty.hidden = ids.length > 0;
   items.hidden = ids.length === 0;
   wa.hidden = ids.length === 0;
-  if (!ids.length) { items.replaceChildren(); return; }
+  if (!ids.length) { items.replaceChildren(); status.textContent = ''; errBox.hidden = true; return; }
   let books = [];
-  try { const sample = await loadSample(); const by = new Map(sample.books.map(b => [b.id, b])); books = ids.map(id => by.get(id)).filter(Boolean); } catch { books = []; }
+  let failed = false;
+  try { const sample = await loadSample(); const by = new Map(sample.books.map(b => [b.id, b])); books = ids.map(id => by.get(id)).filter(Boolean); } catch { failed = true; }
+  // Error (A03): los ids siguen guardados aunque la muestra no cargue; se dice, se ofrece reintentar y WhatsApp sigue a la vista.
+  status.textContent = failed ? `No pudimos cargar la muestra. ${ids.length === 1 ? 'Tu título guardado sigue aquí' : `Tus ${ids.length} títulos guardados siguen aquí`}.` : '';
+  errBox.hidden = !failed;
+  if (failed) {
+    items.replaceChildren();
+    const url = new URL(`https://wa.me/${WA_NUMBER}`);
+    url.searchParams.set('text', `Hola, pienso visitarlos pronto. Anoté ${countText(ids.length)} en la muestra de su sitio y quisiera confirmar si los tienen. Gracias.`);
+    wa.href = url.href;
+    wa.hidden = false;
+    return;
+  }
   items.replaceChildren(...books.map(b => {
     const li = document.createElement('li');
     li.className = 'ml-item';
@@ -221,6 +235,14 @@ export function initSaved() {
     if (opener) { e.preventDefault(); hideToast(); confirmThen(opener, openList); return; } // confirma el toque; la hoja (lo caro) va después de pintar
     const rm = e.target.closest('[data-ml-remove]');
     if (rm) { toggleSaved(rm.dataset.mlRemove); return; }
+    const retry = e.target.closest('[data-ml-retry]');
+    if (retry) { // vuelve a pedir la muestra (sample.js olvida la promesa fallida); respuesta visible antes de la red
+      const dlg = retry.closest('#mylist');
+      dlg.querySelector('[data-ml-error]').hidden = true;
+      dlg.querySelector('[data-ml-status]').textContent = 'Cargando la muestra…';
+      renderList(dlg);
+      return;
+    }
     const dlg = document.getElementById('mylist');
     if (dlg?.open && (e.target === dlg || e.target.closest('[data-ml-close]'))) closeDialog(dlg); // sale primero; el cierre real corre después del fotograma
   });

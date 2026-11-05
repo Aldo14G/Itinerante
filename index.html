@@ -112,6 +112,8 @@
   <dialog class="mylist" id="mylist" data-tone="light" aria-labelledby="mylist-title">
     <div class="ml-head"><h2 class="ml-title" id="mylist-title">Mi lista para la visita</h2><button class="ml-close" type="button" data-ml-close aria-label="Cerrar mi lista"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
     <p class="ml-note">Se guarda solo en este dispositivo. La librería confirma existencia y precio.</p>
+    <p class="ml-status" role="status" data-ml-status></p>
+    <div class="ml-error" data-ml-error hidden><button class="btn btn--line-ink" type="button" data-ml-retry><span>Reintentar</span></button></div>
     <ul class="ml-items" data-ml-items></ul>
     <p class="ml-empty" data-ml-empty hidden>Aún no guardas libros. Toca el marcador en cualquier libro para anotarlo y llévalo a la visita.</p>
     <div class="ml-actions">
@@ -267,6 +269,8 @@
             <p class="rail-note" data-rail-note></p>
             <p class="rail-note rail-seal" data-rail-seal>Datos de muestra · no es inventario.</p>
           </div>
+          <p class="rail-status" role="status" data-rail-status></p>
+          <div class="rail-error" data-rail-error hidden><button class="btn btn--line-ink" type="button" data-rail-retry><span>Reintentar</span></button><a class="btn btn--line-ink" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a></div>
         </div>
         <div class="rail-viewport" role="region" aria-roledescription="carrusel" aria-label="Libros de la colección" tabindex="0" data-rail-viewport>
           <ul class="rail-track" data-rail-track aria-busy="true">
@@ -450,7 +454,7 @@
     </section>
 
     <!-- Cita -->
-    <figure class="quote rx" data-rules data-tone="deep">
+    <figure class="quote" data-rules data-tone="mist">
       <blockquote><p>La libertad, Sancho, es uno de los más preciosos dones que a los hombres dieron los cielos.</p></blockquote>
       <figcaption>Miguel de Cervantes, <cite>Don Quijote de la Mancha</cite>, parte II, cap. 58. Dominio público.</figcaption>
     </figure>
@@ -480,7 +484,7 @@
           <a class="btn btn--line-ink" data-magnetic href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer"><span>Pedir informes</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
         </div>
       </div>
-      <div class="visit-side rx" data-rules>
+      <div class="visit-side" data-rules>
         <table class="hours">
           <caption>Horario habitual</caption>
           <tbody>

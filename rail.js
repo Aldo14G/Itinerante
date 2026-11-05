@@ -70,6 +70,8 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const next = $('[data-rail-next]');
   const thumb = $('[data-rail-thumb]');
   const live = $('[data-rail-live]');
+  const status = $('[data-rail-status]');
+  const errBox = $('[data-rail-error]');
 
   let books, cols;
   try {
@@ -79,12 +81,30 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     ]);
     books = sample.books;
     cols = collections.collections.filter(c => pickBooks(books, c).length);
-    if (!cols.length) throw new Error('sin colecciones');
+    if (!cols.length) { root.hidden = true; return; } // sin datos no se promete nada: el capítulo sigue con los temas y la muestra completa
   } catch {
+    // Error de red (A03): el carrusel no desaparece en silencio. Línea de estado y salida: reintentar o preguntar por WhatsApp.
     delete root.dataset.ready;
-    root.hidden = true; // sin datos no se promete nada: el capítulo sigue con los temas y la muestra completa
+    root.dataset.state = 'error';
+    chipsEl.replaceChildren();
+    track.replaceChildren();
+    track.removeAttribute('aria-busy');
+    status.textContent = 'No pudimos cargar la muestra de libros.';
+    errBox.hidden = false;
+    if (!errBox.dataset.wired) {
+      errBox.dataset.wired = '1';
+      errBox.querySelector('[data-rail-retry]').addEventListener('click', () => { // la muestra se vuelve a pedir (sample.js olvida la promesa fallida)
+        errBox.hidden = true;
+        delete root.dataset.state;
+        status.textContent = 'Cargando la muestra…';
+        track.setAttribute('aria-busy', 'true');
+        initRail({ ensureCatalog, isMotion });
+      });
+    }
     return;
   }
+  status.textContent = '';
+  errBox.hidden = true;
 
   const step = () => {
     const first = track.firstElementChild;

@@ -174,9 +174,10 @@ test('curaduría: los textos de navegación traen pista y los esqueletos ocupan 
   assert.ok(/data-hint="6 temas"><span>Libros<\/span>/.test(html), 'la pista de Libros es corta («6 temas»), como la de los demás capítulos');
 });
 
-test('filetes: horario como filas técnicas, cruces de registro, botones de doble filete y cita atribuida', () => {
+test('filetes: horario como filas técnicas, sin cruces de registro (CR0-06), botones de doble filete y cita atribuida', () => {
   assert.ok(/--hair: 0\.5px/.test(tokensCss) && /min-resolution: 2dppx/.test(tokensCss), 'filete de 0.5 px en pantallas densas');
-  assert.ok(/class="visit-side rx" data-rules/.test(html));
+  assert.ok(/class="visit-side" data-rules/.test(html), 'la columna del horario entra con data-rules y sin cruces de registro (CR0-06)');
+  assert.ok(!/\.rx::(before|after)/.test(css) && !/class="[^"]*\brx\b/.test(html), 'ninguna cruz de registro: el «+» es solo «abrir» y «cerrar»');
   assert.ok(/\.btn--ghost::before, \.btn--line::before, \.btn--line-ink::before/.test(css));
   assert.ok(/@keyframes celluloid/.test(css) && /prefers-reduced-motion: no-preference/.test(css));
   const quote = html.match(/<figure class="quote[\s\S]*?<\/figure>/)[0];
@@ -891,7 +892,7 @@ test('titulares móviles (CR-14): un escalón por nivel, de la escala de tokens,
   assert.ok(/\.layer-title \{[^}]*clamp\(2\.25rem, 3\.4vw, 3\.5rem\)/.test(css.replaceAll('\n', ' ')), 'la capa interna llega a 36 px (= --fs-6) en móvil');
   assert.ok(/--fs-7: 3rem;/.test(tokensCss) && /--fs-6: 2\.25rem;/.test(tokensCss));
   assert.ok(/\.marquee \{ display: none; \}/.test(mobileCss) && /\.visit \.h2 em \{ display: none; \}/.test(mobileCss), 'la dirección «Matamoros 421» no se repite en móvil (marquesina y subtítulo de Visita)');
-  assert.ok(/\.visit \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss) && /\.visit-side\.rx::after \{ right: 0; bottom: -24px; \}/.test(css), 'Visita cierra con 48 px en móvil: la cruz de registro queda a 24 px del pie, no en la costura');
+  assert.ok(/\.visit \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'Visita cierra con 48 px en móvil (48 + 48 del pie = 96, el tope)');
   assert.ok(/@media \(min-width: 1600px\) \{ \.visit \{ grid-template-columns: minmax\(0, 1fr\) 560px; \} \}/.test(css), 'desde 1600 px la columna del horario y la foto de Visita se fija en 560 px');
   assert.ok(/shown = rows\.some\(r => r\.row\.offsetWidth > 0\)/.test(appSrc) && /if \(!shown\) return false;/.test(appSrc), 'la marquesina oculta no se anima');
   assert.ok(/\.call-body \{ padding: 0 var\(--gutter\); \}/.test(mobileCss) && /\.call \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'el llamado sin aire muerto: --sec-sm y sin clamp(vh)');
