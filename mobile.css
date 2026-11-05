@@ -1,16 +1,16 @@
-/* Itinerante B.4 · móvil con estilo de app (liquid glass ligero).
-   Se carga solo con (max-width: 760px). Patrones: barra inferior flotante, cabecera translúcida,
-   iconos en contenedor translúcido, hojas inferiores, historias y chips. Todo propio: sin fuentes,
-   iconos ni CSS de terceros. Reglas de vidrio: solo en la capa de controles, nunca sobre el contenido. */
+/* Itinerante B.4 · móvil con estilo de app (cromo claro).
+   Se carga solo con (max-width: 760px). Patrones: barra inferior flotante, cabecera con chips blancos
+   e iconos en tinta, hojas inferiores, historias y chips. Todo propio: sin fuentes, iconos ni CSS de terceros.
+   El cromo (barra y chips de la cabecera) es blanco opaco con filete en tinta y sombra suave: nada de vidrio oscuro. */
 
 :root { --hdr-h: 60px; }
 html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
 
-/* Vidrio: sólido por defecto; translúcido donde el navegador lo soporta; sólido otra vez si se pide. */
+/* Cromo claro: la barra es blanca (opaca; el desenfoque solo donde el navegador lo soporta) y los chips de la cabecera son blancos sólidos siempre
+   (sobre la foto del hero y sobre el campo turquesa se leen igual: icono en tinta, filete en tinta). */
 .tabbar, .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-solid); }
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .tabbar { background: var(--glass-tint); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
-  .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-chip); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
 }
 @media (prefers-reduced-transparency: reduce) {
   .tabbar, .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -19,22 +19,18 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
   .tabbar, .hdr-wa, .hdr-more, .hdr-list { border-width: 2px; background: var(--glass-solid); }
 }
 
-/* Barra inferior: píldora flotante de cinco pestañas con icono y etiqueta. */
+/* Barra inferior: píldora flotante blanca de cuatro pestañas con icono y etiqueta en tinta; sin reflejo ni brillo interior, sombra suave. */
 .tabbar {
   position: fixed; z-index: 48; display: flex; gap: 2px;
   inset: auto 12px calc(env(safe-area-inset-bottom) + 8px) 12px;
   height: var(--tabbar-h); padding: 4px;
-  border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
-  box-shadow: inset 0 1px 0 var(--glass-edge), 0 12px 32px -8px color-mix(in srgb, var(--black) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: var(--radius-pill);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--black) 18%, transparent);
   transition: translate var(--dur-base) var(--spring), visibility var(--dur-base);
-}
-.tabbar::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(120% 80% at 20% 0, color-mix(in srgb, var(--white) 14%, transparent), transparent 55%);
 }
 .tabbar a {
   position: relative; z-index: 1; flex: 1; min-width: 44px; display: grid; place-items: center; align-content: center; gap: 2px;
-  color: color-mix(in srgb, var(--bone) 72%, transparent); text-decoration: none; border-radius: var(--radius-pill);
+  color: var(--paper-dim); text-decoration: none; border-radius: var(--radius-pill);
   -webkit-tap-highlight-color: transparent;
 }
 .tab-ic {
@@ -43,11 +39,12 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
 }
 .tab-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .tab-lb { font: 650 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.01em; }
-.tabbar a[aria-current="location"] { color: var(--bone); }
-.tabbar a[aria-current="location"] .tab-ic { background: color-mix(in srgb, var(--turq) 30%, transparent); }
+/* Pestaña activa: el único código de «activo» del sitio, cápsula turquesa (--terra) con icono blanco (5.1:1); la etiqueta pasa a tinta plena. */
+.tabbar a[aria-current="location"] { color: var(--paper-ink); }
+.tabbar a[aria-current="location"] .tab-ic { color: var(--white); background: var(--terra); }
 .tabbar a[aria-current="location"] .tab-ic svg { fill: currentColor; fill-opacity: 0.9; }
 .tabbar a:active .tab-ic { scale: 0.92; }
-.tabbar a:focus-visible { outline-offset: -2px; }
+.tabbar a:focus-visible { outline-color: var(--paper-ink); outline-offset: -2px; }
 /* La barra se retira mientras la ficha o el menú ocupan la pantalla. */
 html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 
@@ -59,7 +56,7 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .books { padding-top: var(--sec-sm); }
 .house-pin { padding-block: var(--sec-sm); } /* sin clamp(vh): el relleno no depende de la altura de la pantalla */
 .house-track { padding-bottom: 0; } /* la barra de desplazamiento no se muestra en móvil: sin los 8 px de reserva */
-.visit { padding-block: var(--sec-sm); } /* cierra con 48 px (48 + 48 del pie = 96, el tope): la cruz de registro queda a 24 px del ladrillo, no en la costura */
+.visit { padding-block: var(--sec-sm); } /* cierra con 48 px (48 + 48 del pie = 96, el tope): la cruz de registro queda a 24 px del tono profundo del pie, no en la costura */
 .books > .cat { margin-top: var(--sec-sm); }
 .books-foot { padding-block: var(--space-6); }
 .visit-note { margin-bottom: 0; }
@@ -84,26 +81,27 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .hdr-brand, .bill-foot a { min-height: 44px; }
 @media (min-width: 360px) { .hdr-brand span { white-space: nowrap; } }
 
-/* Cabecera: marca y un icono de WhatsApp en contenedor translúcido. */
+/* Cabecera: marca y dos chips blancos de 44 px (menú y WhatsApp) con icono y filete en tinta; sin brillo interior. */
 .menu-btn, .menu { display: none; }
 .hdr-wa, .hdr-more {
-  display: grid; place-items: center; width: 44px; height: 44px; color: var(--bone); text-decoration: none;
-  border: 1px solid var(--glass-edge); border-radius: 50%; box-shadow: inset 0 1px 0 var(--glass-edge);
+  display: grid; place-items: center; width: 44px; height: 44px; color: var(--paper-ink); text-decoration: none;
+  border: 1px solid var(--glass-edge); border-radius: 50%;
   transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast);
 }
+.hdr-wa:focus-visible, .hdr-more:focus-visible, .hdr-list:focus-visible { outline-color: var(--paper-ink); }
 .hdr-wa .ic, .hdr-more .ic { width: 22px; height: 22px; }
 .hdr-more { padding: 0; cursor: pointer; font: inherit; }
 /* Sin JavaScript el botón no abre nada (boot.js no puso `js`): se oculta; los cuatro capítulos quedan en la franja de enlaces de la cabecera (style.css, html:not(.js)). */
 html:not(.js) .hdr-more { display: none; }
 html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .hdr-wa:active, .hdr-more:active, .hdr-more[aria-expanded="true"] { scale: 0.92; }
-.hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-more, .hdr[data-on="turq"] .hdr-more, .hdr[data-on="tungsten"] .hdr-more, .hdr[data-on="paper"] .hdr-list, .hdr[data-on="turq"] .hdr-list, .hdr[data-on="tungsten"] .hdr-list { color: var(--bone); background: var(--glass-solid); }
+.hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-more, .hdr[data-on="turq"] .hdr-more, .hdr[data-on="tungsten"] .hdr-more, .hdr[data-on="paper"] .hdr-list, .hdr[data-on="turq"] .hdr-list, .hdr[data-on="tungsten"] .hdr-list { color: var(--paper-ink); background: var(--glass-solid); }
 
 /* Hero móvil: póster fijo, sin recorrido por fotogramas ni cortinilla (menos bytes y menos trabajo). */
 /* Primera vista = perfil (patrón de red social): avatar, nombre, estado de hoy y dirección; el párrafo hace de biografía;
    «Cómo llegar» es la acción primaria y «Escribir» la secundaria; los destacados abren historias con fotos de la casa.
    Ley de proximidad / región común: todo vive en un solo bloque pegado al pie de la foto, sobre un velo propio. */
-.entry-shade { background: linear-gradient(180deg, color-mix(in srgb, var(--night) 70%, transparent) 0%, transparent 22%); }
+.entry-shade { background: linear-gradient(180deg, transparent 45%, color-mix(in srgb, var(--night) 70%, transparent) 100%); } /* sin banda arriba: la foto queda limpia en el 45 % superior; el texto lleva su velo propio en .entry-copy */
 .entry-copy {
   display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-4) var(--space-3);
   grid-template-areas: "av name" "av facts" "row row" "hl hl";
@@ -134,12 +132,11 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .hl-list { display: flex; justify-content: space-between; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
 .hl-item { display: grid; justify-items: center; gap: var(--space-1); min-width: 64px; color: var(--bone); text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .hl-ring { position: relative; display: block; width: 68px; height: 68px; padding: 4px; border-radius: 50%; background: linear-gradient(135deg, var(--tungsten), var(--terra)); transition: scale var(--dur-fast) var(--spring); }
-/* Mientras la foto no llega el círculo se pinta arena (--stone, como los demás esqueletos); sin esto se veía el anillo terracota macizo. Quieto, mismo tamaño que la foto. */
+/* Mientras la foto no llega el círculo se pinta con --stone (como los demás esqueletos); sin esto se veía el anillo del aro macizo. Quieto, mismo tamaño que la foto. */
 .hl-img { width: 100%; height: 100%; object-fit: cover; border: 2px solid var(--night); border-radius: 50%; background: var(--stone); }
 .hl-item.is-seen .hl-ring { background: var(--line-strong); }
 .hl-item:active .hl-ring { scale: 0.94; }
-.hl-kind { position: absolute; right: -4px; bottom: -2px; padding: 4px 8px; border-radius: var(--radius-pill); color: var(--tungsten-hi); background: var(--night); border: 1px solid currentColor; font: 700 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.04em; text-transform: uppercase; }
-.hl-kind--real { color: var(--turq-light); }
+.hl-kind { position: absolute; right: -4px; bottom: -2px; padding: 4px 8px; border-radius: var(--radius-pill); color: var(--terra-ink); background: var(--paper); border: 1px solid var(--terra-deep); font: 700 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.04em; text-transform: uppercase; } /* misma piel que .tag */
 .hl-lb { font: 650 var(--fs-0)/1.2 var(--f-sans); }
 /* Cabecera: al inicio solo el menú (el perfil ya dice quién es); marca y WhatsApp aparecen al bajar. */
 .js .hdr:not(.is-solid) :is(.hdr-brand, .hdr-wa) { opacity: 0; visibility: hidden; }
@@ -165,7 +162,7 @@ html:not(.js) .tabbar { display: none; }
 .motion .explorer.is-closing { opacity: 0; transition: opacity var(--dur-fast) var(--ease-io); } /* Explorar no se desplaza: se desvanece mientras corre el cierre */
 .drawer-grabber { display: block; justify-self: center; width: 36px; height: 5px; margin: -16px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--paper-ink) 28%, transparent); touch-action: none; }
 .drawer-body { touch-action: pan-y; overscroll-behavior: contain; }
-.drawer-close { background: color-mix(in srgb, var(--paper-ink) 8%, transparent); border-color: transparent; }
+.drawer-close { background: var(--glass-chip); border-color: var(--glass-edge); } /* mismo cierre que el menú y Explorar: relleno suave y filete en tinta ≥ 3:1 */
 /* Ficha en dos columnas (CR-15): la portada a 40 % del ancho junto a género, título, autor y Guardar; así «Cómo llegar» queda dentro del primer pliegue
    (con la portada a todo lo ancho quedaba bajo el borde en 320-375 px de ancho) sin tocar el orden de lectura ni el foco inicial. */
 .drawer-body { grid-template-columns: 40% minmax(0, 1fr); column-gap: var(--space-4); row-gap: var(--space-3); }
@@ -197,8 +194,8 @@ html:not(.js) .tabbar { display: none; }
   color: var(--bone); background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
 }
-/* Un solo estado activo para toda elección de Libros (colección del carrusel y tema de consulta): tinta rellena, como `.rail-chip`. El terracota relleno queda para «Cómo llegar». */
-.topic[aria-checked="true"], .topic[aria-checked="true"]:focus-visible { color: var(--night); background: var(--bone); border-color: transparent; font-stretch: 100%; }
+/* Un solo estado activo para toda elección de Libros (colección del carrusel y tema de consulta): cápsula turquesa --terra con texto blanco, como `.rail-chip`, la pestaña activa y «Hoy». El turquesa profundo (--terra-deep) queda para «Cómo llegar». */
+.topic[aria-checked="true"], .topic[aria-checked="true"]:focus-visible { color: var(--white); background: var(--terra); border-color: transparent; font-stretch: 100%; }
 .topic:hover:not([aria-checked="true"]) { color: var(--bone); }
 
 /* Primer pintado (R01): bajo el perfil nada se maqueta hasta acercarse; con CPU 4x el primer diseño de toda la página tardaba ~1.8 s y
@@ -253,7 +250,7 @@ html:not(.js) .tabbar { display: none; }
 .bill-dots i { width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--turq-ink) 28%, transparent); transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast); }
 .bill-dots i.is-on { background: var(--turq-ink); scale: 1.5; }
 
-/* Fondo de la hoja plano (sin desenfoque) y vidrio sólido en gama media o baja. */
+/* Fondo de la hoja plano (sin desenfoque) y cromo sólido en gama media o baja. */
 .drawer::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glass="lite"] .hdr-more, html[data-glass="lite"] .hdr-list { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
 
@@ -287,12 +284,12 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 }
 .sm-row:active { background: var(--glass-chip); }
 .sm-list--aside { margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--line); }
-.sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; }
+.sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--glass-chip); border: 1px solid var(--line); border-radius: 50%; } /* contenedor decorativo del icono (no es el control): filete ligero */
 .sm-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .sm-lb { flex: 1; }
 .sm-caret { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--dur-fast) var(--ease-out); }
 .sm-row[aria-expanded="true"] .sm-caret { rotate: 90deg; }
-.sm-row[aria-expanded="true"] .sm-ic { background: color-mix(in srgb, var(--turq) 30%, transparent); }
+.sm-row[aria-expanded="true"] .sm-ic { color: var(--white); background: var(--terra); border-color: transparent; } /* mismo código de «activo» que chips y pestaña */
 .sm-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-fast) var(--ease-out); }
 .sm-row[aria-expanded="true"] + .sm-sub { grid-template-rows: 1fr; }
 .sm-sub-in { min-height: 0; overflow: hidden; padding-left: calc(40px + var(--space-3) + var(--space-2)); }
@@ -324,10 +321,10 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .rail-chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter); scroll-padding-inline: var(--gutter); scrollbar-width: none; }
 .rail-chips::-webkit-scrollbar { display: none; }
 .rail-chip { flex: none; background: var(--glass-chip); border-color: var(--glass-edge); }
-.rail-chip[aria-checked="true"] { background: var(--bone); border-color: transparent; }
+.rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; }
 
-/* Guardar y Mi lista en móvil: hoja inferior, aviso sobre la barra y chip de cabecera (con libros guardados) que cuenta lo anotado y abre la hoja: lo guardado no se pierde de vista (U03). Mismo vidrio y alto que el menú. */
-.hdr-list { min-width: 44px; min-height: 44px; padding: 0 var(--space-3); color: var(--bone); border-color: var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-edge); }
+/* Guardar y Mi lista en móvil: hoja inferior, aviso sobre la barra y chip de cabecera (con libros guardados) que cuenta lo anotado y abre la hoja: lo guardado no se pierde de vista (U03). Mismo cromo y alto que el menú. */
+.hdr-list { min-width: 44px; min-height: 44px; padding: 0 var(--space-3); color: var(--paper-ink); border-color: var(--glass-edge); }
 .hdr-list:active { scale: 0.92; }
 /* Con el chip a la vista la marca pierde «y Más» (no cabe en 360 px): el nombre completo sigue en el menú, el pie y el título. */
 .hdr:has(.hdr-list:not([hidden])) .hdr-brand i { display: none; }
@@ -389,7 +386,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 .story-av { width: 36px; height: 36px; border-radius: var(--radius-3); }
 .story-who { display: grid; flex: 1; margin: 0; font: 600 var(--fs-1)/1.25 var(--f-sans); }
 .story-who span { color: var(--bone-dim); font-weight: 500; }
-.story-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; }
+.story-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer; background: color-mix(in srgb, var(--bone) 8%, transparent); border: 1px solid var(--line-strong); border-radius: 50%; } /* la historia es oscura: filete claro (--line-strong de :root), no el cromo blanco */
 .story-close .ic { width: 22px; height: 22px; rotate: 45deg; }
 .story-fig { position: absolute; inset: 0; z-index: 0; }
 .story-fig::after {

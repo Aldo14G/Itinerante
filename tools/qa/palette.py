@@ -43,13 +43,13 @@ print('\n== PALETA ACTUAL (tokens) ==')
 tokens = json.load(open(os.path.join(ROOT, 'design', 'tokens.json'), encoding='utf-8'))['themes']['b4']
 base = tokens['color']
 named = {
-    'cal (light.night)': tokens['tones']['light']['night'],
-    'arena (sand.night)': tokens['tones']['sand']['night'],
-    'ladrillo pie (brick.night)': tokens['tones']['brick']['night'],
+    'blanco (light.night)': tokens['tones']['light']['night'],
+    'bruma (mist.night)': tokens['tones']['mist']['night'],
+    'profundo (deep.night)': tokens['tones']['deep']['night'],
     'papel (paper)': base['paper'],
     'turquesa Cartelera (turq)': base['turq'],
-    'ámbar llamado (tungsten)': base['tungsten'],
-    'terracota acento (light.tungsten)': tokens['tones']['light']['tungsten'],
+    'turquesa llamado (tungsten)': base['tungsten'],
+    'turquesa profundo acento (light.tungsten)': tokens['tones']['light']['tungsten'],
     'turquesa texto (light.turq)': tokens['tones']['light']['turq'],
     'noche hero (night)': base['night'],
 }

@@ -106,7 +106,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     return out;
   })()`);
   ck(name + ': elegir el tema Crónica marca Memorias, Poesía (sin equivalente) la deja y Narrativa vuelve a una colección de narrativa', link.chip === 'Memorias' && link.topic === 'cronica' && link.sinEquivalente === 'Memorias' && ['Ciencia ficción', 'Suspenso', 'Novela histórica'].includes(link.narrativa), JSON.stringify(link));
-  if (mobile) ck('móvil: el chip activo del carrusel y el del tema comparten fondo y tinta, y no son el terracota de «Cómo llegar»', link.chipBg === link.topicBg && link.chipFg === link.topicFg && link.chipBg !== link.ctaBg, JSON.stringify(link));
+  if (mobile) ck('móvil: el chip activo del carrusel y el del tema comparten fondo y tinta, y no son el turquesa profundo de «Cómo llegar»', link.chipBg === link.topicBg && link.chipFg === link.topicFg && link.chipBg !== link.ctaBg, JSON.stringify(link));
   await ev(`document.querySelector('[data-rail-viewport]').scrollTo({ left: 600, behavior: 'instant' })`);
   await sleep(500);
   const sc = await ev(`(() => { const r = document.querySelector('[data-rail]'); return { tr: getComputedStyle(r.querySelector('[data-rail-thumb]')).transform, prev: r.querySelector('[data-rail-prev]').disabled, next: r.querySelector('[data-rail-next]').disabled }; })()`);

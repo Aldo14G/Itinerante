@@ -363,8 +363,8 @@ test('cita sin filetes, barra inferior opaca (móvil)', async () => {
   assert.ok(!/blockquote::before/.test(quoteCss) && !/clip-path/.test(quoteCss) && !/linear-gradient/.test(quoteCss), 'la cita es tipografía sola: sin filetes por renglón ni animación decorativa');
   assert.ok(!/@keyframes/.test(quoteCss) && !/--q-h/.test(quoteCss));
   assert.ok(!/blockquote::before/.test(css), 'ninguna regla vieja de los filetes de la cita');
-  const tint = Number(tokensCss.match(/--glass-tint: rgb\(15 39 36 \/ ([0-9.]+)\)/)[1]);
-  const solid = Number(tokensCss.match(/--glass-solid: rgb\(15 39 36 \/ ([0-9.]+)\)/)[1]);
+  const tint = Number(tokensCss.match(/--glass-tint: rgb\(255 255 255 \/ ([0-9.]+)\)/)[1]);
+  const solid = Number(tokensCss.match(/--glass-solid: rgb\(255 255 255 \/ ([0-9.]+)\)/)[1]);
   assert.ok(tint >= 0.96 && solid >= 0.98, `la barra no deja ver contenido bajo las etiquetas (tinte ${tint}, sólido ${solid})`);
 });
 
@@ -710,7 +710,7 @@ test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única ac
   }
   assert.deepEqual(KIND_LABEL, { ai: 'Recreación IA', real: 'Foto real' }, 'las historias se rotulan con las mismas palabras que el resto del sitio');
   assert.ok(/\.profile-av, \.hl \{ display: none; \}/.test(css) && /\.hl \{ display: block; grid-area: hl; \}/.test(mobileCss), 'el perfil y los destacados son solo móvil');
-  assert.ok(/\.hl-img \{[^}]*background: var\(--stone\)/.test(mobileCss) && !/\.hl-img \{[^}]*(animation|terra|tungsten)/.test(mobileCss), 'el destacado sin foto se pinta arena (token), quieto: nunca el anillo terracota macizo');
+  assert.ok(/\.hl-img \{[^}]*background: var\(--stone\)/.test(mobileCss) && !/\.hl-img \{[^}]*(animation|terra|tungsten)/.test(mobileCss), 'el destacado sin foto se pinta con --stone (token), quieto: nunca el anillo del aro macizo');
   assert.ok(/\.hl-item \{[^}]*min-width: 64px/.test(mobileCss) && /\.hl-ring \{[^}]*width: 68px; height: 68px/.test(mobileCss), 'destacados de ≥ 44 px');
   assert.ok(/\.js \.hdr:not\(\.is-solid\) :is\(\.hdr-brand, \.hdr-wa\) \{ opacity: 0; visibility: hidden; \}/.test(mobileCss), 'al inicio la cabecera solo deja el menú; sin JS la marca sigue visible');
 });
@@ -968,9 +968,9 @@ test('géneros: todo género de la muestra tiene etiqueta en español y uno sin 
 });
 
 test('Libros: una sola taxonomía a la vista (mismo estado activo, tema ligado a colección) y «Filtros» sin el total de la muestra', async () => {
-  assert.ok(/\.topic\[aria-checked="true"\], \.topic\[aria-checked="true"\]:focus-visible \{[^}]*color: var\(--night\); background: var\(--bone\)/.test(mobileCss), 'el tema activo usa la tinta rellena');
-  assert.ok(/\.rail-chip\[aria-checked="true"\] \{[^}]*background: var\(--bone\)/.test(mobileCss), 'el chip de colección activo usa la misma tinta');
-  assert.ok(!/\.topic\[aria-checked="true"\][^{]*\{[^}]*background: var\(--tungsten\)/.test(mobileCss), 'el terracota relleno queda para «Cómo llegar»');
+  assert.ok(/\.topic\[aria-checked="true"\], \.topic\[aria-checked="true"\]:focus-visible \{[^}]*color: var\(--white\); background: var\(--terra\)/.test(mobileCss), 'el tema activo usa la cápsula turquesa (--terra) con texto blanco');
+  assert.ok(/\.rail-chip\[aria-checked="true"\] \{[^}]*color: var\(--white\); background: var\(--terra\)/.test(mobileCss), 'el chip de colección activo usa la misma cápsula');
+  assert.ok(!/\.topic\[aria-checked="true"\][^{]*\{[^}]*background: var\(--(tungsten|terra-deep)\)/.test(mobileCss), 'el turquesa profundo relleno (--terra-deep) queda para «Cómo llegar»');
   const cols = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
   const temas = cols.collections.map(c => c.tema).filter(Boolean);
   assert.ok(temas.length >= 2 && temas.every(t => Object.hasOwn(TOPICS, t) && t !== 'libre'), 'cada `tema` de colección es un tema de consulta real');

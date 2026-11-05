@@ -9,7 +9,7 @@
 html {
   background: var(--night);
   scroll-padding-top: calc(var(--hdr-h) + 8px);
-  scrollbar-color: var(--paper-dim) var(--paper); /* pista y pulgar de la paleta clara: casi todo el recorrido es cal, arena y papel, no la noche del hero */
+  scrollbar-color: var(--paper-dim) var(--paper); /* pista y pulgar de la paleta clara: casi todo el recorrido es blanco y bruma, no el tono profundo del pie */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -102,8 +102,9 @@ p { text-wrap: pretty; }
   text-transform: uppercase;
   white-space: nowrap;
 }
-.tag--ai { color: var(--tungsten-hi); background: color-mix(in srgb, var(--night) 80%, transparent); border-color: color-mix(in srgb, var(--tungsten) 50%, transparent); } /* chip al 80 %: sobre el campo turquesa el rótulo sigue en ≥ 4.5:1 */
-.tag--real { color: var(--turq-light); background: color-mix(in srgb, var(--night) 80%, transparent); border-color: color-mix(in srgb, var(--turq-light) 50%, transparent); }
+/* Un solo rótulo de procedencia en todo el sitio (foto, publicación, historia, ficha): chip blanco opaco con texto turquesa oscuro (11:1) y filete turquesa profundo
+   (≥ 3:1 sobre blanco, bruma y el campo turquesa; sobre fotos y el tono profundo lo delimita el relleno blanco). Tokens fijos: no se invierten con el tono. */
+.tag--ai, .tag--real { color: var(--terra-ink); background: var(--paper); border-color: var(--terra-deep); }
 
 /* ---------- Buttons ---------- */
 
@@ -140,7 +141,7 @@ p { text-wrap: pretty; }
 .btn .ic { width: 1.05em; height: 1.05em; transition: transform var(--dur-base) var(--ease-out); }
 .btn:hover .ic, .btn:focus-visible .ic { transform: translate(2px, -2px); }
 
-/* Acción primaria (siempre «Cómo llegar»): una sola clase, el mismo terracota con tinta clara sobre cualquier fondo. */
+/* Acción primaria (siempre «Cómo llegar»): una sola clase, el mismo turquesa profundo con tinta clara sobre cualquier fondo. */
 .btn--tungsten { background: var(--terra-deep); color: var(--white); --sweep: var(--terra); }
 .btn--ghost { color: var(--bone); border-color: var(--line-strong); background: color-mix(in srgb, var(--night) 28%, transparent); --sweep: var(--bone); }
 .btn--ghost:hover, .btn--ghost:focus-visible { color: var(--night); border-color: var(--bone); }
@@ -262,9 +263,10 @@ p { text-wrap: pretty; }
 .entry.is-live .entry-canvas { opacity: 1; }
 .entry-shade {
   position: absolute; inset: 0;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--night) 70%, transparent) 0%, color-mix(in srgb, var(--night) 0%, transparent) 22%, color-mix(in srgb, var(--night) 0%, transparent) 36%, color-mix(in srgb, var(--night) 82%, transparent) 54%, color-mix(in srgb, var(--night) 94%, transparent) 76%, color-mix(in srgb, var(--night) 98%, transparent) 100%),
-    radial-gradient(130% 95% at 55% 38%, transparent 52%, color-mix(in srgb, var(--night) 50%, transparent));
+  /* Velo mínimo, sin bruma radial: una franja corta arriba (solo lo que necesita la cabecera en tinta sobre la foto, hasta el 16 %) y un fundido al fondo
+     desde el 42 % para el texto de la entrada, que empieza al 58 % de la altura (medido con un muestreo de píxeles a 1280, 1440 y 1920: ≥ 4.5:1).
+     Entre ambos, del 16 % al 42 %, la foto se ve limpia. */
+  background: linear-gradient(180deg, color-mix(in srgb, var(--night) 72%, transparent) 0%, transparent 16%, transparent 42%, color-mix(in srgb, var(--night) 90%, transparent) 58%, color-mix(in srgb, var(--night) 96%, transparent) 78%, color-mix(in srgb, var(--night) 98%, transparent) 100%);
 }
 .entry-media::after {
   content: ""; position: absolute; inset: 0; background: var(--night);
@@ -505,7 +507,7 @@ p { text-wrap: pretty; }
   background: var(--tungsten); transform: translateY(-50%) scale(0); transition: transform var(--dur-base) var(--ease-out);
 }
 .topic:hover { color: color-mix(in srgb, var(--bone) 88%, transparent); }
-/* El tema elegido va en tinta plena (como el chip de colección activo); el terracota queda en el cuadrito y en «Cómo llegar». */
+/* El tema elegido va en tinta plena (en escritorio es una lista tipográfica, no un chip); el turquesa queda en el cuadrito y en «Cómo llegar». */
 .topic[aria-checked="true"] { color: var(--bone); font-stretch: 80%; translate: 0.55em 0; }
 .topic[aria-checked="true"]::before { transform: translateY(-50%) scale(1); }
 
@@ -539,11 +541,11 @@ p { text-wrap: pretty; }
 .composer input::placeholder { color: color-mix(in srgb, var(--bone) 50%, transparent); }
 .composer input:focus-visible { outline: 2px solid transparent; outline-offset: 4px; border-bottom-color: var(--tungsten); }
 .composer-hint { margin: 12px 0 0; font-size: var(--fs-1); color: var(--bone-dim); }
+/* Nota del mensaje: bloque plano (sin rotación ni sombra de caída), papel con filete de 1 px. */
 .note {
   margin: 0; padding: 20px 20px 20px;
   background: var(--paper); color: var(--paper-ink);
-  border-radius: var(--radius-2); rotate: -0.8deg;
-  box-shadow: 0 22px 44px -22px color-mix(in srgb, var(--black) 70%, transparent);
+  border: 1px solid var(--line); border-radius: var(--radius-2);
 }
 .note figcaption { margin-bottom: 8px; font: 750 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-dim); }
 .note-text { margin: 0; min-height: 2.9em; font: 520 var(--fs-2)/1.45 var(--f-sans); }
@@ -593,13 +595,12 @@ p { text-wrap: pretty; }
 .hours tr.is-today th, .hours tr.is-today td { font-weight: 800; }
 .hours tr.is-today th::after {
   content: "Hoy"; margin-left: 12px; padding: 4px 8px; border-radius: 4px; vertical-align: 2px;
-  background: var(--paper-ink); color: var(--paper); font: 700 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--terra); color: var(--white); font: 700 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.08em; text-transform: uppercase; /* «Hoy»: mismo código de «activo» que chips y pestaña */
 }
 .visit-note { margin: 16px 0 0; font-size: var(--fs-1); color: var(--paper-dim); }
 .visit-arrival { margin: var(--space-6) 0 0; } /* en escritorio va en la columna derecha, bajo el horario: la retícula 7/5 no deja un vacío junto a la foto */
 .visit-arrival .frame-clip { aspect-ratio: 16 / 9; background: var(--night); }
 .visit-arrival figcaption { display: flex; align-items: center; gap: 12px; margin-top: 12px; font: 560 var(--fs-1)/1.3 var(--f-sans); color: var(--paper-dim); }
-.visit-arrival .tag--ai { color: var(--terra-ink); background: color-mix(in srgb, var(--terra-deep) 8%, transparent); border-color: color-mix(in srgb, var(--terra-ink) 50%, transparent); }
 
 /* ---------- Footer ---------- */
 
@@ -684,7 +685,6 @@ p { text-wrap: pretty; }
   .topic-stage { aspect-ratio: 4 / 5; }
   .composer { grid-template-columns: 1fr; }
   .composer > .btn { justify-self: stretch; }
-  .note { rotate: 0deg; }
 
   .call-body { grid-template-columns: 1fr; }
   .visit { grid-template-columns: 1fr; }
@@ -709,8 +709,9 @@ p { text-wrap: pretty; }
 
 .cat { background: var(--night); padding: var(--sec-sm) var(--gutter) var(--sec-md); border-top: 1px solid var(--line); }
 .cat-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; align-items: end; margin-bottom: var(--space-7); }
+/* Sello de la muestra: etiqueta recta y plana (sin rotación ni sombra), contorno de 1 px en turquesa profundo. */
 .cat-seal {
-  margin: 0; padding: 12px 20px; border: 2px solid var(--terra); border-radius: 4px; rotate: 2deg;
+  margin: 0; padding: 12px 20px; border: 1px solid var(--terra-deep); border-radius: var(--radius-2);
   color: var(--terra-light); font: 780 var(--fs-0)/1.2 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; text-align: center;
 }
 .cat-lede { grid-column: 1 / -1; max-width: 60ch; margin: 0; color: var(--bone-dim); font-size: var(--fs-body); }
@@ -743,7 +744,7 @@ p { text-wrap: pretty; }
 }
 .cat-sort select { appearance: none; -webkit-appearance: none; padding-right: 40px; background-image: linear-gradient(45deg, transparent 50%, var(--bone) 50%), linear-gradient(135deg, var(--bone) 50%, transparent 50%); background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size: 5px 5px; background-repeat: no-repeat; }
 .cat-filters-btn { display: none; }
-.cat-filters-btn[aria-expanded="true"] { background: var(--bone); color: var(--night); }
+.cat-filters-btn[aria-expanded="true"] { background: var(--terra); color: var(--white); border-color: transparent; }
 
 .cat-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: clamp(28px, 4vw, 64px); align-items: start; padding-top: 32px; }
 .cat-filters { position: sticky; top: calc(var(--hdr-h) + 20px); display: grid; gap: 28px; max-height: calc(100svh - var(--hdr-h) - 40px); overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--stone-hi) transparent; }
@@ -774,7 +775,7 @@ p { text-wrap: pretty; }
 .cover img { width: 100%; height: 100%; object-fit: cover; }
 .cover--blank { display: grid; place-items: center; padding: 16px; background: linear-gradient(160deg, var(--turq-ink), var(--night-2)); border: 1px solid var(--line-strong); }
 .cover-title { font: 780 var(--fs-body)/1.05 var(--f-sans); font-stretch: 70%; text-transform: uppercase; text-align: center; color: var(--turq-light); text-wrap: balance; }
-.card:hover .cover, .card:focus-visible .cover { translate: 0 -8px; box-shadow: 0 26px 30px -22px color-mix(in srgb, var(--black) 90%, transparent); }
+.card:hover .cover, .card:focus-visible .cover { translate: 0 -8px; box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--black) 20%, transparent); }
 .cat-more { margin-top: 40px; }
 .cat-empty { display: grid; gap: 20px; justify-items: start; padding: 48px 0; }
 .cat-empty[hidden] { display: none; }
@@ -795,13 +796,13 @@ p { text-wrap: pretty; }
 .motion .drawer[open]::backdrop { opacity: 1; }
 @starting-style { .motion .drawer[open] { translate: 100% 0; } .motion .drawer[open]::backdrop { opacity: 0; } }
 .drawer-body { height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 28px clamp(22px, 4vw, 40px) 48px; display: grid; align-content: start; gap: 16px; }
-.drawer-close { position: sticky; top: 0; justify-self: end; z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; margin: -8px -12px -28px 0; border: 1px solid color-mix(in srgb, var(--paper-ink) 35%, transparent); border-radius: 50%; background: var(--paper); color: var(--paper-ink); cursor: pointer; }
+.drawer-close { position: sticky; top: 0; justify-self: end; z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; margin: -8px -12px -28px 0; border: 1px solid color-mix(in srgb, var(--paper-ink) 50%, transparent); border-radius: 50%; background: var(--paper); color: var(--paper-ink); cursor: pointer; }
 .drawer-close .ic { width: 24px; height: 24px; rotate: 45deg; }
 /* Escritorio: el grupo de cabecera de la ficha no existe como caja (el contenido fluye en la columna); en móvil se pone junto a la portada (mobile.css). */
 .drawer-head { display: contents; }
 .drawer-cover { width: min(220px, 56%); }
-.drawer-cover .cover { box-shadow: 0 30px 40px -26px color-mix(in srgb, var(--paper-ink) 70%, transparent); }
-.drawer-tag { justify-self: start; margin: 8px 0 0; color: var(--terra-ink); background: color-mix(in srgb, var(--terra-deep) 8%, transparent); border-color: color-mix(in srgb, var(--terra-ink) 50%, transparent); }
+.drawer-cover .cover { box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--black) 20%, transparent); }
+.drawer-tag { justify-self: start; margin: 8px 0 0; }
 .drawer h3 { margin: 0; font: 820 clamp(1.9rem, 4vw, 2.7rem)/0.98 var(--f-sans); font-stretch: 72%; text-transform: uppercase; letter-spacing: -0.01em; text-wrap: balance; }
 .drawer-author { margin: 0; font: 600 var(--fs-3)/1.3 var(--f-sans); color: var(--paper-dim); }
 .drawer-facts { display: grid; grid-template-columns: auto 1fr; gap: 0 24px; margin: 12px 0 0; border-top: 2px solid var(--paper-ink); }
@@ -831,7 +832,7 @@ p { text-wrap: pretty; }
 }
 @media (max-width: 760px) {
   .cat-head { grid-template-columns: 1fr; }
-  .cat-seal { justify-self: start; rotate: -1.5deg; }
+  .cat-seal { justify-self: start; }
   .cat-filters { grid-template-columns: 1fr; }
   .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
   .cat-more { width: 100%; }
@@ -890,7 +891,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .tone-7 { background: linear-gradient(165deg, var(--cover-7-a), var(--cover-7-b)); }
 .tone-8 { background: linear-gradient(165deg, var(--cover-8-a), var(--cover-8-b)); }
 .tone-9 { background: linear-gradient(165deg, var(--cover-9-a), var(--cover-9-b)); }
-/* Las portadas claras (crema, arena, turquesa apagado, yeso rosado) llevan tinta oscura propia; las oscuras, la tinta clara de :root. */
+/* Las portadas claras (turquesa del logo, bruma, turquesa apagado, gris azulado) llevan tinta oscura propia; las oscuras, la tinta clara de :root. */
 .tone-6 { --cover-ink: var(--cover-6-ink); --cover-ink-dim: var(--cover-6-ink-dim); }
 .tone-7 { --cover-ink: var(--cover-7-ink); --cover-ink-dim: var(--cover-7-ink-dim); }
 .tone-8 { --cover-ink: var(--cover-8-ink); --cover-ink-dim: var(--cover-8-ink-dim); }
@@ -905,11 +906,8 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 .cat [hidden] { display: none !important; }
 
-/* Lomo y adorno de piso en todas las portadas, para que SVG y tarjetas lean como un solo sistema */
-.cover::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 7%; background: linear-gradient(90deg, color-mix(in srgb, var(--black) 38%, transparent), color-mix(in srgb, var(--white) 14%, transparent) 55%, transparent); pointer-events: none; }
-.cover--blank::before { content: ""; position: absolute; right: 12px; bottom: 12px; width: 30px; height: 20px; background: repeating-conic-gradient(color-mix(in srgb, var(--cover-ink) 38%, transparent) 0 25%, transparent 0 50%) 0 0 / 10px 10px; pointer-events: none; }
+/* Portada plana: campo de color, título y autor, filete de 1 px. Sin lomo ni adorno de piso (el ajedrezado es de la casa, no de la portada). El relleno inferior y derecho deja sitio al marcador de guardar. */
 .cover--blank { padding-bottom: 32px; }
-.rel .cover--blank::before { display: none; }
 .cover--blank .cover-author { padding-right: 48px; }
 .rel .cover--blank .cover-author { padding-right: 0; }
 /* Composición de la portada de plantilla (el hash del título elige una de cuatro; 0 = título arriba y autor abajo, centrados; 1 y 2 a la izquierda; 3 al centro). No cambia color ni contraste. */
@@ -917,7 +915,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .cover--blank[data-cover-layout="1"] { grid-template-rows: 1fr auto; }
 .cover--blank[data-cover-layout="1"] .cover-title { align-self: center; }
 .cover--blank[data-cover-layout="2"] .cover-author { order: -1; padding-right: 0; }
-.cover--blank[data-cover-layout="2"] .cover-title { padding-right: 48px; } /* abajo, junto al botón de guardar y al adorno */
+.cover--blank[data-cover-layout="2"] .cover-title { padding-right: 48px; } /* abajo, junto al botón de guardar */
 .cover--blank[data-cover-layout="3"] { align-content: center; justify-items: center; gap: 16px; text-align: center; }
 .cover--blank[data-cover-layout="3"] .cover-title, .cover--blank[data-cover-layout="3"] .cover-author { text-align: center; padding-right: 0; }
 
@@ -1040,7 +1038,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
   .motion .btn--ghost:hover > span, .motion .btn--line:hover > span, .motion .btn--line-ink:hover > span { animation: celluloid var(--dur-fast) steps(1, end) 2; }
 }
 
-/* Cita: tipografía sola sobre ladrillo. Sin filetes por renglón (cruzaban las letras); solo entra el texto. */
+/* Cita: tipografía sola sobre el tono profundo. Sin filetes por renglón (cruzaban las letras); solo entra el texto. */
 .quote { margin: 0; padding: var(--sec-md) var(--gutter); background: var(--night); border-top: 1px solid var(--line); }
 .quote.rx::before { top: 28px; left: var(--gutter); }
 .quote.rx::after { bottom: 28px; right: var(--gutter); }
@@ -1156,7 +1154,7 @@ html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in s
   font: 650 var(--fs-1)/1 var(--f-sans); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast);
 }
-.rail-chip[aria-checked="true"] { color: var(--night); background: var(--bone); border-color: transparent; }
+.rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; } /* único código de «activo»: cápsula turquesa con texto blanco */
 .rail-viewport {
   margin-inline: calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) var(--space-4);
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none;
@@ -1199,7 +1197,7 @@ html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in s
 .save {
   position: absolute; top: calc(150cqw - var(--target-coarse) - var(--space-2)); right: var(--space-2); z-index: 2;
   display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; cursor: pointer;
-  color: var(--paper-ink); background: color-mix(in srgb, var(--white) 94%, transparent); /* casi opaco: el adorno de piso de la portada no debe verse a través */
+  color: var(--paper-ink); background: color-mix(in srgb, var(--white) 94%, transparent); /* casi opaco sobre la portada */
   border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: 50%;
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
 }
@@ -1215,13 +1213,14 @@ html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in s
 .toast {
   position: fixed; inset: auto auto calc(env(safe-area-inset-bottom) + var(--space-5)) 50%; margin: 0; translate: -50% 0;
   display: none; align-items: center; gap: var(--space-3); width: max-content; max-width: min(92vw, 440px); padding: var(--space-2) var(--space-4);
-  color: var(--bone); font: 600 var(--fs-1)/1.3 var(--f-sans); background: var(--glass-solid); border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
+  color: var(--paper-ink); font: 600 var(--fs-1)/1.3 var(--f-sans); background: var(--glass-solid); border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: var(--radius-pill);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--black) 18%, transparent); /* mismo cromo que la barra inferior */
 }
 .toast:popover-open { display: flex; }
-.toast-action { white-space: nowrap; min-height: var(--target-coarse); padding: 0 var(--space-2); color: var(--tungsten-hi); font: inherit; font-weight: 750; cursor: pointer; background: none; border: 0; }
+.toast-action { white-space: nowrap; min-height: var(--target-coarse); padding: 0 var(--space-2); color: var(--terra-deep); font: inherit; font-weight: 750; cursor: pointer; background: none; border: 0; }
 .hdr-list {
-  display: inline-flex; align-items: center; gap: var(--space-1); min-height: 44px; padding: 0 var(--space-3); color: inherit; cursor: pointer;
-  font: 700 var(--fs-1)/1 var(--f-sans); font-variant-numeric: tabular-nums; background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; gap: var(--space-1); min-height: 44px; padding: 0 var(--space-3); color: var(--paper-ink); cursor: pointer;
+  font: 700 var(--fs-1)/1 var(--f-sans); font-variant-numeric: tabular-nums; background: var(--glass-solid); border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
 }
 .hdr-list[hidden] { display: none; }
 .hdr-list .ic { width: 18px; height: 18px; }
@@ -1260,12 +1259,12 @@ html.explorer-open { overflow: hidden; }
 .act {
   display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-coarse); padding: 0 var(--space-4);
   color: inherit; cursor: pointer; font: 650 var(--fs-1)/1 var(--f-sans); background: none;
-  border: 1px solid color-mix(in srgb, currentColor 45%, transparent); border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, currentColor 60%, transparent); border-radius: var(--radius-pill); /* 60 %: filete ≥ 3:1 también sobre el campo turquesa */
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
 }
 .act .ic { width: 20px; height: 20px; }
 .act:active { scale: 0.96; }
-.act[aria-pressed="true"] { color: var(--bone); background: var(--turq-ink); border-color: transparent; }
+.act[aria-pressed="true"] { color: var(--white); background: var(--terra); border-color: transparent; } /* mismo código de «activo» que chips, pestaña y «Hoy» */
 .act[aria-pressed="true"] .ic { fill: currentColor; }
 html:not(.js) .bill-acts { display: none; }
 .bill-visit { margin-top: var(--space-5); }

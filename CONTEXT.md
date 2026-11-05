@@ -3,7 +3,7 @@
 ## Domain Terms
 
 - **B.4 «Función de la casa»**: el sitio público vigente, en la raíz del repositorio. La librería se presenta como una función de cine: se entra a la casa con el propio scroll. Sistema de diseño en `DESIGN.md` y `design/tokens.json`.
-- **Tono de sección** (`data-tone="light|sand|brick"`): redefine los mismos tokens dentro de una sección y pinta su fondo. El hero y el catálogo van en `light`, La casa y Libros en `sand`, la cita y el pie en `brick`.
+- **Tono de sección** (`data-tone="light|mist|deep"`): redefine los mismos tokens dentro de una sección y pinta su fondo. El hero, el manifiesto y el catálogo van en `light` (blanco), La casa y Libros en `mist` (bruma, blanco teñido de turquesa), la cita y el pie en `deep` (turquesa casi negro). Cartelera y el llamado pintan el campo turquesa del logo.
 - **Recorrido de la entrada**: 145 fotogramas en canvas sincronizados al scroll, solo en escritorio y con movimiento. En móvil, con movimiento reducido o con ahorro de datos, el hero es un póster fijo.
 - **Cartelera**: propuestas de actividades sin fecha, cupo ni costo; el CTA es consulta por WhatsApp, no reserva.
 - **Catálogo de muestra**: `#catalogo`, 500 registros de prueba en `assets/data/catalog.json` con búsqueda y filtros locales, rotulado «Datos de muestra · no es inventario». No consulta `/api/catalog`.

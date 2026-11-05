@@ -15,6 +15,9 @@ def oklch(hexv):
 print('PAREDES (tonos medios de las fotos): L  C  H')
 for n,h in {'piedra gris cálida':'#90826e','piedra oscura':'#746962','yeso rosado':'#d3baac','yeso/ladrillo':'#9e7a70','ladrillo ocre':'#ac7354','ladrillo tostado':'#96623f','madera/tierra':'#bb946f','madera oscura':'#644437','café profundo':'#5c443b'}.items():
     print(f'  {n:22s}{h} {oklch(h)}')
-print('NUESTRA PALETA:')
-for n,h in {'cal':'#fbf8f2','arena':'#efe3cc','papel':'#efe6d5','ladrillo pie':'#8a3720','terracota acento':'#a8432a','turquesa Cartelera':'#34b3a5','turquesa texto':'#176b62','ámbar llamado':'#f0b357','tinta':'#2a1d14'}.items():
-    print(f'  {n:22s}{h} {oklch(h)}')
+print('NUESTRA PALETA (design/tokens.json, 2026-11): L  C  H   (campos ≤ 0.09, acentos ≤ 0.11)')
+import json, os
+_t = json.load(open(os.path.join(os.path.dirname(__file__), '..', '..', 'design', 'tokens.json'), encoding='utf-8'))['themes']['b4']
+_c, _tones = _t['color'], _t['tones']
+for n,h in {'blanco (light.night)':_tones['light']['night'],'bruma (mist.night)':_tones['mist']['night'],'turquesa logo (turq)':_c['turq'],'tinta (light.bone)':_tones['light']['bone'],'turquesa profundo (terra-deep)':_c['terra-deep'],'acento activo (terra)':_c['terra'],'turquesa texto (light.turq)':_tones['light']['turq'],'profundo (deep.night)':_tones['deep']['night']}.items():
+    print(f'  {n:32s}{h} {oklch(h)}')

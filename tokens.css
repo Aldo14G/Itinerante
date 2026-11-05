@@ -10,7 +10,7 @@
   --cover-ink: #f8f8f8;
   --cover-ink-dim: #cfe3df;
   --line: rgb(248 248 248 / 0.14);
-  --line-strong: rgb(248 248 248 / 0.34);
+  --line-strong: rgb(248 248 248 / 0.4);
   --field: rgb(248 248 248 / 0.62);
   --tungsten: #7ac4b4;
   --tungsten-hi: #8fe0d5;
@@ -58,10 +58,10 @@
   --cover-9-b: #aebfc7;
   --cover-9-ink: #10201e;
   --cover-9-ink-dim: #2d3f46;
-  --glass-tint: rgb(15 39 36 / 1);
-  --glass-solid: rgb(15 39 36 / 1);
-  --glass-edge: rgb(255 255 255 / 0.12);
-  --glass-chip: rgb(255 255 255 / 0.08);
+  --glass-tint: rgb(255 255 255 / 1);
+  --glass-solid: rgb(255 255 255 / 1);
+  --glass-edge: rgb(16 32 30 / 0.6);
+  --glass-chip: rgb(16 32 30 / 0.06);
 
   /* Tipografía */
   --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
@@ -137,14 +137,14 @@
   --bone: #10201e;
   --bone-dim: #4b5e5b;
   --line: rgb(16 32 30 / 0.14);
-  --line-strong: rgb(16 32 30 / 0.34);
+  --line-strong: rgb(16 32 30 / 0.5);
   --field: rgb(16 32 30 / 0.62);
   --tungsten: #176b62;
   --tungsten-hi: #0f5f56;
   --turq: #176b62;
   --turq-light: #176b62;
   --terra-light: #176b62;
-  --glass-edge: rgb(16 32 30 / 0.14);
+  --glass-edge: rgb(16 32 30 / 0.6);
   --glass-chip: rgb(16 32 30 / 0.06);
   background: var(--night);
   color: var(--bone);
@@ -159,14 +159,14 @@
   --bone: #10201e;
   --bone-dim: #44605b;
   --line: rgb(16 32 30 / 0.14);
-  --line-strong: rgb(16 32 30 / 0.34);
+  --line-strong: rgb(16 32 30 / 0.5);
   --field: rgb(16 32 30 / 0.62);
   --tungsten: #14625a;
   --tungsten-hi: #0f5248;
   --turq: #14625a;
   --turq-light: #14625a;
   --terra-light: #14625a;
-  --glass-edge: rgb(16 32 30 / 0.14);
+  --glass-edge: rgb(16 32 30 / 0.6);
   --glass-chip: rgb(16 32 30 / 0.06);
   background: var(--night);
   color: var(--bone);
