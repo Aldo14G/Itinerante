@@ -432,8 +432,12 @@ p { text-wrap: pretty; }
 .bill { background: var(--turq); color: var(--turq-ink); padding: var(--sec-md) var(--gutter); }
 .bill .h2 em { color: var(--turq-ink); }
 .bill-head { display: grid; gap: 28px; margin-bottom: var(--space-7); }
-.bill-head .h2 { font-size: clamp(3.2rem, 9vw, 9rem); }
+.bill-head .h2 { font-size: clamp(3.2rem, 6vw, 6rem); } /* mismo tope que Libros y Visita: a 9rem la cabecera medía 300 px y, con la banda, 0.9 pantallas de turquesa con una sola palabra (CR1-01) */
 .bill-head p { margin: 0; max-width: 62ch; padding-top: 20px; border-top: 2px solid var(--turq-ink); font-size: var(--fs-body); }
+@media (min-width: 1024px) {
+  /* CR1-01: titular a la izquierda, sobre el escenario, e intro con su filete a la derecha, sobre la lista: las mismas columnas que .bill-body, con el titular como mínimo de su columna para que «Cartelera» no parta a 1024 */
+  .bill-head { grid-template-columns: minmax(min-content, 5fr) minmax(0, 7fr); column-gap: clamp(32px, 5vw, 80px); align-items: end; }
+}
 .bill-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
 
 .bill-stage { position: sticky; top: calc(var(--hdr-h) + 28px); margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 2px; background: var(--turq-ink); }
