@@ -34,6 +34,9 @@ p { text-wrap: pretty; }
 
 :focus-visible { outline: 2px solid var(--tungsten); outline-offset: 3px; border-radius: var(--radius-2); }
 [data-theme="paper"] :focus-visible, [data-theme="turq"] :focus-visible, [data-theme="tungsten"] :focus-visible, .hdr[data-on] :focus-visible { outline-color: var(--paper-ink); }
+/* Cabecera sobre la foto del hero (data-on sin is-solid) y chips móviles: anillo de dos capas, tinta de 2 px pegada al control y halo blanco de 4 px por fuera.
+   El anillo mide ≥ 3:1 contra el halo y contra el control, y el halo contra la foto, sea cual sea la foto (QA1-01: 1.37:1 con el anillo solo). */
+.hdr[data-on] :focus-visible, .hdr-more:focus-visible, .hdr-wa:focus-visible, .hdr-list:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: 0; box-shadow: 0 0 0 6px var(--white); }
 
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .ic { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -147,7 +150,7 @@ p { text-wrap: pretty; }
 .btn--ghost:hover, .btn--ghost:focus-visible { color: var(--night); border-color: var(--bone); }
 .btn--line { color: var(--night); border-color: var(--night); --sweep: var(--night); }
 .btn--line:hover, .btn--line:focus-visible { color: var(--tungsten); }
-.btn--line-ink { color: var(--paper-ink); border-color: color-mix(in srgb, var(--paper-ink) 50%, transparent); background: transparent; --sweep: var(--paper-ink); } /* también sobre <button> (Reintentar): sin el gris del agente de usuario */
+.btn--line-ink { color: var(--paper-ink); border-color: color-mix(in srgb, var(--paper-ink) 70%, transparent); background: transparent; --sweep: var(--paper-ink); } /* 70 %: ≥ 3:1 también sobre el campo turquesa de Cartelera (QA1-03) */ /* también sobre <button> (Reintentar): sin el gris del agente de usuario */
 .btn--line-ink:hover, .btn--line-ink:focus-visible { color: var(--paper); }
 .btn--sm { min-height: 40px; padding: 0 1em; font-size: var(--fs-1); }
 
@@ -512,15 +515,12 @@ p { text-wrap: pretty; }
 .topic[aria-checked="true"] { color: var(--bone); font-stretch: 80%; translate: 0.55em 0; }
 .topic[aria-checked="true"]::before { transform: translateY(-50%) scale(1); }
 
-.topic-stage { position: relative; aspect-ratio: 5 / 4; overflow: hidden; border-radius: 2px; background: var(--stone); }
-.topic-layers, .topic-layer { position: absolute; inset: 0; }
+/* La foto del tema va limpia (sin velo): el nombre, la frase y el rótulo se colocan debajo, como en La casa y la Visita (CR1-07). */
+.topic-stage { position: relative; display: grid; gap: var(--space-3); }
+.topic-layers { position: relative; aspect-ratio: 5 / 4; overflow: hidden; border-radius: 2px; background: var(--stone); }
+.topic-layer { position: absolute; inset: 0; }
 .topic-layer img { width: 100%; height: 100%; object-fit: cover; }
-.topic-card {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
-  display: grid; gap: 12px;
-  padding: 92px clamp(20px, 3vw, 40px) clamp(20px, 3vw, 36px);
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night) 80%, transparent) 38%, color-mix(in srgb, var(--night) 95%, transparent));
-}
+.topic-card { display: grid; gap: 12px; }
 .topic-name { margin: 0; overflow: hidden; padding-bottom: 0.08em; font: italic 500 clamp(2.6rem, 5vw, 5rem)/1 var(--f-serif); letter-spacing: -0.02em; color: var(--bone); white-space: nowrap; }
 .topic-name .ch { display: inline-block; white-space: pre; }
 .topic-line { margin: 0; max-width: 46ch; font-size: var(--fs-body); }
@@ -683,7 +683,7 @@ p { text-wrap: pretty; }
   .topic { font-size: clamp(2rem, 10vw, 3rem); }
   .topic[aria-checked="true"] { translate: 0 0; }
   .topic::before { display: none; }
-  .topic-stage { aspect-ratio: 4 / 5; }
+  .topic-layers { aspect-ratio: 4 / 5; }
   .composer { grid-template-columns: 1fr; }
   .composer > .btn { justify-self: stretch; }
 
@@ -774,7 +774,7 @@ p { text-wrap: pretty; }
 .card { display: grid; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto var(--card-h); }
 .cover { position: relative; display: block; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 2px; background: var(--stone); transition: translate var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
 .cover img { width: 100%; height: 100%; object-fit: cover; }
-.cover--blank { display: grid; place-items: center; padding: 16px; background: linear-gradient(160deg, var(--turq-ink), var(--night-2)); border: 1px solid var(--line-strong); }
+.cover--blank { display: grid; place-items: center; padding: 16px; background: var(--turq-ink); border: 1px solid var(--line-strong); }
 .cover-title { font: 780 var(--fs-body)/1.05 var(--f-sans); font-stretch: 70%; text-transform: uppercase; text-align: center; color: var(--turq-light); text-wrap: balance; }
 .card:hover .cover, .card:focus-visible .cover { translate: 0 -8px; box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--black) 20%, transparent); }
 .cat-more { margin-top: 40px; }
@@ -787,7 +787,7 @@ p { text-wrap: pretty; }
   position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0;
   width: min(540px, 100vw); max-width: 100vw; height: 100dvh; max-height: 100dvh;
   border: 0; background: var(--paper); color: var(--paper-ink);
-  box-shadow: -30px 0 70px -30px color-mix(in srgb, var(--black) 80%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--black) 18%, transparent); /* la misma sombra que la barra y el aviso; el fondo atenuado ya separa la hoja */
 }
 .drawer::backdrop { background: color-mix(in srgb, var(--night) 70%, transparent); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .drawer:not([open]) { display: none; }
@@ -844,7 +844,7 @@ p { text-wrap: pretty; }
 html:not(.js) :is(.menu-btn, .topics, .composer-field, .motion-btn, .cat-bar, .cat-layout) { display: none; }
 html:not(.js) .hdr::before { opacity: 1; }
 html:not(.js) .books-grid { grid-template-columns: minmax(0, 1fr); }
-html:not(.js) .topic-stage { aspect-ratio: 16 / 9; }
+html:not(.js) .topic-layers { aspect-ratio: 16 / 9; }
 html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 @media (max-width: 1100px) {
   html:not(.js) { --hdr-h: 104px; }
@@ -882,16 +882,16 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .cover-author { font: 600 var(--fs-0)/1.2 var(--f-sans); letter-spacing: 0.04em; color: var(--cover-ink-dim); }
 .cover-title { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; text-align: left; font-size: clamp(1.05rem, 1.7vw, 1.5rem); line-height: 0.98; }
 .cover-author { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.tone-0 { background: linear-gradient(165deg, var(--cover-0-a), var(--cover-0-b)); }
-.tone-1 { background: linear-gradient(165deg, var(--cover-1-a), var(--cover-1-b)); }
-.tone-2 { background: linear-gradient(165deg, var(--cover-2-a), var(--cover-2-b)); }
-.tone-3 { background: linear-gradient(165deg, var(--cover-3-a), var(--cover-3-b)); }
-.tone-4 { background: linear-gradient(165deg, var(--cover-4-a), var(--cover-4-b)); }
-.tone-5 { background: linear-gradient(165deg, var(--cover-5-a), var(--cover-5-b)); }
-.tone-6 { background: linear-gradient(165deg, var(--cover-6-a), var(--cover-6-b)); }
-.tone-7 { background: linear-gradient(165deg, var(--cover-7-a), var(--cover-7-b)); }
-.tone-8 { background: linear-gradient(165deg, var(--cover-8-a), var(--cover-8-b)); }
-.tone-9 { background: linear-gradient(165deg, var(--cover-9-a), var(--cover-9-b)); }
+.tone-0 { background: var(--cover-0-a); }
+.tone-1 { background: var(--cover-1-a); }
+.tone-2 { background: var(--cover-2-a); }
+.tone-3 { background: var(--cover-3-a); }
+.tone-4 { background: var(--cover-4-a); }
+.tone-5 { background: var(--cover-5-a); }
+.tone-6 { background: var(--cover-6-a); }
+.tone-7 { background: var(--cover-7-a); }
+.tone-8 { background: var(--cover-8-a); }
+.tone-9 { background: var(--cover-9-a); }
 /* Las portadas claras (turquesa del logo, bruma, turquesa apagado, gris azulado) llevan tinta oscura propia; las oscuras, la tinta clara de :root. */
 .tone-6 { --cover-ink: var(--cover-6-ink); --cover-ink-dim: var(--cover-6-ink-dim); }
 .tone-7 { --cover-ink: var(--cover-7-ink); --cover-ink-dim: var(--cover-7-ink-dim); }
@@ -1187,7 +1187,7 @@ html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in s
   position: absolute; top: calc(150cqw - var(--target-coarse) - var(--space-2)); right: var(--space-2); z-index: 2;
   display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; cursor: pointer;
   color: var(--paper-ink); background: color-mix(in srgb, var(--white) 94%, transparent); /* casi opaco sobre la portada */
-  border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--paper-ink) 55%, transparent); border-radius: 50%; /* ≥ 3:1 sobre el relleno blanco (QA1-02) */
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
 }
 .save .ic { width: 22px; height: 22px; }

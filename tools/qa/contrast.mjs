@@ -36,7 +36,7 @@ const SWEEP = `window.__sweep = (label) => {
     if (cs.visibility === 'hidden' || cs.display === 'none' || r.width === 0 || r.height === 0 || Number(cs.opacity) < 0.5) return;
     if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) return;
     if (e.closest('.hdr, .tabbar, .toast')) return; // su fondo es un pseudoelemento o vidrio: lo juzga el crítico con capturas
-    if (e.closest('.entry-media, .entry-beat, .house-pin .still-img, .topic-card')) return; // texto sobre foto: lo juzga el crítico con capturas
+    if (e.closest('.entry-media, .entry-beat, .house-pin .still-img')) return; // texto sobre foto: lo juzga el crítico con capturas (el texto del tema ya va debajo de la foto y se mide aquí)
     const big = parseFloat(cs.fontSize) >= 24 || (parseFloat(cs.fontSize) >= 18.66 && Number(cs.fontWeight) >= 700);
     const bg = bgOf(e); const rr = ratio(cs.color, bg);
     if (rr < (big ? 3 : 4.5)) bad.push({ state: label, el: (e.className && String(e.className).split(' ')[0]) || e.tagName, text: e.textContent.trim().slice(0, 28), ratio: +rr.toFixed(2), fg: cs.color, bg });

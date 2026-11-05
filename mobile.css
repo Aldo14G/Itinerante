@@ -193,7 +193,7 @@ html:not(.js) .tabbar { display: none; }
 .topic {
   flex: none; min-height: var(--target-coarse); padding: 0 var(--space-4); scroll-snap-align: start;
   font: 700 var(--fs-1)/1 var(--f-sans); font-stretch: 100%; text-transform: none; letter-spacing: 0;
-  color: var(--bone); background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: var(--radius-pill);
+  color: var(--bone); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); /* misma piel que .rail-chip y que el escritorio: sin relleno gris (CR1-06) */
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
 }
 /* Un solo estado activo para toda elección de Libros (colección del carrusel y tema de consulta): cápsula turquesa --terra con texto blanco, como `.rail-chip`, la pestaña activa y «Hoy». El turquesa profundo (--terra-deep) queda para «Cómo llegar». */
@@ -322,7 +322,7 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .rail-track { --rail-gap: var(--space-3); }
 .rail-chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter); scroll-padding-inline: var(--gutter); scrollbar-width: none; }
 .rail-chips::-webkit-scrollbar { display: none; }
-.rail-chip { flex: none; background: var(--glass-chip); border-color: var(--glass-edge); }
+.rail-chip { flex: none; } /* la piel (transparente, filete --line-strong) es la de style.css: una sola en móvil y escritorio */
 .rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; }
 
 /* Guardar y Mi lista en móvil: hoja inferior, aviso sobre la barra y chip de cabecera (con libros guardados) que cuenta lo anotado y abre la hoja: lo guardado no se pierde de vista (U03). Mismo cromo y alto que el menú. */
@@ -345,7 +345,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 /* Cierre de Libros: tras el buscador solo queda un escalón de ritmo (--sec-sm), no el doble, y el bloque final lleva su frase. */
 .cat { padding-bottom: var(--sec-sm); }
 .cat-head { margin-bottom: 0; } /* la hoja de exploración está cerrada: no hay nada debajo del buscador que separar */
-.topic-stage { aspect-ratio: 4 / 3; }
+.topic-layers { aspect-ratio: 4 / 3; }
 .explore-open {
   display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: 0 var(--space-4); color: var(--bone-dim); cursor: pointer;
   font: 560 var(--fs-2)/1 var(--f-sans); text-align: left; background: var(--glass-chip); border: 1px solid var(--line-strong); border-radius: var(--radius-pill);

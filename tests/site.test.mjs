@@ -512,7 +512,7 @@ test('paleta: los campos de color a ancho completo no superan el croma del turqu
   const FILL_MAX = 0.09; // el turquesa del logo (#7ac4b4) mide 0.078: ningún campo lo supera; lo rústico de la casa queda en las fotos
   const ACCENT_MAX = 0.11;
   const fills = { 'blanco': tk.tones.light.night, 'bruma': tk.tones.mist.night, 'profundo': tk.tones.deep.night, 'turquesa (Cartelera)': tk.color.turq, 'turquesa (llamado)': tk.color.tungsten, 'papel': tk.color.paper };
-  for (let i = 0; i < 10; i++) for (const stop of ['a', 'b']) fills[`portada ${i}${stop}`] = tk.color[`cover-${i}-${stop}`]; // las portadas son campos de color: mismo límite que las paredes
+  for (let i = 0; i < 10; i++) fills[`portada ${i}`] = tk.color[`cover-${i}-a`]; // las portadas son campos de color: mismo límite que las paredes
   for (const [name, hex] of Object.entries(fills)) assert.ok(chroma(hex) <= FILL_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${FILL_MAX}`);
   const accents = { 'primaria (blanco)': tk.tones.light.tungsten, 'primaria (bruma)': tk.tones.mist.tungsten, 'turquesa texto (blanco)': tk.tones.light.turq, 'turquesa texto (bruma)': tk.tones.mist.turq, 'estado abierto': tk.color.open };
   for (const [name, hex] of Object.entries(accents)) assert.ok(chroma(hex) <= ACCENT_MAX, `${name} ${hex}: croma ${chroma(hex).toFixed(3)} > ${ACCENT_MAX}`);
@@ -522,7 +522,7 @@ test('paleta: los campos de color a ancho completo no superan el croma del turqu
   assert.equal(tk.color['turq-base'], tk.color.turq, 'la cortinilla termina exactamente en el color de Cartelera');
 });
 
-test('portadas: el autor y el título se leen sobre la parada más clara de cada degradado', async () => {
+test('portadas: el autor y el título se leen sobre el campo plano de cada portada', async () => {
   const tk = JSON.parse(await readFile(new URL('../design/tokens.json', import.meta.url), 'utf8')).themes.b4.color;
   const lum = hex => { const [r, g, b] = [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16) / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
@@ -531,12 +531,12 @@ test('portadas: el autor y el título se leen sobre la parada más clara de cada
     const own = i >= 6;
     const ink = own ? tk[`cover-${i}-ink`] : tk['cover-ink'], dim = own ? tk[`cover-${i}-ink-dim`] : tk['cover-ink-dim'];
     assert.ok(!own || (ink && dim), `cover-${i} trae su propia tinta`);
-    for (const stop of ['a', 'b']) {
-      const bg = tk[`cover-${i}-${stop}`];
-      assert.ok(ratio(dim, bg) >= 4.5, `autor sobre cover-${i}-${stop}: ${ratio(dim, bg).toFixed(2)}:1`);
-      assert.ok(ratio(ink, bg) >= 4.5, `título sobre cover-${i}-${stop}: ${ratio(ink, bg).toFixed(2)}:1`);
-    }
-    assert.ok(css.includes(`.tone-${i} { background: linear-gradient(165deg, var(--cover-${i}-a), var(--cover-${i}-b)); }`), `tone-${i} usa solo los tokens de su portada`);
+    const bg = tk[`cover-${i}-a`];
+    assert.ok(ratio(dim, bg) >= 4.5, `autor sobre cover-${i}-a: ${ratio(dim, bg).toFixed(2)}:1`);
+    assert.ok(ratio(ink, bg) >= 4.5, `título sobre cover-${i}-a: ${ratio(ink, bg).toFixed(2)}:1`);
+    assert.equal(tk[`cover-${i}-b`], undefined, `cover-${i} es un campo plano: sin segunda parada`);
+    assert.ok(css.includes(`.tone-${i} { background: var(--cover-${i}-a); }`), `tone-${i} es un campo plano con el token de su portada (sin degradado)`);
+    assert.ok(!/\.cover--blank \{[^}]*gradient/.test(css), 'la portada base tampoco lleva degradado');
     if (own) assert.ok(css.includes(`.tone-${i} { --cover-ink: var(--cover-${i}-ink); --cover-ink-dim: var(--cover-${i}-ink-dim); }`), `tone-${i} usa su tinta`);
   }
 });
@@ -552,9 +552,9 @@ test('portadas: las dos familias son frías o neutras (turquesa, azul, gris): na
     const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, bb = 0.0259040371 * l + 0.782771766 * m - 0.808675766 * s;
     return { c: Math.hypot(a, bb), h: (Math.atan2(bb, a) * 180 / Math.PI + 360) % 360 };
   };
-  for (const i of [...TONES.fiction, ...TONES['non-fiction']]) for (const stop of ['a', 'b']) {
-    const { c, h } = hue(tk[`cover-${i}-${stop}`]);
-    assert.ok(c < 0.02 || (h >= 150 && h <= 255), `portada ${i}${stop}: tono ${h.toFixed(0)} fuera de la familia fría (150 a 255)`);
+  for (const i of [...TONES.fiction, ...TONES['non-fiction']]) {
+    const { c, h } = hue(tk[`cover-${i}-a`]);
+    assert.ok(c < 0.02 || (h >= 150 && h <= 255), `portada ${i}: tono ${h.toFixed(0)} fuera de la familia fría (150 a 255)`);
   }
 });
 
