@@ -56,7 +56,7 @@ Verificación final: `npm test` 132 + 18 + 4, `test:design` 72, `critique.mjs` e
 ## Abierto (decisión o ronda siguiente)
 
 - **CR3-05 (baja, ux-movil-feed):** Visita en escritorio deja ~800 px vacíos junto a la foto de llegada (`.tmp-audit` de esta sesión: `d1280-05b-visita-2.png`). Propuesta del crítico: foto bajo el horario o a ancho completo.
-- **CR3-04 (baja, paleta):** cabecera móvil con alfa 0.92 sin desenfoque; el documento la describe opaca. Decidir si se vuelve opaca o se documenta.
+- ~~**CR3-04 (baja, paleta):** cabecera móvil con alfa 0.92 sin desenfoque; el documento la describe opaca.~~ Resuelto en curaduría ronda 2 (CR1-08): la banda de la cabecera es opaca (tono al 100 %, sin desenfoque) en móvil y escritorio; DESIGN.md lo describe.
 - **QA3-02 (baja):** con puntero fino quedan objetivos < 44 px: CTA de cabecera 134×40, Instagram en Cartelera 105×26, «Ver los 48 géneros» 144×30, filas de filtro 262×36, marca 222×36.
 - **QA3-05 (baja):** a 320×640 la página mide 11.5 pantallas (el umbral ≤ 11 se mide a 390, donde da 8.7).
 - **Miller:** el submenú Libros tiene 7 filas; reducir a ≤ 5 es decisión editorial.

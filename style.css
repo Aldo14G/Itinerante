@@ -164,12 +164,12 @@ p { text-wrap: pretty; }
   color: var(--bone);
   transition: transform var(--dur-base) var(--ease-out), color var(--dur-base);
 }
+/* Banda opaca: toma el color del tono que pasa debajo (paper, turq, tungsten; night sobre el pie) al 100 %, sin alfa ni desenfoque,
+   así nada del contenido se lee a través de la marca (CR1-08). El vidrio al 92 % dejaba un fantasma del texto; el desenfoque no existía en gama media (data-glass="lite"). */
 .hdr::before {
   content: "";
   position: absolute; inset: 0; z-index: -1;
-  background: color-mix(in srgb, var(--night) 74%, transparent);
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
-  backdrop-filter: blur(16px) saturate(1.15);
+  background: var(--night);
   border-bottom: 1px solid var(--line);
   opacity: 0;
   transition: opacity var(--dur-base), background-color var(--dur-base);
@@ -184,11 +184,11 @@ p { text-wrap: pretty; }
 .hdr-cta { transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast), translate var(--dur-slow) var(--ease-out), opacity var(--dur-fast) var(--ease-out), visibility var(--dur-fast); }
 .hdr.has-primary .hdr-cta { opacity: 0; visibility: hidden; }
 .hdr[data-on="turq"] { color: var(--turq-ink); }
-.hdr[data-on="turq"]::before { background: color-mix(in srgb, var(--turq) 92%, transparent); border-color: color-mix(in srgb, var(--turq-ink) 20%, transparent); }
+.hdr[data-on="turq"]::before { background: var(--turq); border-color: color-mix(in srgb, var(--turq-ink) 20%, transparent); }
 .hdr[data-on="paper"] { color: var(--paper-ink); }
-.hdr[data-on="paper"]::before { background: color-mix(in srgb, var(--paper) 92%, transparent); border-color: color-mix(in srgb, var(--paper-ink) 12%, transparent); }
+.hdr[data-on="paper"]::before { background: var(--paper); border-color: color-mix(in srgb, var(--paper-ink) 12%, transparent); }
 .hdr[data-on="tungsten"] { color: var(--night); }
-.hdr[data-on="tungsten"]::before { background: color-mix(in srgb, var(--tungsten) 94%, transparent); border-color: color-mix(in srgb, var(--night) 15%, transparent); }
+.hdr[data-on="tungsten"]::before { background: var(--tungsten); border-color: color-mix(in srgb, var(--night) 15%, transparent); }
 
 .hdr-brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font: 720 var(--fs-2)/1.05 var(--f-sans); font-stretch: 88%; }
 .hdr-brand img { width: 36px; height: 36px; border-radius: 8px; }
@@ -1105,10 +1105,6 @@ html.sheet-open { overflow: hidden; }
 /* Cartelera como carrusel (solo móvil): en escritorio la pista es transparente y las fotos de tarjeta no existen. */
 .bill-track { display: contents; }
 .bill-card-fig, .bill-dots, .bill-post-head, .bill-cap { display: none; }
-
-/* Gama media o baja (boot.js marca data-glass="lite"): sin desenfoque en la cabecera. */
-html[data-glass="lite"] .hdr::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
-html[data-glass="lite"] .hdr:not([data-on])::before { background: color-mix(in srgb, var(--night) 94%, transparent); }
 
 /* Progreso de lectura (Goal-Gradient): una línea fija que se llena con el scroll. Sin JS: animación ligada al desplazamiento;
    donde no se soporta, la barra queda en cero y no estorba. */

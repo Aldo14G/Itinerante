@@ -10,7 +10,7 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 | `skeleton.mjs URL` | Esqueletos del tamaño del contenido y CLS de la carga diferida. | sí |
 | `motion.mjs URL` | Transiciones y animaciones disparadas, duraciones frente a tokens y pasada de movimiento reducido. | informa |
 | `spacing.mjs URL` | Relleno y alto de cada capítulo, pantallas por capítulo, uso de grid/flex y cuadrícula de 4 px. | informa |
-| `rail.mjs URL` | Carrusel de libros: colecciones, teclado, progreso, ficha, foco. | informa |
+| `rail.mjs URL` | Carrusel de libros: colecciones, teclado, progreso, ficha, foco. Espera por condición (carrusel `is-ready` sin esqueletos, colección renovada, ficha `open`, foco movido, desplazamiento estable) con tope, no con pausas fijas; si una pantalla aborta la anota como ✗ con el motivo y sigue. | sí |
 | `saved.mjs URL` | Guardar, Mi lista, persistencia, aviso y mensaje de WhatsApp. | informa |
 | `explorer.mjs URL` | Hoja «Explorar»: modal, URL `#explorar`, botón atrás, ficha encima, escritorio y redimensionar. | informa |
 | `e2e.mjs URL DIR` | Auditoría general (desbordes, consola, menú, tonos, barra inferior, cartelera, catálogo, movimiento reducido, rendimiento). | informa |
@@ -23,6 +23,7 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 | `palette.py` / `oklch.py` | Croma de las paredes (fotos) frente a la paleta. | no |
 
 Notas de fiabilidad:
+- Con la máquina cargada (otras instancias de Chromium, `npm test` a la vez) las pausas fijas no bastan: `rail.mjs` espera por condición con tope (QA1-04). Su `ev()` devuelve un valor definido o lanza un error legible con la expresión y el motivo (`ev() no devolvió valor…`, `la página lanzó al evaluar…`, `esperando … (tope N ms)`), nunca un `TypeError … of undefined` del propio script; `run()` es para sentencias sin valor. Si otro script del arnés vuelve a fallar solo bajo carga, copia ese patrón (`ev`/`run`/`waitFor`/`settle` y los ayudantes `__itiQa.until`/`stable` dentro de la página) en vez de alargar `sleep`.
 - Los clics que abren diálogos usan `Input.dispatchMouseEvent`: Chromium agrupa los diálogos abiertos sin activación del usuario y una tecla Escape cierra todo el grupo. Un `element.click()` de JavaScript no cuenta como activación.
 - `e2e.mjs` ya no marca como desborde una `IMG` dentro de `.frame-clip` (escalada 1.22 al revelarse y recortada por su contenedor): ignora lo que recorta un antepasado con `overflow: hidden/clip` que cabe en la ventana. Un fallo de «sin desborde horizontal» es real. Sus métricas de FCP/LCP pueden salir en cero si la máquina está cargada: repite o usa CDP directo.
 - Chromium sin cabeza no declara `(hover: hover)` ni `(pointer: fine)` y `Emulation.setEmulatedMedia` no cambia esas dos consultas: `e2e.mjs` arranca Chrome con `--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4` (lo mismo que hace Playwright) para medir el hover real de la navegación de escritorio (CR0-09).
