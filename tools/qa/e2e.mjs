@@ -9,7 +9,7 @@ const URL_ = process.argv[2] || 'http://127.0.0.1:8105/';
 const out = process.argv[3] || '.';
 mkdirSync(out, { recursive: true });
 const port = 9470;
-const chrome = spawn((process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe'), ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--disable-extensions', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'iti-e2e-'))}`, '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
+const chrome = spawn((process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe'), ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--disable-extensions', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'iti-e2e-'))}`, '--hide-scrollbars', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let targets;
 for (let i = 0; i < 40; i++) { try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); if (targets.length) break; } catch {} await sleep(250); }
@@ -121,8 +121,34 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
   check('tonos ' + tag, 'sin franjas oscuras fuera del tono profundo (deep)', !darkBands.length, JSON.stringify(darkBands));
   const hints = await ev(`[...document.querySelectorAll('a[data-hint]')].filter(a => a.getBoundingClientRect().width > 0).map(a => [a.textContent.trim(), Math.round(a.getBoundingClientRect().width), Math.round(parseFloat(getComputedStyle(a, '::before').width))]).filter(x => x[2] > x[1] + 1)`);
   check('pistas ' + tag, 'ninguna pista es más ancha que su enlace (no pisa al vecino en hover ni con foco)', !hints.length, JSON.stringify(hints));
-  const rule = await ev(`[...document.querySelectorAll('a[data-hint]')].filter(a => a.getBoundingClientRect().width > 0).map(a => [a.textContent.trim(), getComputedStyle(a, '::after').content, getComputedStyle(a.querySelector('span')).backgroundImage, getComputedStyle(a, '::before').backgroundImage]).filter(x => x[1] !== 'none' || !/linear-gradient/.test(x[2]) || !/linear-gradient/.test(x[3]))`);
-  check('pistas ' + tag, 'el filete se pinta sobre la palabra (fondo de etiqueta y pista), no sobre la celda del enlace', !rule.length, JSON.stringify(rule));
+  const rule = await ev(`[...document.querySelectorAll('a[data-hint]')].filter(a => a.getBoundingClientRect().width > 0).map(a => [a.textContent.trim(), getComputedStyle(a, '::after').content, getComputedStyle(a.querySelector('span')).backgroundImage, getComputedStyle(a, '::before').backgroundImage]).filter(x => x[1] !== 'none' || !/linear-gradient/.test(x[2]) || /linear-gradient/.test(x[3]))`);
+  check('pistas ' + tag, 'el filete se pinta sobre el rótulo (fondo de la etiqueta), no sobre la celda del enlace ni bajo la pista', !rule.length, JSON.stringify(rule));
+  if (!mobile) {
+    // CR0-09: con el cursor (y con foco de teclado) el rótulo sigue siendo el texto visible y ni la fila ni el enlace cambian de tamaño.
+    const navState = `[...document.querySelectorAll('.hdr-nav a')].map(a => { const r = a.getBoundingClientRect(), s = getComputedStyle(a.querySelector('span')); return [a.textContent.trim(), Math.round(r.width), Math.round(r.height), Math.round(a.parentElement.getBoundingClientRect().height), s.opacity, s.translate, s.backgroundSize]; })`;
+    // Chromium sin cabeza no declara (hover: hover) ni (pointer: fine) por sí solo: el flag --blink-settings del arranque (arriba) lo hace,
+    // como Playwright; Emulation.setEmulatedMedia no basta para esas dos consultas.
+    const rest = await ev(navState);
+    const bad = [];
+    for (const [i, r] of rest.entries()) {
+      const c = await ev(`(()=>{const r=document.querySelectorAll('.hdr-nav a')[${i}].getBoundingClientRect(); return [r.x+r.width/2, r.y+r.height/2]})()`);
+      await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: c[0], y: c[1] }); await sleep(500);
+      const h = (await ev(navState))[i];
+      const hint = await ev(`(()=>{const b=getComputedStyle(document.querySelectorAll('.hdr-nav a')[${i}],'::before'); return [b.opacity, b.fontSize]})()`);
+      if (h[1] !== r[1] || h[2] !== r[2] || h[3] !== r[3] || h[4] !== '1' || h[5] !== 'none' || parseFloat(h[6]) < 99 || hint[0] !== '1') bad.push({ rest: r, hover: h, hint });
+    }
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 640, y: 500 }); await sleep(300);
+    check('pistas ' + tag, 'con el cursor el rótulo se queda fijo y visible con filete, la pista aparece aparte y ni la fila ni el enlace cambian de tamaño (CR0-09)', !bad.length, JSON.stringify(bad));
+    await ev(`document.querySelector('.hdr-brand').focus()`);
+    const focusBad = [];
+    for (let i = 0; i < rest.length; i++) {
+      await key('Tab', 'Tab', 9); await sleep(600);
+      const f = await ev(`(()=>{const a=document.activeElement; if(!a.matches('.hdr-nav a')) return null; const r=a.getBoundingClientRect(), s=getComputedStyle(a.querySelector('span')); return [a.textContent.trim(), Math.round(r.width), Math.round(r.height), Math.round(a.parentElement.getBoundingClientRect().height), s.opacity, s.translate, s.backgroundSize]})()`);
+      const r = rest[i];
+      if (!f || f[1] !== r[1] || f[2] !== r[2] || f[3] !== r[3] || f[4] !== '1' || f[5] !== 'none' || parseFloat(f[6]) < 99) focusBad.push({ rest: r, focus: f });
+    }
+    check('pistas ' + tag, 'con foco de teclado (Tab real) el rótulo se queda fijo y visible, con filete, sin mover la fila (CR0-09)', !focusBad.length, JSON.stringify(focusBad));
+  }
 }
 
 // ---------- 4. Barra inferior, cartelera, hero (móvil) ----------

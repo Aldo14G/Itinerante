@@ -869,7 +869,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 @media (forced-colors: active) {
   .topic::before { background: Highlight; }
-  .hdr-nav a[aria-current="true"] > span, .hdr-nav a:hover::before, .hdr-nav a:focus-visible::before, .ftr-links a:hover::before, .ftr-links a:focus-visible::before { text-decoration: underline; text-underline-offset: 0.35em; } /* el filete pintado con fondo no sobrevive a los colores forzados */
+  .hdr-nav a[aria-current="true"] > span, .hdr-nav a:hover > span, .hdr-nav a:focus-visible > span, .ftr-links a:hover > span, .ftr-links a:focus-visible > span { text-decoration: underline; text-underline-offset: 0.35em; } /* el filete pintado con fondo no sobrevive a los colores forzados */
   .topic[aria-checked="true"] { color: Highlight; forced-color-adjust: none; }
   .btn, .cat-chip, .cat-filters-btn, .card { border: 1px solid ButtonText; }
   .cover { border: 1px solid CanvasText; }
@@ -921,24 +921,27 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* ---------- Curaduría: textos que responden y esqueletos ---------- */
 
-/* Enlaces: el texto sube y deja ver una pista del destino (la pista no entra en el nombre accesible).
-   Etiqueta y pista comparten la misma celda de la retícula: el enlace mide la más ancha de las dos y la pista nunca pisa al vecino.
-   El filete se pinta bajo la palabra visible (etiqueta o pista), a --ul-gap del texto, y mide exactamente lo que mide la palabra:
-   crece de izquierda a derecha como el filete de los botones de línea. */
+/* Enlaces: el rótulo se queda fijo (es el destino que la persona está decidiendo) y gana el filete con el cursor y con el foco; la
+   pista del destino aparece solo con el cursor, como subtítulo pequeño bajo el filete (con foco de teclado el anillo de 44 px la
+   cortaría, y nunca entra en el nombre accesible). Etiqueta y pista comparten la misma celda de la retícula: el enlace mide la más
+   ancha de las dos, la pista nunca pisa al vecino y, como se coloca con translate, no cambia el alto de la fila ni el ancho del
+   enlace. El filete se pinta bajo la etiqueta, a --ul-gap del texto, y mide exactamente lo que mide la palabra: crece de izquierda
+   a derecha como el filete de los botones de línea. */
 .hdr-nav a, .ftr-links a { position: relative; display: grid; justify-items: start; align-items: center; }
 .hdr-nav a > span, .ftr-links a > span, .hdr-nav a::before, .ftr-links a::before {
-  grid-area: 1 / 1; padding-bottom: var(--ul-gap); margin-bottom: calc(-1 * var(--ul-gap));
-  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+  grid-area: 1 / 1;
   transition: translate var(--dur-base) var(--ease-out), opacity var(--dur-base), background-size var(--dur-base) var(--ease-out);
 }
-.hdr-nav a > span, .ftr-links a > span { display: inline-block; }
-.hdr-nav a::before, .ftr-links a::before { content: attr(data-hint); content: attr(data-hint) / ""; white-space: nowrap; opacity: 0; translate: 0 0.7em; pointer-events: none; }
+.hdr-nav a > span, .ftr-links a > span {
+  display: inline-block; padding-bottom: var(--ul-gap); margin-bottom: calc(-1 * var(--ul-gap));
+  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+}
+.hdr-nav a::before, .ftr-links a::before { content: attr(data-hint); content: attr(data-hint) / ""; align-self: end; font: 500 var(--fs-0)/1 var(--f-sans); white-space: nowrap; opacity: 0; translate: 0 calc(100% + var(--ul-gap)); pointer-events: none; } /* bajo la línea base del rótulo; al mostrarse baja 4 px más, pasado el filete */
 .ftr-links a { --ul-gap: 4px; padding: 12px 0; text-decoration: none; font-weight: 620; }
-.hdr-nav a:focus-visible > span, .ftr-links a:focus-visible > span { translate: 0 -0.7em; opacity: 0; }
-.hdr-nav a:focus-visible::before, .ftr-links a:focus-visible::before { opacity: 1; translate: 0 0; background-size: 100% 1px; }
+.hdr-nav a:focus-visible > span, .ftr-links a:focus-visible > span { background-size: 100% 1px; }
 @media (hover: hover) {
-  .hdr-nav a:hover > span, .ftr-links a:hover > span { translate: 0 -0.7em; opacity: 0; }
-  .hdr-nav a:hover::before, .ftr-links a:hover::before { opacity: 1; translate: 0 0; background-size: 100% 1px; }
+  .hdr-nav a:hover > span, .ftr-links a:hover > span { background-size: 100% 1px; }
+  .hdr-nav a:hover::before, .ftr-links a:hover::before { opacity: 1; translate: 0 calc(100% + var(--ul-gap) + var(--space-1)); }
 }
 
 /* La casa: en la tira fijada, la frase del cuarto aparece en el que está al centro o bajo el cursor. */
