@@ -46,6 +46,8 @@ Errores típicos de productos hechos por agentes y la regla comprobable que los 
 | Patrones inventados donde hay convenciones | Usar lo que la gente ya conoce: diálogo nativo, hoja inferior, barra de pestañas, acordeón | crítico (Jakob) | [Jakob](https://lawsofux.com/jakobs-law/); [GOV.UK Design System](https://design-system.service.gov.uk/) |
 | Errores que se podían prevenir | Valores por defecto, restricciones y confirmación en acciones destructivas | revisión manual | [NN/g #5](https://www.nngroup.com/articles/ten-usability-heuristics/) |
 
+Catálogo de fuentes (citas, licencias y lo que no se pudo verificar): `docs/ux/FUENTES.md`. Esta tabla manda si difieren.
+
 Herramientas: además del arnés propio, `axe.mjs` corre axe-core (WCAG 2.x A/AA y buenas prácticas) en inicio, manifiesto revelado, menú con acordeón, Explorar, ficha, Mi lista y catálogo en línea. Lighthouse no está instalado: LCP, CLS e INP se miden por CDP (`e2e.mjs`, `inp.mjs`).
 </como_evitarlo>
 
