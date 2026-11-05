@@ -415,7 +415,8 @@ p { text-wrap: pretty; }
 /* ---------- Cortinilla ajedrezada ---------- */
 
 .wipe { display: none; }
-.motion .wipe { display: block; position: relative; height: 100svh; margin-top: -1px; background: var(--night); }
+.motion .wipe { display: block; position: relative; height: 40svh; margin-top: -1px; background: var(--night); }
+.motion .wipe + .bill { padding-top: var(--sec-sm); } /* la banda ya es el aire de arriba: con ella, Cartelera no suma otro --sec-md de campo plano (CR0-01) */
 .wipe-grid {
   position: relative; height: 100%;
   display: grid; grid-template-columns: repeat(var(--cols, 12), 1fr); grid-auto-rows: 1fr;

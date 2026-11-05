@@ -173,7 +173,7 @@ export function createWipeScene(c) {
 
   function build() {
     const nextCols = vw() <= 760 ? 6 : 12;
-    const nextRows = Math.ceil(vh() / (vw() / nextCols));
+    const nextRows = Math.max(1, Math.ceil(h / (vw() / nextCols))); // cuadros cuadrados: filas según la altura real de la banda (40svh)
     if (nextCols === cols && nextRows === rows) return;
     cols = nextCols; rows = nextRows;
     grid.style.setProperty('--cols', cols);
@@ -195,13 +195,15 @@ export function createWipeScene(c) {
   return {
     measure() {
       if (!isMotion()) return;
-      build();
       top = absTop(sec);
       h = sec.offsetHeight;
+      build();
     },
     tick(dt, y) {
       if (!isMotion() || y + vh() < top || y > top + h) return false;
-      const p = clamp((y - (top - vh() * 0.5)) / (vh() * 0.95));
+      // Empieza con la banda asomando por abajo (su borde superior al 85 % de la ventana) y termina cuando su base sube al 45 %:
+      // en ese momento el titular de Cartelera ya está a la vista, así que el ajedrezado entrega el capítulo y nunca queda una pantalla plana.
+      const p = clamp((y - (top - vh() * 0.85)) / (h + vh() * 0.4));
       tiles.forEach(t => {
         const k = clamp((p * 1.12 - t.d) / 0.42);
         const e = Math.round((1 - (1 - k) ** 3) * 1000) / 1000;

@@ -188,7 +188,7 @@ async function boot() {
     const measureInner = () => {
       const tTop = absTop(text);
       start = tTop - vh * 0.85;
-      end = tTop + text.offsetHeight - vh * 0.42;
+      end = tTop + text.offsetHeight / 2 - vh * 0.55; // todo encendido cuando el centro del bloque sube al 55 % de la ventana: centrado, se lee completo (CR0-12)
       lit = -1;
       inner = true;
     };

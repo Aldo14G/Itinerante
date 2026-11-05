@@ -40,10 +40,10 @@ async function open(w, h, mobile) {
 }
 const waitFor = async (expr, tries = 40) => { for (let i = 0; i < tries; i++) { if (await ev(expr)) return true; await sleep(200); } return false; };
 
-const MANIFESTO = [['.manifesto']]; // sus palabras entran al 17 % y llegan al 100 % con el scroll: se audita aparte, ya revelado
+const MANIFESTO = [['.manifesto']]; // sus palabras entran al 17 % y llegan al 100 % con el scroll: se audita aparte, con el bloque centrado en la ventana (ahí debe estar todo revelado; app.js manifestoScene)
 await open(390, 844, true);
 await audit('móvil 390: inicio', MANIFESTO);
-await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.bottom - innerHeight * 0.38); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
+await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
 await audit('móvil 390: manifiesto revelado');
 await ev(`document.querySelector('.hdr-more').click()`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(700);
 await ev(`document.querySelector('#sheet-menu .sm-group:nth-of-type(3) .sm-row').click()`); await sleep(500);
@@ -61,7 +61,7 @@ await audit('móvil 390: Mi lista (vacía)');
 
 await open(1280, 800, false);
 await audit('escritorio 1280: inicio', MANIFESTO);
-await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.bottom - innerHeight * 0.38); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
+await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
 await audit('escritorio 1280: manifiesto revelado');
 await ev(`document.getElementById('catalogo').scrollIntoView()`); await waitFor(`document.querySelector('#catalogo [data-cat-grid]').getAttribute('aria-busy') === null`, 60); await sleep(800);
 await audit('escritorio 1280: catálogo en línea', MANIFESTO);
