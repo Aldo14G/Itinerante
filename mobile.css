@@ -68,9 +68,7 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 /* Llamado y Visita (CR-14): sin marquesina (decoración que repetía la dirección), sin relleno por la altura de la pantalla y con el mismo escalón --sec-sm a ambos lados: no queda aire muerto entre «en persona» y el titular de Visita. El subtítulo «Matamoros 421» del titular repetía la dirección que está debajo. */
 .marquee { display: none; }
 .call { padding-block: var(--sec-sm); }
-/* Cierre sin franjas (CR0-10): en móvil el llamado va sobre blanco como entrada de Visita (bruma → blanco → profundo, tres fondos en vez de cinco). El campo turquesa con marquesina queda para escritorio. */
-.call { background: var(--paper); color: var(--paper-ink); }
-.call-title em { color: var(--terra-deep); }
+/* Cierre sin franjas (CR0-10 → CR1-05): el llamado va sobre blanco como entrada de Visita (bruma → blanco → profundo, tres fondos en vez de cinco); desde CR1-05 el tono light lo pinta en style.css para móvil y escritorio. */
 .call-body { padding: 0 var(--gutter); }
 .visit .h2 em { display: none; }
 /* Cierre (CR-10): la dirección con un «Cómo llegar» de texto (no compite con la primaria de Visita), las redes en una sola fila con el correo y «Pausar el movimiento» como enlace discreto. Todo de 44 px. */

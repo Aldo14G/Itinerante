@@ -327,12 +327,16 @@ test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y 
 });
 
 test('tonos claros: las secciones de lectura usan blanco y bruma y el pie el tono profundo, con contraste suficiente', async () => {
-  const expected = { 'id="inicio"': 'light', 'class="manifesto"': 'light', 'id="casa"': 'mist', 'id="libros"': 'mist', 'id="catalogo"': 'light' };
+  // CR1-05: la cita y el llamado comparten el blanco (light) en móvil y escritorio: el cambio bruma → blanco los separa de Libros sin filete.
+  const expected = { 'id="inicio"': 'light', 'class="manifesto"': 'light', 'id="casa"': 'mist', 'id="libros"': 'mist', 'id="catalogo"': 'light', 'class="quote"': 'light', 'class="call"': 'light' };
   for (const [sel, tone] of Object.entries(expected)) {
-    const tag = html.match(new RegExp(`<(?:section|div)[^>]*${sel}[^>]*>`))[0];
-    assert.ok(tag.includes(`data-tone="${tone}"`) && (sel === 'id="catalogo"' || /data-theme="paper"/.test(tag)), `${sel} sin tono ${tone}`);
+    const tag = html.match(new RegExp(`<(?:section|div|figure)[^>]*${sel}[^>]*>`))[0];
+    assert.ok(tag.includes(`data-tone="${tone}"`) && (sel === 'id="catalogo"' || sel === 'class="quote"' || /data-theme="paper"/.test(tag)), `${sel} sin tono ${tone}`);
   }
   assert.ok(/<footer class="ftr" data-tone="deep">/.test(html));
+  assert.ok(!/\.quote \{[^}]*border-top/.test(css), 'sin filete solitario entre Libros y la cita: separa el cambio de tono');
+  assert.ok(/\.quote blockquote \{[^}]*margin: 0; max-width: 50rem/.test(css.replaceAll('\n', ' ')), 'la cita va a la izquierda, como el llamado, en ambos tamaños');
+  assert.ok(!/\.call \{[^}]*background/.test(mobileCss) && /\.call \{ background: var\(--night\); color: var\(--bone\)/.test(css), 'el llamado toma el fondo del tono (blanco) en móvil y escritorio');
   const lum = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
   const tokens = JSON.parse(await readFile(here('./design/tokens.json'), 'utf8')).themes.b4.tones;
