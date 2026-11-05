@@ -1,3 +1,28 @@
+# Continuidad de Itinerante — 2026-11-05 (curaduría, ronda 1, sesión en la nube)
+
+Rama: `claude/cool-turing-37uiqt` (sobre `main` 4af8612; respaldo `backup/pre-curaduria-2026-11-04`). Commits de la curaduría: 1f32a95 (paleta del logo, reglas «cómo evitarlo», axe en el arnés), f088b4d y 69263c0 (catálogo de fuentes `docs/ux/FUENTES.md` corregido y enlazado; supera la PR 1), 877b676 (paleta-skeletons), 03ce089 (navegacion-desplegables), 07d215e (ux-movil-feed), 25a6bef (movimiento). Informes y capturas en `.tmp-audit/agentes/curaduria/ronda-{0,1}/` (efímero).
+
+## Cerrado con medición (ronda 1: 16 de 19 defectos de la línea base)
+
+- **CR0-02** · Cromo móvil blanco: chips de cabecera y barra con icono en tinta (16.8:1), filete 4.3:1, sin reflejo ni vidrio oscuro; pestaña activa en cápsula turquesa (5.2:1). Tokens `glass-*` redefinidos.
+- **CR0-04/05** · Portadas planas (sin ajedrezado ni lomo), nota y sello sin rotación ni sombra; sombras a 0 8px 16px al 20 %.
+- **CR0-07/11, QA0-04** · Una sola piel de rótulo «Recreación IA / Foto real» (12:1, filete 4.9–6.3:1) y un solo «activo» (cápsula `--terra`) en chips, pestañas, HOY y menú; filetes inactivos ≥ 3.2:1 (`--line-strong` 0.34 → 0.5 en light/mist).
+- **CR0-06** · Cruces de registro eliminadas (`.rx` = 0). **CR0-08** · Publicación de Cartelera móvil como tarjeta de papel con filete. **CR0-10** · Cierre móvil con tres fondos (bruma, blanco, profundo), antes cinco. **CR0-13** · Cabecera fija de Explorar a 360 px: 69 px (antes ~200).
+- **CR0-09** · El hover del menú de escritorio no reescribe el rótulo; la pista es subtítulo de 12 px solo con cursor. e2e 99/99.
+- **QA0-01/06 (A03)** · Sin `catalog.json`: Mi lista anuncia con `role=status` cuántos títulos siguen guardados, ofrece Reintentar y WhatsApp; el carrusel muestra su estado en vez de desaparecer; el reintento recupera ambos. axe 0 también en esos estados.
+- **CR0-01** · Cortinilla de 100 a 40 svh con entrega al titular de Cartelera: ninguna pantalla completa de un solo color entre La casa y Cartelera (1024–1920). **CR0-12** · Manifiesto centrado en escritorio: 27/27 palabras al 100 %.
+- **QA0-02/03 (T02)** · e2e, AGENTS.md, CONTEXT.md, DESIGN.md y scripts alineados a `light|mist|deep`; grep de la paleta anterior = 0.
+
+Verificación final (QA ronda 1, HEAD 25a6bef): `npm test` 132 + 18 + 4, `test:design` 72, crítica en baseline, tokens al día, `test:browser` 7/7 (axe 0 serias y 0 leves en 10 estados), contrast ✓, skeleton 12/12, motion ✓, spacing 8.7 pantallas, rail 49/49, saved 34/34, explorer 23/23, e2e 99/99 (LCP 1.36 s, CLS 0.001), INP máx 40 ms con CPU 4×, feed 61/61, hero ≥ 18:1. Crítico ronda 1: identidad 4, jerarquía 4, tipografía 4, ritmo 4, componentes 4, movimiento 4, red social 4, camino a la visita 5, accesibilidad 4, verdad 5 (ronda 0: 3/4/4/4/3/3/4/4/4/5); 0 defectos altos o medios.
+
+## Abierto (ronda 2 o decisión)
+
+- **A01 sigue failing por tres contrastes no textuales** (QA ronda 1): QA1-01 (media) anillo de foco del chip de menú sobre la foto del hero móvil 1.37:1; QA1-02 (baja) filete de «Guardar en mi lista» en la ficha 1.33:1; QA1-03 (baja) botones de contorno de Cartelera en escritorio sobre turquesa 2.69:1. Dueño: paleta-skeletons.
+- **CR0-03 parcial / QA1-05 (baja):** el velo del hero de escritorio cubre el 70 % de la altura (la foto se ve limpia del 13 al 43 %); el crítico lo acepta, QA lo deja anotado. Cerrarlo del todo implica mover el texto de la entrada o dar respaldo propio a la cabecera (CR1-02).
+- **Bajos del crítico (CR1-01…08):** titular de Cartelera de 9rem a 1280 (≈ 0.9 pantallas de turquesa); franja pálida 0–16 % del hero de escritorio; degradado de las portadas; sombra de la ficha de escritorio (-30px 0 70px al 80 %); cita en el tono de Libros (fundir con el llamado sobre blanco); chips inactivos grises en móvil y transparentes en escritorio; velo 80–95 % sobre la foto del tema activo; cabecera móvil al 92 % deja leer el texto que pasa debajo.
+- **QA1-04 (baja, herramienta):** `rail.mjs` y `test:browser` fallan con la máquina cargada (ev() sin guarda); en solitario pasan.
+- **Para Aldo:** QA0-05 (28 controles de 26–36 px en escritorio, cumplen AA de 24 px); conservar o no la cortinilla reducida; la PR 1 queda superada por `docs/ux/FUENTES.md` corregido en esta rama (cerrarla sin fusionar).
+
 # Continuidad de Itinerante — 2026-11-04 (ronda 5, sesión en la nube)
 
 - **CR4-01 cerrado:** Visita cierra en móvil con `--sec-sm` (48 + 48 del pie = 96, el tope de CR-14); la cruz de registro queda a 24 px del ladrillo y a 11 del rótulo (medido a 360, 390 y 414). Regla de ritmo actualizada en DESIGN.md.
