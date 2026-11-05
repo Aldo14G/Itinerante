@@ -66,3 +66,7 @@ Usa commits imperativos y claros, como `Update contact section` o `Tighten Cloud
 ## Security & Configuration Tips
 
 No expongas credenciales de cuenta de servicio en el hosting público. `firebase.json` ya ignora `*.json` en el deploy legado; mantén credenciales fuera de capturas, issues y código del cliente. Los secretos del Worker se cargan con `wrangler secret put`, nunca en el repositorio.
+
+## UX/UI
+
+Las reglas operativas de UX/UI (con la herramienta que mide cada una) están en la tabla «cómo evitarlo» de `docs/agentes/00-contexto-compartido.md`; el catálogo de fuentes con citas y licencias es `docs/ux/FUENTES.md`. Consúltalos antes de crear o mejorar cualquier interfaz.
