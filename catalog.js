@@ -195,7 +195,7 @@ export function relatedBooks(books, book, n = 3) {
 export function bookMessage(book) {
   const by = book.a && book.a !== 'Autor no indicado' ? ` de ${book.a}` : '';
   const isbn = book.n ? ` (ISBN ${book.n})` : '';
-  return `Hola, ¿tienen «${book.t}»${by}${isbn}? Vi el título en la muestra de su sitio.`;
+  return `Hola, ¿tienen «${book.t}»${by}${isbn}? Vi el título en su sitio.`;
 }
 
 export function bookWaUrl(book) {
@@ -217,7 +217,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   try {
     data = await loadSample();
   } catch {
-    status.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
+    status.textContent = 'No pudimos cargar el catálogo. Escríbenos por WhatsApp y te ayudamos a buscar.';
     root.dataset.state = 'error';
     delete root.dataset.ready; // permite reintentar (p. ej. al volver a #catalogo)
     $('[data-cat-grid]', root).replaceChildren();
@@ -233,7 +233,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     box.querySelector('button').addEventListener('click', () => {
       box.remove();
       controls.forEach(c => { c.disabled = false; });
-      status.textContent = 'Cargando la muestra…';
+      status.textContent = 'Cargando el catálogo…';
       initCatalog({ isMotion });
     });
     return;
@@ -251,7 +251,6 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   const moreBtn = $('[data-cat-more]', root);
   const emptyEl = $('[data-cat-empty]', root);
   const drawer = $('#cat-drawer');
-  const seal = data.meta.label;
 
   const state = { q: '', k: new Set(), g: new Set(), f: new Set(), p: new Set(), sort: 'az', shown: PAGE_SIZE, expandG: false };
   const names = {
@@ -359,8 +358,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     emptyEl.hidden = results.length > 0;
     grid.hidden = !results.length;
     status.textContent = results.length
-      ? `Mostrando ${slice.length} de ${results.length} títulos de muestra.`
-      : 'Ningún título de muestra coincide.';
+      ? `Mostrando ${slice.length} de ${results.length} títulos.`
+      : 'Ningún título coincide.';
     return fresh;
   }
 
@@ -559,7 +558,6 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     holder.replaceChildren(el('span', { class: 'cover-title', 'aria-hidden': 'true' }, title));
   }, true);
 
-  document.querySelectorAll('[data-cat-seal]').forEach(n => { n.textContent = seal; }); // el sello de la sección y el de la hoja Explorar
   sortEl.value = state.sort;
   root.dataset.state = 'ready';
   // Primero lo que se ve (rejilla y filtros activos); las facetas, que recorren los 500 títulos, esperan a un momento libre.

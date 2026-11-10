@@ -1,13 +1,5 @@
-// Rótulo de procedencia de una imagen: «Recreación IA» o «Foto real». Un solo origen de los textos; un tipo desconocido
-// no tiene rótulo (`kindTag` devuelve null) y quien lo pide decide no mostrar esa imagen, nunca la presenta como IA o real por omisión.
-export const KIND_LABEL = { ai: 'Recreación IA', real: 'Foto real' };
+// Procedencia de una imagen: dato interno que no se imprime en la página. 'ai' = recreación, 'real' = fotografía.
+// Vive en `data-kind` del marcado, en los temas de app.js y en assets/provenance.json. Una foto sin procedencia registrada no entra a las historias.
+export const KINDS = ['ai', 'real'];
 
-export const validKind = kind => (Object.hasOwn(KIND_LABEL, kind) ? kind : null);
-
-export function kindTag(kind) {
-  if (!validKind(kind)) return null;
-  const tag = document.createElement('span');
-  tag.className = `tag tag--${kind}`;
-  tag.textContent = KIND_LABEL[kind];
-  return tag;
-}
+export const validKind = kind => (KINDS.includes(kind) ? kind : null);

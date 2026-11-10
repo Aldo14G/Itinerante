@@ -3,7 +3,7 @@
 //  1. Primera vista (390x844): perfil (nombre, estado, dirección, «Cómo llegar» como única acción de contacto) y ≥ 3 destacados visibles; ≤ 6 acciones visibles en 390x844, 360x740 y 375x667 (U02/D11); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
 //  2. Cada destacado abre una historia: modal, foco en el cierre, rótulo de procedencia en cada foto, flechas, Escape y «atrás» cierran, el foco vuelve.
 //  3. Cartelera como publicaciones: encabezado → foto → acciones → texto (DOM y pantalla), «Me interesa» (aria-pressed, persistente) y «Compartir» (Web Share y respaldo de copiar) de ≥ 44 px, con nombre accesible propio.
-//  4. Novedades: sin datos no queda ningún nodo visible ni espacio; con ids se pinta con el rótulo de muestra.
+//  4. Novedades: sin datos no queda ningún nodo visible ni espacio; con ids se pinta sin avisos de muestra.
 //  5. Barrido de acciones primarias en 390x844 y 1280x800: a lo sumo una por pantalla, siempre «Cómo llegar», y ningún WhatsApp mayor que ella.
 import { spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
@@ -111,15 +111,15 @@ for (let n = 0; n < 4; n++) {
       cta:q('.story-foot .btn--tungsten')?.textContent.trim(), prim:d.querySelectorAll('.btn--tungsten').length,
       close:Math.round(q('.story-close').getBoundingClientRect().width), next:q('.story-nav--next').getBoundingClientRect().toJSON()}})()`);
   check(A, 'abre como modal con foco en el cierre y el scroll bloqueado', s && s.open && s.modal && /story-close/.test(s.active) && s.sheet && /Historia/.test(s.label) && s.close >= 44, JSON.stringify(s));
-  check(A, 'cada foto lleva rótulo «Recreación IA» o «Foto real» y carga', s && /^(Recreación IA|Foto real)$/.test(s.tag) && s.imgOk && s.bars >= 2, JSON.stringify(s));
+  check(A, 'cada foto carga con su título y sin rótulo de procedencia', s && !s.tag && s.title && s.imgOk && s.bars >= 2, JSON.stringify(s));
   check(A, 'una sola acción primaria en la hoja y es «Cómo llegar»', s && s.prim === 1 && /^Cómo llegar/.test(s.cta), JSON.stringify(s));
   if (n === 0) await shot('02-historia-casa.jpg');
-  // recorre todas las fotos con la flecha: el rótulo siempre está y coincide con la barra
+  // recorre todas las fotos con la flecha: sin rótulo, y el progreso coincide con la barra
   const walk = await ev(`(async()=>{const d=document.querySelector('dialog.story'); const out=[]; const total=d.querySelectorAll('.stories i').length;
     for(let i=0;i<total;i++){ const t=d.querySelector('.story-cap .tag'); out.push({i, tag:t?.textContent, seen:d.querySelectorAll('.stories i.is-seen').length, live:d.querySelector('[aria-live]').textContent});
       if(i<total-1){ d.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true})); await new Promise(r=>setTimeout(r,60)); } }
     return out})()`);
-  check(A, `recorre ${walk.length} fotos con rótulo, progreso y aviso para lectores`, walk.length >= 2 && walk.every((w, i) => /^(Recreación IA|Foto real)$/.test(w.tag) && w.seen === i + 1 && new RegExp(`Foto ${i + 1} de ${walk.length}`).test(w.live)), JSON.stringify(walk));
+  check(A, `recorre ${walk.length} fotos sin rótulo, con progreso y aviso para lectores`, walk.length >= 2 && walk.every((w, i) => !w.tag && !/Recreación IA|Foto real/.test(w.live) && w.seen === i + 1 && new RegExp(`Foto ${i + 1} de ${walk.length}`).test(w.live)), JSON.stringify(walk));
   // Escape cierra y el foco vuelve al destacado
   await key('Escape', 'Escape', 27); await sleep(500);
   const e1 = await ev(`({open:!!document.querySelector('dialog.story')?.open, sheet:document.documentElement.classList.contains('sheet-open'), lock:getComputedStyle(document.documentElement).overflow, focus:document.activeElement.dataset.story, seen:document.querySelectorAll('.hl-item')[${n}].classList.contains('is-seen'), url:location.hash})`);
@@ -141,8 +141,8 @@ await open(390, 844, { reset: true });
 await ev(`localStorage.clear()`);
 const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const i = q('[data-interest]'), s = q('[data-share]');
   const rect = e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
-  return { id: it.dataset.id, photo: !!q('.bill-card-img'), tag: q('.bill-card-cap .tag')?.textContent, title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim() }; })`);
-check('cartelera', '3 publicaciones con foto, rótulo, título, «Me interesa» y «Compartir» de ≥ 44 px', posts.length === 3 && posts.every(p => p.photo && /^(Recreación IA|Foto real)$/.test(p.tag) && p.title && p.iTxt === 'Me interesa' && p.sTxt === 'Compartir' && p.interest[1] >= 44 && p.interest[0] >= 44 && p.share[1] >= 44 && p.share[0] >= 44 && p.pressed === 'false'), JSON.stringify(posts));
+  return { id: it.dataset.id, photo: !!q('.bill-card-img'), tag: q('.bill-card-cap .tag')?.textContent, cap: q('.bill-card-cap')?.textContent.trim(), title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim() }; })`);
+check('cartelera', '3 publicaciones con foto, pie sin rótulo, título, «Me interesa» y «Compartir» de ≥ 44 px', posts.length === 3 && posts.every(p => p.photo && !p.tag && p.cap && !/Recreación IA|Foto real/.test(p.cap) && p.title && p.iTxt === 'Me interesa' && p.sTxt === 'Compartir' && p.interest[1] >= 44 && p.interest[0] >= 44 && p.share[1] >= 44 && p.share[0] >= 44 && p.pressed === 'false'), JSON.stringify(posts));
 // Publicación reconocible (CR-13): encabezado → foto → acciones → texto, tanto en el DOM como en la pantalla; el título se ve una sola vez.
 const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-post-head', '.bill-card-img', '.bill-acts', '.bill-cap', '.bill-detail > p'].map(q);
   const dom = els.every((e, i) => e && (i === 0 || (els[i - 1].compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)));
@@ -201,9 +201,9 @@ const ids = sample.slice(10, 17).map(b => b.id);
 override = { ...realData, novedades: { titulo: 'Recién llegados', ids } };
 await open(390, 844, { wait: 2500 });
 await ev(`document.querySelector('.rail').scrollIntoView()`); await sleep(2500);
-const withData = await ev(`(()=>{ const s = document.querySelector('#novedades'); const r = s.getBoundingClientRect(); const note = s.querySelector('[data-news-note]');
-  return { hidden: s.hidden, cards: s.querySelectorAll('.rail-item').length, h: Math.round(r.height), note: note.hidden ? '' : note.textContent, badge: s.querySelectorAll('.badge-new').length, title: s.querySelector('h3').textContent, links: [...document.querySelectorAll('[data-news-link]')].map(l => l.hidden), ids: [...s.querySelectorAll('.card')].map(c => c.dataset.id), text: s.innerText }; })()`);
-check('novedades', 'con ids se pinta la tira en el orden dado, con el rótulo de muestra y sin «Nuevo» inventado', !withData.hidden && withData.cards === ids.length && JSON.stringify(withData.ids) === JSON.stringify(ids) && withData.note === 'Datos de muestra · no es inventario' && withData.badge === 0 && /Recién\s*llegados/i.test(withData.title) && withData.links.every(h => !h) && !/más leídos/i.test(withData.text), JSON.stringify(withData).slice(0, 500));
+const withData = await ev(`(()=>{ const s = document.querySelector('#novedades'); const r = s.getBoundingClientRect(); 
+  return { hidden: s.hidden, cards: s.querySelectorAll('.rail-item').length, h: Math.round(r.height), note: /Datos de muestra|no es inventario/.test(s.innerText), badge: s.querySelectorAll('.badge-new').length, title: s.querySelector('h3').textContent, links: [...document.querySelectorAll('[data-news-link]')].map(l => l.hidden), ids: [...s.querySelectorAll('.card')].map(c => c.dataset.id), text: s.innerText }; })()`);
+check('novedades', 'con ids se pinta la tira en el orden dado, sin aviso de muestra y sin «Nuevo» inventado', !withData.hidden && withData.cards === ids.length && JSON.stringify(withData.ids) === JSON.stringify(ids) && !withData.note && withData.badge === 0 && /Recién\s*llegados/i.test(withData.title) && withData.links.every(h => !h) && !/más leídos/i.test(withData.text), JSON.stringify(withData).slice(0, 500));
 await ev(`document.querySelector('#novedades').scrollIntoView()`); await sleep(600);
 await shot('04-novedades.jpg');
 // «Nuevo» solo con el dato: la fecha de llegada vive en el registro del libro y se prueba en la prueba unitaria; aquí se confirma que sin dato no hay insignia.

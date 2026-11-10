@@ -1,7 +1,6 @@
 // Itinerante B.4 · escenas sincronizadas al scroll, sin dependencias.
 import { DUR, EASE, EASE_IO, ms, confirmThen } from './motion.js';
 import { openDialog, closeDialog, pushSheet, navigateFromSheet } from './sheets.js';
-import { kindTag } from './tag.js';
 
 const WA = 'https://wa.me/528180875940';
 
@@ -630,7 +629,7 @@ async function boot() {
       });
       shown = i;
       const item = items[i];
-      caption.replaceChildren(kindTag(item.dataset.kind) ?? '', ` ${item.dataset.caption}`);
+      caption.textContent = item.dataset.caption;
     };
     items.forEach((d, i) => {
       d.addEventListener('toggle', () => { if (d.open) show(i); });
@@ -750,13 +749,11 @@ async function boot() {
       if (motion) layer.style.clipPath = 'inset(0 100% 0 0)';
       layersWrap.append(layer);
 
-      const tag = kindTag(t.kind) ?? '';
-
       if (!motion) {
         prev.forEach(p => p.remove());
         nameEl.textContent = t.name;
         lineEl.textContent = t.line;
-        tagEl.replaceChildren(tag, ` ${t.place}`);
+        tagEl.textContent = t.place;
         updateMessage(false);
         return;
       }
@@ -777,7 +774,7 @@ async function boot() {
         if (my !== token) return;
         fillName(t.name).forEach((s, i) => s.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: ease, fill: 'backwards' }));
         lineEl.textContent = t.line;
-        tagEl.replaceChildren(tag, ` ${t.place}`);
+        tagEl.textContent = t.place;
         [lineEl, tagEl].forEach((el, i) => {
           el.getAnimations().forEach(a => a.cancel());
           el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: DUR('instant') * 0.6 + i * ms('stagger-line'), easing: ease, fill: 'backwards' });
@@ -824,7 +821,7 @@ async function boot() {
     const bootCatalog = () => (catalogReady ??= import('./catalog.js').then(m => m.initCatalog({ isMotion })).catch(() => {
       catalogReady = undefined;
       const st = $('[data-cat-status]', catalogSection);
-      if (st) st.textContent = 'No pudimos cargar la muestra. Escríbenos por WhatsApp y te ayudamos a buscar.';
+      if (st) st.textContent = 'No pudimos cargar el catálogo. Escríbenos por WhatsApp y te ayudamos a buscar.';
       $('[data-cat-grid]', catalogSection)?.replaceChildren();
       $('[data-cat-grid]', catalogSection)?.removeAttribute('aria-busy');
       $('[data-cat-filters]', catalogSection)?.replaceChildren();

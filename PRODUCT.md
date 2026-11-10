@@ -43,7 +43,7 @@ genérico.
   fechas, cupos o estados que todavía no estén verificados.
 - En el teléfono la primera vista es un perfil (nombre, estado de hoy, dirección
   y «Cómo llegar» como única acción de contacto) con destacados que abren historias hechas solo con
-  las fotos que ya existen, cada una rotulada «Recreación IA» o «Foto real». En
+  las fotos que ya existen. En
   Cartelera, «Me interesa» y «Compartir» son locales: no envían nada ni muestran
   contadores, reseñas o reacciones, porque no hay datos que los respalden.
 - «Recién llegados» (Novedades) existe solo si la librería entrega una lista de
@@ -61,8 +61,9 @@ genérico.
   mantenible con CSS local y JavaScript nativo. No existe una segunda home; el
   sitio anterior está archivado en `_archive/models/higgsfield-d599d36a/`.
 - Catálogo hoy: `assets/data/catalog.json` con búsqueda por autor, título, ISBN y
-  editorial, filtros con conteo y ficha, todo en el navegador. Cada registro se
-  rotula «Datos de muestra · no es inventario». No consulta `/api/catalog`.
+  editorial, filtros con conteo y ficha, todo en el navegador. Hoy son registros
+  de prueba y la página no lo anuncia con sellos: es la plantilla que recibirá el
+  listado real. No consulta `/api/catalog`.
 - Iti IA existe como API en el Worker (`/api/ai/iti-ia`), pero **no está
   integrada en la interfaz**: el sitio no promete ni ofrece conversación con
   Iti IA. Conectarla y definir el contrato de datos del catálogo es trabajo
@@ -72,7 +73,11 @@ genérico.
 - No se publican precios, existencias, fechas, cupos, reseñas, calificaciones,
   alianzas ni recomendaciones sin una fuente verificable.
 - Los datos de prueba no pueden presentarse como inventario real.
-- Las imágenes se rotulan «Foto real» o «Recreación IA», sin excepción.
+- La plantilla no imprime avisos de maqueta («Recreación IA», «Foto real», «Datos de
+  muestra», «Imagen ilustrativa»): decisión de Aldo del 2026-11-10. La procedencia de
+  cada imagen sigue registrada como dato (`data-kind` en el marcado y
+  `assets/provenance.json`). Antes de anunciar el sitio al público, las recreaciones
+  se sustituyen por las fotos reales de la casa y la muestra por el listado real.
 - El movimiento es complementario: el contenido, la navegación y las acciones
   deben funcionar sin video ni JavaScript de escenas.
 

@@ -6,9 +6,9 @@
 - **Tono de sección** (`data-tone="light|mist|deep"`): redefine los mismos tokens dentro de una sección y pinta su fondo. El hero, el manifiesto y el catálogo van en `light` (blanco), La casa y Libros en `mist` (bruma, blanco teñido de turquesa), la cita y el pie en `deep` (turquesa casi negro). Cartelera y el llamado pintan el campo turquesa del logo.
 - **Recorrido de la entrada**: 145 fotogramas en canvas sincronizados al scroll, solo en escritorio y con movimiento. En móvil, con movimiento reducido o con ahorro de datos, el hero es un póster fijo.
 - **Cartelera**: propuestas de actividades sin fecha, cupo ni costo; el CTA es consulta por WhatsApp, no reserva.
-- **Catálogo de muestra**: `#catalogo`, 500 registros de prueba en `assets/data/catalog.json` con búsqueda y filtros locales, rotulado «Datos de muestra · no es inventario». No consulta `/api/catalog`.
+- **Catálogo de muestra**: `#catalogo`, 500 registros de prueba en `assets/data/catalog.json` con búsqueda y filtros locales. Desde 2026-11-10 la página lo llama «catálogo» y no lleva sellos de muestra (plantilla real, decisión de Aldo); los datos siguen siendo de prueba hasta que llegue el listado de la librería. No consulta `/api/catalog`.
 - **Iti IA**: API en el Worker (`/api/ai/iti-ia`) que responde con base en el catálogo recuperado. **No está conectada a la interfaz del sitio B.4.**
-- **Procedencia**: toda imagen lleva «Foto real» o «Recreación IA»; el origen de cada una está en `assets/provenance.json`.
+- **Procedencia**: el origen de cada imagen está en `assets/provenance.json` y en `data-kind` (`ai` | `real`) del marcado. Desde 2026-11-10 es un dato interno: la página no imprime rótulos «Foto real» ni «Recreación IA».
 
 ## Architecture Decisions In Force
 

@@ -3,7 +3,7 @@
 // locales: no se envía nada y no hay contadores). Se carga al primer toque o en reposo.
 import { openDialog, navigateFromSheet } from './sheets.js';
 import { notify, MAPS } from './saved.js';
-import { KIND_LABEL, kindTag, validKind } from './tag.js';
+import { validKind } from './tag.js';
 
 export const STORY_KEYS = ['casa', 'cartelera', 'libros', 'visita'];
 const STORY_TITLE = { casa: 'La casa', cartelera: 'Cartelera', libros: 'Libros', visita: 'Visita' };
@@ -13,17 +13,17 @@ const INTEREST_KEY = 'iti-b4-interes-v1';
 
 const store = () => { try { return globalThis.localStorage ?? null; } catch { return null; } };
 const text = el => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
-// Procedencia que declara el rótulo del propio documento; sin rótulo es null y la foto no entra a ninguna historia.
-const kindOf = el => (el?.querySelector('.tag--real') ? 'real' : el?.querySelector('.tag--ai') ? 'ai' : null);
+// Procedencia registrada en el propio documento (`data-kind`); sin ella es null y la foto no entra a ninguna historia.
+const kindOf = el => validKind(el?.dataset?.kind);
 
 // Fotos de cada historia: salen del propio documento (una sola fuente de verdad) y los temas de Libros.
-// Cada foto lleva `kind` (ai | real): sin rótulo no hay historia.
+// Cada foto lleva `kind` (ai | real) como dato: sin procedencia registrada no hay historia.
 export function collectSlides(key, doc = document, topics = {}) {
   const imgOf = (root, sel = 'img') => root?.querySelector(sel);
   if (key === 'casa') {
     return [...doc.querySelectorAll('.house .still')].map(li => {
       const img = imgOf(li), cap = li.querySelector('figcaption');
-      return { src: img.getAttribute('src'), alt: img.alt, title: text(cap?.querySelector('b')), text: text(cap?.querySelector('span:not(.tag)')), kind: kindOf(cap) };
+      return { src: img.getAttribute('src'), alt: img.alt, title: text(cap?.querySelector('b')), text: text(cap?.querySelector('span')), kind: kindOf(cap) };
     });
   }
   if (key === 'cartelera') {
@@ -38,8 +38,7 @@ export function collectSlides(key, doc = document, topics = {}) {
   if (key === 'visita') {
     return ['.visit-arrival', '.manifesto-photo--a'].map(sel => doc.querySelector(sel)).filter(Boolean).map(fig => {
       const img = imgOf(fig), cap = fig.querySelector('figcaption');
-      const tag = cap?.querySelector('.tag');
-      return { src: img.getAttribute('src'), alt: img.alt, title: text(cap).replace(text(tag), '').trim(), text: '', kind: kindOf(cap) };
+      return { src: img.getAttribute('src'), alt: img.alt, title: text(cap), text: '', kind: kindOf(cap) };
     });
   }
   return [];
@@ -99,12 +98,12 @@ function buildViewer() {
     v.i = Math.min(n - 1, Math.max(0, i));
     const s = v.slides[v.i];
     v.img.src = s.src; v.img.alt = s.alt || '';
-    v.cap.replaceChildren(kindTag(s.kind), el('b', 'story-t', s.title));
+    v.cap.replaceChildren(el('b', 'story-t', s.title));
     if (s.text) v.cap.append(el('span', 'story-x', s.text));
     v.bars.querySelectorAll('i').forEach((b, k) => b.classList.toggle('is-seen', k <= v.i));
     v.prev.disabled = v.i === 0;
     v.next.disabled = v.i === n - 1;
-    v.live.textContent = `Foto ${v.i + 1} de ${n}. ${s.title}. ${KIND_LABEL[s.kind]}.`;
+    v.live.textContent = `Foto ${v.i + 1} de ${n}. ${s.title}.`;
     const ahead = v.slides[v.i + 1];
     if (ahead) { const pre = new Image(); pre.src = ahead.src; }
   };

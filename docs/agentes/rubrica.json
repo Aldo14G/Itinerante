@@ -103,7 +103,7 @@
     {
       "id": "U03",
       "area": "ux",
-      "enunciado": "Móvil con sensación de red social: encabezado tipo perfil con destacados que abren las historias, Cartelera como publicaciones (foto, pie, rótulo, «Me interesa» y «Compartir» locales), Guardar y Mi lista.",
+      "enunciado": "Móvil con sensación de red social: encabezado tipo perfil con destacados que abren las historias, Cartelera como publicaciones (foto, pie, «Me interesa» y «Compartir» locales), Guardar y Mi lista.",
       "medir": "crítico + e2e propios",
       "dueño": "ux-movil-feed"
     },
@@ -131,7 +131,7 @@
     {
       "id": "V01",
       "area": "verdad",
-      "enunciado": "Se cumplen las reglas de verdad: rótulos de IA/real, «Datos de muestra», sin precios/existencias/fechas/reseñas, horario y WhatsApp correctos.",
+      "enunciado": "Se cumplen las reglas de verdad: sin precios/existencias/fechas/reseñas inventados, horario y WhatsApp correctos, cada ficha termina en una pregunta a la librería; la plantilla no imprime avisos de maqueta («Recreación IA», «Foto real», «Datos de muestra») y la procedencia de cada imagen queda como dato (data-kind y provenance.json).",
       "medir": "npm test + crítico",
       "dueño": "ux-movil-feed"
     },

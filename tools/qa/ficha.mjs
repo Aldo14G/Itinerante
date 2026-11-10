@@ -42,12 +42,12 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   await click(...p); await sleep(1800);
   const m = await ev(`(() => {
     const d = document.querySelector('#cat-drawer'); const r = d.querySelector('[data-d-visit]').getBoundingClientRect(); const sc = d.querySelector('[data-d-scroll]');
-    const seal = d.querySelector('.drawer-seal'); const g = document.createRange(); g.selectNodeContents(seal.lastElementChild);
+    const note = d.querySelector('.drawer-note');
     return { open: d.open, bottom: Math.round(r.bottom), scroll: sc.scrollTop, hover: document.documentElement.scrollWidth > innerWidth || sc.scrollWidth > sc.clientWidth,
-      seal: seal.textContent, sealSplit: g.getClientRects().length > 1, focus: document.activeElement.getAttribute('aria-label') };
+      note: note.textContent.trim(), seal: !!d.querySelector('.drawer-seal, .drawer-tag, .tag'), focus: document.activeElement.getAttribute('aria-label') };
   })()`);
   ck(`${w}x${h}: «Cómo llegar» dentro del primer pliegue (borde ${m.bottom} <= ${h - 8}), hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.scroll === 0 && !m.hover, JSON.stringify(m));
-  ck(`${w}x${h}: sello literal sin partir «no es inventario» y foco inicial en Cerrar`, m.seal === 'Datos de muestra · no es inventario.' && !m.sealSplit && m.focus === 'Cerrar ficha', JSON.stringify(m));
+  ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma y el foco inicial va en Cerrar`, !m.seal && m.note === 'La librería confirma existencia y precio.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
   await shot(`ficha-m${w}x${h}.png`);
   await press('Escape', 'Escape', 27); await sleep(900);
   ck(`${w}x${h}: Escape cierra y libera el scroll`, await ev(`!document.querySelector('#cat-drawer').open && !document.documentElement.classList.contains('sheet-open')`));

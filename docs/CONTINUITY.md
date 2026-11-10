@@ -1,3 +1,14 @@
+# Continuidad de Itinerante — 2026-11-10 (plantilla sin avisos de maqueta y versión única)
+
+- **Decisiones de Aldo:** paleta A (la de la rama, tono del logo `#7ac4b4`; la variante «celeste de la lona» `#8bd2cf` queda descartada por ahora), una sola versión a partir de esta rama (se fusiona en `main`), y la plantilla real sin subtextos de maqueta.
+- **Fuera de la página:** «Recreación IA», «Foto real», insignias IA/Foto de los destacados, el crédito del hero, «Datos de muestra · no es inventario» (carrusel, capa Explora, hoja Explorar, ficha, Novedades) y «Registro de muestra». El texto visible dice «catálogo» en vez de «muestra».
+- **Lo que se conserva como dato:** `data-kind="ai|real"` en pies de foto y publicaciones, `kind` en los temas, `assets/provenance.json`; `tag.js` exporta `KINDS` y `validKind`. Una foto sin procedencia registrada sigue sin entrar a las historias.
+- **Vigilancia invertida:** la prueba «plantilla: sin sellos…», `critique.mjs` (`copy-label`) y el arnés (`explorer`, `ficha`, `rail`, `feed`, `e2e`) fallan si un aviso vuelve a aparecer.
+- **CR2-01 cerrado** (crítico ronda 2): la cita y la cortinilla declaran tema y la cabecera opaca ya no cae a noche sobre el sitio claro; sin JavaScript la banda es de papel.
+- Verificación: `npm test` 132 + 18 + 4, `test:design` 72, crítica en baseline, `test:browser` 7/7 (axe 0), feed 61/61, e2e 101/101, hero ≥ 18:1, móvil 8.7 pantallas, 0 errores de consola.
+- **Riesgo anotado para Aldo:** producción en Vercel sirve `main`. Con la fusión quedan publicadas recreaciones hechas con IA sin rótulo y 500 registros de prueba presentados como catálogo. Antes de anunciar la dirección al público hay que sustituirlas por las fotos reales y el listado real.
+- Pendiente con la librería: fotos profesionales por estación (pasillo, libreros, mesa central, patio), hoja del catálogo con ISBN y estante, fechas reales de Cartelera (hoy dice «propuesta» y «sin fecha confirmada»), capturas de Instagram para afinar marca. QA de la ronda 2 no terminó sus mediciones propias (se detuvo); el arnés completo sí pasó.
+
 # Continuidad de Itinerante — 2026-11-05 (curaduría, ronda 1, sesión en la nube)
 
 Rama: `claude/cool-turing-37uiqt` (sobre `main` 4af8612; respaldo `backup/pre-curaduria-2026-11-04`). Commits de la curaduría: 1f32a95 (paleta del logo, reglas «cómo evitarlo», axe en el arnés), f088b4d y 69263c0 (catálogo de fuentes `docs/ux/FUENTES.md` corregido y enlazado; supera la PR 1), 877b676 (paleta-skeletons), 03ce089 (navegacion-desplegables), 07d215e (ux-movil-feed), 25a6bef (movimiento). Informes y capturas en `.tmp-audit/agentes/curaduria/ronda-{0,1}/` (efímero).

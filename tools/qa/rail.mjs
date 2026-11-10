@@ -130,17 +130,17 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
       return { changed: r.querySelector('.rail-item .cover-title').textContent !== first, label: r.querySelector('[data-rail-viewport]').getAttribute('aria-label'), live: r.querySelector('[data-rail-live]').textContent, n: r.querySelectorAll('.rail-item').length, sl: r.querySelector('[data-rail-viewport]').scrollLeft };
     })()`);
     ck(name + ': cambiar de colección renueva libros, etiqueta y aviso', col.changed && /Suspenso/.test(col.label) && /Suspenso/.test(col.live) && col.n > 0 && col.sl === 0, JSON.stringify(col));
-    // Verdad (regla 3): el rótulo exacto de muestra sigue visible junto al carrusel con cada colección, y la nota de la colección es otra línea.
+    // Plantilla: junto al carrusel solo va la nota de la colección, que cambia con cada una; ningún sello de muestra.
     const seal = await ev(`(async () => {
       const r = document.querySelector('[data-rail]'); const out = [];
       for (const chip of r.querySelectorAll('.rail-chip')) {
         chip.click(); await (${AFTER_CHIP})(chip);
-        const s = r.querySelector('[data-rail-seal]'); const n = r.querySelector('[data-rail-note]'); const b = s.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(s);
-        out.push({ col: chip.textContent, text: s.textContent.trim(), shown: b.width > 0 && b.height > 0 && getComputedStyle(s).visibility === 'visible' && !s.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, sep: s !== n && !n.contains(s) && !s.contains(n), inBody: document.body.innerText.includes('Datos de muestra · no es inventario'), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
+        const n = r.querySelector('[data-rail-note]'); const b = n.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(n);
+        out.push({ col: chip.textContent, shown: b.width > 0 && b.height > 0 && getComputedStyle(n).visibility === 'visible' && !n.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, seal: !!r.querySelector('[data-rail-seal], .rail-seal') || /Datos de muestra|no es inventario/.test(document.body.innerText), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
       }
       return out;
     })()`);
-    ck(name + ': con las 4 colecciones el rótulo «Datos de muestra · no es inventario.» sigue visible, en una línea, antes del carrusel y aparte de la nota', seal.length === 4 && seal.every(s => s.text === 'Datos de muestra · no es inventario.' && s.shown && s.lines === 1 && s.sep && s.inBody && s.above && s.note && !/inventario/.test(s.note)), JSON.stringify(seal));
+    ck(name + ': con las 4 colecciones la nota de la colección se ve, en una línea, antes del carrusel, cambia con cada una y no hay sello de muestra', seal.length === 4 && seal.every(s => s.shown && s.lines === 1 && !s.seal && s.above && s.note && !/inventario|muestra/i.test(s.note)) && new Set(seal.map(s => s.note)).size === 4, JSON.stringify(seal));
     // Una sola taxonomía a la vista: elegir un tema de consulta marca la colección equivalente y el estado activo es el mismo.
     // El tema sin equivalente (Poesía) no debe cambiar nada: se le da un tope corto para «cambiar» y se comprueba que no lo hizo.
     const link = await ev(`(async () => {

@@ -43,7 +43,7 @@ const RULES = {
   'a11y-console': ['a11y', 'error', 'Error de consola o excepción.'],
   'a11y-heading-skip': ['a11y', 'warn', 'Salto de nivel de encabezado.'],
   'copy-truth': ['copy', 'error', 'Afirmación comercial sin fuente (precio, existencia, fecha, reseña o cifra).'],
-  'copy-label': ['copy', 'error', 'Imagen sin rótulo «Foto real» / «Recreación IA».'],
+  'copy-label': ['copy', 'error', 'Aviso de maqueta a la vista («Recreación IA», «Foto real», «Datos de muestra», «Imagen ilustrativa»).'],
   'copy-glued': ['copy', 'error', 'Palabras pegadas (falta un espacio, p. ej. un <br> oculto en móvil).'],
   'copy-repeat': ['copy', 'warn', 'Frase repetida en la página.'],
   'copy-measure': ['copy', 'warn', 'Línea de lectura de más de 75 caracteres.'],
@@ -292,14 +292,10 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
   text.split(/(?<=[.!?])\s+|\n+/).map(s => s.trim().toLowerCase().replace(/\s+/g, ' ')).filter(s => s.split(' ').length >= 5).forEach(s => counts.set(s, (counts.get(s) || 0) + 1));
   counts.forEach((n, s) => { if (n > 1) out.push({ rule: 'copy-repeat', sel: 'texto', detail: `×${n} «${s.slice(0, 60)}»` }); });
 
-  // Rótulos de procedencia
+  // Plantilla sin avisos de maqueta: la procedencia de las fotos es un dato (data-kind, provenance.json), no un rótulo impreso.
   if (cfg.labels) {
-    document.querySelectorAll('img').forEach(img => {
-      const src = img.getAttribute('src') || '';
-      if (!/assets\/img\//.test(src) || !img.getAttribute('alt')) return;
-      const box = img.closest('figure, li, .topic-stage, .bill-stage') || img.parentElement;
-      if (!box.querySelector('.tag--real, .tag--ai')) add('copy-label', img, src);
-    });
+    const mock = text.match(/Recreación IA|Foto real|Datos de muestra|Registro de muestra|no es inventario|Imagen ilustrativa|Hecho con IA/i);
+    if (mock) out.push({ rule: 'copy-label', sel: 'texto', detail: `«${mock[0]}»` });
   }
 
   // Leyes UX (primera vista)

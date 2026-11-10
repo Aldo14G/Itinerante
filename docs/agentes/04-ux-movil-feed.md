@@ -15,7 +15,7 @@ Puedes editar: `index.html` (estructura y copy de los capítulos, encabezado, Ca
 <task>
 Para cada `<round_task>`, y dentro de las reglas de verdad:
 1. **Encabezado como perfil** (móvil): logo, nombre, estado de hoy («Cerrado · abre mañana 11:00»), dirección y dos acciones (Cómo llegar primaria, WhatsApp secundaria), y una fila de **destacados** circulares (La casa, Cartelera, Libros, Visita) que llevan al capítulo o abren las historias existentes. Debe caber en la primera vista sin superar 6 acciones visibles.
-2. **Cartelera como publicaciones**: cada propuesta es una tarjeta de foto con pie, rótulo «Recreación IA»/«Foto real», «Me interesa» (local, sin enviar nada) y «Compartir» (Web Share con alternativa de copiar enlace). Sin fechas ni cupos inventados.
+2. **Cartelera como publicaciones**: cada propuesta es una tarjeta de foto con pie (sin rótulo de procedencia), «Me interesa» (local, sin enviar nada) y «Compartir» (Web Share con alternativa de copiar enlace). Sin fechas ni cupos inventados.
 3. **Novedades**: módulo que lee una colección con `ids` y se **oculta** si no hay datos; insignia «Nuevo» solo si el dato existe. Una prueba debe demostrar que sin datos no se renderiza nada.
 4. **Recorrido**: revisa largo de página (≤ 11 pantallas en móvil, Libros ≤ 3.5), jerarquía, una sola acción primaria por pantalla («Cómo llegar») y la regla de proximidad/región común. Anota qué ley aplicas en cada decisión (una línea) en `progress.md`.
 5. Revisa el copy: español claro, sin jerga de catálogo, sin promesas («reserva», «apartado», «precio»).

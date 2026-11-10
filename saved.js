@@ -44,7 +44,7 @@ export function listMessage(books, max = 12) {
   const lines = books.slice(0, max).map((b, i) => `${i + 1}. «${clip(b.t)}»${b.a && b.a !== 'Autor no indicado' ? ` de ${clip(b.a)}` : ''}`);
   const rest = books.length - lines.length;
   return [
-    'Hola, pienso visitarlos pronto. ¿Me ayudan a confirmar si tienen estos libros? (Los anoté en la muestra de su sitio.)',
+    'Hola, pienso visitarlos pronto. ¿Me ayudan a confirmar si tienen estos libros? (Los anoté en su sitio.)',
     ...lines,
     ...(rest > 0 ? [`…y ${rest} más.`] : []),
     'Gracias.'
@@ -154,12 +154,12 @@ async function renderList(dlg) {
   let failed = false;
   try { const sample = await loadSample(); const by = new Map(sample.books.map(b => [b.id, b])); books = ids.map(id => by.get(id)).filter(Boolean); } catch { failed = true; }
   // Error (A03): los ids siguen guardados aunque la muestra no cargue; se dice, se ofrece reintentar y WhatsApp sigue a la vista.
-  status.textContent = failed ? `No pudimos cargar la muestra. ${ids.length === 1 ? 'Tu título guardado sigue aquí' : `Tus ${ids.length} títulos guardados siguen aquí`}.` : '';
+  status.textContent = failed ? `No pudimos cargar el catálogo. ${ids.length === 1 ? 'Tu título guardado sigue aquí' : `Tus ${ids.length} títulos guardados siguen aquí`}.` : '';
   errBox.hidden = !failed;
   if (failed) {
     items.replaceChildren();
     const url = new URL(`https://wa.me/${WA_NUMBER}`);
-    url.searchParams.set('text', `Hola, pienso visitarlos pronto. Anoté ${countText(ids.length)} en la muestra de su sitio y quisiera confirmar si los tienen. Gracias.`);
+    url.searchParams.set('text', `Hola, pienso visitarlos pronto. Anoté ${countText(ids.length)} en su sitio y quisiera confirmar si los tienen. Gracias.`);
     wa.href = url.href;
     wa.hidden = false;
     return;
@@ -239,7 +239,7 @@ export function initSaved() {
     if (retry) { // vuelve a pedir la muestra (sample.js olvida la promesa fallida); respuesta visible antes de la red
       const dlg = retry.closest('#mylist');
       dlg.querySelector('[data-ml-error]').hidden = true;
-      dlg.querySelector('[data-ml-status]').textContent = 'Cargando la muestra…';
+      dlg.querySelector('[data-ml-status]').textContent = 'Cargando el catálogo…';
       renderList(dlg);
       return;
     }

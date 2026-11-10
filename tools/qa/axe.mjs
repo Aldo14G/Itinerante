@@ -51,7 +51,7 @@ await audit('móvil 390: menú lateral con Libros abierto');
 await ev(`document.getElementById('sheet-menu').close()`); await sleep(500);
 await ev(`document.querySelector('[data-ex-open]').scrollIntoView()`); await sleep(1200);
 await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`document.getElementById('explorer').open`); await waitFor(`document.querySelector('#explorer [data-cat-grid]').getAttribute('aria-busy') === null`, 60); await sleep(600);
-await audit('móvil 390: hoja Explorar con la muestra');
+await audit('móvil 390: hoja Explorar con el catálogo');
 await ev(`document.querySelector('#explorer button.card').click()`); await waitFor(`document.getElementById('cat-drawer') && document.getElementById('cat-drawer').open`); await sleep(800);
 await audit('móvil 390: ficha sobre Explorar');
 await ev(`document.getElementById('cat-drawer').close(); document.getElementById('explorer').close()`); await sleep(600);

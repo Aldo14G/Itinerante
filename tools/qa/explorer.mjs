@@ -54,11 +54,11 @@ const op = await ev(`(() => { const ex = document.getElementById('explorer'); co
 ck('móvil: abre a pantalla completa como diálogo modal con foco en cerrar y el scroll bloqueado', op.open && op.modal && op.full[0] === 390 && op.full[1] === 844 && op.lock && op.focus && op.input && op.cards > 0, JSON.stringify(op));
 ck('móvil: la URL refleja la hoja (#explorar) para que «atrás» la cierre', op.hash === '#explorar');
 
-// Verdad (regla 3): la hoja a pantalla completa lleva el sello de muestra en su cabecera fija, en una sola línea a 390, 360 y 320 px.
+// Plantilla: la cabecera fija de Explorar lleva solo el titular (sin sellos), en una sola línea a 390, 360 y 320 px.
 for (const w of [390, 360, 320]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: 800, deviceScaleFactor: 1, mobile: true }); await sleep(500);
-  const sl = await ev(`(() => { const ex = document.getElementById('explorer'); const s = ex.querySelector('.ex-top [data-cat-seal]'); const top = ex.querySelector('.ex-top').getBoundingClientRect(); const b = s.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(s); const close = ex.querySelector('[data-ex-close]').getBoundingClientRect(); return { text: s.textContent.trim(), lines: range.getClientRects().length, inTop: b.top >= top.top && b.bottom <= top.bottom + 1, right: Math.round(b.right), closeLeft: Math.round(close.left), vis: getComputedStyle(s).visibility, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, topH: Math.round(top.height) }; })()`);
-  ck(`móvil ${w}: la cabecera de Explorar lleva «Datos de muestra · no es inventario» en una línea, sin cortarse ni chocar con cerrar`, sl.text === 'Datos de muestra · no es inventario' && sl.lines === 1 && sl.inTop && sl.right <= sl.closeLeft && sl.vis === 'visible' && sl.sw === sl.cw, JSON.stringify(sl));
+  const sl = await ev(`(() => { const ex = document.getElementById('explorer'); const s = ex.querySelector('.ex-top .ex-title'); const top = ex.querySelector('.ex-top').getBoundingClientRect(); const b = s.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(s); const close = ex.querySelector('[data-ex-close]').getBoundingClientRect(); return { text: s.textContent.trim(), seal: !!ex.querySelector('[data-cat-seal], .ex-seal'), lines: range.getClientRects().length, inTop: b.top >= top.top && b.bottom <= top.bottom + 1, right: Math.round(b.right), closeLeft: Math.round(close.left), vis: getComputedStyle(s).visibility, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, topH: Math.round(top.height) }; })()`);
+  ck(`móvil ${w}: la cabecera de Explorar lleva solo «Explorar el catálogo» en una línea, sin sello, sin cortarse ni chocar con cerrar`, sl.text === 'Explorar el catálogo' && !sl.seal && sl.lines === 1 && sl.inTop && sl.right <= sl.closeLeft && sl.vis === 'visible' && sl.sw === sl.cw, JSON.stringify(sl));
   if (w === 390) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-390.jpg', Buffer.from(shot.result.data, 'base64')); }
   if (w === 360) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-360.jpg', Buffer.from(shot.result.data, 'base64')); }
 }
@@ -83,7 +83,7 @@ ck('móvil: la barra Género de la hoja no muestra etiquetas en inglés (Science
 
 // búsqueda dentro de la hoja
 const se = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.focus(); q.value = 'Freida'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 1200)); return { cards: ex.querySelectorAll('button.card').length, status: ex.querySelector('[data-cat-status]').textContent, first: ex.querySelector('button.card .cover-title')?.textContent }; })()`);
-ck('móvil: buscar «Freida» dentro de la hoja filtra la muestra (5 de 500)', se.cards >= 1 && se.cards < 24 && /de 5 títulos|Mostrando 5/.test(se.status), JSON.stringify(se));
+ck('móvil: buscar «Freida» dentro de la hoja filtra el catálogo (5 de 500)', se.cards >= 1 && se.cards < 24 && /de 5 títulos|Mostrando 5/.test(se.status), JSON.stringify(se));
 
 // ficha encima de la hoja
 await realClick('#explorer button.card');
@@ -111,15 +111,15 @@ await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`doc
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(1000);
 ck('móvil: el botón cerrar también cierra', (await ev(`!document.getElementById('explorer').open && location.hash === ''`)));
 
-// «Ver toda la muestra» y menú lateral
+// «Ver todo el catálogo» y menú lateral
 await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`); await sleep(2500); await ev(`scrollBy(0, 1)`); await sleep(500);
 await ev(`document.querySelector('.rail-all').click()`);
-ck('móvil: «Ver toda la muestra» abre la hoja', await waitFor(`document.getElementById('explorer').open`));
+ck('móvil: «Ver todo el catálogo» abre la hoja', await waitFor(`document.getElementById('explorer').open`));
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
 await ev(`document.querySelector('.hdr-more').click()`); await sleep(800);
 await ev(`document.querySelector('#sheet-menu [aria-controls="sm-libros"]').click()`); await sleep(500);
 await ev(`document.querySelector('#sheet-menu a[href="#catalogo"]').click()`);
-ck('móvil: «Buscar en la muestra» del menú cierra el menú y abre la hoja', await waitFor(`document.getElementById('explorer').open && !document.getElementById('sheet-menu').open`));
+ck('móvil: «Buscar en el catálogo» del menú cierra el menú y abre la hoja', await waitFor(`document.getElementById('explorer').open && !document.getElementById('sheet-menu').open`));
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
 ck('móvil: sin errores de consola', !errs.length, errs.join(' | '));
 { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-cerrado.jpg', Buffer.from(shot.result.data, 'base64')); }

@@ -187,7 +187,7 @@ for (const id of ['libros', 'cartelera', 'visita']) {
   const d = await ev(`Math.round(document.getElementById('${id}').getBoundingClientRect().top)`);
   check('anclas', `la pestaña ${id} aterriza con el título a la vista (|top| ≤ 100 px)`, Math.abs(d) <= 100, d);
 }
-check('hero móvil', 'el crédito tiene fondo propio', await ev(`getComputedStyle(document.querySelector('.entry-credit')).backgroundColor!=='rgba(0, 0, 0, 0)'`));
+check('hero móvil', 'la foto del hero va sin crédito ni rótulos encima', await ev(`!document.querySelector('.entry-credit, .entry .tag') && !/Recreación IA|Foto real|Datos de muestra|no es inventario|Imagen ilustrativa/.test(document.body.innerText)`));
 await ev(`scrollTo(0,0)`); await sleep(800);
 const wm = await ev(`(()=>{const w=document.querySelector('.wordmark').getBoundingClientRect(); const t=document.querySelector('.tabbar').getBoundingClientRect(); const f=document.querySelector('.entry-facts').getBoundingClientRect(); return {wordmarkBottom:Math.round(w.bottom), tabTop:Math.round(t.top), factsBottom:Math.round(f.bottom)}})()`);
 check('hero móvil', 'wordmark y dirección quedan sobre la barra inferior', wm.wordmarkBottom <= wm.tabTop + 2 && wm.factsBottom <= wm.tabTop + 2, JSON.stringify(wm));

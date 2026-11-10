@@ -15,8 +15,8 @@ Librería Itinerante y Más, centro de Monterrey (Mariano Matamoros Pte. 421). E
 <truth_rules>
 Estas reglas no se negocian: la librería confirma la existencia y el precio de todo.
 1. Sin precios, existencias, fechas, reseñas ni calificaciones inventados. Nada de «más leídos» ni «lo más preguntado»: no hay datos.
-2. Imágenes generadas se rotulan «Recreación IA»; fotos reales, «Foto real».
-3. Todo lo que venga de la muestra lleva el rótulo «Datos de muestra · no es inventario». El listado real de obras llegará después: los módulos (carrusel, Novedades) deben poder recibirlo (`ids` en `assets/data/collections.json`) y **ocultarse** si no hay datos.
+2. La plantilla no imprime avisos de maqueta (decisión de Aldo, 2026-11-10): nada de «Recreación IA», «Foto real», «Imagen ilustrativa» ni insignias. La procedencia de cada imagen se registra como dato (`data-kind="ai|real"` y `assets/provenance.json`) y no se muestra.
+3. El texto visible habla de «el catálogo» y no lleva sellos de muestra («Datos de muestra · no es inventario»). Sigue prohibido afirmar existencias o precios: cada ficha termina en una pregunta a la librería. El listado real de obras llegará después: los módulos (carrusel, Novedades) deben poder recibirlo (`ids` en `assets/data/collections.json`) y **ocultarse** si no hay datos.
 4. Horario: lunes a sábado 11:00–20:00; domingo cerrado. WhatsApp 528180875940.
 </truth_rules>
 

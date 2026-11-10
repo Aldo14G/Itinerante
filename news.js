@@ -15,9 +15,7 @@ export function newsPlan(books, data) {
   return {
     show: list.length > 0,
     books: list,
-    titulo: col?.titulo || 'Recién llegados',
-    // Lo que sale de la muestra lleva siempre el rótulo; con inventario verificado (meta.kind distinto) se retira.
-    note: data?.meta?.kind === 'sample' ? (data.meta.label || 'Datos de muestra · no es inventario') : ''
+    titulo: col?.titulo || 'Recién llegados'
   };
 }
 
@@ -37,9 +35,6 @@ export async function initNews({ ensureCatalog } = {}) {
   const track = section.querySelector('[data-news-track]');
   const tones = coverTones(plan.books);
   track.replaceChildren(...plan.books.map((b, i) => bookCard(b, tones[i])));
-  const note = section.querySelector('[data-news-note]');
-  note.textContent = plan.note;
-  note.hidden = !plan.note;
   section.querySelector('[data-news-viewport]')?.setAttribute('aria-label', plan.titulo);
   wireBookOpen(track, ensureCatalog);
 }

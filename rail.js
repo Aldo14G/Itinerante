@@ -89,14 +89,14 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     chipsEl.replaceChildren();
     track.replaceChildren();
     track.removeAttribute('aria-busy');
-    status.textContent = 'No pudimos cargar la muestra de libros.';
+    status.textContent = 'No pudimos cargar los libros.';
     errBox.hidden = false;
     if (!errBox.dataset.wired) {
       errBox.dataset.wired = '1';
       errBox.querySelector('[data-rail-retry]').addEventListener('click', () => { // la muestra se vuelve a pedir (sample.js olvida la promesa fallida)
         errBox.hidden = true;
         delete root.dataset.state;
-        status.textContent = 'Cargando la muestra…';
+        status.textContent = 'Cargando el catálogo…';
         track.setAttribute('aria-busy', 'true');
         initRail({ ensureCatalog, isMotion });
       });
@@ -140,7 +140,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     track.removeAttribute('aria-busy');
     viewport.scrollTo({ left: 0, behavior: 'auto' });
     viewport.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
-    noteEl.textContent = col.nota || ''; // la nota de la colección va aparte: el rótulo de muestra es fijo (vive en el marcado) y nunca se toca
+    noteEl.textContent = col.nota || ''; // la nota de la colección
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`;
     if (cards.length > FIRST_CHUNK) {
       if (!immediate) await afterPaint();

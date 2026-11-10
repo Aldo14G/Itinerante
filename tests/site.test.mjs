@@ -7,7 +7,7 @@ import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
 import { newsPlan, NEWS_SIZE } from '../news.js';
 import { STORY_KEYS, readInterest, shareName, initFeed } from '../feed.js';
-import { KIND_LABEL, validKind } from '../tag.js';
+import { KINDS, validKind } from '../tag.js';
 import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
@@ -102,7 +102,7 @@ test('recursos referenciados existen', async () => {
   for (const ref of new Set(refs)) await access(here(`./${ref}`));
 });
 
-test('procedencia: todo raster de assets/img y la secuencia tiene origen y rótulo', async () => {
+test('procedencia: todo raster de assets/img y la secuencia tiene origen registrado; ningún rótulo se imprime', async () => {
   const kind = new Map();
   prov.real.forEach(f => kind.set(f.file, 'real'));
   prov.aiRecreation.forEach(f => kind.set(f.file, 'ai'));
@@ -113,9 +113,10 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen y rótu
   assert.equal(stills.length, 6);
   for (const s of stills) {
     const file = s.match(/assets\/(img\/[^"]+)"/)[1];
-    assert.ok(s.includes(kind.get(file) === 'real' ? 'tag--real' : 'tag--ai'), `rótulo incorrecto: ${file}`);
+    assert.ok(s.includes(`<figcaption data-kind="${kind.get(file) === 'real' ? 'real' : 'ai'}">`), `procedencia incorrecta en el marcado: ${file}`);
   }
-  for (const [k, t] of Object.entries(TOPICS)) assert.equal(t.kind, kind.get(`img/${t.img}`), `rótulo de tema ${k}`);
+  for (const [k, t] of Object.entries(TOPICS)) assert.equal(t.kind, kind.get(`img/${t.img}`), `procedencia del tema ${k}`);
+  assert.ok(!/Recreación IA|Foto real|Imagen ilustrativa|class="tag\b/.test(html), 'la procedencia es un dato (data-kind): la página no imprime rótulos');
 });
 
 test('marcado compatible con la CSP de producción', () => {
@@ -316,12 +317,13 @@ test('móvil: menú lateral con categorías desplegables accesibles y destinos r
   assert.ok(/grid-template-rows: 0fr/.test(mobileCss) && /min-height: 48px/.test(mobileCss), 'despliegue sin saltos y filas de 48 px');
 });
 
-test('cartelera móvil: cada tarjeta lleva su foto con rótulo de procedencia y los puntos coinciden', () => {
+test('cartelera móvil: cada tarjeta lleva su foto con pie y procedencia registrada, y los puntos coinciden', () => {
   const items = [...html.matchAll(/<details class="bill-item"[\s\S]*?<\/details>/g)].map(m => m[0]);
   assert.equal(items.length, 3);
   for (const it of items) {
     assert.match(it, /class="bill-card-fig"/);
-    assert.match(it, /<span class="tag tag--(real|ai)">(Foto real|Recreación IA)<\/span>/);
+    assert.match(it, /<span class="bill-card-cap">[^<]+<\/span>/, 'pie de foto sin rótulo');
+    assert.match(it, /^<details class="bill-item"[^>]*data-kind="(real|ai)"/, 'la procedencia viaja como dato');
   }
   assert.equal([...html.matchAll(/<div class="bill-dots"[^>]*>([\s\S]*?)<\/div>/g)][0][1].match(/<i>/g).length, items.length);
 });
@@ -352,7 +354,7 @@ test('portadas y cabecera: tinta fija sobre superficies oscuras, también dentro
   assert.ok(/\.cover--blank \.cover-title \{ color: var\(--cover-ink\); \}/.test(css) && /\.cover-author \{[^}]*var\(--cover-ink-dim\)/.test(css), 'portadas con tinta propia');
   assert.ok(/--cover-ink: #f8f8f8/.test(tokensCss) && /--cover-ink-dim: #cfe3df/.test(tokensCss));
   assert.ok(!/html\[data-glass="lite"\] \.hdr::before \{[^}]*background/.test(css), 'lite no pisa el tinte por sección de la cabecera');
-  assert.ok(/\.entry-credit \{[^}]*background: color-mix/.test(css.replaceAll('\n', ' ')), 'crédito del hero sobre chip sólido');
+  assert.ok(!/entry-credit/.test(html + css + mobileCss), 'el hero no lleva crédito ni rótulo sobre la foto');
   assert.ok(/html\.at-top \.tabbar \{ translate: 0 calc\(100% \+ 24px\); \}/.test(mobileCss), 'la barra inferior espera fuera de la primera vista (el perfil no la reserva)');
   assert.ok(/html\.at-top \.tabbar \{ visibility: hidden; \}/.test(mobileCss) && /\.tabbar \{[^}]*transition: translate var\(--dur-base\) var\(--spring\), visibility var\(--dur-base\);/.test(mobileCss.replaceAll('\n', ' ')), 'fuera de pantalla la barra inferior no recibe foco (visibility, con la duración de la salida)');
   assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileCss), 'sin JavaScript la barra inferior no tapa los destacados: la cabecera ya trae los cuatro enlaces');
@@ -436,7 +438,7 @@ test('Libros y Catálogo son un solo capítulo: tres capas, un punto de entrada 
   for (const [name, block] of [['cabecera', desktopNav], ['menú', phoneMenu], ['barra inferior', tabbar]]) {
     assert.deepEqual(names(block), ['casa', 'cartelera', 'libros', 'visita'], `${name}: cuatro capítulos con los mismos nombres`);
   }
-  assert.ok(/class="sm-link" href="#catalogo">Buscar en la muestra/.test(html), 'el menú lateral llega a la muestra desde Libros');
+  assert.ok(/class="sm-link" href="#catalogo">Buscar en el catálogo/.test(html), 'el menú lateral llega al catálogo desde Libros');
 });
 
 test('progreso de lectura: barra fija decorativa, ligada al scroll y sin JS', () => {
@@ -477,16 +479,16 @@ test('ficha: «Cómo llegar» es la acción primaria, WhatsApp confirma, y el re
   assert.ok(/data-d-visit href="https:\/\/www\.google\.com\/maps\/dir\//.test(ask) && /btn btn--tungsten" data-d-visit/.test(ask), 'visita como botón principal');
   assert.ok(/btn btn--line-ink" data-d-cta/.test(ask), 'WhatsApp como acción secundaria');
   assert.ok(/\.drawer-ask \{[^}]*background: color-mix\(in srgb, var\(--white\)/.test(css), 'fondo claro propio: no hereda --bone, que en el tono claro es tinta');
-  assert.ok(/Vi el título en la muestra de su sitio/.test(bookMessage({ t: 'X', a: 'Y' })), 'el mensaje no afirma que el libro esté en el sitio como inventario');
+  assert.ok(/^Hola, ¿tienen «X»/.test(bookMessage({ t: 'X', a: 'Y' })) && /Vi el título en su sitio\.$/.test(bookMessage({ t: 'X', a: 'Y' })), 'el mensaje pregunta si lo tienen: no afirma existencia');
 });
 
-test('ficha móvil: portada y datos en dos columnas para que «Cómo llegar» quede en el primer pliegue; sello literal de la muestra (CR-15)', () => {
-  assert.ok(/<div class="drawer-head">\s*<p class="tag tag--ai drawer-tag">[\s\S]*?data-d-save[\s\S]*?<\/div>/.test(html), 'género, título, autor y Guardar van juntos junto a la portada');
+test('ficha móvil: portada y datos en dos columnas para que «Cómo llegar» quede en el primer pliegue; sin sello ni rótulo (CR-15)', () => {
+  assert.ok(/<div class="drawer-head">[\s\S]*?data-d-save[\s\S]*?<\/div>/.test(html) && !/drawer-tag/.test(html + css + mobileCss), 'título, autor y Guardar van juntos junto a la portada, sin rótulo encima');
   assert.ok(/\.drawer-head \{ display: contents; \}/.test(css), 'en escritorio el grupo no cambia la ficha');
   assert.ok(/\.drawer-body \{[^}]*grid-template-columns: 40% minmax\(0, 1fr\)/.test(mobileCss) && /\.drawer-head \{[^}]*grid-column: 2/.test(mobileCss), 'móvil: portada a 40 % y datos al lado');
   assert.ok(/\.drawer-body > \* \{ grid-column: 1 \/ -1; \}/.test(mobileCss), 'el resto de la ficha ocupa el ancho completo');
   const note = html.match(/<p class="drawer-note">[\s\S]*?<\/p>/)[0];
-  assert.ok(/Datos de muestra ·<\/span> <span>no es inventario\./.test(note) && /\.drawer-seal span \{ white-space: nowrap; \}/.test(mobileCss), 'sello literal «Datos de muestra · no es inventario» sin partir «no es inventario»');
+  assert.equal(note, '<p class="drawer-note">La librería confirma existencia y precio.</p>', 'la nota de la ficha solo dice lo que sirve: quién confirma existencia y precio');
 });
 
 test('sin JavaScript el botón del menú no se muestra y los cuatro capítulos siguen en la cabecera (QA1-03)', () => {
@@ -663,14 +665,12 @@ test('Novedades: sin datos el plan no muestra nada, ni siquiera todo el catálog
   }
 });
 
-test('Novedades: con ids se muestra en el orden dado y con el rótulo de muestra', () => {
+test('Novedades: con ids se muestra en el orden dado, sin avisos', () => {
   const [a, b, c] = [data.books[5], data.books[2], data.books[9]];
   const plan = newsPlan([a, b, c], { meta: SAMPLE_META, novedades: { titulo: 'Recién llegados', ids: [c.id, 'no-existe', b.id, a.id] } });
   assert.equal(plan.show, true);
   assert.deepEqual(plan.books.map(x => x.id), [c.id, b.id, a.id], 'orden de la lista; omite lo que no existe');
-  assert.equal(plan.note, 'Datos de muestra · no es inventario');
-  // con inventario verificado (meta distinto de «sample») el rótulo de muestra se retira
-  assert.equal(newsPlan([a], { meta: { kind: 'inventario' }, novedades: { ids: [a.id] } }).note, '');
+  assert.ok(!('note' in plan), 'el plan no trae rótulo de muestra');
   // tope
   assert.equal(newsPlan(data.books, { meta: SAMPLE_META, novedades: { ids: data.books.slice(0, 40).map(x => x.id) } }).books.length, NEWS_SIZE);
 });
@@ -686,7 +686,7 @@ test('Novedades: nada se presenta como ranking ni como inventario', async () => 
   const files = await Promise.all(['index.html', 'app.js', 'news.js', 'feed.js', 'rail.js', 'catalog.js', 'saved.js'].map(f => readFile(here(`./${f}`), 'utf8')));
   for (const [i, src] of files.entries()) assert.ok(!/m[aá]s le[ií]dos|lo m[aá]s preguntado|best ?seller|m[aá]s vendid/i.test(src), `ranking inventado en el archivo ${i}`);
   const news = await readFile(here('./news.js'), 'utf8');
-  assert.ok(/Datos de muestra · no es inventario/.test(news) && /meta\?\.kind === 'sample'/.test(news), 'el rótulo de muestra viene de los datos');
+  assert.ok(!/Datos de muestra|no es inventario/.test(news), 'Novedades no imprime avisos de muestra');
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/import\('\.\/news\.js'\)/.test(app) && !/^import .*news\.js/m.test(app), 'Novedades se carga bajo demanda');
   const prepare = await readFile(here('./scripts/prepare-public.mjs'), 'utf8');
@@ -694,7 +694,7 @@ test('Novedades: nada se presenta como ranking ni como inventario', async () => 
   for (const f of ['feed.js', 'news.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
 });
 
-test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única acción de la primera vista y destacados con historias rotuladas', () => {
+test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única acción de la primera vista y destacados con historias', () => {
   const copy = html.match(/<div class="entry-copy"[\s\S]*?<\/nav>/)[0];
   assert.ok(/class="profile-av" src="assets\/img\/logo-96\.webp"[^>]*alt=""/.test(copy), 'avatar decorativo con el logo');
   assert.ok(/<h1 id="entry-title"[\s\S]*Librería Itinerante <i>y Más<\/i>/.test(copy), 'el h1 es el nombre del perfil');
@@ -706,16 +706,13 @@ test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única ac
   assert.ok(/btn--ghost/.test(actions[1][1]) && /wa\.me/.test(actions[1][2]) && /Pregunta por un libro/.test(actions[1][3]), 'WhatsApp existe como secundaria (escritorio)');
   assert.ok(/\.entry-actions \.btn--ghost \{ display: none; \}/.test(mobileCss) && /\.entry-actions \{ grid-template-columns: 1fr; \}/.test(mobileCss), 'en móvil «Escribir» sale de la primera vista (Hick: <= 6 acciones); WhatsApp queda en la cabecera al desplazar, Cartelera, Libros y Visita');
   assert.ok(!/only-phone|hide-phone/.test(html + css + mobileCss), 'sin variantes de texto solo móvil');
-  const hl = [...copy.matchAll(/<a class="hl-item" href="#([a-z]+)" data-story="([a-z]+)" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets\/(img\/[^"]+)"[^>]*alt=""[^>]*><span class="hl-kind( hl-kind--real)?" aria-hidden="true">([^<]+)</g)];
+  const hl = [...copy.matchAll(/<a class="hl-item" href="#([a-z]+)" data-story="([a-z]+)" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets\/(img\/[^"]+)"[^>]*alt=""[^>]*><\/span>/g)];
   assert.deepEqual(hl.map(m => m[2]), STORY_KEYS, 'cuatro destacados, uno por capítulo');
   assert.ok(hl.every(m => m[1] === m[2]) && hl.length >= 3, 'sin JavaScript cada destacado lleva a su capítulo');
   const kind = new Map([...prov.real.map(f => [f.file, 'real']), ...prov.aiRecreation.map(f => [f.file, 'ai'])]);
-  for (const m of hl) { // la miniatura tiene procedencia y su micro-rótulo dice lo mismo
-    assert.ok(kind.has(m[3]), `sin procedencia: ${m[3]}`);
-    assert.equal(m[4] ? 'real' : 'ai', kind.get(m[3]), `rótulo de ${m[3]}`);
-    assert.equal(m[5], kind.get(m[3]) === 'real' ? 'Foto' : 'IA');
-  }
-  assert.deepEqual(KIND_LABEL, { ai: 'Recreación IA', real: 'Foto real' }, 'las historias se rotulan con las mismas palabras que el resto del sitio');
+  for (const m of hl) assert.ok(kind.has(m[3]), `sin procedencia registrada: ${m[3]}`); // la miniatura tiene origen en provenance.json; no lleva insignia
+  assert.ok(!/hl-kind/.test(html + mobileCss), 'los destacados no llevan insignia IA/Foto');
+  assert.deepEqual(KINDS, ['ai', 'real'], 'la procedencia es un dato de dos valores; no se imprime ningún rótulo');
   assert.ok(/\.profile-av, \.hl \{ display: none; \}/.test(css) && /\.hl \{ display: block; grid-area: hl; \}/.test(mobileCss), 'el perfil y los destacados son solo móvil');
   assert.ok(/\.hl-img \{[^}]*background: var\(--stone\)/.test(mobileCss) && !/\.hl-img \{[^}]*(animation|terra|tungsten)/.test(mobileCss), 'el destacado sin foto se pinta con --stone (token), quieto: nunca el anillo del aro macizo');
   assert.ok(/\.hl-item \{[^}]*min-width: 64px/.test(mobileCss) && /\.hl-ring \{[^}]*width: 68px; height: 68px/.test(mobileCss), 'destacados de ≥ 44 px');
@@ -737,15 +734,15 @@ test('historias: el visor es un diálogo modal con foco, cierre, flechas y rótu
   assert.ok(/catch\(\(\) => \{ location\.hash = hl\.getAttribute\('href'\); \}\)/.test(app), 'si el módulo no llega, el destacado lleva al capítulo');
   // cada historia sale de fotos que ya están en la página y todas llevan rótulo
   assert.equal(html.match(/<li class="still">/g).length, 6);
-  assert.ok(Object.values(TOPICS).every(t => KIND_LABEL[t.kind]), 'los temas de Libros traen su rótulo');
+  assert.ok(Object.values(TOPICS).every(t => validKind(t.kind)), 'los temas de Libros traen su procedencia como dato');
   assert.ok(/\.story:modal \{[^}]*position: fixed; inset: 0/.test(mobileCss), 'pantalla completa');
 });
 
-test('Cartelera como publicaciones: foto, pie, rótulo, «Me interesa» y «Compartir» locales, sin contadores ni fechas', async () => {
+test('Cartelera como publicaciones: foto, pie, «Me interesa» y «Compartir» locales, sin contadores ni fechas', async () => {
   const items = [...html.matchAll(/<details class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/details>/g)];
   assert.equal(items.length, 3);
   for (const [block, id] of items) {
-    assert.ok(/<img class="bill-card-img"/.test(block) && /class="tag tag--(ai|real)"/.test(block), `${id}: foto y rótulo`);
+    assert.ok(/<img class="bill-card-img"/.test(block) && /<span class="bill-card-cap">[^<]+<\/span>/.test(block), `${id}: foto y pie`);
     assert.ok(new RegExp(`<button class="act" type="button" data-interest="${id}" data-title="[^"]+" aria-pressed="false">`).test(block), `${id}: «Me interesa» con aria-pressed`);
     assert.ok(new RegExp(`<button class="act" type="button" data-share="${id}" data-title="[^"]+">`).test(block), `${id}: «Compartir»`);
     assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
@@ -931,24 +928,19 @@ test('visor de historias: foto a pantalla completa (cover), velo corto en la bas
   assert.ok(/STORY_GO = \{ casa: 'la casa'[^}]*\}/.test(feed) && /Ver \$\{STORY_GO\[key\]\} en la página/.test(feed) && !/Ver \$\{STORY_TITLE/.test(feed), '«Ver la casa en la página»');
 });
 
-test('verdad: el rótulo de muestra del carrusel es fijo y aparte de la nota de la colección, y la hoja Explorar lo lleva en su cabecera', async () => {
-  const LABEL = 'Datos de muestra · no es inventario';
+test('plantilla: sin sellos de muestra ni rótulos de procedencia a la vista; la nota de la colección sigue aparte', async () => {
   const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
-  const seal = rail.match(/<p class="rail-note rail-seal" data-rail-seal>([^<]*)<\/p>/);
-  assert.ok(seal && seal[1] === `${LABEL}.`, 'el rótulo exacto vive en el marcado, no se escribe desde JavaScript');
-  assert.ok(/<p class="rail-note" data-rail-note><\/p>/.test(rail) && rail.indexOf('data-rail-note') < rail.indexOf('data-rail-seal'), 'la nota nace vacía (la llena la colección), es otro elemento y va antes del rótulo');
+  assert.ok(/<p class="rail-note" data-rail-note><\/p>/.test(rail), 'la nota nace vacía (la llena la colección)');
   const railJs = await readFile(here('./rail.js'), 'utf8');
   assert.ok(/noteEl\.textContent = col\.nota/.test(railJs), 'al cambiar de colección solo se reescribe la nota');
-  assert.ok(!/rail-seal|data-rail-seal/.test(railJs), 'rail.js no toca el rótulo: no puede desaparecer al cambiar de colección');
-  assert.ok(!/noteEl\.hidden/.test(railJs), 'la nota no se oculta ni arrastra al rótulo');
+  assert.ok(!/noteEl\.hidden/.test(railJs), 'la nota no se oculta');
   const cols = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
-  assert.ok(cols.collections.length >= 2 && cols.collections.every(c => c.nota && !/inventario|muestra/i.test(c.nota)), 'las notas de colección no suplantan ni repiten el rótulo');
-  assert.equal(cols.meta.label, LABEL);
-  const top = html.match(/<div class="ex-top">[\s\S]*?<button class="ex-close"/)?.[0] ?? '';
-  assert.ok(new RegExp(`<p class="ex-seal" data-cat-seal>${LABEL}</p>`).test(top), 'la cabecera de la hoja Explorar lleva el sello');
-  const catalog = await readFile(here('./catalog.js'), 'utf8');
-  assert.ok(/querySelectorAll\('\[data-cat-seal\]'\)\.forEach/.test(catalog), 'el sello de la sección y el de la hoja salen del mismo dato');
-  assert.ok(/\.ex-seal \{[^}]*white-space: nowrap/.test(mobileCss), '«no es inventario» no se parte a 360 px');
+  assert.ok(cols.collections.length >= 2 && cols.collections.every(c => c.nota && !/inventario|muestra/i.test(c.nota)), 'las notas de colección no hablan de inventario ni de muestra');
+  const names = ['index.html', 'app.js', 'feed.js', 'rail.js', 'catalog.js', 'saved.js', 'news.js', 'tag.js'];
+  const files = await Promise.all(names.map(f => readFile(here(`./${f}`), 'utf8')));
+  for (const [i, src] of files.entries()) assert.ok(!/Datos de muestra|Registro de muestra|no es inventario|Recreación IA|Foto real|Imagen ilustrativa|Hecho con IA/i.test(src), `aviso de maqueta en ${names[i]}`);
+  assert.ok(!/rail-seal|cat-seal|ex-seal|drawer-seal|drawer-tag|hl-kind|entry-credit|tag--ai|tag--real/.test(html + css + mobileCss), 'sin sellos ni rótulos en el marcado ni en los estilos');
+  assert.ok(!/\bmuestra\b/i.test(html.replace(/<!--[\s\S]*?-->/g, '')), 'el texto visible habla del catálogo, no de una muestra');
   assert.ok(/\.rail-info \[data-rail-note\] \{ min-height: 1lh; \}/.test(css), 'la línea de la nota se reserva: el carrusel no salta al pintar');
 });
 
