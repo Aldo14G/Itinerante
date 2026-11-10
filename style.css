@@ -848,7 +848,8 @@ p { text-wrap: pretty; }
 /* ---------- Sin JavaScript ---------- */
 
 html:not(.js) :is(.menu-btn, .topics, .composer-field, .motion-btn, .cat-bar, .cat-layout) { display: none; }
-html:not(.js) .hdr::before { opacity: 1; }
+html:not(.js) .hdr::before { opacity: 1; background: var(--paper); border-color: color-mix(in srgb, var(--paper-ink) 12%, transparent); } /* sin JS no hay tema que copiar: banda de papel con texto en tinta, como en el resto del sitio claro (CR2-05) */
+html:not(.js) .hdr { color: var(--paper-ink); }
 html:not(.js) .books-grid { grid-template-columns: minmax(0, 1fr); }
 html:not(.js) .topic-layers { aspect-ratio: 16 / 9; }
 html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
