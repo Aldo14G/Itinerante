@@ -1,7 +1,9 @@
 // Móvil con sensación de red social (U03), Novedades (U04) y una sola acción primaria (U01/D10).
 // node feed.mjs <url> [outDir]   Sale con código ≠ 0 si algo falla.
 //  1. Primera vista (390x844): perfil (nombre, estado, dirección, «Cómo llegar» como única acción de contacto), sin burbujas de historias y con la barra inferior a la vista; ≤ 6 acciones visibles en 390x844, 360x740 y 375x667 (U02/D11); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
-//  3. Cartelera como publicaciones: encabezado → foto → acciones → texto (DOM y pantalla), «Me interesa» (aria-pressed, persistente) y «Compartir» (Web Share y respaldo de copiar) de ≥ 44 px, con nombre accesible propio.
+//  3. Eventos y talleres: cada tarjeta va foto → insignias (tipo y estado) → título → frase → descripción → acciones (DOM y pantalla); «Me interesa» (aria-pressed, persistente),
+//     «Compartir» (control de icono; Web Share y respaldo de copiar) y «Preguntar por WhatsApp», de ≥ 44 px y con nombre accesible propio; la tarjeta cabe en el alto útil
+//     (entre cabecera y barra, con 12 px de holgura) a 320×640, 360×640, 360×740, 375×667 y 390×844; el estado sale de data-fecha.
 //  4. Novedades: sin datos no queda ningún nodo visible ni espacio; con ids se pinta sin avisos de muestra.
 //  5. Barrido de acciones primarias en 390x844 y 1280x800: a lo sumo una por pantalla, siempre «Cómo llegar», y ningún WhatsApp mayor que ella.
 import { spawn } from 'node:child_process';
@@ -102,19 +104,41 @@ await open(390, 844, { reset: true });
 await ev(`localStorage.clear()`);
 const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const i = q('[data-interest]'), s = q('[data-share]');
   const rect = e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
-  return { id: it.dataset.id, photo: !!q('.bill-card-img'), tag: q('.bill-card-cap .tag')?.textContent, cap: q('.bill-card-cap')?.textContent.trim(), title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim() }; })`);
-check('cartelera', '3 publicaciones con foto, pie sin rótulo, título, «Me interesa» y «Compartir» de ≥ 44 px', posts.length === 3 && posts.every(p => p.photo && !p.tag && p.cap && !/Recreación IA|Foto real/.test(p.cap) && p.title && p.iTxt === 'Me interesa' && p.sTxt === 'Compartir' && p.interest[1] >= 44 && p.interest[0] >= 44 && p.share[1] >= 44 && p.share[0] >= 44 && p.pressed === 'false'), JSON.stringify(posts));
-// Publicación reconocible (CR-13): encabezado → foto → acciones → texto, tanto en el DOM como en la pantalla; el título se ve una sola vez.
-const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-post-head', '.bill-card-img', '.bill-acts', '.bill-cap', '.bill-detail > p'].map(q);
+  const wa = q('.bill-wa'); const badges = [...it.querySelectorAll('.bill-badges .badge')]; const img = q('.bill-card-img').getBoundingClientRect();
+  return { id: it.dataset.id, photo: !!q('.bill-card-img'), alt: q('.bill-card-img').alt, ratio: +(img.width / img.height).toFixed(2), badges: badges.map(b => b.textContent.trim()), onPhoto: badges.every(b => { const r = b.getBoundingClientRect(); return r.top >= img.top && r.bottom <= img.bottom && r.left >= img.left && r.right <= img.right; }), badgeFs: badges.map(b => getComputedStyle(b).fontSize).join(),
+    title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), wa: wa && rect(wa), waTxt: wa?.innerText.trim(), waHref: wa?.href, pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim(), sIcon: !!s?.querySelector('svg'), sRound: getComputedStyle(s).borderRadius, row: Math.abs(i.getBoundingClientRect().top - s.getBoundingClientRect().top) < 2, waBelow: wa.getBoundingClientRect().top >= i.getBoundingClientRect().bottom }; })`);
+const TIPOS = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
+check('eventos', '3 tarjetas con foto 4:3 descrita, título y dos insignias sobre la foto: el tipo (Lectura, Juego, Taller) y «Propuesta · sin fecha»', posts.length === 3 && posts.every(p => p.photo && p.alt && !/Recreación IA|Foto real/.test(p.alt) && Math.abs(p.ratio - 1.33) < 0.03 && p.title && p.badges.length === 2 && p.badges[0] === TIPOS[p.id] && p.badges[1] === 'Propuesta · sin fecha' && p.onPhoto && p.badgeFs === '12px,12px'), JSON.stringify(posts.map(p => [p.id, p.alt, p.ratio, p.badges, p.onPhoto, p.badgeFs])));
+check('eventos', 'tres acciones de ≥ 44 px: «Me interesa» y «Compartir» (control de icono redondo) en un renglón y «Preguntar por WhatsApp» debajo, con su mensaje', posts.every(p => p.iTxt === 'Me interesa' && p.sTxt === '' && p.sIcon && p.sRound === '50%' && p.interest[1] >= 44 && p.interest[0] >= 44 && p.share[1] >= 44 && p.share[0] >= 44 && p.pressed === 'false' && p.row && p.waBelow && p.waTxt === 'Preguntar por WhatsApp' && p.wa[1] >= 44 && /wa\.me\/528180875940\?text=Hola/.test(p.waHref)), JSON.stringify(posts.map(p => [p.id, p.iTxt, p.sTxt, p.interest, p.share, p.wa, p.waTxt, p.row, p.waBelow])));
+// Tarjeta de evento: foto → insignias → título → frase → descripción → acciones, tanto en el DOM como en la pantalla; el título está una sola vez y ya no hay encabezado de red social.
+const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-card-img', '.bill-badges', '.bill-title', '.bill-sub', '.bill-detail > p', '.bill-acts'].map(q);
   const dom = els.every((e, i) => e && (i === 0 || (els[i - 1].compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)));
   const tops = els.map(e => e ? Math.round(e.getBoundingClientRect().top) : null); const vis = tops.every((t, i) => t !== null && (i === 0 || t >= tops[i - 1]));
-  return { id: it.dataset.id, dom, vis, tops, who: q('.bill-post-who')?.textContent.trim(), once: [...it.querySelectorAll('.bill-title, .bill-cap-t')].filter(e => e.getBoundingClientRect().height > 0).length }; })`);
-check('cartelera', 'orden del DOM y de la pantalla: encabezado → foto → acciones → texto; «Itinerante · propuesta»; el título se ve una sola vez', order.length === 3 && order.every(o => o.dom && o.vis && o.who === 'Itinerante · propuesta' && o.once === 1), JSON.stringify(order));
-// Nombres accesibles (árbol de accesibilidad del navegador): los tres «Compartir» y los tres «Me interesa» llevan el título de su publicación.
+  return { id: it.dataset.id, dom, vis, tops, head: it.querySelectorAll('.bill-post-head, .bill-post-who, .bill-cap').length, once: [...it.querySelectorAll('.bill-title')].filter(e => e.getBoundingClientRect().height > 0).length, titles: it.querySelectorAll('.bill-title').length }; })`);
+check('eventos', 'orden del DOM y de la pantalla: foto → insignias → título → frase → descripción → acciones; sin encabezado «Itinerante · propuesta»; el título está y se ve una sola vez', order.length === 3 && order.every(o => o.dom && o.vis && o.head === 0 && o.once === 1 && o.titles === 1), JSON.stringify(order));
+// Nombres accesibles (árbol de accesibilidad del navegador): cada «Compartir», «Me interesa» y «Preguntar por WhatsApp» lleva el título de su propuesta.
 await send('Accessibility.enable');
-const ax = (await send('Accessibility.getFullAXTree')).result.nodes.filter(n => n.role?.value === 'button' && /^(Compartir|Me interesa)/.test(n.name?.value || '')).map(n => n.name.value);
+const axNodes = (await send('Accessibility.getFullAXTree')).result.nodes;
+const ax = axNodes.filter(n => n.role?.value === 'button' && /^(Compartir|Me interesa)/.test(n.name?.value || '')).map(n => n.name.value);
 const shareNames = ax.filter(n => n.startsWith('Compartir')), likeNames = ax.filter(n => n.startsWith('Me interesa'));
-check('cartelera', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos que llevan el título (y 3 «Me interesa» igual)', shareNames.length === 3 && new Set(shareNames).size === 3 && shareNames.every(n => /^Compartir «.+»$/.test(n)) && likeNames.length === 3 && new Set(likeNames).size === 3, JSON.stringify(ax));
+const waNames = axNodes.filter(n => n.role?.value === 'link' && /^Preguntar por WhatsApp/.test(n.name?.value || '')).map(n => n.name.value);
+check('eventos', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos que llevan el título (y 3 «Me interesa» y 3 «Preguntar por WhatsApp» igual)', shareNames.length === 3 && new Set(shareNames).size === 3 && shareNames.every(n => /^Compartir «.+»$/.test(n)) && likeNames.length === 3 && new Set(likeNames).size === 3 && waNames.length === 3 && new Set(waNames).size === 3 && waNames.every(n => /^Preguntar por WhatsApp: .+/.test(n)), JSON.stringify([...ax, ...waNames]));
+// Estado de la propuesta: sale de data-fecha (hora de Monterrey); sin atributo, «Propuesta · sin fecha».
+const when = await ev(`(async () => { const m = await import(new URL('feed.js', document.baseURI).href); const it = document.querySelector('.bill-item'); const b = it.querySelector('[data-bill-when]'); const read = () => ({ text: b.textContent, quiet: b.classList.contains('badge--quiet') });
+  const out = { base: read() }; it.dataset.fecha = '2099-05-02'; m.initFeed(); out.fecha = read(); it.dataset.fecha = '2099-05-02T18:30'; m.initFeed(); out.hora = read(); it.dataset.fecha = '2001-01-01'; m.initFeed(); out.pasada = read(); delete it.dataset.fecha; m.initFeed(); out.sin = read(); return out; })()`);
+check('eventos', 'la insignia de estado sale de data-fecha: fecha vigente en español («Sáb 2 may 2099», con hora si la trae) en la insignia común; sin atributo o con fecha pasada, «Propuesta · sin fecha»', when && when.base.text === 'Propuesta · sin fecha' && when.base.quiet && when.fecha.text === 'Sáb 2 may 2099' && !when.fecha.quiet && when.hora.text === 'Sáb 2 may 2099 · 18:30' && when.pasada.text === 'Propuesta · sin fecha' && when.pasada.quiet && when.sin.text === 'Propuesta · sin fecha' && when.sin.quiet, JSON.stringify(when));
+// La tarjeta cabe en el alto útil: entre la cabecera y la barra inferior (--tabbar-h), con 12 px de holgura, desde 320×640.
+for (const [vw, vh] of [[320, 640], [360, 640], [360, 740], [375, 667], [390, 844]]) {
+  await open(vw, vh, { reset: true, wait: 2500 });
+  await ev(`document.querySelector('.bill-track').scrollIntoView({ block: 'center' })`); await sleep(900);
+  const fit = await ev(`(() => { const cs = getComputedStyle(document.documentElement); const hdr = parseFloat(cs.getPropertyValue('--hdr-h')), tab = parseFloat(cs.getPropertyValue('--tabbar-h')); const cards = [...document.querySelectorAll('.bill-item')].map(c => Math.round(c.getBoundingClientRect().height));
+    const c = document.querySelector('.bill-item'); const acts = c.querySelector('.bill-acts').getBoundingClientRect(), box = c.getBoundingClientRect();
+    return { util: innerHeight - hdr - tab, cards, actsInside: acts.bottom <= box.bottom, cut: [...c.querySelectorAll('.bill-title, .bill-sub, .bill-detail > p, .bill-acts > *')].filter(e => e.scrollWidth > e.clientWidth + 1).length, over: document.documentElement.scrollWidth > innerWidth }; })()`);
+  const tallest = Math.max(...fit.cards);
+  check('eventos', `${vw}×${vh}: la tarjeta (${tallest} px) cabe en el alto útil (${fit.util} px) con ≥ 12 px de holgura (${(tallest / fit.util).toFixed(2)}×), sin texto cortado`, tallest <= fit.util - 12 && fit.actsInside && fit.cut === 0 && !fit.over, JSON.stringify(fit));
+}
+await open(390, 844, { reset: true });
+await ev(`localStorage.clear()`);
 await ev(`document.querySelector('.bill-item').scrollIntoView({block:'start'}); scrollBy(0, 120)`); await sleep(600);
 await shot('03-cartelera-publicacion.jpg');
 await clickSel('[data-interest]', 0); await sleep(500);

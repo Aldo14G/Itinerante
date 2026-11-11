@@ -44,3 +44,14 @@ export async function confirmThen(el, fn) {
   el.dataset.opening = '';
   try { await afterPaint(); await fn(); } finally { delete el.dataset.opening; }
 }
+
+/**
+ * Rebote corto del icono al elegir («Me interesa», guardar, parada del recorrido): solo cuando la persona toca y solo con movimiento.
+ * Pone `.is-pop` en el control (la animación `pick-pop` vive en el CSS) y la retira al terminar, así restaurar un estado guardado al
+ * pintar no rebota, y tampoco rebota después si el movimiento se reactiva.
+ */
+export function pickPop(el) {
+  if (typeof document === 'undefined' || !document.documentElement.classList.contains('motion')) return;
+  el.classList.add('is-pop');
+  el.addEventListener('animationend', () => el.classList.remove('is-pop'), { once: true });
+}

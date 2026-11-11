@@ -68,15 +68,31 @@ await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, devi
 const fl = await ev(`(async () => { const ex = document.getElementById('explorer'); const btn = ex.querySelector('[data-cat-filters-btn]'); const w = x => new Promise(r => setTimeout(r, x));
   const idle = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
   btn.click(); await w(400);
-  const more = ex.querySelector('[data-expand="g"]'); if (more) { more.click(); await w(300); }
+  // Filtros plegados (Hick): cada grupo abre con 5 opciones como máximo y su propio «Ver las N»; al abrirlo el botón no se mueve, conserva el foco y el scroll no cambia.
+  const shownOpts = g => [...g.querySelectorAll('.cat-opt')].filter(o => o.getBoundingClientRect().height > 0).length;
+  const groups = () => [...ex.querySelectorAll('.cat-group')].map(g => { const b = g.querySelector('[data-expand]'); return { legend: g.querySelector('legend').textContent, opts: shownOpts(g), btn: b?.textContent, exp: b?.getAttribute('aria-expanded'), ctl: !!b && !!document.getElementById(b.getAttribute('aria-controls')), h: b ? Math.round(b.getBoundingClientRect().height) : null }; });
+  const folded = groups();
+  const more = ex.querySelector('[data-expand="g"]'); more.scrollIntoView({ block: 'center' }); await w(200);
+  const before = { top: Math.round(more.getBoundingClientRect().top), scroll: ex.scrollTop };
+  more.focus(); more.click(); await w(300);
+  const moreNow = ex.querySelector('[data-expand="g"]');
+  const opened = { groups: groups(), top: Math.round(moreNow.getBoundingClientRect().top), scroll: ex.scrollTop, focus: document.activeElement === moreNow };
+  const foot = ex.querySelector('.cat-filters-foot'); const fr = foot.getBoundingClientRect();
+  const sticky = { pos: getComputedStyle(foot).position, bottom: Math.round(fr.bottom), vh: innerHeight, text: foot.textContent.trim() };
+  const p = ex.querySelector('[data-expand="p"]'); p.click(); await w(300); const editorials = shownOpts([...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Editorial')); ex.querySelector('[data-expand="p"]').click(); await w(300);
+  const folding = { folded, before, opened, sticky, editorials, refolded: groups().find(g => g.legend === 'Editorial') };
   const genres = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género');
   const labels = [...genres.querySelectorAll('label')].map(l => l.firstChild.textContent);
   const cb = genres.querySelector('input[type=checkbox]'); cb.click(); await w(500);
   const again = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género'); again.querySelectorAll('input[type=checkbox]')[1].click(); await w(500); // el panel se vuelve a pintar tras cada filtro
   const active = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
   for (let i = 0; i < 6 && ex.querySelector('[data-chip-dim]'); i++) { ex.querySelector('[data-chip-dim]').click(); await w(300); }
-  return { idle, active, back: btn.textContent.trim(), labels };
+  return { idle, active, back: btn.textContent.trim(), labels, folding };
 })()`);
+{ const f = fl.folding; const g = f.folded.find(x => x.legend === 'Género'), og = f.opened.groups.find(x => x.legend === 'Género');
+  ck('móvil: el panel de filtros abre con 5 opciones como máximo por grupo (≤ 20 en total) y un «Ver las N» propio (aria-expanded, aria-controls, ≥ 44 px) en cada grupo plegable', f.folded.every(x => x.opts <= 5 && (x.btn === undefined || (/^Ver l[oa]s \d+ /.test(x.btn) && x.exp === 'false' && x.ctl && x.h >= 44))) && f.folded.reduce((n, x) => n + x.opts, 0) <= 20 && f.folded.filter(x => x.btn).length >= 2 && g.btn === 'Ver los 48 géneros', JSON.stringify(f.folded));
+  ck('móvil: «Ver los 48 géneros» despliega el grupo sin mover el botón ni el scroll y con el foco en él; pasa a «Ver menos géneros» (aria-expanded=true)', og.opts === 48 && og.btn === 'Ver menos géneros' && og.exp === 'true' && f.opened.focus && f.opened.top === f.before.top && f.opened.scroll === f.before.scroll, JSON.stringify({ og, before: f.before, top: f.opened.top, scroll: f.opened.scroll, focus: f.opened.focus }));
+  ck('móvil: cada grupo se pliega por su cuenta (Editorial abre todas y vuelve a 5) y «Ver N títulos» sigue pegado al pie', f.editorials > 5 && f.refolded.opts === 5 && f.refolded.exp === 'false' && f.sticky.pos === 'sticky' && f.sticky.bottom <= f.sticky.vh + 1 && f.sticky.bottom >= f.sticky.vh - 1 && /^Ver \d+ títulos?$/.test(f.sticky.text), JSON.stringify({ editorials: f.editorials, refolded: f.refolded, sticky: f.sticky })); }
 const EN = /Science Fiction|Middle Grade|Self-Help|Fiction|Romance(?!\s+(contempor|oscuro|paranormal|juvenil|y fantas))|Thriller|Mystery|History|Memoir|Parenting|True Crime|Business|Cooking|Health|Politics|Productivity|Spirituality|Biography|Fantasy|Horror|Dystopian|Graphic Novel/;
 ck('móvil: el botón dice «Filtros» sin número, con 2 filtros «Filtros 2» y vuelve a «Filtros» al limpiar (nunca 500)', fl.idle.text === 'Filtros' && fl.idle.label === 'Filtros' && fl.active.text === 'Filtros 2' && /2 activos/.test(fl.active.label) && fl.back === 'Filtros' && !/500/.test(JSON.stringify(fl.idle) + fl.active.text), JSON.stringify({ ...fl, labels: undefined }));
 ck('móvil: la barra Género de la hoja no muestra etiquetas en inglés (Science Fiction, Middle Grade, Self-Help…)', fl.labels.length >= 40 && !fl.labels.some(l => EN.test(l) || /(Science Fiction|Middle Grade|Self-Help)/.test(l)) && fl.labels.includes('Ciencia ficción') && fl.labels.includes('Superación personal'), JSON.stringify(fl.labels.filter(l => EN.test(l)).slice(0, 8)) + ' ' + fl.labels.length);

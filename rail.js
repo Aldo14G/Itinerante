@@ -1,11 +1,39 @@
-// Carrusel de libros: una sola pieza para cualquier colección. Hoy muestra la muestra (rotulada);
-// cuando llegue el listado real basta con poner `ids` en assets/data/collections.json.
+// Carrusel de libros: una sola pieza para cualquier colección; cuando llegue el listado real basta con poner `ids` en
+// assets/data/collections.json. Las colecciones se eligen en un recorrido de paradas (DESIGN.md, «Catálogo como recorrido»):
+// cada una con su icono (`icono` en el JSON), y las que la persona ya hojeó quedan marcadas en este dispositivo.
 import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf } from './catalog.js';
 import { loadSample, loadCollections } from './sample.js';
 import { saveButton, initSaved } from './saved.js';
-import { afterPaint, confirmThen } from './motion.js';
+import { afterPaint, confirmThen, pickPop } from './motion.js';
 
 export const RAIL_SIZE = 12;
+
+// ---------- Recorrido: parte pura (se prueba sin navegador) ----------
+// Icono de la parada: el símbolo del sprite que nombra `icono`; si falta, no es un id válido o no está en el sprite, el genérico.
+export const STOP_ICON = 'c-libro';
+export function stopIcon(col, inSprite = () => true) {
+  const id = col?.icono;
+  return typeof id === 'string' && /^[a-z][a-z0-9-]*$/.test(id) && inSprite(id) ? id : STOP_ICON;
+}
+
+// Progreso: cuántas de las colecciones que hoy existen ya hojeó la persona. Un dato local y verdadero: sin metas ni recompensas.
+// Lo guardado de colecciones que ya no existen no cuenta.
+export function trailProgress(ids, seen) {
+  const set = new Set(seen);
+  const total = ids.length;
+  const done = ids.filter(id => set.has(id)).length;
+  const complete = total > 0 && done === total;
+  const text = complete
+    ? (total === 1 ? 'Ya hojeaste la colección.' : `Ya hojeaste las ${total} colecciones.`)
+    : (total === 1 ? '0 de 1 parada hojeada' : `${done} de ${total} paradas hojeadas`);
+  return { done, total, complete, text };
+}
+
+// Paradas hojeadas, en este dispositivo y sin cuenta. Sin almacenamiento (bloqueado o lleno) el recorrido funciona igual: dura la visita.
+export const TRAIL_KEY = 'iti-recorrido-v1';
+const store = () => { try { return globalThis.localStorage ?? null; } catch { return null; } };
+export const readTrail = () => { try { const r = JSON.parse(store()?.getItem(TRAIL_KEY) || '[]'); return Array.isArray(r) ? r.filter(x => typeof x === 'string') : []; } catch { return []; } };
+export const writeTrail = ids => { try { store()?.setItem(TRAIL_KEY, JSON.stringify(ids)); return true; } catch { return false; } };
 
 // Libros de una colección: una lista curada (`ids`, en ese orden) o un filtro sobre la muestra, por título.
 export function pickBooks(books, col, size = RAIL_SIZE) {
@@ -24,6 +52,37 @@ const make = (tag, cls, text) => {
   if (text != null) n.textContent = text;
   return n;
 };
+const icon = id => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'ic');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(NS, 'use');
+  use.setAttribute('href', `#${id}`);
+  svg.append(use);
+  return svg;
+};
+
+// Una parada del recorrido: el control redondo (role="radio") con su icono, el nombre colgado debajo (es su nombre accesible) y la
+// insignia de «hojeada», que se muestra con la clase is-seen de la envoltura. La envoltura lleva la línea punteada hacia la siguiente.
+export function stopNode(col) {
+  const btn = make('button', 'rail-chip');
+  btn.type = 'button';
+  btn.setAttribute('role', 'radio');
+  btn.dataset.id = col.id;
+  btn.setAttribute('aria-checked', 'false');
+  const done = make('span', 'badge rail-chip-done');
+  done.setAttribute('aria-hidden', 'true');
+  done.append(icon('i-check'));
+  const seen = make('span', 'sr-only');
+  seen.dataset.stopSeen = '';
+  btn.append(icon(stopIcon(col, id => !!document.getElementById(id))), make('span', 'rail-chip-name', col.titulo), seen, done);
+  const wrap = make('span', 'rail-stop');
+  wrap.setAttribute('role', 'presentation');
+  wrap.dataset.stop = col.id;
+  wrap.append(btn);
+  return wrap;
+}
 
 // `tone` lo da la lista (coverTones: sin vecinas del mismo tono); sin él, el tono propio del libro.
 export function bookCard(b, tone = coverTone(b)) {
@@ -70,6 +129,9 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const next = $('[data-rail-next]');
   const thumb = $('[data-rail-thumb]');
   const live = $('[data-rail-live]');
+  const trailBar = $('[data-rail-trail-bar]');
+  const trailText = $('[data-rail-trail-text]');
+  const trailAll = $('[data-rail-trail-all]');
   const status = $('[data-rail-status]');
   const errBox = $('[data-rail-error]');
 
@@ -122,14 +184,46 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   };
   const go = dir => viewport.scrollBy({ left: dir * Math.max(step(), viewport.clientWidth * 0.85), behavior: isMotion() ? 'smooth' : 'auto' });
 
+  // Recorrido: una parada queda hojeada cuando la persona la elige y su carrusel se pinta. La que no eligió con un toque (la primera, o la que
+  // marca un tema de «Pregúntanos») cuenta cuando ese carrusel llega a la pantalla, no al cargar.
+  const seen = new Set(readTrail());
+  let painted = null; // colección cuyas tarjetas están en la pista
+  let inView = !('IntersectionObserver' in window);
+  const paintTrail = () => {
+    const p = trailProgress(cols.map(c => c.id), seen);
+    chipsEl.querySelectorAll('.rail-stop').forEach(stop => {
+      const on = seen.has(stop.dataset.stop);
+      stop.classList.toggle('is-seen', on);
+      stop.querySelector('[data-stop-seen]').textContent = on ? ', hojeada' : '';
+    });
+    trailBar.max = Math.max(1, p.total);
+    trailBar.value = p.done;
+    trailBar.setAttribute('aria-valuetext', p.text);
+    trailText.textContent = p.text;
+    trailAll.hidden = !p.complete;
+    root.classList.toggle('is-complete', p.complete);
+    return p;
+  };
+  const markSeen = (id, chosen = false) => {
+    if (!id || seen.has(id) || !(chosen || inView)) return false;
+    seen.add(id);
+    writeTrail([...seen]);
+    return true;
+  };
+
   let current = null;
-  let paintId = 0; // el último cambio de colección gana si se toca otro chip antes de terminar de pintar
+  let paintId = 0; // el último cambio de colección gana si se toca otra parada antes de terminar de pintar
   const FIRST_CHUNK = 6; // lo que se ve al llegar; el resto se pinta en el fotograma siguiente para no hacer una tarea larga
-  // `immediate` (primera carga) pinta de una vez. Al tocar un chip, el chip confirma ya y las tarjetas se cambian después de pintar.
+  // `immediate` (primera carga) pinta de una vez. Al tocar una parada, la parada confirma ya y las tarjetas se cambian después de pintar.
+  // `announce` es verdadero solo cuando la persona eligió la parada (toque o teclado): se anuncia y cuenta como hojeada al pintarse.
   async function show(id, announce, immediate = false) {
     const col = cols.find(c => c.id === id) ?? cols[0];
     current = col.id;
-    chipsEl.querySelectorAll('.rail-chip').forEach(c => c.setAttribute('aria-checked', String(c.dataset.id === col.id)));
+    chipsEl.querySelectorAll('.rail-chip').forEach(c => { // la marcada es también el punto de tabulación del grupo, la elija un toque, una flecha o un tema
+      const on = c.dataset.id === col.id;
+      c.setAttribute('aria-checked', String(on));
+      c.tabIndex = on ? 0 : -1;
+    });
     const mine = ++paintId;
     if (!immediate) await afterPaint();
     if (mine !== paintId) return;
@@ -141,7 +235,10 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     viewport.scrollTo({ left: 0, behavior: 'auto' });
     viewport.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
     noteEl.textContent = col.nota || ''; // la nota de la colección
-    if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`;
+    painted = col.id;
+    markSeen(col.id, announce);
+    const trail = paintTrail();
+    if (announce) live.textContent = `${col.titulo}: ${list.length} libros. ${trail.text}${trail.complete ? '' : '.'}`; // una sola región viva: la colección y el progreso del recorrido
     if (cards.length > FIRST_CHUNK) {
       if (!immediate) await afterPaint();
       if (mine !== paintId) return;
@@ -150,23 +247,32 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     sync();
   }
 
-  chipsEl.replaceChildren(...cols.map(c => {
-    const b = make('button', 'rail-chip', c.titulo);
-    b.type = 'button';
-    b.setAttribute('role', 'radio');
-    b.dataset.id = c.id;
-    b.setAttribute('aria-checked', 'false');
-    return b;
-  }));
-  chipsEl.addEventListener('click', e => { const c = e.target.closest('.rail-chip'); if (c && c.dataset.id !== current) show(c.dataset.id, true); });
+  chipsEl.replaceChildren(...cols.map(stopNode));
+  // La parada elegida queda a la vista dentro de la fila (solo se mueve la fila, nunca la página).
+  const reveal = chip => {
+    const max = chipsEl.scrollWidth - chipsEl.clientWidth;
+    if (max <= 0) return;
+    const r = chipsEl.getBoundingClientRect(), b = chip.parentElement.getBoundingClientRect();
+    if (b.left >= r.left && b.right <= r.right) return;
+    chipsEl.scrollBy({ left: b.left + b.width / 2 - (r.left + r.width / 2), behavior: isMotion() ? 'smooth' : 'auto' });
+  };
+  // Elegir por toque o teclado: el control confirma ya (aria-checked y rebote del icono) y el carrusel cambia después de pintar.
+  const choose = chip => {
+    if (chip.dataset.id === current) return;
+    pickPop(chip);
+    reveal(chip);
+    show(chip.dataset.id, true);
+  };
+  chipsEl.addEventListener('click', e => { const c = e.target.closest('.rail-chip'); if (c) choose(c); });
   chipsEl.addEventListener('keydown', e => {
-    if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+    const dir = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!dir) return;
     const all = [...chipsEl.querySelectorAll('.rail-chip')];
     const i = all.findIndex(c => c.dataset.id === current);
-    const nextChip = all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length];
+    const nextChip = all[(i + dir + all.length) % all.length];
     e.preventDefault();
-    nextChip.focus();
-    show(nextChip.dataset.id, true);
+    nextChip.focus({ preventScroll: true });
+    choose(nextChip);
   });
   chipsEl.addEventListener('focusin', e => { // un solo punto de tabulación: la colección activa
     chipsEl.querySelectorAll('.rail-chip').forEach(c => { c.tabIndex = c === e.target ? 0 : -1; });
@@ -179,6 +285,14 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     const col = cols.find(c => c.tema === tema);
     if (col && cols.find(c => c.id === current)?.tema !== tema) show(col.id, false);
   });
+
+  // La parada pintada cuenta como hojeada cuando el carrusel está a la vista (más de la mitad): la primera al llegar, no al cargar.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      inView = entries[entries.length - 1].isIntersecting;
+      if (markSeen(painted)) paintTrail();
+    }, { threshold: 0.5 }).observe(viewport);
+  }
 
   prev.addEventListener('click', () => go(-1));
   next.addEventListener('click', () => go(1));
@@ -202,8 +316,8 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
 
   wireBookOpen(track, ensureCatalog);
 
-  chipsEl.querySelector('.rail-chip').tabIndex = 0;
-  chipsEl.querySelectorAll('.rail-chip:not(:first-child)').forEach(c => { c.tabIndex = -1; });
+  chipsEl.querySelectorAll('.rail-chip').forEach((c, i) => { c.tabIndex = i ? -1 : 0; });
+  paintTrail(); // lo guardado de visitas anteriores se pinta sin rebote: no hubo toque
   show(cols[0].id, false, true);
   root.classList.add('is-ready');
 }

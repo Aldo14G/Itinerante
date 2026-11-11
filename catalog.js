@@ -169,6 +169,18 @@ export function facetCounts(books, f, dim) {
   return counts;
 }
 
+// Opciones de un grupo de filtros (Hick): plegado muestra como máximo `limit`; las marcadas siempre entran y el resto se completa por conteo,
+// en el orden recibido (por conteo), así marcar una opción visible no mueve nada. Abierto, las primeras `limit` quedan arriba y el resto debajo
+// del botón «Ver las N» (`rest`): el botón no cambia de sitio al abrir ni al cerrar. Con `limit` opciones o menos no hay nada que plegar.
+export const FACET_LIMIT = 5;
+export function facetView(entries, checked = new Set(), open = false, limit = FACET_LIMIT) {
+  if (entries.length <= limit) return { top: entries, rest: [], total: entries.length, foldable: false };
+  if (open) return { top: entries.slice(0, limit), rest: entries.slice(limit), total: entries.length, foldable: true };
+  const keep = new Set(entries.filter(([value]) => checked.has(value)).map(([value]) => value));
+  for (const [value] of entries) { if (keep.size >= limit) break; keep.add(value); }
+  return { top: entries.filter(([value]) => keep.has(value)), rest: [], total: entries.length, foldable: true };
+}
+
 export function suggest(books, query, limit = 6) {
   const q = norm(query);
   if (q.length < 2) return [];
@@ -252,18 +264,19 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   const emptyEl = $('[data-cat-empty]', root);
   const drawer = $('#cat-drawer');
 
-  const state = { q: '', k: new Set(), g: new Set(), f: new Set(), p: new Set(), sort: 'az', shown: PAGE_SIZE, expandG: false };
+  const state = { q: '', k: new Set(), g: new Set(), f: new Set(), p: new Set(), sort: 'az', shown: PAGE_SIZE, open: new Set() }; // `open`: grupos de filtros desplegados
   const names = {
     k: id => CATEGORY_ES[id] || data.categories[id] || id,
     g: id => genreLabel(id, data.subgenres[id]?.n),
     f: formatLabel,
     p: id => id,
   };
+  // `all` y `less`: el rótulo del botón que despliega y pliega el grupo («Ver los 48 géneros» / «Ver menos géneros»).
   const GROUPS = [
-    { dim: 'k', label: 'Categoría', limit: 99 },
-    { dim: 'g', label: 'Género', limit: 10 },
-    { dim: 'f', label: 'Formato', limit: 99 },
-    { dim: 'p', label: 'Editorial', limit: 8 },
+    { dim: 'k', label: 'Categoría', all: n => `Ver las ${n} categorías`, less: 'Ver menos categorías' },
+    { dim: 'g', label: 'Género', all: n => `Ver los ${n} géneros`, less: 'Ver menos géneros' },
+    { dim: 'f', label: 'Formato', all: n => `Ver los ${n} formatos`, less: 'Ver menos formatos' },
+    { dim: 'p', label: 'Editorial', all: n => `Ver las ${n} editoriales`, less: 'Ver menos editoriales' },
   ];
 
   const el = (tag, attrs = {}, ...kids) => {
@@ -284,17 +297,20 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       let entries = [...counts.entries()].filter(([v]) => v).sort((a, b) => b[1] - a[1] || String(names[g.dim](a[0])).localeCompare(String(names[g.dim](b[0])), 'es'));
       for (const v of state[g.dim]) if (!counts.has(v)) entries.push([v, 0]);
       if (!entries.length) continue;
-      const open = g.dim === 'g' && state.expandG;
-      const visible = g.limit < entries.length && !open ? entries.slice(0, g.limit) : entries;
-      const fs = el('fieldset', { class: 'cat-group' }, el('legend', {}, g.label));
-      for (const [value, n] of visible) {
+      const open = state.open.has(g.dim);
+      const view = facetView(entries, state[g.dim], open);
+      const option = ([value, n]) => {
         const id = `cf-${g.dim}-${norm(value).replace(/[^a-z0-9]+/g, '-')}`;
         const cb = el('input', { type: 'checkbox', id, 'data-dim': g.dim, 'data-value': value });
         cb.checked = state[g.dim].has(value);
-        fs.append(el('div', { class: 'cat-opt' }, cb, el('label', { for: id }, names[g.dim](value), el('span', { class: 'cat-n' }, String(n)))));
-      }
-      if (g.dim === 'g' && entries.length > g.limit) {
-        fs.append(el('button', { type: 'button', class: 'cat-more-facets', 'data-expand': 'g', 'aria-expanded': String(open) }, open ? 'Ver menos géneros' : `Ver los ${entries.length} géneros`));
+        return el('div', { class: 'cat-opt' }, cb, el('label', { for: id }, names[g.dim](value), el('span', { class: 'cat-n' }, String(n))));
+      };
+      const fs = el('fieldset', { class: 'cat-group' }, el('legend', {}, g.label), view.top.map(option));
+      if (view.foldable) { // el botón queda siempre tras las primeras opciones: lo que despliega aparece debajo de él y nada salta
+        const restId = `cf-${g.dim}-rest`;
+        fs.append(
+          el('button', { type: 'button', class: 'cat-more-facets', 'data-expand': g.dim, 'aria-expanded': String(open), 'aria-controls': restId }, open ? g.less : g.all(view.total)),
+          el('div', { class: 'cat-rest', id: restId, hidden: !open }, view.rest.map(option)));
       }
       frag.append(fs);
     }
@@ -430,7 +446,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     const set = state[cb.dataset.dim];
     if (cb.checked) set.add(cb.dataset.value); else set.delete(cb.dataset.value);
     refresh();
-    document.getElementById(cb.id)?.focus({ preventScroll: true });
+    // El foco sigue a la casilla; si al desmarcarla dejó de estar entre las visibles de su grupo plegado, pasa al botón que lo despliega.
+    (document.getElementById(cb.id) ?? filtersEl.querySelector(`[data-expand="${cb.dataset.dim}"]`))?.focus({ preventScroll: true });
   });
   filtersEl.addEventListener('click', e => {
     if (e.target.closest('[data-cat-filters-done]')) { // cierra el panel y deja el foco en el estado de resultados, a la vista
@@ -442,9 +459,10 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     }
     const b = e.target.closest('[data-expand]');
     if (!b) return;
-    state.expandG = !state.expandG;
+    const dim = b.dataset.expand;
+    if (state.open.has(dim)) state.open.delete(dim); else state.open.add(dim);
     renderFilters();
-    filtersEl.querySelector('[data-expand]')?.focus({ preventScroll: true });
+    filtersEl.querySelector(`[data-expand="${dim}"]`)?.focus({ preventScroll: true }); // el foco se queda en el botón, que no cambió de sitio
   });
   chipsEl.addEventListener('click', e => {
     const chip = e.target.closest('[data-chip-dim]');

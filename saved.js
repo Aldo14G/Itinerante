@@ -2,7 +2,7 @@
 // Sirve al objetivo del sitio: que lleguen a la librería sabiendo qué quieren ver y puedan preguntarlo.
 import { loadSample } from './sample.js';
 import { openDialog, closeDialog, topDialog } from './sheets.js';
-import { afterPaint, confirmThen } from './motion.js';
+import { afterPaint, confirmThen, pickPop } from './motion.js';
 
 const KEY = 'iti-saved-v1';
 export const MAX_SAVED = 30;
@@ -226,6 +226,7 @@ export function initSaved() {
     if (save) {
       e.preventDefault();
       const res = toggleSaved(save.dataset.saveId); // el marcador cambia de estado en este fotograma
+      if (res.on) pickPop(save); // rebote solo por el toque: los marcadores que se pintan ya guardados no rebotan
       afterPaint(() => { // el aviso (capa superior) va después de pintar
         if (res.full) toast(`Tu lista llegó a ${MAX_SAVED} libros: quita alguno para sumar otro.`, true);
         else if (res.on) toast('Guardado en tu lista para la visita.');
