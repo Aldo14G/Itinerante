@@ -10,6 +10,7 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 | `skeleton.mjs URL` | Esqueletos del tamaño del contenido y CLS de la carga diferida. | sí |
 | `motion.mjs URL` | Transiciones y animaciones disparadas, duraciones frente a tokens y pasada de movimiento reducido. | informa |
 | `spacing.mjs URL` | Relleno y alto de cada capítulo, pantallas por capítulo, uso de grid/flex y cuadrícula de 4 px. | informa |
+| `piso.mjs URL` | Piso de oficio (Impeccable): titulares ≤ 6rem fuera del cartón de título y la marquesina, interletra ≥ -0.04em, medida ≤ 78ch, sin cejas sobre titulares; informa aire de titulares, controles nativos y superficies del navegador. | sí |
 | `rail.mjs URL` | Carrusel de libros: colecciones, teclado, progreso, ficha, foco. Espera por condición (carrusel `is-ready` sin esqueletos, colección renovada, ficha `open`, foco movido, desplazamiento estable) con tope, no con pausas fijas; si una pantalla aborta la anota como ✗ con el motivo y sigue. | sí |
 | `saved.mjs URL` | Guardar, Mi lista, persistencia, aviso y mensaje de WhatsApp. | informa |
 | `explorer.mjs URL` | Hoja «Explorar»: modal, URL `#explorar`, botón atrás, ficha encima, escritorio y redimensionar. | informa |

@@ -291,7 +291,7 @@ test('móvil: barra inferior con una pestaña por sección, iconos en el sprite 
   for (const m of nav.matchAll(/<use href="#(t-[a-z]+)"/g)) assert.ok(html.includes(`<symbol id="${m[1]}"`), `falta el icono ${m[1]}`);
   assert.ok(/<link rel="stylesheet" href="mobile\.css" media="\(max-width: 760px\)">/.test(html));
   assert.ok(/aria-label="Secciones"/.test(nav) && !/role="tablist"/.test(nav), 'navegación por anclas, no tablist');
-  assert.ok(/prefers-reduced-transparency: reduce/.test(mobileCss) && /@supports \(\(-webkit-backdrop-filter/.test(mobileCss), 'vidrio con degradación');
+  assert.ok(/prefers-reduced-transparency: reduce/.test(mobileCss) && !/\.tabbar \{[^}]*backdrop-filter: blur/.test(mobileCss), 'la barra inferior es opaca y no lleva desenfoque: sobre un fondo opaco sería adorno sin efecto');
   assert.ok(!/backdrop-filter:[^;]*\n?[^;]*\.entry-canvas/.test(mobileCss));
 });
 

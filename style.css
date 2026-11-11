@@ -9,6 +9,7 @@
 html {
   background: var(--night);
   scroll-padding-top: calc(var(--hdr-h) + 8px);
+  accent-color: var(--terra-deep); /* cualquier control nativo (casilla, radio, rango) toma el turquesa profundo de la paleta */
   scrollbar-color: var(--paper-dim) var(--paper); /* pista y pulgar de la paleta clara: casi todo el recorrido es blanco y bruma, no el tono profundo del pie */
   -webkit-text-size-adjust: 100%;
 }
@@ -496,7 +497,7 @@ p { text-wrap: pretty; }
 
 /* La foto del tema va limpia (sin velo): el nombre, la frase y el rótulo se colocan debajo, como en La casa y la Visita (CR1-07). */
 .topic-stage { position: relative; display: grid; gap: var(--space-3); }
-.topic-layers { position: relative; aspect-ratio: 5 / 4; overflow: hidden; border-radius: 2px; background: var(--stone); }
+.topic-layers { position: relative; aspect-ratio: 3 / 2; /* 3:2 en escritorio: a 1280×800 la foto, el nombre y la frase del tema caben en la misma pantalla que la lista (CR2-02) */ overflow: hidden; border-radius: 2px; background: var(--stone); }
 .topic-layer { position: absolute; inset: 0; }
 .topic-layer img { width: 100%; height: 100%; object-fit: cover; }
 .topic-card { display: grid; gap: 12px; }
@@ -1003,7 +1004,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 /* Cita (CR1-05): tipografía sola sobre blanco (tono light, el mismo del llamado): el cambio bruma → blanco la separa de Libros sin filete, y va alineada a la izquierda como el llamado en móvil y escritorio. Sin filetes por renglón (cruzaban las letras); solo entra el texto. */
-.quote { margin: 0; padding: var(--sec-md) var(--gutter); background: var(--night); }
+.quote { margin: 0; padding: var(--sec-md) var(--gutter) var(--sec-sm); background: var(--night); } /* cierra con --sec-sm: la cita y el llamado comparten el blanco y se leen como un solo bloque de entrada a Visita (CR2-03) */
 .quote blockquote {
   position: relative; margin: 0; max-width: 50rem;
   font: 380 clamp(1.5rem, 3.4vw, 3rem)/1.3 var(--f-sans); font-stretch: 112%; letter-spacing: -0.01em; text-wrap: balance;

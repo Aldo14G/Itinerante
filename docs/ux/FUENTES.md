@@ -72,6 +72,13 @@ https://baymard.com/blog · Cubre e-commerce y checkout. Tiene más de 450 artí
 ## 13. Refactoring UI (Adam Wathan y Steve Schoger, fuente de los autores)
 https://www.refactoringui.com/ · Cubre la jerarquía visual práctica. El libro es de pago y no lo abrí, así que no saco reglas de ahí. Solo la cito como lectura recomendada **[sin reglas citadas]**.
 
+## 14. Impeccable (Paul Bakaus)
+https://github.com/pbakaus/impeccable · Skill de diseño para agentes: piso de oficio, pulido, composición, tipografía, auditoría y crítica. Licencia Apache 2.0. Leída el 11 nov 2026 (versión 4.8.2).
+- Evitar la página «armada» en vez de construida → tematizar selección, cursor, barras de desplazamiento, foco y subrayados desde la paleta (referencia `craft-floor`, «Browser surfaces»).
+- Evitar la jerarquía por adorno → nada de ceja sobre el titular, texto con degradado ni tarjetas idénticas como estructura (`craft-floor`, «Refuse»).
+- Evitar pulir a ciegas → comprobar el render en los tamaños reales y clasificar cada desviación (token faltante, implementación suelta, desajuste de concepto, defecto local) antes de corregir (`polish`).
+- Las reglas que se aplican en este repositorio están en el bloque «piso de oficio» de `docs/agentes/00-contexto-compartido.md`.
+
 ---
 
 ## Anti-patrones comunes de productos hechos por agentes

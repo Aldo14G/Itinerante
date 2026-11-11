@@ -221,7 +221,7 @@ check('movimiento reducido', 'sin errores de consola', !problems.length, problem
 // ---------- 7. Escritorio: cabecera y anclas ----------
 await open(1280, 800, { mobile: false });
 const dk = await ev(`(()=>{const q=s=>document.querySelector(s); return {more:getComputedStyle(q('.hdr-more')).display, tab:getComputedStyle(q('.tabbar')).display, nav:[...document.querySelectorAll('.hdr-nav a')].map(a=>a.getAttribute('href')), canvas:getComputedStyle(q('.entry-canvas')).display}})()`);
-check('escritorio', 'sin menú móvil ni barra inferior; hay navegación y canvas', dk.more === 'none' && dk.tab === 'none' && dk.nav.length >= 4 && dk.canvas === 'block', JSON.stringify(dk));
+check('escritorio', 'sin menú móvil ni barra inferior; hay navegación y el inicio es una foto fija (sin lienzo de fotogramas)', dk.more === 'none' && dk.tab === 'none' && dk.nav.length >= 4 && dk.canvas === 'none', JSON.stringify(dk));
 const anchors = await ev(`(()=>{const bad=[]; document.querySelectorAll('a[href^="#"]').forEach(a=>{const id=a.getAttribute('href').slice(1); if(id && !document.getElementById(id)) bad.push(id)}); return bad})()`);
 check('escritorio', 'todas las anclas internas existen', !anchors.length, JSON.stringify(anchors));
 await shot('d-hero.jpg');

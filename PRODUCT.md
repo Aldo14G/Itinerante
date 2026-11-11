@@ -95,10 +95,10 @@ genérico.
 
 ## Evidence on Hand
 
-- Fotografías oficiales del espacio (`assets/img/oficial-*`) y recreaciones
-  rotuladas; origen de cada imagen en `assets/provenance.json`.
-- Secuencia de 145 fotogramas para escritorio (`assets/seq/`) y su versión
-  vertical (`assets/seq-m/`).
+- Fotografías reales de la casa en `assets/img/` (lote oficial, cuenta oficial de Instagram y
+  fotos de Aldo; sin recreaciones desde 2026-11-10); origen de cada imagen en
+  `assets/provenance.json`. La secuencia de fotogramas generados se retiró y el inicio es una
+  foto fija.
 - Catálogo de prueba en `assets/data/catalog.json` (fuente: CSV
   Amazon_BestSelling_Books_500, registros de prueba).
 - Capturas de revisión en `docs/evidence/`.

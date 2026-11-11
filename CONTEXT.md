@@ -4,7 +4,7 @@
 
 - **B.4 «Función de la casa»**: el sitio público vigente, en la raíz del repositorio. La librería se presenta como una función de cine: se entra a la casa con el propio scroll. Sistema de diseño en `DESIGN.md` y `design/tokens.json`.
 - **Tono de sección** (`data-tone="light|mist|deep"`): redefine los mismos tokens dentro de una sección y pinta su fondo. El hero, el manifiesto y el catálogo van en `light` (blanco), La casa y Libros en `mist` (bruma, blanco teñido de turquesa), la cita y el pie en `deep` (turquesa casi negro). Cartelera y el llamado pintan el campo turquesa del logo.
-- **Recorrido de la entrada**: 145 fotogramas en canvas sincronizados al scroll, solo en escritorio y con movimiento. En móvil, con movimiento reducido o con ahorro de datos, el hero es un póster fijo.
+- **Entrada**: desde 2026-11-10 el inicio es una fotografía real fija de la sala central (escritorio) y una vertical (móvil). El recorrido de 145 fotogramas generados se retiró; el mecanismo queda dormido en `scenes-desktop.js` y solo corre si `#inicio` declara `data-seq` (para un recorrido futuro hecho con fotos reales).
 - **Cartelera**: propuestas de actividades sin fecha, cupo ni costo; el CTA es consulta por WhatsApp, no reserva.
 - **Catálogo de muestra**: `#catalogo`, 500 registros de prueba en `assets/data/catalog.json` con búsqueda y filtros locales. Desde 2026-11-10 la página lo llama «catálogo» y no lleva sellos de muestra (plantilla real, decisión de Aldo); los datos siguen siendo de prueba hasta que llegue el listado de la librería. No consulta `/api/catalog`.
 - **Iti IA**: API en el Worker (`/api/ai/iti-ia`) que responde con base en el catálogo recuperado. **No está conectada a la interfaz del sitio B.4.**

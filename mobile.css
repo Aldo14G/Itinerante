@@ -6,12 +6,9 @@
 :root { --hdr-h: 60px; }
 html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
 
-/* Cromo claro: la barra es blanca (opaca; el desenfoque solo donde el navegador lo soporta) y los chips de la cabecera son blancos sólidos siempre
+/* Cromo claro: la barra es blanca y opaca, sin desenfoque (sobre un fondo opaco el desenfoque no se ve y solo cuesta una capa), y los chips de la cabecera son blancos sólidos siempre
    (sobre la foto del hero y sobre el campo turquesa se leen igual: icono en tinta, filete en tinta). */
 .tabbar, .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-solid); }
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .tabbar { background: var(--glass-tint); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
-}
 @media (prefers-reduced-transparency: reduce) {
   .tabbar, .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }

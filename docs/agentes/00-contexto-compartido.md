@@ -51,6 +51,25 @@ Catálogo de fuentes (citas, licencias y lo que no se pudo verificar): `docs/ux/
 Herramientas: además del arnés propio, `axe.mjs` corre axe-core (WCAG 2.x A/AA y buenas prácticas) en inicio, manifiesto revelado, menú con acordeón, Explorar, ficha, Mi lista y catálogo en línea. Lighthouse no está instalado: LCP, CLS e INP se miden por CDP (`e2e.mjs`, `inp.mjs`).
 </como_evitarlo>
 
+<piso_de_oficio>
+Piso de oficio para la maquetación, tomado de Impeccable (`pbakaus/impeccable`, v4.8.2, Apache 2.0; referencias `craft-floor`, `polish` y `layout`). Decisión de Aldo del 2026-11-11: se usa para seguir mejorando sin equivocarse. Este sitio es una superficie de **persuadir** (una landing): la primera pantalla hace entendible la oferta y deja a la vista la acción real, que aquí es «Cómo llegar». Pulir es refinar: se conserva el mundo visual vigente (DESIGN.md); si el concepto está mal se dice y se propone rediseño, no se cuela.
+
+Se comprueba sobre el resultado pintado, en los tamaños reales, y en una sola pasada por lote de cambios:
+
+- **Contraste:** texto ≥ 4.5:1, grande ≥ 3:1; sobre superficies de color el texto secundario se tiñe de ese tono o de la tinta, nunca gris suelto.
+- **Profundidad:** las sombras llevan desplazamiento y desenfoque suave; un halo de color sin desplazamiento es decoración.
+- **Espaciado:** grupos apretados, separación generosa, más aire encima de un titular que debajo. Se leen los valores calculados.
+- **Tipografía:** medida de lectura 65–75ch, titulares hasta 6rem (el cartón de título «Itinerante» y la marquesina son el mundo comprometido y quedan fuera), interletra no menor a -0.04em, titulares equilibrados, pasos de escala y peso evidentes. Se prueba el texto real en cada tamaño y se arregla lo que desborde.
+- **Movimiento:** un momento con autor, no efectos repartidos ni la misma entrada en cada sección.
+- **Estados:** hover, deshabilitado, carga, error y vacío; contenido real, controles que funcionan, foco de teclado.
+- **Superficies del navegador:** selección de texto, cursor de texto, barras de desplazamiento, anillos de foco, separación del subrayado, cifras tabulares y `accent-color` salen de la paleta.
+- **Texto:** el lenguaje del producto; los controles nombran su acción y los errores dicen el problema y la salida.
+
+Lo que no se usa salvo que el encargo lo pida con sus palabras: tarjetas iguales de icono, título y texto como estructura de página; la plantilla de cifra grande con etiqueta; números de sección; un modal para lo que no necesita interrupción; texto con degradado; vidrio y desenfoque como adorno; borde lateral de color de más de 1 px; sombras duras sin desenfoque; monoespaciada como disfraz; emojis o glifos en lugar de iconos; máscaras geométricas en lugar de recortes reales. **Prohibido sin excepción:** una ceja o antetítulo encima de un titular.
+
+Se mide con `node tools/qa/piso.mjs URL` (tamaños de titular, interletra, medida, cejas, controles nativos, aire de titulares, entradas repetidas); falla si un titular pasa de 6rem fuera del cartón de título y la marquesina, si la interletra baja de -0.04em, si la medida pasa de 78ch o si aparece una ceja. El lanzador de Impeccable descarga un binario: no se ejecuta en este repositorio sin que Aldo lo pida.
+</piso_de_oficio>
+
 <tools>
 Verificación (todas aceptan una URL y salen con código ≠ 0 si fallan):
 - `npm test` (regresión completa), `npm run test:design`, `node scripts/critique.mjs` (reglas de diseño con ratchet en `design/baseline.json`; nunca subir un conteo).

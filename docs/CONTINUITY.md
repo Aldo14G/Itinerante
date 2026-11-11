@@ -1,3 +1,12 @@
+# Continuidad de Itinerante — 2026-11-11 (fotos reales y piso de oficio)
+
+- **Fotos reales (pedido de Aldo):** se retiraron las 20 recreaciones y los 218 fotogramas generados. Vistas de La casa, Cartelera, temas de Poesía e Infantil, llegada, destacados e inicio usan fotos de la casa: publicadas por la cuenta oficial de Instagram (@sharonmirelesgong, @alfonso_boeta; tomadas de la rama `agent/atenea/casa-editorial-base`) y tres de Aldo. `assets/provenance.json` guarda fuente, autor y huella de cada una. **Pendiente de la librería: confirmar el permiso de uso de los dos fotógrafos**, o sustituir por la sesión profesional.
+- **Inicio:** foto fija de la sala central (1080 px; se ve algo suave por encima de 1440 px de ancho hasta tener la foto profesional). El recorrido por fotogramas queda dormido tras `data-seq`. Contraste del texto sobre la foto: percentil 5 ≥ 5.2:1 en 1024, 1280, 1440 y 1920.
+- **Impeccable (pedido de Aldo):** se leyó `pbakaus/impeccable` v4.8.2 (Apache 2.0) y sus reglas aplicables quedaron en el bloque «piso de oficio» de `docs/agentes/00-contexto-compartido.md` y como fuente 14 en `docs/ux/FUENTES.md`. No se ejecutó su lanzador (descarga un binario) ni se instaló la skill en el repositorio. `tools/qa/piso.mjs` mide el piso: todo dentro en 1280 y 390.
+- **Pulido:** foto del tema a 3:2 en escritorio (CR2-02: de 522 a 435 px; nombre y frase caben a 1280×800), la cita cierra con `--sec-sm` (CR2-03: hueco con el llamado de 192 a 128 px), barra inferior sin desenfoque (era opaca: adorno sin efecto), `accent-color` de la paleta.
+- Verificación: `npm test` 132 + 18 + 4, `test:design` 72, crítica en baseline, `test:browser` 7/7 con las fotos reales, e2e 101/101, piso de oficio en verde, móvil 8.7 pantallas y escritorio 15.6 (antes 17.4).
+- Abierto: CR2-04 (pie del escenario de Cartelera sobre la foto con degradado), CR2-06 (ficha a 360 px parte «Guardar en mi lista»), `worker/_headers` aún nombra `assets/seq` (inofensivo), fechas reales de Cartelera, hoja del catálogo con estante, capítulo de café y menú para el recorrido pasillo → libreros → mesa → patio.
+
 # Continuidad de Itinerante — 2026-11-10 (plantilla sin avisos de maqueta y versión única)
 
 - **Decisiones de Aldo:** paleta A (la de la rama, tono del logo `#7ac4b4`; la variante «celeste de la lona» `#8bd2cf` queda descartada por ahora), una sola versión a partir de esta rama (se fusiona en `main`), y la plantilla real sin subtextos de maqueta.
