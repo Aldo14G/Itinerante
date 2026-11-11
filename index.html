@@ -10,7 +10,7 @@
   <link rel="icon" href="Logo.png" type="image/png" sizes="256x256">
   <link rel="apple-touch-icon" href="Logo.png">
   <link rel="preload" href="assets/fonts/archivo-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/bodoni-moda-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/nunito-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/img/03-home-sala-central.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px), (min-width: 761px) and (orientation: landscape)">
   <link rel="preload" href="assets/img/inicio-sala-m.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 760px), (max-width: 1023px) and (orientation: portrait)">
   <meta property="og:title" content="Librería Itinerante y Más · Centro de Monterrey">
@@ -123,7 +123,7 @@
     </div>
   </dialog>
 
-  <nav class="tabbar" aria-label="Secciones">
+  <nav class="tabbar" data-tone="light" aria-label="Secciones">
     <a href="#casa"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-casa"/></svg></span><span class="tab-lb">La casa</span></a>
     <a href="#cartelera"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-cartelera"/></svg></span><span class="tab-lb">Cartelera</span></a>
     <a href="#libros"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-libros"/></svg></span><span class="tab-lb">Libros</span></a>
@@ -153,8 +153,8 @@
           <div class="entry-row">
             <p class="entry-lede" data-intro>Libros, café y talleres en una casa de piedra del centro de Monterrey. Hojea a tu ritmo; confirma existencias por WhatsApp antes de venir.</p>
             <div class="entry-actions" data-intro>
-              <a class="btn btn--tungsten" data-magnetic href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
-              <a class="btn btn--ghost" data-magnetic href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Pregunta por un libro</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+              <a class="btn btn--tungsten" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+              <a class="btn btn--ghost" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Pregunta por un libro</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
             </div>
           </div>
           <ul class="entry-facts" data-intro aria-label="Datos para tu visita">
@@ -200,7 +200,7 @@
     <div class="wipe" data-scene="wipe" data-tone="mist" data-theme="turq" aria-hidden="true"><div class="wipe-grid" data-wipe-grid></div></div>
 
     <!-- Cartelera -->
-    <section id="cartelera" class="bill" data-theme="turq" aria-labelledby="bill-title">
+    <section id="cartelera" class="bill" data-tone="light" data-theme="turq" aria-labelledby="bill-title">
       <div class="bill-head">
         <h2 id="bill-title" class="h2">Cartelera <em>de la casa</em></h2>
         <p>Lecturas, partidas y talleres hacen de la librería un punto de encuentro. Estas son <strong>propuestas para la agenda</strong>: ninguna tiene fecha, cupo ni costo confirmados todavía.</p>
@@ -457,7 +457,7 @@
           </section>
 
     <!-- Visita -->
-    <section id="visita" class="visit" data-theme="paper" aria-labelledby="visit-title">
+    <section id="visita" class="visit" data-tone="light" data-theme="paper" aria-labelledby="visit-title">
       <div class="visit-main">
         <h2 id="visit-title" class="h2">Pasa por la casa <em>Matamoros 421</em></h2>
         <address>
@@ -467,8 +467,8 @@
         </address>
         <p class="visit-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-long>Lunes a sábado de 11:00 a 20:00</span></p>
         <div class="visit-actions">
-          <a class="btn btn--tungsten" data-magnetic href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
-          <a class="btn btn--line-ink" data-magnetic href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer"><span>Pedir informes</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+          <a class="btn btn--tungsten" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+          <a class="btn btn--line-ink" href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer"><span>Pedir informes</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
         </div>
       </div>
       <div class="visit-side" data-rules>

@@ -177,12 +177,14 @@ test('curaduría: los textos de navegación traen pista y los esqueletos ocupan 
   assert.ok(/data-hint="6 temas"><span>Libros<\/span>/.test(html), 'la pista de Libros es corta («6 temas»), como la de los demás capítulos');
 });
 
-test('filetes: horario como filas técnicas, sin cruces de registro (CR0-06), botones de doble filete y cita atribuida', () => {
+test('filetes: horario como filas técnicas, sin cruces de registro (CR0-06), botones con canto (sin barrido ni doble filete) y cita atribuida', () => {
   assert.ok(/--hair: 0\.5px/.test(tokensCss) && /min-resolution: 2dppx/.test(tokensCss), 'filete de 0.5 px en pantallas densas');
   assert.ok(/class="visit-side" data-rules/.test(html), 'la columna del horario entra con data-rules y sin cruces de registro (CR0-06)');
   assert.ok(!/\.rx::(before|after)/.test(css) && !/class="[^"]*\brx\b/.test(html), 'ninguna cruz de registro: el «+» es solo «abrir» y «cerrar»');
-  assert.ok(/\.btn--ghost::before, \.btn--line::before, \.btn--line-ink::before/.test(css));
-  assert.ok(/@keyframes celluloid/.test(css) && /prefers-reduced-motion: no-preference/.test(css));
+  // Sistema táctil: la respuesta del botón es el canto que se cierra al presionar; ya no hay barrido de relleno, doble filete ni vibración de celuloide.
+  assert.ok(!/\.btn[\w-]*::before/.test(css + mobileCss) && !/--sweep/.test(css + mobileCss) && !/@keyframes celluloid/.test(css), 'sin barrido de color ni filetes animados en los botones');
+  assert.ok(/:active:not\(:disabled\) \{ translate: 0 var\(--lip\); --ctl-lip: 0px; \}/.test(css), 'al presionar, el control baja lo que mide el canto y el canto se cierra');
+  assert.ok(/\.hours \{[^}]*border: var\(--edge-w\) solid var\(--edge-soft\); border-radius: var\(--radius-card\)/.test(css) && /\.hours th, \.hours td \{\s*border-bottom: 0;\s*background: linear-gradient\(var\(--edge-soft\), var\(--edge-soft\)\) left bottom \/ 100% var\(--edge-w\) no-repeat;/.test(css), 'el horario es una tarjeta y su filete se dibuja fila por fila');
   const quote = html.match(/<figure class="quote[\s\S]*?<\/figure>/)[0];
   assert.match(quote, /Miguel de Cervantes/);
   assert.match(quote, /Dominio público/);
@@ -307,7 +309,7 @@ test('móvil: menú lateral con categorías desplegables accesibles y destinos r
   assert.deepEqual(bar, [...order.slice(2), 'Menú'], 'la barra inferior lleva los cuatro capítulos en el mismo orden que el menú y, al final, el botón Menú');
   const foot = dlg.match(/<div class="sm-foot">[\s\S]*?<\/div>/)[0];
   assert.equal((foot.match(/btn--tungsten/g) || []).length, 1, 'una sola acción primaria en el menú');
-  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost sm-wa"[^>]*wa\.me[^>]*aria-label="Escribir por WhatsApp"/.test(foot) && !/sm-social/.test(foot) && /\.sm-foot \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 50px;/.test(mobileCss), '«Cómo llegar» es el primario y WhatsApp el secundario (botón de icono con nombre accesible); el pie es una sola fila y las redes van al final de la lista');
+  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost sm-wa"[^>]*wa\.me[^>]*aria-label="Escribir por WhatsApp"/.test(foot) && !/sm-social/.test(foot) && /\.sm-foot \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 48px;/.test(mobileCss), '«Cómo llegar» es el primario y WhatsApp el secundario (botón de icono con nombre accesible); el pie es una sola fila y las redes van al final de la lista');
   assert.ok(/id="sm-visita"[\s\S]*?<dl class="sm-hours"><dt>Lunes a sábado<\/dt><dd>11:00–20:00<\/dd><dt>Domingo<\/dt><dd>Cerrado/.test(dlg), 'Horarios dentro de Visita');
   assert.equal((dlg.match(/Cómo llegar/g) || []).length, 1, '«Cómo llegar» aparece una sola vez en el menú (el botón primario del pie)');
   assert.ok(!/Horario y dirección/.test(dlg), 'Visita no repite el horario con un enlace');
@@ -316,7 +318,7 @@ test('móvil: menú lateral con categorías desplegables accesibles y destinos r
   for (const m of dlg.matchAll(/data-topic-go="([a-z]+)"/g)) assert.ok(html.includes(`data-topic="${m[1]}"`), `tema ${m[1]} inexistente`);
   for (const m of dlg.matchAll(/<use href="#(t-[a-z]+)"/g)) assert.ok(html.includes(`<symbol id="${m[1]}"`), `falta el icono ${m[1]}`);
   assert.ok(/Lunes a s&aacute;bado|Lunes a sábado/.test(dlg) && /Domingo<\/dt><dd>Cerrado/.test(dlg), 'horario real');
-  assert.ok(/grid-template-rows: 0fr/.test(mobileCss) && /min-height: 48px/.test(mobileCss), 'despliegue sin saltos y filas de 48 px');
+  assert.ok(/grid-template-rows: 0fr/.test(mobileCss) && /\.sm-row \{[^}]*min-height: 56px/.test(mobileCss) && /\.sm-link \{[^}]*min-height: var\(--target-coarse\)/.test(mobileCss), 'despliegue sin saltos, filas de 56 px (control táctil) y subdestinos de 44 px');
 });
 
 test('cartelera móvil: cada tarjeta lleva su foto con pie y procedencia registrada, y los puntos coinciden', () => {
@@ -481,7 +483,8 @@ test('ficha: «Cómo llegar» es la acción primaria, WhatsApp confirma, y el re
   assert.ok(ask.indexOf('data-d-visit') > -1 && ask.indexOf('data-d-visit') < ask.indexOf('data-d-cta'), 'la visita va antes que WhatsApp');
   assert.ok(/data-d-visit href="https:\/\/www\.google\.com\/maps\/dir\//.test(ask) && /btn btn--tungsten" data-d-visit/.test(ask), 'visita como botón principal');
   assert.ok(/btn btn--line-ink" data-d-cta/.test(ask), 'WhatsApp como acción secundaria');
-  assert.ok(/\.drawer-ask \{[^}]*background: color-mix\(in srgb, var\(--white\)/.test(css), 'fondo claro propio: no hereda --bone, que en el tono claro es tinta');
+  const askRule = css.match(/\.drawer-ask \{[^}]*\}/)[0];
+  assert.ok(/border: var\(--edge-w\) solid var\(--edge-soft\); border-radius: var\(--radius-card\)/.test(askRule) && !/background|var\(--bone\)/.test(askRule), 'el recuadro es una tarjeta sobre el papel de la ficha (borde suave, sin fondo propio): no toma --bone, que en el tono claro es tinta');
   assert.ok(/^Hola, ¿tienen «X»/.test(bookMessage({ t: 'X', a: 'Y' })) && /Vi el título en su sitio\.$/.test(bookMessage({ t: 'X', a: 'Y' })), 'el mensaje pregunta si lo tienen: no afirma existencia');
 });
 
@@ -604,7 +607,7 @@ test('Mi lista y Explorar: marcado accesible, entradas coherentes y publicación
   assert.ok(/class="sm-row" type="button" data-open-mylist/.test(html) && /data-saved-count/.test(html) && /class="hdr-list"[^>]*data-saved-badge[^>]*hidden/.test(html), 'entradas desde el menú y la cabecera');
   assert.ok(/class="save save--wide" data-d-save[^>]*aria-pressed="false"/.test(html), 'la ficha trae su botón de guardar');
   const savedSrc = await readFile(here('./saved.js'), 'utf8');
-  assert.ok(!/\.hdr-list \{ display: none; \}/.test(mobileCss) && /\.hdr-list \{[^}]*min-width: 44px; min-height: 44px/.test(mobileCss), 'U03: en móvil el chip de la cabecera se ve con libros guardados (objetivo de 44 px) y no se oculta');
+  assert.ok(!/\.hdr-list \{ display: none; \}/.test(mobileCss) && /\.hdr-list \{[^}]*min-width: 44px/.test(mobileCss) && /\.hdr-list \{[^}]*min-height: var\(--target-coarse\)/.test(css), 'U03: en móvil el chip de la cabecera se ve con libros guardados (objetivo de 44 px) y no se oculta');
   assert.ok(/\.hdr-list\[hidden\] \{ display: none; \}/.test(css), 'sin libros guardados el chip desaparece');
   assert.ok(/setAttribute\('aria-label', `Mi lista, \$\{countText\(n\)\}`\)/.test(savedSrc), 'el chip lleva el conteo en su nombre accesible («Mi lista, 3 libros»)');
   const ex = html.match(/<dialog class="explorer" id="explorer"[\s\S]*?\n {6}<\/dialog>/)[0];
@@ -717,7 +720,7 @@ test('Cartelera como publicaciones: foto, pie, «Me interesa» y «Compartir» l
     assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
   }
   for (const id of ['i-heart', 'i-share']) assert.ok(html.includes(`<symbol id="${id}"`), `icono ${id}`);
-  assert.ok(/\.act \{[^}]*min-height: var\(--target-coarse\)/.test(css.replaceAll('\n', ' ')) && /\.act\[aria-pressed="true"\]/.test(css), 'botones de ≥ 44 px con estado');
+  assert.ok(/\.act \{[^}]*min-height: var\(--target-coarse\)/.test(css.replaceAll('\n', ' ')) && /:where\(\.act, \.save, \.motion-btn\)\[aria-pressed="true"\][^{]*\{\s*--ctl-bg: var\(--pick-fill\); --ctl-edge: var\(--terra\); --ctl-ink: var\(--pick-ink\);/.test(css) && /:where\(\.act, \.save\)\[aria-pressed="true"\] \.ic \{ fill: currentColor; \}/.test(css), 'botones de ≥ 44 px con estado: «elegido» (menta, borde --terra, tinta --pick-ink) y el icono relleno');
   assert.ok(/html:not\(\.js\) \.bill-acts \{ display: none; \}/.test(css), 'sin JavaScript no se muestran botones que no funcionan');
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/navigator\.share/.test(feed) && /AbortError/.test(feed) && /clipboard\.writeText/.test(feed), 'Web Share con respaldo de copiar enlace; cancelar no copia');
@@ -859,10 +862,13 @@ test('largo móvil: los capítulos, la cita y el pie usan --sec-sm (96 px entre 
 
 test('titulares móviles (CR-14): un escalón por nivel, de la escala de tokens, y sin marquesina ni dirección repetida', async () => {
   const appSrc = await readFile(here('./app.js'), 'utf8');
-  assert.ok(/\.h2, \.house-head \.h2, \.bill-head \.h2 \{ font-size: var\(--fs-7\); \}/.test(mobileCss), 'los cuatro capítulos comparten --fs-7');
-  assert.ok(/\.call-title \{ font-size: var\(--fs-6\); \}/.test(mobileCss), 'el llamado usa --fs-6, como las capas internas');
-  assert.ok(/\.layer-title \{[^}]*clamp\(2\.25rem, 3\.4vw, 3\.5rem\)/.test(css.replaceAll('\n', ' ')), 'la capa interna llega a 36 px (= --fs-6) en móvil');
-  assert.ok(/--fs-7: 3rem;/.test(tokensCss) && /--fs-6: 2\.25rem;/.test(tokensCss));
+  // Sistema táctil: capítulo = --fs-6 en móvil (el suelo del clamp; 4vw no lo supera hasta 900 px) y hasta --fs-7 en escritorio; capa interna = --fs-5. Un escalón por nivel y sin regla por capítulo.
+  const flatCss = css.replaceAll('\n', ' ');
+  assert.ok(/\.h2 \{[^}]*font: 900 clamp\(var\(--fs-6\), 4vw, var\(--fs-7\)\)\/1\.1 var\(--f-display\);[^}]*letter-spacing: -0\.01em/.test(flatCss), 'titular de capítulo: familia redonda, peso 900, interlínea 1.1, de --fs-6 a --fs-7');
+  assert.ok(!/\.h2[^{]*\{[^}]*font-size/.test(css + mobileCss), 'los cuatro capítulos comparten ese escalón: ninguna regla cambia el tamaño por capítulo ni por tramo');
+  assert.ok(/\.call-title \{[^}]*font: 900 clamp\(var\(--fs-6\), 4vw, var\(--fs-7\)\)\/1\.1 var\(--f-display\)/.test(flatCss) && !/\.call-title \{[^}]*font-size/.test(mobileCss), 'el llamado usa el mismo escalón que los capítulos');
+  assert.ok(/\.layer-title \{[^}]*font: 900 var\(--fs-5\)\/1\.1 var\(--f-display\)/.test(flatCss), 'la capa interna queda un escalón abajo (--fs-5, 28 px)');
+  assert.ok(/--fs-7: 3rem;/.test(tokensCss) && /--fs-6: 2\.25rem;/.test(tokensCss) && /--fs-5: 1\.75rem;/.test(tokensCss));
   assert.ok(/\.marquee \{ display: none; \}/.test(mobileCss) && /\.visit \.h2 em \{ display: none; \}/.test(mobileCss), 'la dirección «Matamoros 421» no se repite en móvil (marquesina y subtítulo de Visita)');
   assert.ok(/\.visit \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'Visita cierra con 48 px en móvil (48 + 48 del pie = 96, el tope)');
   assert.ok(/@media \(min-width: 1600px\) \{ \.visit \{ grid-template-columns: minmax\(0, 1fr\) 560px; \} \}/.test(css), 'desde 1600 px la columna del horario y la foto de Visita se fija en 560 px');
@@ -930,9 +936,10 @@ test('géneros: todo género de la muestra tiene etiqueta en español y uno sin 
 });
 
 test('Libros: una sola taxonomía a la vista (mismo estado activo, tema ligado a colección) y «Filtros» sin el total de la muestra', async () => {
-  assert.ok(/\.topic\[aria-checked="true"\], \.topic\[aria-checked="true"\]:focus-visible \{[^}]*color: var\(--white\); background: var\(--terra\)/.test(mobileCss), 'el tema activo usa la cápsula turquesa (--terra) con texto blanco');
-  assert.ok(/\.rail-chip\[aria-checked="true"\] \{[^}]*color: var\(--white\); background: var\(--terra\)/.test(mobileCss), 'el chip de colección activo usa la misma cápsula');
-  assert.ok(!/\.topic\[aria-checked="true"\][^{]*\{[^}]*background: var\(--(tungsten|terra-deep)\)/.test(mobileCss), 'el turquesa profundo relleno (--terra-deep) queda para «Cómo llegar»');
+  const pickRule = css.replaceAll('\n', ' ').match(/:where\(\.rail-chip, \.topic\)\[aria-checked="true"\][^{]*\{[^}]*\}/)[0];
+  assert.ok(/--ctl-bg: var\(--pick-fill\); --ctl-edge: var\(--terra\); --ctl-ink: var\(--pick-ink\);/.test(pickRule), 'el tema activo y la colección activa comparten el código de «elegido» (menta, borde y canto --terra, tinta --pick-ink) en una sola regla');
+  assert.ok(!/\.(topic|rail-chip)\[aria-checked="true"\]/.test(mobileCss) && !/\.(topic|rail-chip)\[aria-checked="true"\]/.test(css), 'ninguna regla aparte redefine el estado activo de temas o colecciones, ni en móvil ni en escritorio');
+  assert.ok(!/\[aria-(checked|pressed|expanded|current)="[a-z]+"\][^{]*\{[^}]*background: var\(--(tungsten|terra-deep|terra)\)/.test(css + mobileCss), 'ningún estado activo lleva relleno turquesa: el turquesa profundo relleno (--terra-deep) queda para «Cómo llegar»');
   const cols = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
   const temas = cols.collections.map(c => c.tema).filter(Boolean);
   assert.ok(temas.length >= 2 && temas.every(t => Object.hasOwn(TOPICS, t) && t !== 'libre'), 'cada `tema` de colección es un tema de consulta real');
@@ -948,11 +955,12 @@ test('Libros: una sola taxonomía a la vista (mismo estado activo, tema ligado a
 test('perfil móvil: el nombre de la librería tiene escala display (28 px), mayor que el párrafo, sin color ni efecto nuevo', () => {
   const fs5 = Number(tokensCss.match(/--fs-5: ([\d.]+)rem/)[1]) * 16;
   const rule = mobileCss.match(/\.entry-title \{[^}]*\}/)[0];
-  assert.ok(/font: \d+ var\(--fs-5\)\/[\d.]+ var\(--f-sans\)/.test(rule) && fs5 >= 28, 'el nombre usa el escalón de 28 px');
-  assert.ok(/text-transform: uppercase/.test(rule) && /font-stretch: \d+%/.test(rule), 'mayúsculas en condensada, como los titulares de hoja');
+  assert.ok(/font: 900 var\(--fs-5\)\/[\d.]+ var\(--f-display\)/.test(rule) && fs5 >= 28, 'el nombre usa el escalón de 28 px en la familia redonda, peso 900');
+  assert.ok(!/text-transform|font-stretch/.test(rule), 'sin mayúsculas forzadas ni condensar, como los titulares de hoja');
   assert.ok(!/color:|text-shadow|filter|animation|background/.test(rule), 'sin color ni efecto nuevo');
-  const lede = Number(css.match(/\.entry-lede \{[^}]*font: \d+ clamp\([^,]+, [^,]+, ([\d.]+)rem\)/)[1]) * 16;
-  assert.ok(fs5 > lede, `el nombre (${fs5} px) es mayor que el párrafo (hasta ${lede} px)`);
+  assert.ok(/\.entry-lede \{[^}]*font: \d+ var\(--fs-body\)\/[\d.]+ var\(--f-sans\)/.test(css), 'el párrafo de entrada usa el token de texto (antes un valor continuo: 16.3–19.5 px)');
+  const lede = Number(tokensCss.match(/--fs-body: ([\d.]+)rem/)[1]) * 16;
+  assert.ok(fs5 > lede, `el nombre (${fs5} px) es mayor que el párrafo (${lede} px)`);
 });
 
 test('arranque (R01): tramos cortos, hora de Monterrey en reposo y medidas de descendientes solo con la sección a la vista', async () => {
@@ -984,4 +992,76 @@ test('acomodo responsive: cromo fijo bajo, casillas fijas en la barra y tramos p
   assert.ok(html.includes(`<source media="${tall}" srcset="assets/img/inicio-sala-m.webp"`) && html.includes(`fetchpriority="high" media="${tall}">`) && html.includes('fetchpriority="high" media="(min-width: 1024px), (min-width: 761px) and (orientation: landscape)">'), 'la tableta vertical recibe la foto vertical del inicio, y cada precarga coincide con su fuente');
   assert.ok(/data-cat-filters-done/.test(catalogJs) && /\.explorer \.cat-filters-foot \{ position: sticky; bottom: calc\(-1 \* var\(--space-9\)\);/.test(mobileCss), 'el panel de filtros de Explorar tiene salida fija a los resultados');
   assert.ok(/data-saved-dot/.test(savedJs), 'el botón Menú lleva el conteo de Mi lista');
+});
+
+test('sistema táctil: una sola piel de control, un solo código de «elegido», tarjetas planas, familia redonda y sin Bodoni', async () => {
+  const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replaceAll('\n', ' ');
+  const flat = strip(css), flatAll = strip(css + mobileCss);
+  const owners = re => [...flatAll.matchAll(re)].map(m => m[1].trim().replace(/^@media[^{]*\{\s*/, ''));
+  // Control: una sola regla de piel, sin peso de selector, que cubre todas las piezas que se tocan.
+  const skin = flat.match(/:where\(\.btn, [^)]*\) \{[^}]*\}/)[0];
+  for (const piece of ['.btn', '.rail-chip', '.topic', '.cat-chip', '.act', '.save', '.rail-btn', '.drawer-close', '.ml-close', '.ml-remove', '.sm-close', '.ex-close', '.hdr-wa', '.hdr-list', '.menu-btn', '.cat-filters-btn', '.cat-sort select', '.cat-bar input[type="search"]', '.composer input', '.explore-open', '.sm-row', '.sm-link', '.motion-btn', '.toast-action']) {
+    assert.ok(skin.slice(0, skin.indexOf('{')).includes(piece), `${piece} comparte la piel del control`);
+  }
+  assert.ok(/--ctl-bg: var\(--night\); --ctl-edge: var\(--edge\); --ctl-ink: var\(--bone\); --ctl-lip: var\(--lip\);/.test(skin), 'reposo: fondo del tono, borde --edge y tinta del tono');
+  assert.ok(/border: var\(--edge-w\) solid var\(--ctl-edge\); border-radius: var\(--radius-ctl\);/.test(skin) && /box-shadow: 0 var\(--ctl-lip\) 0 var\(--ctl-edge\)/.test(skin), 'radio de control, borde de 2 px y canto por box-shadow');
+  assert.ok(/margin: 0 0 var\(--lip\);/.test(skin), 'el margen inferior reserva el canto: nada lo recorta y al presionar no empuja a los vecinos');
+  assert.ok(/transition: translate var\(--dur-instant\) var\(--ease-out\), box-shadow var\(--dur-instant\) var\(--ease-out\)/.test(skin), 'presionar responde con --dur-instant');
+  assert.ok(/:active:not\(:disabled\) \{ translate: 0 var\(--lip\); --ctl-lip: 0px; \}/.test(flat) && !/:active[^{]*\{[^}]*scale:/.test(flatAll), 'presionado = baja con translate y cierra el canto; ninguna pieza cambia de tamaño');
+  const lip = Number(tokensCss.match(/--lip: (\d+)px/)[1]), edgeW = Number(tokensCss.match(/--edge-w: (\d+)px/)[1]);
+  assert.ok(lip === 4 && edgeW === 2 && /--radius-ctl: 16px/.test(tokensCss) && /--radius-card: 20px/.test(tokensCss) && /--radius-cover: 12px/.test(tokensCss), 'medidas de la norma: canto 4, borde 2, radios 16 / 20 / 12');
+  // Un solo código de «elegido».
+  const pick = flat.match(/:where\(\.rail-chip, \.topic\)\[aria-checked="true"\][^{]*\{[^}]*\}/)[0];
+  assert.ok(/:where\(\.act, \.save, \.motion-btn\)\[aria-pressed="true"\]/.test(pick) && /:where\(\.cat-filters-btn\)\[aria-expanded="true"\]/.test(pick) && /:where\(\.cat-chip\)/.test(pick), 'chips, «Me interesa», guardar, el filtro abierto y los filtros puestos comparten la regla');
+  assert.ok(/--ctl-bg: var\(--pick-fill\); --ctl-edge: var\(--terra\); --ctl-ink: var\(--pick-ink\);/.test(pick), 'relleno menta, borde y canto --terra, tinta --pick-ink');
+  assert.ok(!/color: var\(--white\); background: var\(--terra\)/.test(flatAll) && !/background: var\(--terra\); color: var\(--white\)/.test(flatAll), 'ya no existe la cápsula turquesa sólida con texto blanco');
+  assert.deepEqual(owners(/([^{}]+)\{[^{}]*background: var\(--terra-deep\)/g).sort(), ['.btn--tungsten', '.progress'], 'el único relleno turquesa profundo es la primaria (y la línea de progreso de lectura)');
+  assert.ok(/\.tabbar a\[aria-current="location"\] \.tab-ic \{[^}]*background: var\(--pick-fill\); box-shadow: inset 0 0 0 var\(--edge-w\) var\(--terra\);/.test(mobileCss) && /\.tabbar a\[aria-current="location"\] \{ color: var\(--pick-ink\); \}/.test(mobileCss), 'pestaña activa con el mismo código, sin cambiar sus dimensiones');
+  assert.ok(/\.sm-row\[aria-expanded="true"\] \.sm-ic \{ color: var\(--pick-ink\); background: var\(--pick-fill\); box-shadow: inset 0 0 0 var\(--edge-w\) var\(--terra\); \}/.test(mobileCss), 'icono del acordeón abierto con el mismo código');
+  assert.ok(/\.cat-opt input:checked \+ label::before \{ background: var\(--pick-fill\); border-color: var\(--terra\); \}/.test(css) && /\.cat-opt input:checked \+ label \{ color: var\(--pick-ink\)/.test(css), 'casilla marcada con el mismo código');
+  assert.ok(/<nav class="tabbar" data-tone="light"/.test(html) && /<section id="cartelera" class="bill" data-tone="light"/.test(html) && /<section id="visita" class="visit" data-tone="light"/.test(html), 'la barra, Cartelera y Visita resuelven borde y «elegido» con los tokens del tono claro');
+  // Contraste de bordes y de «elegido» en cada tono (WCAG 1.4.11 y 1.4.3).
+  const lum = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const b4 = JSON.parse(await readFile(here('./design/tokens.json'), 'utf8')).themes.b4;
+  for (const [name, t] of Object.entries(b4.tones)) {
+    assert.ok(ratio(t.edge, t.night) >= 3, `${name}: borde de control ≥ 3:1 sobre el fondo (${ratio(t.edge, t.night).toFixed(2)})`);
+    assert.ok(ratio(t['pick-ink'], t['pick-fill']) >= 4.5, `${name}: tinta de «elegido» ≥ 4.5:1 sobre su relleno`);
+    assert.ok(ratio(b4.color.terra, t.night) >= 3, `${name}: el borde --terra de lo elegido delimita la pieza, ≥ 3:1 sobre el fondo del tono (${ratio(b4.color.terra, t.night).toFixed(2)})`);
+  }
+  assert.ok(ratio(b4.color.edge, b4.color.paper) >= 3, 'cromo blanco de la cabecera (fuera de todo tono): el borde --edge de :root mide ≥ 3:1 sobre blanco');
+  assert.ok(ratio(b4.color.white, b4.color['terra-deep']) >= 4.5 && ratio(b4.color.white, b4.color.terra) >= 4.5, 'primaria: texto blanco ≥ 4.5:1 en reposo y con el cursor encima');
+  // Canto, no sombra difusa: --elev-* solo en lo que flota.
+  assert.deepEqual(owners(/([^{}]+)\{[^{}]*var\(--elev-/g).sort(), ['.cat-suggest', '.drawer', '.mylist', '.sheet-menu', '.tabbar', '.toast'], 'sombras difusas solo en hojas, aviso, barra y la lista de sugerencias');
+  assert.ok(/\.cover \{[^}]*border-radius: var\(--radius-cover\); box-shadow: 0 var\(--lip\) 0 var\(--edge-soft\)/.test(flat) && /\.card:active \.cover, \.card\[data-opening\] \.cover \{ translate: 0 var\(--lip\); box-shadow: 0 0 0 var\(--edge-soft\); \}/.test(flat), 'portada: radio de 12 px, canto suave y baja al presionar');
+  assert.ok(/\.card \{[^}]*padding: 0 0 var\(--lip\);[^}]*contain-intrinsic-size: auto calc\(var\(--card-h\) \+ var\(--lip\)\)/.test(flat), 'la tarjeta reserva el canto de la portada dentro de su caja (content-visibility recorta lo que sale)');
+  for (const card of ['.bill-item', '.note', '.hours', '.cat-group', '.drawer-facts', '.drawer-ask', '.mylist']) {
+    const rule = flat.match(new RegExp(String.raw`(?:^|\})\s*${card.replace('.', String.raw`\.`)} \{[^}]*\}`))[0];
+    assert.ok(/border: var\(--edge-w\) solid var\(--edge-soft\); border-radius: var\(--radius-card\)/.test(rule), `${card}: tarjeta con radio --radius-card y borde --edge-soft`);
+  }
+  // Insignias.
+  const badge = flat.match(/:where\(\.tab-badge, [^{]*\{[^}]*\}/)[0];
+  assert.ok(/\.cat-n/.test(badge) && /\.bill-stage figcaption/.test(badge) && /\.bill-card-cap/.test(badge) && /\.hours tr\.is-today th::after/.test(badge), '«Hoy», conteos y pies de foto tipo etiqueta comparten la insignia');
+  assert.ok(/border-radius: var\(--radius-pill\); background: var\(--pick-fill\); color: var\(--pick-ink\);/.test(badge) && /font: 800 var\(--fs-0\)\/1 var\(--f-display\)/.test(badge), 'insignia: píldora menta sin canto, 12 px en la familia redonda');
+  // Tipografía: familia redonda en titulares y controles, sin mayúsculas forzadas ni condensar; Archivo para el texto corrido y las portadas.
+  assert.deepEqual(owners(/([^{}]+)\{[^{}]*text-transform: uppercase/g).sort(), ['.cover-title', '.hours tr.is-today th::after', '.wordmark, .ftr-mark'], 'mayúsculas solo en el rótulo «ITINERANTE», la insignia «Hoy» y las portadas (objetos)');
+  assert.deepEqual(owners(/([^{}]+)\{[^{}]*font-stretch/g), ['.cover-title'], 'la condensada queda solo en las portadas tipográficas');
+  assert.ok(/\.wordmark, \.ftr-mark \{[^}]*font-family: var\(--f-display\);\s*font-weight: 900;/.test(flat), 'el rótulo va en la familia redonda');
+  for (const sel of ['.btn', '.rail-chip', '.topic', '.act', '.cat-chip', '.sm-row', '.sm-link', '.ml-title', '.sm-title', '.ex-title', '.bill-title', '.bill-cap-t', '.drawer h3', '.topic-name', '.manifesto-text', '.hdr-nav a', '.composer-field label', '.cat-bar label']) {
+    const rule = flatAll.match(new RegExp(String.raw`(?:^|\})\s*${sel.replace('.', String.raw`\.`)} \{[^}]*\}`));
+    assert.ok(rule && /font: (800|900) [^;]*var\(--f-display\)/.test(rule[0]), `${sel} en la familia redonda (800 o 900)`);
+  }
+  assert.ok(/\.h2 em, \.h2 \.ln-em, \.layer-title em, \.call-title em \{[^}]*font-weight: 800;\s*color: var\(--tungsten\);/.test(flat) && /\.manifesto-text em \{ font-style: normal; font-weight: 800; color: var\(--tungsten\); \}/.test(flat), 'el énfasis de los titulares: misma familia, peso 800, acento del tono');
+  assert.ok(/--f-display: "Nunito"/.test(tokensCss) && !/--f-serif/.test(tokensCss), 'token de la familia redonda; el de la serif ya no existe');
+  const fontsCss = await readFile(here('./assets/fonts/fonts.css'), 'utf8');
+  const sources = await readFile(here('./assets/fonts/sources.json'), 'utf8');
+  assert.ok(!/bodoni|f-serif/i.test(html + css + mobileCss + tokensCss + fontsCss + sources + JSON.stringify(prov)), 'Bodoni Moda retirada de marcado, estilos, tokens, fuentes y procedencia');
+  assert.ok(!existsSync(here('./assets/fonts/bodoni-moda-italic-latin.woff2')) && !existsSync(here('./assets/fonts/OFL-bodonimoda.txt')), 'sin el archivo de Bodoni ni su licencia');
+  assert.ok(existsSync(here('./assets/fonts/nunito-normal-latin.woff2')) && existsSync(here('./assets/fonts/OFL-nunito.txt')) && /font-family: 'Nunito'/.test(fontsCss), 'Nunito alojada con su licencia');
+  assert.ok(html.includes('<link rel="preload" href="assets/fonts/nunito-normal-latin.woff2" as="font" type="font/woff2" crossorigin>') && html.includes('<link rel="preload" href="assets/fonts/archivo-normal-latin.woff2" as="font" type="font/woff2" crossorigin>'), 'se precargan las dos familias que pintan la primera vista');
+  // Movimiento: rebote corto del icono al elegir, solo con movimiento.
+  assert.ok(/@keyframes pick-pop \{ 50% \{ scale: 1\.12; \} \}/.test(flat) && /\.motion :is\(\.act, \.save\)\[aria-pressed="true"\] \.ic \{ animation: pick-pop var\(--dur-fast\) var\(--spring\); \}/.test(flat), 'rebote 1 → 1.12 → 1 con --spring y --dur-fast');
+  assert.ok(/prefers-reduced-motion: reduce\) \{\s*\.motion :is\(\.act, \.save\)\[aria-pressed="true"\] \.ic \{ animation: none; \}/.test(flat), 'con «reducir movimiento» no hay rebote');
+  const appSrc = await readFile(here('./app.js'), 'utf8');
+  assert.ok(!/data-magnetic/.test(html + appSrc) && !/--mx|--my/.test(css + appSrc), 'los botones ya no se desplazan tras el cursor: la única respuesta es hundirse');
 });

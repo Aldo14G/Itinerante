@@ -90,9 +90,10 @@ genérico.
   del producto y no deben sustituirse por una librería genérica.
 - El sistema visual vigente es B.4 (`DESIGN.md`): la paleta del logo,
   turquesa (#7ac4b4) y blanco, con un tono profundo para el pie; lo rústico
-  de la casa vive en las fotos, no en los tokens. Archivo y una voz literaria
-  en Bodoni Moda cursiva. El canon anterior (Claude Design y Higgsfield) es
-  historia.
+  de la casa vive en las fotos, no en los tokens. Componentes táctiles (piezas
+  con canto que se hunden al tocarlas) con Nunito en titulares y controles y
+  Archivo en el texto corrido. El canon anterior (Claude Design y Higgsfield)
+  es historia.
 
 ## Evidence on Hand
 

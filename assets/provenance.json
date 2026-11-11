@@ -211,7 +211,7 @@
       "origin": "images/brand/logo-96.webp"
     }
   ],
-  "fonts": "fonts/sources.json (Archivo y Bodoni Moda, Google Fonts, licencia OFL incluida)",
+  "fonts": "fonts/sources.json (Archivo, de Google Fonts, y Nunito, de Fontsource; licencia OFL incluida)",
   "sampleData": {
     "file": "data/catalog.json",
     "origin": "data/books.amazon-test.json (500 registros de prueba, Amazon_BestSelling_Books_500.csv)",

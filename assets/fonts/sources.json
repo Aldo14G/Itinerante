@@ -1,5 +1,5 @@
 {
-  "cssSource": "https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bodoni+Moda:ital,opsz,wght@1,6..96,400..700&display=swap",
+  "cssSource": "https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap",
   "fonts": [
     {
       "file": "archivo-italic-latin.woff2",
@@ -12,12 +12,6 @@
       "source": "https://fonts.gstatic.com/s/archivo/v25/k3kQo8UDI-1M0wlSfdnoLg.woff2",
       "family": "Archivo",
       "style": "normal"
-    },
-    {
-      "file": "bodoni-moda-italic-latin.woff2",
-      "source": "https://fonts.gstatic.com/s/bodonimoda/v28/aFTS7PxzY382XsXX63LUYJSPeKrcWw.woff2",
-      "family": "Bodoni Moda",
-      "style": "italic"
     },
     {
       "file": "nunito-normal-latin.woff2",

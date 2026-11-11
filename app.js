@@ -923,17 +923,6 @@ async function boot() {
   });
   (window.requestIdleCallback || (cb => setTimeout(cb, 800)))(() => loadFeed().then(m => m.initFeed()).catch(() => {}), { timeout: 4000 });
 
-  // ---------- Magnetic buttons ----------
-  $$('[data-magnetic]').forEach(btn => {
-    btn.addEventListener('pointermove', e => {
-      if (!fineMq.matches || !isMotion()) return;
-      const r = btn.getBoundingClientRect();
-      btn.style.setProperty('--mx', `${(((e.clientX - r.left) / r.width - 0.5) * 12).toFixed(1)}px`);
-      btn.style.setProperty('--my', `${(((e.clientY - r.top) / r.height - 0.5) * 10).toFixed(1)}px`);
-    });
-    btn.addEventListener('pointerleave', () => { btn.style.removeProperty('--mx'); btn.style.removeProperty('--my'); });
-  });
-
   await yieldNow();
   // ---------- Start ----------
   applyMode({ measure: false }); // la primera medición va después de fuentes y póster (abajo)

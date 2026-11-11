@@ -184,7 +184,7 @@ if (!cov) console.log('COV PROBLEMS', problems.slice(-3)); check('portadas', 't�
 for (const id of ['libros', 'cartelera', 'visita']) {
   await ev(`scrollTo(0,0)`); await sleep(600);
   await ev(`document.querySelector('.tabbar a[href="#${id}"]').click()`); await sleep(2500);
-  const d = await ev(`Math.round(document.getElementById('${id}').getBoundingClientRect().top)`);
+  const d = await ev(`Math.round(document.getElementById('${id}').getBoundingClientRect().top) + 0`); // + 0: un aterrizaje a -0.4 px redondea a -0, que CDP no serializa por valor (llegaba undefined y la comprobación fallaba con el título en su sitio)
   check('anclas', `la pestaña ${id} aterriza con el título a la vista (|top| ≤ 100 px)`, Math.abs(d) <= 100, d);
 }
 check('hero móvil', 'la foto del hero va sin crédito ni rótulos encima', await ev(`!document.querySelector('.entry-credit, .entry .tag') && !/Recreación IA|Foto real|Datos de muestra|no es inventario|Imagen ilustrativa/.test(document.body.innerText)`));

@@ -1,7 +1,7 @@
 /* Itinerante B.4 · móvil con estilo de app (cromo claro).
-   Se carga solo con (max-width: 760px). Patrones: barra inferior flotante, cabecera con chips blancos
+   Se carga solo con (max-width: 760px). Patrones: barra inferior flotante, cabecera con controles blancos
    e iconos en tinta, hojas inferiores y chips. Todo propio: sin fuentes, iconos ni CSS de terceros.
-   El cromo (barra y chips de la cabecera) es blanco opaco con filete en tinta y sombra suave: nada de vidrio oscuro. */
+   La piel de cada pieza (borde, canto, «elegido») es la del sistema táctil de style.css; aquí solo cambian cajas y acomodo. */
 
 :root { --hdr-h: 56px; } /* banda de 56 px: los chips de 44 px con 6 px de aire; con la barra (56 + 8) el cromo fijo queda bajo 20 % del alto incluso a 320×640 (Laws of UX: la pantalla es del contenido) */
 html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
@@ -11,12 +11,12 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
 
 /* Cromo claro: la barra es blanca y opaca, sin desenfoque (sobre un fondo opaco el desenfoque no se ve y solo cuesta una capa), y los chips de la cabecera son blancos sólidos siempre
    (sobre la foto del hero y sobre el campo turquesa se leen igual: icono en tinta, filete en tinta). */
-.tabbar, .hdr-wa, .hdr-list { background: var(--glass-solid); }
+.tabbar { background: var(--glass-solid); }
 @media (prefers-reduced-transparency: reduce) {
-  .tabbar, .hdr-wa, .hdr-list { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .tabbar { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
-  .tabbar, .hdr-wa, .hdr-list { border-width: 2px; background: var(--glass-solid); }
+  .tabbar { border-width: 2px; background: var(--glass-solid); }
 }
 
 /* Barra inferior: cápsula flotante centrada (no ocupa el ancho), con los cuatro capítulos y el menú al alcance del pulgar. Cinco casillas del mismo ancho:
@@ -36,12 +36,14 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
   -webkit-tap-highlight-color: transparent;
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
-.tab-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: var(--radius-pill); transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast) var(--ease-out); }
+.tab-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: var(--radius-pill); transition: translate var(--dur-instant) var(--ease-out), background-color var(--dur-fast) var(--ease-out); }
 .tab-ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 /* El nombre de cada pestaña existe siempre para lectores de pantalla; a la vista solo el de la pestaña activa. */
-.tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; font: 650 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.01em; }
-/* Pestaña activa: el único código de «activo» del sitio, cápsula turquesa (--terra) con el icono en blanco (5.1:1); el nombre va debajo en tinta, con la casilla entera para él. */
-.tabbar a[aria-current="location"] .tab-ic { width: 48px; height: 26px; color: var(--white); background: var(--terra); }
+.tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; font: 800 min(var(--fs-0), 3.4vw)/1 var(--f-display); } /* con el texto ampliado el nombre crece hasta donde cabe en la casilla de 60 px */
+/* Pestaña activa: el único código de «elegido» del sitio, cápsula menta (--pick-fill) con filete --terra y el icono relleno en --pick-ink; el nombre va debajo en la misma tinta.
+   El filete es una sombra interior: la cápsula mide lo mismo que antes (48×26) y ninguna casilla cambia de tamaño. */
+.tabbar a[aria-current="location"] { color: var(--pick-ink); }
+.tabbar a[aria-current="location"] .tab-ic { width: 48px; height: 26px; background: var(--pick-fill); box-shadow: inset 0 0 0 var(--edge-w) var(--terra); }
 .tabbar a[aria-current="location"] .tab-ic svg { width: 20px; height: 20px; fill: currentColor; fill-opacity: 0.9; }
 .tabbar a[aria-current="location"] .tab-lb { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
 /* A 320 px no caben cinco casillas de 60: bajan a 48 y la activa queda solo con su icono en un círculo turquesa. */
@@ -51,10 +53,10 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
   .tabbar a[aria-current="location"] .tab-ic svg { width: 24px; height: 24px; }
   .tabbar a[aria-current="location"] .tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 }
-.tabbar a:active .tab-ic, .tab-menu:active .tab-ic { scale: 0.92; }
+.tabbar a:active .tab-ic, .tab-menu:active .tab-ic { translate: 0 2px; } /* el icono baja al tocar, como toda pieza; no cambia de tamaño */
 .tabbar a:focus-visible, .tab-menu:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: 2px; }
 /* Mi lista a la vista (SAT-11): con libros guardados el botón Menú lleva el conteo; la lista es la primera fila del menú. */
-.tab-badge { position: absolute; top: 2px; right: var(--space-1); display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 var(--space-1); color: var(--white); background: var(--terra-deep); border-radius: var(--radius-pill); font: 700 var(--fs-0)/1 var(--f-sans); font-variant-numeric: tabular-nums; }
+.tab-badge { position: absolute; top: 0; right: var(--space-1); min-width: 20px; padding: 0 var(--space-1); box-shadow: 0 0 0 var(--edge-w) var(--glass-solid); } /* insignia de conteo (piel en style.css) con un filete blanco que la separa del icono */
 .tab-badge[hidden] { display: none; }
 /* La barra se retira mientras la ficha o el menú ocupan la pantalla. */
 html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
@@ -80,9 +82,8 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .quote { padding-block: var(--sec-sm) var(--space-5); } /* la cita y el llamado comparten fondo blanco: se leen como un solo cierre (48 px entre ambos, no 96) */
 .ftr { padding-top: var(--sec-sm); }
 .ftr-mark { margin-bottom: var(--space-6); } /* sin vh: el hueco bajo el rótulo no depende del alto de la pantalla */
-/* Titulares (CR-14): un solo escalón por nivel, ambos de la escala de tokens. Capítulo (La casa, Cartelera, Elige, Pasa) = --fs-7; el llamado y las capas internas (.layer-title, 36 px por la misma escala) = --fs-6. Antes: 33.6, 38.4, 41.6 y 51.2 px. */
-.h2, .house-head .h2, .bill-head .h2 { font-size: var(--fs-7); }
-.call-title { font-size: var(--fs-6); }
+/* Titulares (CR-14 → sistema táctil): un solo escalón por nivel, de la escala de tokens y sin regla propia en móvil. Capítulo (La casa, Cartelera, Elige, Pasa) y el llamado = --fs-6
+   (el suelo del clamp de .h2 y .call-title en style.css: 4vw no lo supera hasta 900 px); las capas internas (.layer-title) = --fs-5. */
 /* Llamado y Visita (CR-14): sin marquesina (decoración que repetía la dirección), sin relleno por la altura de la pantalla y con el mismo escalón --sec-sm a ambos lados: no queda aire muerto entre «en persona» y el titular de Visita. El subtítulo «Matamoros 421» del titular repetía la dirección que está debajo. */
 .marquee { display: none; }
 .call { padding-block: var(--space-5) var(--sec-sm); }
@@ -93,25 +94,20 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 .ftr-row { gap: var(--space-2); padding: var(--space-5) 0 0; }
 .ftr-links { flex-wrap: wrap; justify-content: space-between; gap: var(--space-2); } /* en una fila a tamaño normal; con el texto ampliado (WCAG 1.4.4) bajan de renglón en vez de cortarse */
 .ftr-links a { min-width: var(--target-coarse); min-height: var(--target-coarse); padding: 0; font-size: var(--fs-1); }
-.motion-btn { justify-self: start; min-height: var(--target-coarse); padding: 0; border: 0; border-radius: 0; color: var(--bone-dim); font: 560 var(--fs-1)/1 var(--f-sans); text-decoration: underline; text-underline-offset: 0.25em; text-decoration-thickness: 1px; }
+.motion-btn { --ctl-bg: transparent; --ctl-lip: 0px; justify-self: start; min-height: var(--target-coarse); margin: 0; padding: 0; border: 0; border-radius: 0; color: var(--bone-dim); font: 500 var(--fs-1)/1 var(--f-sans); text-decoration: underline; text-underline-offset: 0.25em; text-decoration-thickness: 1px; } /* enlace de texto: sin relleno, borde ni canto */
+.motion-btn:active:not(:disabled) { translate: none; }
+.motion-btn[aria-pressed="true"] { color: var(--bone); }
 
 /* Marca y enlace Instagram del pie de Cartelera: 44 px de alto en cualquier puntero (style.css solo lo pedia con puntero tactil). El nombre cabe en un renglon desde 360 px. */
 .hdr-brand, .bill-foot a { min-height: 44px; }
 @media (min-width: 360px) { .hdr-brand span { white-space: nowrap; } }
 
-/* Cabecera: marca y dos chips blancos de 44 px (menú y WhatsApp) con icono y filete en tinta; sin brillo interior. */
+/* Cabecera: marca y dos controles blancos de 44 px (WhatsApp en círculo y Mi lista) con icono en tinta, borde y canto. */
 .menu-btn, .menu { display: none; }
-.hdr-wa {
-  display: grid; place-items: center; width: 44px; height: 44px; color: var(--paper-ink); text-decoration: none;
-  border: 1px solid var(--glass-edge); border-radius: 50%;
-  transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast);
-}
-.hdr-wa:focus-visible, .hdr-list:focus-visible { outline-color: var(--paper-ink); }
+.hdr-wa { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
 .hdr-wa .ic { width: 22px; height: 22px; }
 /* Sin JavaScript el botón no abre nada (boot.js no puso `js`): se oculta; los cuatro capítulos quedan en la franja de enlaces de la cabecera (style.css, html:not(.js)). */
 html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
-.hdr-wa:active { scale: 0.92; }
-.hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-list, .hdr[data-on="turq"] .hdr-list, .hdr[data-on="tungsten"] .hdr-list { color: var(--paper-ink); background: var(--glass-solid); }
 
 /* Hero móvil: póster fijo, sin recorrido por fotogramas ni cortinilla (menos bytes y menos trabajo). */
 /* Primera vista = perfil (patrón de red social): avatar, nombre, estado de hoy y dirección; el párrafo hace de biografía;
@@ -131,9 +127,9 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .profile-av { display: block; grid-area: av; width: 56px; height: 56px; border-radius: var(--radius-3); }
 /* El nombre es lo primero que se lee: escala display (28 px, mayor que el párrafo de 17 px) en la misma condensada de los titulares de hoja, sin color ni efecto nuevo.
    «text-wrap: balance» parte «LIBRERÍA ITINERANTE / Y MÁS» donde una persona lo haría cuando no cabe en una línea (320-375 px). */
-.entry-title { grid-area: name; align-self: end; font: 800 var(--fs-5)/1.04 var(--f-sans); font-stretch: 74%; text-transform: uppercase; text-wrap: balance; }
+.entry-title { grid-area: name; align-self: end; font: 900 var(--fs-5)/1.1 var(--f-display); letter-spacing: -0.01em; text-wrap: balance; }
 .entry-title .sr-only { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; }
-.entry-title i { font-style: normal; font-weight: 440; }
+.entry-title i { font-style: normal; }
 .wordmark { display: none; }
 .entry-facts { grid-area: facts; align-self: start; flex-direction: column; flex-wrap: nowrap; align-items: flex-start; gap: 2px; margin: 0; font-size: var(--fs-1); }
 .entry-facts li { align-items: center; }
@@ -142,12 +138,11 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .entry-row { grid-area: row; gap: var(--space-4); margin: 0; }
 /* Una sola acción en la primera vista (Hick, <= 6 acciones): «Escribir» sale del perfil; WhatsApp sigue en la cabecera al desplazar, en Cartelera, en Libros y en Visita. */
 .entry-actions { grid-template-columns: 1fr; }
-.entry-actions .btn { min-height: 50px; } /* la primaria mide lo mismo aquí que en el resto de la página */
 .entry-actions .btn--ghost { display: none; }
 /* Mientras la foto no llega el círculo se pinta con --stone (como los demás esqueletos); sin esto se veía el anillo del aro macizo. Quieto, mismo tamaño que la foto. */
 /* Cabecera: al inicio la foto va limpia (el perfil ya dice quién es y el menú vive en la barra inferior); marca y WhatsApp aparecen al bajar. */
 .js .hdr:not(.is-solid) :is(.hdr-brand, .hdr-wa) { opacity: 0; visibility: hidden; }
-.hdr-brand, .hdr-wa { transition: opacity var(--dur-fast) var(--ease-out), visibility var(--dur-fast), scale var(--dur-fast) var(--spring), background-color var(--dur-fast); }
+.hdr-brand, .hdr-wa { transition: opacity var(--dur-fast) var(--ease-out), visibility var(--dur-fast), translate var(--dur-instant) var(--ease-out), box-shadow var(--dur-instant) var(--ease-out); }
 /* Sin JavaScript la cabecera ya trae los cuatro enlaces y el botón de menú de la barra no funcionaría: la barra no se muestra. */
 html:not(.js) .tabbar { display: none; }
 .motion .entry { height: auto; }
@@ -157,7 +152,7 @@ html:not(.js) .tabbar { display: none; }
 /* Hojas inferiores: la ficha sube desde abajo y se arrastra para cerrarla. */
 .drawer {
   inset: auto 0 0 0; width: 100%; max-width: 100%; height: min(88dvh, calc(100dvh - 48px)); max-height: none;
-  border-radius: var(--radius-4) var(--radius-4) 0 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 .motion .drawer { translate: 0 100%; transition: translate var(--dur-slow) var(--spring), overlay var(--dur-slow) allow-discrete, display var(--dur-slow) allow-discrete; }
 .motion .drawer[open] { translate: 0 0; }
@@ -166,7 +161,6 @@ html:not(.js) .tabbar { display: none; }
 .motion .explorer.is-closing { opacity: 0; transition: opacity var(--dur-fast) var(--ease-io); } /* Explorar no se desplaza: se desvanece mientras corre el cierre */
 .drawer-grabber { display: block; justify-self: center; width: 36px; height: 5px; margin: -16px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--paper-ink) 28%, transparent); touch-action: none; }
 .drawer-body { touch-action: pan-y; overscroll-behavior: contain; }
-.drawer-close { background: var(--glass-chip); border-color: var(--glass-edge); } /* mismo cierre que el menú y Explorar: relleno suave y filete en tinta ≥ 3:1 */
 /* Ficha en dos columnas (CR-15): la portada a 40 % del ancho junto a género, título, autor y Guardar; así «Cómo llegar» queda dentro del primer pliegue
    (con la portada a todo lo ancho quedaba bajo el borde en 320-375 px de ancho) sin tocar el orden de lectura ni el foco inicial. */
 .drawer-body { grid-template-columns: 40% minmax(0, 1fr); column-gap: var(--space-4); row-gap: var(--space-3); }
@@ -187,27 +181,21 @@ html:not(.js) .tabbar { display: none; }
 /* Categorías a la vista (Hick): los temas van en rejilla de dos columnas, todos visibles sin deslizar ni cortarse en el borde. */
 .topics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
 @media (min-width: 600px) { .topics { grid-template-columns: repeat(3, minmax(0, 1fr)); } } /* 600–760 px: seis temas en dos filas, no en tres */
-.topic {
-  min-height: 48px; padding: 0 var(--space-3); text-align: center;
-  font: 700 var(--fs-1)/1 var(--f-sans); font-stretch: 100%; text-transform: none; letter-spacing: 0;
-  color: var(--bone); background: var(--paper); border: 1px solid var(--line-strong); border-radius: var(--radius-pill); box-shadow: var(--elev-1); /* misma piel suave que .rail-chip: ficha blanca, filete y sombra corta */
-  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
-}
-/* Un solo estado activo para toda elección de Libros (colección del carrusel y tema de consulta): cápsula turquesa --terra con texto blanco, como `.rail-chip`, la pestaña activa y «Hoy». El turquesa profundo (--terra-deep) queda para «Cómo llegar». */
-.topic[aria-checked="true"], .topic[aria-checked="true"]:focus-visible { color: var(--white); background: var(--terra); border-color: transparent; box-shadow: none; font-stretch: 100%; }
-.topic:hover:not([aria-checked="true"]) { color: var(--bone); }
+/* Misma pieza que la colección del carrusel (.rail-chip): control de 48 px. Un solo estado «elegido» para toda elección de Libros, el del sistema táctil
+   (menta --pick-fill, borde y canto --terra, tinta --pick-ink); aquí no se redefine. El turquesa profundo relleno queda para «Cómo llegar». */
+.topic { justify-content: center; min-height: 48px; padding: 0 var(--space-3); font-size: var(--fs-1); text-align: center; }
 
 /* Primer pintado (R01): bajo el perfil nada se maqueta hasta acercarse; con CPU 4x el primer diseño de toda la página tardaba ~1.8 s y
    solo se ve el perfil. El navegador recuerda la altura real al mostrar cada sección (`auto`). Las cifras son la altura del contenido
    (sin relleno) medida a 360-414 px de ancho: así el largo de la página y las anclas casi no se mueven mientras tanto. */
-.manifesto { content-visibility: auto; contain-intrinsic-size: auto 440px; }
-.house { content-visibility: auto; contain-intrinsic-size: auto 500px; }
-.bill { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
-.books { content-visibility: auto; contain-intrinsic-size: auto 2240px; }
-.quote { content-visibility: auto; contain-intrinsic-size: auto 190px; }
-.call { content-visibility: auto; contain-intrinsic-size: auto 96px; }
-.visit { content-visibility: auto; contain-intrinsic-size: auto 820px; }
-.ftr { content-visibility: auto; contain-intrinsic-size: auto 330px; }
+.manifesto { content-visibility: auto; contain-intrinsic-size: auto 456px; }
+.house { content-visibility: auto; contain-intrinsic-size: auto 480px; }
+.bill { content-visibility: auto; contain-intrinsic-size: auto 1040px; }
+.books { content-visibility: auto; contain-intrinsic-size: auto 2280px; }
+.quote { content-visibility: auto; contain-intrinsic-size: auto 224px; }
+.call { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+.visit { content-visibility: auto; contain-intrinsic-size: auto 848px; }
+.ftr { content-visibility: auto; contain-intrinsic-size: auto 304px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tabbar, .tab-ic, .hdr-wa, .topic { transition-duration: 0.01ms; }
@@ -217,32 +205,29 @@ html:not(.js) .tabbar { display: none; }
 /* Cartelera: carrusel horizontal de tarjetas con foto, título, descripción y acción; todas abiertas. */
 .bill-stage, .bill-ic { display: none; }
 .bill-body { display: block; }
-.bill-list { border-top: 0; }
 .bill-track {
   display: flex; gap: var(--space-3); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
   margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 8px; overscroll-behavior-x: contain; scrollbar-width: none;
 }
 .bill-track::-webkit-scrollbar { display: none; }
-.bill-item {
-  flex: 0 0 min(82vw, 340px); scroll-snap-align: start; overflow: hidden;
-  border: 0; border-radius: var(--radius-card);
-  background: var(--paper); box-shadow: var(--elev-1); /* región propia (CR0-08): tarjeta de papel redondeada con sombra corta sobre el campo turquesa */
-}
-.bill-item summary { display: block; padding: 0; pointer-events: none; }
-.bill-card-fig { display: block; }
+/* Región propia (CR0-08): tarjeta blanca sobre el campo turquesa, con el radio y el borde suave de toda tarjeta (style.css), sin sombra. Aquí todas están abiertas: ninguna es «la elegida». */
+.bill-item { flex: 0 0 min(82vw, 340px); scroll-snap-align: start; overflow: hidden; }
+.bill-item[open] { border-color: var(--edge-soft); }
+.bill-item summary { display: block; padding: 0; border-radius: 0; pointer-events: none; }
+.bill-card-fig { display: block; position: relative; }
 .bill-card-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; } /* 4:3 (SAT-02): con la foto cuadrada la tarjeta era más alta que la ventana útil y «Me interesa» quedaba bajo la barra */
-.bill-card-cap { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); font: 600 var(--fs-1)/1.2 var(--f-sans); }
+.bill-card-cap { position: absolute; left: var(--space-3); bottom: var(--space-3); } /* pie de foto como insignia sobre la foto (piel en style.css) */
 /* Publicación (CR-13): encabezado (avatar y «Itinerante · propuesta»), foto con su rótulo, la fila de acciones justo debajo de la foto y después el texto. El orden del DOM es el orden de lectura.
    El título y la frase están dos veces (el acordeón de escritorio los pide en el resumen y el pie de la publicación los pide después de las acciones): cada copia se oculta donde no corresponde. */
 .bill-item summary .bill-title, .bill-item summary .bill-sub { display: none; }
 .bill-post-head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); }
 .bill-av { flex: none; width: 32px; height: 32px; border-radius: var(--radius-3); }
 .bill-post-who { font: 500 var(--fs-1)/1.2 var(--f-sans); }
-.bill-post-who b { font-weight: 760; }
-.bill-detail { gap: var(--space-3); padding: var(--space-1) var(--space-4) var(--space-4); }
+.bill-post-who b { font: 800 var(--fs-1)/1.2 var(--f-display); }
+.bill-detail { gap: var(--space-3); padding: var(--space-3) var(--space-4) var(--space-4); }
 .bill-cap { display: grid; gap: var(--space-1); }
-.bill-cap-t { font: 820 var(--fs-5)/0.95 var(--f-sans); font-stretch: 66%; letter-spacing: -0.01em; text-transform: uppercase; }
-.bill-cap-s { font: 560 var(--fs-2)/1.2 var(--f-sans); }
+.bill-cap-t { font: 900 var(--fs-4)/1.1 var(--f-display); letter-spacing: -0.01em; }
+.bill-cap-s { font: 500 var(--fs-2)/1.3 var(--f-sans); color: var(--bone-dim); }
 /* «Me interesa» y «Compartir» comparten renglón (proximidad: son las dos acciones de la publicación); si no caben, bajan. */
 .bill-acts .act { flex: 1 1 auto; justify-content: center; padding: 0 var(--space-3); gap: var(--space-1); }
 /* A 320 px las dos acciones no cabían en un renglón (+52 px de tarjeta): «Compartir» queda como botón de icono; su nombre accesible no cambia. */
@@ -262,8 +247,8 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 /* Menú (hojas laterales, patrón de Docusaurus corregido): categorías que se despliegan, filas de 48 px. */
 .sheet-menu {
   position: fixed; inset: 0 auto 0 0; margin: 0; padding: 0; width: min(88vw, 360px); max-width: none; height: 100dvh; max-height: none;
-  display: none; flex-direction: column; overflow: hidden; color: var(--bone); background: var(--night-2);
-  border: 0; border-right: 1px solid var(--glass-edge); border-radius: 0 var(--radius-4) var(--radius-4) 0;
+  display: none; flex-direction: column; overflow: hidden; color: var(--bone); background: var(--night);
+  border: 0; border-radius: 0 var(--radius-card) var(--radius-card) 0; box-shadow: var(--elev-2); /* hoja que flota: sombra de token, sin filete */
 }
 .sheet-menu[open] { display: flex; }
 .sheet-menu::backdrop { background: color-mix(in srgb, var(--black) 60%, transparent); }
@@ -275,44 +260,38 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 @starting-style { .motion .sheet-menu[open]::backdrop { opacity: 0; } }
 .motion .sheet-menu.is-closing { translate: -100% 0; }
 .motion .sheet-menu.is-closing::backdrop { opacity: 0; }
-.sm-head { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-4); padding-top: calc(var(--space-3) + env(safe-area-inset-top)); border-bottom: 1px solid var(--line); }
-.sm-title { margin: 0; font: 780 var(--fs-5)/1 var(--f-sans); font-stretch: 74%; text-transform: uppercase; }
-.sm-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; cursor: pointer; }
-.sm-close .ic { width: 22px; height: 22px; rotate: 45deg; }
-.sm-nav { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-2) var(--space-3); }
+.sm-head { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-4); padding-top: calc(var(--space-3) + env(safe-area-inset-top)); border-bottom: var(--edge-w) solid var(--edge-soft); }
+.sm-title { margin: 0; font: 900 var(--fs-5)/1.1 var(--f-display); letter-spacing: -0.01em; }
+.sm-nav { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-4) var(--space-4) var(--space-3); }
 .sm-nav[data-more="1"] { mask-image: linear-gradient(to bottom, var(--black) calc(100% - var(--space-7)), transparent); } /* hay más abajo: el pie de la lista se funde (app.js pone data-more) */
-.sm-list { margin: 0; padding: 0; list-style: none; }
-.sm-row {
-  display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 48px; padding: var(--space-1) var(--space-2);
-  color: inherit; font: 650 var(--fs-3)/1.2 var(--f-sans); text-align: left; text-decoration: none; background: none; border: 0; border-radius: var(--radius-3); cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.sm-row:active { background: var(--glass-chip); }
-.sm-list--aside { margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--line); }
-.sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--glass-chip); border: 1px solid var(--line); border-radius: 50%; } /* contenedor decorativo del icono (no es el control): filete ligero */
+/* Filas del menú: controles táctiles de 56 px (borde, radio y canto), separados 12 px. */
+.sm-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.sm-row { display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: var(--space-1) var(--space-3) var(--space-1) var(--space-2); font: 800 var(--fs-3)/1.2 var(--f-display); text-align: left; }
+.sm-list--aside { margin-top: var(--space-3); padding-top: var(--space-4); border-top: var(--edge-w) solid var(--edge-soft); }
+.sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--stone); border-radius: 50%; transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); } /* contenedor decorativo del icono (no es el control) */
 .sm-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .sm-lb { flex: 1; }
 .sm-caret { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--dur-fast) var(--ease-out); }
 .sm-row[aria-expanded="true"] .sm-caret { rotate: 90deg; }
-.sm-row[aria-expanded="true"] .sm-ic { color: var(--white); background: var(--terra); border-color: transparent; } /* mismo código de «activo» que chips y pestaña */
+.sm-row[aria-expanded="true"] .sm-ic { color: var(--pick-ink); background: var(--pick-fill); box-shadow: inset 0 0 0 var(--edge-w) var(--terra); } /* grupo abierto: el icono toma el código de «elegido», como chips y pestaña */
 .sm-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-fast) var(--ease-out); }
 .sm-row[aria-expanded="true"] + .sm-sub { grid-template-rows: 1fr; }
-.sm-sub-in { min-height: 0; overflow: hidden; padding-left: calc(40px + var(--space-3) + var(--space-2)); }
-.sm-sub ul { margin: 0; padding: 0 0 var(--space-2); list-style: none; }
-.sm-link { display: flex; align-items: center; min-height: var(--target-coarse); padding: 0 var(--space-2); color: color-mix(in srgb, var(--bone) 86%, transparent); font: 560 var(--fs-2)/1.2 var(--f-sans); text-decoration: none; border-radius: var(--radius-3); }
-.sm-link:active { background: var(--glass-chip); }
-.sm-status { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-2); font: 620 var(--fs-1)/1.3 var(--f-sans); }
-.sm-hours { display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); margin: 0 0 var(--space-2); font-variant-numeric: tabular-nums; }
-.sm-hours dt, .sm-hours dd { margin: 0; font: 560 var(--fs-2)/1.4 var(--f-sans); }
-.sm-hours dd { text-align: right; }
-.sm-note { margin: 0 0 var(--space-2); font: 500 var(--fs-1)/1.4 var(--f-sans); color: var(--bone-dim); }
+.sm-sub-in { min-height: 0; overflow: hidden; }
+/* Subdestinos: chips (el mismo control, en compacto) que se acomodan en renglones; el relleno de la lista deja sitio al canto y al anillo de foco, que el recorte del acordeón cortaría. */
+.sm-sub ul { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: var(--space-3) var(--space-2) var(--space-1); list-style: none; }
+.sm-link { display: inline-flex; align-items: center; min-height: var(--target-coarse); padding: 0 var(--space-3); font: 800 var(--fs-1)/1.2 var(--f-display); }
+.sm-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) var(--space-2) var(--space-2); font: 800 var(--fs-1)/1.3 var(--f-display); }
+.sm-hours { display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); margin: 0 var(--space-2) var(--space-2); font-variant-numeric: tabular-nums; }
+.sm-hours dt, .sm-hours dd { margin: 0; font: 500 var(--fs-1)/1.4 var(--f-sans); }
+.sm-hours dd { text-align: right; font: 800 var(--fs-1)/1.4 var(--f-display); }
+.sm-note { margin: 0 var(--space-2) var(--space-2); font: 500 var(--fs-1)/1.4 var(--f-sans); color: var(--bone-dim); }
 /* Pie del menú en una sola fila (SAT-06): «Cómo llegar» y WhatsApp como botón de icono. Antes dos botones apilados y las redes sumaban, con la cabeza, 262 px fijos (31–41 % de la ventana). */
-.sm-foot { display: grid; grid-template-columns: minmax(0, 1fr) 50px; gap: var(--space-2); padding: var(--space-3) var(--space-4); padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+.sm-foot { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: var(--space-2); padding: var(--space-3) var(--space-4); padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom)); border-top: var(--edge-w) solid var(--edge-soft); }
 .sm-foot .btn { width: 100%; }
-.sm-foot .sm-wa { padding: 0; }
+.sm-foot .sm-wa { padding: 0; border-radius: 50%; }
 .sm-foot .sm-wa .ic { width: 22px; height: 22px; }
-.sm-social { display: flex; gap: var(--space-5); margin: var(--space-2) 0 0; padding: var(--space-2) var(--space-2) 0; border-top: 1px solid var(--line); }
-.sm-social a { display: inline-flex; align-items: center; min-height: var(--target-coarse); color: var(--bone-dim); font: 600 var(--fs-1)/1 var(--f-sans); text-decoration: none; }
+.sm-social { display: flex; gap: var(--space-5); margin: var(--space-4) 0 0; padding: var(--space-2) var(--space-2) 0; border-top: var(--edge-w) solid var(--edge-soft); }
+.sm-social a { display: inline-flex; align-items: center; min-height: var(--target-coarse); color: var(--bone-dim); font: 800 var(--fs-1)/1 var(--f-display); text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .sm-sub, .sm-caret { transition-duration: 0.01ms; }
   .sheet-menu { translate: none; }
@@ -323,26 +302,25 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 /* Carrusel de libros: 2.3 tarjetas por vista para que se note que sigue. */
 /* Las tarjetas fuera de la vista no cuestan estilo: cada tarjeta mide lo mismo (2:3 de 42vw), así que la caja que se conserva al omitirla es exacta y el carrusel no se mueve.
    Menos elementos vivos hacen más barato el showModal()/close() de la ficha, que recalcula el estilo de todo lo vivo (ver DESIGN.md, «Hojas en dos tareas»). */
-.rail-item { --rail-w: clamp(134px, 42vw, 200px); /* 2.3 portadas por vista en teléfono; con tope: a 760 px la portada medía 319×479 y al cruzar a 761 bajaba de golpe a 148×222 */ flex-basis: var(--rail-w); content-visibility: auto; contain-intrinsic-size: auto var(--rail-w) auto calc(var(--rail-w) * 1.5); }
+.rail-item { --rail-w: clamp(134px, 42vw, 200px); /* 2.3 portadas por vista en teléfono; con tope: a 760 px la portada medía 319×479 y al cruzar a 761 bajaba de golpe a 148×222 */ flex-basis: var(--rail-w); content-visibility: auto; contain-intrinsic-size: auto var(--rail-w) auto calc(var(--rail-w) * 1.5 + var(--lip)); } /* la tarjeta mide la portada 2:3 más su canto */
 .rail-item .card:focus-visible { outline-offset: -3px; } /* la contención de pintura de la tarjeta recortaría un contorno externo */
 .rail-track { --rail-gap: var(--space-3); }
 /* Colecciones en rejilla de dos columnas: las cuatro a la vista, sin fila que se corte en el borde derecho. */
 .rail-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
 @media (min-width: 600px) { .rail-chips { grid-template-columns: repeat(4, minmax(0, 1fr)); } } /* 600–760 px: las cuatro colecciones en una fila */
-.rail-chip { min-height: 48px; padding: 0 var(--space-3); } /* la piel (transparente, filete --line-strong) es la de style.css: una sola en móvil y escritorio */
-.rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; }
+.rail-chip { min-height: 48px; padding: 0 var(--space-3); } /* la piel y el estado «elegido» son los de style.css: una sola en móvil y escritorio */
+.sk-chip { width: auto; height: 48px; }
 
 /* Guardar y Mi lista en móvil: hoja inferior, aviso sobre la barra y chip de cabecera (con libros guardados) que cuenta lo anotado y abre la hoja: lo guardado no se pierde de vista (U03). Mismo cromo y alto que el menú. */
-.hdr-list { min-width: 44px; min-height: 44px; padding: 0 var(--space-3); color: var(--paper-ink); border-color: var(--glass-edge); }
-.hdr-list:active { scale: 0.92; }
+.hdr-list { min-width: 44px; justify-content: center; }
 /* Con el chip a la vista la marca pierde «y Más» (no cabe en 360 px): el nombre completo sigue en el menú, el pie y el título. */
 .hdr:has(.hdr-list:not([hidden])) .hdr-brand i { display: none; }
 .hdr-end { gap: var(--space-2); }
-.toast { bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--space-5)); padding-block: 0; } /* 46 px de alto (el botón de acción ya da los 44): con cabecera, barra y aviso a la vez el cromo no pasa de un quinto de la ventana a 390 px */
+.toast { bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--space-5)); } /* sobre la barra inferior; mide 60 px (acción táctil de 44 con su canto) y es pasajero */
 html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-5)); }
 .mylist {
   inset: auto 0 0 0; width: 100%; max-width: 100%; margin: 0; max-height: 88dvh;
-  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom)); border-radius: var(--radius-4) var(--radius-4) 0 0;
+  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom)); border-bottom: 0; border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 .motion .mylist { translate: 0 100%; transition: translate var(--dur-slow) var(--spring), overlay var(--dur-slow) allow-discrete, display var(--dur-slow) allow-discrete; }
 .motion .mylist[open] { translate: 0 0; }
@@ -353,10 +331,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 .cat { padding-top: var(--space-6); padding-bottom: var(--space-6); }
 .cat-head { margin-bottom: 0; } /* la hoja de exploración está cerrada: no hay nada debajo del buscador que separar */
 .topic-layers { aspect-ratio: 3 / 2; max-height: 60svh; } /* 3:2 como en escritorio y nunca más alta que 60 % de la ventana (a 760 px medía 711×533) */
-.explore-open {
-  display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: 0 var(--space-4); color: var(--bone-dim); cursor: pointer;
-  font: 560 var(--fs-2)/1 var(--f-sans); text-align: left; background: var(--paper); border: 1px solid var(--line-strong); border-radius: var(--radius-pill); box-shadow: var(--elev-in); /* campo hundido: sombra interior corta */
-}
+.explore-open { --ctl-ink: var(--bone-dim); display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: 0 var(--space-4); font: 500 var(--fs-2)/1 var(--f-sans); text-align: left; } /* botón con cara de campo: la misma caja que el buscador de la hoja */
 .explore-open .ic { width: 22px; height: 22px; flex: none; }
 .explorer:modal {
   position: fixed; inset: 0; width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; padding: 0 var(--gutter) var(--space-9);
@@ -365,19 +340,17 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 .explorer:modal .ex-top {
   position: sticky; top: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
   margin-inline: calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter); padding-top: calc(var(--space-3) + env(safe-area-inset-top));
-  background: var(--night); border-bottom: 1px solid var(--line);
+  background: var(--night); border-bottom: var(--edge-w) solid var(--edge-soft);
 }
 .ex-id { display: grid; gap: var(--space-1); min-width: 0; }
-.ex-title { margin: 0; font: 780 var(--fs-5)/1 var(--f-sans); font-stretch: 74%; text-transform: uppercase; }
+.ex-title { margin: 0; font: 900 var(--fs-5)/1.1 var(--f-display); letter-spacing: -0.01em; }
 @media (max-width: 374px) { .ex-title { font-size: var(--fs-4); } } /* CR0-13: a 320–360 px el titular cabe en una línea junto al cierre; la cabecera fija no crece */
 /* El sello de la muestra viaja con la hoja a pantalla completa (no se pierde al abrir Explorar). Una sola línea hasta 320 px: nunca parte «no es inventario». */
-.ex-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer; background: var(--glass-chip); border: 1px solid var(--glass-edge); border-radius: 50%; }
-.ex-close .ic { width: 22px; height: 22px; rotate: 45deg; }
 .explorer .cat-bar { margin-top: var(--space-4); }
 /* Explorar (SAT-13, SAT-03): el selector ya dice «Título A–Z», su etiqueta queda solo para lectores de pantalla; el panel de filtros (hasta dos pantallas) lleva un pie pegajoso con la salida a los resultados. */
 .explorer .cat-sort label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .explorer:modal .ex-top { padding-block: var(--space-2); padding-top: calc(var(--space-2) + env(safe-area-inset-top)); }
-.explorer .cat-filters-foot { position: sticky; bottom: calc(-1 * var(--space-9)); /* el relleno inferior de la hoja (--space-9) cuenta para el borde pegajoso: se descuenta para que el pie quede al ras */ z-index: 2; margin: 0 -24px -24px; padding: var(--space-3) 24px calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--night); border-top: 1px solid var(--line); border-radius: 0 0 4px 4px; }
+.explorer .cat-filters-foot { position: sticky; bottom: calc(-1 * var(--space-9)); /* el relleno inferior de la hoja (--space-9) cuenta para el borde pegajoso: se descuenta para que el pie quede al ras */ z-index: 2; margin: 0 calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--night); border-top: var(--edge-w) solid var(--edge-soft); }
 @media (min-width: 520px) { .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 680px) { .cat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .explorer .cat-layout { padding-top: var(--space-4); }

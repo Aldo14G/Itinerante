@@ -60,7 +60,6 @@
 
   /* Tipografía */
   --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
-  --f-serif: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
   --f-display: "Nunito", "Archivo", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
 
   /* Escala tipográfica */
@@ -72,7 +71,7 @@
   --fs-5: 1.75rem;
   --fs-6: 2.25rem;
   --fs-7: 3rem;
-  --fs-body: 1.0625rem;
+  --fs-body: 1rem;
 
   /* Espaciado (múltiplos de 4) */
   --space-1: 4px;
@@ -118,6 +117,7 @@
   --elev-2: 0 2px 6px rgb(16 32 30 / 0.08), 0 14px 32px rgb(16 32 30 / 0.16);
   --elev-in: inset 0 1px 2px rgb(16 32 30 / 0.10);
   --radius-ctl: 16px;
+  --radius-cover: 12px;
   --edge-w: 2px;
   --lip: 4px;
 
