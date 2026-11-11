@@ -2,7 +2,6 @@
 (function () {
   var r = document.documentElement;
   r.classList.add('js');
-  if (!scrollY) r.classList.add('at-top'); // móvil: la barra inferior entra al salir del perfil (app.js lo mantiene)
   var off = false;
   try { off = localStorage.getItem('iti-b4-motion') === 'off'; } catch (e) { /* almacenamiento bloqueado */ }
   var saveData = navigator.connection && navigator.connection.saveData;

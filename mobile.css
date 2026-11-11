@@ -8,40 +8,42 @@ html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)
 
 /* Cromo claro: la barra es blanca y opaca, sin desenfoque (sobre un fondo opaco el desenfoque no se ve y solo cuesta una capa), y los chips de la cabecera son blancos sólidos siempre
    (sobre la foto del hero y sobre el campo turquesa se leen igual: icono en tinta, filete en tinta). */
-.tabbar, .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-solid); }
+.tabbar, .hdr-wa, .hdr-list { background: var(--glass-solid); }
 @media (prefers-reduced-transparency: reduce) {
-  .tabbar, .hdr-wa, .hdr-more, .hdr-list { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .tabbar, .hdr-wa, .hdr-list { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
-  .tabbar, .hdr-wa, .hdr-more, .hdr-list { border-width: 2px; background: var(--glass-solid); }
+  .tabbar, .hdr-wa, .hdr-list { border-width: 2px; background: var(--glass-solid); }
 }
 
-/* Barra inferior: píldora flotante blanca de cuatro pestañas con icono y etiqueta en tinta; sin reflejo ni brillo interior, sombra suave. */
+/* Barra inferior: cápsula flotante centrada (no ocupa el ancho), con los cuatro capítulos y el menú al alcance del pulgar. Solo iconos;
+   la pestaña activa se abre en cápsula turquesa con su nombre (orienta sin llenar la barra de etiquetas). Blanca, con sombra suave de dos capas. */
 .tabbar {
-  position: fixed; z-index: 48; display: flex; gap: 2px;
-  inset: auto 12px calc(env(safe-area-inset-bottom) + 8px) 12px;
-  height: var(--tabbar-h); padding: 4px;
-  border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: var(--radius-pill);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--black) 18%, transparent);
+  position: fixed; z-index: 48; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 12px);
+  width: fit-content; max-width: calc(100% - 24px); margin-inline: auto;
+  display: flex; align-items: center; gap: 4px; height: var(--tabbar-h); padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--paper-ink) 10%, transparent); border-radius: var(--radius-pill);
+  box-shadow: var(--elev-2);
   transition: translate var(--dur-base) var(--spring), visibility var(--dur-base);
 }
-.tabbar a {
-  position: relative; z-index: 1; flex: 1; min-width: 44px; display: grid; place-items: center; align-content: center; gap: 2px;
-  color: var(--paper-dim); text-decoration: none; border-radius: var(--radius-pill);
+.tabbar a, .tab-menu {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-width: 48px; height: 48px; padding: 0;
+  color: var(--paper-ink); text-decoration: none; border: 0; background: none; border-radius: var(--radius-pill); font: inherit; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
-.tab-ic {
-  display: grid; place-items: center; width: 52px; height: 28px; border-radius: var(--radius-pill);
-  transition: background-color var(--dur-fast) var(--ease-out), scale var(--dur-fast) var(--spring);
-}
-.tab-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.tab-lb { font: 650 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.01em; }
-/* Pestaña activa: el único código de «activo» del sitio, cápsula turquesa (--terra) con icono blanco (5.1:1); la etiqueta pasa a tinta plena. */
-.tabbar a[aria-current="location"] { color: var(--paper-ink); }
-.tabbar a[aria-current="location"] .tab-ic { color: var(--white); background: var(--terra); }
+.tab-ic { display: grid; place-items: center; width: 24px; height: 24px; transition: scale var(--dur-fast) var(--spring); }
+.tab-ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+/* El nombre de cada pestaña existe siempre para lectores de pantalla; a la vista solo el de la pestaña activa. */
+.tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; font: 650 var(--fs-1)/1 var(--f-sans); letter-spacing: 0.01em; }
+/* Pestaña activa: el único código de «activo» del sitio, cápsula turquesa (--terra) con icono y nombre en blanco (5.1:1). */
+.tabbar a[aria-current="location"] { padding: 0 16px 0 12px; color: var(--white); background: var(--terra); }
 .tabbar a[aria-current="location"] .tab-ic svg { fill: currentColor; fill-opacity: 0.9; }
-.tabbar a:active .tab-ic { scale: 0.92; }
-.tabbar a:focus-visible { outline-color: var(--paper-ink); outline-offset: -2px; }
+.tabbar a[aria-current="location"] .tab-lb { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
+@media (max-width: 359px) { .tabbar a[aria-current="location"] { padding: 0; } .tabbar a[aria-current="location"] .tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } } /* a 320 px no caben cinco botones y un nombre: la activa queda solo con su icono en cápsula */
+.tabbar a:active .tab-ic, .tab-menu:active .tab-ic { scale: 0.92; }
+.tabbar a:focus-visible, .tab-menu:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: 2px; }
+.tabbar a[aria-current="location"]:focus-visible { outline-offset: 2px; }
 /* La barra se retira mientras la ficha o el menú ocupan la pantalla. */
 html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 
@@ -80,19 +82,17 @@ html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
 
 /* Cabecera: marca y dos chips blancos de 44 px (menú y WhatsApp) con icono y filete en tinta; sin brillo interior. */
 .menu-btn, .menu { display: none; }
-.hdr-wa, .hdr-more {
+.hdr-wa {
   display: grid; place-items: center; width: 44px; height: 44px; color: var(--paper-ink); text-decoration: none;
   border: 1px solid var(--glass-edge); border-radius: 50%;
   transition: scale var(--dur-fast) var(--spring), background-color var(--dur-fast);
 }
-.hdr-wa:focus-visible, .hdr-more:focus-visible, .hdr-list:focus-visible { outline-color: var(--paper-ink); }
-.hdr-wa .ic, .hdr-more .ic { width: 22px; height: 22px; }
-.hdr-more { padding: 0; cursor: pointer; font: inherit; }
+.hdr-wa:focus-visible, .hdr-list:focus-visible { outline-color: var(--paper-ink); }
+.hdr-wa .ic { width: 22px; height: 22px; }
 /* Sin JavaScript el botón no abre nada (boot.js no puso `js`): se oculta; los cuatro capítulos quedan en la franja de enlaces de la cabecera (style.css, html:not(.js)). */
-html:not(.js) .hdr-more { display: none; }
 html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
-.hdr-wa:active, .hdr-more:active, .hdr-more[aria-expanded="true"] { scale: 0.92; }
-.hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-more, .hdr[data-on="turq"] .hdr-more, .hdr[data-on="tungsten"] .hdr-more, .hdr[data-on="paper"] .hdr-list, .hdr[data-on="turq"] .hdr-list, .hdr[data-on="tungsten"] .hdr-list { color: var(--paper-ink); background: var(--glass-solid); }
+.hdr-wa:active { scale: 0.92; }
+.hdr[data-on="paper"] .hdr-wa, .hdr[data-on="turq"] .hdr-wa, .hdr[data-on="tungsten"] .hdr-wa, .hdr[data-on="paper"] .hdr-list, .hdr[data-on="turq"] .hdr-list, .hdr[data-on="tungsten"] .hdr-list { color: var(--paper-ink); background: var(--glass-solid); }
 
 /* Hero móvil: póster fijo, sin recorrido por fotogramas ni cortinilla (menos bytes y menos trabajo). */
 /* Primera vista = perfil (patrón de red social): avatar, nombre, estado de hoy y dirección; el párrafo hace de biografía;
@@ -101,9 +101,9 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .entry-shade { background: linear-gradient(180deg, transparent 45%, color-mix(in srgb, var(--night) 70%, transparent) 100%); } /* sin banda arriba: la foto queda limpia en el 45 % superior; el texto lleva su velo propio en .entry-copy */
 .entry-copy {
   display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-4) var(--space-3);
-  grid-template-areas: "av name" "av facts" "row row" "hl hl";
+  grid-template-areas: "av name" "av facts" "row row";
   padding-top: var(--space-7);
-  padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-5)); /* la barra inferior espera fuera de la primera vista (html.at-top) */
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--tabbar-h) + var(--space-7)); /* la barra inferior está desde la primera vista: «Cómo llegar» queda por encima de ella */
   /* El velo vive detrás del texto, no sobre toda la foto: crece con el bloque, así que el párrafo queda sobre fondo claro
      en cualquier alto de pantalla (antes seguía porcentajes de la altura y en pantallas cortas caía en la parte transparente). */
   background: linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--night) 90%, transparent) var(--space-7), color-mix(in srgb, var(--night) 97%, transparent) 100%);
@@ -125,22 +125,11 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .entry-actions { grid-template-columns: 1fr; }
 .entry-actions .btn { min-height: var(--target-coarse); }
 .entry-actions .btn--ghost { display: none; }
-.hl { display: block; grid-area: hl; }
-.hl-list { display: flex; justify-content: space-between; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-.hl-item { display: grid; justify-items: center; gap: var(--space-1); min-width: 64px; color: var(--bone); text-decoration: none; -webkit-tap-highlight-color: transparent; }
-.hl-ring { position: relative; display: block; width: 68px; height: 68px; padding: 4px; border-radius: 50%; background: linear-gradient(135deg, var(--tungsten), var(--terra)); transition: scale var(--dur-fast) var(--spring); }
 /* Mientras la foto no llega el círculo se pinta con --stone (como los demás esqueletos); sin esto se veía el anillo del aro macizo. Quieto, mismo tamaño que la foto. */
-.hl-img { width: 100%; height: 100%; object-fit: cover; border: 2px solid var(--night); border-radius: 50%; background: var(--stone); }
-.hl-item.is-seen .hl-ring { background: var(--line-strong); }
-.hl-item:active .hl-ring { scale: 0.94; }
-.hl-lb { font: 650 var(--fs-0)/1.2 var(--f-sans); }
-/* Cabecera: al inicio solo el menú (el perfil ya dice quién es); marca y WhatsApp aparecen al bajar. */
+/* Cabecera: al inicio la foto va limpia (el perfil ya dice quién es y el menú vive en la barra inferior); marca y WhatsApp aparecen al bajar. */
 .js .hdr:not(.is-solid) :is(.hdr-brand, .hdr-wa) { opacity: 0; visibility: hidden; }
 .hdr-brand, .hdr-wa { transition: opacity var(--dur-fast) var(--ease-out), visibility var(--dur-fast), scale var(--dur-fast) var(--spring), background-color var(--dur-fast); }
-/* La barra inferior entra al salir del perfil: en la primera vista no compite con los destacados (Hick). */
-html.at-top .tabbar { translate: 0 calc(100% + 24px); }
-/* Fuera de pantalla tampoco recibe foco (visibility pasa a hidden al terminar la salida). Sin JavaScript la cabecera ya trae los cuatro enlaces y la barra taparia los destacados. */
-html.at-top .tabbar { visibility: hidden; }
+/* Sin JavaScript la cabecera ya trae los cuatro enlaces y el botón de menú de la barra no funcionaría: la barra no se muestra. */
 html:not(.js) .tabbar { display: none; }
 .motion .entry { height: auto; }
 .motion .entry-stage { position: relative; height: 100svh; min-height: 560px; }
@@ -169,28 +158,23 @@ html:not(.js) .tabbar { display: none; }
 .drawer h3 { font-size: var(--fs-5); overflow-wrap: anywhere; }
 .drawer-author { font-size: var(--fs-2); }
 .drawer .save--wide { justify-self: stretch; padding: 0 var(--space-3); line-height: 1.15; text-align: left; }
- /* el sello literal de la muestra puede partirse en el punto medio, nunca dentro de «no es inventario» */
-
-/* Historias de La casa: barra segmentada y fotos que se pasan con un toque. */
-.stories { display: flex; gap: 4px; margin: 4px 0 8px; }
-.stories i { flex: 1; height: 3px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--bone) 24%, transparent); transition: background-color var(--dur-base) var(--ease-out); }
-.stories i.is-seen { background: var(--bone); }
+ /* el sello literal de la muestra puede partirse en el punto medio { display: flex; gap: 4px; margin: 4px 0 8px; }
 .house-meter { display: none; }
 .house-track { scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); overscroll-behavior-x: contain; scrollbar-width: none; }
 .house-track::-webkit-scrollbar { display: none; }
 .still { scroll-snap-align: center; }
 
 /* Libros: los temas son chips deslizables (como los destacados), no una lista grande. */
-.topics { flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter); scroll-snap-type: x proximity; scroll-padding-inline: var(--gutter); scrollbar-width: none; }
-.topics::-webkit-scrollbar { display: none; }
+/* Categorías a la vista (Hick): los temas van en rejilla de dos columnas, todos visibles sin deslizar ni cortarse en el borde. */
+.topics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
 .topic {
-  flex: none; min-height: var(--target-coarse); padding: 0 var(--space-4); scroll-snap-align: start;
+  min-height: 48px; padding: 0 var(--space-3); text-align: center;
   font: 700 var(--fs-1)/1 var(--f-sans); font-stretch: 100%; text-transform: none; letter-spacing: 0;
-  color: var(--bone); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); /* misma piel que .rail-chip y que el escritorio: sin relleno gris (CR1-06) */
+  color: var(--bone); background: var(--paper); border: 1px solid var(--line-strong); border-radius: var(--radius-pill); box-shadow: var(--elev-1); /* misma piel suave que .rail-chip: ficha blanca, filete y sombra corta */
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast), scale var(--dur-fast) var(--spring);
 }
 /* Un solo estado activo para toda elección de Libros (colección del carrusel y tema de consulta): cápsula turquesa --terra con texto blanco, como `.rail-chip`, la pestaña activa y «Hoy». El turquesa profundo (--terra-deep) queda para «Cómo llegar». */
-.topic[aria-checked="true"], .topic[aria-checked="true"]:focus-visible { color: var(--white); background: var(--terra); border-color: transparent; font-stretch: 100%; }
+.topic[aria-checked="true"], .topic[aria-checked="true"]:focus-visible { color: var(--white); background: var(--terra); border-color: transparent; box-shadow: none; font-stretch: 100%; }
 .topic:hover:not([aria-checked="true"]) { color: var(--bone); }
 
 /* Primer pintado (R01): bajo el perfil nada se maqueta hasta acercarse; con CPU 4x el primer diseño de toda la página tardaba ~1.8 s y
@@ -206,7 +190,7 @@ html:not(.js) .tabbar { display: none; }
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 330px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .tabbar, .tab-ic, .hdr-wa, .topic, .stories i { transition-duration: 0.01ms; }
+  .tabbar, .tab-ic, .hdr-wa, .topic { transition-duration: 0.01ms; }
   .motion .drawer { transition: opacity var(--dur-instant) linear, display var(--dur-instant) allow-discrete; translate: none; opacity: 1; }
 }
 
@@ -221,8 +205,8 @@ html:not(.js) .tabbar { display: none; }
 .bill-track::-webkit-scrollbar { display: none; }
 .bill-item {
   flex: 0 0 min(82vw, 340px); scroll-snap-align: start; overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--turq-ink) 22%, transparent); border-radius: var(--radius-2);
-  background: var(--paper); /* región propia (CR0-08): tarjeta papel con filete de 1 px sobre el campo turquesa, sin sombra */
+  border: 0; border-radius: var(--radius-card);
+  background: var(--paper); box-shadow: var(--elev-1); /* región propia (CR0-08): tarjeta de papel redondeada con sombra corta sobre el campo turquesa */
 }
 .bill-item summary { display: block; padding: 0; pointer-events: none; }
 .bill-card-fig { display: block; }
@@ -247,7 +231,7 @@ html:not(.js) .tabbar { display: none; }
 
 /* Fondo de la hoja plano (sin desenfoque) y cromo sólido en gama media o baja. */
 .drawer::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
-html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glass="lite"] .hdr-more, html[data-glass="lite"] .hdr-list { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
+html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glass="lite"] .hdr-list { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
 
 /* Menú (hojas laterales, patrón de Docusaurus corregido): categorías que se despliegan, filas de 48 px. */
 .sheet-menu {
@@ -313,9 +297,9 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .rail-item { --rail-w: 42vw; flex-basis: var(--rail-w); content-visibility: auto; contain-intrinsic-size: auto var(--rail-w) auto calc(var(--rail-w) * 1.5); }
 .rail-item .card:focus-visible { outline-offset: -3px; } /* la contención de pintura de la tarjeta recortaría un contorno externo */
 .rail-track { --rail-gap: var(--space-3); }
-.rail-chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter); scroll-padding-inline: var(--gutter); scrollbar-width: none; }
-.rail-chips::-webkit-scrollbar { display: none; }
-.rail-chip { flex: none; } /* la piel (transparente, filete --line-strong) es la de style.css: una sola en móvil y escritorio */
+/* Colecciones en rejilla de dos columnas: las cuatro a la vista, sin fila que se corte en el borde derecho. */
+.rail-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+.rail-chip { min-height: 48px; padding: 0 var(--space-3); } /* la piel (transparente, filete --line-strong) es la de style.css: una sola en móvil y escritorio */
 .rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; }
 
 /* Guardar y Mi lista en móvil: hoja inferior, aviso sobre la barra y chip de cabecera (con libros guardados) que cuenta lo anotado y abre la hoja: lo guardado no se pierde de vista (U03). Mismo cromo y alto que el menú. */
@@ -341,7 +325,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 .topic-layers { aspect-ratio: 4 / 3; }
 .explore-open {
   display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: 0 var(--space-4); color: var(--bone-dim); cursor: pointer;
-  font: 560 var(--fs-2)/1 var(--f-sans); text-align: left; background: var(--glass-chip); border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
+  font: 560 var(--fs-2)/1 var(--f-sans); text-align: left; background: var(--paper); border: 1px solid var(--line-strong); border-radius: var(--radius-pill); box-shadow: var(--elev-in); /* campo hundido: sombra interior corta */
 }
 .explore-open .ic { width: 22px; height: 22px; flex: none; }
 .explorer:modal {
@@ -365,50 +349,8 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
 .motion .explorer[open] { translate: 0 0; }
 @starting-style { .motion .explorer[open] { translate: 0 100%; } }
 
-/* Historias: los destacados del perfil abren las fotos de cada capítulo a pantalla completa. Se pasan con un toque a la
-   izquierda o a la derecha (o con las flechas); la procedencia de cada foto va siempre en el pie. Sin avance automático. */
-.story:modal {
-  position: fixed; inset: 0; width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; overflow: hidden;
-  color: var(--bone); background: var(--night); border: 0;
-}
 /* Inmersivo: la foto cubre toda la pantalla (object-fit: cover) y barra, perfil, pie y botones flotan encima. Un velo corto arriba y otro en la base
    (donde viven el rótulo de procedencia y los botones) mantienen el texto legible sin bandas negras; el centro de la foto queda limpio. */
-.story[open] { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; }
-.story .stories, .story-top, .story-cap, .story-foot { position: relative; z-index: 1; }
-.story .stories { margin: 0; padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-3) 0; pointer-events: none; }
-.story-top { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); pointer-events: none; }
-.story-top .story-close { pointer-events: auto; }
-.story-av { width: 36px; height: 36px; border-radius: var(--radius-3); }
-.story-who { display: grid; flex: 1; margin: 0; font: 600 var(--fs-1)/1.25 var(--f-sans); }
-.story-who span { color: var(--bone-dim); font-weight: 500; }
-.story-close { display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); padding: 0; color: inherit; cursor: pointer; background: color-mix(in srgb, var(--bone) 8%, transparent); border: 1px solid var(--line-strong); border-radius: 50%; } /* la historia es oscura: filete claro (--line-strong de :root), no el cromo blanco */
-.story-close .ic { width: 22px; height: 22px; rotate: 45deg; }
-.story-fig { position: absolute; inset: 0; z-index: 0; }
-.story-fig::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background:
-    linear-gradient(0deg, color-mix(in srgb, var(--night) 94%, transparent) 0, color-mix(in srgb, var(--night) 88%, transparent) var(--veil-solid, 208px), transparent var(--veil-end, 336px)),
-    linear-gradient(180deg, color-mix(in srgb, var(--night) 64%, transparent) 0, transparent 128px);
-}
-.story-img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.story-nav { position: absolute; top: 0; bottom: 0; padding: 0; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.story-nav--prev { left: 0; width: 35%; }
-.story-nav--next { right: 0; width: 65%; }
-.story-nav:disabled { cursor: default; }
 /* Foco por teclado (CR-18): la zona de toque ocupa hasta 65 % de la foto; el marco no se pinta sobre toda la zona sino en un indicador de 44 px
    en su borde (disco oscuro con aro tungsteno y flecha: legible sobre cualquier foto). El área táctil no cambia. */
-.story-nav:focus-visible { outline-color: transparent; outline-offset: -4px; } /* transparente, no `none`: en modo de contraste forzado el sistema lo vuelve a pintar */
-.story-nav:focus-visible::after {
-  content: "›"; content: "›" / ""; position: absolute; top: 50%; translate: 0 -50%; display: grid; place-items: center;
-  width: var(--target-coarse); height: var(--target-coarse); font: 700 var(--fs-5)/1 var(--f-sans); color: var(--bone); background: var(--night);
-  border-radius: 50%; outline: 2px solid var(--tungsten); outline-offset: 0;
-}
-.story-nav--next:focus-visible::after { right: var(--space-3); }
-.story-nav--prev:focus-visible::after { left: var(--space-3); content: "‹"; content: "‹" / ""; }
-.story-cap { grid-row: 4; display: grid; justify-items: start; gap: var(--space-1); padding: var(--space-3) var(--space-4) 0; pointer-events: none; }
-.story-t { font: 700 var(--fs-3)/1.2 var(--f-sans); }
-.story-x { color: var(--bone-dim); font-size: var(--fs-1); }
-.story-foot { grid-row: 5; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom)); }
-.story-foot .btn { padding: 0 0.9em; font-size: var(--fs-1); min-height: var(--target-coarse); }
-@media (max-width: 360px) { .story-foot { grid-template-columns: 1fr; } .story-fig { --veil-solid: 280px; --veil-end: 400px; } } /* botones apilados: el pie crece 56 px y el velo con él */
-.story::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+@media (max-width: 360px) {}

@@ -37,7 +37,7 @@ p { text-wrap: pretty; }
 [data-theme="paper"] :focus-visible, [data-theme="turq"] :focus-visible, [data-theme="tungsten"] :focus-visible, .hdr[data-on] :focus-visible { outline-color: var(--paper-ink); }
 /* Cabecera sobre la foto del hero (data-on sin is-solid) y chips móviles: anillo de dos capas, tinta de 2 px pegada al control y halo blanco de 4 px por fuera.
    El anillo mide ≥ 3:1 contra el halo y contra el control, y el halo contra la foto, sea cual sea la foto (QA1-01: 1.37:1 con el anillo solo). */
-.hdr[data-on] :focus-visible, .hdr-more:focus-visible, .hdr-wa:focus-visible, .hdr-list:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: 0; box-shadow: 0 0 0 6px var(--white); }
+.hdr[data-on] :focus-visible, .hdr-wa:focus-visible, .hdr-list:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: 0; box-shadow: 0 0 0 6px var(--white); }
 
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .ic { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -132,7 +132,7 @@ p { text-wrap: pretty; }
 .btn:hover .ic, .btn:focus-visible .ic { transform: translate(2px, -2px); }
 
 /* Acción primaria (siempre «Cómo llegar»): una sola clase, el mismo turquesa profundo con tinta clara sobre cualquier fondo. */
-.btn--tungsten { background: var(--terra-deep); color: var(--white); --sweep: var(--terra); }
+.btn--tungsten { background: var(--terra-deep); color: var(--white); --sweep: var(--terra); box-shadow: var(--elev-1); }
 .btn--ghost { color: var(--bone); border-color: var(--line-strong); background: color-mix(in srgb, var(--night) 28%, transparent); --sweep: var(--bone); }
 .btn--ghost:hover, .btn--ghost:focus-visible { color: var(--night); border-color: var(--bone); }
 .btn--line { color: var(--night); border-color: var(--night); --sweep: var(--night); }
@@ -291,7 +291,7 @@ p { text-wrap: pretty; }
 .entry-facts .ic { color: var(--tungsten); }
 .entry-title { order: 3; margin: 0; font-size: var(--fs-2); }
 /* Perfil y destacados: solo móvil (mobile.css los muestra). */
-.profile-av, .hl { display: none; }
+.profile-av { display: none; }
 
 .wordmark, .ftr-mark {
   display: flex; justify-content: space-between;
@@ -341,7 +341,7 @@ p { text-wrap: pretty; }
 .manifesto-photo--a { grid-column: 9 / span 4; grid-row: 1; }
 .manifesto-photo--a .frame-clip { aspect-ratio: 4 / 3; }
 
-.frame-clip { overflow: hidden; border-radius: 2px; background: var(--stone); }
+.frame-clip { overflow: hidden; border-radius: var(--radius-4); background: var(--stone); }
 .frame-clip img { width: 100%; height: 100%; object-fit: cover; }
 .motion [data-reveal] .frame-clip { clip-path: inset(0); transition: clip-path var(--dur-scene) var(--ease-out); }
 .motion [data-reveal] .frame-clip img { transition: transform var(--dur-scene) var(--ease-out); }
@@ -381,7 +381,7 @@ p { text-wrap: pretty; }
 .house-track:focus-visible { outline-offset: -3px; }
 .still figure { margin: 0; transform-origin: 50% 60%; }
 .pin-house .still figure { transform: scale(var(--s, 1)); }
-.still-img { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 2px; background: var(--stone); }
+.still-img { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-4); background: var(--stone); }
 .still-img::after { content: ""; position: absolute; inset: 0; background: var(--night); opacity: var(--dim, 0); pointer-events: none; }
 .still-img img { width: 100%; height: 100%; object-fit: cover; transform: translateX(var(--px, 0%)) scale(1.12); }
 .still figcaption {
@@ -416,7 +416,7 @@ p { text-wrap: pretty; }
 }
 .bill-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
 
-.bill-stage { position: sticky; top: calc(var(--hdr-h) + 28px); margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 2px; background: var(--turq-ink); }
+.bill-stage { position: sticky; top: calc(var(--hdr-h) + 28px); margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius-4); background: var(--turq-ink); }
 .bill-layer { position: absolute; inset: 0; clip-path: inset(100% 0 0 0); }
 .bill-layer img { width: 100%; height: 100%; object-fit: cover; scale: 1.16; }
 .bill-layer.is-active { z-index: 2; clip-path: inset(0); }
@@ -497,7 +497,7 @@ p { text-wrap: pretty; }
 
 /* La foto del tema va limpia (sin velo): el nombre, la frase y el rótulo se colocan debajo, como en La casa y la Visita (CR1-07). */
 .topic-stage { position: relative; display: grid; gap: var(--space-3); }
-.topic-layers { position: relative; aspect-ratio: 3 / 2; /* 3:2 en escritorio: a 1280×800 la foto, el nombre y la frase del tema caben en la misma pantalla que la lista (CR2-02) */ overflow: hidden; border-radius: 2px; background: var(--stone); }
+.topic-layers { position: relative; aspect-ratio: 3 / 2; /* 3:2 en escritorio: a 1280×800 la foto, el nombre y la frase del tema caben en la misma pantalla que la lista (CR2-02) */ overflow: hidden; border-radius: var(--radius-4); background: var(--stone); }
 .topic-layer { position: absolute; inset: 0; }
 .topic-layer img { width: 100%; height: 100%; object-fit: cover; }
 .topic-card { display: grid; gap: 12px; }
@@ -747,11 +747,11 @@ p { text-wrap: pretty; }
 .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 36px 24px; margin: 0; padding: 0; list-style: none; }
 .cat-grid[hidden] { display: none; }
 .card { display: grid; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; content-visibility: auto; contain-intrinsic-size: auto var(--card-h); }
-.cover { position: relative; display: block; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 2px; background: var(--stone); transition: translate var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
+.cover { position: relative; display: block; aspect-ratio: 2 / 3; overflow: hidden; border-radius: var(--radius-3); box-shadow: var(--elev-1); background: var(--stone); transition: translate var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
 .cover img { width: 100%; height: 100%; object-fit: cover; }
 .cover--blank { display: grid; place-items: center; padding: 16px; background: var(--turq-ink); border: 1px solid var(--line-strong); }
 .cover-title { font: 780 var(--fs-body)/1.05 var(--f-sans); font-stretch: 70%; text-transform: uppercase; text-align: center; color: var(--turq-light); text-wrap: balance; }
-.card:hover .cover, .card:focus-visible .cover { translate: 0 -8px; box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--black) 20%, transparent); }
+.card:hover .cover, .card:focus-visible .cover { translate: 0 -8px; box-shadow: var(--elev-2); }
 .cat-more { margin-top: 40px; }
 .cat-empty { display: grid; gap: 20px; justify-items: start; padding: 48px 0; }
 .cat-empty[hidden] { display: none; }
@@ -777,7 +777,7 @@ p { text-wrap: pretty; }
 /* Escritorio: el grupo de cabecera de la ficha no existe como caja (el contenido fluye en la columna); en móvil se pone junto a la portada (mobile.css). */
 .drawer-head { display: contents; }
 .drawer-cover { width: min(220px, 56%); }
-.drawer-cover .cover { box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--black) 20%, transparent); }
+.drawer-cover .cover { box-shadow: var(--elev-2); }
 .drawer h3 { margin: 0; font: 820 clamp(1.9rem, 4vw, 2.7rem)/0.98 var(--f-sans); font-stretch: 72%; text-transform: uppercase; letter-spacing: -0.01em; text-wrap: balance; }
 .drawer-author { margin: 0; font: 600 var(--fs-3)/1.3 var(--f-sans); color: var(--paper-dim); }
 .drawer-facts { display: grid; grid-template-columns: auto 1fr; gap: 0 24px; margin: 12px 0 0; border-top: 2px solid var(--paper-ink); }
@@ -1074,7 +1074,7 @@ html.sheet-open { overflow: hidden; }
 .motion img.is-loaded[loading="lazy"] { animation: img-in var(--dur-base) var(--ease-out); }
 
 /* Elementos solo móviles: ocultos por defecto (mobile.css los muestra). */
-.tabbar, .hdr-wa, .hdr-more, .stories, .drawer-grabber { display: none; }
+.tabbar, .hdr-wa, .drawer-grabber { display: none; }
 
 /* Cartelera como carrusel (solo móvil): en escritorio la pista es transparente y las fotos de tarjeta no existen. */
 .bill-track { display: contents; }
@@ -1104,10 +1104,11 @@ html.sheet-open { overflow: hidden; }
 .rail-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .rail-chip {
   min-height: var(--target-coarse); padding: 0 var(--space-4); color: inherit; cursor: pointer;
-  font: 650 var(--fs-1)/1 var(--f-sans); background: none; border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
+  font: 650 var(--fs-1)/1 var(--f-sans); background: var(--paper); border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
+  box-shadow: var(--elev-1); /* piel suave: ficha blanca con sombra corta de dos capas; el filete mantiene el 3:1 */
   transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast);
 }
-.rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; } /* único código de «activo»: cápsula turquesa con texto blanco */
+.rail-chip[aria-checked="true"] { color: var(--white); background: var(--terra); border-color: transparent; box-shadow: none; } /* único código de «activo»: cápsula turquesa con texto blanco */
 .rail-viewport {
   margin-inline: calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) var(--space-4);
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none;
@@ -1173,7 +1174,7 @@ html.sheet-open { overflow: hidden; }
   position: fixed; inset: auto auto calc(env(safe-area-inset-bottom) + var(--space-5)) 50%; margin: 0; translate: -50% 0;
   display: none; align-items: center; gap: var(--space-3); width: max-content; max-width: min(92vw, 440px); padding: var(--space-2) var(--space-4);
   color: var(--paper-ink); font: 600 var(--fs-1)/1.3 var(--f-sans); background: var(--glass-solid); border: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); border-radius: var(--radius-pill);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--black) 18%, transparent); /* mismo cromo que la barra inferior */
+  box-shadow: var(--elev-2); /* mismo cromo que la barra inferior */
 }
 .toast:popover-open { display: flex; }
 .toast-action { white-space: nowrap; min-height: var(--target-coarse); padding: 0 var(--space-2); color: var(--terra-deep); font: inherit; font-weight: 750; cursor: pointer; background: none; border: 0; }

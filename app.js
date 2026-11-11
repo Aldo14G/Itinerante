@@ -359,7 +359,6 @@ async function boot() {
       },
       tick(dt, y) {
         hdr.classList.toggle('is-solid', y > 24);
-        root.classList.toggle('at-top', y < Math.min(240, vh * 0.3)); // móvil: la barra inferior espera a que se salga del perfil
         const probe = y + 34;
         const r = ranges.find(range => probe >= range.top && probe < range.bottom);
         const on = r ? r.theme : '';
@@ -547,7 +546,7 @@ async function boot() {
   // ---------- Menú móvil (hoja lateral con categorías que se despliegan) ----------
   (function sheetMenu() {
     const dlg = $('#sheet-menu');
-    const opener = $('.hdr-more');
+    const opener = $('[data-menu-open]'); // el menú vive en la barra inferior (quinto botón), al alcance del pulgar
     if (!dlg || !opener) return;
     const phone = matchMedia('(max-width: 760px)');
     const groups = $$('.sm-group', dlg);
@@ -906,16 +905,10 @@ async function boot() {
   (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
 
   await yieldNow();
-  // ---------- Perfil y publicaciones (móvil): historias de los destacados, «Me interesa» y «Compartir» ----------
+  // ---------- Publicaciones de Cartelera (móvil): «Me interesa» y «Compartir» ----------
   let feedLoad;
   const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => { feedLoad = undefined; throw err; }));
   document.addEventListener('click', e => {
-    const hl = e.target.closest('[data-story]');
-    if (hl) {
-      e.preventDefault();
-      loadFeed().then(m => m.openStory(hl.dataset.story, hl, TOPICS)).catch(() => { location.hash = hl.getAttribute('href'); }); // sin módulo: lleva al capítulo
-      return;
-    }
     const act = e.target.closest('[data-interest], [data-share]');
     if (act) loadFeed().then(m => m.onAct(act)).catch(() => {});
   });

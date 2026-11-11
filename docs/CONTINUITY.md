@@ -1,3 +1,14 @@
+# Continuidad de Itinerante — 2026-11-11 (rediseño móvil: sin historias, barra centrada, categorías y piel suave)
+
+- **Pedido de Aldo:** la experiencia debe sentirse como navegar una red social sin copiar sus secciones de historias; mejorar categorías, menú y navegación inferior; usar la plantilla de referencia (guía de estilo suave) con mejor textura y nuestra paleta.
+- **Fuera:** los cuatro destacados del inicio, el visor de historias (`feed.js` queda en 59 líneas: «Me interesa» y «Compartir»), sus estilos y miniaturas, la hamburguesa de la cabecera y el estado `at-top`.
+- **Barra inferior:** cápsula centrada con cinco botones de 48 px (cuatro capítulos y Menú); la activa muestra su nombre en cápsula `--terra`. Visible desde la primera pantalla sin tapar «Cómo llegar» (medido en 390, 360 y 320). Sin JavaScript no se muestra y la cabecera conserva los cuatro enlaces.
+- **Categorías:** colecciones (4) y temas (6) en rejilla de dos columnas en móvil; a 320 px cada chip mide 140×48 sin desbordar.
+- **Piel suave:** tokens `--elev-1/2/in` y `--radius-card`; chips, tarjetas de Cartelera, portadas, fotos, campo de búsqueda, aviso y primaria. El «activo» sigue siendo la cápsula `--terra` y los filetes mantienen 3:1.
+- **Rendimiento:** la foto vertical del inicio baja a 648×864 (66 KB): LCP 1.7 s con CPU 4× y 4G lenta (había subido a 2.5 s con la versión de 104 KB).
+- Verificación: `npm test`, `test:design`, crítica en baseline, feed 30/30 (antes 61: salieron las comprobaciones de historias), e2e 101/101, piso de oficio en verde, hero ≥ 4.5:1, 0 errores de consola. Móvil 8.9 pantallas (la rejilla de categorías añade dos filas).
+- Abierto: la hoja de menú repite los cuatro capítulos que ya están en la barra (podría quedarse solo con subtemas, Mi lista y contacto); los iconos sin nombre a la vista dependen de que se reconozcan (probar con usuarios); desktop conserva su cabecera con enlaces.
+
 # Continuidad de Itinerante — 2026-11-11 (fotos reales y piso de oficio)
 
 - **Fotos reales (pedido de Aldo):** se retiraron las 20 recreaciones y los 218 fotogramas generados. Vistas de La casa, Cartelera, temas de Poesía e Infantil, llegada, destacados e inicio usan fotos de la casa: publicadas por la cuenta oficial de Instagram (@sharonmirelesgong, @alfonso_boeta; tomadas de la rama `agent/atenea/casa-editorial-base`) y tres de Aldo. `assets/provenance.json` guarda fuente, autor y huella de cada una. **Pendiente de la librería: confirmar el permiso de uso de los dos fotógrafos**, o sustituir por la sesión profesional.

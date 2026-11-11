@@ -63,7 +63,6 @@
     <div class="hdr-end">
       <p class="status" data-status title="Horario habitual. Días festivos: confirma por WhatsApp."><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></p>
       <button class="hdr-list" type="button" data-open-mylist data-saved-badge hidden aria-label="Mi lista"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-saved-n>0</span></button>
-      <button class="hdr-more" type="button" aria-expanded="false" aria-controls="sheet-menu" aria-label="Abrir menú"><svg class="ic" aria-hidden="true"><use href="#t-menu"/></svg></button>
       <a class="hdr-wa" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer" aria-label="Escribir por WhatsApp"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
       <a class="btn btn--sm btn--tungsten hdr-cta" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer">Cómo llegar <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-btn-label">Menú</span><span class="menu-btn-lines" aria-hidden="true"></span></button>
@@ -127,6 +126,7 @@
     <a href="#cartelera"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-cartelera"/></svg></span><span class="tab-lb">Cartelera</span></a>
     <a href="#libros"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-libros"/></svg></span><span class="tab-lb">Libros</span></a>
     <a href="#visita"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-visita"/></svg></span><span class="tab-lb">Visita</span></a>
+    <button class="tab-menu" type="button" data-menu-open aria-expanded="false" aria-controls="sheet-menu"><span class="tab-ic"><svg aria-hidden="true"><use href="#t-menu"/></svg></span><span class="tab-lb">Menú</span></button>
   </nav>
 
   <main id="contenido">
@@ -159,15 +159,6 @@
             <li class="entry-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></li>
             <li><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mariano Matamoros Pte. 421&nbsp;·&nbsp;Centro</li>
           </ul>
-          <!-- Destacados (móvil): cada círculo abre una historia con fotos de la casa; sin JavaScript llevan al capítulo. -->
-          <nav class="hl" aria-label="Destacados">
-            <ul class="hl-list">
-              <li><a class="hl-item" href="#casa" data-story="casa" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets/img/hl-casa.webp" width="72" height="72" alt="" decoding="async"></span><span class="hl-lb">La casa<span class="sr-only">: ver fotos</span></span></a></li>
-              <li><a class="hl-item" href="#cartelera" data-story="cartelera" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets/img/hl-cartelera.webp" width="72" height="72" alt="" decoding="async"></span><span class="hl-lb">Cartelera<span class="sr-only">: ver fotos</span></span></a></li>
-              <li><a class="hl-item" href="#libros" data-story="libros" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets/img/hl-libros.webp" width="72" height="72" alt="" decoding="async"></span><span class="hl-lb">Libros<span class="sr-only">: ver fotos</span></span></a></li>
-              <li><a class="hl-item" href="#visita" data-story="visita" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets/img/hl-visita.webp" width="72" height="72" alt="" decoding="async"></span><span class="hl-lb">Visita<span class="sr-only">: ver fotos</span></span></a></li>
-            </ul>
-          </nav>
         </div>
       </div>
     </section>

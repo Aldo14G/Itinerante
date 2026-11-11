@@ -116,7 +116,7 @@ await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRec
 await ev(`document.querySelector('.rail-all').click()`);
 ck('móvil: «Ver todo el catálogo» abre la hoja', await waitFor(`document.getElementById('explorer').open`));
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
-await ev(`document.querySelector('.hdr-more').click()`); await sleep(800);
+await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800);
 await ev(`document.querySelector('#sheet-menu [aria-controls="sm-libros"]').click()`); await sleep(500);
 await ev(`document.querySelector('#sheet-menu a[href="#catalogo"]').click()`);
 ck('móvil: «Buscar en el catálogo» del menú cierra el menú y abre la hoja', await waitFor(`document.getElementById('explorer').open && !document.getElementById('sheet-menu').open`));

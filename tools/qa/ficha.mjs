@@ -1,4 +1,4 @@
-// Ficha móvil, historias y sin JavaScript (navegacion-desplegables, ronda 2: CR-15, CR-18, QA1-03).
+// Ficha móvil y sin JavaScript (navegacion-desplegables, ronda 2: CR-15, CR-18, QA1-03).
 // Uso: node tools/qa/ficha.mjs URL [DIR]   (necesita Chrome; DIR recibe capturas). Sale con 1 si algo falla.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
@@ -53,30 +53,12 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   ck(`${w}x${h}: Escape cierra y libera el scroll`, await ev(`!document.querySelector('#cat-drawer').open && !document.documentElement.classList.contains('sheet-open')`));
 }
 
-// CR-18: con teclado real, el foco de «Foto siguiente» no dibuja un marco sobre toda la zona de toque.
-await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
-await send('Page.navigate', { url: URL_ }); await sleep(4500);
-await ev(`scrollTo(0, 0)`); await sleep(500);
-const hl = await ev(`(() => { const r = document.querySelector('.hl-item').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
-await click(...hl); await sleep(1500);
-await press('Tab', 'Tab', 9); await sleep(300);
-const f = await ev(`(() => {
-  const a = document.activeElement; const r = a.getBoundingClientRect(); const fig = document.querySelector('dialog.story .story-fig').getBoundingClientRect();
-  const o = getComputedStyle(a); const ring = getComputedStyle(a, '::after');
-  return { cls: a.className, fv: a.matches(':focus-visible'), zone: [r.width, r.height], outline: o.outlineStyle, outlineColor: o.outlineColor, outlineArea: (o.outlineStyle === 'none' || o.outlineColor === 'transparent' || o.outlineColor.endsWith(', 0)')) ? 0 : r.width * r.height / (fig.width * fig.height),
-    ringW: parseFloat(ring.width), ringH: parseFloat(ring.height), ringOutline: parseFloat(ring.outlineWidth), ringStyle: ring.outlineStyle, ringBg: ring.backgroundColor, ringColor: ring.outlineColor };
-})()`);
-ck('historia: el foco por teclado llega a «Foto siguiente» y es :focus-visible', /story-nav--next/.test(f.cls) && f.fv, JSON.stringify(f));
-ck('historia: la zona de toque no dibuja marco (área del marco <= 25 % de la foto)', f.outlineArea <= 0.25, JSON.stringify(f));
-ck('historia: el indicador es visible (aro >= 2 px sólido, >= 44 px) y la zona de toque sigue >= 44 px', f.ringOutline >= 2 && f.ringStyle === 'solid' && f.ringW >= 44 && f.ringH >= 44 && f.zone[0] >= 44 && f.zone[1] >= 44, JSON.stringify(f));
-await shot('story-foco-siguiente.png');
-
-// QA1-03: sin JavaScript, «Abrir menú» no se muestra y los cuatro capítulos son alcanzables.
+// QA1-03: sin JavaScript, la barra inferior (con el botón de menú) no se muestra y los cuatro capítulos son alcanzables.
 await send('Emulation.setScriptExecutionDisabled', { value: true });
 await send('Page.navigate', { url: URL_ }); await sleep(2500);
-const nj = await ev(`(() => ({ js: document.documentElement.classList.contains('js'), more: getComputedStyle(document.querySelector('button.hdr-more')).display,
+const nj = await ev(`(() => ({ js: document.documentElement.classList.contains('js'), more: getComputedStyle(document.querySelector('.tabbar')).display,
   links: [...document.querySelectorAll('.hdr-nav a')].map(a => { const r = a.getBoundingClientRect(); return [a.getAttribute('href'), r.width > 0 && r.right > 0 && r.left < innerWidth, Math.round(r.height)]; }) }))()`);
-ck('sin JavaScript: button.hdr-more con display none', nj.js === false && nj.more === 'none', JSON.stringify(nj));
+ck('sin JavaScript: la barra inferior con el botón de menú no se muestra', nj.js === false && nj.more === 'none', JSON.stringify(nj));
 ck('sin JavaScript: los cuatro capítulos son alcanzables (>= 44 px de alto)', nj.links.length === 4 && nj.links.every(l => l[1] && l[2] >= 44), JSON.stringify(nj));
 await shot('nojs-390-top.png');
 

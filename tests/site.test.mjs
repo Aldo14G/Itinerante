@@ -7,7 +7,7 @@ import { pickBooks } from '../rail.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
 import { newsPlan, NEWS_SIZE } from '../news.js';
-import { STORY_KEYS, readInterest, shareName, initFeed } from '../feed.js';
+import { readInterest, shareName, initFeed } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
 import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
@@ -297,14 +297,14 @@ test('móvil: barra inferior con una pestaña por sección, iconos en el sprite 
 
 test('móvil: menú lateral con categorías desplegables accesibles y destinos reales', () => {
   const dlg = html.match(/<dialog class="sheet-menu"[\s\S]*?<\/dialog>/)[0];
-  assert.ok(/<button class="hdr-more"[^>]*aria-expanded="false"[^>]*aria-controls="sheet-menu"/.test(html), 'botón del menú con aria-expanded y aria-controls');
+  assert.ok(/<nav class="tabbar"[\s\S]*?<button class="tab-menu" type="button" data-menu-open aria-expanded="false" aria-controls="sheet-menu">[\s\S]*?<span class="tab-lb">Menú<\/span><\/button>\s*<\/nav>/.test(html) && !/hdr-more/.test(html + css + mobileCss), 'el botón del menú vive en la barra inferior (quinto botón, con nombre, aria-expanded y aria-controls); ya no hay hamburguesa en la cabecera');
   assert.ok(/aria-labelledby="sheet-menu-title"/.test(dlg) && /data-sm-close/.test(dlg), 'diálogo con título y botón de cierre');
   const rows = [...dlg.matchAll(/<button class="sm-row"[^>]*aria-expanded="false"[^>]*aria-controls="([a-z-]+)"/g)].map(m => m[1]);
   assert.deepEqual(rows, ['sm-cartelera', 'sm-libros', 'sm-visita'], 'acordeones en el orden de la barra inferior; Horarios vive dentro de Visita');
   const order = [...dlg.matchAll(/<(?:a|button) class="sm-row"[^>]*>[\s\S]*?<span class="sm-lb">([^<]+)/g)].map(m => m[1]);
   assert.deepEqual(order, ['La casa', 'Cartelera', 'Libros', 'Visita', 'Mi lista'], 'mismo orden y nombres que la cabecera y la barra; Mi lista aparte al final');
   const bar = [...html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0].matchAll(/<span class="tab-lb">([^<]+)/g)].map(m => m[1]);
-  assert.deepEqual(order.slice(0, 4), bar, 'las cuatro primeras filas repiten la barra inferior');
+  assert.deepEqual(bar, [...order.slice(0, 4), 'Menú'], 'la barra inferior lleva los cuatro capítulos en el mismo orden que el menú y, al final, el botón Menú');
   const foot = dlg.match(/<div class="sm-foot">[\s\S]*?<\/div>/)[0];
   assert.equal((foot.match(/btn--tungsten/g) || []).length, 1, 'una sola acción primaria en el menú');
   assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost"[^>]*wa\.me[\s\S]*Escribir por WhatsApp/.test(foot), '«Cómo llegar» es el primario y WhatsApp el secundario');
@@ -357,11 +357,12 @@ test('portadas y cabecera: tinta fija sobre superficies oscuras, también dentro
   assert.ok(/--cover-ink: #f8f8f8/.test(tokensCss) && /--cover-ink-dim: #cfe3df/.test(tokensCss));
   assert.ok(!/html\[data-glass="lite"\] \.hdr::before \{[^}]*background/.test(css), 'lite no pisa el tinte por sección de la cabecera');
   assert.ok(!/entry-credit/.test(html + css + mobileCss), 'el hero no lleva crédito ni rótulo sobre la foto');
-  assert.ok(/html\.at-top \.tabbar \{ translate: 0 calc\(100% \+ 24px\); \}/.test(mobileCss), 'la barra inferior espera fuera de la primera vista (el perfil no la reserva)');
-  assert.ok(/html\.at-top \.tabbar \{ visibility: hidden; \}/.test(mobileCss) && /\.tabbar \{[^}]*transition: translate var\(--dur-base\) var\(--spring\), visibility var\(--dur-base\);/.test(mobileCss.replaceAll('\n', ' ')), 'fuera de pantalla la barra inferior no recibe foco (visibility, con la duración de la salida)');
+  assert.ok(!/at-top/.test(mobileCss) && /\.entry-copy \{[^}]*padding-bottom: calc\(env\(safe-area-inset-bottom\) \+ var\(--tabbar-h\) \+ var\(--space-7\)\)/.test(mobileCss.replaceAll('\n', ' ')), 'la barra inferior está desde la primera vista y el perfil le reserva su sitio: «Cómo llegar» queda por encima');
+  assert.ok(/\.tabbar \{[^}]*width: fit-content;[^}]*margin-inline: auto;/.test(mobileCss.replaceAll('\n', ' ')) && /\.tabbar \{[^}]*box-shadow: var\(--elev-2\);/.test(mobileCss.replaceAll('\n', ' ')) && /\.tabbar \{[^}]*transition: translate var\(--dur-base\) var\(--spring\), visibility var\(--dur-base\);/.test(mobileCss.replaceAll('\n', ' ')), 'barra inferior centrada (no ocupa el ancho), con sombra suave de token y salida animada cuando una hoja ocupa la pantalla');
+  assert.ok(/\.tab-lb \{[^}]*clip-path: inset\(50%\)/.test(mobileCss) && /\.tabbar a\[aria-current="location"\] \.tab-lb \{ position: static;/.test(mobileCss) && /\.tabbar a, \.tab-menu \{[^}]*min-width: 48px; height: 48px;/.test(mobileCss.replaceAll('\n', ' ')), 'solo iconos de 48 px; el nombre existe siempre para lectores y se ve en la pestaña activa');
   assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileCss), 'sin JavaScript la barra inferior no tapa los destacados: la cabecera ya trae los cuatro enlaces');
   assert.ok(/\.hdr-brand, \.bill-foot a \{ min-height: 44px; \}/.test(mobileCss) && /\(min-width: 360px\) \{ \.hdr-brand span \{ white-space: nowrap; \} \}/.test(mobileCss), 'marca de la cabecera y enlace del pie de Cartelera de 44 px en móvil; nombre en un renglón desde 360 px');
-  assert.ok(/at-top/.test(await readFile(new URL('../assets/js/boot.js', import.meta.url), 'utf8')) && /classList\.toggle\('at-top'/.test(await readFile(new URL('../app.js', import.meta.url), 'utf8')), 'at-top lo fija boot.js y lo mantiene app.js');
+  assert.ok(!/at-top/.test(await readFile(new URL('../assets/js/boot.js', import.meta.url), 'utf8')) && !/at-top/.test(await readFile(new URL('../app.js', import.meta.url), 'utf8')), 'ya no existe el estado at-top: la barra no se esconde en la primera vista');
   // R01: bajo el perfil nada se maqueta hasta acercarse; cada sección lleva la altura de su contenido para que el largo y las anclas no se muevan.
   for (const sel of ['manifesto', 'house', 'bill', 'books', 'quote', 'call', 'visit', 'ftr']) {
     assert.ok(new RegExp(String.raw`\.${sel} \{ content-visibility: auto; contain-intrinsic-size: auto \d+px; \}`).test(mobileCss), `.${sel} con content-visibility: auto y altura estimada (móvil)`);
@@ -493,18 +494,11 @@ test('ficha móvil: portada y datos en dos columnas para que «Cómo llegar» qu
   assert.equal(note, '<p class="drawer-note">La librería confirma existencia y precio.</p>', 'la nota de la ficha solo dice lo que sirve: quién confirma existencia y precio');
 });
 
-test('sin JavaScript el botón del menú no se muestra y los cuatro capítulos siguen en la cabecera (QA1-03)', () => {
-  assert.ok(/html:not\(\.js\) \.hdr-more \{ display: none; \}/.test(mobileCss), 'button.hdr-more oculto sin la clase js de boot.js');
+test('sin JavaScript la barra con el botón del menú no se muestra y los cuatro capítulos siguen en la cabecera (QA1-03)', () => {
+  assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileCss), 'la barra inferior (y su botón de menú) se oculta sin la clase js de boot.js');
   assert.ok(/html:not\(\.js\) \.hdr-nav a \{[^}]*min-height: var\(--target-coarse\)/.test(mobileCss), 'enlaces de capítulo de 44 px sin JavaScript');
   const nav = html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0];
   for (const id of ['casa', 'cartelera', 'libros', 'visita']) assert.ok(nav.includes(`href="#${id}"`), `enlace a #${id} en la cabecera`);
-});
-
-test('historias: el foco del teclado se dibuja en un indicador de 44 px, no sobre la zona de toque (CR-18)', () => {
-  assert.ok(/\.story-nav:focus-visible \{ outline-color: transparent;/.test(mobileCss) && !/\.story-nav:focus-visible \{[^}]*outline: none/.test(mobileCss), 'la zona de toque no pinta marco de foco (transparente: el contraste forzado lo recupera)');
-  const ring = mobileCss.match(/\.story-nav:focus-visible::after \{[^}]*\}/)[0];
-  assert.ok(/width: var\(--target-coarse\); height: var\(--target-coarse\)/.test(ring) && /outline: 2px solid var\(--tungsten\)/.test(ring) && /background: var\(--night\)/.test(ring), 'indicador de 44 px con aro tungsteno de 2 px sobre disco oscuro');
-  assert.ok(/\.story-nav--next \{ right: 0; width: 65%; \}/.test(mobileCss), 'la zona de toque conserva su tamaño');
 });
 
 test('paleta: los campos de color a ancho completo no superan el croma del turquesa del logo; los acentos, un poco más', async () => {
@@ -696,8 +690,8 @@ test('Novedades: nada se presenta como ranking ni como inventario', async () => 
   for (const f of ['feed.js', 'news.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
 });
 
-test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única acción de la primera vista y destacados con historias', () => {
-  const copy = html.match(/<div class="entry-copy"[\s\S]*?<\/nav>/)[0];
+test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única acción de la primera vista, sin burbujas de historias', () => {
+  const copy = html.match(/<div class="entry-copy"[\s\S]*?<\/section>/)[0];
   assert.ok(/class="profile-av" src="assets\/img\/logo-96\.webp"[^>]*alt=""/.test(copy), 'avatar decorativo con el logo');
   assert.ok(/<h1 id="entry-title"[\s\S]*Librería Itinerante <i>y Más<\/i>/.test(copy), 'el h1 es el nombre del perfil');
   assert.ok(/data-status-text/.test(copy) && /Mariano Matamoros Pte\. 421/.test(copy), 'estado en vivo y dirección');
@@ -708,36 +702,9 @@ test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única ac
   assert.ok(/btn--ghost/.test(actions[1][1]) && /wa\.me/.test(actions[1][2]) && /Pregunta por un libro/.test(actions[1][3]), 'WhatsApp existe como secundaria (escritorio)');
   assert.ok(/\.entry-actions \.btn--ghost \{ display: none; \}/.test(mobileCss) && /\.entry-actions \{ grid-template-columns: 1fr; \}/.test(mobileCss), 'en móvil «Escribir» sale de la primera vista (Hick: <= 6 acciones); WhatsApp queda en la cabecera al desplazar, Cartelera, Libros y Visita');
   assert.ok(!/only-phone|hide-phone/.test(html + css + mobileCss), 'sin variantes de texto solo móvil');
-  const hl = [...copy.matchAll(/<a class="hl-item" href="#([a-z]+)" data-story="([a-z]+)" aria-haspopup="dialog"><span class="hl-ring"><img class="hl-img" src="assets\/(img\/[^"]+)"[^>]*alt=""[^>]*><\/span>/g)];
-  assert.deepEqual(hl.map(m => m[2]), STORY_KEYS, 'cuatro destacados, uno por capítulo');
-  assert.ok(hl.every(m => m[1] === m[2]) && hl.length >= 3, 'sin JavaScript cada destacado lleva a su capítulo');
-  const kind = new Map([...prov.real.map(f => [f.file, 'real']), ...prov.aiRecreation.map(f => [f.file, 'ai'])]);
-  for (const m of hl) assert.ok(kind.has(m[3]), `sin procedencia registrada: ${m[3]}`); // la miniatura tiene origen en provenance.json; no lleva insignia
-  assert.ok(!/hl-kind/.test(html + mobileCss), 'los destacados no llevan insignia IA/Foto');
-  assert.deepEqual(KINDS, ['ai', 'real'], 'la procedencia es un dato de dos valores; no se imprime ningún rótulo');
-  assert.ok(/\.profile-av, \.hl \{ display: none; \}/.test(css) && /\.hl \{ display: block; grid-area: hl; \}/.test(mobileCss), 'el perfil y los destacados son solo móvil');
-  assert.ok(/\.hl-img \{[^}]*background: var\(--stone\)/.test(mobileCss) && !/\.hl-img \{[^}]*(animation|terra|tungsten)/.test(mobileCss), 'el destacado sin foto se pinta con --stone (token), quieto: nunca el anillo del aro macizo');
-  assert.ok(/\.hl-item \{[^}]*min-width: 64px/.test(mobileCss) && /\.hl-ring \{[^}]*width: 68px; height: 68px/.test(mobileCss), 'destacados de ≥ 44 px');
-  assert.ok(/\.js \.hdr:not\(\.is-solid\) :is\(\.hdr-brand, \.hdr-wa\) \{ opacity: 0; visibility: hidden; \}/.test(mobileCss), 'al inicio la cabecera solo deja el menú; sin JS la marca sigue visible');
-});
-
-test('historias: el visor es un diálogo modal con foco, cierre, flechas y rótulo de procedencia en cada foto', async () => {
-  const feed = await readFile(here('./feed.js'), 'utf8');
-  const app = await readFile(here('./app.js'), 'utf8');
-  assert.ok(/openDialog\(v\.dlg\)/.test(feed) && /v\.close\.focus\(/.test(feed), 'modal por openDialog y foco inicial en el cierre');
-  assert.ok(/opener\?\.focus/.test(feed), 'el foco vuelve al destacado');
-  assert.ok(/ArrowRight/.test(feed) && /ArrowLeft/.test(feed), 'flechas');
-  assert.equal(validKind('ai'), 'ai');
-  assert.equal(validKind('real'), 'real');
-  for (const x of [undefined, null, '', 'toString', 'constructor', 'AI', 'otro']) assert.equal(validKind(x), null, `«${x}» no es una procedencia: sin rótulo no hay foto`);
-  assert.ok(!/'real' : 'ai'/.test(feed + await readFile(here('./app.js'), 'utf8')), 'ninguna imagen se rotula IA o real por omisión');
-  assert.ok(!/setInterval|setTimeout/.test(feed), 'sin avance automático (WCAG 2.2.2)');
-  assert.ok(/import\('\.\/feed\.js'\)/.test(app) && !/^import .*feed\.js/m.test(app), 'el visor se carga bajo demanda');
-  assert.ok(/catch\(\(\) => \{ location\.hash = hl\.getAttribute\('href'\); \}\)/.test(app), 'si el módulo no llega, el destacado lleva al capítulo');
-  // cada historia sale de fotos que ya están en la página y todas llevan rótulo
-  assert.equal(html.match(/<li class="still">/g).length, 6);
-  assert.ok(Object.values(TOPICS).every(t => validKind(t.kind)), 'los temas de Libros traen su procedencia como dato');
-  assert.ok(/\.story:modal \{[^}]*position: fixed; inset: 0/.test(mobileCss), 'pantalla completa');
+  assert.ok(!/class="hl\b|hl-item|data-story/.test(html) && !/\.hl\b|\.hl-|\.story|\.stories/.test(css + mobileCss), 'sin destacados ni visor de historias: ni marcado ni estilos (decisión del 2026-11-11)');
+  assert.ok(/\.profile-av \{ display: none; \}/.test(css) && /grid-template-areas: "av name" "av facts" "row row";/.test(mobileCss), 'el perfil es solo móvil y su retícula no reserva fila de destacados');
+  assert.ok(/\.js \.hdr:not\(\.is-solid\) :is\(\.hdr-brand, \.hdr-wa\) \{ opacity: 0; visibility: hidden; \}/.test(mobileCss), 'al inicio la cabecera va vacía sobre la foto (el menú vive en la barra inferior); sin JS la marca sigue visible');
 });
 
 test('Cartelera como publicaciones: foto, pie, «Me interesa» y «Compartir» locales, sin contadores ni fechas', async () => {
@@ -915,19 +882,11 @@ test('cierre móvil (CR-10): dirección con «Cómo llegar» de texto, redes y c
 });
 
 test('avatar del perfil (CR-12): el logotipo cuadrado se ve entero (cuadrado redondeado, no círculo)', () => {
-  for (const sel of ['profile-av', 'story-av']) {
+  for (const sel of ['profile-av']) {
     const rule = mobileCss.match(new RegExp(`\\.${sel} \\{[^}]*\\}`))[0];
     assert.ok(/border-radius: var\(--radius-3\)/.test(rule) && !/50%/.test(rule), `.${sel}: sin recorte circular`);
   }
   assert.ok(JSON.stringify(prov).includes('img/logo-96.webp'), 'el logo es un asset local con procedencia');
-});
-
-test('visor de historias: foto a pantalla completa (cover), velo corto en la base y botón en minúscula a mitad de frase', async () => {
-  const feed = await readFile(here('./feed.js'), 'utf8');
-  assert.ok(/\.story-fig \{ position: absolute; inset: 0;/.test(mobileCss) && /\.story-img \{[^}]*object-fit: cover/.test(mobileCss), 'la foto cubre la pantalla');
-  assert.ok(!/object-fit: contain/.test(mobileCss.match(/\.story-img \{[^}]*\}/)[0]), 'sin bandas negras');
-  assert.ok(/\.story-fig::after \{[\s\S]*?linear-gradient\(0deg/.test(mobileCss), 'velo en la base para el rótulo y los botones');
-  assert.ok(/STORY_GO = \{ casa: 'la casa'[^}]*\}/.test(feed) && /Ver \$\{STORY_GO\[key\]\} en la página/.test(feed) && !/Ver \$\{STORY_TITLE/.test(feed), '«Ver la casa en la página»');
 });
 
 test('plantilla: sin sellos de muestra ni rótulos de procedencia a la vista; la nota de la colección sigue aparte', async () => {

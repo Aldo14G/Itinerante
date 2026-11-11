@@ -103,7 +103,7 @@
     {
       "id": "U03",
       "area": "ux",
-      "enunciado": "Móvil con sensación de red social: encabezado tipo perfil con destacados que abren las historias, Cartelera como publicaciones (foto, pie, «Me interesa» y «Compartir» locales), Guardar y Mi lista.",
+      "enunciado": "Móvil con sensación de red social: encabezado tipo perfil sin burbujas de historias, barra inferior centrada con los cuatro capítulos y el menú, Cartelera como publicaciones (foto, pie, «Me interesa» y «Compartir» locales), Guardar y Mi lista.",
       "medir": "crítico + e2e propios",
       "dueño": "ux-movil-feed"
     },

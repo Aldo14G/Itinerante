@@ -56,12 +56,12 @@ for (const [w, h, mobile] of [[360, 740, true], [390, 844, true], [414, 896, tru
 for (const w of [360, 390]) {
   await open(w, 800);
   const A = 'menú ' + w;
-  const btn = await ev(`(()=>{const b=document.querySelector('.hdr-more'); const r=b.getBoundingClientRect(); return {shown:getComputedStyle(b).display!=='none', w:r.width, h:r.height, exp:b.getAttribute('aria-expanded'), ctl:b.getAttribute('aria-controls'), label:b.getAttribute('aria-label')}})()`);
-  check(A, 'botón visible ≥44px con aria', btn.shown && btn.w >= 44 && btn.h >= 44 && btn.exp === 'false' && btn.ctl === 'sheet-menu' && btn.label, JSON.stringify(btn));
+  const btn = await ev(`(()=>{const b=document.querySelector('[data-menu-open]'); const r=b.getBoundingClientRect(); return {shown:getComputedStyle(b).display!=='none', w:r.width, h:r.height, exp:b.getAttribute('aria-expanded'), ctl:b.getAttribute('aria-controls'), label:b.getAttribute('aria-label') || b.textContent.trim()}})()`);
+  check(A, 'botón de menú en la barra inferior, visible, ≥44px, con nombre y aria', btn.shown && btn.w >= 44 && btn.h >= 44 && btn.exp === 'false' && btn.ctl === 'sheet-menu' && btn.label, JSON.stringify(btn));
   const desktopMenuHidden = await ev(`getComputedStyle(document.querySelector('.menu-btn')).display==='none'`);
   check(A, 'botón de escritorio oculto en móvil', desktopMenuHidden);
-  await ev(`document.querySelector('.hdr-more').click()`); await sleep(700);
-  const s1 = await ev(`(()=>{const d=document.querySelector('#sheet-menu'); const r=d.getBoundingClientRect(); return {open:d.open, x:Math.round(r.x), w:Math.round(r.width), vw:innerWidth, active:document.activeElement.className, sheet:document.documentElement.classList.contains('sheet-open'), lock:getComputedStyle(document.documentElement).overflow, exp:document.querySelector('.hdr-more').getAttribute('aria-expanded'), tabbarHidden:document.querySelector('.tabbar').getBoundingClientRect().top>=innerHeight-1, modal:d.matches(':modal'), label:d.getAttribute('aria-labelledby')}})()`);
+  await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(700);
+  const s1 = await ev(`(()=>{const d=document.querySelector('#sheet-menu'); const r=d.getBoundingClientRect(); return {open:d.open, x:Math.round(r.x), w:Math.round(r.width), vw:innerWidth, active:document.activeElement.className, sheet:document.documentElement.classList.contains('sheet-open'), lock:getComputedStyle(document.documentElement).overflow, exp:document.querySelector('[data-menu-open]').getAttribute('aria-expanded'), tabbarHidden:document.querySelector('.tabbar').getBoundingClientRect().top>=innerHeight-1, modal:d.matches(':modal'), label:d.getAttribute('aria-labelledby')}})()`);
   check(A, 'abre como modal, foco en cierre, scroll bloqueado, barra inferior oculta', s1.open && s1.modal && s1.x === 0 && /sm-close/.test(s1.active) && s1.sheet && s1.lock === 'hidden' && s1.exp === 'true' && s1.tabbarHidden, JSON.stringify(s1));
   check(A, 'ancho del panel ≤ 88vw y ≤360', s1.w <= Math.min(s1.vw * 0.88 + 1, 361), s1.w);
   const rows = await ev(`[...document.querySelectorAll('#sheet-menu .sm-row')].map(r=>Math.round(r.getBoundingClientRect().height))`);
@@ -81,10 +81,10 @@ for (const w of [360, 390]) {
   check(A, 'el foco no escapa con Tab (trampa modal)', !escaped);
   // Escape
   await key('Escape', 'Escape', 27); await sleep(500);
-  const s2 = await ev(`({open:document.querySelector('#sheet-menu').open, focus:document.activeElement.className, sheet:document.documentElement.classList.contains('sheet-open'), exp:document.querySelector('.hdr-more').getAttribute('aria-expanded'), groups:[...document.querySelectorAll('#sheet-menu .sm-row[aria-controls]')].map(b=>b.getAttribute('aria-expanded'))})`);
-  check(A, 'Escape cierra, devuelve foco y restablece categorías', !s2.open && /hdr-more/.test(s2.focus) && !s2.sheet && s2.exp === 'false' && s2.groups.every(g => g === 'false'), JSON.stringify(s2));
+  const s2 = await ev(`({open:document.querySelector('#sheet-menu').open, focus:document.activeElement.className, sheet:document.documentElement.classList.contains('sheet-open'), exp:document.querySelector('[data-menu-open]').getAttribute('aria-expanded'), groups:[...document.querySelectorAll('#sheet-menu .sm-row[aria-controls]')].map(b=>b.getAttribute('aria-expanded'))})`);
+  check(A, 'Escape cierra, devuelve foco y restablece categorías', !s2.open && /tab-menu/.test(s2.focus) && !s2.sheet && s2.exp === 'false' && s2.groups.every(g => g === 'false'), JSON.stringify(s2));
   // navegación a tema
-  await ev(`document.querySelector('.hdr-more').click()`); await sleep(600);
+  await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(600);
   await ev(`document.querySelector('#sheet-menu [aria-controls="sm-libros"]').click()`); await sleep(400);
   await ev(`document.querySelector('[data-topic-go="poesia"]').click()`); await sleep(2200);
   const nav = await ev(`({closed:!document.querySelector('#sheet-menu').open, checked:document.querySelector('.topic[data-topic="poesia"]').getAttribute('aria-checked'), top:Math.round(document.querySelector('#libros').getBoundingClientRect().top), y:scrollY})`);
@@ -92,13 +92,13 @@ for (const w of [360, 390]) {
   check(A, 'tras navegar el foco va al título de la sección destino', foc === 'libros', foc);
   check(A, 'Libros → Poesía cierra, navega y selecciona el tema', nav.closed && nav.checked === 'true' && Math.abs(nav.top) < 900 && nav.y > 1000, JSON.stringify(nav));
   // navegación a cartelera
-  await ev(`document.querySelector('.hdr-more').click()`); await sleep(600);
+  await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(600);
   await ev(`document.querySelector('#sheet-menu [aria-controls="sm-cartelera"]').click()`); await sleep(400);
   await ev(`document.querySelector('[data-bill-go="2"]').click()`); await sleep(2200);
   const bill = await ev(`({closed:!document.querySelector('#sheet-menu').open, sl:Math.round(document.querySelector('.bill-track').scrollLeft), dot:[...document.querySelectorAll('.bill-dots i')].findIndex(i=>i.classList.contains('is-on'))})`);
   check(A, 'Eventos → Taller desplaza el carrusel y marca el punto', bill.closed && bill.sl > 200 && bill.dot === 2, JSON.stringify(bill));
   // horarios: contenido real
-  await ev(`document.querySelector('.hdr-more').click()`); await sleep(600);
+  await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(600);
   await ev(`document.querySelector('#sheet-menu [aria-controls="sm-visita"]').click()`); await sleep(500);
   const hrs = await ev(`document.querySelector('#sm-visita').innerText`);
   check(A, 'Visita incluye horarios: lunes–sábado 11:00–20:00 y domingo cerrado', /11:00.{0,3}20:00/.test(hrs) && /Domingo\s*Cerrado/.test(hrs), hrs);
@@ -212,7 +212,7 @@ check('catálogo', 'Escape cierra la ficha y libera el scroll', await ev(`!docum
 await open(390, 844, { reduced: true });
 const rm = await ev(`({motion:document.documentElement.classList.contains('motion'), anims:document.getAnimations().filter(a=>a.playState==='running'&&a.effect?.getTiming().iterations===Infinity).length})`);
 check('movimiento reducido', 'sin clase motion ni animaciones infinitas', !rm.motion && rm.anims === 0, JSON.stringify(rm));
-await ev(`document.querySelector('.hdr-more').click()`); await sleep(500);
+await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(500);
 const rmm = await ev(`({open:document.querySelector('#sheet-menu').open, x:Math.round(document.querySelector('#sheet-menu').getBoundingClientRect().x)})`);
 check('movimiento reducido', 'el menú abre sin deslizar', rmm.open && rmm.x === 0, JSON.stringify(rmm));
 await key('Escape', 'Escape', 27);
@@ -220,7 +220,7 @@ check('movimiento reducido', 'sin errores de consola', !problems.length, problem
 
 // ---------- 7. Escritorio: cabecera y anclas ----------
 await open(1280, 800, { mobile: false });
-const dk = await ev(`(()=>{const q=s=>document.querySelector(s); return {more:getComputedStyle(q('.hdr-more')).display, tab:getComputedStyle(q('.tabbar')).display, nav:[...document.querySelectorAll('.hdr-nav a')].map(a=>a.getAttribute('href')), canvas:getComputedStyle(q('.entry-canvas')).display}})()`);
+const dk = await ev(`(()=>{const q=s=>document.querySelector(s); return {more:(q('[data-menu-open]').getClientRects().length ? 'block' : 'none'), tab:getComputedStyle(q('.tabbar')).display, nav:[...document.querySelectorAll('.hdr-nav a')].map(a=>a.getAttribute('href')), canvas:getComputedStyle(q('.entry-canvas')).display}})()`);
 check('escritorio', 'sin menú móvil ni barra inferior; hay navegación y el inicio es una foto fija (sin lienzo de fotogramas)', dk.more === 'none' && dk.tab === 'none' && dk.nav.length >= 4 && dk.canvas === 'none', JSON.stringify(dk));
 const anchors = await ev(`(()=>{const bad=[]; document.querySelectorAll('a[href^="#"]').forEach(a=>{const id=a.getAttribute('href').slice(1); if(id && !document.getElementById(id)) bad.push(id)}); return bad})()`);
 check('escritorio', 'todas las anclas internas existen', !anchors.length, JSON.stringify(anchors));

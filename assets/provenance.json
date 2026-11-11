@@ -52,22 +52,13 @@
       "sha256": "bdecb4611aa033366103a07260f3a0335f49880c60c7c1dde9e0bb7236505703"
     },
     {
-      "file": "img/hl-libros.webp",
-      "origin": "recorte cuadrado 144x144 de img/libro-narrativa.webp (destacado de Libros)",
-      "source": "_archive/reference-inputs/2026-10-27-official-interiors/photo-05.jpg",
-      "sourceSha256": "41884c234d8e03988b0fc74feab0c64f0257783d20157f01a3d99a529d1fb55a",
-      "derivedFrom": "img/libro-narrativa.webp",
-      "command": "sharp resize 144x144 cover centre, webp q78",
-      "sha256": "54e63173b4363010e84e26632f4fc803cf02c510386368ef875a99dd25dabdb9"
-    },
-    {
       "file": "img/inicio-sala-m.webp",
-      "origin": "reducción a 810x1080 de la foto completa",
+      "origin": "reducción a 648x864 de la foto completa",
       "source": "Instagram oficial, diapositiva 1 (docs/cuaderno-de-margen/fotos/ig-09.jpg en la rama agent/atenea/casa-editorial-base)",
       "post": "https://www.instagram.com/p/Ddwk2NFlviR/",
       "author": "@alfonso_boeta",
       "account": "@libreriaitineranteymasmty",
-      "sha256": "f1439290655484fcbf9e3abecece5f52a2628b4099629986b3da0a4b54cdba75"
+      "sha256": "b4006bb31747dad0ccbd2c9753db5eaae21a1ffdefeee1d239e4c17cfa060222"
     },
     {
       "file": "img/01-entrada-pasillo.webp",
@@ -211,31 +202,6 @@
       "date": "2026-11-10",
       "note": "foto de teléfono tomada en la casa (Matamoros 421)",
       "sha256": "78b994c5fdaa90263e2431009f652f05ac19b77f9475c6eb61ca6567ca893d11"
-    },
-    {
-      "file": "img/hl-casa.webp",
-      "origin": "recorte cuadrado de la foto del pasillo, 144x144",
-      "author": "Aldo G. Pineda",
-      "date": "2026-11-10",
-      "note": "foto de teléfono tomada en la casa (Matamoros 421)",
-      "sha256": "c1c4d50031ce15dbdae60258a3277acd8cb464d845c94384f9d0dd81b021ea40"
-    },
-    {
-      "file": "img/hl-cartelera.webp",
-      "origin": "recorte cuadrado 144x144",
-      "source": "Instagram oficial, diapositiva 1 (docs/cuaderno-de-margen/fotos/ig-09.jpg en la rama agent/atenea/casa-editorial-base)",
-      "post": "https://www.instagram.com/p/Ddwk2NFlviR/",
-      "author": "@alfonso_boeta",
-      "account": "@libreriaitineranteymasmty",
-      "sha256": "5d7812998507f1631308d1b9c858e58c7e2953508954ced658cd43b28da48d1c"
-    },
-    {
-      "file": "img/hl-visita.webp",
-      "origin": "recorte cuadrado de la foto de la sala, 144x144",
-      "author": "Aldo G. Pineda",
-      "date": "2026-11-10",
-      "note": "foto de teléfono tomada en la casa (Matamoros 421)",
-      "sha256": "bce4f60fb18fa1a4896f413670cb7b2b80b0bf4ea39f2c3c5620607df2cc2a9a"
     }
   ],
   "aiRecreation": [],

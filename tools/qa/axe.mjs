@@ -45,7 +45,7 @@ await open(390, 844, true);
 await audit('móvil 390: inicio', MANIFESTO);
 await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
 await audit('móvil 390: manifiesto revelado');
-await ev(`document.querySelector('.hdr-more').click()`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(700);
+await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(700);
 await ev(`document.querySelector('#sheet-menu .sm-group:nth-of-type(3) .sm-row').click()`); await sleep(500);
 await audit('móvil 390: menú lateral con Libros abierto');
 await ev(`document.getElementById('sheet-menu').close()`); await sleep(500);
@@ -55,7 +55,7 @@ await audit('móvil 390: hoja Explorar con el catálogo');
 await ev(`document.querySelector('#explorer button.card').click()`); await waitFor(`document.getElementById('cat-drawer') && document.getElementById('cat-drawer').open`); await sleep(800);
 await audit('móvil 390: ficha sobre Explorar');
 await ev(`document.getElementById('cat-drawer').close(); document.getElementById('explorer').close()`); await sleep(600);
-await ev(`document.querySelector('[data-open-mylist]') ? (document.querySelector('.hdr-more').click(), true) : false`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(500);
+await ev(`document.querySelector('[data-open-mylist]') ? (document.querySelector('[data-menu-open]').click(), true) : false`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(500);
 await ev(`document.querySelector('[data-open-mylist]').click()`); await waitFor(`document.getElementById('mylist').open`, 30); await sleep(800);
 await audit('móvil 390: Mi lista (vacía)');
 

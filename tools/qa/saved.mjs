@@ -100,7 +100,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   }
 
   // abrir Mi lista desde el aviso o el menú
-  if (mobile) { await ev(`document.querySelector('.hdr-more').click()`); await sleep(800); await ev(`document.querySelector('#sheet-menu [data-open-mylist]').click()`); }
+  if (mobile) { await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800); await ev(`document.querySelector('#sheet-menu [data-open-mylist]').click()`); }
   else { await ev(`document.querySelector('.hdr-list').click()`); }
   await sleep(1500);
   const ml = await ev(`(() => {

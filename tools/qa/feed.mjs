@@ -1,7 +1,6 @@
 // Móvil con sensación de red social (U03), Novedades (U04) y una sola acción primaria (U01/D10).
 // node feed.mjs <url> [outDir]   Sale con código ≠ 0 si algo falla.
-//  1. Primera vista (390x844): perfil (nombre, estado, dirección, «Cómo llegar» como única acción de contacto) y ≥ 3 destacados visibles; ≤ 6 acciones visibles en 390x844, 360x740 y 375x667 (U02/D11); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
-//  2. Cada destacado abre una historia: modal, foco en el cierre, rótulo de procedencia en cada foto, flechas, Escape y «atrás» cierran, el foco vuelve.
+//  1. Primera vista (390x844): perfil (nombre, estado, dirección, «Cómo llegar» como única acción de contacto), sin burbujas de historias y con la barra inferior a la vista; ≤ 6 acciones visibles en 390x844, 360x740 y 375x667 (U02/D11); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
 //  3. Cartelera como publicaciones: encabezado → foto → acciones → texto (DOM y pantalla), «Me interesa» (aria-pressed, persistente) y «Compartir» (Web Share y respaldo de copiar) de ≥ 44 px, con nombre accesible propio.
 //  4. Novedades: sin datos no queda ningún nodo visible ni espacio; con ids se pinta sin avisos de muestra.
 //  5. Barrido de acciones primarias en 390x844 y 1280x800: a lo sumo una por pantalla, siempre «Cómo llegar», y ningún WhatsApp mayor que ella.
@@ -67,7 +66,7 @@ const first = await ev(`(()=>{
   const vis = e => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && cs.visibility !== 'hidden' && cs.display !== 'none'; };
   const q = s => document.querySelector(s);
   const act = [...document.querySelectorAll('a[href], button')].filter(e => vis(e) && !e.closest('[aria-hidden="true"], [hidden]'));
-  const hl = [...document.querySelectorAll('.hl-item')].map(a => ({ vis: vis(a), r: a.getBoundingClientRect().toJSON(), name: a.textContent.trim() }));
+  const hl = document.querySelectorAll('.hl, .hl-item, [data-story], dialog.story').length;
   const cta = q('.entry-actions a:first-child'), wa = q('.entry-actions a:last-child');
   return {
     name: q('.entry-title').getBoundingClientRect().height > 10 && q('.entry-title').textContent.trim(),
@@ -76,16 +75,16 @@ const first = await ev(`(()=>{
     avatar: vis(q('.profile-av')),
     cta: { txt: cta.innerText.trim(), cls: cta.className, h: cta.getBoundingClientRect().height, vis: vis(cta) },
     wa: { txt: wa.innerText.trim(), cls: wa.className, h: wa.getBoundingClientRect().height, vis: vis(wa) },
-    hl, tab: q('.tabbar').getBoundingClientRect().top >= innerHeight - 1, brandHidden: !vis(q('.hdr-brand')),
+    hl, tab: vis(q('.tabbar')), tabTop: Math.round(q('.tabbar').getBoundingClientRect().top), ctaBottom: Math.round(cta.getBoundingClientRect().bottom), tabItems: [...document.querySelectorAll('.tabbar a, .tab-menu')].map(e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), e.textContent.trim()]; }), barBox: (() => { const r = q('.tabbar').getBoundingClientRect(); return [Math.round(r.left), Math.round(innerWidth - r.right)]; })(), brandHidden: !vis(q('.hdr-brand')),
     actions: act.map(e => (e.className || e.tagName) + ':' + e.textContent.trim().slice(0, 20))
   };
 })()`);
 await shot('01-perfil-390x844.jpg');
 check('perfil', 'nombre, estado de hoy, dirección y avatar visibles', first.name && /Itinerante/.test(first.name) && first.statusVis && /Abierto|Cerrad|Cierra/.test(first.status) && first.address && first.avatar, JSON.stringify(first).slice(0, 400));
 check('perfil', '«Cómo llegar» primaria de ≥ 44 px y «Escribir» fuera de la primera vista (D11)', first.cta.vis && /^Cómo llegar/.test(first.cta.txt) && /btn--tungsten/.test(first.cta.cls) && first.cta.h >= 44 && !first.wa.vis && !first.actions.some(a => /Escribir|Pregunta por un libro/.test(a)), JSON.stringify([first.cta, first.wa]));
-const hlVisible = first.hl.filter(h => h.vis);
-check('destacados', '≥ 3 destacados visibles en la primera vista, de ≥ 44 px', hlVisible.length >= 3 && first.hl.every(h => h.r.width >= 44 && h.r.height >= 44), JSON.stringify(first.hl));
-check('primera vista', `acciones visibles en la primera vista (${first.actions.length}): barra inferior y marca esperan al desplazamiento`, first.tab && first.brandHidden && first.actions.length <= 6, JSON.stringify(first.actions));
+check('primera vista', 'sin burbujas de historias: ni destacados ni visor', first.hl === 0, String(first.hl));
+check('barra inferior', 'a la vista desde la primera pantalla, centrada, sin tapar «Cómo llegar»; cinco botones de ≥ 44 px con nombre (cuatro capítulos y Menú)', first.tab && first.tabTop >= first.ctaBottom + 8 && Math.abs(first.barBox[0] - first.barBox[1]) <= 1 && first.tabItems.length === 5 && first.tabItems.every(t => t[0] >= 44 && t[1] >= 44 && t[2]) && first.tabItems[4][2] === 'Menú', JSON.stringify([first.tabTop, first.ctaBottom, first.barBox, first.tabItems]));
+check('primera vista', `acciones visibles en la primera vista (${first.actions.length} ≤ 6): «Cómo llegar» y la barra; la marca espera al desplazamiento`, first.tab && first.brandHidden && first.actions.length <= 6, JSON.stringify(first.actions));
 for (const [vw, vh] of [[360, 740], [375, 667]]) {
   await open(vw, vh, { reset: true });
   const n = await ev(`[...document.querySelectorAll('a[href], button')].filter(e => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && cs.visibility !== 'hidden' && cs.display !== 'none' && !e.closest('[aria-hidden="true"], [hidden], [inert]'); }).map(e => (e.className || e.tagName) + ':' + e.textContent.trim().slice(0, 14))`);
@@ -97,44 +96,6 @@ const hdrWa = await ev(`(()=>{ const a = document.querySelector('.hdr-wa'); cons
 check('perfil', 'al desplazar, WhatsApp está en la cabecera (≥ 44 px)', hdrWa.vis && hdrWa.w >= 44 && /wa\.me\/528180875940/.test(hdrWa.href), JSON.stringify(hdrWa));
 await open(390, 844, { reset: true });
 check('consola', 'sin errores de consola en la primera vista', !problems.length, problems.join(' | '));
-
-// ---------- 2. Cada destacado abre una historia ----------
-for (let n = 0; n < 4; n++) {
-  await open(390, 844);
-  const meta = await ev(`(()=>{const a=document.querySelectorAll('.hl-item')[${n}]; return {key:a.dataset.story, label:a.querySelector('.hl-lb').firstChild.textContent.trim()}})()`);
-  const A = `historia ${meta.label}`;
-  await clickSel('.hl-item', n);
-  await sleep(700);
-  const s = await ev(`(()=>{const d=document.querySelector('dialog.story'); if(!d) return null; const q=x=>d.querySelector(x);
-    return {open:d.open, modal:d.matches(':modal'), label:d.getAttribute('aria-label'), active:document.activeElement.className, sheet:document.documentElement.classList.contains('sheet-open'),
-      bars:d.querySelectorAll('.stories i').length, tag:q('.story-cap .tag')?.textContent, tagCls:q('.story-cap .tag')?.className, title:q('.story-t')?.textContent, imgOk:q('.story-img').naturalWidth>0,
-      cta:q('.story-foot .btn--tungsten')?.textContent.trim(), prim:d.querySelectorAll('.btn--tungsten').length,
-      close:Math.round(q('.story-close').getBoundingClientRect().width), next:q('.story-nav--next').getBoundingClientRect().toJSON()}})()`);
-  check(A, 'abre como modal con foco en el cierre y el scroll bloqueado', s && s.open && s.modal && /story-close/.test(s.active) && s.sheet && /Historia/.test(s.label) && s.close >= 44, JSON.stringify(s));
-  check(A, 'cada foto carga con su título y sin rótulo de procedencia', s && !s.tag && s.title && s.imgOk && s.bars >= 2, JSON.stringify(s));
-  check(A, 'una sola acción primaria en la hoja y es «Cómo llegar»', s && s.prim === 1 && /^Cómo llegar/.test(s.cta), JSON.stringify(s));
-  if (n === 0) await shot('02-historia-casa.jpg');
-  // recorre todas las fotos con la flecha: sin rótulo, y el progreso coincide con la barra
-  const walk = await ev(`(async()=>{const d=document.querySelector('dialog.story'); const out=[]; const total=d.querySelectorAll('.stories i').length;
-    for(let i=0;i<total;i++){ const t=d.querySelector('.story-cap .tag'); out.push({i, tag:t?.textContent, seen:d.querySelectorAll('.stories i.is-seen').length, live:d.querySelector('[aria-live]').textContent});
-      if(i<total-1){ d.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true})); await new Promise(r=>setTimeout(r,60)); } }
-    return out})()`);
-  check(A, `recorre ${walk.length} fotos sin rótulo, con progreso y aviso para lectores`, walk.length >= 2 && walk.every((w, i) => !w.tag && !/Recreación IA|Foto real/.test(w.live) && w.seen === i + 1 && new RegExp(`Foto ${i + 1} de ${walk.length}`).test(w.live)), JSON.stringify(walk));
-  // Escape cierra y el foco vuelve al destacado
-  await key('Escape', 'Escape', 27); await sleep(500);
-  const e1 = await ev(`({open:!!document.querySelector('dialog.story')?.open, sheet:document.documentElement.classList.contains('sheet-open'), lock:getComputedStyle(document.documentElement).overflow, focus:document.activeElement.dataset.story, seen:document.querySelectorAll('.hl-item')[${n}].classList.contains('is-seen'), url:location.hash})`);
-  check(A, 'Escape cierra, libera el scroll y el foco vuelve al destacado', !e1.open && !e1.sheet && e1.focus === meta.key && e1.seen && e1.url === '', JSON.stringify(e1));
-  // botón de cierre y «atrás»
-  await clickSel('.hl-item', n); await sleep(600);
-  await clickSel('dialog.story .story-close'); await sleep(500);
-  const e2 = await ev(`({open:!!document.querySelector('dialog.story')?.open, sheet:document.documentElement.classList.contains('sheet-open'), focus:document.activeElement.dataset.story, len:history.length})`);
-  check(A, 'el botón de cierre cierra y devuelve el foco', !e2.open && !e2.sheet && e2.focus === meta.key, JSON.stringify(e2));
-  await clickSel('.hl-item', n); await sleep(600);
-  await ev(`history.back()`); await sleep(700);
-  const e3 = await ev(`({open:!!document.querySelector('dialog.story')?.open, sheet:document.documentElement.classList.contains('sheet-open'), path:location.pathname})`);
-  check(A, '«atrás» cierra la historia sin salir del sitio', !e3.open && !e3.sheet && /\/$|index\.html$/.test(e3.path), JSON.stringify(e3));
-  check(A, 'sin errores de consola', !problems.length, problems.join(' | '));
-}
 
 // ---------- 3. Cartelera como publicaciones ----------
 await open(390, 844, { reset: true });
@@ -182,7 +143,7 @@ check('cartelera', 'cancelar la hoja de compartir no copia nada', (await ev(`win
 check('cartelera', 'sin errores de consola', !problems.length, problems.join(' | '));
 // sin números ni reseñas inventadas en el feed
 const feedText = await ev(`[...document.querySelectorAll('.hl, .profile-av, .bill-acts, .entry-copy, .news')].map(e => e.innerText).join(' ')`);
-check('verdad', 'sin contadores, reseñas, precios ni fechas inventadas en perfil, destacados y publicaciones', !/(\\d+\\s*(me gusta|likes?|seguidores|reseñas|opiniones|vistas))|★|\\$\\s?\\d|\\bmás leídos\\b|\\bagotad/i.test(feedText || ''), feedText);
+check('verdad', 'sin contadores, reseñas, precios ni fechas inventadas en perfil y publicaciones', !/(\\d+\\s*(me gusta|likes?|seguidores|reseñas|opiniones|vistas))|★|\\$\\s?\\d|\\bmás leídos\\b|\\bagotad/i.test(feedText || ''), feedText);
 
 // ---------- 4. Novedades ----------
 const sample = JSON.parse(readFileSync(new URL('../../assets/data/catalog.json', import.meta.url), 'utf8')).books;
@@ -249,12 +210,11 @@ const sheetPrim = async (name, opener) => {
   sheets.push({ name, ...r });
   await key('Escape', 'Escape', 27); await sleep(600);
 };
-await sheetPrim('menú', () => clickSel('.hdr-more'));
+await sheetPrim('menú', () => clickSel('[data-menu-open]'));
 await sheetPrim('Mi lista', async () => { await ev(`localStorage.setItem('iti-saved-v1', JSON.stringify(['${sample[0].id}']))`); await ev(`document.querySelector('[data-open-mylist]')?.click?.()`); });
-await sheetPrim('historia', () => clickSel('.hl-item', 0));
 await ev(`scrollTo(0,0)`);
 await sheetPrim('Explorar', async () => { await ev(`document.querySelector('[data-ex-open]').scrollIntoView({block:'center'})`); await sleep(500); await clickSel('[data-ex-open]'); await sleep(2000); });
-check('primaria', 'hojas abiertas (menú, Mi lista, historia): una sola primaria «Cómo llegar» y ningún WhatsApp mayor', sheets.filter(s => s.id).every(s => s.prim.length <= 1 && s.prim.every(t => /^Cómo llegar/.test(t)) && s.maxWa <= (s.maxPrim || Infinity)) && sheets.filter(s => ['menú', 'historia'].includes(s.name)).every(s => s.id && s.prim.length === 1), JSON.stringify(sheets));
+check('primaria', 'hojas abiertas (menú, Mi lista): una sola primaria «Cómo llegar» y ningún WhatsApp mayor', sheets.filter(s => s.id).every(s => s.prim.length <= 1 && s.prim.every(t => /^Cómo llegar/.test(t)) && s.maxWa <= (s.maxPrim || Infinity)) && sheets.filter(s => ['menú', 'historia'].includes(s.name)).every(s => s.id && s.prim.length === 1), JSON.stringify(sheets));
 check('consola', 'sin errores de consola en el barrido', !problems.length, problems.join(' | '));
 
 const failed = report.filter(r => !r.ok);

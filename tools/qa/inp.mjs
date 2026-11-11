@@ -52,7 +52,7 @@ const INSTALL = `
 `;
 
 const steps = [
-  ['menú abrir', async () => { await click('.hdr-more'); }],
+  ['menú abrir', async () => { await click('[data-menu-open]'); }],
   ['menú cerrar', async () => { await click('[data-sm-close]'); }],
   ['chip carrusel', async () => { await ev(`document.querySelector('[data-rail]').scrollIntoView()`); await sleep(2500); await click('.rail-chip:not([aria-checked=true])'); }],
   ['guardar', async () => { await click('.rail-item .save'); }],

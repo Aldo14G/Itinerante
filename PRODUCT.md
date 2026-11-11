@@ -42,8 +42,9 @@ genérico.
 - La Cartelera comunica la existencia de actividades como propuestas, sin
   fechas, cupos o estados que todavía no estén verificados.
 - En el teléfono la primera vista es un perfil (nombre, estado de hoy, dirección
-  y «Cómo llegar» como única acción de contacto) con destacados que abren historias hechas solo con
-  las fotos que ya existen. En
+  y «Cómo llegar» como única acción de contacto) sin burbujas de historias (se retiraron el 2026-11-11: la referencia es navegar como en
+  una red social, no copiar sus secciones). La navegación vive en una barra inferior centrada
+  con los cuatro capítulos y el menú. En
   Cartelera, «Me interesa» y «Compartir» son locales: no envían nada ni muestran
   contadores, reseñas o reacciones, porque no hay datos que los respalden.
 - «Recién llegados» (Novedades) existe solo si la librería entrega una lista de
