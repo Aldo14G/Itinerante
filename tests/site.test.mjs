@@ -645,6 +645,19 @@ test('filtros de Explorar: cada grupo muestra como máximo 5 opciones y un «Ver
   assert.ok(!/expandG|limit: (99|10|8)/.test(catalog), 'ya no hay un límite distinto por grupo ni un único grupo desplegable');
 });
 
+test('fuentes: sources.json lista solo archivos que existen y que fonts.css declara (sin la cursiva que nunca se alojó)', async () => {
+  const sources = JSON.parse(await readFile(here('./assets/fonts/sources.json'), 'utf8'));
+  const fontsCss = await readFile(here('./assets/fonts/fonts.css'), 'utf8');
+  assert.ok(sources.fonts.length >= 2);
+  for (const f of sources.fonts) {
+    assert.ok(existsSync(here(`./assets/fonts/${f.file}`)), `${f.file} existe`);
+    assert.ok(fontsCss.includes(`url(./${f.file})`) && new RegExp(`font-family: '${f.family}';\\s*font-style: ${f.style};`).test(fontsCss), `${f.file} tiene su @font-face (${f.family}, ${f.style})`);
+  }
+  const woff = (await readdir(here('./assets/fonts'))).filter(n => n.endsWith('.woff2')).sort();
+  assert.deepEqual(woff, sources.fonts.map(f => f.file).sort(), 'ni archivos sin registrar ni registros sin archivo');
+  assert.ok(!/font-style: italic/.test(css + mobileCss + fontsCss), 'el sitio no usa cursivas: no hace falta alojar una');
+});
+
 test('ficha: «Cómo llegar» es la acción primaria, WhatsApp confirma, y el recuadro es legible en el tono claro', () => {
   const ask = html.match(/<div class="drawer-ask">[\s\S]*?<\/div>/)[0];
   assert.ok(ask.indexOf('data-d-visit') > -1 && ask.indexOf('data-d-visit') < ask.indexOf('data-d-cta'), 'la visita va antes que WhatsApp');

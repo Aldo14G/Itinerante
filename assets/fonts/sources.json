@@ -2,12 +2,6 @@
   "cssSource": "https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap",
   "fonts": [
     {
-      "file": "archivo-italic-latin.woff2",
-      "source": "https://fonts.gstatic.com/s/archivo/v25/k3kSo8UDI-1M0wlSfdzYLGHE.woff2",
-      "family": "Archivo",
-      "style": "italic"
-    },
-    {
       "file": "archivo-normal-latin.woff2",
       "source": "https://fonts.gstatic.com/s/archivo/v25/k3kQo8UDI-1M0wlSfdnoLg.woff2",
       "family": "Archivo",
