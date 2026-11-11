@@ -214,6 +214,7 @@ html:not(.js) .tabbar { display: none; }
 .bill-item { flex: 0 0 min(82vw, 340px); scroll-snap-align: start; overflow: hidden; }
 .bill-item[open] { border-color: var(--edge-soft); }
 .bill-item summary { display: block; padding: 0; border-radius: 0; pointer-events: none; }
+html:not(.js) .bill-item summary { pointer-events: auto; } /* sin JavaScript nadie abre las tarjetas: el resumen vuelve a ser tocable para leer la descripción y preguntar por WhatsApp */
 .bill-card-fig { display: block; }
 .bill-card-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; } /* 4:3 (SAT-02): con la foto cuadrada la tarjeta era más alta que la ventana útil y las acciones quedaban bajo la barra */
 /* Tope contra el alto: en ventanas de hasta 700 px de alto (320×640, 360×640, 375×667) la foto va en 16:9 para que la tarjeta entera, con sus tres acciones, quepa entre la cabecera y la barra. */

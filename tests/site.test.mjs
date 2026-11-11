@@ -949,6 +949,7 @@ test('tarjeta de evento: foto → insignias → título → frase → descripci�
   assert.ok(!/\.bill-(title|sub)[^{]*\{[^}]*display: none/.test(css + mobileCss), 'el título y la frase no se ocultan en ningún tamaño');
   assert.ok(/\.act--icon \{ flex: none; width: 48px; padding: 0; border-radius: 50%; \}/.test(css) && /\.bill-acts > \* \{ min-height: 48px; \}/.test(css) && /\.bill-wa \{ font-size: var\(--fs-1\); \}/.test(css), 'las tres acciones miden 48 px; «Compartir» es un círculo y WhatsApp no lleva letra mayor que la primaria');
   assert.ok(/@media \(max-height: 700px\) \{ \.bill-card-img \{ aspect-ratio: 16 \/ 9; \} \}/.test(mobileCss), 'tope contra el alto: en ventanas bajas la foto se acorta para que la tarjeta quepa con sus acciones');
+  assert.ok(/html:not\(\.js\) \.bill-item summary \{ pointer-events: auto; \}/.test(mobileCss), 'sin JavaScript las tarjetas móviles se pueden abrir (nadie las abre por la persona)');
   assert.ok(/\.bill-foot a, \.rail-trail-all \{ position: relative; white-space: nowrap; \}/.test(css) && /\.bill-foot a::after, \.rail-trail-all::after \{ content: ""; position: absolute; inset: calc\(-1 \* var\(--space-3\)\) 0; \}/.test(css) && !/\.bill-foot a[^{]*\{[^}]*inline-flex/.test(css + mobileCss), 'el enlace a Instagram es texto en línea con 44 px de objetivo: no deja un renglón alto');
 });
 

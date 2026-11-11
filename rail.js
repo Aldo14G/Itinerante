@@ -211,6 +211,14 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     return true;
   };
 
+  // La parada marcada queda a la vista dentro de la fila, la elija un toque, una flecha o un tema (solo se mueve la fila, nunca la página).
+  const reveal = chip => {
+    if (chipsEl.scrollWidth - chipsEl.clientWidth <= 0) return;
+    const r = chipsEl.getBoundingClientRect(), b = chip.parentElement.getBoundingClientRect();
+    if (b.left >= r.left && b.right <= r.right) return;
+    chipsEl.scrollBy({ left: b.left + b.width / 2 - (r.left + r.width / 2), behavior: isMotion() ? 'smooth' : 'auto' });
+  };
+
   let current = null;
   let paintId = 0; // el último cambio de colección gana si se toca otra parada antes de terminar de pintar
   const FIRST_CHUNK = 6; // lo que se ve al llegar; el resto se pinta en el fotograma siguiente para no hacer una tarea larga
@@ -223,6 +231,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
       const on = c.dataset.id === col.id;
       c.setAttribute('aria-checked', String(on));
       c.tabIndex = on ? 0 : -1;
+      if (on) reveal(c);
     });
     const mine = ++paintId;
     if (!immediate) await afterPaint();
@@ -248,19 +257,10 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   }
 
   chipsEl.replaceChildren(...cols.map(stopNode));
-  // La parada elegida queda a la vista dentro de la fila (solo se mueve la fila, nunca la página).
-  const reveal = chip => {
-    const max = chipsEl.scrollWidth - chipsEl.clientWidth;
-    if (max <= 0) return;
-    const r = chipsEl.getBoundingClientRect(), b = chip.parentElement.getBoundingClientRect();
-    if (b.left >= r.left && b.right <= r.right) return;
-    chipsEl.scrollBy({ left: b.left + b.width / 2 - (r.left + r.width / 2), behavior: isMotion() ? 'smooth' : 'auto' });
-  };
   // Elegir por toque o teclado: el control confirma ya (aria-checked y rebote del icono) y el carrusel cambia después de pintar.
   const choose = chip => {
     if (chip.dataset.id === current) return;
     pickPop(chip);
-    reveal(chip);
     show(chip.dataset.id, true);
   };
   chipsEl.addEventListener('click', e => { const c = e.target.closest('.rail-chip'); if (c) choose(c); });
