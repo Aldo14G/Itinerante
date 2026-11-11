@@ -4,7 +4,10 @@
 
 /* Ritmo vertical: dos pasos de la escala de 4 px (no dependen del alto de la pantalla). Móvil 48 / 96, escritorio 64 / 128. */
 :root { --sec-sm: var(--space-7); --sec-md: var(--space-9); }
-@media (min-width: 1025px) { :root { --sec-sm: var(--space-8); --sec-md: var(--space-10); } }
+@media (min-width: 1101px) { :root { --sec-sm: var(--space-8); --sec-md: var(--space-10); } } /* mismo quiebre que la cabecera con enlaces: hasta 1100 px (tableta en horizontal, 1024×768) el ritmo es el compacto */
+/* Tope de contenido en pantallas muy anchas (RSP-07): desde 1728 px el contenedor se queda en 1632 px y el margen crece. A 2560 px el buscador medía 2231 px y el catálogo 11 columnas.
+   Los fondos, el inicio y la cabecera siguen de borde a borde. */
+@media (min-width: 1728px) { :root { --gutter: calc((100vw - 1632px) / 2); } .entry-copy, .hdr { padding-inline: 48px; } }
 
 html {
   background: var(--night);
@@ -407,7 +410,7 @@ p { text-wrap: pretty; }
 
 .bill { background: var(--turq); color: var(--turq-ink); padding: var(--sec-md) var(--gutter); }
 .bill .h2 em { color: var(--turq-ink); }
-.bill-head { display: grid; gap: 28px; margin-bottom: var(--space-7); }
+.bill-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; margin-bottom: var(--space-7); }
 .bill-head .h2 { font-size: clamp(3.2rem, 6vw, 6rem); } /* mismo tope que Libros y Visita: a 9rem la cabecera medía 300 px y, con la banda, 0.9 pantallas de turquesa con una sola palabra (CR1-01) */
 .bill-head p { margin: 0; max-width: 62ch; padding-top: 20px; border-top: 2px solid var(--turq-ink); font-size: var(--fs-body); }
 @media (min-width: 1024px) {
@@ -574,7 +577,7 @@ p { text-wrap: pretty; }
 .hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .hours caption { padding-bottom: 16px; text-align: left; font: 760 var(--fs-0)/1 var(--f-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-dim); }
 .hours th, .hours td { padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, var(--paper-ink) 14%, transparent); font-weight: 520; text-align: left; }
-.hours td { text-align: right; }
+.hours td { text-align: right; white-space: nowrap; } /* «11:00–20:00» no se parte (a 768 px la columna angosta lo cortaba en dos renglones) */
 .hours tr.is-today th, .hours tr.is-today td { font-weight: 800; }
 .hours tr.is-today th::after {
   content: "Hoy"; margin-left: 12px; padding: 4px 8px; border-radius: 4px; vertical-align: 2px;
@@ -627,7 +630,7 @@ p { text-wrap: pretty; }
 }
 
 @media (max-width: 760px) {
-  :root { --hdr-h: 60px; }
+  :root { --hdr-h: 56px; }
   body { font-size: var(--fs-2); }
   .status { display: none; }
   .hdr-cta { display: none; }
@@ -673,8 +676,25 @@ p { text-wrap: pretty; }
   .ftr-row { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 440px) {
-  .entry-actions { grid-template-columns: 1fr; }
+/* Tableta y escritorio angosto (761–1023 px): el escritorio comprimido. */
+@media (min-width: 761px) and (max-width: 1023px) {
+  .h2, .house-head .h2, .bill-head .h2 { font-size: var(--fs-7); } /* un solo escalón de titular (RSP-11): antes 38, 46 y 51 px según el capítulo */
+  .ftr-row { grid-template-columns: minmax(0, 1fr) auto; } /* la marca y la dirección en su renglón (RSP-02): en tres columnas la dirección se partía en 8 líneas sobre los enlaces */
+  .ftr-id { grid-column: 1 / -1; }
+}
+@media (min-width: 761px) and (max-width: 900px) {
+  .hdr .status { display: none; } /* (RSP-12) a 761–900 px no caben marca, estado y botones: el estado sigue en el inicio, en Visita y en el menú */
+  .hdr-brand span { white-space: nowrap; }
+}
+/* Ventanas bajas con maquetación de escritorio (teléfono grande en horizontal, 844×390; RSP-04): el inicio no puede medir más que la ventana y el menú a pantalla completa debe caber.
+   El rótulo gigante no cabe junto al texto en 390 px de alto: se retira (el nombre ya está en la cabecera y en el h1) y quedan la frase, las dos acciones y los datos sobre el velo. */
+@media (min-width: 761px) and (max-height: 520px) {
+  .entry, .entry-stage, .motion .entry-stage { min-height: 340px; }
+  .wordmark { display: none; }
+  .entry-facts { margin-bottom: var(--space-5); }
+  /* El velo normal mide su franja superior en porcentaje (16 % de 390 px = 62 px, menos que la cabecera): aquí la franja se mide con la cabecera, para que la marca y el estado conserven 4.5:1. */
+  .entry-shade { background: linear-gradient(180deg, color-mix(in srgb, var(--night) 90%, transparent) 0, color-mix(in srgb, var(--night) 84%, transparent) var(--hdr-h), transparent calc(var(--hdr-h) + var(--space-8)), transparent 46%, color-mix(in srgb, var(--night) 90%, transparent) 60%, color-mix(in srgb, var(--night) 97%, transparent) 100%); }
+  .menu nav a { font-size: clamp(2.25rem, 14vh, 6rem); }
 }
 
 @media (hover: none) {
@@ -720,6 +740,7 @@ p { text-wrap: pretty; }
 }
 .cat-sort select { appearance: none; -webkit-appearance: none; padding-right: 40px; background-image: linear-gradient(45deg, transparent 50%, var(--bone) 50%), linear-gradient(135deg, var(--bone) 50%, transparent 50%); background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size: 5px 5px; background-repeat: no-repeat; }
 .cat-filters-btn { display: none; }
+.cat-filters-foot { display: none; } /* solo donde los filtros son un panel plegable (≤ 1100 px) */
 .cat-filters-btn[aria-expanded="true"] { background: var(--terra); color: var(--white); border-color: transparent; }
 
 .cat-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: clamp(28px, 4vw, 64px); align-items: start; padding-top: 32px; }
@@ -804,6 +825,8 @@ p { text-wrap: pretty; }
   .cat-layout { grid-template-columns: 1fr; padding-top: 24px; }
   .cat-filters { position: static; display: none; max-height: none; overflow: visible; padding: 24px; border: 1px solid var(--line-strong); border-radius: 4px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cat.filters-open .cat-filters { display: grid; }
+  .cat-filters-foot { display: block; grid-column: 1 / -1; }
+  .cat-filters-foot .btn { width: 100%; }
 }
 @media (max-width: 760px) {
   .cat-head { grid-template-columns: 1fr; }
@@ -948,8 +971,9 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 .cat-grid[aria-busy="true"] .card--sk .cover { background: var(--stone); }
 
 /* Objetivos táctiles de 44 px. */
+.hdr-brand, .topic { min-height: 44px; } /* con cualquier puntero (RSP-14): un portátil táctil de 761–1100 px no carga mobile.css */
 @media (pointer: coarse) {
-  .hdr-brand, .topic, .cat-opt label, .cat-more-facets, .bill-foot a { min-height: 44px; }
+  .cat-opt label, .cat-more-facets, .bill-foot a { min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1148,6 +1172,8 @@ html.sheet-open { overflow: hidden; }
    desplazamientos se vuelven instantáneos). La barra de progreso va ligada al scroll, no al tiempo: queda fuera. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+  /* El rótulo «ITINERANTE» se ajusta al ancho midiendo su caja (fitWord): con una transición de 0.01 ms la medida leía el tamaño anterior y el nombre salía cortado (RSP-01). Sin transición no hay valor intermedio que leer. */
+  .wordmark, .wordmark *, .ftr-mark, .ftr-mark * { transition-property: none !important; }
   *:not(.progress), *:not(.progress)::before, *:not(.progress)::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }
 
@@ -1163,7 +1189,7 @@ html.sheet-open { overflow: hidden; }
 }
 .save .ic { width: 22px; height: 22px; }
 .save:active { scale: 0.9; }
-.save[aria-pressed="true"] { color: var(--white); background: var(--terra-deep); border-color: transparent; }
+.save[aria-pressed="true"] { color: var(--terra-deep); background: var(--white); border-color: var(--terra-deep); } /* guardado = marcador relleno y filete turquesa, sin relleno sólido (Von Restorff): el único relleno turquesa profundo de la pantalla es «Cómo llegar» */
 .save[aria-pressed="true"] .ic { fill: currentColor; }
 .save--wide {
   position: static; display: inline-flex; gap: var(--space-2); justify-self: start; container-type: normal; width: auto; height: auto; min-height: var(--target-coarse);

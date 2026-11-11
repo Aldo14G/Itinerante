@@ -33,7 +33,7 @@ Evita salida de build en la raíz. No retomes trabajo de UI en `_archive/`.
 - `npm run cf:deploy`: arma `public/` y ejecuta `wrangler deploy`. Secreto opcional: `npx wrangler secret put GEMINI_API_KEY` (sin él Iti IA responde con el ranking local). **No ejecutes un deploy sin que Aldo lo pida.**
 - `npm run tokens`: regenera `tokens.css` desde `design/tokens.json`. `npm run tokens:check` falla si el CSS generado está desactualizado.
 - `npm run critique` y `npm run critique:static`: revisión de diseño contra los tokens.
-- `npm run test:browser`: arnés de Chromium (`tools/qa/run.mjs`: explorer, saved, rail, skeleton, contrast, ficha). El resto del arnés (`motion`, `spacing`, `e2e`, `feed`, `hero`, `inp`, `strip`) se corre a mano contra una vista previa; ver `tools/qa/README.md`.
+- `npm run test:browser`: arnés de Chromium (`tools/qa/run.mjs`: explorer, saved, rail, skeleton, contrast, ficha). El resto del arnés (`motion`, `spacing`, `e2e`, `feed`, `hero`, `inp`, `responsive`, `strip`) se corre a mano contra una vista previa; ver `tools/qa/README.md`.
 - Legado: `firebase deploy --only hosting` publica `public/` sin API; `firebase emulators:start --only hosting` lo sirve local.
 - Protección de Iti IA (Worker): comprobación de Origin y tamaño de cuerpo desde `src/lib/api-guard.ts` (`ITI_IA_ALLOWED_ORIGINS`, `ITI_IA_MAX_BODY_BYTES`) y bindings de Rate Limiting `IA_PER_IP` (10/min) y `IA_GLOBAL` (120/min), aplicados por ubicación de Cloudflare, no como tope global estricto. Pendiente: validarlos en preview y envolver `limit()` en try/catch. La ruta Next conserva su limitador en memoria.
 

@@ -14,6 +14,7 @@ Scripts que abren el sitio en Chrome headless por CDP y miden lo que importa. To
 | `rail.mjs URL` | Carrusel de libros: colecciones, teclado, progreso, ficha, foco. Espera por condición (carrusel `is-ready` sin esqueletos, colección renovada, ficha `open`, foco movido, desplazamiento estable) con tope, no con pausas fijas; si una pantalla aborta la anota como ✗ con el motivo y sigue. | sí |
 | `saved.mjs URL` | Guardar, Mi lista, persistencia, aviso y mensaje de WhatsApp. | informa |
 | `explorer.mjs URL` | Hoja «Explorar»: modal, URL `#explorar`, botón atrás, ficha encima, escritorio y redimensionar. | informa |
+| `responsive.mjs URL` | Barrido de 42 tamaños (28 anchos a 800 px de alto, cuatro teléfonos en vertical y cuatro en horizontal, tabletas en ambas orientaciones, 1920 y 2560): sin desborde horizontal, sin texto cortado, pie sin encimar, rótulo «ITINERANTE» entero y «Cómo llegar» con el párrafo del inicio dentro de la primera vista; informa pantallas totales, cromo fijo en % y ancho del contenido. | sí |
 | `e2e.mjs URL DIR` | Auditoría general (desbordes, consola, menú, tonos, barra inferior, cartelera, catálogo, movimiento reducido, rendimiento). | informa |
 | `desk.mjs URL` | Escenas de escritorio frente a móvil (qué módulos se descargan). | informa |
 | `hero.mjs URL [DIR]` | Contraste real del párrafo del hero móvil con muestreo de píxeles (320×640, 360×640, 375×667, 390×844): captura con el texto transparente y compara los píxeles de cada línea con la tinta; `HERO_SELECTORS` cambia qué texto medir. | sí |

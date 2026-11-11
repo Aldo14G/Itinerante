@@ -196,6 +196,8 @@ function syncAll(e) {
     if (c) c.textContent = String(n);
     el.setAttribute('aria-label', `Mi lista, ${countText(n)}`);
   });
+  // Botón Menú de la barra inferior: con libros guardados lleva el conteo (la lista es la primera fila del menú). Decorativo: el nombre del botón sigue siendo «Menú».
+  document.querySelectorAll('[data-saved-dot]').forEach(el => { el.hidden = n === 0; el.textContent = n ? String(n) : ''; });
   const dlg = document.getElementById('mylist');
   if (dlg?.open) renderList(dlg);
 }

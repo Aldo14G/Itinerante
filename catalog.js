@@ -298,6 +298,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       }
       frag.append(fs);
     }
+    // Salida del panel (SAT-03): en teléfono los filtros miden hasta dos pantallas; el pie pegajoso dice cuántos títulos quedan y lleva a ellos.
+    if (frag.childElementCount) frag.append(el('div', { class: 'cat-filters-foot' }, el('button', { type: 'button', class: 'btn btn--ghost', 'data-cat-filters-done': '' }, el('span', {}, results.length === 1 ? 'Ver 1 título' : `Ver ${results.length} títulos`))));
     filtersEl.replaceChildren(frag);
   }
 
@@ -431,6 +433,13 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     document.getElementById(cb.id)?.focus({ preventScroll: true });
   });
   filtersEl.addEventListener('click', e => {
+    if (e.target.closest('[data-cat-filters-done]')) { // cierra el panel y deja el foco en el estado de resultados, a la vista
+      filtersBtn.setAttribute('aria-expanded', 'false');
+      root.classList.remove('filters-open');
+      restFocus();
+      status.scrollIntoView({ block: 'center', behavior: 'auto' });
+      return;
+    }
     const b = e.target.closest('[data-expand]');
     if (!b) return;
     state.expandG = !state.expandG;

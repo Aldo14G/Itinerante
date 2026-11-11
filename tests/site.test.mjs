@@ -297,17 +297,17 @@ test('móvil: barra inferior con una pestaña por sección, iconos en el sprite 
 
 test('móvil: menú lateral con categorías desplegables accesibles y destinos reales', () => {
   const dlg = html.match(/<dialog class="sheet-menu"[\s\S]*?<\/dialog>/)[0];
-  assert.ok(/<nav class="tabbar"[\s\S]*?<button class="tab-menu" type="button" data-menu-open aria-expanded="false" aria-controls="sheet-menu">[\s\S]*?<span class="tab-lb">Menú<\/span><\/button>\s*<\/nav>/.test(html) && !/hdr-more/.test(html + css + mobileCss), 'el botón del menú vive en la barra inferior (quinto botón, con nombre, aria-expanded y aria-controls); ya no hay hamburguesa en la cabecera');
+  assert.ok(/<nav class="tabbar"[\s\S]*?<button class="tab-menu" type="button" data-menu-open aria-expanded="false" aria-controls="sheet-menu">[\s\S]*?<span class="tab-lb">Menú<\/span><span class="tab-badge" data-saved-dot hidden aria-hidden="true"><\/span><\/button>\s*<\/nav>/.test(html) && !/hdr-more/.test(html + css + mobileCss), 'el botón del menú vive en la barra inferior (quinto botón, con nombre, aria-expanded y aria-controls); ya no hay hamburguesa en la cabecera');
   assert.ok(/aria-labelledby="sheet-menu-title"/.test(dlg) && /data-sm-close/.test(dlg), 'diálogo con título y botón de cierre');
   const rows = [...dlg.matchAll(/<button class="sm-row"[^>]*aria-expanded="false"[^>]*aria-controls="([a-z-]+)"/g)].map(m => m[1]);
   assert.deepEqual(rows, ['sm-cartelera', 'sm-libros', 'sm-visita'], 'acordeones en el orden de la barra inferior; Horarios vive dentro de Visita');
   const order = [...dlg.matchAll(/<(?:a|button) class="sm-row"[^>]*>[\s\S]*?<span class="sm-lb">([^<]+)/g)].map(m => m[1]);
-  assert.deepEqual(order, ['La casa', 'Cartelera', 'Libros', 'Visita', 'Mi lista'], 'mismo orden y nombres que la cabecera y la barra; Mi lista aparte al final');
+  assert.deepEqual(order, ['Mi lista', 'Buscar en el catálogo', 'La casa', 'Cartelera', 'Libros', 'Visita'], 'primero lo que la barra no tiene (Mi lista y el buscador); después los capítulos, con el mismo orden y nombres que la cabecera y la barra');
   const bar = [...html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0].matchAll(/<span class="tab-lb">([^<]+)/g)].map(m => m[1]);
-  assert.deepEqual(bar, [...order.slice(0, 4), 'Menú'], 'la barra inferior lleva los cuatro capítulos en el mismo orden que el menú y, al final, el botón Menú');
+  assert.deepEqual(bar, [...order.slice(2), 'Menú'], 'la barra inferior lleva los cuatro capítulos en el mismo orden que el menú y, al final, el botón Menú');
   const foot = dlg.match(/<div class="sm-foot">[\s\S]*?<\/div>/)[0];
   assert.equal((foot.match(/btn--tungsten/g) || []).length, 1, 'una sola acción primaria en el menú');
-  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost"[^>]*wa\.me[\s\S]*Escribir por WhatsApp/.test(foot), '«Cómo llegar» es el primario y WhatsApp el secundario');
+  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost sm-wa"[^>]*wa\.me[^>]*aria-label="Escribir por WhatsApp"/.test(foot) && !/sm-social/.test(foot) && /\.sm-foot \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 50px;/.test(mobileCss), '«Cómo llegar» es el primario y WhatsApp el secundario (botón de icono con nombre accesible); el pie es una sola fila y las redes van al final de la lista');
   assert.ok(/id="sm-visita"[\s\S]*?<dl class="sm-hours"><dt>Lunes a sábado<\/dt><dd>11:00–20:00<\/dd><dt>Domingo<\/dt><dd>Cerrado/.test(dlg), 'Horarios dentro de Visita');
   assert.equal((dlg.match(/Cómo llegar/g) || []).length, 1, '«Cómo llegar» aparece una sola vez en el menú (el botón primario del pie)');
   assert.ok(!/Horario y dirección/.test(dlg), 'Visita no repite el horario con un enlace');
@@ -357,9 +357,9 @@ test('portadas y cabecera: tinta fija sobre superficies oscuras, también dentro
   assert.ok(/--cover-ink: #f8f8f8/.test(tokensCss) && /--cover-ink-dim: #cfe3df/.test(tokensCss));
   assert.ok(!/html\[data-glass="lite"\] \.hdr::before \{[^}]*background/.test(css), 'lite no pisa el tinte por sección de la cabecera');
   assert.ok(!/entry-credit/.test(html + css + mobileCss), 'el hero no lleva crédito ni rótulo sobre la foto');
-  assert.ok(!/at-top/.test(mobileCss) && /\.entry-copy \{[^}]*padding-bottom: calc\(env\(safe-area-inset-bottom\) \+ var\(--tabbar-h\) \+ var\(--space-7\)\)/.test(mobileCss.replaceAll('\n', ' ')), 'la barra inferior está desde la primera vista y el perfil le reserva su sitio: «Cómo llegar» queda por encima');
+  assert.ok(!/at-top/.test(mobileCss) && /\.entry-copy \{[^}]*padding-bottom: calc\(env\(safe-area-inset-bottom\) \+ var\(--tabbar-h\) \+ var\(--space-6\)\)/.test(mobileCss.replaceAll('\n', ' ')), 'la barra inferior está desde la primera vista y el perfil le reserva su sitio: «Cómo llegar» queda por encima');
   assert.ok(/\.tabbar \{[^}]*width: fit-content;[^}]*margin-inline: auto;/.test(mobileCss.replaceAll('\n', ' ')) && /\.tabbar \{[^}]*box-shadow: var\(--elev-2\);/.test(mobileCss.replaceAll('\n', ' ')) && /\.tabbar \{[^}]*transition: translate var\(--dur-base\) var\(--spring\), visibility var\(--dur-base\);/.test(mobileCss.replaceAll('\n', ' ')), 'barra inferior centrada (no ocupa el ancho), con sombra suave de token y salida animada cuando una hoja ocupa la pantalla');
-  assert.ok(/\.tab-lb \{[^}]*clip-path: inset\(50%\)/.test(mobileCss) && /\.tabbar a\[aria-current="location"\] \.tab-lb \{ position: static;/.test(mobileCss) && /\.tabbar a, \.tab-menu \{[^}]*min-width: 48px; height: 48px;/.test(mobileCss.replaceAll('\n', ' ')), 'solo iconos de 48 px; el nombre existe siempre para lectores y se ve en la pestaña activa');
+  assert.ok(/\.tab-lb \{[^}]*clip-path: inset\(50%\)/.test(mobileCss) && /\.tabbar a\[aria-current="location"\] \.tab-lb \{ position: static;/.test(mobileCss) && /\.tabbar a, \.tab-menu \{[^}]*width: 60px; height: 48px;/.test(mobileCss.replaceAll('\n', ' ')), 'solo iconos en casillas iguales de 60×48 px (48 a 320 px de ancho); el nombre existe siempre para lectores y se ve en la pestaña activa');
   assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileCss), 'sin JavaScript la barra inferior no tapa los destacados: la cabecera ya trae los cuatro enlaces');
   assert.ok(/\.hdr-brand, \.bill-foot a \{ min-height: 44px; \}/.test(mobileCss) && /\(min-width: 360px\) \{ \.hdr-brand span \{ white-space: nowrap; \} \}/.test(mobileCss), 'marca de la cabecera y enlace del pie de Cartelera de 44 px en móvil; nombre en un renglón desde 360 px');
   assert.ok(!/at-top/.test(await readFile(new URL('../assets/js/boot.js', import.meta.url), 'utf8')) && !/at-top/.test(await readFile(new URL('../app.js', import.meta.url), 'utf8')), 'ya no existe el estado at-top: la barra no se esconde en la primera vista');
@@ -441,7 +441,7 @@ test('Libros y Catálogo son un solo capítulo: tres capas, un punto de entrada 
   for (const [name, block] of [['cabecera', desktopNav], ['menú', phoneMenu], ['barra inferior', tabbar]]) {
     assert.deepEqual(names(block), ['casa', 'cartelera', 'libros', 'visita'], `${name}: cuatro capítulos con los mismos nombres`);
   }
-  assert.ok(/class="sm-link" href="#catalogo">Buscar en el catálogo/.test(html), 'el menú lateral llega al catálogo desde Libros');
+  assert.ok(/<a class="sm-row" href="#catalogo">[\s\S]*?<span class="sm-lb">Buscar en el catálogo/.test(html) && !/class="sm-link" href="#catalogo"/.test(html), 'el menú lateral llega al catálogo con una fila propia (no escondida dentro de Libros)');
 });
 
 test('progreso de lectura: barra fija decorativa, ligada al scroll y sin JS', () => {
@@ -841,7 +841,7 @@ test('Libros: un solo titular grande, una sola fila de chips al inicio, el carru
 test('cierre de Libros: una frase y «Cómo llegar» en el mismo bloque, sin vacío tras el buscador ni rellenos con vh', () => {
   const foot = html.match(/<div class="books-foot">[\s\S]*?<\/div>/)[0];
   assert.ok(/<p>[^<]+<\/p>/.test(foot) && (foot.match(/btn--tungsten/g) || []).length === 1, 'frase + una sola primaria');
-  assert.ok(/\.cat \{ padding-bottom: var\(--sec-sm\); \}/.test(mobileCss), 'tras el buscador un solo escalón de ritmo');
+  assert.ok(/\.cat \{ padding-top: var\(--space-6\); padding-bottom: var\(--space-6\); \}/.test(mobileCss) && /\.books > \.cat \{ margin-top: var\(--space-6\); \}/.test(mobileCss), 'tras el buscador un solo escalón de ritmo, el de capa (64 px con el margen), no el de capítulo');
   for (const rule of ['.books-head', '.cat-head', '.composer', '.bill-head']) {
     const m = css.match(new RegExp(`${rule.replace('.', '\.')} \{[^}]*\}`));
     assert.ok(m && !/vh/.test(m[0]), `${rule} sin clamp(vh)`);
@@ -849,7 +849,9 @@ test('cierre de Libros: una frase y «Cómo llegar» en el mismo bloque, sin vac
 });
 
 test('largo móvil: los capítulos, la cita y el pie usan --sec-sm (96 px entre bloques); Cartelera junta «Me interesa» y «Compartir»', () => {
-  assert.ok(/\.quote \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss) && /\.ftr \{ padding-top: var\(--sec-sm\); \}/.test(mobileCss));
+  assert.ok(/\.quote \{ padding-block: var\(--sec-sm\) var\(--space-5\); \}/.test(mobileCss) && /\.ftr \{ padding-top: var\(--sec-sm\); \}/.test(mobileCss), 'la cita abre con --sec-sm y cierra con 24 px: comparte fondo con el llamado');
+  assert.ok(/\.rail \{ margin-bottom: var\(--space-6\); \}/.test(mobileCss) && /\.ask \{ margin-top: var\(--space-6\); \}/.test(mobileCss) && /\.books-head, \.bill-head \{ margin-bottom: var\(--space-5\); \}/.test(mobileCss), 'tres escalones: capítulo 96 px, capa 64 px, titular a contenido 24 px');
+  assert.ok(/\.bill-card-img \{ width: 100%; aspect-ratio: 4 \/ 3;/.test(mobileCss), 'la foto de la publicación va en 4:3: la tarjeta cabe en la ventana útil con sus acciones');
   assert.ok(/\.manifesto, \.bill \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss) && /\.books \{ padding-top: var\(--sec-sm\); \}/.test(mobileCss) && /\.visit \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'CR-14: entre dos capítulos la suma de rellenos no pasa de 96 px');
   assert.ok(/\.house-pin \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'la tira de La casa no pone el relleno por la altura de la pantalla');
   assert.ok(/\.bill-acts \.act \{ flex: 1 1 auto/.test(mobileCss));
@@ -865,7 +867,7 @@ test('titulares móviles (CR-14): un escalón por nivel, de la escala de tokens,
   assert.ok(/\.visit \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'Visita cierra con 48 px en móvil (48 + 48 del pie = 96, el tope)');
   assert.ok(/@media \(min-width: 1600px\) \{ \.visit \{ grid-template-columns: minmax\(0, 1fr\) 560px; \} \}/.test(css), 'desde 1600 px la columna del horario y la foto de Visita se fija en 560 px');
   assert.ok(/shown = rows\.some\(r => r\.row\.offsetWidth > 0\)/.test(appSrc) && /if \(!shown\) return false;/.test(appSrc), 'la marquesina oculta no se anima');
-  assert.ok(/\.call-body \{ padding: 0 var\(--gutter\); \}/.test(mobileCss) && /\.call \{ padding-block: var\(--sec-sm\); \}/.test(mobileCss), 'el llamado sin aire muerto: --sec-sm y sin clamp(vh)');
+  assert.ok(/\.call-body \{ padding: 0 var\(--gutter\); \}/.test(mobileCss) && /\.call \{ padding-block: var\(--space-5\) var\(--sec-sm\); \}/.test(mobileCss), 'el llamado sin aire muerto: 24 px tras la cita, --sec-sm abajo y sin clamp(vh)');
 });
 
 test('cierre móvil (CR-10): dirección con «Cómo llegar» de texto, redes y correo en una fila, «Pausar el movimiento» discreto', () => {
@@ -874,7 +876,7 @@ test('cierre móvil (CR-10): dirección con «Cómo llegar» de texto, redes y c
   assert.ok(!/class="(?:[^"]* )?btn[ "]/.test(ftr), 'el pie no tiene botones (la primaria vive en cada capítulo)');
   const links = ftr.match(/<ul class="ftr-links">[\s\S]*?<\/ul>/)[0];
   assert.deepEqual([...links.matchAll(/<span>([^<]+)<\/span>/g)].map(m => m[1]), ['Instagram', 'Facebook', 'WhatsApp', 'Correo'], 'redes y correo en la misma lista');
-  assert.ok(/\.ftr-links \{ flex-wrap: nowrap; justify-content: space-between;/.test(mobileCss), 'una sola fila: el correo no queda huérfano');
+  assert.ok(/\.ftr-links \{ flex-wrap: wrap; justify-content: space-between; gap: var\(--space-2\); \}/.test(mobileCss), 'una sola fila a tamaño normal (lo mide el arnés a 320 px); con el texto ampliado los enlaces bajan de renglón en vez de cortarse');
   assert.ok(/\.ftr-links a \{[^}]*min-height: var\(--target-coarse\)/.test(mobileCss) && /\.motion-btn \{[^}]*min-height: var\(--target-coarse\)/.test(mobileCss) && /\.ftr-route \{[^}]*min-height: var\(--target-coarse\)/.test(css), 'objetivos de 44 px');
   const mb = mobileCss.match(/\.motion-btn \{[^}]*\}/)[0];
   assert.ok(/border: 0/.test(mb) && /text-decoration: underline/.test(mb) && !/background:|border-radius: 999/.test(mb), '«Pausar el movimiento» es un enlace de texto, no un botón de contorno');
@@ -964,4 +966,22 @@ test('arranque (R01): tramos cortos, hora de Monterrey en reposo y medidas de de
   assert.ok(/async function boot\(\)/.test(appSrc) && (appSrc.match(/await yieldNow\(\)/g) || []).length >= 8, 'boot() cede el hilo entre secciones');
   assert.ok(/requestIdleCallback \|\| \(cb => setTimeout\(cb, 300\)\)\)\(updateStatus/.test(appSrc), 'la hora de Monterrey (Intl) no corre en la tarea de arranque');
   assert.ok(!/fitOnly/.test(appSrc), 'el nombre se ajusta una sola vez al arrancar (entry.measure ya lo hace)');
+});
+
+test('acomodo responsive: cromo fijo bajo, casillas fijas en la barra y tramos por alto de ventana', async () => {
+  const [appJs, catalogJs, savedJs] = await Promise.all(['app.js', 'catalog.js', 'saved.js'].map(f => readFile(here('./' + f), 'utf8')));
+  const flat = mobileCss.replaceAll('\n', ' ');
+  assert.ok(/--tabbar-h: 56px;/.test(tokensCss) && /:root \{ --hdr-h: 56px; \}/.test(mobileCss), 'barra y cabecera de 56 px: el cromo fijo queda bajo un quinto de la ventana a 320×640');
+  assert.ok(/\.tabbar a, \.tab-menu \{[^}]*width: 60px; height: 48px;/.test(flat) && !/\.tabbar a\[aria-current="location"\] \{[^}]*padding:/.test(flat), 'cinco casillas del mismo ancho: la pestaña activa no empuja a sus vecinas');
+  assert.ok(/#casa, #cartelera, #libros, #visita \{ scroll-margin-top: calc\(-1 \* \(var\(--hdr-h\) \+ 8px\)\); \}/.test(mobileCss) && /dropHeaderForJump/.test(appJs), 'el salto desde la barra deja el capítulo al borde de la ventana y la cabecera oculta');
+  assert.ok(!/\/\*[^*]*\{ display: flex; gap: 4px; margin: 4px 0 8px; \}/.test(mobileCss) && /\n\.house-meter \{ display: none; \}/.test(mobileCss) && /\n\.still \{ scroll-snap-align: center; \}/.test(mobileCss), 'las reglas de la tira de La casa no quedan dentro de un comentario sin cerrar');
+  assert.ok(/@media \(orientation: landscape\) and \(max-height: 500px\) \{[^@]*\.entry, \.entry-stage, \.motion \.entry-stage \{ min-height: 320px; \}/.test(flat), 'teléfono en horizontal: el inicio cabe en la ventana');
+  assert.ok(/@media \(min-width: 761px\) and \(max-height: 520px\) \{[^@]*min-height: 340px;[^@]*\.wordmark \{ display: none; \}/.test(css.replaceAll('\n', ' ')), 'ventana baja con maquetación de escritorio: el inicio cabe y el rótulo gigante se retira');
+  assert.ok(/@media \(min-width: 1728px\) \{ :root \{ --gutter: calc\(\(100vw - 1632px\) \/ 2\); \}/.test(css), 'tope de contenido de 1632 px en pantallas muy anchas');
+  assert.ok(/@media \(min-width: 761px\) and \(max-width: 1023px\) \{[^@]*\.ftr-row \{ grid-template-columns: minmax\(0, 1fr\) auto; \}/.test(css.replaceAll('\n', ' ')), 'tableta: el pie no encima la dirección sobre los enlaces');
+  assert.ok(/\.wordmark, \.wordmark \*, \.ftr-mark, \.ftr-mark \* \{ transition-property: none !important; \}/.test(css), 'con movimiento reducido el rótulo se mide sin transición: no sale cortado');
+  const tall = '(max-width: 760px), (max-width: 1023px) and (orientation: portrait)';
+  assert.ok(html.includes(`<source media="${tall}" srcset="assets/img/inicio-sala-m.webp"`) && html.includes(`fetchpriority="high" media="${tall}">`) && html.includes('fetchpriority="high" media="(min-width: 1024px), (min-width: 761px) and (orientation: landscape)">'), 'la tableta vertical recibe la foto vertical del inicio, y cada precarga coincide con su fuente');
+  assert.ok(/data-cat-filters-done/.test(catalogJs) && /\.explorer \.cat-filters-foot \{ position: sticky; bottom: calc\(-1 \* var\(--space-9\)\);/.test(mobileCss), 'el panel de filtros de Explorar tiene salida fija a los resultados');
+  assert.ok(/data-saved-dot/.test(savedJs), 'el botón Menú lleva el conteo de Mi lista');
 });

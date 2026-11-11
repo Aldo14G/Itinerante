@@ -65,7 +65,7 @@ for (const w of [360, 390]) {
   check(A, 'abre como modal, foco en cierre, scroll bloqueado, barra inferior oculta', s1.open && s1.modal && s1.x === 0 && /sm-close/.test(s1.active) && s1.sheet && s1.lock === 'hidden' && s1.exp === 'true' && s1.tabbarHidden, JSON.stringify(s1));
   check(A, 'ancho del panel ≤ 88vw y ≤360', s1.w <= Math.min(s1.vw * 0.88 + 1, 361), s1.w);
   const rows = await ev(`[...document.querySelectorAll('#sheet-menu .sm-row')].map(r=>Math.round(r.getBoundingClientRect().height))`);
-  check(A, 'todas las filas ≥48px (5: La casa, Cartelera, Libros, Visita y Mi lista)', rows.every(h => h >= 48) && rows.length === 5, JSON.stringify(rows));
+  check(A, 'todas las filas ≥48px (6: Mi lista, Buscar en el catálogo, La casa, Cartelera, Libros y Visita)', rows.every(h => h >= 48) && rows.length === 6, JSON.stringify(rows));
   // acordeón
   const acc = await ev(`(async()=>{const g=[...document.querySelectorAll('#sheet-menu .sm-group')]; const st=()=>g.map(x=>[x.querySelector('.sm-row').getAttribute('aria-expanded'), x.querySelector('.sm-sub').inert]); const res={}; g[0].querySelector('.sm-row').click(); await new Promise(r=>setTimeout(r,500)); res.a=st(); g[1].querySelector('.sm-row').click(); await new Promise(r=>setTimeout(r,500)); res.b=st(); g[1].querySelector('.sm-row').click(); await new Promise(r=>setTimeout(r,500)); res.c=st(); res.subH=g.map(x=>Math.round(x.querySelector('.sm-sub').getBoundingClientRect().height)); return res})()`);
   check(A, 'acordeón exclusivo con inert', acc.a[0][0] === 'true' && !acc.a[0][1] && acc.a[1][0] === 'false' && acc.b[0][0] === 'false' && acc.b[1][0] === 'true' && acc.c.every(x => x[0] === 'false' && x[1] === true) && acc.subH.every(h => h === 0), JSON.stringify(acc));

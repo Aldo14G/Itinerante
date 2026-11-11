@@ -345,11 +345,19 @@ async function boot() {
   }
 
   let holdHeader = 0; // hasta este instante (performance.now) el encabezado no se oculta
+  // Salto a un capítulo desde la barra inferior o el menú móvil: el capítulo cae al borde de la ventana (scroll-margin en mobile.css), así que la cabecera
+  // se queda oculta hasta que el desplazamiento termina; si reapareciera al subir taparía el titular recién alcanzado.
+  let dropHeader = 0;
+  const dropHeaderForJump = () => {
+    dropHeader = performance.now() + 1600;
+    addEventListener('scrollend', () => { dropHeader = Math.min(dropHeader, performance.now() + 250); }, { once: true });
+  };
   function headerScene() {
     const hdr = $('[data-hdr]');
     const themed = $$('main [data-theme]');
     const navLinks = $$('.hdr-nav a');
     const tabLinks = $$('.tabbar a');
+    tabLinks.forEach(a => a.addEventListener('click', dropHeaderForJump));
     const chapters = navLinks.map(a => $(a.getAttribute('href')));
     let ranges = [], chapterRanges = [], hidden = false, current = '';
     return {
@@ -366,6 +374,7 @@ async function boot() {
         if (hdr.classList.contains('is-menu') || hdr.contains(document.activeElement) || y < vh * 0.6 || performance.now() < holdHeader) hidden = false;
         else if (vel > 60) hidden = true;
         else if (vel < -60) hidden = false;
+        if (performance.now() < dropHeader && y >= vh * 0.6 && !hdr.contains(document.activeElement)) hidden = true;
         hdr.classList.toggle('is-hidden', hidden);
         const idx = chapterRanges.findIndex(c => y + vh * 0.4 >= c.top && y + vh * 0.4 < c.bottom);
         const id = idx >= 0 ? String(idx) : '';
@@ -597,7 +606,7 @@ async function boot() {
       const link = e.target.closest('a[href]');
       if (!link) return;
       const topic = link.dataset.topicGo, bill = link.dataset.billGo;
-      holdHeader = performance.now() + 900;
+      dropHeaderForJump();
       const href = link.getAttribute('href');
       landing = href.startsWith('#') ? $(href) : null;
       if (href === '#catalogo') { // en móvil la muestra es una hoja: se abre cuando el menú termina de cerrarse
