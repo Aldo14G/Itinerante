@@ -80,6 +80,67 @@ motion:
 
 > **Estado: sistema vigente del sitio publicado en la raíz** (`index.html`), promovido desde el prototipo B.4 el 2026-11-01. Este archivo y `design/tokens.json` son la fuente de verdad visual. Los valores salen de `design/tokens.json` → `tokens.css` (generado con `npm run tokens`). El canon anterior (Claude Design/Higgsfield) vive en `design-system/libreria-itinerante-y-mas/MASTER.md` solo como referencia histórica. El sitio todavía no está desplegado.
 
+## Sistema táctil (vigente desde 2026-11-11; manda sobre lo que lo contradiga más abajo)
+
+Decisión de Aldo: los componentes deben sentirse como los de una app de aprendizaje bien hecha (piezas que se hunden al tocarlas, estados inequívocos, tipografía redonda), con **nuestra identidad**: paleta turquesa, blanco y menta del logo y fotos reales de la casa. No se copian colores, mascota, ilustraciones ni iconos de ninguna app. El sitio solo tiene que resolver cinco cosas: **menú, secciones, catálogo, eventos y talleres, novedades**.
+
+### Reglas de forma (una sola familia de piezas)
+
+| Pieza | Forma | Reposo | Al presionar | Elegido / activo |
+|---|---|---|---|---|
+| **Control** (botón secundario, chip, campo, fila de menú, parada del recorrido, botón de icono) | radio `--radius-ctl` (16 px; círculo si es de icono), borde `--edge-w` (2 px) `--edge`, **canto** inferior `box-shadow: 0 var(--lip) 0 var(--edge)` (4 px), fondo `--night` del tono (blanco en claro) | tinta `--bone` | baja `translate: 0 var(--lip)` y el canto pasa a `0 0 0`; nunca cambia de tamaño ni empuja a sus vecinos | fondo `--pick-fill`, borde y canto `--terra`, texto e icono `--pick-ink`; el icono se rellena |
+| **Primaria** («Cómo llegar», una por pantalla) | igual radio y canto | fondo `--terra-deep`, canto `--terra-lip`, texto blanco, sin borde | igual que un control | no aplica |
+| **Tarjeta** (publicación de evento, ficha, bloque de visita, grupo del menú) | radio `--radius-card` (20 px), borde 2 px `--edge-soft`, canto 4 px `--edge-soft` solo si toda la tarjeta es tocable | fondo `--night` del tono | solo si es tocable | borde `--terra` si representa lo elegido |
+| **Portada de libro** | radio 12 px, sin borde; canto 4 px `--edge-soft` | — | baja con el canto | — |
+| **Insignia** («Nuevo», «Taller», «Hoy», conteos) | radio `--radius-pill`, sin canto, 12 px en `--f-display` 800 | fondo `--pick-fill`, texto `--pick-ink` | — | «Nuevo»: fondo `--terra-deep`, texto blanco |
+
+- **Un solo código de «elegido»** en todo el sitio: relleno menta `--pick-fill` + borde y canto `--terra` + tinta `--pick-ink`. Sustituye a la cápsula turquesa sólida con texto blanco. El único relleno turquesa profundo de cada pantalla es la primaria.
+- **Canto, no sombra difusa.** Las sombras `--elev-1` y `--elev-2` quedan solo para lo que flota sobre la página (hojas, aviso, cabecera sólida). Nada que esté en el flujo lleva sombra difusa.
+- **Bordes con contraste.** `--edge` da ≥ 3:1 contra el fondo de su tono (WCAG 1.4.11) y es el borde de todo control; `--edge-soft` es solo para contenedores que no son controles.
+- **Objetivos:** todo control mide ≥ 48 px de alto en móvil (44 mínimo absoluto) y deja ≥ 8 px a su vecino; el canto no cuenta como separación.
+- **Foco:** contorno de 2 px en tinta con 2 px de separación, por fuera del canto.
+- **Espaciado y tamaños** solo de la escala de tokens (4 px). Nada de valores sueltos.
+
+### Tipografía
+
+- `--f-display` (**Nunito** variable, OFL, alojada en `assets/fonts/`): titulares (h1–h3), botones, chips, pestañas, insignias, rótulos de formulario, cifras y el rótulo «ITINERANTE». Pesos 800 (controles y subtítulos) y 900 (titulares). **Sin mayúsculas forzadas** salvo el rótulo «ITINERANTE» y las insignias; sin condensar (`font-stretch` normal).
+- `--f-sans` (**Archivo**): solo texto corrido, notas y las portadas tipográficas de los libros (son «objetos», conservan su condensada).
+- **Bodoni Moda se retira** (archivo, precarga y token): el énfasis `em` de los titulares va en la misma familia redonda, peso 800, color `--tungsten` del tono.
+- Escala: titular de capítulo `--fs-6` en móvil y `clamp(var(--fs-6), 4vw, var(--fs-7))` en escritorio, interlínea 1.1, interletra −0.01em; titular de capa `--fs-5`; botones `--fs-2`; chips y pestañas `--fs-1` y `--fs-0`. Como máximo **6 tamaños de letra por pantalla**; los valores sueltos (16.3, 16.8, 20.8 px…) se llevan al token más cercano.
+
+### Movimiento (respuesta, no decoración)
+
+- Presionar: `translate` con `--dur-instant` (120 ms) y `--ease-out`.
+- Elegir (chip, parada, «Me interesa», guardar): el icono hace un rebote corto `scale 1 → 1.12 → 1` con `--spring` y `--dur-fast`.
+- Insignia «Nuevo» y punto de aviso: aparecen con el mismo rebote, una sola vez.
+- Con «reducir movimiento» no hay rebote ni traslado animado: el estado cambia al instante. Todas las duraciones salen de tokens (`motion.js`).
+
+### Navegación y orden de la página
+
+- **Orden:** Inicio (foto, nombre, estado, «Cómo llegar»; debajo «La casa») → **Catálogo** (`#libros`) → **Eventos y talleres** (`#cartelera`) → **Novedades** (`#novedades`) → Visita (`#visita`) → pie. Los `id` no cambian; cambian los nombres visibles.
+- **Barra inferior (móvil):** acoplada al borde inferior, de lado a lado, blanca, con borde superior de 2 px `--edge-soft` y alto `--tabbar-h` más el área segura. Cinco casillas iguales **con nombre siempre visible**: Inicio, Catálogo, Eventos, Novedades, Más. La activa lleva el código de «elegido» (casilla menta con borde `--terra`, icono relleno, nombre en `--pick-ink`). «Novedades» muestra un punto `--terra-deep` cuando hay llegadas que la persona no ha visto. «Más» abre la hoja de menú.
+- **Cabecera de escritorio:** Catálogo, Eventos, Novedades, Visita; mismo orden que la página.
+- **Hoja «Más»:** Mi lista, Buscar en el catálogo, La casa, Visita (horario y dirección), redes; pie con «Cómo llegar» y WhatsApp. Filas como controles táctiles.
+
+### Catálogo como recorrido
+
+- Las colecciones son **paradas** de un recorrido: botones redondos de 64 px (control táctil) con un icono propio y su nombre debajo, unidos por una línea punteada; en móvil la fila alterna la altura de las paradas (zigzag corto) y se desplaza en horizontal si no caben.
+- Estados: **actual** (código de «elegido», un poco más grande), **hojeada** (marca de verificación en una insignia sobre la parada y su tramo de línea en `--terra`), **por hojear** (blanca).
+- Una parada se marca hojeada cuando la persona la elige y su carrusel se pinta. Se guarda en `localStorage`, sin cuenta. Debajo: «N de M paradas hojeadas» con una barra de progreso. Es un dato local y verdadero; no hay puntos, vidas, rachas ni retos.
+- Sigue siendo un `radiogroup` (flechas, `aria-checked`); el progreso se anuncia en una región `aria-live`.
+
+### Novedades
+
+- Fuente: `novedades.entradas` de `assets/data/collections.json`, lista de `{ "id": "…", "llegada": "AAAA-MM-DD" }` ordenada por la librería. Sin entradas la sección, su pestaña y sus enlaces no existen.
+- **«Nuevo»** = llegó después de la última vez que esta persona vio Novedades (fecha guardada en `localStorage` cuando la sección entra en pantalla). En la primera visita cuentan como nuevas las llegadas de los últimos 14 días. La cabecera dice cuántas («3 llegaron desde tu última visita») y, si no hay, «Ya viste todo lo que ha llegado».
+- Con llegadas sin ver: punto en la pestaña Novedades y, en Inicio, un control «N novedades desde tu visita» que lleva a la sección. Nunca se presenta como ranking ni se inventan cifras.
+- Actualizar: añadir entradas al JSON; no hay que tocar HTML ni JS.
+
+### Eventos y talleres
+
+- Cada propuesta es una tarjeta: foto 4:3, insignia de tipo (Lectura, Juego, Taller) y de estado («Propuesta · sin fecha» mientras no haya fecha confirmada; con fecha real, la fecha), título, frase, descripción, y tres acciones: «Me interesa» (control que se elige), «Compartir» (control de icono) y «Preguntar por WhatsApp» (control secundario). «Cómo llegar» sigue siendo la única primaria del capítulo.
+- En escritorio se conserva el acordeón con escenario, con la misma piel.
+
 ## Mundo
 
 **Moderno y minimalista en lo digital; rústico y clásico en la casa.** La librería se mudó a una casa clásica del Barrio Antiguo: la piedra, la madera y el piso ajedrezado viven en las fotos, y solo ahí. El sitio, en cambio, es el logo llevado a página: blanco y turquesa, tipografía grande y aire. **El sitio es claro de punta a punta**, incluido el hero: la entrada se lee sobre blanco (tono `light`: fondo `#ffffff`, tinta `#10201e`) y la foto del pasillo se funde hacia ese fondo con un velo en la base. Siguen la bruma (tono `mist`, `#eef6f4`, un blanco apenas teñido de turquesa) en La casa, la cortinilla y Libros, de nuevo blanco (`light`) en el manifiesto y el catálogo, el campo turquesa del logo (`#7ac4b4`, tinta `#0c2825`) en Cartelera, de nuevo blanco (`light`) en la cita y el llamado, que hacen de entrada de la Visita, y el tono profundo (`deep`, `#0f2724`, texto `#f8f8f8`) en el pie. La única acción primaria, «Cómo llegar», es turquesa profundo (`--terra-deep` `#176b62`, texto blanco, 6.3:1); el turquesa profundo sirve también como color de texto de acento sobre blanco y bruma (`#176b62` y `#14625a`). Las secciones sin tono usan los tokens de `:root`.

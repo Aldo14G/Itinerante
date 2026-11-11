@@ -18,6 +18,13 @@
       "source": "https://fonts.gstatic.com/s/bodonimoda/v28/aFTS7PxzY382XsXX63LUYJSPeKrcWw.woff2",
       "family": "Bodoni Moda",
       "style": "italic"
+    },
+    {
+      "file": "nunito-normal-latin.woff2",
+      "source": "npm:@fontsource-variable/nunito@5.3.0/files/nunito-latin-wght-normal.woff2",
+      "family": "Nunito",
+      "style": "normal",
+      "license": "OFL-1.1 (assets/fonts/OFL-nunito.txt)"
     }
   ]
 }

@@ -52,10 +52,16 @@
   --glass-solid: rgb(255 255 255 / 1);
   --glass-edge: rgb(16 32 30 / 0.6);
   --glass-chip: rgb(16 32 30 / 0.06);
+  --edge: #5f8f88;
+  --edge-soft: rgb(248 248 248 / 0.16);
+  --pick-fill: #1b4a44;
+  --pick-ink: #8fe0d5;
+  --terra-lip: #0e4a44;
 
   /* Tipografía */
   --f-sans: "Archivo", Arial, Helvetica, system-ui, sans-serif;
   --f-serif: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-display: "Nunito", "Archivo", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
 
   /* Escala tipográfica */
   --fs-0: 0.75rem;
@@ -111,6 +117,9 @@
   --elev-1: 0 1px 2px rgb(16 32 30 / 0.06), 0 4px 12px rgb(16 32 30 / 0.08);
   --elev-2: 0 2px 6px rgb(16 32 30 / 0.08), 0 14px 32px rgb(16 32 30 / 0.16);
   --elev-in: inset 0 1px 2px rgb(16 32 30 / 0.10);
+  --radius-ctl: 16px;
+  --edge-w: 2px;
+  --lip: 4px;
 
   /* Objetivos y medida */
   --target-fine: 24px;
@@ -140,6 +149,10 @@
   --terra-light: #176b62;
   --glass-edge: rgb(16 32 30 / 0.6);
   --glass-chip: rgb(16 32 30 / 0.06);
+  --edge: #6f8985;
+  --edge-soft: #d3e1de;
+  --pick-fill: #dcf1ec;
+  --pick-ink: #0f5248;
   background: var(--night);
   color: var(--bone);
 }
@@ -162,6 +175,10 @@
   --terra-light: #14625a;
   --glass-edge: rgb(16 32 30 / 0.6);
   --glass-chip: rgb(16 32 30 / 0.06);
+  --edge: #6f8985;
+  --edge-soft: #c5d8d4;
+  --pick-fill: #d2ebe5;
+  --pick-ink: #0f5248;
   background: var(--night);
   color: var(--bone);
 }
@@ -177,6 +194,10 @@
   --line: rgb(248 248 248 / 0.2);
   --line-strong: rgb(248 248 248 / 0.4);
   --field: rgb(248 248 248 / 0.7);
+  --edge: #5f8f88;
+  --edge-soft: rgb(248 248 248 / 0.16);
+  --pick-fill: #1b4a44;
+  --pick-ink: #8fe0d5;
   background: var(--night);
   color: var(--bone);
 }
