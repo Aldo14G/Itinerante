@@ -1,6 +1,7 @@
 // Comprobaciones del sitio (modelo B.4 «Función de la casa», en la raíz del repo): node --test tests/site.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { readFile, access, readdir } from 'node:fs/promises';
 import { pickBooks } from '../rail.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
@@ -96,8 +97,6 @@ test('datos de muestra: sin precios ni existencias', () => {
 test('recursos referenciados existen', async () => {
   const refs = [...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m => m[1]);
   refs.push(...Object.values(TOPICS).map(t => `assets/img/${t.img}`));
-  for (let i = 1; i <= 145; i++) refs.push(`assets/seq/f${String(i).padStart(3, '0')}.webp`);
-  for (let i = 1; i <= 73; i++) refs.push(`assets/seq-m/m${String(i).padStart(3, '0')}.webp`);
   for (const b of data.books) if (b.c) refs.push(`assets/${b.c}`);
   for (const ref of new Set(refs)) await access(here(`./${ref}`));
 });
@@ -108,7 +107,10 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
   prov.aiRecreation.forEach(f => kind.set(f.file, 'ai'));
   prov.brand.forEach(f => kind.set(f.file, 'brand'));
   for (const f of await readdir(here('./assets/img'))) assert.ok(kind.has(`img/${f}`), `sin procedencia: img/${f}`);
-  assert.ok([...kind.keys()].some(k => k.startsWith('seq/')) && [...kind.keys()].some(k => k.startsWith('seq-m/')));
+  assert.equal(prov.aiRecreation.length, 0, 'no quedan recreaciones: todas las imágenes son fotografías de la casa');
+  assert.ok(![...kind.keys()].some(k => k.startsWith('seq')) && !existsSync(here('./assets/seq')) && !existsSync(here('./assets/seq-m')), 'la secuencia de fotogramas generada se retiró');
+  assert.ok(/<img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp"/.test(html) && /srcset="assets\/img\/inicio-sala-m\.webp"/.test(html) && !/<section id="inicio"[^>]*data-seq/.test(html), 'el inicio es una fotografía fija (sin data-seq no hay recorrido por fotogramas)');
+  assert.ok(!/data-kind="ai"/.test(html) && Object.values(TOPICS).every(t => t.kind === 'real'), 'marcado y temas declaran solo fotografías');
   const stills = [...html.matchAll(/<li class="still">([\s\S]*?)<\/li>/g)].map(m => m[1]);
   assert.equal(stills.length, 6);
   for (const s of stills) {

@@ -6,10 +6,10 @@ const WA = 'https://wa.me/528180875940';
 
 export const TOPICS = {
   narrativa: { name: 'Narrativa', msg: 'narrativa', line: 'Una historia lleva a otra. Novela y cuento, de aquí y de otros lados.', img: 'libro-narrativa.webp', w: 900, h: 720, alt: 'Libros de portadas de colores sobre una repisa de madera, junto a un muro de piedra', kind: 'real', place: 'La repisa de la entrada' },
-  poesia: { name: 'Poesía', msg: 'poesía', line: 'Para leer despacio y en voz alta. Pregunta por un poeta o deja que te recomienden.', img: 'libro-poesia.webp', w: 760, h: 608, alt: 'Pilas de libros junto a un muro de piedra', kind: 'ai', place: 'Pilas por descubrir' },
+  poesia: { name: 'Poesía', msg: 'poesía', line: 'Para leer despacio y en voz alta. Pregunta por un poeta o deja que te recomienden.', img: 'libro-poesia.webp', w: 760, h: 608, alt: 'Diccionario antiguo sobre una mesa de libros, frente a un muro de piedra con cuadros', kind: 'real', place: 'Entre diccionarios y cuadros' },
   ensayo: { name: 'Ensayo', msg: 'ensayo', line: 'Ideas para conversar después. Cuéntanos qué tema te ronda.', img: 'libro-ensayo.webp', w: 900, h: 720, alt: 'Portadas de colores sobre una mesa blanca, vistas de cerca', kind: 'real', place: 'La mesa de libros' },
   cronica: { name: 'Crónica', msg: 'crónica', line: 'La realidad contada de cerca: ciudades, viajes y testimonios.', img: 'libro-cronica.webp', w: 760, h: 608, alt: 'Librero de madera con libros de periodismo, junto a un grabado enmarcado', kind: 'real', place: 'El rincón de lectura' },
-  infantil: { name: 'Infantil', msg: 'literatura infantil', line: 'Libros para leer juntos, en mesas con lugar para todos.', img: 'libro-infantil.webp', w: 760, h: 608, alt: 'Librero lleno de libros junto a una ventana y una mesa blanca', kind: 'ai', place: 'Los libreros' },
+  infantil: { name: 'Infantil', msg: 'literatura infantil', line: 'Libros para leer juntos, en mesas con lugar para todos.', img: 'libro-infantil.webp', w: 760, h: 608, alt: 'Globo terráqueo antiguo junto a una fila de libros en un estante de madera', kind: 'real', place: 'El globo terráqueo' },
   libre: { name: 'Sin rumbo fijo', msg: '', line: 'Empieza por una mesa, una portada o una conversación. Te ayudamos a buscar.', img: 'libro-libre.webp', w: 760, h: 608, alt: 'Pilas de libros sobre una mesa negra junto a una repisa', kind: 'real', place: 'El rincón de lectura' }
 };
 
@@ -390,7 +390,7 @@ async function boot() {
     if (desktopLoad || vw <= 760) return;
     desktopLoad = import('./scenes-desktop.js').then(m => {
       const c = { $, $$, clamp, smooth, damp, absTop, isMotion, kick, vw: () => vw, vh: () => vh };
-      entry.attach(m.createEntryScene(c, entry));
+      if (entry.sec.dataset.seq) entry.attach(m.createEntryScene(c, entry)); // el recorrido por fotogramas solo existe si la entrada lo declara (data-seq); hoy el inicio es una fotografía fija de la casa
       wipe.attach(m.createWipeScene(c));
       applyMode();
     }).catch(err => {

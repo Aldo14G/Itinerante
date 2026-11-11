@@ -42,8 +42,8 @@ export const REQUIRED_IN_ASSETS = [
   "assets/data/catalog.json",
   "assets/data/collections.json",
   "assets/img/logo-96.webp",
-  "assets/seq/f001.webp",
-  "assets/seq-m/m001.webp",
+  "assets/img/03-home-sala-central.webp",
+  "assets/img/inicio-sala-m.webp",
 ];
 // Config de Cloudflare: worker/_headers se publica como /_headers (no es contenido, lo consume el runtime).
 export const HEADERS_SOURCE = join("worker", "_headers");
