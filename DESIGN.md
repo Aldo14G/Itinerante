@@ -145,6 +145,14 @@ Decisión de Aldo: los componentes deben sentirse como los de una app de aprendi
 - Cada propuesta es una tarjeta: foto 4:3, insignia de tipo (Lectura, Juego, Taller) y de estado («Propuesta · sin fecha» mientras no haya fecha confirmada; con fecha real, la fecha), título, frase, descripción, y tres acciones: «Me interesa» (control que se elige), «Compartir» (control de icono) y «Preguntar por WhatsApp» (control secundario). «Cómo llegar» sigue siendo la única primaria del capítulo.
 - En escritorio se conserva el acordeón con escenario, con la misma piel.
 
+### Escala de controles (2026-11-12)
+
+- Tres altos y nada en medio: `--ctl-lg` 56 px («Cómo llegar» y los botones de su mismo grupo, campos, selectores, filas del menú), `--ctl-md` 48 px (todo botón, acción, chip y botón de icono) y `--ctl-sm` 44 px (acciones en texto, navegación de la cabecera, «Guardar» sobre la portada). Con alto propio: casillas de la barra (54), paradas (64), tarjetas, filas de tema y campos.
+- Rótulos de botón a 16 px; 14 en chips y acciones pequeñas. Botones de un mismo grupo comparten alto. Entre controles vecinos ≥ 8 px; dentro de un grupo de acciones, 12.
+- En escritorio el párrafo del inicio y sus dos botones van juntos a la izquierda (antes el párrafo a la izquierda y los botones al extremo derecho).
+- Estado «cerrado»: anillo hueco gris; «abierto»: punto lleno que late. Se distinguen por forma, no solo por color.
+- Lo mide `tools/qa/controles.mjs` y se puntúa con `docs/agentes/rubrica-visual.md`.
+
 ## Mundo
 
 **Moderno y minimalista en lo digital; rústico y clásico en la casa.** La librería se mudó a una casa clásica del Barrio Antiguo: la piedra, la madera y el piso ajedrezado viven en las fotos, y solo ahí. El sitio, en cambio, es el logo llevado a página: blanco y turquesa, tipografía grande y aire. **El sitio es claro de punta a punta**, incluido el hero: la entrada se lee sobre blanco (tono `light`: fondo `#ffffff`, tinta `#10201e`) y la foto del pasillo se funde hacia ese fondo con un velo en la base. Siguen el blanco (`light`) del manifiesto, la bruma (tono `mist`, `#eef6f4`, un blanco apenas teñido de turquesa) en La casa, de nuevo blanco en el Catálogo (su capa de exploración se separa con un filete) y en la cortinilla, el campo turquesa del logo (`#7ac4b4`, tinta `#0c2825`) en Eventos y talleres, bruma otra vez en Novedades, blanco en la cita y el llamado, que hacen de entrada de la Visita, y el tono profundo (`deep`, `#0f2724`, texto `#f8f8f8`) en el pie. La única acción primaria, «Cómo llegar», es turquesa profundo (`--terra-deep` `#176b62`, texto blanco, 6.3:1); el turquesa profundo sirve también como color de texto de acento sobre blanco y bruma (`#176b62` y `#14625a`). Las secciones sin tono usan los tokens de `:root`.

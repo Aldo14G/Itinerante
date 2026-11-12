@@ -105,3 +105,6 @@ La skill de este repositorio es `/autocorregir` (`npm run critique`): mide token
 - Apple HIG: el HTML es JS; la verifiqué en su JSON oficial.
 - Refactoring UI y Baymard benchmark: son de pago; no los abrí.
 - USWDS Alert: la página abrió, pero no extraje una regla textual.
+
+## MotionSites Web Builder (skill de Claude; instrucciones, referencias y scripts bajo licencia MIT)
+https://github.com/Motionsites-AI/claude-skill · Revisado el 12 nov 2026 a pedido de Aldo. Se adoptó: la revisión «mira y corrige» (capturar, puntuar diez criterios, corregir los tres más bajos con valores y repetir; vara: promedio ≥ 8 y nada < 7), los bloqueantes (destello al cargar, fuentes sin cargar, imágenes rotas, desborde) y la regla de que el fondo del lienzo sea el del borde de la imagen. Vive en `docs/agentes/rubrica-visual.md` y `tools/qa/controles.mjs`. No se adoptó: los ejemplos y la repisa de medios (licencia aparte), librerías por CDN, vidrio, video de fondo, tipografías de su catálogo ni su bloque promocional, porque chocan con la CSP, los tokens o `PRODUCT.md`.

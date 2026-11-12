@@ -124,6 +124,9 @@
   /* Objetivos y medida */
   --target-fine: 24px;
   --target-coarse: 44px;
+  --ctl-sm: 44px;
+  --ctl-md: 48px;
+  --ctl-lg: 56px;
   --measure-max: 75ch;
 
   --hair: 1px;

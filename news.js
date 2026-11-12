@@ -16,8 +16,10 @@ const STATE_KEY = 'iti-news-estado'; // lo que boot.js reserva antes del primer 
 // Lógica pura (se prueba con fechas en tests/site.test.mjs)
 
 /** Fecha local del dispositivo como AAAA-MM-DD. */
+/** El día (AAAA-MM-DD) en hora de Monterrey, el mismo reloj que el estado de apertura y las fechas de los eventos. Sin soporte de zonas horarias, el día local del dispositivo. */
 export function isoDay(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); }
+  catch { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
 }
 
 /** ¿Es una fecha real escrita como AAAA-MM-DD? (2026-02-30 no lo es). */

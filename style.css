@@ -10,7 +10,7 @@
 @media (min-width: 1728px) { :root { --gutter: calc((100vw - 1632px) / 2); } .entry-copy, .hdr { padding-inline: 48px; } }
 
 html {
-  background: var(--night);
+  background: var(--paper); /* el lienzo es el blanco del inicio (y de theme-color): sin franja oscura en el canal de la barra de desplazamiento ni destello oscuro al cargar */
   scroll-padding-top: calc(var(--hdr-h) + 8px);
   accent-color: var(--terra-deep); /* cualquier control nativo (casilla, radio, rango) toma el turquesa profundo de la paleta */
   scrollbar-color: var(--paper-dim) var(--paper); /* pista y pulgar de la paleta clara: casi todo el recorrido es blanco y bruma, no el tono profundo del pie */
@@ -222,7 +222,7 @@ p { text-wrap: pretty; }
   border: 1px solid var(--open); opacity: 0;
   animation: ping var(--dur-scene) var(--ease-out) 3; /* confirma «abierto» con tres pulsos y se queda quieto: una animación infinita en reposo cuesta batería y no orienta más que tres */
 }
-[data-open="false"] .status-dot { background: var(--terra); }
+[data-open="false"] .status-dot { background: transparent; box-shadow: inset 0 0 0 2px var(--bone-dim); } /* cerrado: anillo hueco en gris; abierto: punto lleno que late. Se distinguen por la forma, no solo por el color (WCAG 1.4.1) */
 @keyframes ping { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.8); opacity: 0; } }
 
 /* Cromo de la cabecera (Menú, Mi lista, WhatsApp): controles blancos con tinta, iguales sobre la foto, el blanco, el campo turquesa y el pie. */
@@ -304,12 +304,12 @@ p { text-wrap: pretty; }
 
 .entry-copy { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; flex-direction: column; padding: 0 var(--gutter); }
 .entry-row:focus-within, .entry-facts:focus-within { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
-.entry-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 20px; }
+.entry-row { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); margin-bottom: var(--space-5); } /* el texto y sus acciones juntos, a la izquierda (proximidad y lectura en F): antes el párrafo iba a la izquierda y los botones al extremo derecho */
 .entry-lede { max-width: 40ch; margin: 0; font: 480 var(--fs-body)/1.45 var(--f-sans); color: var(--bone); }
 .entry-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 /* Datos de la visita y, a su derecha (bajo las acciones), el control de novedades. El control solo existe con llegadas sin ver; su sitio se reserva antes del
    primer render (clase news-hint, que pone boot.js con lo que dejó la visita anterior) para que al llegar el conteo nada se mueva. */
-.entry-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); margin: 0 0 clamp(6px, 1vw, 14px); }
+.entry-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: var(--space-3) var(--space-6); margin: 0 0 clamp(6px, 1vw, 14px); }
 .entry-news { display: none; flex: none; }
 .news-hint .entry-news { display: inline-flex; visibility: hidden; }
 .news-hint .entry-news:not([hidden]) { visibility: visible; }
@@ -591,7 +591,8 @@ p { text-wrap: pretty; }
 .hours { width: 100%; padding: var(--space-2) var(--space-5); border: var(--edge-w) solid var(--edge-soft); border-radius: var(--radius-card); border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; }
 .hours caption { padding-bottom: var(--space-3); text-align: left; font: 800 var(--fs-1)/1.2 var(--f-display); color: var(--paper-dim); }
 .hours th, .hours td { padding: var(--space-4) 0; text-align: left; }
-.hours td { text-align: right; white-space: nowrap; } /* «11:00–20:00» no se parte (a 768 px la columna angosta lo cortaba en dos renglones) */
+.hours td { text-align: right; white-space: nowrap; overflow-wrap: normal; }
+@media (max-width: 30em) { .hours td { white-space: normal; } } /* con el texto ampliado la columna se angosta: ahí el horario puede partir en el guion antes que desbordar */ /* «11:00–20:00» no se parte (a 768 px la columna angosta lo cortaba en dos renglones) */
 .hours tr.is-today th::after { content: "Hoy"; margin-left: var(--space-3); vertical-align: 1px; text-transform: uppercase; } /* insignia: mismo relleno y tinta de «elegido» que chips y pestaña */
 .visit-note { margin: var(--space-4) 0 0; font-size: var(--fs-1); color: var(--paper-dim); }
 .visit-arrival { margin: var(--space-6) 0 0; } /* en escritorio va en la columna derecha, bajo el horario: la retícula 7/5 no deja un vacío junto a la foto */
@@ -1090,7 +1091,7 @@ html.sheet-open { overflow: hidden; }
    Geometría: --pitch es la distancia entre centros y --zig el escalón entre paradas pares e impares; la línea mide hypot(pitch, zig) y gira
    atan2(zig, pitch). Sin esas funciones la fila queda recta. El primer disco y el último quedan al ras del contenido (alineados con el titular). */
 .rail-chips {
-  --stop: 64px; --pitch: 128px; --zig: 0px; --name-h: 36px;
+  --stop: 64px; --pitch: clamp(128px, 14vw, 216px); --zig: 0px; --name-h: 36px;
   display: flex; align-items: flex-start; gap: calc(var(--pitch) - var(--stop));
   margin: 0 calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) var(--space-1);
   overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
@@ -1281,3 +1282,21 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
 .card:active .badge-new, .card[data-opening] .badge-new { translate: 0 var(--lip); }
 .motion .news.is-in .badge-new { animation: pick-pop var(--dur-fast) var(--spring); } /* aparece con el rebote, una vez, cuando la sección entra en pantalla */
 @media print { .news { display: none; } }
+
+/* ---------- Escala de controles (2026-11-12): tres alturas y nada en medio ----------
+   --ctl-lg 56 px: la primaria («Cómo llegar») y los botones de su mismo grupo, campos, selectores y filas de menú.
+   --ctl-md 48 px: todo botón, acción, chip y botón de icono.
+   --ctl-sm 44 px: enlaces de acción en texto (pie, «Ver todo», «Ver las N»), navegación de la cabecera y controles sobre una portada.
+   Botones de un mismo grupo comparten alto; entre controles vecinos quedan al menos 12 px (WCAG 2.5.5 y 2.5.8 con holgura). */
+.btn, .act, .rail-btn, .entry-news, .cat-chip, .toast-action { min-height: var(--ctl-md); }
+.btn, .act { font-size: var(--fs-2); }
+.btn--tungsten, .btn:has(~ .btn--tungsten), .btn--tungsten ~ .btn { min-height: var(--ctl-lg); padding-inline: var(--space-6); }
+.hdr .btn, .btn--sm { min-height: var(--ctl-sm); padding-inline: var(--space-4); font-size: var(--fs-1); }
+.act--icon, .rail-btn, .drawer-close, .ml-close, .ml-remove, .sm-close, .ex-close { width: var(--ctl-md); height: var(--ctl-md); min-height: var(--ctl-md); }
+.bill-acts { gap: var(--space-3); }
+.skip { display: inline-flex; align-items: center; min-height: var(--ctl-sm); padding-block: 0; }
+.ftr-links a { min-height: var(--ctl-sm); padding-block: 0; }
+.ftr-links { column-gap: var(--space-6); row-gap: var(--space-2); }
+.cat-more-facets { display: inline-flex; align-items: center; min-height: var(--ctl-sm); margin-top: var(--space-2); padding: 0 var(--space-2); }
+.cat-opt label { min-height: var(--ctl-sm); }
+.rail-all, .ftr-route, .motion-btn, .cat-clear, .hdr-list { min-height: var(--ctl-sm); }

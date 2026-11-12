@@ -31,7 +31,7 @@ export function renderSite(tokens) {
   group('Radios', Object.entries(s.radius).map(([k, v]) => [`radius-${k}`, v]));
   group('Movimiento', [...Object.entries(s.duration).map(([k, v]) => [`dur-${k}`, v]), ...Object.entries(s.stagger).map(([k, v]) => [`stagger-${k}`, v]), ...Object.entries(s.intent).map(([k, v]) => [`intent-${k}`, v]), ...Object.entries(t.ease)]);
   group('Distribución', Object.entries(t.layout));
-  group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
+  group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['ctl-sm', `${s.control.sm}px`], ['ctl-md', `${s.control.md}px`], ['ctl-lg', `${s.control.lg}px`], ['measure-max', `${s.measure.max}ch`]]);
   lines.push(`  --hair: ${s.hair.base};`);
   Object.entries(t.root).forEach(([k, v]) => lines.push(`  ${k}: ${v};`));
   const print = Object.entries(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');

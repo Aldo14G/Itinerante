@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 const URL_ = process.argv[2] || 'http://127.0.0.1:8105/';
 const out = process.argv[3] || '.';
 mkdirSync(out, { recursive: true });
-const port = 9470;
+const port = 9400 + Math.floor(Math.random() * 60); // puerto al azar: dos corridas a la vez (agentes en paralelo) ya no chocan
 const chrome = spawn((process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe'), ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--disable-extensions', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'iti-e2e-'))}`, '--hide-scrollbars', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let targets;
@@ -257,4 +257,4 @@ console.log(`PASS ${report.filter(r => r.ok).length} / ${report.length}  FAIL ${
 for (const f of fails) console.log(`✗ [${f.area}] ${f.name}\n    ${f.detail}`);
 console.log('info', report.at(-1).detail);
 chrome.kill();
-process.exit(0);
+process.exit(fails.length ? 1 : 0); // código ≠ 0 si algo falla, como el resto del arnés

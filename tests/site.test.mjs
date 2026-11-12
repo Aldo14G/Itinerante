@@ -6,7 +6,7 @@ import { readFile, access, readdir } from 'node:fs/promises';
 import { pickBooks, stopIcon, STOP_ICON, trailProgress, readTrail, writeTrail, TRAIL_KEY } from '../rail.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
-import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, NEWS_SIZE, NEW_DAYS } from '../news.js';
+import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
 import { readInterest, shareName, initFeed, eventBadge, NO_DATE } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
 import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
@@ -328,7 +328,7 @@ test('móvil: hoja «Más» con lo que la barra no tiene, filas táctiles y dest
   assert.ok(!/aria-expanded|sm-group|sm-sub|sm-caret|data-topic-go|data-bill-go/.test(dlg) && !/sm-group|setGroup|topicGo|billGo/.test(app) && !/\.sm-sub|\.sm-caret|\.sm-group/.test(mobileCss), 'sin acordeones ni atajos a temas o propuestas: cada fila lleva a su destino');
   const foot = dlg.match(/<div class="sm-foot">[\s\S]*?<\/div>/)[0];
   assert.equal((foot.match(/btn--tungsten/g) || []).length, 1, 'una sola acción primaria en la hoja');
-  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost sm-wa"[^>]*wa\.me[^>]*aria-label="Escribir por WhatsApp"/.test(foot) && !/sm-social/.test(foot) && /\.sm-foot \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 48px;/.test(mobileCss), '«Cómo llegar» es el primario y WhatsApp el secundario (botón de icono con nombre accesible); el pie es una sola fila y las redes van al final de la lista');
+  assert.ok(/class="btn btn--tungsten"[^>]*google\.com\/maps[^>]*>\s*<span>Cómo llegar/.test(foot) && /class="btn btn--ghost sm-wa"[^>]*wa\.me[^>]*aria-label="Escribir por WhatsApp"/.test(foot) && !/sm-social/.test(foot) && /\.sm-foot \{ display: grid; grid-template-columns: minmax\(0, 1fr\) var\(--ctl-lg\); gap: var\(--space-3\);/.test(mobileCss), '«Cómo llegar» es el primario y WhatsApp el secundario (botón de icono con nombre accesible); el pie es una sola fila y las redes van al final de la lista');
   assert.ok(/<div class="sm-card">\s*<a class="sm-row" href="#visita">[\s\S]*?<p class="sm-status" data-status>[\s\S]*?data-status-long[\s\S]*?<dl class="sm-hours"><dt>Lunes a sábado<\/dt><dd>11:00–20:00<\/dd><dt>Domingo<\/dt><dd>Cerrado<\/dd><\/dl>/.test(dlg), 'Visita: tarjeta con la fila que lleva a la sección y, a la vista, el estado de hoy y el horario');
   assert.ok(/<a class="sm-row" href="#visita">[\s\S]*?<small class="sm-meta">Matamoros 421, Centro<\/small>/.test(dlg), 'la fila de Visita lleva la dirección');
   assert.ok(/\.sm-card \{[^}]*border: var\(--edge-w\) solid var\(--edge-soft\); border-radius: var\(--radius-card\); \}/.test(mobileCss), 'el grupo de Visita es una tarjeta (radio de tarjeta, borde suave)');
@@ -963,7 +963,7 @@ test('Novedades: capítulo propio, reservado sin saltos, ausente sin entradas y 
   const copy = html.match(/<div class="entry-copy"[\s\S]*?<\/section>/)[0];
   assert.ok(/<div class="entry-meta">\s*<ul class="entry-facts"[\s\S]*?<\/ul>\s*<a class="btn btn--sm btn--ghost entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"><\/span><span data-news-cta-text><\/span>/.test(copy) && copy.indexOf('entry-news') > copy.indexOf('btn--tungsten'), 'control secundario después de «Cómo llegar», con texto propio (el punto es decorativo)');
   assert.ok(/\.entry-news \{ display: none; flex: none; \}\s*\.news-hint \.entry-news \{ display: inline-flex; visibility: hidden; \}\s*\.news-hint \.entry-news:not\(\[hidden\]\) \{ visibility: visible; \}/.test(css), 'sin reserva no ocupa sitio; con reserva lo ocupa invisible hasta que llega el conteo: nada salta');
-  assert.ok(/\.entry-meta \{ display: contents; \}\s*\.news-hint \.entry-copy \{ grid-template-areas: "av name" "av facts" "row row" "news news"; \}\s*\.entry-news \{ grid-area: news; min-height: 48px; \}/.test(mobileCss), 'en móvil el control baja al pie del perfil, bajo «Cómo llegar», de 48 px; sin reserva la retícula no deja hueco');
+  assert.ok(/\.entry-meta \{ display: contents; \}\s*\.news-hint \.entry-copy \{ grid-template-areas: "av name" "av facts" "row row" "news news"; \}\s*\.entry-news \{ grid-area: news; min-height: var\(--ctl-md\); \}/.test(mobileCss), 'en móvil el control baja al pie del perfil, bajo «Cómo llegar», de 48 px (--ctl-md); sin reserva la retícula no deja hueco');
   assert.ok(/root\.classList\.toggle\('news-hint'/.test(news) && /new IntersectionObserver\(es => \{\s*if \(es\.some\(e => e\.isIntersecting\)\) return;/.test(news), 'si la reserva no coincide, se corrige con el inicio fuera de la vista');
   // Carga: módulo ligero para el conteo temprano; carrusel y catálogo solo al pintar la tira.
   assert.ok(!/^import [^;]*(rail|catalog|saved)\.js/m.test(news) && /import\('\.\/rail\.js'\), import\('\.\/catalog\.js'\)/.test(news), 'news.js no arrastra el catálogo para contar');
@@ -977,7 +977,8 @@ test('Novedades: capítulo propio, reservado sin saltos, ausente sin entradas y 
   // Insignia «Nuevo» y verdad: dentro del botón (nombre accesible), turquesa profundo con blanco; la fecha no se imprime.
   assert.ok(/li\.querySelector\('\.card'\)\.prepend\(badge\(\)\)/.test(news) && /b\.textContent = 'Nuevo';/.test(news), '«Nuevo» va dentro del botón de la tarjeta: entra en su nombre accesible');
   assert.ok(/\.badge-new \{[^}]*background: var\(--terra-deep\); color: var\(--white\);/.test(css.replaceAll('\n', ' ')) && /\.motion \.news\.is-in \.badge-new \{ animation: pick-pop var\(--dur-fast\) var\(--spring\); \}/.test(css), 'insignia en turquesa profundo con texto blanco; rebote solo con movimiento');
-  assert.ok(!/toLocale|Intl\.|datetime|<time/.test(news) && !/\.llegada\b|\bllegada:/.test(news.slice(news.indexOf('// Interfaz (solo navegador)'))), 'la fecha de llegada no llega a la interfaz: solo ordena y decide «Nuevo»');
+  assert.ok(!/toLocale|datetime|<time/.test(news) && !/Intl\.|\.llegada\b|\bllegada:/.test(news.slice(news.indexOf('// Interfaz (solo navegador)'))), 'la fecha de llegada no llega a la interfaz: solo ordena y decide «Nuevo» (Intl solo calcula el día de Monterrey en la lógica pura, nunca formatea texto visible)');
+  assert.equal(isoDay(new Date('2026-11-12T05:30:00Z')), '2026-11-11', '«visto» y «hoy» se cuentan en el día de Monterrey (23:30 del 11 allá), no en el del dispositivo');
   assert.ok(/rail\.bookCard\(b, tones\[i\]\)/.test(news) && /rail\.wireBookOpen\(track, ensureCatalog\)/.test(news), 'misma tarjeta, guardar y ficha que el carrusel de colecciones');
 });
 
@@ -1417,4 +1418,24 @@ test('scroll-spy: Inicio abarca la entrada, el manifiesto y La casa; cada capít
   const tabbar = html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0];
   assert.ok(!/href="#visita"/.test(tabbar) && !/aria-current/.test(tabbar.match(/<button class="tab-menu"[\s\S]*?<\/button>/)[0]) && !/tab-menu[^;]*aria-current/.test(app), 'en Visita y el pie la barra no marca ninguna casilla; «Más» abre una hoja y no se marca');
   assert.ok(/tabLinks\.forEach\(a => a\.addEventListener\('click', dropHeaderForJump\)\);/.test(app), 'al saltar desde una casilla la cabecera no tapa el titular');
+});
+
+test('escala de controles: tres altos (44 / 48 / 56), separación de 12 px en los grupos y acciones del inicio junto a su texto', async () => {
+  const tokens = JSON.parse(await readFile(here('./design/tokens.json'), 'utf8'));
+  const tcss = await readFile(here('./tokens.css'), 'utf8');
+  const css = await readFile(here('./style.css'), 'utf8');
+  const mobileCss = await readFile(here('./mobile.css'), 'utf8');
+  const tool = await readFile(here('./tools/qa/controles.mjs'), 'utf8');
+  const rubric = await readFile(here('./docs/agentes/rubrica-visual.md'), 'utf8');
+  assert.deepEqual(tokens.size?.control ?? Object.values(tokens).find(g => g && g.control)?.control, { sm: 44, md: 48, lg: 56 }, 'la escala vive en design/tokens.json');
+  assert.ok(/--ctl-sm: 44px;/.test(tcss) && /--ctl-md: 48px;/.test(tcss) && /--ctl-lg: 56px;/.test(tcss), 'tokens.css la genera');
+  assert.ok(/\.btn, \.act, \.rail-btn, \.entry-news, \.cat-chip, \.toast-action \{ min-height: var\(--ctl-md\); \}/.test(css), 'todo botón, acción y chip mide 48');
+  assert.ok(/\.btn--tungsten, \.btn:has\(~ \.btn--tungsten\), \.btn--tungsten ~ \.btn \{ min-height: var\(--ctl-lg\);/.test(css), 'la primaria y los botones de su grupo miden 56: un grupo comparte alto');
+  assert.ok(/\.cat-more-facets \{ display: inline-flex; align-items: center; min-height: var\(--ctl-sm\);/.test(css) && /\.ftr-links a \{ min-height: var\(--ctl-sm\);/.test(css) && /\.skip \{ display: inline-flex; align-items: center; min-height: var\(--ctl-sm\);/.test(css), '«Ver las N», los enlaces del pie y el salto al contenido llegan a 44 (medían 30, 41 y 40)');
+  assert.ok(/\.bill-acts \{ gap: var\(--space-3\); \}/.test(css) && /\.sm-foot \{ display: grid; grid-template-columns: minmax\(0, 1fr\) var\(--ctl-lg\); gap: var\(--space-3\);/.test(mobileCss), '12 px dentro de los grupos de acciones');
+  assert.ok(/\.entry-row \{ display: flex; flex-direction: column; align-items: flex-start;/.test(css), 'en escritorio el párrafo del inicio y sus botones van juntos a la izquierda');
+  assert.ok(/\[data-open="false"\] \.status-dot \{ background: transparent; box-shadow: inset 0 0 0 2px var\(--bone-dim\); \}/.test(css), 'cerrado: anillo hueco gris (forma, no solo color); el turquesa ya no dice «cerrado»');
+  assert.ok(/html \{\n  background: var\(--paper\);/.test(css), 'el lienzo es el blanco del inicio: sin franja ni destello oscuro');
+  assert.ok(/const SCALE = \[44, 48, 56\]/.test(tool) && /process\.exit\(fails \? 1 : 0\)/.test(tool) && /< 8\)/.test(tool), 'controles.mjs mide la escala, la separación y falla con código 1');
+  assert.ok(/promedio ≥ 8 y ningún criterio < 7/.test(rubric) && /MIT/.test(rubric), 'la rúbrica adaptada de MotionSites fija la vara y cita su licencia');
 });
