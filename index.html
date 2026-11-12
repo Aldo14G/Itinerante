@@ -46,7 +46,7 @@
     <symbol id="i-tile" viewBox="0 0 24 24"><path d="M3 3h9v9H3zM12 12h9v9h-9z" fill="currentColor" stroke="none"/></symbol>
     <!-- Recorrido del catálogo: una parada por colección (`icono` en assets/data/collections.json; sin él, c-libro) y la marca de «hojeada». Dibujos propios. -->
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4.3 4.3 8.7-9.3" fill="none"/></symbol>
-    <symbol id="c-libro" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M8 4h8.5A1.5 1.5 0 0 1 18 5.5v13a1.5 1.5 0 0 1-1.5 1.5H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3.5 4v2.5H15V8z"/><path d="M9 4v16" fill="none"/></symbol>
+    <symbol id="c-libro" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M8 4h8.5A1.5 1.5 0 0 1 18 5.5v13a1.5 1.5 0 0 1-1.5 1.5H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3.5 4v2.5H15V8z"/><path d="M9 4v16" fill="none"/></symbol><symbol id="c-ensayo" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V17h5v-1.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/><path d="M9.5 19h5v1a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1z"/></symbol>
     <symbol id="c-ciencia-ficcion" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M7.5 14.1C4.4 15.9 2.6 17.6 3.2 18.6c.8 1.4 5.6-.1 10.6-3.1s8.6-6.5 7.8-7.9c-.5-.9-2.6-.3-5.3 1.8" fill="none"/></symbol>
     <symbol id="c-suspenso" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M8 3.5h8a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-11a3 3 0 0 1 3-3zM12 8a2 2 0 0 1 1.2 3.6l.8 4.4h-4l.8-4.4A2 2 0 0 1 12 8z"/></symbol>
     <symbol id="c-novela-historica" viewBox="0 0 24 24"><path d="M8 3.5v2.6c0 2.2 1.7 3.6 4 5.9 2.3-2.3 4-3.7 4-5.9V3.5zM8 20.5v-2.6c0-2.2 1.7-3.6 4-5.9 2.3 2.3 4 3.7 4 5.9v2.6z"/><path d="M6 3.5h12M6 20.5h12" fill="none"/></symbol>
@@ -363,6 +363,7 @@
             <p class="drawer-author" data-d-author></p>
             <button type="button" class="save save--wide" data-d-save aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-save-label>Guardar en mi lista</span></button>
           </div>
+          <p class="drawer-synopsis" data-d-synopsis hidden></p>
           <dl class="drawer-facts" data-d-facts></dl>
           <div class="drawer-ask">
             <p class="drawer-msg-label">Pásate a verlo</p>

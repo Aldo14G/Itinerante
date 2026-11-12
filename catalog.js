@@ -15,6 +15,7 @@ export const WA_NUMBER = '528180875940';
 // oscura propia, `--cover-N-ink`) para que una fila no sea un muro de marrones. Dentro de la familia el tono sale del título
 // (hash estable, FNV-1a), no del género: una colección suele ser de un solo género y así sus portadas no salen todas del mismo color.
 export const TONES = { fiction: [1, 2, 5, 6, 9], 'non-fiction': [0, 3, 4, 7, 8] };
+TONES.literatura = TONES.fiction; TONES.pensamiento = TONES['non-fiction']; // categorías del inventario real (2026-11-12)
 const titleHash = book => {
   let h = 2166136261;
   for (const ch of String(book.t ?? '')) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
@@ -49,6 +50,33 @@ export function coverTones(books) {
 }
 
 // Tono de una tarjeta ya pintada (`data-cover-tone`): viaja con la petición de abrir la ficha para que ésta lo repita.
+// Portada real (assets/img/portadas, ver data/portadas.json): la imagen no lleva texto alternativo porque el título y el autor van como
+// texto dentro de la portada (ocultos a la vista); así siguen siendo el nombre accesible del botón y la búsqueda del navegador los encuentra.
+// Sin portada real o si la imagen falla, la tarjeta tipográfica de siempre (`coverFallback`).
+export function imageCover(b, tone, { named = true, eager = false } = {}) {
+  const span = (cls, text) => { const s = document.createElement('span'); s.className = cls; if (text != null) s.textContent = text; return s; };
+  const holder = span(`cover cover--img tone-${tone}`);
+  holder.dataset.coverTone = tone;
+  const img = document.createElement('img');
+  img.src = b.c; img.alt = ''; img.decoding = 'async'; img.loading = eager ? 'eager' : 'lazy';
+  if (b.cw && b.ch) { img.width = b.cw; img.height = b.ch; }
+  const t = span('cover-title sr-only', b.t), a = span('cover-author sr-only', b.a);
+  if (!named) { t.setAttribute('aria-hidden', 'true'); a.setAttribute('aria-hidden', 'true'); }
+  holder.append(img, t, a);
+  return holder;
+}
+// Una portada real que no carga vuelve a la tipográfica, con su título y autor a la vista.
+export function coverFallback(img) {
+  const holder = img.closest('.cover');
+  if (!holder || img.dataset.failed) return;
+  img.dataset.failed = '1';
+  holder.classList.remove('cover--img');
+  holder.classList.add('cover--blank');
+  holder.querySelectorAll('.sr-only').forEach(s => s.classList.remove('sr-only'));
+  img.remove();
+}
+if (typeof document !== 'undefined') document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement && e.target.closest('.cover--img')) coverFallback(e.target); }, true);
+
 export const toneOf = node => { const t = Number(node.querySelector('.cover')?.dataset.coverTone); return Number.isInteger(t) ? t : undefined; };
 
 // Composición de la portada de plantilla (4 variantes en CSS: [data-cover-layout]); sale del título, no del tono ni del género.
@@ -57,6 +85,8 @@ export const coverLayout = book => (titleHash(book) >>> 11) % COVER_LAYOUTS;
 
 const CATEGORY_ES = { fiction: 'Ficción', 'non-fiction': 'No ficción' };
 const FORMAT_ES = { 'Libro electronico': 'Libro electrónico', 'Board Book': 'Libro de cartón' };
+// Precio de la hoja de la librería (pesos mexicanos); sin precio, la ficha no muestra el renglón.
+export const priceLabel = pr => (typeof pr === 'number' && pr > 0 ? `$${pr.toLocaleString('es-MX')} MXN` : null);
 export const formatLabel = f => FORMAT_ES[f] || f;
 
 // Géneros de la muestra en español, por el id estable del subgénero (la verdad del dato, catalog.json, sigue en inglés y no se toca:
@@ -338,7 +368,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   // Título y autor van una sola vez, dentro de la portada: en la tarjeta de la rejilla son el nombre accesible del botón;
   // en la ficha y en «Relacionados» ya hay un encabezado aparte y la portada los oculta a los lectores de pantalla.
   function cover(b, tone = coverTone(b), layout = true, named = false) {
-    return blankCover(b, tone, layout, named);
+    return b.c ? imageCover(b, tone, { named }) : blankCover(b, tone, layout, named);
   }
   function blankCover(b, tone, layout, named) {
     const attrs = { class: `cover cover--blank tone-${tone}`, 'data-cover-tone': tone };
@@ -503,8 +533,9 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     $('[data-d-cover]', drawer).replaceChildren(cover(b, tone)); // el tono de la tarjeta pulsada; sin él, el del libro
     $('[data-d-title]', drawer).textContent = b.t;
     $('[data-d-author]', drawer).textContent = b.a;
+    const syn = $('[data-d-synopsis]', drawer); syn.textContent = b.s || ''; syn.hidden = !b.s; // sinopsis de la hoja de la librería
     $('[data-d-facts]', drawer).replaceChildren(
-      ...row('Editorial', b.p), ...row('Año', b.y), ...row('Formato', formatLabel(b.f)),
+      ...row('Editorial', b.p), ...row('Precio', priceLabel(b.pr)), ...row('Año', b.y), ...row('Formato', formatLabel(b.f)),
       ...row('Género', names.g(b.g)), ...row('Categoría', names.k(b.k)), ...row('ISBN-13', b.n), ...row('Páginas', b.pg));
     const cta = $('[data-d-cta]', drawer);
     cta.href = bookWaUrl(b);
@@ -574,16 +605,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (t) t.focus({ preventScroll: true });
   });
 
-  // portadas que no cargan: tarjeta tipográfica
-  document.addEventListener('error', e => {
-    const img = e.target;
-    if (!(img instanceof HTMLImageElement) || !img.closest('.cover') || img.dataset.failed) return;
-    img.dataset.failed = '1';
-    const holder = img.closest('.cover');
-    const title = holder.closest('.card, .rel, dialog')?.querySelector('.rel span, [data-d-title]')?.textContent || '';
-    holder.classList.add('cover--blank');
-    holder.replaceChildren(el('span', { class: 'cover-title', 'aria-hidden': 'true' }, title));
-  }, true);
+  // portadas que no cargan: vuelven a la tipográfica (coverFallback, arriba)
 
   sortEl.value = state.sort;
   root.dataset.state = 'ready';

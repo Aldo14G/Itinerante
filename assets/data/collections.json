@@ -1,30 +1,15 @@
 {
   "meta": {
-    "kind": "sample",
-    "label": "Datos de muestra · no es inventario",
-    "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado. La clave opcional `tema` de cada colección (narrativa, poesia, ensayo, cronica, infantil, libre) la une con el tema de consulta de Pregúntanos: al elegir ese tema el carrusel marca la primera colección que lo trae. La nota de cada colección no repite el rótulo de muestra: ese rótulo es fijo en la página. La clave «novedades» alimenta el capítulo Novedades: `entradas` es una lista de { id, llegada } (el id de un libro de catalog.json y su fecha de llegada, AAAA-MM-DD). Para actualizarla se añaden renglones; el sitio ordena de lo más reciente a lo más antiguo, muestra hasta 12 y marca «Nuevo» lo que llegó después de la última visita de cada persona. La fecha no se imprime. Sin entradas no se muestra nada (ni sección, ni casilla, ni enlaces, ni el control del inicio). Hoy son datos de ejemplo: libros del catálogo de prueba con fechas de ejemplo."
+    "kind": "inventario",
+    "nota": "Colecciones del inventario real (catalog.json, importado de la hoja de la librería con scripts/import-inventario.py). Cada colección es un filtro sobre el catálogo (`filtro`) o una lista curada (`ids`, en el orden en que se muestran); `icono` es un símbolo c-* del sprite de index.html (sin él, c-libro) y `tema` la une con el tema de Pregúntanos (narrativa, poesia, ensayo, cronica, infantil, libre). La clave «novedades» alimenta el capítulo Novedades: `entradas` es una lista de { id, llegada } (el id de un libro de catalog.json y su fecha de llegada real, AAAA-MM-DD). Está vacía mientras la librería no registre fechas de llegada: sin entradas no se muestra la sección, su casilla, sus enlaces ni el control del inicio. Para activarla basta con añadir renglones."
   },
   "collections": [
-    { "id": "ciencia-ficcion", "icono": "c-ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles.", "tema": "narrativa", "filtro": { "g": ["fiction-science-fiction"] } },
-    { "id": "suspenso", "icono": "c-suspenso", "titulo": "Suspenso", "nota": "Para leer sin soltarlo.", "tema": "narrativa", "filtro": { "g": ["fiction-psychological-thriller"] } },
-    { "id": "novela-historica", "icono": "c-novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela.", "tema": "narrativa", "filtro": { "g": ["fiction-historical-fiction"] } },
-    { "id": "memorias", "icono": "c-memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona.", "tema": "cronica", "filtro": { "g": ["non-fiction-memoir"] } }
+    { "id": "narrativa", "icono": "c-libro", "titulo": "Narrativa", "nota": "Cuento y novela de editoriales independientes.", "tema": "narrativa", "filtro": { "g": ["narrativa", "ensayo-narrativa"] } },
+    { "id": "poesia", "icono": "c-memorias", "titulo": "Poesía", "nota": "Poemarios y antologías.", "tema": "poesia", "filtro": { "g": ["poesia", "ensayo-poesia"] } },
+    { "id": "ensayo", "icono": "c-ensayo", "titulo": "Ensayo", "nota": "Pensamiento, crítica y divulgación.", "tema": "ensayo", "filtro": { "g": ["ensayo", "divulgacion", "ensayo-poesia", "ensayo-narrativa"] } }
   ],
   "novedades": {
     "titulo": "Recién llegados",
-    "entradas": [
-      { "id": "libro-project-hail-mary-andy-weir-ballantine-books-9784303-5e06bb4c", "llegada": "2026-11-10" },
-      { "id": "libro-lessons-in-chemistry-bonnie-garmus-doubleday-9784375-685f3d93", "llegada": "2026-11-07" },
-      { "id": "libro-the-creative-act-rick-rubin-penguin-press-9780140673-83de0c6c", "llegada": "2026-11-04" },
-      { "id": "libro-oh-the-places-you-ll-go-dr-seuss-random-house-978719-62f45d9b", "llegada": "2026-10-31" },
-      { "id": "libro-the-midnight-library-matt-haig-viking-9780781469258-3bfec6cf", "llegada": "2026-10-29" },
-      { "id": "libro-spare-prince-harry-random-house-9785271467524-58d437e3", "llegada": "2026-10-26" },
-      { "id": "libro-the-earth-of-fire-john-grisham-tor-books-97828654496-21a91fd8", "llegada": "2026-10-22" },
-      { "id": "libro-iron-heart-erik-larson-macmillan-publishers-97802700-036be6c5", "llegada": "2026-10-19" },
-      { "id": "libro-the-mind-rising-v-e-schwab-workman-publishing-978848-125763e6", "llegada": "2026-10-15" },
-      { "id": "libro-last-ice-robin-diangelo-scholastic-press-97839198731-e7f66777", "llegada": "2026-10-12" },
-      { "id": "libro-hope-and-rain-charlotte-mcconaghy-tor-books-97861777-fd2347e2", "llegada": "2026-10-08" },
-      { "id": "libro-princess-of-roses-david-grann-anchor-books-978037297-a6deffa7", "llegada": "2026-10-05" }
-    ]
+    "entradas": []
   }
 }

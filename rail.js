@@ -1,7 +1,7 @@
 // Carrusel de libros: una sola pieza para cualquier colección; cuando llegue el listado real basta con poner `ids` en
 // assets/data/collections.json. Las colecciones se eligen en un recorrido de paradas (DESIGN.md, «Catálogo como recorrido»):
 // cada una con su icono (`icono` en el JSON), y las que la persona ya hojeó quedan marcadas en este dispositivo.
-import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf } from './catalog.js';
+import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover } from './catalog.js';
 import { loadSample, loadCollections } from './sample.js';
 import { saveButton, initSaved } from './saved.js';
 import { afterPaint, confirmThen, pickPop } from './motion.js';
@@ -86,11 +86,15 @@ export function stopNode(col) {
 
 // `tone` lo da la lista (coverTones: sin vecinas del mismo tono); sin él, el tono propio del libro.
 export function bookCard(b, tone = coverTone(b)) {
-  const cover = make('span', `cover cover--blank tone-${tone}`);
-  cover.dataset.coverTone = tone;
-  cover.dataset.coverLayout = coverLayout(b);
-  // Título y autor van una sola vez, dentro de la portada; son también el nombre accesible del botón.
-  cover.append(make('span', 'cover-title', b.t), make('span', 'cover-author', b.a));
+  let cover;
+  if (b.c) cover = imageCover(b, tone); // portada real; título y autor siguen dentro, ocultos a la vista
+  else {
+    cover = make('span', `cover cover--blank tone-${tone}`);
+    cover.dataset.coverTone = tone;
+    cover.dataset.coverLayout = coverLayout(b);
+    // Título y autor van una sola vez, dentro de la portada; son también el nombre accesible del botón.
+    cover.append(make('span', 'cover-title', b.t), make('span', 'cover-author', b.a));
+  }
   const btn = make('button', 'card');
   btn.type = 'button';
   btn.dataset.id = b.id;
