@@ -5,10 +5,10 @@
     "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado. La clave opcional `tema` de cada colección (narrativa, poesia, ensayo, cronica, infantil, libre) la une con el tema de consulta de Pregúntanos: al elegir ese tema el carrusel marca la primera colección que lo trae. La nota de cada colección no repite el rótulo de muestra: ese rótulo es fijo en la página. La clave «novedades» alimenta el capítulo Novedades: `entradas` es una lista de { id, llegada } (el id de un libro de catalog.json y su fecha de llegada, AAAA-MM-DD). Para actualizarla se añaden renglones; el sitio ordena de lo más reciente a lo más antiguo, muestra hasta 12 y marca «Nuevo» lo que llegó después de la última visita de cada persona. La fecha no se imprime. Sin entradas no se muestra nada (ni sección, ni casilla, ni enlaces, ni el control del inicio). Hoy son datos de ejemplo: libros del catálogo de prueba con fechas de ejemplo."
   },
   "collections": [
-    { "id": "ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles.", "tema": "narrativa", "filtro": { "g": ["fiction-science-fiction"] } },
-    { "id": "suspenso", "titulo": "Suspenso", "nota": "Para leer sin soltarlo.", "tema": "narrativa", "filtro": { "g": ["fiction-psychological-thriller"] } },
-    { "id": "novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela.", "tema": "narrativa", "filtro": { "g": ["fiction-historical-fiction"] } },
-    { "id": "memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona.", "tema": "cronica", "filtro": { "g": ["non-fiction-memoir"] } }
+    { "id": "ciencia-ficcion", "icono": "c-ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles.", "tema": "narrativa", "filtro": { "g": ["fiction-science-fiction"] } },
+    { "id": "suspenso", "icono": "c-suspenso", "titulo": "Suspenso", "nota": "Para leer sin soltarlo.", "tema": "narrativa", "filtro": { "g": ["fiction-psychological-thriller"] } },
+    { "id": "novela-historica", "icono": "c-novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela.", "tema": "narrativa", "filtro": { "g": ["fiction-historical-fiction"] } },
+    { "id": "memorias", "icono": "c-memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona.", "tema": "cronica", "filtro": { "g": ["non-fiction-memoir"] } }
   ],
   "novedades": {
     "titulo": "Recién llegados",

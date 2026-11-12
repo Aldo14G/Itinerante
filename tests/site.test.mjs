@@ -3,13 +3,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { readFile, access, readdir } from 'node:fs/promises';
-import { pickBooks } from '../rail.js';
+import { pickBooks, stopIcon, STOP_ICON, trailProgress, readTrail, writeTrail, TRAIL_KEY } from '../rail.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, NEWS_SIZE, NEW_DAYS } from '../news.js';
-import { readInterest, shareName, initFeed } from '../feed.js';
+import { readInterest, shareName, initFeed, eventBadge, NO_DATE } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -160,7 +160,8 @@ test('curaduría: los textos de navegación traen pista y los esqueletos ocupan 
   assert.equal([...html.matchAll(/class="card-item card--sk"/g)].length, PAGE_SIZE, 'un esqueleto por tarjeta de la primera página');
   assert.ok(/--card-h: 150cqw;/.test(css) && /:is\(\.rail-item, \.card-item\) > \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto');
   assert.ok(!/class="sk-line/.test(/data-rail-track[\s\S]*?<\/ul>/.exec(html)[0]) && !/class="card-item card--sk"[^>]*><span class="card"><span class="cover"><\/span><span class="sk-line/.test(html), 'el esqueleto de tarjeta es solo la portada: el título y el autor van dentro de ella');
-  assert.ok(/data-rail-chips>(<span class="sk-chip" aria-hidden="true"><\/span>){3,}<\/div>/.test(html), 'el esqueleto del carrusel reserva la fila de chips');
+  assert.ok(/data-rail-chips>(<span class="sk-chip" aria-hidden="true"><\/span>){3,}<\/div>/.test(html), 'el esqueleto del carrusel reserva la fila de paradas');
+  assert.ok(/\.rail-stop, \.sk-chip \{ flex: 0 0 var\(--stop\); height: calc\(var\(--stop\) \+ var\(--lip\) \+ var\(--space-2\) \+ var\(--name-h\)\); \}/.test(css) && !/(^|\n)\.sk-chip \{[^}]*(width|height):/.test(css + mobileCss), 'el esqueleto de la parada y la parada real comparten una sola regla de caja: no hay salto al pintar');
   assert.ok(/data-cat-grid aria-busy="true"/.test(html));
   assert.ok(/\.card--sk/.test(css));
   assert.ok(!/sk-sweep/.test(css + mobileCss), 'los esqueletos no se animan (una sola regla para móvil y escritorio)');
@@ -339,12 +340,14 @@ test('móvil: hoja «Más» con lo que la barra no tiene, filas táctiles y dest
   assert.ok(/\.sm-row \{[^}]*min-height: 56px/.test(mobileCss) && /\.sm-link \{[^}]*min-height: var\(--target-coarse\)/.test(mobileCss), 'filas de 56 px (control táctil) y chips de 44 px');
 });
 
-test('cartelera móvil: cada tarjeta lleva su foto con pie y procedencia registrada, y los puntos coinciden', () => {
+test('cartelera móvil: cada tarjeta lleva su foto (el pie de antes es su alt), la procedencia registrada, y los puntos coinciden', () => {
   const items = [...html.matchAll(/<details class="bill-item"[\s\S]*?<\/details>/g)].map(m => m[0]);
   assert.equal(items.length, 3);
   for (const it of items) {
     assert.match(it, /class="bill-card-fig"/);
-    assert.match(it, /<span class="bill-card-cap">[^<]+<\/span>/, 'pie de foto sin rótulo');
+    const caption = it.match(/data-caption="([^"]+)"/)[1];
+    assert.ok(it.includes(`<img class="bill-card-img" src="assets/img/`) && it.includes(` alt="${caption}" `), 'la foto de la tarjeta se describe con el pie del escenario (sin rótulo de procedencia)');
+    assert.ok(!/bill-card-cap/.test(it), 'el pie ya no es una tercera insignia sobre la foto');
     assert.match(it, /^<details class="bill-item"[^>]*data-kind="(real|ai)"/, 'la procedencia viaja como dato');
   }
   assert.equal([...html.matchAll(/<div class="bill-dots"[^>]*>([\s\S]*?)<\/div>/g)][0][1].match(/<i>/g).length, items.length);
@@ -502,6 +505,183 @@ test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimenta
   const ids = [sample.books[7].id, sample.books[3].id, 'no-existe', sample.books[9].id];
   assert.deepEqual(pickBooks(sample.books, { ids }).map(b => b.id), [ids[0], ids[1], ids[3]], 'una lista curada respeta el orden y omite lo que no existe');
   assert.equal(pickBooks(sample.books, { ids: sample.books.map(b => b.id) }).length, 12, 'tope de 12');
+});
+
+// ---------- Recorrido, eventos y filtros (sistema táctil) ----------
+test('recorrido: las colecciones son paradas de un radiogroup, cada una con su icono (con respaldo) y su nombre', async () => {
+  const railJs = await readFile(here('./rail.js'), 'utf8');
+  const cols = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8')).collections;
+  const symbols = new Set([...html.matchAll(/<symbol id="([a-z0-9-]+)"/g)].map(m => m[1]));
+  assert.ok(/<div class="rail-chips" role="radiogroup" aria-label="Colección" data-rail-chips>/.test(html), 'la fila sigue siendo un radiogroup con nombre');
+  assert.ok(/btn\.setAttribute\('role', 'radio'\)/.test(railJs) && /btn\.setAttribute\('aria-checked', 'false'\)/.test(railJs) && /wrap\.setAttribute\('role', 'presentation'\)/.test(railJs), 'cada parada es un botón role="radio" con aria-checked; su envoltura no entra al árbol de accesibilidad');
+  assert.ok(/make\('span', 'rail-chip-name', col\.titulo\)/.test(railJs), 'el nombre de la colección va dentro del botón: es su nombre accesible');
+  assert.ok(/\{ ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 \}\[e\.key\]/.test(railJs) && /c\.tabIndex = c === e\.target \? 0 : -1/.test(railJs) && /c\.tabIndex = i \? -1 : 0/.test(railJs), 'flechas y un solo punto de tabulación (roving tabindex)');
+  // Icono propio por colección, del sprite; sin `icono` (o con uno que no existe) cae al genérico.
+  for (const c of cols) {
+    assert.ok(typeof c.icono === 'string' && symbols.has(c.icono), `${c.id}: su icono (${c.icono}) está en el sprite`);
+    assert.equal(stopIcon(c, id => symbols.has(id)), c.icono);
+  }
+  assert.equal(new Set(cols.map(c => c.icono)).size, cols.length, 'un icono distinto por colección');
+  assert.ok(symbols.has(STOP_ICON) && symbols.has('i-check'), 'el genérico y la marca de «hojeada» están en el sprite');
+  assert.equal(stopIcon({ id: 'nueva', titulo: 'Poesía' }), STOP_ICON, 'una colección nueva sin icono sigue siendo solo un objeto en el JSON');
+  assert.equal(stopIcon({ icono: 'c-no-existe' }, id => symbols.has(id)), STOP_ICON, 'un icono que no está en el sprite cae al genérico');
+  for (const bad of ['', 3, null, 'c libro', '"><svg', 'C-LIBRO']) assert.equal(stopIcon({ icono: bad }), STOP_ICON, `icono inválido (${JSON.stringify(bad)})`);
+  // Dibujos propios en el lenguaje del sprite: 24 px, solo trazos y rellenos sin color propio.
+  for (const id of [...cols.map(c => c.icono), STOP_ICON, 'i-check']) {
+    const sym = html.match(new RegExp(`<symbol id="${id}" viewBox="0 0 24 24">([\\s\\S]*?)</symbol>`));
+    assert.ok(sym && !/(fill|stroke)="(?!none")[^"]*"|<image|href=|style=/.test(sym[1]), `${id}: símbolo de 24 px sin colores ni recursos propios`);
+  }
+  // Forma: control redondo de 64 px (la piel es la del control), nombre en la familia redonda, línea punteada con tramo --terra para lo hojeado.
+  const flat = css.replaceAll('\n', ' ');
+  assert.ok(/\.rail-chips \{\s*--stop: 64px;/.test(flat) && /\.rail-chip \{[^}]*width: var\(--stop\); height: var\(--stop\); padding: 0; border-radius: 50%;\s*font: 800 var\(--fs-1\)\/1\.25 var\(--f-display\);/.test(flat), 'parada redonda de 64 px con el nombre en --f-display 800');
+  assert.ok(/\.rail-chip \{ font-size: var\(--fs-0\); \}/.test(mobileCss), 'en teléfono el nombre baja a --fs-0');
+  assert.ok(/\.rail-chips \{[^}]*overflow-x: auto;/.test(flat) && /\.rail-chips \{ --per: 4; --pitch: clamp\(72px, calc\(\(100vw - var\(--gutter\) - var\(--stop\) \/ 2\) \/ var\(--per\)\), 128px\);/.test(mobileCss) && /@media \(max-width: 359px\) \{ \.rail-chips \{ --per: 3; \} \}/.test(mobileCss) && /@media \(min-width: 360px\) \{ \.rail-chips:has\(> :nth-child\(4\):last-child\) \{ --pitch: clamp\(72px, calc\(\(100vw - 2 \* var\(--gutter\) - var\(--stop\)\) \/ 3\), 128px\); \} \}/.test(mobileCss), 'la fila se desplaza si no caben, dejando media parada a la vista; el paso nunca baja de 72 px (8 px entre discos)');
+  assert.ok(/\.rail-chips > :nth-child\(even\) \{ margin-top: var\(--zig\); \}/.test(css) && /\.rail-chips \{ --zig: var\(--space-5\); \}/.test(mobileCss), 'zigzag por nth-child (sin estilos en línea), corto en teléfono');
+  assert.ok(/\.rail-stop:not\(:last-child\)::after \{[^}]*radial-gradient\(circle closest-side, var\(--edge\) 75%, transparent\)/.test(flat) && /\.rail-stop\.is-seen::after \{ background: linear-gradient\(var\(--terra\), var\(--terra\)\)/.test(flat), 'línea punteada en --edge; el tramo de una parada hojeada, en --terra');
+  assert.ok(/\.rail-stop\.is-seen \.rail-chip-done \{ display: inline-grid; \}/.test(css) && /make\('span', 'badge rail-chip-done'\)/.test(railJs) && /icon\('i-check'\)/.test(railJs), 'la parada hojeada lleva la insignia con la marca de verificación');
+  assert.ok(!/style\.|setProperty/.test(railJs.slice(railJs.indexOf('export function stopNode'), railJs.indexOf('// La ficha vive en el catálogo'))), 'ninguna parada lleva estilos puestos desde JS');
+});
+
+test('recorrido: progreso local y verdadero, con almacenamiento tolerante y sin puntos, rachas ni recompensas', async () => {
+  const railJs = await readFile(here('./rail.js'), 'utf8');
+  const ids = ['a', 'b', 'c', 'd'];
+  assert.deepEqual(trailProgress(ids, []), { done: 0, total: 4, complete: false, text: '0 de 4 paradas hojeadas' });
+  assert.deepEqual(trailProgress(ids, ['b']), { done: 1, total: 4, complete: false, text: '1 de 4 paradas hojeadas' });
+  assert.deepEqual(trailProgress(ids, ['b', 'b', 'zz', 'a']), { done: 2, total: 4, complete: false, text: '2 de 4 paradas hojeadas' }, 'lo guardado de colecciones que ya no existen no cuenta, ni lo repetido');
+  assert.deepEqual(trailProgress(ids, new Set(['d', 'c', 'b', 'a'])), { done: 4, total: 4, complete: true, text: 'Ya hojeaste las 4 colecciones.' });
+  assert.deepEqual(trailProgress(['a'], ['a']), { done: 1, total: 1, complete: true, text: 'Ya hojeaste la colección.' });
+  assert.equal(trailProgress(['a'], []).text, '0 de 1 parada hojeada');
+  assert.equal(trailProgress([], ['a']).complete, false, 'sin colecciones no hay nada que completar');
+  // Almacenamiento: sin él, bloqueado, roto o lleno, el recorrido sigue (dura la visita).
+  assert.ok(/const store = \(\) => \{ try \{ return globalThis\.localStorage/.test(railJs), 'el almacenamiento va en try/catch');
+  assert.deepEqual(readTrail(), [], 'sin almacenamiento');
+  assert.equal(writeTrail(['a']), true, 'sin almacenamiento no lanza');
+  Object.defineProperty(globalThis, 'localStorage', { get() { throw new Error('bloqueado'); }, configurable: true });
+  assert.deepEqual(readTrail(), [], 'almacenamiento bloqueado');
+  assert.equal(writeTrail(['a']), true, 'bloqueado al escribir: no lanza');
+  Object.defineProperty(globalThis, 'localStorage', { value: { getItem: () => '["suspenso", 3, null, "memorias"]', setItem() { throw new Error('lleno'); } }, configurable: true });
+  assert.deepEqual(readTrail(), ['suspenso', 'memorias'], 'ignora lo que no es texto');
+  assert.equal(writeTrail(['a']), false, 'lleno: no lanza y avisa a quien llama');
+  const mem = new Map();
+  Object.defineProperty(globalThis, 'localStorage', { value: { getItem: k => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v) }, configurable: true });
+  writeTrail(['ciencia-ficcion', 'suspenso']);
+  assert.deepEqual(JSON.parse(mem.get(TRAIL_KEY)), ['ciencia-ficcion', 'suspenso']);
+  assert.deepEqual(readTrail(), ['ciencia-ficcion', 'suspenso'], 'lo guardado vuelve en la siguiente visita');
+  Object.defineProperty(globalThis, 'localStorage', { value: { getItem: () => '{rota' }, configurable: true });
+  assert.deepEqual(readTrail(), [], 'JSON roto');
+  delete globalThis.localStorage;
+  assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(railJs.replace(/loadSample|loadCollections/g, '')), 'el progreso no se envía a ningún lado');
+  // Marcado: barra de progreso nativa con nombre, texto, salida al completar y una sola región viva.
+  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  assert.ok(/<progress class="rail-trail-bar" max="4" value="0" aria-label="Paradas hojeadas" data-rail-trail-bar><\/progress>/.test(rail), 'barra de progreso nativa con nombre accesible');
+  assert.ok(/<span data-rail-trail-text><\/span> <a class="rail-trail-all" href="#catalogo" data-rail-trail-all hidden>Ver todo el catálogo<\/a>/.test(rail), 'el texto del progreso y, oculta hasta completar, la salida al catálogo');
+  assert.ok(rail.indexOf('data-rail-chips') < rail.indexOf('rail-trail-bar') && rail.indexOf('rail-trail-bar') < rail.indexOf('data-rail-note') && rail.indexOf('data-rail-note') < rail.indexOf('data-rail-viewport'), 'orden: paradas, progreso, nota, carrusel');
+  assert.equal((rail.match(/aria-live=/g) || []).length, 1, 'una sola región viva en el carrusel');
+  assert.ok(/live\.textContent = `\$\{col\.titulo\}: \$\{list\.length\} libros\. \$\{trail\.text\}/.test(railJs), 'al elegir una parada la región viva dice la colección y el progreso');
+  assert.ok(/trailBar\.value = p\.done;/.test(railJs) && /trailBar\.setAttribute\('aria-valuetext', p\.text\)/.test(railJs) && /trailAll\.hidden = !p\.complete;/.test(railJs), 'la barra, su texto y la salida salen del mismo cálculo');
+  // Cuándo cuenta: al elegirla y pintarse su carrusel; la que no se eligió con un toque, cuando el carrusel está a la vista (no al cargar).
+  assert.ok(/if \(!id \|\| seen\.has\(id\) \|\| !\(chosen \|\| inView\)\) return false;/.test(railJs) && /markSeen\(col\.id, announce\);/.test(railJs) && /new IntersectionObserver\(entries => \{\s*inView = entries\[entries\.length - 1\]\.isIntersecting;\s*if \(markSeen\(painted\)\) paintTrail\(\);/.test(railJs), 'la parada inicial cuenta cuando el carrusel entra en pantalla');
+  assert.ok(railJs.indexOf('painted = col.id;') > railJs.indexOf('track.replaceChildren(...cards.slice(0, FIRST_CHUNK));'), 'una parada elegida cuenta cuando su carrusel ya se pintó');
+  // Sin altura que salte: el renglón del progreso reserva su alto y la salida del pie se oculta sin quitar su caja.
+  assert.ok(/\.rail-trail \{[^}]*min-height: var\(--target-coarse\); \}/.test(css) && /\.rail-trail \{ grid-template-columns: minmax\(0, 1fr\); grid-template-rows: auto minmax\(var\(--target-coarse\), auto\); \}/.test(mobileCss) && /\.rail\.is-complete \.rail-all \{ visibility: hidden; \}/.test(css), 'completar el recorrido no mueve el carrusel');
+  // Verdad: nada de mecánicas de juego ni cifras inventadas.
+  const visible = [html.replace(/<!--[\s\S]*?-->/g, ''), railJs.replace(/\/\/[^\n]*/g, '')].join('\n');
+  assert.ok(!/\b(puntos?|puntaje|vidas?|rachas?|retos?|niveles|nivel \d|medallas?|logros?|trofeos?|confeti|XP|recompensas?)\b/i.test(visible.replace(/punto de (encuentro|tabulación)/gi, '')), 'sin puntos, vidas, rachas, retos ni confeti');
+  // Rebote solo por toque: lo pone pickPop en el manejador, nunca el pintado.
+  const motionJs = await readFile(here('./motion.js'), 'utf8');
+  const [feedJs, savedJs] = await Promise.all(['feed.js', 'saved.js'].map(f => readFile(here('./' + f), 'utf8')));
+  assert.ok(/export function pickPop\(el\) \{\s*if \(typeof document === 'undefined' \|\| !document\.documentElement\.classList\.contains\('motion'\)\) return;\s*el\.classList\.add\('is-pop'\);\s*el\.addEventListener\('animationend', \(\) => el\.classList\.remove\('is-pop'\), \{ once: true \}\);/.test(motionJs), 'pickPop: solo con movimiento, y la clase se retira al terminar');
+  assert.equal((railJs.match(/pickPop\(/g) || []).length, 1, 'el recorrido rebota en un solo sitio');
+  assert.ok(/const choose = chip => \{\s*if \(chip\.dataset\.id === current\) return;\s*pickPop\(chip\);/.test(railJs), 'la parada rebota al elegirla con un toque o con el teclado');
+  assert.ok(/if \(at < 0\) pickPop\(btn\);/.test(feedJs) && !/pickPop/.test(feedJs.slice(feedJs.indexOf('function paintInterest'), feedJs.indexOf('export function toggleInterest'))), '«Me interesa» rebota al tocar, no al pintar lo guardado');
+  assert.ok(/if \(res\.on\) pickPop\(save\);/.test(savedJs) && !/pickPop/.test(savedJs.slice(savedJs.indexOf('function paint(btn)'), savedJs.indexOf('export function saveButton'))), 'guardar rebota al tocar, no al pintar lo guardado');
+});
+
+test('eventos: insignias de tipo y de estado; la fecha solo sale de data-fecha, en español y con el día de Monterrey', () => {
+  const items = [...html.matchAll(/<details class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/details>/g)];
+  const tipo = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
+  for (const [block, id] of items) {
+    assert.ok(block.includes(`<span class="bill-badges"><span class="badge" data-bill-type>${tipo[id]}</span><span class="badge badge--quiet" data-bill-when>${NO_DATE}</span></span>`), `${id}: insignia de tipo «${tipo[id]}» e insignia de estado «${NO_DATE}»`);
+    assert.equal((block.match(/class="badge/g) || []).length, 2, `${id}: dos insignias, no más`);
+    assert.ok(!/data-fecha=/.test(block.match(/^<details[^>]*>/)[0]), `${id}: hoy ninguna propuesta tiene fecha confirmada`);
+  }
+  assert.ok(/data-fecha="AAAA-MM-DD"/.test(html.match(/<!-- Fecha confirmada:[^>]*-->/)[0]), 'el marcado dice cómo se pone una fecha real');
+  assert.equal(NO_DATE, 'Propuesta · sin fecha');
+  const now = new Date('2026-11-11T18:00:00Z'); // mediodía del 11 de noviembre en Monterrey
+  for (const bad of [undefined, null, '', 'pronto', '2026-13-01', '2026-02-31', '21/11/2026', '2026-11-21T25:00', '2026-11-21 18:00']) {
+    assert.deepEqual(eventBadge(bad, now), { kind: 'propuesta', text: NO_DATE }, `sin fecha válida (${bad}) sigue siendo una propuesta`);
+  }
+  assert.deepEqual(eventBadge('2026-11-21', now), { kind: 'fecha', text: 'Sáb 21 nov', date: '2026-11-21' });
+  assert.deepEqual(eventBadge('2026-11-21T18:30', now), { kind: 'fecha', text: 'Sáb 21 nov · 18:30', date: '2026-11-21' });
+  assert.deepEqual(eventBadge('2027-01-09', now), { kind: 'fecha', text: 'Sáb 9 ene 2027', date: '2027-01-09' }, 'otro año lleva el año');
+  assert.deepEqual(eventBadge('2026-11-11', now), { kind: 'hoy', text: 'Hoy', date: '2026-11-11' });
+  assert.deepEqual(eventBadge('2026-11-11T19:00', now), { kind: 'hoy', text: 'Hoy · 19:00', date: '2026-11-11' });
+  assert.deepEqual(eventBadge('2026-11-10', now), { kind: 'propuesta', text: NO_DATE }, 'una fecha que ya pasó no se anuncia');
+  // El día es el de Monterrey, no el del reloj del visitante ni UTC: a las 23:30 del 11 en Monterrey ya es 12 en UTC.
+  const late = new Date('2026-11-12T05:30:00Z');
+  assert.equal(eventBadge('2026-11-11', late).kind, 'hoy');
+  assert.equal(eventBadge('2026-11-12', late).text, 'Jue 12 nov');
+  assert.ok(!/\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i.test(html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0]), 'ninguna fecha escrita a mano en el capítulo');
+  // La insignia callada es para lo no confirmado; lo confirmado usa la insignia común.
+  assert.ok(/\.badge--quiet \{ background: var\(--stone\); color: var\(--bone\); \}/.test(css), 'insignia callada con colores del tono');
+  // initFeed pinta el estado desde el atributo.
+  const mk = fecha => { const el = { textContent: '', quiet: null, classList: { toggle(c, on) { el.quiet = on; } } }; return { dataset: { fecha }, querySelector: () => el, el }; };
+  const future = `${new Date().getUTCFullYear() + 1}-06-15`;
+  const cards = [mk(undefined), mk(future), mk('2020-01-01')];
+  globalThis.document = { querySelectorAll: sel => (sel === '.bill-item' ? cards : []) };
+  try { initFeed(); } finally { delete globalThis.document; }
+  assert.deepEqual(cards.map(c => [c.el.textContent === NO_DATE, c.el.quiet]), [[true, true], [false, false], [true, true]], 'sin atributo o con fecha vencida: «Propuesta · sin fecha»; con fecha vigente, la fecha en la insignia común');
+  assert.match(cards[1].el.textContent, /^(Lun|Mar|Mié|Jue|Vie|Sáb|Dom) 15 jun \d{4}$/);
+});
+
+test('filtros de Explorar: cada grupo muestra como máximo 5 opciones y un «Ver las N» / «Ver menos» propio', async () => {
+  const catalog = await readFile(here('./catalog.js'), 'utf8');
+  const entries = [['a', 30], ['b', 20], ['c', 10], ['d', 9], ['e', 8], ['f', 7], ['g', 6], ['h', 1]];
+  const vals = list => list.map(([v]) => v);
+  assert.equal(FACET_LIMIT, 5);
+  let v = facetView(entries.slice(0, 5));
+  assert.ok(!v.foldable && v.top.length === 5 && v.rest.length === 0, 'con 5 o menos no hay nada que plegar');
+  v = facetView(entries);
+  assert.deepEqual([vals(v.top), v.rest.length, v.total, v.foldable], [['a', 'b', 'c', 'd', 'e'], 0, 8, true], 'plegado: las 5 con más títulos');
+  v = facetView(entries, new Set(['h', 'g']));
+  assert.deepEqual(vals(v.top), ['a', 'b', 'c', 'g', 'h'], 'las marcadas siempre a la vista; el resto por conteo, sin cambiar el orden');
+  v = facetView(entries, new Set(['a']));
+  assert.deepEqual(vals(v.top), ['a', 'b', 'c', 'd', 'e'], 'marcar una opción visible no mueve nada');
+  v = facetView(entries, new Set(['a', 'b', 'c', 'f', 'g', 'h']));
+  assert.deepEqual(vals(v.top), ['a', 'b', 'c', 'f', 'g', 'h'], 'si hay más de 5 marcadas se ven todas');
+  v = facetView(entries, new Set(['h']), true);
+  assert.deepEqual([vals(v.top), vals(v.rest)], [['a', 'b', 'c', 'd', 'e'], ['f', 'g', 'h']], 'abierto: las primeras arriba y el resto bajo el botón, sin reordenar');
+  // Con los datos reales: ningún grupo plegado pasa de 5 y ninguno pierde opciones al abrirse.
+  const sample = JSON.parse(await readFile(here('./assets/data/catalog.json'), 'utf8')).books;
+  let shown = 0;
+  for (const dim of ['k', 'g', 'f', 'p']) {
+    const all = [...facetCounts(sample, {}, dim).entries()].filter(([x]) => x).sort((a, b) => b[1] - a[1]);
+    const closed = facetView(all), open = facetView(all, new Set(), true);
+    assert.ok(closed.top.length <= FACET_LIMIT && closed.rest.length === 0, `${dim}: plegado, 5 como máximo`);
+    assert.equal(open.top.length + open.rest.length, all.length, `${dim}: abierto, todas`);
+    shown += closed.top.length;
+  }
+  assert.ok(shown <= 20, `el panel abre con ${shown} opciones a la vista (antes ~25)`);
+  // El botón: uno por grupo plegable, con aria-expanded y aria-controls, entre las primeras opciones y el resto; el foco se queda en él.
+  assert.ok(/el\('button', \{ type: 'button', class: 'cat-more-facets', 'data-expand': g\.dim, 'aria-expanded': String\(open\), 'aria-controls': restId \}, open \? g\.less : g\.all\(view\.total\)\)/.test(catalog), 'botón con aria-expanded y aria-controls por grupo');
+  assert.ok(/el\('div', \{ class: 'cat-rest', id: restId, hidden: !open \}, view\.rest\.map\(option\)\)/.test(catalog), 'lo que despliega aparece debajo del botón: el botón no cambia de sitio');
+  for (const label of ['Ver los ${n} géneros', 'Ver menos géneros', 'Ver las ${n} editoriales', 'Ver menos editoriales', 'Ver los ${n} formatos', 'Ver menos formatos']) assert.ok(catalog.includes(label), `rótulo «${label}»`);
+  assert.ok(/if \(state\.open\.has\(dim\)\) state\.open\.delete\(dim\); else state\.open\.add\(dim\);\s*renderFilters\(\);\s*filtersEl\.querySelector\(`\[data-expand="\$\{dim\}"\]`\)\?\.focus\(\{ preventScroll: true \}\);/.test(catalog), 'al abrir o plegar el foco se conserva en el botón y el scroll no se mueve');
+  assert.ok(/\(document\.getElementById\(cb\.id\) \?\? filtersEl\.querySelector\(`\[data-expand="\$\{cb\.dataset\.dim\}"\]`\)\)\?\.focus\(\{ preventScroll: true \}\)/.test(catalog), 'si la casilla desmarcada deja de verse, el foco pasa al botón de su grupo');
+  assert.ok(!/expandG|limit: (99|10|8)/.test(catalog), 'ya no hay un límite distinto por grupo ni un único grupo desplegable');
+});
+
+test('fuentes: sources.json lista solo archivos que existen y que fonts.css declara (sin la cursiva que nunca se alojó)', async () => {
+  const sources = JSON.parse(await readFile(here('./assets/fonts/sources.json'), 'utf8'));
+  const fontsCss = await readFile(here('./assets/fonts/fonts.css'), 'utf8');
+  assert.ok(sources.fonts.length >= 2);
+  for (const f of sources.fonts) {
+    assert.ok(existsSync(here(`./assets/fonts/${f.file}`)), `${f.file} existe`);
+    assert.ok(fontsCss.includes(`url(./${f.file})`) && new RegExp(`font-family: '${f.family}';\\s*font-style: ${f.style};`).test(fontsCss), `${f.file} tiene su @font-face (${f.family}, ${f.style})`);
+  }
+  const woff = (await readdir(here('./assets/fonts'))).filter(n => n.endsWith('.woff2')).sort();
+  assert.deepEqual(woff, sources.fonts.map(f => f.file).sort(), 'ni archivos sin registrar ni registros sin archivo');
+  assert.ok(!/font-style: italic/.test(css + mobileCss + fontsCss), 'el sitio no usa cursivas: no hace falta alojar una');
 });
 
 test('ficha: «Cómo llegar» es la acción primaria, WhatsApp confirma, y el recuadro es legible en el tono claro', () => {
@@ -831,18 +1011,18 @@ test('perfil móvil: nombre, estado, dirección, «Cómo llegar» como única ac
   assert.ok(/\.js \.hdr:not\(\.is-solid\) :is\(\.hdr-brand, \.hdr-wa\) \{ opacity: 0; visibility: hidden; \}/.test(mobileCss), 'al inicio la cabecera va vacía sobre la foto (el menú vive en la barra inferior); sin JS la marca sigue visible');
 });
 
-test('Cartelera como publicaciones: foto, pie, «Me interesa» y «Compartir» locales, sin contadores ni fechas', async () => {
+test('Eventos y talleres: foto, «Me interesa» y «Compartir» locales, sin contadores ni fechas', async () => {
   const items = [...html.matchAll(/<details class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/details>/g)];
   assert.equal(items.length, 3);
   for (const [block, id] of items) {
-    assert.ok(/<img class="bill-card-img"/.test(block) && /<span class="bill-card-cap">[^<]+<\/span>/.test(block), `${id}: foto y pie`);
+    assert.ok(/<img class="bill-card-img"[^>]* alt="[^"]+"/.test(block), `${id}: foto con texto alternativo`);
     assert.ok(new RegExp(`<button class="act" type="button" data-interest="${id}" data-title="[^"]+" aria-pressed="false">`).test(block), `${id}: «Me interesa» con aria-pressed`);
-    assert.ok(new RegExp(`<button class="act" type="button" data-share="${id}" data-title="[^"]+">`).test(block), `${id}: «Compartir»`);
+    assert.ok(new RegExp(`<button class="act act--icon" type="button" data-share="${id}" data-title="([^"]+)" aria-label="Compartir «\\1»">`).test(block), `${id}: «Compartir» es un control de icono cuyo nombre lleva el título`);
     assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
   }
   for (const id of ['i-heart', 'i-share']) assert.ok(html.includes(`<symbol id="${id}"`), `icono ${id}`);
   assert.ok(/\.act \{[^}]*min-height: var\(--target-coarse\)/.test(css.replaceAll('\n', ' ')) && /:where\(\.act, \.save, \.motion-btn\)\[aria-pressed="true"\][^{]*\{\s*--ctl-bg: var\(--pick-fill\); --ctl-edge: var\(--terra\); --ctl-ink: var\(--pick-ink\);/.test(css) && /:where\(\.act, \.save\)\[aria-pressed="true"\] \.ic \{ fill: currentColor; \}/.test(css), 'botones de ≥ 44 px con estado: «elegido» (menta, borde --terra, tinta --pick-ink) y el icono relleno');
-  assert.ok(/html:not\(\.js\) \.bill-acts \{ display: none; \}/.test(css), 'sin JavaScript no se muestran botones que no funcionan');
+  assert.ok(/html:not\(\.js\) \.bill-acts \.act \{ display: none; \}/.test(css) && !/html:not\(\.js\) \.bill-acts \{/.test(css), 'sin JavaScript no se muestran los botones que no funcionan; la consulta por WhatsApp, que es un enlace, sigue');
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/navigator\.share/.test(feed) && /AbortError/.test(feed) && /clipboard\.writeText/.test(feed), 'Web Share con respaldo de copiar enlace; cancelar no copia');
   assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(feed), '«Me interesa» no envía nada');
@@ -858,32 +1038,40 @@ test('Cartelera como publicaciones: foto, pie, «Me interesa» y «Compartir» l
   delete globalThis.localStorage;
 });
 
-test('publicaciones de Cartelera (CR-13, QA1-05): encabezado → foto → acciones → texto, sin números de interacción, y cada «Compartir» nombra su publicación', async () => {
+test('tarjeta de evento: foto → insignias → título → frase → descripción → acciones, sin números de interacción, y cada acción nombra su propuesta', async () => {
   const items = [...html.matchAll(/<details class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/details>/g)];
   assert.equal(items.length, 3);
   const buttons = [];
   for (const [block, id] of items) {
-    const order = [/class="bill-post-head"/, /class="bill-card-img"/, /class="bill-acts"/, /class="bill-cap"/, /<p>/].map(re => block.search(re));
-    assert.ok(order.every((n, i) => n >= 0 && (i === 0 || n > order[i - 1])), `${id}: el DOM va de encabezado a foto, acciones y texto (${order})`);
-    assert.ok(/<span class="bill-post-who"><b>Itinerante<\/b> · propuesta<\/span>/.test(block) && /<img class="bill-av" src="assets\/img\/logo-96\.webp"[^>]*alt=""/.test(block), `${id}: avatar y «Itinerante · propuesta»`);
+    const order = [/class="bill-card-img"/, /class="bill-badges"/, /class="bill-title"/, /class="bill-sub"/, /<p>/, /class="bill-acts"/, /data-interest=/, /data-share=/, /class="btn btn--line-ink bill-wa"/].map(re => block.search(re));
+    assert.ok(order.every((n, i) => n >= 0 && (i === 0 || n > order[i - 1])), `${id}: el DOM va de la foto a las insignias, el título, la frase, la descripción y las tres acciones (${order})`);
+    assert.ok(!/bill-post-head|bill-post-who|bill-av|bill-cap/.test(block), `${id}: sin encabezado de red social ni título repetido (las insignias ya dicen qué es)`);
     const pick = re => block.match(re)[1];
-    assert.equal(pick(/class="bill-cap-t">([^<]+)</), pick(/class="bill-title">([^<]+)</), `${id}: el título del pie es el del acordeón`);
-    assert.equal(pick(/class="bill-cap-s">([^<]+)</), pick(/class="bill-sub">([^<]+)</), `${id}: la frase del pie es la del acordeón`);
+    assert.equal((block.match(/class="bill-title"/g) || []).length, 1, `${id}: el título está una sola vez`);
     assert.equal(pick(/data-share="[a-z]+" data-title="([^"]+)"/), pick(/class="bill-title">([^<]+)</), `${id}: «Compartir» lleva el título`);
+    assert.equal(pick(/data-interest="[a-z]+" data-title="([^"]+)"/), pick(/class="bill-title">([^<]+)</), `${id}: «Me interesa» lleva el título`);
+    assert.ok(block.includes(`aria-label="Preguntar por WhatsApp: ${pick(/class="bill-title">([^<]+)</)}"><span>Preguntar por WhatsApp</span>`), `${id}: la consulta dice «Preguntar por WhatsApp» y su nombre accesible lleva el título (empieza por el texto visible)`);
+    assert.ok(/<a class="btn btn--line-ink bill-wa" href="https:\/\/wa\.me\/528180875940\?text=Hola%2C%20me%20interesa/.test(block), `${id}: WhatsApp es secundaria y conserva su mensaje`);
+    assert.ok(!/btn--tungsten/.test(block), `${id}: ninguna acción de la tarjeta es primaria`);
     assert.ok(!/\b\d+\s*(me gusta|likes?|reseñas|personas|interesad)/i.test(block.replace(/<[^>]+>/g, ' ')), `${id}: sin contadores ni números de interacción`);
     buttons.push({ dataset: { title: pick(/data-share="[a-z]+" data-title="([^"]+)"/) }, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } });
   }
-  // initFeed de verdad, sobre un DOM mínimo: cada botón «Compartir» queda con un nombre distinto y con el texto visible dentro (WCAG 2.5.3)
+  const bill = html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0];
+  assert.equal((bill.match(/btn--tungsten/g) || []).length, 1, '«Cómo llegar» sigue siendo la única primaria del capítulo');
+  // initFeed de verdad, sobre un DOM mínimo: cada botón «Compartir» queda con un nombre distinto que empieza por la acción (WCAG 2.5.3)
   globalThis.document = { querySelectorAll: sel => (sel === '[data-share]' ? buttons : []) };
   try { initFeed(); } finally { delete globalThis.document; }
   const names = buttons.map(b => b.attrs['aria-label']);
   assert.equal(new Set(names).size, 3, `tres nombres distintos: ${names}`);
   assert.deepEqual(names, ['Compartir «Círculo de lectura»', 'Compartir «Ajedrez en la casa»', 'Compartir «Taller de escritura»']);
-  assert.ok(names.every(n => n.startsWith('Compartir')), 'el nombre empieza por el texto visible');
   assert.equal(shareName(''), 'Compartir «esta propuesta»');
-  // escritorio no ve el encabezado ni el pie móvil; móvil no repite el título del acordeón
-  assert.ok(/\.bill-card-fig, \.bill-dots, \.bill-post-head, \.bill-cap \{ display: none; \}/.test(css), 'solo móvil');
-  assert.ok(/\.bill-item summary \.bill-title, \.bill-item summary \.bill-sub \{ display: none; \}/.test(mobileCss), 'en móvil el título se lee una sola vez');
+  // escritorio no ve la foto de tarjeta (va en el escenario); móvil y escritorio comparten título, frase e insignias (una sola copia)
+  assert.ok(/\.bill-card-fig, \.bill-dots \{ display: none; \}/.test(css), 'la foto de tarjeta y los puntos son solo de móvil');
+  assert.ok(!/\.bill-(title|sub)[^{]*\{[^}]*display: none/.test(css + mobileCss), 'el título y la frase no se ocultan en ningún tamaño');
+  assert.ok(/\.act--icon \{ flex: none; width: 48px; padding: 0; border-radius: 50%; \}/.test(css) && /\.bill-acts > \* \{ min-height: 48px; \}/.test(css) && /\.bill-wa \{ font-size: var\(--fs-1\); \}/.test(css), 'las tres acciones miden 48 px; «Compartir» es un círculo y WhatsApp no lleva letra mayor que la primaria');
+  assert.ok(/@media \(max-height: 700px\) \{ \.bill-card-img \{ aspect-ratio: 16 \/ 9; \} \}/.test(mobileCss), 'tope contra el alto: en ventanas bajas la foto se acorta para que la tarjeta quepa con sus acciones');
+  assert.ok(/html:not\(\.js\) \.bill-item summary \{ pointer-events: auto; \}/.test(mobileCss), 'sin JavaScript las tarjetas móviles se pueden abrir (nadie las abre por la persona)');
+  assert.ok(/\.bill-foot a, \.rail-trail-all \{ position: relative; white-space: nowrap; \}/.test(css) && /\.bill-foot a::after, \.rail-trail-all::after \{ content: ""; position: absolute; inset: calc\(-1 \* var\(--space-3\)\) 0; \}/.test(css) && !/\.bill-foot a[^{]*\{[^}]*inline-flex/.test(css + mobileCss), 'el enlace a Instagram es texto en línea con 44 px de objetivo: no deja un renglón alto');
 });
 
 test('una sola acción primaria («Cómo llegar») con la misma clase y WhatsApp siempre secundario', async () => {
@@ -1059,7 +1247,8 @@ test('géneros: todo género de la muestra tiene etiqueta en español y uno sin 
 test('Libros: una sola taxonomía a la vista (mismo estado activo, tema ligado a colección) y «Filtros» sin el total de la muestra', async () => {
   const pickRule = css.replaceAll('\n', ' ').match(/:where\(\.rail-chip, \.topic\)\[aria-checked="true"\][^{]*\{[^}]*\}/)[0];
   assert.ok(/--ctl-bg: var\(--pick-fill\); --ctl-edge: var\(--terra\); --ctl-ink: var\(--pick-ink\);/.test(pickRule), 'el tema activo y la colección activa comparten el código de «elegido» (menta, borde y canto --terra, tinta --pick-ink) en una sola regla');
-  assert.ok(!/\.(topic|rail-chip)\[aria-checked="true"\]/.test(mobileCss) && !/\.(topic|rail-chip)\[aria-checked="true"\]/.test(css), 'ninguna regla aparte redefine el estado activo de temas o colecciones, ni en móvil ni en escritorio');
+  assert.ok(!/\.(topic|rail-chip)\[aria-checked="true"\][^{]*\{[^}]*(--ctl-|background|border|box-shadow|(?<![-\w])color\s*:)/.test(css + mobileCss), 'ninguna regla aparte redefine los colores del estado activo de temas o colecciones, ni en móvil ni en escritorio');
+  assert.deepEqual([...css.matchAll(/\.rail-chip\[aria-checked="true"\][^{]*\{([^}]*)\}/g)].map(m => m[1].trim()), ['scale: 1.1;', 'fill: currentColor;', 'scale: calc(1 / 1.1);'], 'la parada actual solo suma tamaño (scale, sin mover a las vecinas) y el icono relleno');
   assert.ok(!/\[aria-(checked|pressed|expanded|current)="[a-z]+"\][^{]*\{[^}]*background: var\(--(tungsten|terra-deep|terra)\)/.test(css + mobileCss), 'ningún estado activo lleva relleno turquesa: el turquesa profundo relleno (--terra-deep) queda para «Cómo llegar»');
   const cols = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
   const temas = cols.collections.map(c => c.tema).filter(Boolean);
@@ -1163,14 +1352,14 @@ test('sistema táctil: una sola piel de control, un solo código de «elegido»,
   }
   // Insignias.
   const badge = flat.match(/:where\(\.tab-badge, [^{]*\{[^}]*\}/)[0];
-  assert.ok(/\.cat-n/.test(badge) && /\.bill-stage figcaption/.test(badge) && /\.bill-card-cap/.test(badge) && /\.hours tr\.is-today th::after/.test(badge), '«Hoy», conteos y pies de foto tipo etiqueta comparten la insignia');
+  assert.ok(/\.cat-n/.test(badge) && /\.bill-stage figcaption/.test(badge) && /\.badge[,)]/.test(badge) && /\.hours tr\.is-today th::after/.test(badge), '«Hoy», conteos, insignias de tipo y estado y pies de foto tipo etiqueta comparten la insignia');
   assert.ok(/border-radius: var\(--radius-pill\); background: var\(--pick-fill\); color: var\(--pick-ink\);/.test(badge) && /font: 800 var\(--fs-0\)\/1 var\(--f-display\)/.test(badge), 'insignia: píldora menta sin canto, 12 px en la familia redonda');
   assert.ok(/\.badge-new/.test(badge), '«Nuevo» es una insignia más de la misma regla (solo cambia relleno y tinta)');
   // Tipografía: familia redonda en titulares y controles, sin mayúsculas forzadas ni condensar; Archivo para el texto corrido y las portadas.
   assert.deepEqual(owners(/([^{}]+)\{[^{}]*text-transform: uppercase/g).sort(), ['.cover-title', '.hours tr.is-today th::after', '.wordmark, .ftr-mark'], 'mayúsculas solo en el rótulo «ITINERANTE», la insignia «Hoy» y las portadas (objetos)');
   assert.deepEqual(owners(/([^{}]+)\{[^{}]*font-stretch/g), ['.cover-title'], 'la condensada queda solo en las portadas tipográficas');
   assert.ok(/\.wordmark, \.ftr-mark \{[^}]*font-family: var\(--f-display\);\s*font-weight: 900;/.test(flat), 'el rótulo va en la familia redonda');
-  for (const sel of ['.btn', '.rail-chip', '.topic', '.act', '.cat-chip', '.sm-row', '.sm-link', '.ml-title', '.sm-title', '.ex-title', '.bill-title', '.bill-cap-t', '.drawer h3', '.topic-name', '.manifesto-text', '.hdr-nav a', '.composer-field label', '.cat-bar label']) {
+  for (const sel of ['.btn', '.rail-chip', '.topic', '.act', '.cat-chip', '.sm-row', '.sm-link', '.ml-title', '.sm-title', '.ex-title', '.bill-title', '.rail-trail-text', '.drawer h3', '.topic-name', '.manifesto-text', '.hdr-nav a', '.composer-field label', '.cat-bar label']) {
     const rule = flatAll.match(new RegExp(String.raw`(?:^|\})\s*${sel.replace('.', String.raw`\.`)} \{[^}]*\}`));
     assert.ok(rule && /font: (800|900) [^;]*var\(--f-display\)/.test(rule[0]), `${sel} en la familia redonda (800 o 900)`);
   }
@@ -1183,8 +1372,9 @@ test('sistema táctil: una sola piel de control, un solo código de «elegido»,
   assert.ok(existsSync(here('./assets/fonts/nunito-normal-latin.woff2')) && existsSync(here('./assets/fonts/OFL-nunito.txt')) && /font-family: 'Nunito'/.test(fontsCss), 'Nunito alojada con su licencia');
   assert.ok(html.includes('<link rel="preload" href="assets/fonts/nunito-normal-latin.woff2" as="font" type="font/woff2" crossorigin>') && html.includes('<link rel="preload" href="assets/fonts/archivo-normal-latin.woff2" as="font" type="font/woff2" crossorigin>'), 'se precargan las dos familias que pintan la primera vista');
   // Movimiento: rebote corto del icono al elegir, solo con movimiento.
-  assert.ok(/@keyframes pick-pop \{ 50% \{ scale: 1\.12; \} \}/.test(flat) && /\.motion :is\(\.act, \.save\)\[aria-pressed="true"\] \.ic \{ animation: pick-pop var\(--dur-fast\) var\(--spring\); \}/.test(flat), 'rebote 1 → 1.12 → 1 con --spring y --dur-fast');
-  assert.ok(/prefers-reduced-motion: reduce\) \{\s*\.motion :is\(\.act, \.save\)\[aria-pressed="true"\] \.ic \{ animation: none; \}/.test(flat), 'con «reducir movimiento» no hay rebote');
+  assert.ok(/@keyframes pick-pop \{ 50% \{ scale: 1\.12; \} \}/.test(flat) && /\.motion \.is-pop > :is\(\.ic, \.badge\) \{ animation: pick-pop var\(--dur-fast\) var\(--spring\); \}/.test(flat), 'rebote 1 → 1.12 → 1 con --spring y --dur-fast');
+  assert.ok(/prefers-reduced-motion: reduce\) \{\s*\.motion \.is-pop > :is\(\.ic, \.badge\) \{ animation: none; \}/.test(flat), 'con «reducir movimiento» no hay rebote');
+  assert.ok(!/\[aria-(pressed|checked)="true"\][^{]*\{[^}]*animation/.test(flatAll), 'el rebote no cuelga del estado: un guardado o un «Me interesa» restaurado al pintar no rebota');
   const appSrc = await readFile(here('./app.js'), 'utf8');
   assert.ok(!/data-magnetic/.test(html + appSrc) && !/--mx|--my/.test(css + appSrc), 'los botones ya no se desplazan tras el cursor: la única respuesta es hundirse');
 });

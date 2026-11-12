@@ -126,16 +126,20 @@ p { text-wrap: pretty; }
   outline: 2px solid transparent; outline-offset: 2px;
   --ctl-ring: 0 calc(var(--ctl-lip) / 2) 0 calc(var(--ctl-lip) / 2 + 2px) var(--ring-gap, var(--night)), 0 calc(var(--ctl-lip) / 2) 0 calc(var(--ctl-lip) / 2 + 4px) var(--ring-ink, var(--bone));
 }
-/* Rebote corto del icono al elegir («Me interesa», guardar): una vez, con el resorte. Sin movimiento no existe. */
+/* Rebote corto del icono al elegir («Me interesa», guardar, parada del recorrido): una vez, con el resorte, y solo por un toque de la persona.
+   La clase .is-pop la pone pickPop() (motion.js) en el manejador del toque y se retira al terminar; restaurar un estado guardado al pintar no rebota.
+   La marca de «hojeada» entra con el mismo rebote si aparece durante ese toque. Sin movimiento no existe. */
 @keyframes pick-pop { 50% { scale: 1.12; } }
-.motion :is(.act, .save)[aria-pressed="true"] .ic { animation: pick-pop var(--dur-fast) var(--spring); }
+.motion .is-pop > :is(.ic, .badge) { animation: pick-pop var(--dur-fast) var(--spring); }
 
-/* Insignia («Hoy», conteos, pie de foto tipo etiqueta): píldora sin canto, 12 px en la familia redonda, menta con tinta turquesa. */
-:where(.tab-badge, .badge-new, .cat-n, .bill-stage figcaption, .bill-card-cap, [data-cat-filters-count]:not(:empty)), .hours tr.is-today th::after {
+/* Insignia («Hoy», conteos, tipo y estado de una propuesta, pie de foto tipo etiqueta): píldora sin canto, 12 px en la familia redonda, menta con tinta turquesa. */
+:where(.tab-badge, .badge-new, .cat-n, .bill-stage figcaption, .badge, [data-cat-filters-count]:not(:empty)), .hours tr.is-today th::after {
   display: inline-grid; place-items: center; min-height: 20px; padding: 0 var(--space-2);
   border-radius: var(--radius-pill); background: var(--pick-fill); color: var(--pick-ink);
   font: 800 var(--fs-0)/1 var(--f-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; white-space: nowrap;
 }
+/* Insignia callada: lo que todavía no está confirmado («Propuesta · sin fecha»). Gris del tono con tinta; la menta queda para lo afirmado (tipo, fecha, «Hoy»). */
+.badge--quiet { background: var(--stone); color: var(--bone); }
 
 .btn {
   position: relative;
@@ -438,6 +442,8 @@ p { text-wrap: pretty; }
 /* Campo turquesa del logo con piezas blancas encima. La sección lleva los tokens del tono claro (data-tone="light": controles, tarjetas e insignias
    se resuelven como en cualquier sección blanca) y aquí solo se pinta el campo. Sobre el turquesa directo va únicamente tinta y la primaria. */
 .bill { background: var(--turq-base); color: var(--turq-ink); padding: var(--sec-md) var(--gutter); }
+/* Foco sobre el campo turquesa: el anillo de un control se separa con el turquesa real y se pinta con su tinta (el tono claro daría un halo blanco). Dentro de una tarjeta vuelve al blanco. */
+.bill { --ring-gap: var(--turq-base); --ring-ink: var(--turq-ink); }
 .bill .h2 em { color: var(--turq-ink); }
 .bill-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; margin-bottom: var(--space-7); }
 .bill-head p { margin: 0; max-width: 62ch; padding-top: 20px; border-top: 2px solid var(--turq-ink); font-size: var(--fs-body); }
@@ -461,14 +467,17 @@ p { text-wrap: pretty; }
 .bill-track { display: grid; gap: var(--space-3); }
 .bill-item { border: var(--edge-w) solid var(--edge-soft); border-radius: var(--radius-card); background: var(--night); color: var(--bone); transition: border-color var(--dur-fast) var(--ease-out); }
 .bill-item[open] { border-color: var(--terra); }
+.bill-item { --ring-gap: var(--night); --ring-ink: var(--bone); } /* dentro de la tarjeta el foco vuelve a separarse con blanco */
 .bill-item summary {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title ic" "meta ic";
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "badges ic" "title ic" "meta ic";
   gap: var(--space-1) var(--space-5); align-items: center;
   padding: var(--space-5);
   border-radius: calc(var(--radius-card) - var(--edge-w));
   list-style: none; cursor: pointer;
 }
 .bill-item summary::-webkit-details-marker { display: none; }
+/* Insignias de la propuesta: tipo (Lectura, Juego, Taller) y estado («Propuesta · sin fecha» o la fecha confirmada, ver feed.js). */
+.bill-badges { grid-area: badges; display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-1); }
 .bill-title { grid-area: title; font: 900 var(--fs-5)/1.1 var(--f-display); letter-spacing: -0.01em; }
 .bill-sub { grid-area: meta; justify-self: start; font: 500 var(--fs-2)/1.3 var(--f-sans); color: var(--bone-dim); }
 /* El signo «+» vive en un botón de icono (decorativo: el control es el resumen entero) que toma el código de «elegido» al abrir. */
@@ -479,13 +488,16 @@ p { text-wrap: pretty; }
 }
 .bill-item summary:active .bill-ic { translate: 0 var(--lip); box-shadow: 0 0 0 var(--edge); }
 .bill-item[open] .bill-ic { rotate: 45deg; border-color: var(--terra); background: var(--pick-fill); color: var(--pick-ink); box-shadow: 0 0 0 var(--terra); }
-.bill-detail { display: grid; gap: var(--space-4); justify-items: start; max-width: 54ch; padding: 0 var(--space-5) var(--space-5); }
-.bill-detail p { margin: 0; font-size: var(--fs-body); }
+.bill-detail { display: grid; gap: var(--space-4); justify-items: start; padding: 0 var(--space-5) var(--space-5); }
+.bill-detail p { max-width: 54ch; margin: 0; font-size: var(--fs-body); } /* la medida es del párrafo: las tres acciones caben en un renglón a su lado */
 .bill-item::details-content { block-size: 0; overflow: clip; }
 .motion .bill-item::details-content { transition: block-size var(--dur-slow) var(--ease-out), content-visibility var(--dur-slow) allow-discrete; } /* ci:motion-layout-prop el acordeón necesita animar la altura (interpolate-size) */
 .bill-item[open]::details-content { block-size: auto; }
 .bill-foot { margin: var(--space-5) 0 0; font-weight: 650; }
-.bill-foot a { display: inline-flex; align-items: center; gap: 8px; }
+/* Enlace en línea: un pseudoelemento le da 44 px de objetivo sin engordar el renglón ni el contorno de foco (como caja flexible de 44 px dejaba un renglón alto al partir la frase). */
+.bill-foot a, .rail-trail-all { position: relative; white-space: nowrap; }
+.bill-foot a::after, .rail-trail-all::after { content: ""; position: absolute; inset: calc(-1 * var(--space-3)) 0; }
+.bill-foot a .ic { margin-inline-start: var(--space-1); vertical-align: -0.125em; }
 
 /* ---------- Libros ---------- */
 
@@ -937,7 +949,12 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
    el título y el autor dentro. Nada que dependa del largo del texto: el contenido llega al lugar exacto del esqueleto. */
 .rail-item, .card-item { --card-h: 150cqw; }
 :is(.rail-item, .card-item) > .card { min-height: var(--card-h); align-content: start; }
-.sk-chip { flex: none; box-sizing: border-box; width: 112px; height: var(--target-coarse); margin-bottom: var(--lip); border-radius: var(--radius-ctl); background: color-mix(in srgb, var(--bone) 9%, transparent); } /* misma caja que el chip real, canto incluido */
+/* Esqueleto de una parada: la misma caja que la parada real (.rail-stop, más abajo), con el disco de 64 px y una línea donde irá el nombre. */
+.sk-chip {
+  --sk: color-mix(in srgb, var(--bone) 9%, transparent);
+  background: radial-gradient(circle at 50% calc(var(--stop) / 2), var(--sk) calc(var(--stop) / 2 - 1px), transparent calc(var(--stop) / 2)) no-repeat,
+    linear-gradient(var(--sk), var(--sk)) 50% calc(var(--stop) + var(--lip) + var(--space-3)) / var(--space-7) var(--space-3) no-repeat;
+}
 .card--sk .cover { overflow: hidden; }
 .frame-clip { position: relative; }
 .still-img img, .frame-clip img, .topic-layer img, .bill-layer img { position: relative; }
@@ -946,7 +963,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* Objetivos táctiles de 44 px. */
 .hdr-brand { min-height: 44px; } /* con cualquier puntero (RSP-14): un portátil táctil de 761–1100 px no carga mobile.css; los temas ya miden 56 px */
 @media (pointer: coarse) {
-  .cat-opt label, .cat-more-facets, .bill-foot a { min-height: 44px; }
+  .cat-opt label, .cat-more-facets { min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1018,7 +1035,7 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* Movimiento reducido: sin desplazamiento, pero con un fundido que confirma el cambio de estado. */
 @media (prefers-reduced-motion: reduce) {
-  .motion :is(.act, .save)[aria-pressed="true"] .ic { animation: none; }
+  .motion .is-pop > :is(.ic, .badge) { animation: none; }
   .drawer { transition: opacity var(--dur-instant) linear, display var(--dur-instant) allow-discrete; opacity: 1; }
   .drawer:not([open]), .drawer.is-closing { opacity: 0; }
   @starting-style { .drawer[open] { opacity: 0; } }
@@ -1043,8 +1060,8 @@ html.sheet-open { overflow: hidden; }
 /* Elementos solo móviles: ocultos por defecto (mobile.css los muestra). */
 .tabbar, .hdr-wa, .drawer-grabber { display: none; }
 
-/* Cartelera como carrusel (solo móvil): en escritorio las fotos de tarjeta, los puntos y el encabezado de publicación no existen. */
-.bill-card-fig, .bill-dots, .bill-post-head, .bill-cap { display: none; }
+/* Cartelera como carrusel (solo móvil): en escritorio las fotos de tarjeta y los puntos no existen (la foto va en el escenario). */
+.bill-card-fig, .bill-dots { display: none; }
 
 /* Progreso de lectura (Goal-Gradient): una línea fija que se llena con el scroll. Sin JS: animación ligada al desplazamiento;
    donde no se soporta, la barra queda en cero y no estorba. */
@@ -1067,8 +1084,62 @@ html.sheet-open { overflow: hidden; }
 /* Dos líneas con dueño distinto: la nota de la colección (cambia con el chip, reserva su línea para que el carrusel no salte) y el rótulo de muestra (fijo). */
 .rail-info { display: grid; gap: var(--space-1); }
 .rail-info [data-rail-note] { min-height: 1lh; }
-.rail-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.rail-chip { min-height: var(--target-coarse); padding: 0 var(--space-4); font: 800 var(--fs-1)/1 var(--f-display); } /* control; la colección activa lleva el código de «elegido» (ver «Sistema táctil») */
+/* Recorrido (DESIGN.md, «Catálogo como recorrido»): cada colección es una parada, un control redondo de 64 px con su icono y el nombre debajo,
+   unidas por una línea punteada. La parada actual lleva el código de «elegido» y crece con scale (no mueve a sus vecinas); la hojeada lleva la
+   marca de verificación y su tramo (el que sale hacia la siguiente) en --terra. La fila se desplaza en horizontal si no caben.
+   Geometría: --pitch es la distancia entre centros y --zig el escalón entre paradas pares e impares; la línea mide hypot(pitch, zig) y gira
+   atan2(zig, pitch). Sin esas funciones la fila queda recta. El primer disco y el último quedan al ras del contenido (alineados con el titular). */
+.rail-chips {
+  --stop: 64px; --pitch: 128px; --zig: 0px; --name-h: 36px;
+  display: flex; align-items: flex-start; gap: calc(var(--pitch) - var(--stop));
+  margin: 0 calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) var(--space-1);
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.rail-chips::-webkit-scrollbar { display: none; }
+.rail-stop, .sk-chip { flex: 0 0 var(--stop); height: calc(var(--stop) + var(--lip) + var(--space-2) + var(--name-h)); } /* la caja mide el disco; el nombre cuelga centrado y puede ser más ancho */
+.rail-chips > :nth-child(even) { margin-top: var(--zig); }
+.rail-chips > :nth-child(odd) { margin-bottom: var(--zig); }
+.rail-stop { position: relative; display: grid; justify-items: center; align-content: start; }
+.rail-stop:not(:last-child)::after {
+  content: ""; position: absolute; z-index: 0; left: 50%; top: calc(var(--stop) / 2 - 2px); width: var(--pitch); height: 4px; transform-origin: 0 50%;
+  background: radial-gradient(circle closest-side, var(--edge) 75%, transparent) 0 0 / var(--space-2) 100% repeat-x;
+}
+.rail-stop.is-seen::after { background: linear-gradient(var(--terra), var(--terra)) 0 50% / 100% var(--edge-w) no-repeat; }
+@supports (rotate: atan2(1px, 1px)) and (width: hypot(1px, 1px)) {
+  .rail-chips { --zig: var(--space-4); }
+  .rail-stop:not(:last-child)::after { width: hypot(var(--pitch), var(--zig)); rotate: atan2(var(--zig), var(--pitch)); }
+  .rail-stop:nth-child(even):not(:last-child)::after { rotate: atan2(calc(-1 * var(--zig)), var(--pitch)); }
+}
+/* La parada: control redondo (la piel, el canto y el código de «elegido» salen de la regla común). El nombre va dentro del botón, colgado debajo:
+   es su nombre accesible y también se toca. */
+.rail-chip {
+  position: relative; z-index: 1; display: grid; place-items: center; width: var(--stop); height: var(--stop); padding: 0; border-radius: 50%;
+  font: 800 var(--fs-1)/1.25 var(--f-display);
+  transition: scale var(--dur-fast) var(--ease-out), translate var(--dur-instant) var(--ease-out), box-shadow var(--dur-instant) var(--ease-out), background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.rail-chip > .ic { width: 28px; height: 28px; stroke-width: 1.75; }
+.rail-chip-name {
+  position: absolute; top: calc(100% + var(--edge-w) + var(--lip) + var(--space-2)); left: 50%; translate: -50% 0; transform-origin: 50% 0;
+  width: min(calc(var(--pitch) - var(--space-2)), calc(var(--stop) + var(--space-4))); text-align: center; text-wrap: balance; overflow-wrap: break-word; /* apenas más ancho que el disco: un nombre de dos palabras parte en dos renglones y no se sale del margen del contenido */
+}
+/* Actual: un poco más grande (el nombre conserva su tamaño) y el icono relleno. Los colores de «elegido» no se redefinen aquí. */
+.rail-chip[aria-checked="true"] { scale: 1.1; }
+.rail-chip[aria-checked="true"] > .ic { fill: currentColor; }
+.rail-chip[aria-checked="true"] > .rail-chip-name { scale: calc(1 / 1.1); }
+/* Hojeada: insignia con la marca de verificación sobre la parada (la piel de la insignia, con el filete --terra de lo elegido y un aro del fondo que la separa del disco). */
+.rail-chip-done { display: none; position: absolute; top: calc(-1 * var(--space-1)); right: calc(-1 * var(--space-1)); width: 24px; min-height: 24px; padding: 0; box-shadow: inset 0 0 0 var(--edge-w) var(--terra), 0 0 0 var(--edge-w) var(--night); }
+.rail-chip-done .ic { width: 14px; height: 14px; stroke-width: 2.5; }
+.rail-stop.is-seen .rail-chip-done { display: inline-grid; }
+/* Progreso del recorrido: «N de M paradas hojeadas» con su barra. El renglón reserva 44 px: al completar, el mensaje y su salida caben sin mover el carrusel. */
+.rail-trail { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); align-items: center; gap: 0 var(--space-4); min-height: var(--target-coarse); }
+.rail-trail-bar { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 12px; overflow: hidden; border: var(--edge-w) solid var(--edge); border-radius: var(--radius-pill); background: var(--night); }
+.rail-trail-bar::-webkit-progress-bar { background: var(--night); }
+.rail-trail-bar::-webkit-progress-value { background: var(--terra); border-radius: var(--radius-pill); }
+.rail-trail-bar::-moz-progress-bar { background: var(--terra); border-radius: var(--radius-pill); }
+.rail-trail-text { margin: 0; color: var(--bone-dim); font: 800 var(--fs-1)/1.4 var(--f-display); font-variant-numeric: tabular-nums; }
+.rail-trail-all { color: var(--bone); } /* enlace en línea con 44 px de objetivo (el mismo pseudoelemento que el enlace a Instagram de Cartelera) */
+.rail-trail-all[hidden] { display: none; }
+.rail.is-complete .rail-all { visibility: hidden; } /* con el recorrido completo la salida al catálogo sube junto al mensaje; el pie conserva su alto */
 .rail-viewport {
   margin-inline: calc(-1 * var(--gutter)); padding: var(--space-3) var(--gutter) var(--space-4);
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none;
@@ -1084,8 +1155,8 @@ html.sheet-open { overflow: hidden; }
 .rail-ctrl { display: none; gap: var(--space-2); }
 @media (hover: hover) and (pointer: fine) { .rail-ctrl { display: flex; } }
 .rail-btn .ic { width: 20px; height: 20px; }
-.rail-btn[data-rail-prev] .ic { rotate: 90deg; }
-.rail-btn[data-rail-next] .ic { rotate: -90deg; }
+.rail-btn:is([data-rail-prev], [data-news-prev]) .ic { rotate: 90deg; }
+.rail-btn:is([data-rail-next], [data-news-next]) .ic { rotate: -90deg; }
 .rail-btn:disabled { --ctl-bg: var(--night); --ctl-edge: var(--edge-soft); --ctl-ink: var(--bone-dim); cursor: default; } /* sin más libros hacia ese lado: borde y canto suaves, tinta atenuada */
 .rail-all { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-coarse); margin-inline-start: auto; font: 800 var(--fs-1)/1 var(--f-display); text-decoration: none; }
 .rail-all .ic { width: 18px; height: 18px; }
@@ -1095,7 +1166,7 @@ html.sheet-open { overflow: hidden; }
 .rail-status:empty { position: absolute; } /* vacía no ocupa celda ni hueco de la retícula, pero sigue en el árbol de accesibilidad: al llenarse se anuncia */
 .rail-error { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .rail-error[hidden] { display: none; }
-.rail[data-state="error"] :is(.rail-chips, .rail-info, .rail-viewport, .rail-foot) { display: none; } /* los chips vacíos tampoco dejan hueco */
+.rail[data-state="error"] :is(.rail-chips, .rail-trail, .rail-info, .rail-viewport, .rail-foot) { display: none; } /* los chips vacíos tampoco dejan hueco */
 @media print { .rail { display: none; } }
 
 /* Movimiento reducido, regla general: ningún cambio de estado se anima ni se desplaza (los fundidos y los
@@ -1117,6 +1188,18 @@ html.sheet-open { overflow: hidden; }
   display: grid; place-items: center; width: var(--target-coarse); height: var(--target-coarse); margin: 0; padding: 0; border-radius: 50%;
 }
 .save .ic { width: 22px; height: 22px; }
+/* Foco de «Guardar» sobre la portada: el anillo se separa con el color de esa portada y se pinta con su tinta (el fondo claro de la sección daba un halo blanco sobre una portada oscura). */
+:is(.rail-item, .card-item) > .save { --ring-ink: var(--cover-ink); }
+:is(.rail-item, .card-item):has(.tone-0) > .save { --ring-gap: var(--cover-0-a); }
+:is(.rail-item, .card-item):has(.tone-1) > .save { --ring-gap: var(--cover-1-a); }
+:is(.rail-item, .card-item):has(.tone-2) > .save { --ring-gap: var(--cover-2-a); }
+:is(.rail-item, .card-item):has(.tone-3) > .save { --ring-gap: var(--cover-3-a); }
+:is(.rail-item, .card-item):has(.tone-4) > .save { --ring-gap: var(--cover-4-a); }
+:is(.rail-item, .card-item):has(.tone-5) > .save { --ring-gap: var(--cover-5-a); }
+:is(.rail-item, .card-item):has(.tone-6) > .save { --ring-gap: var(--cover-6-a); --ring-ink: var(--cover-6-ink); }
+:is(.rail-item, .card-item):has(.tone-7) > .save { --ring-gap: var(--cover-7-a); --ring-ink: var(--cover-7-ink); }
+:is(.rail-item, .card-item):has(.tone-8) > .save { --ring-gap: var(--cover-8-a); --ring-ink: var(--cover-8-ink); }
+:is(.rail-item, .card-item):has(.tone-9) > .save { --ring-gap: var(--cover-9-a); --ring-ink: var(--cover-9-ink); }
 .save--wide {
   position: static; display: inline-flex; gap: var(--space-2); justify-self: start; container-type: normal; width: auto; height: auto; min-height: var(--target-coarse);
   margin-bottom: var(--lip); padding: 0 var(--space-4); font: 800 var(--fs-1)/1 var(--f-display); border-radius: var(--radius-ctl);
@@ -1168,10 +1251,14 @@ html.sheet-open { overflow: hidden; }
 html.explorer-open { overflow: hidden; }
 
 /* ---------- Publicaciones de Cartelera: «Me interesa» y «Compartir» (locales: no se envía nada, sin contadores) ---------- */
-.bill-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.act { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-coarse); padding: 0 var(--space-4); font: 800 var(--fs-1)/1 var(--f-display); } /* control; «Me interesa» elegido lleva el código de «elegido» con el corazón relleno */
+/* Tres acciones por propuesta: «Me interesa» (se elige), «Compartir» (control de icono) y «Preguntar por WhatsApp» (secundaria, nunca mayor que «Cómo llegar»). */
+.bill-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.act { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--target-coarse); padding: 0 var(--space-4); font: 800 var(--fs-1)/1 var(--f-display); } /* control; «Me interesa» elegido lleva el código de «elegido» con el corazón relleno */
 .act .ic { width: 20px; height: 20px; }
-html:not(.js) .bill-acts { display: none; }
+.act--icon { flex: none; width: 48px; padding: 0; border-radius: 50%; }
+.bill-acts > * { min-height: 48px; }
+.bill-wa { font-size: var(--fs-1); } /* WhatsApp nunca más alto ni con letra mayor que la primaria */
+html:not(.js) .bill-acts .act { display: none; } /* sin JavaScript solo queda la consulta por WhatsApp, que es un enlace */
 .bill-visit { margin-top: var(--space-5); }
 .books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec-sm) 0; }
 .books-foot p { margin: 0; max-width: 46ch; color: var(--bone-dim); font-size: var(--fs-body); }
@@ -1194,4 +1281,3 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
 .card:active .badge-new, .card[data-opening] .badge-new { translate: 0 var(--lip); }
 .motion .news.is-in .badge-new { animation: pick-pop var(--dur-fast) var(--spring); } /* aparece con el rebote, una vez, cuando la sección entra en pantalla */
 @media print { .news { display: none; } }
-.bill-detail .btn { min-height: var(--target-coarse); font-size: var(--fs-1); text-align: left; }
