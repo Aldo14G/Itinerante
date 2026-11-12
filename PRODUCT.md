@@ -43,13 +43,23 @@ genérico.
   fechas, cupos o estados que todavía no estén verificados.
 - En el teléfono la primera vista es un perfil (nombre, estado de hoy, dirección
   y «Cómo llegar» como única acción de contacto) sin burbujas de historias (se retiraron el 2026-11-11: la referencia es navegar como en
-  una red social, no copiar sus secciones). La navegación vive en una barra inferior centrada
-  con los cuatro capítulos y el menú. En
-  Cartelera, «Me interesa» y «Compartir» son locales: no envían nada ni muestran
+  una red social, no copiar sus secciones). La navegación vive en una barra inferior acoplada
+  con cinco casillas con nombre: Inicio, Catálogo, Eventos, Novedades y Más (la hoja «Más» lleva Mi lista,
+  el buscador, La casa, Visita y las redes). El orden de la página es Inicio (con La casa), Catálogo,
+  Eventos y talleres, Novedades, Visita. En
+  Eventos y talleres (antes Cartelera), «Me interesa» y «Compartir» son locales: no envían nada ni muestran
   contadores, reseñas o reacciones, porque no hay datos que los respalden.
-- «Recién llegados» (Novedades) existe solo si la librería entrega una lista de
-  `ids`; sin ella el módulo, su ancla y sus enlaces no aparecen. No es un ranking
-  ni una promesa de existencia.
+- Novedades es un capítulo propio que existe solo si la librería entrega su lista:
+  `novedades.entradas` en `assets/data/collections.json`, un renglón por libro con
+  `{ "id": "…", "llegada": "AAAA-MM-DD" }`. **Se actualiza añadiendo renglones a ese
+  archivo**, sin tocar HTML ni JS. Sin entradas no aparecen la sección, su casilla, sus
+  enlaces ni el control del inicio. No es un ranking ni una promesa de existencia.
+- **Hoy las entradas de Novedades son datos de ejemplo**: 12 libros del catálogo de prueba
+  con fechas de llegada de ejemplo. La fecha no se imprime; solo ordena (lo más reciente
+  primero) y decide qué lleva «Nuevo». Las cifras que sí se muestran («5 llegaron en las
+  últimas dos semanas», «3 novedades desde tu visita») son conteos reales de esa lista
+  frente a la última vez que la persona vio la sección en su dispositivo: no se inventa
+  ninguna. Antes de publicar, la lista se sustituye por las llegadas reales.
 - El catálogo es una muestra estática de 500 registros de prueba con búsqueda
   local; no depende de ningún servicio para funcionar.
 - El recorrido audiovisual acompaña la entrada y las secciones de la casa; la

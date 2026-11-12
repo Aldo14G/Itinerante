@@ -7,7 +7,7 @@ Librería Itinerante y Más, centro de Monterrey (Mariano Matamoros Pte. 421). E
 </project>
 
 <state_of_the_site>
-- Cuatro capítulos con los mismos nombres en cabecera, menú y barra inferior: La casa · Cartelera · Libros · Visita. Libros tiene tres capas: carrusel de libros → temas y consulta por WhatsApp → «Explorar la muestra» (hoja a pantalla completa en móvil; en línea en escritorio).
+- Orden de la página y nombres visibles (2026-11-11; los `id` no cambian): Inicio (`#inicio`, con el manifiesto y La casa `#casa`) · Catálogo (`#libros`) · Eventos y talleres (`#cartelera`, «Eventos» en la navegación) · Novedades (`#novedades`) · Visita (`#visita`). Cabecera de escritorio: Catálogo, Eventos, Novedades, Visita. Móvil: barra inferior acoplada con cinco casillas con nombre (Inicio, Catálogo, Eventos, Novedades, Más) y hoja «Más» (Mi lista, buscador, La casa, Visita, redes). El Catálogo tiene tres capas: carrusel de libros → temas y consulta por WhatsApp → «Explorar la muestra» (hoja a pantalla completa en móvil; en línea en escritorio).
 - Archivos: `index.html`, `style.css` (base y escritorio), `mobile.css` (solo ≤ 760 px), `tokens.css` (GENERADO desde `design/tokens.json` con `npm run tokens`; no se edita a mano), `app.js` (escenas, menú lateral, Explorar), `scenes-desktop.js` (solo escritorio), `catalog.js` (muestra y ficha), `rail.js` (carrusel), `saved.js` (Mi lista), `sample.js`, `motion.js`, `assets/`.
 - Documentos de diseño vigentes: `DESIGN.md`, `PRODUCT.md`, `design/tokens.json`, `docs/PLAN-ESTRUCTURA-Y-CARRUSEL.md`. El sitio anterior está archivado y NO se toca (`_archive/`).
 </state_of_the_site>
@@ -16,7 +16,7 @@ Librería Itinerante y Más, centro de Monterrey (Mariano Matamoros Pte. 421). E
 Estas reglas no se negocian: la librería confirma la existencia y el precio de todo.
 1. Sin precios, existencias, fechas, reseñas ni calificaciones inventados. Nada de «más leídos» ni «lo más preguntado»: no hay datos.
 2. La plantilla no imprime avisos de maqueta (decisión de Aldo, 2026-11-10): nada de «Recreación IA», «Foto real», «Imagen ilustrativa» ni insignias. La procedencia de cada imagen se registra como dato (`data-kind="ai|real"` y `assets/provenance.json`) y no se muestra.
-3. El texto visible habla de «el catálogo» y no lleva sellos de muestra («Datos de muestra · no es inventario»). Sigue prohibido afirmar existencias o precios: cada ficha termina en una pregunta a la librería. El listado real de obras llegará después: los módulos (carrusel, Novedades) deben poder recibirlo (`ids` en `assets/data/collections.json`) y **ocultarse** si no hay datos.
+3. El texto visible habla de «el catálogo» y no lleva sellos de muestra («Datos de muestra · no es inventario»). Sigue prohibido afirmar existencias o precios: cada ficha termina en una pregunta a la librería. El listado real de obras llegará después: los módulos (carrusel, Novedades) deben poder recibirlo (`ids` de cada colección y `novedades.entradas` con `{ id, llegada }` en `assets/data/collections.json`) y **ocultarse** si no hay datos. Las entradas de Novedades que hay hoy son datos de ejemplo; su fecha no se imprime.
 4. Horario: lunes a sábado 11:00–20:00; domingo cerrado. WhatsApp 528180875940.
 </truth_rules>
 

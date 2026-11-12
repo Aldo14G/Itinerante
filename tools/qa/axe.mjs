@@ -1,5 +1,5 @@
 // Auditoría automática de accesibilidad con axe-core (WCAG 2.x A/AA y buenas prácticas) en los estados principales:
-// inicio en móvil y escritorio, menú lateral, hoja Explorar, Mi lista y ficha. Falla (código 1) con violaciones serias o críticas.
+// inicio en móvil y escritorio, hoja «Más», hoja Explorar, Mi lista y ficha. Falla (código 1) con violaciones serias o críticas.
 // Uso: node tools/qa/axe.mjs http://127.0.0.1:PORT/   (CHROME_PATH cambia el navegador; AXE_ALL=1 lista también las moderadas y leves)
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
@@ -46,8 +46,7 @@ await audit('móvil 390: inicio', MANIFESTO);
 await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
 await audit('móvil 390: manifiesto revelado');
 await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(700);
-await ev(`document.querySelector('#sheet-menu .sm-group:nth-of-type(3) .sm-row').click()`); await sleep(500);
-await audit('móvil 390: menú lateral con Libros abierto');
+await audit('móvil 390: hoja «Más» (filas, tarjeta de Visita con horario y redes)');
 await ev(`document.getElementById('sheet-menu').close()`); await sleep(500);
 await ev(`document.querySelector('[data-ex-open]').scrollIntoView()`); await sleep(1200);
 await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`document.getElementById('explorer').open`); await waitFor(`document.querySelector('#explorer [data-cat-grid]').getAttribute('aria-busy') === null`, 60); await sleep(600);

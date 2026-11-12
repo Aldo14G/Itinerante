@@ -22,7 +22,7 @@ await send('Page.navigate', { url: URL_ });
 await sleep(4500);
 const H = await ev(`document.documentElement.scrollHeight`);
 for (let y = 0; y < H; y += 600) { await ev(`scrollTo(0, ${y})`); await sleep(200); }
-const marks = await ev(`(() => { const top = s => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY); return [['inicio', 0], ['manifiesto', top('.manifesto') - 40], ['casa', top('#casa')], ['cartelera', top('#cartelera')], ['libros', top('#libros')], ['libros-catalogo', top('#catalogo') + 380], ['cita', top('.quote') - 40], ['llamado', top('.call') - 40], ['visita', top('#visita')], ['pie', top('.ftr') - 100]]; })()`);
+const marks = await ev(`(() => { const top = s => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY); return [['inicio', 0], ['manifiesto', top('.manifesto') - 40], ['casa', top('#casa')], ['catalogo', top('#libros')], ['catalogo-explorar', top('#catalogo') + 380], ['eventos', top('#cartelera')], ['novedades', top('#novedades')], ['cita', top('.quote') - 40], ['llamado', top('.call') - 40], ['visita', top('#visita')], ['pie', top('.ftr') - 100]]; })()`);
 let i = 0;
 for (const [name, y] of marks) {
   await ev(`scrollTo(0, ${y})`); await sleep(1400); await ev(`scrollBy(0, 1)`); await sleep(500);

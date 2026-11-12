@@ -84,11 +84,9 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   // ficha
   await ev(`document.querySelector('[data-rail] button.card')?.click()`);
   if (await wait(`document.getElementById('cat-drawer')?.open`)) { await sleep(900); await sweep(`${name}: ficha`); await ev(`document.getElementById('cat-drawer').close()`); await sleep(500); }
-  // menú móvil y acordeones
+  // hoja «Más» (sin acordeones: las filas, la tarjeta de Visita y las redes están a la vista)
   if (mobile) {
-    await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800); await sweep(`${name}: menú`);
-    const groups = await ev(`[...document.querySelectorAll('#sheet-menu .sm-row[aria-controls]')].map(b => b.getAttribute('aria-controls'))`);
-    for (const g of groups) { await ev(`document.querySelector('#sheet-menu [aria-controls="${g}"]').click()`); await sleep(500); await sweep(`${name}: menú ${g}`); }
+    await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800); await sweep(`${name}: hoja Más`);
     await ev(`document.querySelector('#sheet-menu [data-open-mylist]').click()`); await sleep(1500); await sweep(`${name}: Mi lista`);
     await ev(`document.getElementById('mylist').close()`); await sleep(600);
     await ev(`scrollTo(0, document.querySelector('[data-ex-open]').getBoundingClientRect().top + scrollY - 200)`); await sleep(1200);

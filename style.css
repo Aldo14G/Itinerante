@@ -131,7 +131,7 @@ p { text-wrap: pretty; }
 .motion :is(.act, .save)[aria-pressed="true"] .ic { animation: pick-pop var(--dur-fast) var(--spring); }
 
 /* Insignia («Hoy», conteos, pie de foto tipo etiqueta): píldora sin canto, 12 px en la familia redonda, menta con tinta turquesa. */
-:where(.tab-badge, .cat-n, .bill-stage figcaption, .bill-card-cap, [data-cat-filters-count]:not(:empty)), .hours tr.is-today th::after {
+:where(.tab-badge, .badge-new, .cat-n, .bill-stage figcaption, .bill-card-cap, [data-cat-filters-count]:not(:empty)), .hours tr.is-today th::after {
   display: inline-grid; place-items: center; min-height: 20px; padding: 0 var(--space-2);
   border-radius: var(--radius-pill); background: var(--pick-fill); color: var(--pick-ink);
   font: 800 var(--fs-0)/1 var(--f-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; white-space: nowrap;
@@ -303,8 +303,16 @@ p { text-wrap: pretty; }
 .entry-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 20px; }
 .entry-lede { max-width: 40ch; margin: 0; font: 480 var(--fs-body)/1.45 var(--f-sans); color: var(--bone); }
 .entry-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+/* Datos de la visita y, a su derecha (bajo las acciones), el control de novedades. El control solo existe con llegadas sin ver; su sitio se reserva antes del
+   primer render (clase news-hint, que pone boot.js con lo que dejó la visita anterior) para que al llegar el conteo nada se mueva. */
+.entry-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); margin: 0 0 clamp(6px, 1vw, 14px); }
+.entry-news { display: none; flex: none; }
+.news-hint .entry-news { display: inline-flex; visibility: hidden; }
+.news-hint .entry-news:not([hidden]) { visibility: visible; }
+.entry-news-dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--terra-deep); }
+.motion .entry-news:not([hidden]) .entry-news-dot { animation: pick-pop var(--dur-fast) var(--spring); } /* el mismo rebote del punto de la barra, una vez */
 .entry-facts {
-  display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0 0 clamp(6px, 1vw, 14px); padding: 0; list-style: none;
+  display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; padding: 0; list-style: none;
   font: 620 var(--fs-1)/1.25 var(--f-sans); color: var(--bone-dim);
 }
 .entry-facts li { display: inline-flex; align-items: center; gap: 8px; }
@@ -666,7 +674,7 @@ p { text-wrap: pretty; }
 @media (min-width: 761px) and (max-height: 520px) {
   .entry, .entry-stage, .motion .entry-stage { min-height: 340px; }
   .wordmark { display: none; }
-  .entry-facts { margin-bottom: var(--space-5); }
+  .entry-meta { margin-bottom: var(--space-5); }
   /* El velo normal mide su franja superior en porcentaje (16 % de 390 px = 62 px, menos que la cabecera): aquí la franja se mide con la cabecera, para que la marca y el estado conserven 4.5:1. */
   .entry-shade { background: linear-gradient(180deg, color-mix(in srgb, var(--night) 90%, transparent) 0, color-mix(in srgb, var(--night) 84%, transparent) var(--hdr-h), transparent calc(var(--hdr-h) + var(--space-8)), transparent 46%, color-mix(in srgb, var(--night) 90%, transparent) 60%, color-mix(in srgb, var(--night) 97%, transparent) 100%); }
   .menu nav a { font-size: var(--fs-6); }
@@ -1168,6 +1176,22 @@ html:not(.js) .bill-acts { display: none; }
 .books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec-sm) 0; }
 .books-foot p { margin: 0; max-width: 46ch; color: var(--bone-dim); font-size: var(--fs-body); }
 
-/* ---------- Novedades (Recién llegados): sin datos no existe ---------- */
-.news[hidden] { display: none; }
+/* ---------- Novedades: capítulo propio; sin entradas no existe ----------
+   La sección, su casilla y sus enlaces existen mientras <html> lleve has-news: boot.js la pone antes del primer render (salvo que la visita anterior no
+   encontrara novedades) y news.js la confirma con el JSON. Sin JavaScript no hay clase y nada de esto se muestra. */
+html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link][hidden] { display: none; }
+.news { --rail-gap: var(--space-4); padding: var(--sec-md) var(--gutter); background: var(--night); }
+.news-head { display: grid; justify-items: start; gap: var(--space-3); margin-bottom: var(--space-6); }
+.news-status { margin: 0; min-height: 1lh; font: 800 var(--fs-2)/1.3 var(--f-display); color: var(--tungsten); } /* reserva su renglón: el conteo llega con el JSON */
+.news .rail-viewport { padding-top: var(--space-4); } /* sitio para la insignia montada en el borde de la portada */
+.news.is-static :is(.rail-progress, .rail-ctrl) { display: none; }
+/* «Nuevo»: insignia (regla común) en turquesa profundo con texto blanco, montada en el borde superior de la portada para no tapar el título. Baja con la portada al presionar. */
+.badge-new {
+  position: absolute; z-index: 2; top: calc(-1 * var(--space-3)); left: var(--space-2);
+  background: var(--terra-deep); color: var(--white); box-shadow: 0 0 0 var(--edge-w) var(--night);
+  pointer-events: none; transition: translate var(--dur-instant) var(--ease-out);
+}
+.card:active .badge-new, .card[data-opening] .badge-new { translate: 0 var(--lip); }
+.motion .news.is-in .badge-new { animation: pick-pop var(--dur-fast) var(--spring); } /* aparece con el rebote, una vez, cuando la sección entra en pantalla */
+@media print { .news { display: none; } }
 .bill-detail .btn { min-height: var(--target-coarse); font-size: var(--fs-1); text-align: left; }

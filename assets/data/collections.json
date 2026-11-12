@@ -2,7 +2,7 @@
   "meta": {
     "kind": "sample",
     "label": "Datos de muestra · no es inventario",
-    "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado. La clave opcional `tema` de cada colección (narrativa, poesia, ensayo, cronica, infantil, libre) la une con el tema de consulta de Pregúntanos: al elegir ese tema el carrusel marca la primera colección que lo trae. La nota de cada colección no repite el rótulo de muestra: ese rótulo es fijo en la página. La clave «novedades» alimenta la tira «Recién llegados»: mientras `ids` esté vacío no se muestra nada (ni sección, ni ancla, ni enlaces); con ids aparece, con el rótulo de muestra mientras `meta.kind` sea «sample»."
+    "nota": "Colecciones de muestra construidas con filtros sobre catalog.json. Cuando llegue el listado real de la librería, cada colección puede traer una lista curada en `ids` (en el orden en que se muestran) y este rótulo se retira donde haya inventario verificado. La clave opcional `tema` de cada colección (narrativa, poesia, ensayo, cronica, infantil, libre) la une con el tema de consulta de Pregúntanos: al elegir ese tema el carrusel marca la primera colección que lo trae. La nota de cada colección no repite el rótulo de muestra: ese rótulo es fijo en la página. La clave «novedades» alimenta el capítulo Novedades: `entradas` es una lista de { id, llegada } (el id de un libro de catalog.json y su fecha de llegada, AAAA-MM-DD). Para actualizarla se añaden renglones; el sitio ordena de lo más reciente a lo más antiguo, muestra hasta 12 y marca «Nuevo» lo que llegó después de la última visita de cada persona. La fecha no se imprime. Sin entradas no se muestra nada (ni sección, ni casilla, ni enlaces, ni el control del inicio). Hoy son datos de ejemplo: libros del catálogo de prueba con fechas de ejemplo."
   },
   "collections": [
     { "id": "ciencia-ficcion", "titulo": "Ciencia ficción", "nota": "Mundos posibles.", "tema": "narrativa", "filtro": { "g": ["fiction-science-fiction"] } },
@@ -10,5 +10,21 @@
     { "id": "novela-historica", "titulo": "Novela histórica", "nota": "Otras épocas contadas como novela.", "tema": "narrativa", "filtro": { "g": ["fiction-historical-fiction"] } },
     { "id": "memorias", "titulo": "Memorias", "nota": "Vidas contadas en primera persona.", "tema": "cronica", "filtro": { "g": ["non-fiction-memoir"] } }
   ],
-  "novedades": { "titulo": "Recién llegados", "ids": [] }
+  "novedades": {
+    "titulo": "Recién llegados",
+    "entradas": [
+      { "id": "libro-project-hail-mary-andy-weir-ballantine-books-9784303-5e06bb4c", "llegada": "2026-11-10" },
+      { "id": "libro-lessons-in-chemistry-bonnie-garmus-doubleday-9784375-685f3d93", "llegada": "2026-11-07" },
+      { "id": "libro-the-creative-act-rick-rubin-penguin-press-9780140673-83de0c6c", "llegada": "2026-11-04" },
+      { "id": "libro-oh-the-places-you-ll-go-dr-seuss-random-house-978719-62f45d9b", "llegada": "2026-10-31" },
+      { "id": "libro-the-midnight-library-matt-haig-viking-9780781469258-3bfec6cf", "llegada": "2026-10-29" },
+      { "id": "libro-spare-prince-harry-random-house-9785271467524-58d437e3", "llegada": "2026-10-26" },
+      { "id": "libro-the-earth-of-fire-john-grisham-tor-books-97828654496-21a91fd8", "llegada": "2026-10-22" },
+      { "id": "libro-iron-heart-erik-larson-macmillan-publishers-97802700-036be6c5", "llegada": "2026-10-19" },
+      { "id": "libro-the-mind-rising-v-e-schwab-workman-publishing-978848-125763e6", "llegada": "2026-10-15" },
+      { "id": "libro-last-ice-robin-diangelo-scholastic-press-97839198731-e7f66777", "llegada": "2026-10-12" },
+      { "id": "libro-hope-and-rain-charlotte-mcconaghy-tor-books-97861777-fd2347e2", "llegada": "2026-10-08" },
+      { "id": "libro-princess-of-roses-david-grann-anchor-books-978037297-a6deffa7", "llegada": "2026-10-05" }
+    ]
+  }
 }

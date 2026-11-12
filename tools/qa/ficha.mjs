@@ -53,13 +53,13 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   ck(`${w}x${h}: Escape cierra y libera el scroll`, await ev(`!document.querySelector('#cat-drawer').open && !document.documentElement.classList.contains('sheet-open')`));
 }
 
-// QA1-03: sin JavaScript, la barra inferior (con el botón de menú) no se muestra y los cuatro capítulos son alcanzables.
+// QA1-03: sin JavaScript, la barra inferior (con la casilla «Más») no se muestra y los capítulos son alcanzables desde la cabecera (Novedades necesita JavaScript: ni su sección ni su enlace existen).
 await send('Emulation.setScriptExecutionDisabled', { value: true });
 await send('Page.navigate', { url: URL_ }); await sleep(2500);
 const nj = await ev(`(() => ({ js: document.documentElement.classList.contains('js'), more: getComputedStyle(document.querySelector('.tabbar')).display,
   links: [...document.querySelectorAll('.hdr-nav a')].map(a => { const r = a.getBoundingClientRect(); return [a.getAttribute('href'), r.width > 0 && r.right > 0 && r.left < innerWidth, Math.round(r.height)]; }) }))()`);
-ck('sin JavaScript: la barra inferior con el botón de menú no se muestra', nj.js === false && nj.more === 'none', JSON.stringify(nj));
-ck('sin JavaScript: los cuatro capítulos son alcanzables (>= 44 px de alto)', nj.links.length === 4 && nj.links.every(l => l[1] && l[2] >= 44), JSON.stringify(nj));
+ck('sin JavaScript: la barra inferior con la casilla «Más» no se muestra', nj.js === false && nj.more === 'none', JSON.stringify(nj));
+ck('sin JavaScript: Catálogo, Eventos y Visita son alcanzables (>= 44 px de alto) y Novedades, que necesita JavaScript, no se ofrece', nj.links.filter(l => l[1]).map(l => l[0]).join() === '#libros,#cartelera,#visita' && nj.links.filter(l => l[1]).every(l => l[2] >= 44) && nj.links.some(l => l[0] === '#novedades' && !l[1]), JSON.stringify(nj));
 await shot('nojs-390-top.png');
 
 ck('sin errores de consola', errs.length === 0, errs.join(' | '));

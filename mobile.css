@@ -1,77 +1,67 @@
 /* Itinerante B.4 · móvil con estilo de app (cromo claro).
-   Se carga solo con (max-width: 760px). Patrones: barra inferior flotante, cabecera con controles blancos
+   Se carga solo con (max-width: 760px). Patrones: barra inferior acoplada con cinco casillas con nombre, cabecera con controles blancos
    e iconos en tinta, hojas inferiores y chips. Todo propio: sin fuentes, iconos ni CSS de terceros.
    La piel de cada pieza (borde, canto, «elegido») es la del sistema táctil de style.css; aquí solo cambian cajas y acomodo. */
 
-:root { --hdr-h: 56px; } /* banda de 56 px: los chips de 44 px con 6 px de aire; con la barra (56 + 8) el cromo fijo queda bajo 20 % del alto incluso a 320×640 (Laws of UX: la pantalla es del contenido) */
+:root { --hdr-h: 56px; } /* banda de 56 px: los chips de 44 px con 6 px de aire; con la barra (56) el cromo fijo queda bajo 20 % del alto incluso a 320×640 (Laws of UX: la pantalla es del contenido) */
 html { scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px); }
 /* Aterrizaje desde la barra y el menú (SAT-01): al bajar la cabecera está oculta, así que el capítulo cae al borde de la ventana y su titular queda a un escalón (48 px);
    antes caía 68 px abajo y se veía la cola del capítulo anterior. El relleno global de scroll sigue protegiendo el foco de teclado en todo lo demás. */
-#casa, #cartelera, #libros, #visita { scroll-margin-top: calc(-1 * (var(--hdr-h) + 8px)); }
+#casa, #libros, #cartelera, #novedades, #visita { scroll-margin-top: calc(-1 * (var(--hdr-h) + 8px)); }
 
-/* Cromo claro: la barra es blanca y opaca, sin desenfoque (sobre un fondo opaco el desenfoque no se ve y solo cuesta una capa), y los chips de la cabecera son blancos sólidos siempre
-   (sobre la foto del hero y sobre el campo turquesa se leen igual: icono en tinta, filete en tinta). */
-.tabbar { background: var(--glass-solid); }
-@media (prefers-reduced-transparency: reduce) {
-  .tabbar { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
-}
-@media (prefers-contrast: more) {
-  .tabbar { border-width: 2px; background: var(--glass-solid); }
-}
-
-/* Barra inferior: cápsula flotante centrada (no ocupa el ancho), con los cuatro capítulos y el menú al alcance del pulgar. Cinco casillas del mismo ancho:
-   ningún botón cambia de sitio al cambiar de capítulo (antes la cápsula activa crecía y corría a sus vecinos hasta 68 px). Solo iconos; en la casilla activa
-   el icono va en una cápsula turquesa y su nombre aparece debajo, en tinta. Blanca, con sombra suave de dos capas. Alto 56 px a 8 px del borde: 64 px de franja. */
+/* Barra inferior: acoplada al borde inferior, de lado a lado, blanca y opaca (sin desenfoque ni sombra: no flota), con borde superior de 2 px y el alto --tabbar-h
+   más el área segura. Cinco casillas iguales (cuatro si no hay novedades) con icono y nombre siempre a la vista: Inicio, Catálogo, Eventos, Novedades y Más.
+   El objetivo táctil es la casilla entera (un quinto del ancho por todo el alto de la barra); ninguna cambia de tamaño ni de sitio al cambiar de capítulo. */
 .tabbar {
-  position: fixed; z-index: 48; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 8px);
-  width: fit-content; max-width: calc(100% - 24px); margin-inline: auto;
-  display: flex; align-items: center; gap: 4px; height: var(--tabbar-h); padding: 4px;
-  border: 1px solid color-mix(in srgb, var(--paper-ink) 10%, transparent); border-radius: var(--radius-pill);
-  box-shadow: var(--elev-2);
-  transition: translate var(--dur-base) var(--spring), visibility var(--dur-base);
+  position: fixed; z-index: 48; inset: auto 0 0 0;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  box-sizing: border-box; height: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); padding: 0 var(--space-1) env(safe-area-inset-bottom);
+  background: var(--glass-solid); border-top: var(--edge-w) solid var(--edge-soft);
+  transition: translate var(--dur-base) var(--ease-out), visibility var(--dur-base);
 }
+@media (prefers-contrast: more) { .tabbar { border-top-color: var(--edge); } }
 .tabbar a, .tab-menu {
-  position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 60px; height: 48px; padding: 0;
-  color: var(--paper-ink); text-decoration: none; border: 0; background: none; border-radius: var(--radius-pill); font: inherit; cursor: pointer;
+  position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; height: 100%; margin: 0; padding: 0;
+  color: var(--paper-ink); text-decoration: none; border: 0; background: none; font: inherit; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-fast) var(--ease-out);
 }
-.tab-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: var(--radius-pill); transition: translate var(--dur-instant) var(--ease-out), background-color var(--dur-fast) var(--ease-out); }
+/* La casilla se dibuja dentro del objetivo táctil (4 px de aire arriba y abajo). Activa = el único código de «elegido» del sitio: relleno menta (--pick-fill),
+   borde --terra (sombra interior: no cambia la caja), icono relleno y nombre en --pick-ink. */
+.tabbar a::before, .tab-menu::before { content: ""; position: absolute; z-index: -1; inset: var(--space-1) 0; border-radius: var(--radius-ctl); transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.tab-ic { position: relative; display: grid; place-items: center; flex: none; width: 24px; height: 24px; transition: translate var(--dur-instant) var(--ease-out); }
 .tab-ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-/* El nombre de cada pestaña existe siempre para lectores de pantalla; a la vista solo el de la pestaña activa. */
-.tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; font: 800 min(var(--fs-0), 3.4vw)/1 var(--f-display); } /* con el texto ampliado el nombre crece hasta donde cabe en la casilla de 60 px */
-/* Pestaña activa: el único código de «elegido» del sitio, cápsula menta (--pick-fill) con filete --terra y el icono relleno en --pick-ink; el nombre va debajo en la misma tinta.
-   El filete es una sombra interior: la cápsula mide lo mismo que antes (48×26) y ninguna casilla cambia de tamaño. */
+.tab-lb { max-width: 100%; white-space: nowrap; font: 800 min(var(--fs-0), 3.2vw)/1.1 var(--f-display); } /* 12 px; a 320 px baja con el ancho para que «Novedades» quepa en su casilla, y con el texto ampliado crece solo hasta donde cabe */
 .tabbar a[aria-current="location"] { color: var(--pick-ink); }
-.tabbar a[aria-current="location"] .tab-ic { width: 48px; height: 26px; background: var(--pick-fill); box-shadow: inset 0 0 0 var(--edge-w) var(--terra); }
-.tabbar a[aria-current="location"] .tab-ic svg { width: 20px; height: 20px; fill: currentColor; fill-opacity: 0.9; }
-.tabbar a[aria-current="location"] .tab-lb { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
-/* A 320 px no caben cinco casillas de 60: bajan a 48 y la activa queda solo con su icono en un círculo turquesa. */
-@media (max-width: 359px) {
-  .tabbar a, .tab-menu { width: 48px; }
-  .tabbar a[aria-current="location"] .tab-ic { width: 40px; height: 40px; }
-  .tabbar a[aria-current="location"] .tab-ic svg { width: 24px; height: 24px; }
-  .tabbar a[aria-current="location"] .tab-lb { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-}
+.tabbar a[aria-current="location"]::before { background: var(--pick-fill); box-shadow: inset 0 0 0 var(--edge-w) var(--terra); }
+.tabbar a[aria-current="location"] .tab-ic svg { fill: currentColor; fill-opacity: 0.9; }
 .tabbar a:active .tab-ic, .tab-menu:active .tab-ic { translate: 0 2px; } /* el icono baja al tocar, como toda pieza; no cambia de tamaño */
-.tabbar a:focus-visible, .tab-menu:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: 2px; }
-/* Mi lista a la vista (SAT-11): con libros guardados el botón Menú lleva el conteo; la lista es la primera fila del menú. */
-.tab-badge { position: absolute; top: 0; right: var(--space-1); min-width: 20px; padding: 0 var(--space-1); box-shadow: 0 0 0 var(--edge-w) var(--glass-solid); } /* insignia de conteo (piel en style.css) con un filete blanco que la separa del icono */
-.tab-badge[hidden] { display: none; }
-/* La barra se retira mientras la ficha o el menú ocupan la pantalla. */
-html.sheet-open .tabbar { translate: 0 calc(100% + 24px); }
+.tabbar a:focus-visible, .tab-menu:focus-visible { outline: 2px solid var(--paper-ink); outline-offset: calc(-1 * var(--space-1)); border-radius: var(--radius-ctl); } /* por dentro de la casilla: la barra llega al borde de la pantalla */
+/* Avisos sobre el icono, con un filete blanco que los separa de él. «Más» lleva el conteo de Mi lista (SAT-11: la lista es la primera fila de la hoja);
+   «Novedades» lleva un punto turquesa profundo cuando hay llegadas sin ver (su nombre accesible lo dice con texto: «, N sin ver»). */
+.tab-badge { position: absolute; top: calc(-1 * var(--space-1)); left: calc(100% - var(--space-1)); min-width: 20px; padding: 0 var(--space-1); box-shadow: 0 0 0 var(--edge-w) var(--glass-solid); }
+.tab-dot { position: absolute; top: 0; right: calc(-1 * var(--space-1)); width: 10px; height: 10px; border-radius: 50%; background: var(--terra-deep); box-shadow: 0 0 0 var(--edge-w) var(--glass-solid); }
+.tabbar a[aria-current="location"] .tab-dot { box-shadow: 0 0 0 var(--edge-w) var(--pick-fill); } /* sobre la casilla activa el filete toma su relleno */
+.tab-badge[hidden], .tab-dot[hidden] { display: none; }
+.motion .tab-dot { animation: pick-pop var(--dur-fast) var(--spring); } /* aparece con el rebote corto, una vez */
+@media (forced-colors: active) { /* sin rellenos ni sombras, la casilla activa y el punto se marcan con el color de selección del sistema */
+  .tabbar a[aria-current="location"]::before { outline: 2px solid Highlight; outline-offset: -2px; }
+  .tab-dot { background: Highlight; forced-color-adjust: none; }
+}
+/* La barra se retira mientras una hoja ocupa la pantalla. */
+html.sheet-open .tabbar { translate: 0 100%; }
 
 /* Espacio para que la barra no tape el final de la página. */
-.ftr { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 40px); }
+.ftr { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--space-6)); }
 /* Ritmo móvil (U02, CR-14): entre dos capítulos el aire es la suma del relleno inferior de uno y el superior del siguiente. Con --sec-md a ambos lados eran 190-200 px de color liso;
    con --sec-sm son 96 px, el tope entre bloques. La cita, el llamado y el pie también usan --sec-sm; Visita cierra con --space-6 porque el pie aporta su --sec-sm. */
-.manifesto, .bill { padding-block: var(--sec-sm); }
+.manifesto, .bill, .news { padding-block: var(--sec-sm); }
 .books { padding-top: var(--sec-sm); }
 .house-pin { padding-block: var(--sec-sm); } /* sin clamp(vh): el relleno no depende de la altura de la pantalla */
 .house-track { padding-bottom: 0; } /* la barra de desplazamiento no se muestra en móvil: sin los 8 px de reserva */
 .visit { padding-block: var(--sec-sm); } /* cierra con 48 px (48 + 48 del pie = 96, el tope) */
 /* Tres escalones (SAT-09, proximidad): entre capítulos 96 px, entre capas de un mismo capítulo 64 px y del titular a su contenido 24 px. Antes seis huecos de 96 px hacían que capítulos y capas se leyeran igual. */
-.books-head, .bill-head { margin-bottom: var(--space-5); }
+.books-head, .bill-head, .news-head { margin-bottom: var(--space-5); }
 .rail { margin-bottom: var(--space-6); }
 .ask { margin-top: var(--space-6); }
 .ask > .layer-title { margin-bottom: var(--space-5); }
@@ -118,7 +108,7 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
   display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-4) var(--space-3);
   grid-template-areas: "av name" "av facts" "row row";
   padding-top: var(--space-7);
-  padding-bottom: calc(env(safe-area-inset-bottom) + var(--tabbar-h) + var(--space-6)); /* la barra inferior está desde la primera vista: «Cómo llegar» queda 24 px por encima de ella */
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--tabbar-h) + var(--space-5)); /* la barra inferior está desde la primera vista: lo último del perfil queda 24 px por encima de ella */
   /* El velo vive detrás del texto, no sobre toda la foto: crece con el bloque, así que el párrafo queda sobre fondo claro
      en cualquier alto de pantalla (antes seguía porcentajes de la altura y en pantallas cortas caía en la parte transparente). */
   background: linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--night) 90%, transparent) var(--space-7), color-mix(in srgb, var(--night) 97%, transparent) 100%);
@@ -136,6 +126,10 @@ html:not(.js) .hdr-nav a { min-height: var(--target-coarse); }
 .entry-facts li:has(> .ic) { align-items: start; } /* si la dirección parte en dos líneas (360 px), el pin se queda en la primera, no flotando entre ambas */
 .entry-facts li:has(> .ic) > .ic { margin-top: 2px; margin-top: calc((1lh - 1em) / 2); }
 .entry-row { grid-area: row; gap: var(--space-4); margin: 0; }
+/* Control de novedades: bajo «Cómo llegar», secundario (borde y canto), a todo el ancho y de 48 px. Su renglón solo existe con la reserva (news-hint): sin ella la retícula no deja hueco. */
+.entry-meta { display: contents; }
+.news-hint .entry-copy { grid-template-areas: "av name" "av facts" "row row" "news news"; }
+.entry-news { grid-area: news; min-height: 48px; }
 /* Una sola acción en la primera vista (Hick, <= 6 acciones): «Escribir» sale del perfil; WhatsApp sigue en la cabecera al desplazar, en Cartelera, en Libros y en Visita. */
 .entry-actions { grid-template-columns: 1fr; }
 .entry-actions .btn--ghost { display: none; }
@@ -194,6 +188,7 @@ html:not(.js) .tabbar { display: none; }
 .books { content-visibility: auto; contain-intrinsic-size: auto 2280px; }
 .quote { content-visibility: auto; contain-intrinsic-size: auto 224px; }
 .call { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+.news { content-visibility: auto; contain-intrinsic-size: auto 380px; }
 .visit { content-visibility: auto; contain-intrinsic-size: auto 848px; }
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 304px; }
 
@@ -242,9 +237,9 @@ html:not(.js) .tabbar { display: none; }
 
 /* Fondo de la hoja plano (sin desenfoque) y cromo sólido en gama media o baja. */
 .drawer::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
-html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glass="lite"] .hdr-list { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
+html[data-glass="lite"] .hdr-wa, html[data-glass="lite"] .hdr-list { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
 
-/* Menú (hojas laterales, patrón de Docusaurus corregido): categorías que se despliegan, filas de 48 px. */
+/* Hoja «Más» (lateral): lo que la barra no tiene. Filas como controles táctiles de 56 px; Visita va en una tarjeta con su resumen (estado, horario) a la vista. Sin acordeones. */
 .sheet-menu {
   position: fixed; inset: 0 auto 0 0; margin: 0; padding: 0; width: min(88vw, 360px); max-width: none; height: 100dvh; max-height: none;
   display: none; flex-direction: column; overflow: hidden; color: var(--bone); background: var(--night);
@@ -264,46 +259,39 @@ html[data-glass="lite"] .tabbar, html[data-glass="lite"] .hdr-wa, html[data-glas
 .sm-title { margin: 0; font: 900 var(--fs-5)/1.1 var(--f-display); letter-spacing: -0.01em; }
 .sm-nav { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-4) var(--space-4) var(--space-3); }
 .sm-nav[data-more="1"] { mask-image: linear-gradient(to bottom, var(--black) calc(100% - var(--space-7)), transparent); } /* hay más abajo: el pie de la lista se funde (app.js pone data-more) */
-/* Filas del menú: controles táctiles de 56 px (borde, radio y canto), separados 12 px. */
+/* Filas: controles táctiles de 56 px (borde, radio y canto), separados 8 px más el canto. */
 .sm-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
 .sm-row { display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 56px; padding: var(--space-1) var(--space-3) var(--space-1) var(--space-2); font: 800 var(--fs-3)/1.2 var(--f-display); text-align: left; }
-.sm-list--aside { margin-top: var(--space-3); padding-top: var(--space-4); border-top: var(--edge-w) solid var(--edge-soft); }
-.sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--stone); border-radius: 50%; transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); } /* contenedor decorativo del icono (no es el control) */
+.sm-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; background: var(--stone); border-radius: 50%; } /* contenedor decorativo del icono (no es el control) */
 .sm-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.sm-lb { flex: 1; }
-.sm-caret { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--dur-fast) var(--ease-out); }
-.sm-row[aria-expanded="true"] .sm-caret { rotate: 90deg; }
-.sm-row[aria-expanded="true"] .sm-ic { color: var(--pick-ink); background: var(--pick-fill); box-shadow: inset 0 0 0 var(--edge-w) var(--terra); } /* grupo abierto: el icono toma el código de «elegido», como chips y pestaña */
-.sm-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-fast) var(--ease-out); }
-.sm-row[aria-expanded="true"] + .sm-sub { grid-template-rows: 1fr; }
-.sm-sub-in { min-height: 0; overflow: hidden; }
-/* Subdestinos: chips (el mismo control, en compacto) que se acomodan en renglones; el relleno de la lista deja sitio al canto y al anillo de foco, que el recorte del acordeón cortaría. */
-.sm-sub ul { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: var(--space-3) var(--space-2) var(--space-1); list-style: none; }
-.sm-link { display: inline-flex; align-items: center; min-height: var(--target-coarse); padding: 0 var(--space-3); font: 800 var(--fs-1)/1.2 var(--f-display); }
-.sm-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) var(--space-2) var(--space-2); font: 800 var(--fs-1)/1.3 var(--f-display); }
-.sm-hours { display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); margin: 0 var(--space-2) var(--space-2); font-variant-numeric: tabular-nums; }
+.sm-lb { flex: 1; display: grid; gap: 2px; }
+.sm-meta { font: 500 var(--fs-0)/1.3 var(--f-sans); color: var(--bone-dim); }
+/* Visita: tarjeta (radio de tarjeta, borde suave) con la fila que lleva a la sección y, debajo, el estado de hoy y el horario. */
+.sm-card { display: grid; gap: var(--space-2); margin-top: var(--space-3); padding: var(--space-2) var(--space-2) var(--space-3); border: var(--edge-w) solid var(--edge-soft); border-radius: var(--radius-card); }
+.sm-status { display: flex; align-items: center; gap: var(--space-2); margin: 0 var(--space-2); font: 800 var(--fs-1)/1.3 var(--f-display); }
+.sm-hours { display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); margin: 0 var(--space-2); font-variant-numeric: tabular-nums; }
 .sm-hours dt, .sm-hours dd { margin: 0; font: 500 var(--fs-1)/1.4 var(--f-sans); }
 .sm-hours dd { text-align: right; font: 800 var(--fs-1)/1.4 var(--f-display); }
-.sm-note { margin: 0 var(--space-2) var(--space-2); font: 500 var(--fs-1)/1.4 var(--f-sans); color: var(--bone-dim); }
-/* Pie del menú en una sola fila (SAT-06): «Cómo llegar» y WhatsApp como botón de icono. Antes dos botones apilados y las redes sumaban, con la cabeza, 262 px fijos (31–41 % de la ventana). */
+.sm-note { margin: 0 var(--space-2); font: 500 var(--fs-1)/1.4 var(--f-sans); color: var(--bone-dim); }
+/* Redes: dos chips (el mismo control, en compacto). */
+.sm-social { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-4) 0 0; padding: 0; list-style: none; }
+.sm-link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-coarse); padding: 0 var(--space-3); font: 800 var(--fs-1)/1.2 var(--f-display); }
+.sm-link .ic { width: 16px; height: 16px; }
+/* Pie de la hoja en una sola fila (SAT-06): «Cómo llegar» y WhatsApp como botón de icono. Antes dos botones apilados y las redes sumaban, con la cabeza, 262 px fijos (31–41 % de la ventana). */
 .sm-foot { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: var(--space-2); padding: var(--space-3) var(--space-4); padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom)); border-top: var(--edge-w) solid var(--edge-soft); }
 .sm-foot .btn { width: 100%; }
 .sm-foot .sm-wa { padding: 0; border-radius: 50%; }
 .sm-foot .sm-wa .ic { width: 22px; height: 22px; }
-.sm-social { display: flex; gap: var(--space-5); margin: var(--space-4) 0 0; padding: var(--space-2) var(--space-2) 0; border-top: var(--edge-w) solid var(--edge-soft); }
-.sm-social a { display: inline-flex; align-items: center; min-height: var(--target-coarse); color: var(--bone-dim); font: 800 var(--fs-1)/1 var(--f-display); text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
-  .sm-sub, .sm-caret { transition-duration: 0.01ms; }
   .sheet-menu { translate: none; }
 }
-.sm-lb { display: grid; gap: 2px; }
-.sm-meta { font: 500 var(--fs-0)/1.3 var(--f-sans); color: var(--bone-dim); }
 
 /* Carrusel de libros: 2.3 tarjetas por vista para que se note que sigue. */
 /* Las tarjetas fuera de la vista no cuestan estilo: cada tarjeta mide lo mismo (2:3 de 42vw), así que la caja que se conserva al omitirla es exacta y el carrusel no se mueve.
    Menos elementos vivos hacen más barato el showModal()/close() de la ficha, que recalcula el estilo de todo lo vivo (ver DESIGN.md, «Hojas en dos tareas»). */
 .rail-item { --rail-w: clamp(134px, 42vw, 200px); /* 2.3 portadas por vista en teléfono; con tope: a 760 px la portada medía 319×479 y al cruzar a 761 bajaba de golpe a 148×222 */ flex-basis: var(--rail-w); content-visibility: auto; contain-intrinsic-size: auto var(--rail-w) auto calc(var(--rail-w) * 1.5 + var(--lip)); } /* la tarjeta mide la portada 2:3 más su canto */
 .rail-item .card:focus-visible { outline-offset: -3px; } /* la contención de pintura de la tarjeta recortaría un contorno externo */
+.news .rail-item { content-visibility: visible; } /* son 12 tarjetas y la sección entera ya se omite fuera de pantalla: sin contención, la insignia «Nuevo» puede montar el borde de la portada */
 .rail-track { --rail-gap: var(--space-3); }
 /* Colecciones en rejilla de dos columnas: las cuatro a la vista, sin fila que se corte en el borde derecho. */
 .rail-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
@@ -372,6 +360,8 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
     grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "av name row" "av facts row"; align-items: start;
     padding-top: var(--space-6); padding-bottom: calc(env(safe-area-inset-bottom) + var(--tabbar-h) + var(--space-5));
   }
+  .news-hint .entry-copy { grid-template-areas: "av name row" "av facts row" "av news row"; } /* el control va bajo los datos, junto a «Cómo llegar»: no suma alto al perfil */
+  .entry-news { justify-self: start; }
   .entry-row { margin: 0; }
   .still { width: min(84vw, calc((100svh - 150px) * 1.7778)); }
   .rail-item { --rail-w: min(42vw, calc((100svh - 150px) / 1.5)); }
@@ -381,9 +371,12 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom) + var(--space-
   .drawer-body { grid-template-columns: 24% minmax(0, 1fr); }
   .mylist { max-height: calc(100dvh - 16px); }
 }
-/* Ventanas de menos de 420 px de alto (horizontal o zoom al 400 %, WCAG 1.4.10): la cabecera deja de ser fija (WhatsApp y Mi lista siguen en el menú de la barra) y la barra se ciñe. */
+/* Ventanas de menos de 420 px de alto (horizontal o zoom al 400 %, WCAG 1.4.10): la cabecera deja de ser fija (WhatsApp y Mi lista siguen en la hoja «Más») y la barra se ciñe a 52 px;
+   en horizontal (casillas anchas) el nombre va junto al icono. */
 @media (max-height: 420px) {
+  :root { --tabbar-h: 52px; }
   .hdr { position: absolute; }
-  .tabbar { height: 52px; bottom: calc(env(safe-area-inset-bottom) + 6px); }
-  .tabbar a, .tab-menu { height: 44px; }
+}
+@media (max-height: 420px) and (min-width: 480px) {
+  .tabbar a, .tab-menu { flex-direction: row; gap: var(--space-2); }
 }

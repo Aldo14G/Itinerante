@@ -358,12 +358,17 @@ async function boot() {
     const navLinks = $$('.hdr-nav a');
     const tabLinks = $$('.tabbar a');
     tabLinks.forEach(a => a.addEventListener('click', dropHeaderForJump));
-    const chapters = navLinks.map(a => $(a.getAttribute('href')));
-    let ranges = [], chapterRanges = [], hidden = false, current = '';
+    $('[data-news-cta]')?.addEventListener('click', dropHeaderForJump); // el control de novedades del inicio salta igual que su casilla
+    // Zonas del recorrido: cada una marca su enlace de la cabecera y su casilla de la barra. «Inicio» abarca la entrada, el manifiesto y La casa.
+    // La cita, el llamado, Visita y el pie no tienen casilla (Visita vive en la hoja «Más»): ahí la barra no marca ninguna, y «Más» nunca se marca
+    // como lugar (abre una hoja, no es un capítulo). En la cabecera de escritorio Visita sí tiene enlace y se marca.
+    const zones = [['#inicio', '#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
+    let ranges = [], zoneRanges = [], hidden = false, current = null;
     return {
       measure() {
         ranges = themed.map(el => ({ top: absTop(el), bottom: absTop(el) + el.offsetHeight, theme: el.dataset.theme }));
-        chapterRanges = chapters.map(el => ({ top: absTop(el), bottom: absTop(el) + el.offsetHeight }));
+        zoneRanges = zones.filter(z => z.from.offsetHeight && z.to.offsetHeight) // una sección que no existe (Novedades sin entradas) no tiene zona
+          .map(z => ({ hash: z.hash, top: absTop(z.from), bottom: absTop(z.to) + z.to.offsetHeight }));
       },
       tick(dt, y) {
         hdr.classList.toggle('is-solid', y > 24);
@@ -376,12 +381,12 @@ async function boot() {
         else if (vel < -60) hidden = false;
         if (performance.now() < dropHeader && y >= vh * 0.6 && !hdr.contains(document.activeElement)) hidden = true;
         hdr.classList.toggle('is-hidden', hidden);
-        const idx = chapterRanges.findIndex(c => y + vh * 0.4 >= c.top && y + vh * 0.4 < c.bottom);
-        const id = idx >= 0 ? String(idx) : '';
-        if (id !== current) {
-          navLinks.forEach((a, i) => { if (String(i) === id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
-          tabLinks.forEach((a, i) => { if (String(i) === id) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
-          current = id;
+        const zone = zoneRanges.find(c => y + vh * 0.4 >= c.top && y + vh * 0.4 < c.bottom);
+        const hash = zone ? zone.hash : '';
+        if (hash !== current) {
+          navLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+          tabLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+          current = hash;
         }
         return false;
       }
@@ -552,34 +557,18 @@ async function boot() {
   matchMedia('(min-width: 1101px)').addEventListener('change', e => { if (e.matches) setMenu(false); });
 
   await yieldNow();
-  // ---------- Menú móvil (hoja lateral con categorías que se despliegan) ----------
+  // ---------- Hoja «Más» (móvil): lo que la barra inferior no tiene ----------
   (function sheetMenu() {
     const dlg = $('#sheet-menu');
-    const opener = $('[data-menu-open]'); // el menú vive en la barra inferior (quinto botón), al alcance del pulgar
+    const opener = $('[data-menu-open]'); // «Más» es la quinta casilla de la barra inferior, al alcance del pulgar
     if (!dlg || !opener) return;
     const phone = matchMedia('(max-width: 760px)');
-    const groups = $$('.sm-group', dlg);
     const nav = $('.sm-nav', dlg);
-    // Pista de que hay más abajo (en 360×740, Libros abierto deja Visita y Mi lista bajo el pie fijo): el pie de la lista se funde
+    // Pista de que hay más abajo (en ventanas bajas las redes quedan bajo el pie fijo): el pie de la lista se funde
     // mientras se pueda bajar (data-more; la máscara vive en mobile.css).
     const more = () => { nav.dataset.more = nav.scrollTop + nav.clientHeight < nav.scrollHeight - 2 ? '1' : '0'; };
     nav.addEventListener('scroll', more, { passive: true });
     if ('ResizeObserver' in window) new ResizeObserver(more).observe(nav); else dlg.addEventListener('toggle', more);
-    const setGroup = (g, open) => {
-      const btn = $('.sm-row', g), sub = $('.sm-sub', g);
-      btn.setAttribute('aria-expanded', String(open));
-      sub.inert = !open; // fuera del orden de tabulación y del árbol de accesibilidad mientras está plegado
-      if (open) sub.addEventListener('transitionend', function shown(e) { // al terminar de desplegarse, la lista entera queda a la vista
-        if (e.target !== sub) return;
-        sub.removeEventListener('transitionend', shown);
-        sub.scrollIntoView({ block: 'nearest', behavior: isMotion() ? 'smooth' : 'auto' });
-        more();
-      });
-    };
-    groups.forEach(g => $('.sm-row', g).addEventListener('click', () => {
-      const open = $('.sm-row', g).getAttribute('aria-expanded') !== 'true';
-      groups.forEach(o => setGroup(o, o === g ? open : false)); // acordeón exclusivo: una categoría abierta a la vez
-    }));
     let landing = null; // sección a enfocar al cerrar tras elegir un destino
     const close = () => closeDialog(dlg); // botón y fondo: sale primero, el cierre real corre después del fotograma
     opener.addEventListener('click', () => {
@@ -592,7 +581,6 @@ async function boot() {
     });
     dlg.addEventListener('close', () => {
       opener.setAttribute('aria-expanded', 'false');
-      groups.forEach(g => setGroup(g, false));
       if (landing) { // la navegación lleva el foco al título de la sección, no de vuelta al botón
         const h = $('h1, h2, h3', landing) || landing;
         h.tabIndex = -1;
@@ -605,7 +593,6 @@ async function boot() {
       if (e.target === dlg) return close(); // clic en el fondo
       const link = e.target.closest('a[href]');
       if (!link) return;
-      const topic = link.dataset.topicGo, bill = link.dataset.billGo;
       dropHeaderForJump();
       const href = link.getAttribute('href');
       landing = href.startsWith('#') ? $(href) : null;
@@ -615,11 +602,8 @@ async function boot() {
         dlg.addEventListener('close', () => document.dispatchEvent(new CustomEvent('iti:open-explorer')), { once: true });
       } else if (landing) { e.preventDefault(); navigateFromSheet(href); } // la entrada de historial de la hoja pasa a ser la del destino
       dlg.close();
-      if (topic) setTimeout(() => $(`.topic[data-topic="${topic}"]`)?.click(), 350);
-      if (bill !== undefined) setTimeout(() => { const t = $('.bill-track'), card = $$('.bill-item')[Number(bill)]; if (t && card) t.scrollTo({ left: card.offsetLeft - t.firstElementChild.offsetLeft, behavior: isMotion() ? 'smooth' : 'auto' }); }, 350);
     });
     phone.addEventListener('change', e => { if (!e.matches) close(); });
-    groups.forEach(g => setGroup(g, false));
   })();
 
   await yieldNow();
@@ -821,6 +805,14 @@ async function boot() {
   })();
 
   await yieldNow();
+  // ---------- Novedades: un módulo ligero que se pide dos veces sin repetirse (el conteo, pronto; la tira, al acercarse) ----------
+  let newsLoad;
+  const loadNews = () => (newsLoad ??= import('./news.js').catch(err => {
+    newsLoad = undefined;
+    root.classList.remove('has-news', 'news-hint'); // sin el módulo no hay novedades que prometer: ni sección, ni casilla, ni control
+    throw err;
+  }));
+
   // ---------- Catálogo de muestra (carga al acercarse) ----------
   const catalogSection = $('#catalogo');
   if (catalogSection) {
@@ -899,14 +891,21 @@ async function boot() {
     // Carrusel de libros (capa 1 de Libros): se carga al acercarse y pide la ficha al catálogo al elegir un libro.
     const railEl = $('[data-rail]');
     if (railEl) {
-      const bootRail = () => {
-        import('./news.js').then(m => m.initNews({ ensureCatalog: bootCatalog })).catch(() => {}); // Novedades: sin datos queda oculta
-        return import('./rail.js').then(m => m.initRail({ ensureCatalog: bootCatalog, isMotion })).catch(() => { railEl.hidden = true; });
-      };
+      const bootRail = () => import('./rail.js').then(m => m.initRail({ ensureCatalog: bootCatalog, isMotion })).catch(() => { railEl.hidden = true; });
       if ('IntersectionObserver' in window) {
         const railIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { railIo.disconnect(); bootRail(); } }, { rootMargin: '700px 0px' });
         railIo.observe(railEl);
       } else bootRail();
+    }
+
+    // Novedades: la tira se pinta al acercarse a su sección (el conteo llega antes, ver «Start»). Sin entradas la sección no se muestra y nunca se acerca.
+    const newsEl = $('[data-news]');
+    if (newsEl) {
+      const bootNews = () => loadNews().then(m => m.initNews({ ensureCatalog: bootCatalog, isMotion })).catch(() => {});
+      if ('IntersectionObserver' in window) {
+        const newsIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { newsIo.disconnect(); bootNews(); } }, { rootMargin: '700px 0px' });
+        newsIo.observe(newsEl);
+      } else bootNews();
     }
   }
 
@@ -931,6 +930,9 @@ async function boot() {
   Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
     measureAll(); // entry.measure() ajusta el nombre antes de leer nada: un solo ajuste y un solo maquetado
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
+    // Conteo de novedades (punto de la casilla y control del inicio): después de la foto y las fuentes, para no competir con el primer render.
+    // Su sitio ya está reservado (boot.js), así que al llegar no mueve nada.
+    loadNews().then(m => m.initNewsCount()).catch(() => {});
   });
   // El nombre gigante del pie solo se ajusta cuando se acerca a la pantalla (cada ajuste fuerza un layout completo).
   let footFitted = false;

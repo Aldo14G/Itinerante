@@ -42,10 +42,9 @@ async function pass(name, w, h, mobile, reduced) {
   const H = await ev(`document.documentElement.scrollHeight - innerHeight`);
   for (let y = 0; y <= H; y += Math.round(h * 0.6)) { await ev(`scrollTo(0, ${y})`); await sleep(260); }
   await ev(`scrollTo(0, 0)`); await sleep(500);
-  // interacciones: menú móvil, acordeón, chips del carrusel, tarjeta -> ficha
+  // interacciones: hoja «Más», chips del carrusel, tarjeta -> ficha
   if (mobile) {
     await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(700);
-    await ev(`document.querySelector('#sheet-menu [aria-controls="sm-libros"]').click()`); await sleep(500);
     await ev(`document.querySelector('[data-sm-close]').click()`); await sleep(700);
   } else {
     await ev(`document.querySelector('.menu-btn')?.click()`); await sleep(500);
