@@ -1,7 +1,7 @@
 // Auditoría E2E con Chromium (CDP) de la hoja «Más», tonos, barra inferior, eventos, catálogo, movimiento reducido, desbordes y rendimiento.
 // node e2e.mjs <url> <outDir>
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { mkdirSync, writeFileSync, mkdtempSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -19,6 +19,7 @@ let id = 0; const pending = new Map(); let problems = [];
 ws.addEventListener('message', e => {
   const m = JSON.parse(e.data);
   if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); return; }
+  if (m.method === 'Fetch.requestPaused') { send('Fetch.fulfillRequest', { requestId: m.params.requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body: Buffer.from(JSON.stringify(NEWS_DATA)).toString('base64') }); return; }
   if (m.method === 'Runtime.exceptionThrown') problems.push('EXC ' + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text));
   if (m.method === 'Log.entryAdded' && ['error'].includes(m.params.entry.level)) problems.push(`LOG error: ${m.params.entry.text} ${m.params.entry.url || ''}`);
   if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') problems.push('CONSOLE ' + m.params.args.map(a => a.value || a.description).join(' '));
@@ -28,6 +29,13 @@ const ev = async expr => { const r = await send('Runtime.evaluate', { expression
 const shot = async n => writeFileSync(join(out, n), Buffer.from((await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 })).result.data, 'base64'));
 const key = async (k, code, vk) => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: k, code, windowsVirtualKeyCode: vk }); };
 await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'); await send('Network.enable');
+// Novedades: la lista que se publica está vacía hasta que la librería registre fechas de llegada reales, y entonces el capítulo no existe
+// (eso lo comprueba feed.mjs). Esta auditoría recorre la página completa, con Novedades: collections.json se sirve con siete libros del
+// inventario y fechas relativas a hoy (tres en las dos últimas semanas). Los ids salen del catálogo real: si un libro se va, la prueba lo dice.
+const CATALOG = JSON.parse(readFileSync(new URL('../../assets/data/catalog.json', import.meta.url), 'utf8')).books;
+const dayAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const NEWS_DATA = { ...JSON.parse(readFileSync(new URL('../../assets/data/collections.json', import.meta.url), 'utf8')), novedades: { titulo: 'Recién llegados', entradas: CATALOG.slice(10, 17).map((b, i) => ({ id: b.id, llegada: dayAgo([1, 3, 20, 2, 30, 35, 40][i]) })) } };
+await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }] });
 
 const report = []; // { area, name, ok, detail }
 const check = (area, name, ok, detail = '') => report.push({ area, name, ok: !!ok, detail: ok ? '' : String(detail) });
@@ -207,8 +215,8 @@ check('gama media', 'lite activo, cabecera con tinte claro y sin desenfoque', li
 
 // ---------- 5. Catálogo ----------
 await ev(`scrollTo(0, document.getElementById('catalogo').getBoundingClientRect().top + scrollY)`); await sleep(1500);
-const cat = await ev(`(async()=>{const q=s=>document.querySelector(s); const inp=q('#catalogo input[type=search], #catalogo input'); inp.focus(); inp.value='Freida'; inp.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,1200)); const n=document.querySelectorAll('#catalogo .card').length; const sugg=document.querySelectorAll('#catalogo [role=option]').length; return {n, sugg, status:(q('#catalogo [aria-live]')||{}).textContent}})()`);
-check('catálogo', 'buscar «Freida» devuelve resultados o sugerencias sin errores', cat.n > 0 || cat.sugg > 0, JSON.stringify(cat));
+const cat = await ev(`(async()=>{const q=s=>document.querySelector(s); const inp=q('#catalogo input[type=search], #catalogo input'); inp.focus(); inp.value='lomeli'; inp.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,1200)); const n=document.querySelectorAll('#catalogo .card').length; const sugg=document.querySelectorAll('#catalogo [role=option]').length; return {n, sugg, status:(q('#catalogo [aria-live]')||{}).textContent}})()`);
+check('catálogo', 'buscar «lomeli» (sin acento) encuentra «Perorata» de Luis Felipe Lomelí: resultado y sugerencia, sin errores', cat.n > 0 && cat.sugg > 0, JSON.stringify(cat));
 check('catálogo', 'sin errores de consola', !problems.length, problems.join(' | '));
 const card = await ev(`(async()=>{const c=document.querySelector('#catalogo .card button, #catalogo .card a, #catalogo .card'); c.click(); await new Promise(r=>setTimeout(r,1300)); const d=document.querySelector('dialog.drawer'); return {open:d&&d.open, sheet:document.documentElement.classList.contains('sheet-open'), wa:!!d.querySelector('a[href*="wa.me"]'), grab:getComputedStyle(d.querySelector('.drawer-grabber')).display}})()`);
 check('catálogo', 'la ficha abre como hoja con WhatsApp y asa de arrastre', card.open && card.sheet && card.wa && card.grab !== 'none', JSON.stringify(card));

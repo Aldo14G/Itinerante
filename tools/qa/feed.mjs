@@ -47,6 +47,13 @@ const clickSel = async (sel, nth = 0) => {
 const key = async (k, code, vk) => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: k, code, windowsVirtualKeyCode: vk }); };
 await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'); await send('Network.enable');
 await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }] });
+// La lista de Novedades que se publica está vacía (la librería aún no registra fechas de llegada): la primera vista y Eventos se miden con
+// siete libros del inventario y fechas relativas a hoy (tres recientes), como se verá cuando haya llegadas. El estado vacío se mide en el punto 4.
+{
+  const books = JSON.parse(readFileSync(new URL('../../assets/data/catalog.json', import.meta.url), 'utf8')).books;
+  const ago = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  override = { ...JSON.parse(readFileSync(new URL('../../assets/data/collections.json', import.meta.url), 'utf8')), novedades: { titulo: 'Recién llegados', entradas: books.slice(10, 17).map((b, i) => ({ id: b.id, llegada: ago([1, 3, 20, 2, 30, 35, 40][i]) })) } };
+}
 
 const report = [];
 const check = (area, name, ok, detail = '') => { report.push({ area, name, ok: !!ok, detail: ok ? '' : String(detail) }); };
@@ -193,7 +200,7 @@ const newsState = () => ev(`(()=>{ const s = document.querySelector('#novedades'
     status: s.querySelector('[data-news-status]').textContent, badges: [...s.querySelectorAll('.card')].map(c => !!c.querySelector('.badge-new')), names: [...s.querySelectorAll('.card')].slice(0, 2).map(c => c.textContent.trim().slice(0, 12)),
     ids: [...s.querySelectorAll('.card')].map(c => c.dataset.id), title: s.querySelector('h2').textContent.trim(), text: s.innerText, seen: localStorage.getItem('iti-news-visto'), state: localStorage.getItem('iti-news-estado') }; })()`);
 const approach = async () => { await ev(`document.querySelector('#cartelera').scrollIntoView({ block: 'end' })`); await sleep(2500); }; // la tira se pinta (y comprueba los ids contra el catálogo) al acercarse
-for (const [label, data] of [['sin la clave', { ...realData, novedades: undefined }], ['con entradas vacías', { ...realData, novedades: { titulo: 'Recién llegados', entradas: [] } }], ['con ids que no existen', { ...realData, novedades: { entradas: [{ id: 'no-existe-1', llegada: dayAgo(1) }, { id: 'no-existe-2', llegada: dayAgo(2) }] } }], ['con entradas que aún no llegan', { ...realData, novedades: { entradas: [{ id: sample[3].id, llegada: dayAgo(-5) }] } }]]) {
+for (const [label, data] of [['la lista que se publica (vacía hasta que haya fechas reales)', realData], ['sin la clave', { ...realData, novedades: undefined }], ['con entradas vacías', { ...realData, novedades: { titulo: 'Recién llegados', entradas: [] } }], ['con ids que no existen', { ...realData, novedades: { entradas: [{ id: 'no-existe-1', llegada: dayAgo(1) }, { id: 'no-existe-2', llegada: dayAgo(2) }] } }], ['con entradas que aún no llegan', { ...realData, novedades: { entradas: [{ id: sample[3].id, llegada: dayAgo(-5) }] } }]]) {
   override = data;
   await ev(`localStorage.clear()`);
   await open(390, 844, { wait: 2500 });

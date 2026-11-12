@@ -181,6 +181,15 @@ export function suggest(books, query, limit = 6) {
   return out;
 }
 
+// Título y subtítulo («Hipercódex: Ensayo poético hiperbólico»): se parte en el primer «: ». Sin él, todo es título.
+export function splitTitle(t) {
+  const s = String(t ?? ''); const at = s.indexOf(': ');
+  return at > 0 ? { main: s.slice(0, at), sub: s.slice(at + 2) } : { main: s, sub: '' };
+}
+// Un título de más de 24 caracteres o con una palabra de 10 caracteres o más (con su signo: «Hipercódex:») no cabe a 28 px en la columna
+// de la ficha móvil de 320 px sin partir palabras.
+export const titleSize = (main, sub = '') => (main.length > 24 || Math.max(0, ...`${main}${sub ? ':' : ''}`.split(/\s+/).map(w => w.length)) >= 10 ? 'long' : 'base');
+
 export function relatedBooks(books, book, n = 3) {
   if (!book.g) return []; // sin género en la hoja no hay con qué relacionarlo (y dos libros sin género no son «del mismo género»)
   return books.filter(b => b.id !== book.id && b.g === book.g).sort(byTitle).slice(0, n);
@@ -478,12 +487,19 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   });
 
   // ----- ficha (drawer) -----
+  // Título de la ficha: lo que va tras «: » es subtítulo (renglón propio, más pequeño) y un título largo o con una palabra muy larga
+  // baja un escalón y se ajusta al ancho de su columna (titleSize); el texto del encabezado sigue siendo el título completo.
+  function titleInto(h, t) {
+    const { main, sub } = splitTitle(t);
+    if (sub) h.replaceChildren(`${main}: `, el('span', { class: 'drawer-sub' }, sub)); else h.textContent = t;
+    h.classList.toggle('is-long', titleSize(main, sub) === 'long');
+  }
   function row(k, v) { return v ? [el('dt', {}, k), el('dd', {}, String(v))] : []; }
   function openBook(id, { trigger, tone } = {}) {
     const b = byId.get(id);
     if (!b) return;
     $('[data-d-cover]', drawer).replaceChildren(cover(b, tone)); // el tono de la tarjeta pulsada; sin él, el del libro
-    $('[data-d-title]', drawer).textContent = b.t;
+    titleInto($('[data-d-title]', drawer), b.t);
     $('[data-d-author]', drawer).textContent = b.a;
     $('[data-d-synopsis]', drawer).textContent = b.s || ''; // sinopsis de la hoja de la librería; sin ella, el bloque no ocupa sitio
     $('[data-d-synopsis-wrap]', drawer).hidden = !b.s;

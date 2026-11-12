@@ -9,7 +9,7 @@ import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } fro
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
 import { readInterest, shareName, initFeed, eventBadge, NO_DATE } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -93,6 +93,8 @@ test('catálogo: búsqueda por título, autor, ISBN y editorial, sin acentos', (
   assert.deepEqual(ids('capitulo siete').sort(), books.filter(b => b.p === 'Capítulo Siete').map(b => b.id).sort(), 'editorial sin acento');
   assert.equal(filterBooks(books, { q: 'zzzxqv' }).length, 0);
   assert.equal(filterBooks(books, { q: 'Project Hail Mary' }).length, 0, 'nada del catálogo de prueba');
+  const example = html.match(/<input id="cat-q"[^>]*placeholder="Prueba «([^»]+)» o un ISBN"/)[1];
+  assert.ok(filterBooks(books, { q: example }).length > 0, `el ejemplo del buscador (« ${example} ») encuentra un libro del inventario`);
   assert.equal(score(fabre, ''), 1);
   assert.ok(score(book('perorata-luis-felipe-lomeli'), 'perorata') > score(book('perorata-luis-felipe-lomeli'), 'lomeli'), 'el título pesa más que el autor');
 });
@@ -438,11 +440,23 @@ test('portada real: la imagen va sin alt, título y autor como texto oculto (nom
   const [cat, rail] = await Promise.all(['catalog.js', 'rail.js'].map(f => readFile(here(`./${f}`), 'utf8')));
   assert.ok(/document\.addEventListener\('error', e => \{ if \(e\.target instanceof HTMLImageElement && e\.target\.closest\('\.cover--img'\)\) coverFallback\(e\.target\); \}, true\)/.test(cat), 'un solo oyente (en captura) atiende las portadas rotas de la rejilla, el carrusel, Novedades y la ficha');
   assert.ok(/return b\.c \? imageCover\(b, tone, \{ named \}\) : blankCover/.test(cat) && /if \(b\.c\) cover = imageCover\(b, tone\);/.test(rail), 'rejilla, ficha y carrusel usan la portada real cuando existe');
-  assert.ok(/\.cover--img img \{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; \}/.test(css), 'la imagen llena la portada sin deformarla (object-fit), con la forma de la tarjeta de siempre');
+  assert.ok(/\.cover--img img \{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; \}/.test(css) && /\.cover \{[^}]*aspect-ratio: 2 \/ 3;/.test(css), 'la imagen llena la portada 2:3 sin deformarla (object-fit) y, si sobra alto, se recorta abajo: el título de la portada queda a la vista');
   assert.ok(/\.sr-only \{[^}]*clip: rect\(0 0 0 0\)/.test(css), 'sr-only existe');
 });
 
 test('ficha: sinopsis y precio de la hoja de la librería; sin dato, sin renglón', async () => {
+  // Títulos del inventario: subtítulo tras «: » en su renglón y un escalón menos para los largos (ninguna palabra partida a 320 px; tools/qa/ficha.mjs lo mide).
+  assert.deepEqual(splitTitle('Hipercódex: Ensayo poético hiperbólico'), { main: 'Hipercódex', sub: 'Ensayo poético hiperbólico' });
+  assert.deepEqual(splitTitle('¿Cuánto ha visto el hombre?'), { main: '¿Cuánto ha visto el hombre?', sub: '' });
+  assert.deepEqual(splitTitle(': raro'), { main: ': raro', sub: '' }, 'sin título antes de los dos puntos no hay subtítulo');
+  assert.equal(titleSize('Polvo'), 'base');
+  assert.equal(titleSize('Hipercódex', 'Ensayo poético hiperbólico'), 'long', '«Hipercódex:» con su signo ya no cabe');
+  assert.equal(titleSize('Acaso un descubrimiento a mitad de la noche'), 'long');
+  assert.equal(titleSize('Las hojas de Fabre'), 'base');
+  assert.equal(titleSize('Rito de iniciación'), 'long', 'una palabra de 10 letras ya no cabe a 28 px en 150 px');
+  const catSrc = await readFile(here('./catalog.js'), 'utf8');
+  assert.ok(/h\.replaceChildren\(\`\$\{main\}: \`, el\('span', \{ class: 'drawer-sub' \}, sub\)\)/.test(catSrc) && /h\.classList\.toggle\('is-long', titleSize\(main, sub\) === 'long'\)/.test(catSrc), 'el encabezado sigue siendo el título completo (nombre del diálogo) con el subtítulo dentro');
+  assert.ok(/\.drawer h3\.is-long \{ font-size: clamp\(var\(--fs-3\), 12\.5cqi, var\(--fs-4\)\); \}/.test(css) && /\.drawer-head \{[^}]*container-type: inline-size;/.test(mobileCss), 'el título largo se mide contra su columna, entre dos escalones de la escala');
   assert.equal(priceLabel(250), '$250 MXN');
   assert.equal(priceLabel(1200), '$1,200 MXN', 'miles con coma (es-MX)');
   assert.equal(priceLabel(null), null);

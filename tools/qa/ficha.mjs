@@ -67,6 +67,32 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   ck(`${w}x${h}: Escape cierra y libera el scroll`, await ev(`!document.querySelector('#cat-drawer').open && !document.documentElement.classList.contains('sheet-open')`));
 }
 
+// Títulos largos del inventario (hasta 94 caracteres, «descubrimiento» de 14 letras): ninguna palabra partida, subtítulo en su renglón
+// y «Cómo llegar» todavía en el primer pliegue, en el teléfono más angosto y en el más bajo.
+for (const [w, h] of [[320, 640], [375, 667]]) {
+  await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
+  await send('Page.navigate', { url: URL_ }); await sleep(4000);
+  await ev(`scrollTo(0, document.getElementById('catalogo').getBoundingClientRect().top + scrollY - 100)`); await sleep(2500);
+  for (const id of ['lo-que-el-doc-quiso-decir-antonio-zamudio', 'acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h', 'cartografias-del-pensamiento-latinoamericano-compiladora-mai', 'hipercodex-emmanuel-vizcaya']) {
+    const m = await ev(`(async () => {
+      const wait = ms => new Promise(r => setTimeout(r, ms)); const d = document.getElementById('cat-drawer');
+      if (d.open) { d.close(); await wait(400); }
+      document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: '${id}' } }));
+      for (let i = 0; i < 40 && !(d.open && d.dataset.book === '${id}'); i++) await wait(100);
+      await wait(900);
+      const h3 = d.querySelector('[data-d-title]'); const text = h3.textContent;
+      const words = []; const walk = document.createTreeWalker(h3, NodeFilter.SHOW_TEXT);
+      for (let n; (n = walk.nextNode());) for (const m of n.data.matchAll(/\\S+/g)) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); const lines = new Set([...r.getClientRects()].map(x => Math.round(x.top))); if (lines.size > 1) words.push(m[0]); }
+      const sub = h3.querySelector('.drawer-sub');
+      return { text, split: words, sub: sub ? getComputedStyle(sub).display : null, long: h3.classList.contains('is-long'), size: getComputedStyle(h3).fontSize, visit: Math.round(d.querySelector('[data-d-visit]').getBoundingClientRect().bottom), scroll: d.querySelector('[data-d-scroll]').scrollTop };
+    })()`);
+    const full = await ev(`fetch('assets/data/catalog.json').then(r => r.json()).then(j => j.books.find(b => b.id === '${id}').t)`);
+    ck(`${w}x${h} «${full.slice(0, 32)}…»: ninguna palabra partida, el encabezado es el título completo${full.includes(': ') ? ' (subtítulo en su renglón)' : ''} y «Cómo llegar» dentro del primer pliegue (${m.visit} <= ${h - 8})`, !m.split.length && m.text === full && (full.includes(': ') ? m.sub === 'block' : m.sub === null) && m.visit <= h - 8 && m.scroll === 0, JSON.stringify(m));
+    if (w === 320 && id.startsWith('lo-que')) await shot('ficha-titulo-largo-320.png');
+  }
+  await press('Escape', 'Escape', 27); await sleep(700);
+}
+
 // QA1-03: sin JavaScript, la barra inferior (con la casilla «Más») no se muestra y los capítulos son alcanzables desde la cabecera (Novedades necesita JavaScript: ni su sección ni su enlace existen).
 await send('Emulation.setScriptExecutionDisabled', { value: true });
 await send('Page.navigate', { url: URL_ }); await sleep(2500);
