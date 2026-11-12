@@ -153,7 +153,7 @@ async function renderList(dlg) {
   let books = [];
   let failed = false;
   try { const sample = await loadSample(); const by = new Map(sample.books.map(b => [b.id, b])); books = ids.map(id => by.get(id)).filter(Boolean); } catch { failed = true; }
-  // Error (A03): los ids siguen guardados aunque la muestra no cargue; se dice, se ofrece reintentar y WhatsApp sigue a la vista.
+  // Error (A03): los ids siguen guardados aunque el catálogo no cargue; se dice, se ofrece reintentar y WhatsApp sigue a la vista.
   status.textContent = failed ? `No pudimos cargar el catálogo. ${ids.length === 1 ? 'Tu título guardado sigue aquí' : `Tus ${ids.length} títulos guardados siguen aquí`}.` : '';
   errBox.hidden = !failed;
   if (failed) {
@@ -239,7 +239,7 @@ export function initSaved() {
     const rm = e.target.closest('[data-ml-remove]');
     if (rm) { toggleSaved(rm.dataset.mlRemove); return; }
     const retry = e.target.closest('[data-ml-retry]');
-    if (retry) { // vuelve a pedir la muestra (sample.js olvida la promesa fallida); respuesta visible antes de la red
+    if (retry) { // vuelve a pedir el catálogo (sample.js olvida la promesa fallida); respuesta visible antes de la red
       const dlg = retry.closest('#mylist');
       dlg.querySelector('[data-ml-error]').hidden = true;
       dlg.querySelector('[data-ml-status]').textContent = 'Cargando el catálogo…';

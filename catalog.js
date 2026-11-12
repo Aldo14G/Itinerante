@@ -1,4 +1,4 @@
-// Catálogo de muestra: búsqueda predictiva, filtros con conteo, rejilla y ficha.
+// Catálogo (inventario real de la librería, assets/data/catalog.json): búsqueda predictiva, filtros con conteo, rejilla y ficha.
 import { DUR, EASE, ms, confirmThen } from './motion.js';
 import { loadSample } from './sample.js';
 import { saveButton, bindSaveButton, initSaved } from './saved.js';
@@ -49,7 +49,6 @@ export function coverTones(books) {
   });
 }
 
-// Tono de una tarjeta ya pintada (`data-cover-tone`): viaja con la petición de abrir la ficha para que ésta lo repita.
 // Portada real (assets/img/portadas, ver data/portadas.json): la imagen no lleva texto alternativo porque el título y el autor van como
 // texto dentro de la portada (ocultos a la vista); así siguen siendo el nombre accesible del botón y la búsqueda del navegador los encuentra.
 // Sin portada real o si la imagen falla, la tarjeta tipográfica de siempre (`coverFallback`).
@@ -77,6 +76,7 @@ export function coverFallback(img) {
 }
 if (typeof document !== 'undefined') document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement && e.target.closest('.cover--img')) coverFallback(e.target); }, true);
 
+// Tono de una tarjeta ya pintada (`data-cover-tone`): viaja con la petición de abrir la ficha para que ésta lo repita.
 export const toneOf = node => { const t = Number(node.querySelector('.cover')?.dataset.coverTone); return Number.isInteger(t) ? t : undefined; };
 
 // Composición de la portada de plantilla (4 variantes en CSS: [data-cover-layout]); sale del título, no del tono ni del género.
@@ -89,59 +89,10 @@ const FORMAT_ES = { 'Libro electronico': 'Libro electrónico', 'Board Book': 'Li
 export const priceLabel = pr => (typeof pr === 'number' && pr > 0 ? `$${pr.toLocaleString('es-MX')} MXN` : null);
 export const formatLabel = f => FORMAT_ES[f] || f;
 
-// Géneros de la muestra en español, por el id estable del subgénero (la verdad del dato, catalog.json, sigue en inglés y no se toca:
-// esto es solo la capa de presentación). Un id sin traducción conocida cae al nombre original del dato y, sin él, al id: nada se rompe.
-// Títulos y autores no se traducen nunca.
-export const GENRE_ES = {
-  'fiction-children-s-graphic-novel': 'Novela gráfica infantil',
-  'fiction-children-s-picture-book': 'Libro ilustrado infantil',
-  'fiction-climate-fiction': 'Ficción climática',
-  'fiction-contemporary-romance': 'Romance contemporáneo',
-  'fiction-cozy-mystery': 'Misterio acogedor',
-  'fiction-crime-detective': 'Novela negra y de detectives',
-  'fiction-dark-romance': 'Romance oscuro',
-  'fiction-fantasy': 'Fantasía',
-  'fiction-graphic-novel': 'Novela gráfica',
-  'fiction-historical-fiction': 'Novela histórica',
-  'fiction-horror': 'Terror',
-  'fiction-literary-fiction': 'Narrativa literaria',
-  'fiction-middle-grade': 'Para preadolescentes',
-  'fiction-paranormal-romance': 'Romance paranormal',
-  'fiction-psychological-thriller': 'Suspenso psicológico',
-  'fiction-romantasy': 'Romance y fantasía',
-  'fiction-science-fiction': 'Ciencia ficción',
-  'fiction-space-opera': 'Ópera espacial',
-  'fiction-urban-fantasy': 'Fantasía urbana',
-  'fiction-ya-dystopian': 'Distopía juvenil',
-  'fiction-ya-romance': 'Romance juvenil',
-  'non-fiction-activity-coloring': 'Actividades y colorear',
-  'non-fiction-art-activity': 'Arte y actividades',
-  'non-fiction-biography': 'Biografía',
-  'non-fiction-business-finance': 'Negocios y finanzas',
-  'non-fiction-business-leadership': 'Negocios y liderazgo',
-  'non-fiction-business-psychology': 'Negocios y psicología',
-  'non-fiction-celebrity-memoir': 'Memorias de famosos',
-  'non-fiction-cooking-food': 'Cocina y alimentos',
-  'non-fiction-creativity-art': 'Creatividad y arte',
-  'non-fiction-gift-journal': 'Regalo y diarios',
-  'non-fiction-health-longevity': 'Salud y longevidad',
-  'non-fiction-history': 'Historia',
-  'non-fiction-history-adventure': 'Historia y aventura',
-  'non-fiction-memoir': 'Memorias',
-  'non-fiction-parenting': 'Crianza',
-  'non-fiction-personal-finance': 'Finanzas personales',
-  'non-fiction-politics-society': 'Política y sociedad',
-  'non-fiction-productivity': 'Productividad',
-  'non-fiction-psychology-health': 'Psicología y salud',
-  'non-fiction-psychology-society': 'Psicología y sociedad',
-  'non-fiction-science-nature': 'Ciencia y naturaleza',
-  'non-fiction-self-help': 'Superación personal',
-  'non-fiction-self-help-memoir': 'Superación y memorias',
-  'non-fiction-self-help-productivity': 'Superación y productividad',
-  'non-fiction-spirituality-religion': 'Espiritualidad y religión',
-  'non-fiction-true-crime': 'Crimen real',
-  'non-fiction-true-crime-history': 'Crimen real e historia'
-};
+// Capa de presentación de los géneros, por el id estable del subgénero. El inventario real (catalog.json) ya trae su nombre en español
+// (`subgenres[id].n`), así que hoy no hace falta ninguna traducción; si un día llega un id con nombre en otro idioma, su etiqueta va aquí.
+// Un id sin entrada cae al nombre original del dato y, sin él, al id: nada se rompe. Títulos y autores no se traducen nunca.
+export const GENRE_ES = {};
 export const genreLabel = (id, original) => (Object.hasOwn(GENRE_ES, id) ? GENRE_ES[id] : original || id);
 
 export const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
@@ -231,6 +182,7 @@ export function suggest(books, query, limit = 6) {
 }
 
 export function relatedBooks(books, book, n = 3) {
+  if (!book.g) return []; // sin género en la hoja no hay con qué relacionarlo (y dos libros sin género no son «del mismo género»)
   return books.filter(b => b.id !== book.id && b.g === book.g).sort(byTitle).slice(0, n);
 }
 
@@ -533,7 +485,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     $('[data-d-cover]', drawer).replaceChildren(cover(b, tone)); // el tono de la tarjeta pulsada; sin él, el del libro
     $('[data-d-title]', drawer).textContent = b.t;
     $('[data-d-author]', drawer).textContent = b.a;
-    const syn = $('[data-d-synopsis]', drawer); syn.textContent = b.s || ''; syn.hidden = !b.s; // sinopsis de la hoja de la librería
+    $('[data-d-synopsis]', drawer).textContent = b.s || ''; // sinopsis de la hoja de la librería; sin ella, el bloque no ocupa sitio
+    $('[data-d-synopsis-wrap]', drawer).hidden = !b.s;
     $('[data-d-facts]', drawer).replaceChildren(
       ...row('Editorial', b.p), ...row('Precio', priceLabel(b.pr)), ...row('Año', b.y), ...row('Formato', formatLabel(b.f)),
       ...row('Género', names.g(b.g)), ...row('Categoría', names.k(b.k)), ...row('ISBN-13', b.n), ...row('Páginas', b.pg));
@@ -607,9 +560,11 @@ export async function initCatalog({ isMotion = () => false } = {}) {
 
   // portadas que no cargan: vuelven a la tipográfica (coverFallback, arriba)
 
+  // «Más recientes» ordena por año; la hoja de la librería no trae años, y una opción que no cambia nada no se ofrece.
+  if (!books.some(b => b.y)) sortEl.querySelector('option[value="new"]')?.remove();
   sortEl.value = state.sort;
   root.dataset.state = 'ready';
-  // Primero lo que se ve (rejilla y filtros activos); las facetas, que recorren los 500 títulos, esperan a un momento libre.
+  // Primero lo que se ve (rejilla y filtros activos); las facetas, que recorren todo el catálogo, esperan a un momento libre.
   compute();
   renderChips();
   renderGrid();

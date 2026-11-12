@@ -1,6 +1,6 @@
 {
-  "updated": "2026-11-10",
-  "rule": "Todas las imágenes del sitio son fotografías reales de la casa: el lote oficial entregado por Aldo (2026-10-27), fotos publicadas por la cuenta oficial de Instagram (con su autor) y fotos de Aldo (2026-11-10). No quedan recreaciones generadas con IA; la secuencia de fotogramas del inicio se retiró el 2026-11-10. La procedencia es un dato interno (data-kind y este archivo): la página no imprime rótulos. Pendiente de la librería: confirmar el permiso de uso de las fotos de @sharonmirelesgong y @alfonso_boeta, o sustituirlas por la sesión profesional.",
+  "updated": "2026-11-12",
+  "rule": "Todas las imágenes del sitio son fotografías reales de la casa, salvo las portadas de los libros (img/portadas/, registradas aparte en «covers»): el lote oficial entregado por Aldo (2026-10-27), fotos publicadas por la cuenta oficial de Instagram (con su autor) y fotos de Aldo (2026-11-10). No quedan recreaciones generadas con IA; la secuencia de fotogramas del inicio se retiró el 2026-11-10. La procedencia es un dato interno (data-kind y este archivo): la página no imprime rótulos. Pendiente de la librería: confirmar el permiso de uso de las fotos de @sharonmirelesgong y @alfonso_boeta, o sustituirlas por la sesión profesional.",
   "real": [
     {
       "file": "img/oficial-mesa-800.webp",
@@ -212,13 +212,272 @@
     }
   ],
   "fonts": "fonts/sources.json (Archivo, de Google Fonts, y Nunito, de Fontsource; licencia OFL incluida)",
-  "sampleData": {
-    "file": "data/catalog.json",
-    "origin": "data/books.amazon-test.json (500 registros de prueba, Amazon_BestSelling_Books_500.csv)",
-    "note": "Sin precios ni existencias. Se rotula siempre como muestra, no inventario."
-  },
   "covers": {
-    "file": "(ninguna)",
-    "origin": "Las portadas del catalogo de muestra son tarjetas tipograficas generadas en el navegador (catalog.js, coverTone). No se usan imagenes de portada de terceros ni SVG."
+    "dir": "img/portadas/",
+    "registry": "data/portadas.json",
+    "rule": "Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 600 px de ancho como máximo. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).",
+    "files": [
+      {
+        "file": "img/portadas/las-hojas-de-fabre-jesus-ferreiro.webp",
+        "book": "las-hojas-de-fabre-jesus-ferreiro",
+        "isbn": "9786075954004",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1685598707i/169712594.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/lo-que-el-doc-quiso-decir-antonio-zamudio.webp",
+        "book": "lo-que-el-doc-quiso-decir-antonio-zamudio",
+        "isbn": "9786075954059",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1740999973i/228659389.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h.webp",
+        "book": "acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h",
+        "isbn": "9786075954066",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1741979045i/229147380.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/amigos-rodrigo-garnica.webp",
+        "book": "amigos-rodrigo-garnica",
+        "isbn": "9798288544323",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61ySEhBZH0L.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/rito-de-iniciacion-diego-uribe.webp",
+        "book": "rito-de-iniciacion-diego-uribe",
+        "isbn": "9798284002780",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51OVHVqODCL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/perorata-luis-felipe-lomeli.webp",
+        "book": "perorata-luis-felipe-lomeli",
+        "isbn": "9781081194567",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1672414426i/75420536.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp",
+        "book": "los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla",
+        "isbn": "9798649937733",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1678255876i/80562270.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/las-ruinas-de-la-caza-alfredo-leal.webp",
+        "book": "las-ruinas-de-la-caza-alfredo-leal",
+        "isbn": null,
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61nalhU1ylL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/demonios-huascar-robles.webp",
+        "book": "demonios-huascar-robles",
+        "isbn": "9798264705427",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1758372356i/241859512.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/el-lugar-de-la-noche-david-ornelas.webp",
+        "book": "el-lugar-de-la-noche-david-ornelas",
+        "isbn": "9798336751734",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71YwY08UuFL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/las-funciones-del-placer-carlos-rangel.webp",
+        "book": "las-funciones-del-placer-carlos-rangel",
+        "isbn": "9798278144199",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61l9GzNGrbL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/perlas-de-obsidiana-olaf-marin.webp",
+        "book": "perlas-de-obsidiana-olaf-marin",
+        "isbn": "9798872431039",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51IvmSkMdTL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/amanecer-de-california-j-enrique-vazquez-m.webp",
+        "book": "amanecer-de-california-j-enrique-vazquez-m",
+        "isbn": "9798279346790",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51-Y3mHEIeL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/otra-vez-el-crepusculo-asbel-hernandez.webp",
+        "book": "otra-vez-el-crepusculo-asbel-hernandez",
+        "isbn": "9781072678540",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61pjyHxLrWL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/la-sombra-del-guerrero-hermes-millan.webp",
+        "book": "la-sombra-del-guerrero-hermes-millan",
+        "isbn": "9798199939584",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71G6WtVj6TL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/la-voz-vertical-bruno-clemet.webp",
+        "book": "la-voz-vertical-bruno-clemet",
+        "isbn": "9798266911147",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41V+33ZE47L.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar.webp",
+        "book": "pensamiento-e-ideologia-en-america-latina-compiladora-sidhar",
+        "isbn": "9798289373700",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1759950146i/242540214.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/maurice-blanchot-sergio-espinosa-proa.webp",
+        "book": "maurice-blanchot-sergio-espinosa-proa",
+        "isbn": "9798303443310",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1735661631i/223130311.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/cartografias-del-pensamiento-latinoamericano-compiladora-mai.webp",
+        "book": "cartografias-del-pensamiento-latinoamericano-compiladora-mai",
+        "isbn": "9798283285757",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41uxtxYZPbL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp.webp",
+        "book": "maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp",
+        "isbn": "9798315333005",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1748018728i/234825882.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/polvo-carlos-bortoni.webp",
+        "book": "polvo-carlos-bortoni",
+        "isbn": "9798195788827",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/512wuZdVNgL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/yita-y-el-arcoiris-cristi-na-han.webp",
+        "book": "yita-y-el-arcoiris-cristi-na-han",
+        "isbn": "9798870244792",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1701455772i/203054065.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/el-circo-miguel-del-valle.webp",
+        "book": "el-circo-miguel-del-valle",
+        "isbn": "9786079946968",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61Ec699J+yL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/reino-mundo-juan-mireles.webp",
+        "book": "reino-mundo-juan-mireles",
+        "isbn": "9786078900251",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1765604854i/245172308.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano.webp",
+        "book": "domingo-por-la-tarde-cuando-llueve-alejandro-mandujano",
+        "isbn": "9786078900213",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51dxg9qh+YL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/todas-las-lluvias-francisco-javier-hernandez-m.webp",
+        "book": "todas-las-lluvias-francisco-javier-hernandez-m",
+        "isbn": "9786078900244",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51nbwcYm3xL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/no-pelear-pelear-arturo-r-orozco-padilla.webp",
+        "book": "no-pelear-pelear-arturo-r-orozco-padilla",
+        "isbn": "9786078900206",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71w6NLpKydL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/cuanto-ha-visto-el-hombre-antonio-estudillo.webp",
+        "book": "cuanto-ha-visto-el-hombre-antonio-estudillo",
+        "isbn": "9786078900121",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51qwlySVkwL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/material-sensible-francisco-javier-hernandez-m.webp",
+        "book": "material-sensible-francisco-javier-hernandez-m",
+        "isbn": "9786078900145",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71JIZRIwIyL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/me-llaman-loca-cristina-arreola-marquez.webp",
+        "book": "me-llaman-loca-cristina-arreola-marquez",
+        "isbn": "9786078900107",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61mkX7o9amL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux.webp",
+        "book": "los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux",
+        "isbn": "9786079860455",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41KNFPlSbXL.jpg",
+        "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/antologia-gris-compilador-francisco-javier-hernandez-m.webp",
+        "book": "antologia-gris-compilador-francisco-javier-hernandez-m",
+        "isbn": "9786078900046",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51E4cK+I3NL.jpg",
+        "reviewed": "2026-11-12"
+      }
+    ]
+  },
+  "catalogData": {
+    "file": "data/catalog.json",
+    "origin": "Catálogo Itinerante.xlsx (hoja de la librería), importada con scripts/import-inventario.py; copia fiel con avisos por renglón en data/inventario-itinerante.json",
+    "note": "Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp."
   }
 }

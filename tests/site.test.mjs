@@ -9,7 +9,7 @@ import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } fro
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
 import { readInterest, shareName, initFeed, eventBadge, NO_DATE } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -19,6 +19,35 @@ const tokensCss = await readFile(here('./tokens.css'), 'utf8');
 const mobileCss = await readFile(here('./mobile.css'), 'utf8');
 const prov = JSON.parse(await readFile(here('./assets/provenance.json'), 'utf8'));
 const data = JSON.parse(await readFile(here('./assets/data/catalog.json'), 'utf8'));
+const portadas = JSON.parse(await readFile(here('./data/portadas.json'), 'utf8'));
+const book = id => { const b = data.books.find(x => x.id === id); assert.ok(b, `el inventario trae ${id}`); return b; };
+// ISBN-13: dígito de control (pesos 1 y 3 alternados).
+const isbnOk = n => /^97[89]\d{10}$/.test(n) && (10 - [...n.slice(0, 12)].reduce((t, d, i) => t + Number(d) * (i % 2 ? 3 : 1), 0) % 10) % 10 === Number(n[12]);
+// Medidas de un WebP (VP8, VP8L o VP8X) leídas de la cabecera, para comparar con cw/ch del catálogo.
+function webpSize(buf) {
+  assert.equal(buf.toString('ascii', 0, 4), 'RIFF'); assert.equal(buf.toString('ascii', 8, 12), 'WEBP');
+  const kind = buf.toString('ascii', 12, 16);
+  if (kind === 'VP8 ') return [buf.readUInt16LE(26) & 0x3fff, buf.readUInt16LE(28) & 0x3fff];
+  if (kind === 'VP8L') { const b = buf.readUInt32LE(21); return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1]; }
+  if (kind === 'VP8X') return [buf.readUIntLE(24, 3) + 1, buf.readUIntLE(27, 3) + 1];
+  throw new Error(`WebP desconocido: ${kind}`);
+}
+// DOM mínimo para probar las portadas sin navegador: lo justo que usan imageCover y coverFallback.
+function fakeDocument() {
+  class El {
+    constructor(tag) { this.tagName = tag.toUpperCase(); this.children = []; this.parent = null; this.attrs = {}; this.dataset = {}; this.cls = new Set(); this.textContent = ''; }
+    get className() { return [...this.cls].join(' '); }
+    set className(v) { this.cls = new Set(String(v).split(/\s+/).filter(Boolean)); }
+    get classList() { const c = this.cls; return { add: (...x) => x.forEach(v => c.add(v)), remove: (...x) => x.forEach(v => c.delete(v)), contains: v => c.has(v) }; }
+    setAttribute(k, v) { this.attrs[k] = String(v); }
+    getAttribute(k) { return this.attrs[k] ?? null; }
+    append(...kids) { for (const k of kids) { k.parent = this; this.children.push(k); } }
+    remove() { if (this.parent) this.parent.children = this.parent.children.filter(c => c !== this); this.parent = null; }
+    closest(sel) { const c = sel.slice(1); for (let n = this; n; n = n.parent) if (n.cls.has(c)) return n; return null; }
+    querySelectorAll(sel) { const c = sel.slice(1), out = []; const walk = n => n.children.forEach(k => { if (k.cls.has(c)) out.push(k); walk(k); }); walk(this); return out; }
+  }
+  return { createElement: tag => new El(tag) };
+}
 
 test('mensajes por tema y por título', () => {
   assert.equal(buildMessage('poesia'), 'Hola, me gustaría preguntar por libros de poesía. ¿Qué me recomiendan?');
@@ -48,32 +77,53 @@ test('estado de apertura: límites de horario', () => {
 
 test('catálogo: búsqueda por título, autor, ISBN y editorial, sin acentos', () => {
   const books = data.books;
-  assert.equal(books.length, 500);
-  const any = books.find(b => b.n);
-  assert.ok(filterBooks(books, { q: any.n }).some(b => b.id === any.id), 'ISBN');
-  assert.ok(filterBooks(books, { q: norm(any.t).toUpperCase() }).some(b => b.id === any.id), 'título en mayúsculas');
-  const withAuthor = books.find(b => b.a !== 'Autor no indicado');
-  assert.ok(filterBooks(books, { q: withAuthor.a.split(' ')[0] }).some(b => b.id === withAuthor.id), 'autor');
-  assert.ok(filterBooks(books, { q: books.find(b => b.p).p }).length > 0, 'editorial');
+  const ids = q => filterBooks(books, { q }).map(b => b.id);
+  assert.deepEqual(ids('hipercodex'), ['hipercodex-emmanuel-vizcaya'], 'título sin acento');
+  assert.deepEqual(ids('HIPERCÓDEX'), ['hipercodex-emmanuel-vizcaya'], 'título en mayúsculas y con acento');
+  assert.deepEqual(ids('Lomelí'), ['perorata-luis-felipe-lomeli'], 'autor con acento');
+  assert.deepEqual(ids('lomeli'), ['perorata-luis-felipe-lomeli'], 'autor sin acento');
+  assert.deepEqual(ids('hojas fabre'), ['las-hojas-de-fabre-jesus-ferreiro'], 'todas las palabras deben aparecer');
+  const fabre = book('las-hojas-de-fabre-jesus-ferreiro');
+  assert.ok(isbnOk(fabre.n), 'el ISBN de la prueba es válido');
+  assert.deepEqual(ids(fabre.n), [fabre.id], 'ISBN completo');
+  assert.deepEqual(ids(fabre.n.slice(0, 12)), [fabre.id], 'ISBN a medias');
+  const abismos = books.filter(b => b.p === 'Abismos Casa Editorial').map(b => b.id);
+  assert.ok(abismos.length >= 10, 'Abismos Casa Editorial trae una buena parte del inventario');
+  assert.deepEqual(ids('Abismos').sort(), abismos.sort(), 'editorial: exactamente sus libros');
+  assert.deepEqual(ids('capitulo siete').sort(), books.filter(b => b.p === 'Capítulo Siete').map(b => b.id).sort(), 'editorial sin acento');
   assert.equal(filterBooks(books, { q: 'zzzxqv' }).length, 0);
-  assert.equal(score(any, ''), 1);
+  assert.equal(filterBooks(books, { q: 'Project Hail Mary' }).length, 0, 'nada del catálogo de prueba');
+  assert.equal(score(fabre, ''), 1);
+  assert.ok(score(book('perorata-luis-felipe-lomeli'), 'perorata') > score(book('perorata-luis-felipe-lomeli'), 'lomeli'), 'el título pesa más que el autor');
 });
 
-test('catálogo: filtros combinados, conteo de facetas y orden', () => {
+test('catálogo: filtros combinados, conteo de facetas y orden', async () => {
   const books = data.books;
-  const k = new Set(['fiction']);
-  const fic = filterBooks(books, { k });
-  assert.ok(fic.length > 0 && fic.every(b => b.k === 'fiction'));
-  const both = filterBooks(books, { k: new Set(['fiction']), f: new Set(['Tapa dura']) });
-  assert.ok(both.every(b => b.k === 'fiction' && b.f === 'Tapa dura'));
-  const counts = facetCounts(books, { k }, 'f');
-  assert.equal([...counts.values()].reduce((a, b) => a + b, 0), fic.length, 'las facetas suman el resultado');
+  const k = new Set(['literatura']);
+  const lit = filterBooks(books, { k });
+  assert.ok(lit.length > 0 && lit.every(b => b.k === 'literatura'));
+  const both = filterBooks(books, { k: new Set(['literatura']), p: new Set(['Capítulo Siete']) });
+  assert.ok(both.length > 0 && both.every(b => b.k === 'literatura' && b.p === 'Capítulo Siete'));
+  const poesia = filterBooks(books, { g: new Set(['poesia']), p: new Set(['Capítulo Siete', 'Abismos Casa Editorial']) });
+  assert.ok(poesia.length > 0 && poesia.every(b => b.g === 'poesia' && ['Capítulo Siete', 'Abismos Casa Editorial'].includes(b.p)), 'dentro de un grupo, cualquiera de las marcadas');
+  const counts = facetCounts(books, { k }, 'p');
+  assert.equal([...counts.values()].reduce((a, b) => a + b, 0), lit.length, 'las facetas suman el resultado');
   const own = facetCounts(books, { k }, 'k');
-  assert.equal(own.size, 2, 'la faceta propia no se filtra a sí misma');
+  assert.deepEqual([...own.keys()].filter(Boolean).sort(), ['literatura', 'pensamiento'], 'la faceta propia no se filtra a sí misma');
+  assert.equal([...facetCounts(books, {}, 'g').keys()].filter(Boolean).length, Object.keys(data.subgenres).length, 'cada género del inventario es una opción');
+  // La hoja no trae formato ni año: el grupo Formato no tiene opciones (renderFilters lo omite) y «Más recientes» no se ofrece.
+  assert.equal([...facetCounts(books, {}, 'f').keys()].filter(Boolean).length, 0, 'sin formatos en la hoja');
+  assert.ok(books.every(b => b.f == null && b.y == null && b.pg == null), 'nada se inventa: formato, año y páginas quedan en null');
+  const catalog = await readFile(here('./catalog.js'), 'utf8');
+  assert.ok(/\.filter\(\(\[v\]\) => v\)/.test(catalog) && /if \(!entries\.length\) continue;/.test(catalog), 'un grupo sin opciones no se dibuja (ni los valores vacíos)');
+  assert.ok(/if \(!books\.some\(b => b\.y\)\) sortEl\.querySelector\('option\[value="new"\]'\)\?\.remove\(\);/.test(catalog), 'sin años, «Más recientes» sale del selector');
   const az = sortBooks(books, 'az');
   assert.ok(az.every((b, i) => i === 0 || az[i - 1].t.localeCompare(b.t, 'es') <= 0));
-  const recent = sortBooks(books, 'new');
-  assert.ok((recent[0].y || 0) >= (recent[recent.length - 1].y || 0));
+  const byAuthor = sortBooks(books, 'autor');
+  assert.ok(byAuthor.every((b, i) => i === 0 || byAuthor[i - 1].a.localeCompare(b.a, 'es') <= 0));
+  assert.deepEqual(sortBooks(books, 'new').map(b => b.id), az.map(b => b.id), 'sin años, «recientes» no inventa un orden');
+  const rel = sortBooks(filterBooks(books, { q: 'noche' }), 'rel', 'noche');
+  assert.ok(rel.length >= 2 && rel.every((b, i) => i === 0 || score(rel[i - 1], 'noche') >= score(b, 'noche')), 'relevancia de mayor a menor');
 });
 
 test('catálogo: sugerencias, relacionados y mensaje de ficha', () => {
@@ -86,18 +136,65 @@ test('catálogo: sugerencias, relacionados y mensaje de ficha', () => {
   assert.ok(rel.length <= 3 && rel.every(r => r.g === b.g && r.id !== b.id));
   assert.match(bookMessage(b), new RegExp(`«${b.t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}»`));
   assert.equal(new URL(bookWaUrl(b)).searchParams.get('text'), bookMessage(b));
+  const sinGenero = data.books.find(x => !x.g);
+  assert.ok(sinGenero, 'el inventario trae un libro sin género (fila incompleta de la hoja)');
+  assert.deepEqual(relatedBooks(data.books, sinGenero), [], 'sin género no hay relacionados');
+  assert.equal(bookMessage(sinGenero), `Hola, ¿tienen «${sinGenero.t}» de ${sinGenero.a}? Vi el título en su sitio.`, 'sin ISBN el mensaje no lo menciona');
 });
 
-test('datos de muestra: sin precios ni existencias', () => {
-  assert.equal(data.meta.kind, 'sample');
-  assert.match(data.meta.label, /no es inventario/i);
-  for (const b of data.books) assert.ok(!('priceMxnCents' in b) && !('stockQty' in b));
+test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, con ISBN válidos, portadas registradas y nada de la muestra', async () => {
+  assert.equal(data.meta.kind, 'inventario');
+  assert.equal(data.books.length, 41);
+  assert.equal(data.meta.count, 41);
+  assert.equal(data.meta.currency, 'MXN');
+  assert.ok(!('label' in data.meta), 'el inventario no lleva rótulo de muestra');
+  const ids = data.books.map(b => b.id);
+  assert.equal(new Set(ids).size, ids.length, 'ningún id repetido');
+  assert.ok(ids.every(id => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(id) && id.length <= 60), 'ids estables: minúsculas, sin acentos, hasta 60 caracteres');
+  const isbns = data.books.map(b => b.n).filter(Boolean);
+  assert.equal(new Set(isbns).size, isbns.length, 'ningún ISBN repetido');
+  assert.ok(isbns.length >= 38, `casi todo el inventario trae ISBN (${isbns.length})`);
+  for (const b of data.books) {
+    assert.ok(b.n === null || isbnOk(b.n), `${b.id}: ISBN-13 con dígito de control inválido (${b.n})`);
+    assert.ok(typeof b.t === 'string' && b.t.trim() && typeof b.a === 'string' && b.a.trim(), `${b.id}: título y autor`);
+    assert.equal(b.lg, 'es');
+    assert.ok(b.g === null || Object.hasOwn(data.subgenres, b.g), `${b.id}: género fuera del diccionario`);
+    assert.ok(b.k === null || Object.hasOwn(data.categories, b.k), `${b.id}: categoría fuera del diccionario`);
+    assert.ok(b.g === null || data.subgenres[b.g].c === b.k, `${b.id}: el género y la categoría coinciden`);
+    assert.ok(b.pr === null || (Number.isInteger(b.pr) && b.pr > 0 && b.pr < 5000), `${b.id}: precio en pesos (${b.pr})`);
+    assert.ok(b.s === null || (typeof b.s === 'string' && b.s.length >= 40), `${b.id}: sinopsis`);
+    assert.ok(!('priceMxnCents' in b) && !('stockQty' in b) && !('stock' in b), `${b.id}: la existencia no se publica (se confirma por WhatsApp)`);
+  }
+  // Portadas: archivo local, registrado con su fuente, con las medidas reales (la tarjeta reserva su forma con width/height).
+  const conPortada = data.books.filter(b => b.c);
+  assert.equal(data.meta.covers, conPortada.length);
+  assert.ok(conPortada.length >= 30, `la mayoría trae portada real (${conPortada.length})`);
+  for (const b of conPortada) {
+    assert.equal(b.c, `assets/img/portadas/${b.id}.webp`, `${b.id}: ruta de portada`);
+    assert.ok(existsSync(here(`./${b.c}`)), `${b.id}: la portada existe en disco`);
+    const reg = portadas[b.id];
+    assert.ok(reg && ['Goodreads', 'Amazon'].includes(reg.fuente) && /^https:\/\//.test(reg.url) && reg.revisada, `${b.id}: portada registrada en data/portadas.json con fuente, URL y revisión`);
+    assert.equal(reg.isbn ?? null, b.n, `${b.id}: el registro de la portada es del mismo ISBN`);
+    assert.deepEqual(webpSize(await readFile(here(`./${b.c}`))), [b.cw, b.ch], `${b.id}: cw/ch son las medidas del archivo`);
+    assert.ok(b.cw <= 600 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 600 px como máximo (${b.cw}×${b.ch})`);
+  }
+  for (const b of data.books.filter(x => !x.c)) assert.ok(b.cw === null && b.ch === null && !portadas[b.id], `${b.id}: sin portada no hay medidas ni registro`);
+  const files = await readdir(here('./assets/img/portadas'));
+  assert.deepEqual(files.sort(), conPortada.map(b => `${b.id}.webp`).sort(), 'ninguna portada huérfana en assets/img/portadas');
+  assert.deepEqual(Object.keys(portadas).sort(), conPortada.map(b => b.id).sort(), 'data/portadas.json no registra libros que no estén en el catálogo');
+  // Nada del catálogo de prueba (CSV de Amazon) queda en lo que carga el sitio.
+  const titles = new Set(data.books.map(b => b.t));
+  for (const t of ['The Let Them Theory', 'Project Hail Mary', 'Lessons in Chemistry', 'The Midnight Library', 'Spare']) assert.ok(!titles.has(t), `título de la muestra: ${t}`);
+  assert.ok(!ids.some(id => id.startsWith('libro-')) && !Object.keys(data.subgenres).some(g => /^(non-)?fiction-/.test(g)), 'ni ids ni géneros de la muestra');
+  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
+  assert.equal(inv.filas.length, data.books.length, 'la copia fiel de la hoja tiene un renglón por libro');
+  assert.deepEqual(inv.filas.map(f => f.titulo), data.books.map(b => b.t), 'mismo orden y mismos títulos que la hoja');
 });
 
 test('recursos referenciados existen', async () => {
   const refs = [...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m => m[1]);
   refs.push(...Object.values(TOPICS).map(t => `assets/img/${t.img}`));
-  for (const b of data.books) if (b.c) refs.push(`assets/${b.c}`);
+  for (const b of data.books) if (b.c) refs.push(b.c); // b.c ya es la ruta desde la raíz (assets/img/portadas/…)
   for (const ref of new Set(refs)) await access(here(`./${ref}`));
 });
 
@@ -106,7 +203,24 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
   prov.real.forEach(f => kind.set(f.file, 'real'));
   prov.aiRecreation.forEach(f => kind.set(f.file, 'ai'));
   prov.brand.forEach(f => kind.set(f.file, 'brand'));
-  for (const f of await readdir(here('./assets/img'))) assert.ok(kind.has(`img/${f}`), `sin procedencia: img/${f}`);
+  const entries = await readdir(here('./assets/img'), { withFileTypes: true });
+  for (const f of entries.filter(e => e.isFile())) assert.ok(kind.has(`img/${f.name}`), `sin procedencia: img/${f.name}`);
+  assert.deepEqual(entries.filter(e => e.isDirectory()).map(e => e.name), ['portadas'], 'la única subcarpeta de assets/img es la de portadas');
+  // Portadas de los libros: no son fotos de la casa; cada una registrada con su fuente (las mismas de data/portadas.json).
+  assert.equal(prov.covers.dir, 'img/portadas/');
+  assert.equal(prov.covers.registry, 'data/portadas.json');
+  assert.match(prov.covers.rule, /Goodreads/);
+  const covers = new Map(prov.covers.files.map(f => [f.file, f]));
+  const onDisk = await readdir(here('./assets/img/portadas'));
+  assert.equal(covers.size, onDisk.length, 'una entrada por portada');
+  for (const f of onDisk) {
+    const reg = covers.get(`img/portadas/${f}`);
+    assert.ok(reg, `portada sin procedencia: img/portadas/${f}`);
+    const src = portadas[reg.book];
+    assert.ok(src && reg.source === src.fuente && reg.url === src.url && reg.isbn === (src.isbn ?? null), `img/portadas/${f}: la procedencia coincide con data/portadas.json`);
+    assert.ok(!kind.has(`img/portadas/${f}`), 'una portada no se registra como foto de la casa');
+  }
+  assert.ok(!('sampleData' in prov) && /inventario-itinerante\.json/.test(prov.catalogData.origin), 'el origen del catálogo es la hoja de la librería');
   assert.equal(prov.aiRecreation.length, 0, 'no quedan recreaciones: todas las imágenes son fotografías de la casa');
   assert.ok(![...kind.keys()].some(k => k.startsWith('seq')) && !existsSync(here('./assets/seq')) && !existsSync(here('./assets/seq-m')), 'la secuencia de fotogramas generada se retiró');
   assert.ok(/<img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp"/.test(html) && /srcset="assets\/img\/inicio-sala-m\.webp"/.test(html) && !/<section id="inicio"[^>]*data-seq/.test(html), 'el inicio es una fotografía fija (sin data-seq no hay recorrido por fotogramas)');
@@ -155,12 +269,14 @@ test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
   assert.equal(new Set(labels).size, labels.length, 'los CTA de Cartelera son distintos');
 });
 
-test('curaduría: los textos de navegación traen pista y los esqueletos ocupan el lugar', () => {
+test('curaduría: los textos de navegación traen pista y los esqueletos ocupan el lugar', async () => {
   assert.equal([...html.matchAll(/<a href="#[a-z]+" data-hint="[^"]+"(?: data-news-link)?><span>/g)].length, 4, 'los cuatro capítulos de la cabecera traen pista');
   assert.equal([...html.matchAll(/class="card-item card--sk"/g)].length, PAGE_SIZE, 'un esqueleto por tarjeta de la primera página');
   assert.ok(/--card-h: 150cqw;/.test(css) && /:is\(\.rail-item, \.card-item\) > \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto');
   assert.ok(!/class="sk-line/.test(/data-rail-track[\s\S]*?<\/ul>/.exec(html)[0]) && !/class="card-item card--sk"[^>]*><span class="card"><span class="cover"><\/span><span class="sk-line/.test(html), 'el esqueleto de tarjeta es solo la portada: el título y el autor van dentro de ella');
   assert.ok(/data-rail-chips>(<span class="sk-chip" aria-hidden="true"><\/span>){3,}<\/div>/.test(html), 'el esqueleto del carrusel reserva la fila de paradas');
+  const reserved = html.match(/data-rail-chips>((?:<span class="sk-chip" aria-hidden="true"><\/span>)+)<\/div>/)[1].split('sk-chip').length - 1;
+  assert.equal(reserved, JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8')).collections.length, 'una parada de esqueleto por colección: la fila no cambia de ancho al cargar');
   assert.ok(/\.rail-stop, \.sk-chip \{ flex: 0 0 var\(--stop\); height: calc\(var\(--stop\) \+ var\(--lip\) \+ var\(--space-2\) \+ var\(--name-h\)\); \}/.test(css) && !/(^|\n)\.sk-chip \{[^}]*(width|height):/.test(css + mobileCss), 'el esqueleto de la parada y la parada real comparten una sola regla de caja: no hay salto al pintar');
   assert.ok(/data-cat-grid aria-busy="true"/.test(html));
   assert.ok(/\.card--sk/.test(css));
@@ -196,7 +312,7 @@ test('filetes: horario como filas técnicas, sin cruces de registro (CR0-06), bo
 
 test('tokens: el CSS generado está al día y style.css no redeclara colores en :root', () => {
   assert.ok(html.indexOf('href="tokens.css"') < html.indexOf('href="style.css"'), 'tokens.css va antes que style.css');
-  assert.ok(!/:root\s*\{[^}]*--(night|bone|tungsten|turq|terra|paper)/.test(css), 'colores solo en tokens.css');
+  assert.ok(!/:root\s*\{[^}]*--(night|bone|tungsten|turq|terra|paper)\b/.test(css), 'colores solo en tokens.css');
   assert.match(tokensCss, /GENERADO por scripts\/build-tokens\.mjs/);
 });
 
@@ -209,60 +325,68 @@ test('referencia SP: fila «Ver los N resultados» en la búsqueda y documento d
 });
 
 test('sugerencias: los autores que empiezan por la consulta van antes que las coincidencias a mitad de palabra', () => {
-  const rows = suggest(data.books, 'fre').filter(s => s.kind === 'Autor');
-  assert.ok(rows.length >= 2);
-  const starts = s => { const a = norm(s.text); return a.startsWith('fre') || a.includes(' fre'); };
+  const rows = suggest(data.books, 'car').filter(s => s.kind === 'Autor');
+  assert.ok(rows.length >= 3, `varios autores con «car» (${rows.length})`);
+  const starts = s => { const a = norm(s.text); return a.startsWith('car') || a.includes(' car'); };
   const firstMid = rows.findIndex(s => !starts(s));
-  assert.ok(firstMid === -1 || rows.slice(firstMid).every(s => !starts(s)), 'ningún prefijo detrás de una coincidencia interna');
+  assert.ok(firstMid > 0, 'hay prefijos (Carlos) y al menos una coincidencia interna (Huáscar) que prueban el orden');
+  assert.ok(rows.slice(firstMid).every(s => !starts(s)), 'ningún prefijo detrás de una coincidencia interna');
+  assert.ok(rows.some(s => s.text === 'Huáscar Robles'), 'la coincidencia interna se encuentra sin acento');
+  assert.deepEqual(suggest(data.books, 'lomeli').filter(s => s.kind === 'Autor').map(s => s.text), ['Luis Felipe Lomelí'], 'el autor se sugiere con su acento original');
+  assert.ok(suggest(data.books, 'abismos').some(s => s.kind === 'Editorial' && s.text === 'Abismos Casa Editorial'), 'la editorial también se sugiere');
 });
 
 test('portadas: una sola familia visual, con el tono por categoría y por título', async () => {
   const warm = new Set(TONES.fiction), cool = new Set(TONES['non-fiction']);
+  const family = b => (b.k === 'literatura' ? warm : cool); // una fila sin categoría cae a la familia fría, como coverTone
   assert.deepEqual([...warm, ...cool].sort(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'diez tonos, cada uno en una sola familia');
+  assert.equal(TONES.literatura, TONES.fiction, 'literatura usa la familia cálida');
+  assert.equal(TONES.pensamiento, TONES['non-fiction'], 'pensamiento usa la familia fría');
+  assert.ok(Object.keys(data.categories).every(k => TONES[k]), 'toda categoría del inventario tiene familia (ninguna cae por descuido a la de respaldo)');
   for (const b of data.books) {
-    assert.equal(b.c ?? null, null, 'ya no hay SVG de portada');
-    assert.ok((b.k === 'fiction' ? warm : cool).has(coverTone(b)), `tono fuera de su familia: ${b.g}`);
+    assert.ok(b.c === null || /^assets\/img\/portadas\/[a-z0-9-]+\.webp$/.test(b.c), `${b.id}: la portada es un WebP local (nunca SVG ni URL externa)`);
+    assert.ok(family(b).has(coverTone(b)), `tono fuera de su familia: ${b.id}`);
   }
-  const a = data.books.find(b => b.k === 'fiction');
+  const a = data.books.find(b => b.k === 'literatura');
   assert.equal(coverTone(a), coverTone({ ...a }), 'el mismo libro da siempre el mismo tono');
   assert.equal(coverTone(a), coverTone({ ...a, g: 'otro-genero' }), 'el tono sale del título, no del género');
-  // Cada familia usa sus cinco tonos (oscuros y claros) en todo el catálogo...
-  for (const [k, family] of [['fiction', warm], ['non-fiction', cool]]) {
-    const used = new Set(data.books.filter(b => b.k === k).map(coverTone));
-    assert.deepEqual([...used].sort(), [...family].sort(), `la familia ${k} usa sus cinco tonos`);
-  }
-  // ...y cada colección de 12 del carrusel (un solo género) muestra al menos tres tonos distintos.
+  // La familia grande (literatura) usa sus cinco tonos; la pequeña (pensamiento, unos pocos títulos) al menos tres.
+  const used = k => new Set(data.books.filter(b => b.k === k).map(coverTone));
+  assert.deepEqual([...used('literatura')].sort(), [...warm].sort(), 'literatura usa sus cinco tonos');
+  assert.ok(used('pensamiento').size >= 3, `pensamiento usa ${used('pensamiento').size} tonos (mínimo 3)`);
+  // Cada colección del carrusel muestra al menos tres tonos distintos, cada portada en la familia de su libro.
   const { collections } = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
   for (const col of collections) {
     const books = pickBooks(data.books, col);
-    assert.equal(books.length, 12, `${col.id}: 12 libros`);
+    assert.ok(books.length >= 8 && books.length <= 12, `${col.id}: entre 8 y 12 libros (${books.length})`);
     const tones = new Set(books.map(coverTone));
     assert.ok(tones.size >= 3, `${col.id}: ${tones.size} tonos (mínimo 3)`);
-    const family = books[0].k === 'fiction' ? warm : cool;
-    for (const t of tones) assert.ok(family.has(t), `${col.id}: tono ${t} fuera de su familia`);
+    books.forEach(b => assert.ok(family(b).has(coverTone(b)), `${col.id}: tono de ${b.id} fuera de su familia`));
   }
 });
 
-test('portadas: en cada colección de 12 no hay vecinas del mismo tono, ninguno pasa de 5 y la composición varía', async () => {
+test('portadas: en cada colección no hay vecinas del mismo tono, ningún tono pasa de ⌈n/5⌉ + 1 y la composición varía', async () => {
   const { collections } = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
-  assert.equal(collections.length, 4);
+  assert.equal(collections.length, 3);
   const warm = new Set(TONES.fiction), cool = new Set(TONES['non-fiction']);
+  const family = b => (b.k === 'literatura' ? warm : cool); // una fila sin categoría cae a la familia fría, como coverTone
   const light = new Set([6, 7, 8, 9]);
   for (const col of collections) {
     const books = pickBooks(data.books, col);
-    assert.equal(books.length, 12, `${col.id}: 12 libros`);
+    const all = filterBooks(data.books, { q: '', k: new Set(col.filtro.k ?? []), g: new Set(col.filtro.g ?? []), f: new Set(), p: new Set(col.filtro.p ?? []) });
+    assert.equal(books.length, Math.min(12, all.length), `${col.id}: todos los libros de su filtro, hasta 12`);
     const tones = coverTones(books);
-    assert.equal(tones.length, 12);
+    assert.equal(tones.length, books.length);
     for (let i = 1; i < tones.length; i++) assert.notEqual(tones[i], tones[i - 1], `${col.id}: las portadas ${i} y ${i + 1} repiten tono`);
     const count = new Map();
     for (const t of tones) count.set(t, (count.get(t) ?? 0) + 1);
-    assert.ok(Math.max(...count.values()) <= 5, `${col.id}: un tono pasa de 5 de 12 (${[...count]})`);
+    const cap = Math.ceil(books.length / 5) + 1;
+    assert.ok(Math.max(...count.values()) <= cap, `${col.id}: un tono pasa de ${cap} de ${books.length} (${[...count]})`);
     assert.ok(count.size >= 3, `${col.id}: ${count.size} tonos (mínimo 3)`);
     assert.ok(tones.some(t => light.has(t)) && tones.some(t => !light.has(t)), `${col.id}: mezcla portadas claras y oscuras (no un muro de marrones)`);
     assert.ok(!tones.slice(3).every((t, i) => t === tones[i]), `${col.id}: el reparto no es un ciclo estricto de periodo 3`);
     for (let i = 2; i < tones.length; i++) assert.ok(tones[i] !== tones[i - 2], `${col.id}: las portadas ${i - 1} y ${i + 1} repiten tono (A-B-A)`);
-    const family = books[0].k === 'fiction' ? warm : cool;
-    for (const t of tones) assert.ok(family.has(t), `${col.id}: tono ${t} fuera de su familia`);
+    tones.forEach((t, i) => assert.ok(family(books[i]).has(t), `${col.id}: tono ${t} fuera de la familia de ${books[i].id}`));
     assert.deepEqual(coverTones(books), tones, `${col.id}: el reparto es estable`);
     assert.deepEqual(coverTones(books.map(b => ({ ...b }))), tones, `${col.id}: el mismo libro da el mismo tono en la misma lista`);
     const layouts = new Set(books.map(coverLayout));
@@ -276,6 +400,64 @@ test('portadas: en cada colección de 12 no hay vecinas del mismo tono, ninguno 
   }
   assert.deepEqual(coverTones([]), []);
   assert.deepEqual(coverTones([data.books[0]]), [coverTone(data.books[0])]);
+});
+
+test('portada real: la imagen va sin alt, título y autor como texto oculto (nombre accesible) y, si falla, vuelve la tipográfica', async () => {
+  const fabre = book('las-hojas-de-fabre-jesus-ferreiro');
+  const prev = globalThis.document;
+  globalThis.document = fakeDocument();
+  try {
+    const holder = imageCover(fabre, 3);
+    assert.ok(holder.cls.has('cover') && holder.cls.has('cover--img') && holder.cls.has('tone-3') && holder.dataset.coverTone === 3, 'portada con su tono (fondo mientras carga y respaldo)');
+    const [img, t, a] = holder.children;
+    assert.equal(img.tagName, 'IMG');
+    assert.equal(img.src, fabre.c);
+    assert.equal(img.alt, '', 'la imagen es decorativa: el nombre lo da el texto');
+    assert.equal(img.loading, 'lazy');
+    assert.equal(img.decoding, 'async');
+    assert.deepEqual([img.width, img.height], [fabre.cw, fabre.ch], 'medidas reales: la tarjeta no salta al cargar');
+    assert.deepEqual([t.textContent, a.textContent], [fabre.t, fabre.a], 'título y autor dentro de la portada');
+    assert.ok(t.cls.has('cover-title') && t.cls.has('sr-only') && a.cls.has('cover-author') && a.cls.has('sr-only'), 'ocultos a la vista, no al lector de pantalla');
+    assert.ok(t.getAttribute('aria-hidden') === null && a.getAttribute('aria-hidden') === null, 'en la tarjeta son el nombre accesible del botón');
+    const quiet = imageCover(fabre, 3, { named: false, eager: true });
+    assert.equal(quiet.children[0].loading, 'eager');
+    assert.ok(quiet.children.slice(1).every(s => s.getAttribute('aria-hidden') === 'true'), 'en la ficha (con encabezado propio) el texto de la portada no se repite al lector');
+    const noSize = imageCover({ ...fabre, cw: null, ch: null }, 3).children[0];
+    assert.ok(noSize.width === undefined && noSize.height === undefined, 'sin medidas no se inventan');
+    // Si la imagen falla: tipográfica, con el texto a la vista, sin imagen; una segunda llamada no hace nada.
+    coverFallback(img);
+    assert.ok(holder.cls.has('cover--blank') && !holder.cls.has('cover--img'), 'vuelve a la portada tipográfica');
+    assert.ok(!holder.children.some(c => c.tagName === 'IMG'), 'la imagen rota sale');
+    assert.ok(holder.children.every(c => !c.cls.has('sr-only')), 'título y autor a la vista');
+    assert.equal(img.dataset.failed, '1');
+    coverFallback(img);
+    assert.equal(holder.children.length, 2, 'idempotente');
+  } finally {
+    globalThis.document = prev;
+  }
+  const [cat, rail] = await Promise.all(['catalog.js', 'rail.js'].map(f => readFile(here(`./${f}`), 'utf8')));
+  assert.ok(/document\.addEventListener\('error', e => \{ if \(e\.target instanceof HTMLImageElement && e\.target\.closest\('\.cover--img'\)\) coverFallback\(e\.target\); \}, true\)/.test(cat), 'un solo oyente (en captura) atiende las portadas rotas de la rejilla, el carrusel, Novedades y la ficha');
+  assert.ok(/return b\.c \? imageCover\(b, tone, \{ named \}\) : blankCover/.test(cat) && /if \(b\.c\) cover = imageCover\(b, tone\);/.test(rail), 'rejilla, ficha y carrusel usan la portada real cuando existe');
+  assert.ok(/\.cover--img img \{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; \}/.test(css), 'la imagen llena la portada sin deformarla (object-fit), con la forma de la tarjeta de siempre');
+  assert.ok(/\.sr-only \{[^}]*clip: rect\(0 0 0 0\)/.test(css), 'sr-only existe');
+});
+
+test('ficha: sinopsis y precio de la hoja de la librería; sin dato, sin renglón', async () => {
+  assert.equal(priceLabel(250), '$250 MXN');
+  assert.equal(priceLabel(1200), '$1,200 MXN', 'miles con coma (es-MX)');
+  assert.equal(priceLabel(null), null);
+  assert.equal(priceLabel(undefined), null);
+  assert.equal(priceLabel(0), null, 'un cero no es un precio');
+  assert.equal(priceLabel('250'), null, 'solo números');
+  const drawer = html.match(/<dialog[^>]*id="cat-drawer"[\s\S]*?<\/dialog>/)[0];
+  assert.ok(/<div class="drawer-ask">[\s\S]*?<\/div>\s*<div class="drawer-about" data-d-synopsis-wrap hidden>\s*<h4>Sinopsis<\/h4>\s*<p class="drawer-synopsis" data-d-synopsis><\/p>\s*<\/div>\s*<div class="drawer-related"/.test(drawer), 'la sinopsis, con su encabezado, va después de la visita y antes de «Del mismo género», oculta hasta que haya texto');
+  assert.ok(/\.drawer-about, \.drawer-related \{ order: 3; \}/.test(css) && /\.drawer-ask \{ order: 1; \}\s*\.drawer-facts \{ order: 2; \}/.test(css), 'a la vista: «Cómo llegar», ficha técnica (con el precio) y luego la sinopsis; «Cómo llegar» sigue en el primer pliegue');
+  const cat = await readFile(here('./catalog.js'), 'utf8');
+  assert.ok(/\$\('\[data-d-synopsis\]', drawer\)\.textContent = b\.s \|\| '';/.test(cat) && /\$\('\[data-d-synopsis-wrap\]', drawer\)\.hidden = !b\.s;/.test(cat), 'sinopsis del libro; sin sinopsis el bloque (y su encabezado) no ocupa sitio');
+  assert.ok(/\.\.\.row\('Editorial', b\.p\), \.\.\.row\('Precio', priceLabel\(b\.pr\)\)/.test(cat) && /function row\(k, v\) \{ return v \? /.test(cat), 'precio justo después de la editorial; sin precio, sin renglón');
+  assert.ok(/\.drawer-synopsis \{[^}]*max-width: 60ch;[^}]*font: 400 var\(--fs-body\)\/1\.55 var\(--f-sans\); color: var\(--paper-ink\);/.test(css) && /\.drawer \{[^}]*background: var\(--paper\); color: var\(--paper-ink\);/.test(css.replaceAll('\n', ' ')), 'sinopsis con medida de lectura y la tinta de la hoja (fondo --paper, texto --paper-ink)');
+  assert.ok(!/[Ee]xistencia|[Dd]isponible|[Aa]gotado|stockQty/.test(cat), 'la ficha no promete existencias');
+  assert.ok(data.books.filter(b => b.s).length >= 35 && data.books.filter(b => b.pr).length >= 40, 'casi todo el inventario trae sinopsis y precio');
 });
 
 test('portadas: la ficha repite el tono de la tarjeta pulsada y la composición vive en CSS', async () => {
@@ -496,10 +678,13 @@ test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimenta
   assert.ok(/track\.addEventListener\('focusin'[\s\S]{0,500}scrollPaddingInlineStart[\s\S]{0,300}viewport\.scrollBy\(\{ left: b\.left - v\.left - pad, behavior: isMotion\(\)/.test(railJs), 'Tab: la tarjeta enfocada que asoma recortada se alinea dentro del carrusel');
   const cols = JSON.parse(await readFile(new URL('../assets/data/collections.json', import.meta.url), 'utf8'));
   const sample = JSON.parse(await readFile(new URL('../assets/data/catalog.json', import.meta.url), 'utf8'));
-  assert.equal(cols.meta.kind, 'sample');
+  assert.equal(cols.meta.kind, 'inventario');
+  assert.ok(!('label' in cols.meta), 'sin rótulo de muestra');
+  assert.deepEqual(cols.collections.map(c => c.id), ['narrativa', 'poesia', 'ensayo'], 'tres colecciones del inventario');
   for (const c of cols.collections) {
     const list = pickBooks(sample.books, c);
-    assert.ok(list.length > 0 && list.length <= 12, `${c.id}: entre 1 y 12 libros`);
+    assert.ok(list.length >= 3 && list.length <= 12, `${c.id}: entre 3 y 12 libros (una parada con uno o dos no es colección)`);
+    assert.ok(list.every(b => (c.filtro.g ?? []).includes(b.g)), `${c.id}: solo libros de sus géneros`);
     assert.deepEqual(list.map(b => b.t), [...list.map(b => b.t)].sort((a, b) => a.localeCompare(b, 'es')), `${c.id}: orden determinista por título`);
   }
   const ids = [sample.books[7].id, sample.books[3].id, 'no-existe', sample.books[9].id];
@@ -873,26 +1058,37 @@ test('Novedades: sin entradas válidas el plan no muestra nada, ni siquiera todo
   }
 });
 
-test('Novedades: las entradas de ejemplo son 12 libros del catálogo de prueba, con fecha válida, variados y recientes', async () => {
+test('Novedades: toda entrada que exista es un libro real con fecha válida; con la lista vacía el capítulo no existe', async () => {
   const shipped = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
   const list = shipped.novedades.entradas;
+  assert.ok(Array.isArray(list), 'la fuente es una lista');
   assert.ok(!('ids' in shipped.novedades) && shipped.novedades.titulo === 'Recién llegados', 'la fuente es `entradas` ({ id, llegada }); se conserva `titulo`');
   assert.ok(!shipped.collections.some(c => /novedades/i.test(c.id)), 'el carrusel de libros no recibe la colección de Novedades');
-  assert.equal(list.length, 12, '12 entradas de ejemplo');
   const byId = new Map(data.books.map(b => [b.id, b]));
   for (const e of list) {
     assert.deepEqual(Object.keys(e).sort(), ['id', 'llegada'], 'cada renglón es { id, llegada }');
-    assert.ok(byId.has(e.id), `el id existe en la muestra que carga el sitio: ${e.id}`);
+    assert.ok(byId.has(e.id), `el id es un libro del inventario: ${e.id}`);
     assert.ok(validDay(e.llegada), `fecha real AAAA-MM-DD: ${e.llegada}`);
-    assert.ok(e.llegada >= '2026-10-05' && e.llegada <= '2026-11-10', `fecha de ejemplo dentro del tramo: ${e.llegada}`);
+    assert.ok(e.llegada <= isoDay(), `no se anuncia una llegada futura: ${e.llegada}`);
   }
-  assert.equal(new Set(list.map(e => e.id)).size, 12, 'sin repetidos');
-  assert.ok(new Set(list.map(e => byId.get(e.id).g)).size >= 10 && new Set(list.map(e => byId.get(e.id).k)).size === 2, 'variados en género, con ficción y no ficción');
+  assert.equal(new Set(list.map(e => e.id)).size, list.length, 'sin repetidos');
+  assert.ok(!list.some(e => e.id.startsWith('libro-')), 'no quedan las entradas de ejemplo del catálogo de prueba');
   const plan = newsPlan(data.books, shipped, { hoy: HOY });
-  assert.equal(plan.books.length, 12, 'las 12 se muestran');
-  assert.ok(plan.n >= 4 && plan.n <= 5, `entre 4 y 5 llegaron en los 14 días previos al ${HOY} (${plan.n})`);
-  assert.deepEqual(plan.ids, [...list].sort((a, b) => (a.llegada < b.llegada ? 1 : -1)).map(e => e.id), 'lo más reciente primero');
-  assert.deepEqual(newsPlan(null, shipped, { hoy: HOY }).nuevos, plan.nuevos, 'el conteo temprano (sin catálogo) coincide con el de la tira');
+  if (list.length) {
+    assert.equal(plan.show, true);
+    assert.deepEqual(plan.ids, newsEntries(shipped, HOY).filter(e => byId.has(e.id)).slice(0, NEWS_SIZE).map(e => e.id), 'lo más reciente primero, hasta NEWS_SIZE');
+  } else {
+    // Hoy: la librería no ha registrado fechas de llegada. Sin entradas no hay plan, ni conteo temprano, ni tarjetas.
+    assert.equal(plan.show, false, 'sin entradas no se muestra el capítulo');
+    assert.deepEqual([plan.books, plan.ids, plan.n], [[], [], 0]);
+    assert.equal(newsPlan(null, shipped, { hoy: HOY }).show, false, 'el conteo temprano (sin catálogo) tampoco muestra nada');
+    assert.match(shipped.meta.nota, /vac[ií]a mientras la librer[ií]a no registre fechas de llegada/, 'la nota del JSON dice cómo activarla');
+  }
+  // Lo que hace la interfaz con un plan vacío: oculta sección, enlaces, punto y control, recuerda «n» para boot.js y no pinta la tira.
+  const news = await readFile(here('./news.js'), 'utf8');
+  const apply = news.slice(news.indexOf('function apply('), news.indexOf('export function initNewsCount'));
+  assert.ok(/if \(section\) section\.hidden = !plan\.show;/.test(apply) && /\[data-news-link\]'\)\.forEach\(l => \{ l\.hidden = !plan\.show; \}\)/.test(apply), 'sin plan: sección y enlaces (cabecera, menú, casilla) ocultos');
+  assert.ok(/\[data-news-dot\]'\)\.forEach\(d => \{ d\.hidden = n === 0; \}\)/.test(apply) && /cta\.hidden = n === 0;/.test(apply), 'sin novedades: ni punto en la casilla ni control en el inicio');
 });
 
 test('Novedades: «nuevo» es lo que llegó después de la última visita; en la primera, lo de las dos últimas semanas', () => {
@@ -1140,7 +1336,7 @@ test('Libros: un solo titular grande, una sola fila de chips al inicio, el carru
   const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
   assert.equal((libros.match(/class="h2"/g) || []).length, 1, 'un solo H2 visual en el capítulo');
   assert.equal((libros.match(/<h2[\s>]/g) || []).length, 1, 'un solo h2 en el marcado');
-  assert.ok(!/class="[^"]*h2[^"]*"/.test(libros.replace(/class="h2"/, '')), 'las capas internas usan layer-title, no h2');
+  assert.ok(!/class="[^"]*\bh2\b[^"]*"/.test(libros.replace(/class="h2"/, '')), 'las capas internas usan layer-title, no h2');
   const chips = [...libros.matchAll(/role="radiogroup"[^>]*aria-label="([^"]+)"/g)].map(m => m[1]);
   assert.deepEqual(chips, ['Colección', 'Elige un tema de lectura'], 'primero la elección de colección; los temas son la capa de consulta de abajo');
   const at = k => libros.indexOf(k);
@@ -1223,24 +1419,23 @@ test('plantilla: sin sellos de muestra ni rótulos de procedencia a la vista; la
   assert.ok(/\.rail-info \[data-rail-note\] \{ min-height: 1lh; \}/.test(css), 'la línea de la nota se reserva: el carrusel no salta al pintar');
 });
 
-test('géneros: todo género de la muestra tiene etiqueta en español y uno sin traducción cae al valor original', async () => {
-  const ids = new Set(data.books.map(b => b.g));
-  assert.ok(ids.size >= 40, 'la muestra trae decenas de géneros');
+test('géneros: todo género del inventario se lee en español (del propio dato) y uno sin nombre cae al id', async () => {
+  const ids = new Set(data.books.map(b => b.g).filter(Boolean));
+  assert.deepEqual([...ids].sort(), Object.keys(data.subgenres).sort(), 'el diccionario del catálogo trae justo los géneros en uso');
+  assert.ok(ids.size >= 5, 'el inventario trae varios géneros');
   for (const id of ids) {
     const original = data.subgenres[id]?.n;
-    assert.ok(original, `${id}: el dato trae su nombre original`);
-    assert.ok(Object.hasOwn(GENRE_ES, id), `${id}: sin etiqueta en español`);
+    assert.ok(original, `${id}: el dato trae su nombre`);
     const label = genreLabel(id, original);
-    assert.notEqual(label, original, `${id}: sigue en inglés (${original})`);
-    assert.ok(!/\b(Science Fiction|Middle Grade|Self-Help|Fiction|Thriller|Memoir|History)\b/.test(label), `${id}: etiqueta con inglés: ${label}`);
+    assert.equal(label, original, `${id}: el nombre del inventario ya está en español y se usa tal cual`);
+    assert.ok(!/\b(Fiction|Poetry|Essay|Non-?fiction|Memoir|History)\b/i.test(label), `${id}: etiqueta con inglés: ${label}`);
   }
-  assert.equal(genreLabel('fiction-science-fiction', 'Science Fiction'), 'Ciencia ficción');
-  assert.equal(genreLabel('fiction-middle-grade', 'Middle Grade'), 'Para preadolescentes');
-  assert.equal(genreLabel('non-fiction-self-help', 'Self-Help'), 'Superación personal');
+  assert.equal(genreLabel('ensayo-poesia', data.subgenres['ensayo-poesia'].n), 'Ensayo y poesía');
   assert.equal(genreLabel('nuevo-genero', 'New Genre'), 'New Genre', 'sin traducción: el nombre original');
   assert.equal(genreLabel('nuevo-genero'), 'nuevo-genero', 'sin traducción ni nombre: el id');
   assert.equal(genreLabel('toString', 'Original'), 'Original', 'un id como propiedad heredada no rompe');
-  assert.ok(Object.keys(GENRE_ES).every(id => data.subgenres[id]), 'el diccionario no trae ids que la muestra no tiene');
+  assert.ok(Object.keys(GENRE_ES).every(id => data.subgenres[id]), 'el diccionario de presentación no trae ids que el inventario no tiene');
+  assert.ok(Object.values(data.categories).every(n => /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ ]+$/.test(n)), 'las categorías también vienen en español');
   const catalog = await readFile(here('./catalog.js'), 'utf8');
   assert.ok(/g: id => genreLabel\(id, data\.subgenres\[id\]\?\.n\)/.test(catalog), 'barra Género, chips y ficha comparten la misma etiqueta');
 });

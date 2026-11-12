@@ -59,6 +59,27 @@ def cover(key, entry):
     return f'assets/img/portadas/{key}.webp', w, h
 
 
+def provenance(books, portadas):
+    """Registra en assets/provenance.json el origen del catálogo y de cada portada publicada (tests/site.test.mjs lo exige)."""
+    path = os.path.join(ROOT, 'assets', 'provenance.json')
+    prov = json.load(open(path, encoding='utf-8'))
+    prov.pop('sampleData', None)
+    prov['catalogData'] = {
+        'file': 'data/catalog.json',
+        'origin': 'Catálogo Itinerante.xlsx (hoja de la librería), importada con scripts/import-inventario.py; copia fiel con avisos por renglón en data/inventario-itinerante.json',
+        'note': 'Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp.'
+    }
+    prov['covers'] = {
+        'dir': 'img/portadas/',
+        'registry': 'data/portadas.json',
+        'rule': 'Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 600 px de ancho como máximo. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).',
+        'files': [{'file': b['c'].removeprefix('assets/'), 'book': b['id'], 'isbn': portadas[b['id']].get('isbn'), 'source': portadas[b['id']]['fuente'],
+                   'url': portadas[b['id']]['url'], 'reviewed': portadas[b['id']].get('revisada')} for b in books if b['c']]
+    }
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(prov, f, ensure_ascii=False, indent=2); f.write('\n')
+
+
 def main(xlsx):
     ws = openpyxl.load_workbook(xlsx, data_only=True).worksheets[0]
     portadas = json.load(open(os.path.join(ROOT, 'data', 'portadas.json'), encoding='utf-8'))
@@ -98,6 +119,7 @@ def main(xlsx):
         json.dump({'meta': meta, 'filas': rows}, f, ensure_ascii=False, indent=1); f.write('\n')
     with open(os.path.join(ROOT, 'assets', 'data', 'catalog.json'), 'w', encoding='utf-8') as f:
         json.dump({'meta': meta, 'categories': cat, 'subgenres': sub, 'books': books}, f, ensure_ascii=False, separators=(',', ':')); f.write('\n')
+    provenance(books, portadas)
     print(f"{len(books)} libros, {meta['covers']} con portada; avisos:")
     for r in rows:
         if r['avisos']: print(f"  fila {r['fila']} «{r['titulo'][:40]}»: {'; '.join(r['avisos'])}")

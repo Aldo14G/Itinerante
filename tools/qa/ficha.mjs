@@ -48,6 +48,20 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   })()`);
   ck(`${w}x${h}: «Cómo llegar» dentro del primer pliegue (borde ${m.bottom} <= ${h - 8}), hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.scroll === 0 && !m.hover, JSON.stringify(m));
   ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma y el foco inicial va en Cerrar`, !m.seal && m.note === 'La librería confirma existencia y precio.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
+  // Inventario real: la portada real carga, la ficha técnica trae el precio de la hoja y la sinopsis (con su encabezado) va bajo ella.
+  const dd = await ev(`(async () => {
+    const d = document.querySelector('#cat-drawer'); const id = d.dataset.book;
+    const b = (await (await fetch('assets/data/catalog.json')).json()).books.find(x => x.id === id);
+    const img = d.querySelector('[data-d-cover] img'); if (img) await img.decode().catch(() => {});
+    const facts = Object.fromEntries([...d.querySelectorAll('[data-d-facts] dt')].map(dt => [dt.textContent, dt.nextElementSibling.textContent]));
+    const wrap = d.querySelector('[data-d-synopsis-wrap]'); const syn = d.querySelector('[data-d-synopsis]');
+    const pos = sel => d.querySelector(sel).getBoundingClientRect().top;
+    const ink = getComputedStyle(syn).color, bg = getComputedStyle(d).backgroundColor;
+    return { id, img: !!img && img.complete && img.naturalWidth > 0, alt: img?.getAttribute('alt'), price: facts.Precio, want: b.pr ? '$' + b.pr + ' MXN' : null, editorial: facts.Editorial === b.p,
+      synShown: !wrap.hidden && wrap.getBoundingClientRect().height > 0, synSame: syn.textContent === b.s, head: wrap.querySelector('h4')?.textContent,
+      order: pos('[data-d-visit]') < pos('[data-d-facts]') && pos('[data-d-facts]') < pos('[data-d-synopsis-wrap]'), ink, bg, noYear: !('Año' in facts) && !('Formato' in facts) && !('Páginas' in facts) };
+  })()`);
+  ck(`${w}x${h}: portada real cargada (sin alt), precio de la hoja («${dd.price}»), sinopsis completa con su encabezado bajo la ficha técnica, con la tinta de la hoja; sin renglones vacíos (año, formato, páginas)`, dd.img && dd.alt === '' && dd.price === dd.want && /^\$\d[\d,]* MXN$/.test(dd.price) && dd.editorial && dd.synShown && dd.synSame && dd.head === 'Sinopsis' && dd.order && dd.ink !== dd.bg && dd.noYear, JSON.stringify(dd));
   await shot(`ficha-m${w}x${h}.png`);
   await press('Escape', 'Escape', 27); await sleep(900);
   ck(`${w}x${h}: Escape cierra y libera el scroll`, await ev(`!document.querySelector('#cat-drawer').open && !document.documentElement.classList.contains('sheet-open')`));

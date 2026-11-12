@@ -42,6 +42,16 @@ test("index.html solo referencia archivos que existen en public/", async () => {
   assert.deepEqual(refs.filter((r) => !set.has(r.replace(/^\//, ""))), []);
 });
 
+test("las portadas del inventario se publican: toda ruta `c` de catalog.json existe en public/ y nada sobra", async () => {
+  const catalog = JSON.parse(await readFile(join(out, "assets", "data", "catalog.json"), "utf8"));
+  const covers = catalog.books.map((b) => b.c).filter(Boolean);
+  assert.ok(covers.length >= 30, `se esperaban las portadas reales (${covers.length})`);
+  const set = new Set(files);
+  assert.deepEqual(covers.filter((c) => !set.has(c)), [], "portadas que faltan en public/");
+  assert.deepEqual(files.filter((f) => f.startsWith("assets/img/portadas/")).sort(), [...covers].sort(), "solo las portadas que usa el catalogo");
+  assert.ok(!files.includes("data/portadas.json") && !files.some((f) => f.endsWith("inventario-itinerante.json")), "los registros internos (data/) no se publican");
+});
+
 test("la CSP del HTML no abre origenes externos", async () => {
   const html = await readFile(join(out, "index.html"), "utf8");
   const csp = html.match(/Content-Security-Policy" content="([^"]+)"/)[1];

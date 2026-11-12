@@ -1,4 +1,4 @@
-// Cargas únicas de los datos de muestra: las comparten el catálogo, el carrusel, Novedades y «Mi lista».
+// Cargas únicas del catálogo (inventario real, assets/data/catalog.json): las comparten el catálogo, el carrusel, Novedades y «Mi lista».
 const once = url => {
   let promise;
   return () => (promise ??= fetch(url)

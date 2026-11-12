@@ -596,7 +596,7 @@ async function boot() {
       dropHeaderForJump();
       const href = link.getAttribute('href');
       landing = href.startsWith('#') ? $(href) : null;
-      if (href === '#catalogo') { // en móvil la muestra es una hoja: se abre cuando el menú termina de cerrarse
+      if (href === '#catalogo') { // en móvil el catálogo es una hoja: se abre cuando el menú termina de cerrarse
         landing = null;
         e.preventDefault();
         dlg.addEventListener('close', () => document.dispatchEvent(new CustomEvent('iti:open-explorer')), { once: true });
@@ -813,7 +813,7 @@ async function boot() {
     throw err;
   }));
 
-  // ---------- Catálogo de muestra (carga al acercarse) ----------
+  // ---------- Catálogo (carga al acercarse) ----------
   const catalogSection = $('#catalogo');
   if (catalogSection) {
     // Una sola promesa: el catálogo y el carrusel esperan lo mismo (la ficha existe cuando resuelve).
@@ -833,7 +833,7 @@ async function boot() {
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
 
     await yieldNow();
-    // Explorar la muestra: en móvil es una hoja a pantalla completa (la rejilla deja de alargar el capítulo);
+    // Explorar el catálogo: en móvil es una hoja a pantalla completa (la rejilla deja de alargar el capítulo);
     // en escritorio el diálogo queda abierto en línea. El botón «atrás» del teléfono cierra la hoja.
     const explorer = $('#explorer');
     if (explorer) {
@@ -875,7 +875,7 @@ async function boot() {
       $('[data-ex-close]', explorer).addEventListener('click', () => closeDialog(explorer)); // el cierre real (volver a activar la página) corre después del fotograma
       $('[data-ex-open]')?.addEventListener('click', e => confirmThen(e.currentTarget, openExplorer)); // confirma el toque; la hoja (lo caro) va después de pintar
       document.addEventListener('iti:open-explorer', openExplorer);
-      // Cualquier enlace a la muestra abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
+      // Cualquier enlace al catálogo abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href="#catalogo"]');
         if (!a || a.closest('#sheet-menu')) return;

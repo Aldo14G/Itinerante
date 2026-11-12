@@ -1,4 +1,4 @@
-// Carrusel de libros: una sola pieza para cualquier colección; cuando llegue el listado real basta con poner `ids` en
+// Carrusel de libros: una sola pieza para cualquier colección del inventario; una lista curada se escribe como `ids` en
 // assets/data/collections.json. Las colecciones se eligen en un recorrido de paradas (DESIGN.md, «Catálogo como recorrido»):
 // cada una con su icono (`icono` en el JSON), y las que la persona ya hojeó quedan marcadas en este dispositivo.
 import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover } from './catalog.js';
@@ -35,7 +35,7 @@ const store = () => { try { return globalThis.localStorage ?? null; } catch { re
 export const readTrail = () => { try { const r = JSON.parse(store()?.getItem(TRAIL_KEY) || '[]'); return Array.isArray(r) ? r.filter(x => typeof x === 'string') : []; } catch { return []; } };
 export const writeTrail = ids => { try { store()?.setItem(TRAIL_KEY, JSON.stringify(ids)); return true; } catch { return false; } };
 
-// Libros de una colección: una lista curada (`ids`, en ese orden) o un filtro sobre la muestra, por título.
+// Libros de una colección: una lista curada (`ids`, en ese orden) o un filtro sobre el catálogo, por título.
 export function pickBooks(books, col, size = RAIL_SIZE) {
   if (Array.isArray(col.ids) && col.ids.length) {
     const byId = new Map(books.map(b => [b.id, b]));
@@ -147,7 +147,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     ]);
     books = sample.books;
     cols = collections.collections.filter(c => pickBooks(books, c).length);
-    if (!cols.length) { root.hidden = true; return; } // sin datos no se promete nada: el capítulo sigue con los temas y la muestra completa
+    if (!cols.length) { root.hidden = true; return; } // sin datos no se promete nada: el capítulo sigue con los temas y el catálogo completo
   } catch {
     // Error de red (A03): el carrusel no desaparece en silencio. Línea de estado y salida: reintentar o preguntar por WhatsApp.
     delete root.dataset.ready;
@@ -159,7 +159,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     errBox.hidden = false;
     if (!errBox.dataset.wired) {
       errBox.dataset.wired = '1';
-      errBox.querySelector('[data-rail-retry]').addEventListener('click', () => { // la muestra se vuelve a pedir (sample.js olvida la promesa fallida)
+      errBox.querySelector('[data-rail-retry]').addEventListener('click', () => { // el catálogo se vuelve a pedir (sample.js olvida la promesa fallida)
         errBox.hidden = true;
         delete root.dataset.state;
         status.textContent = 'Cargando el catálogo…';

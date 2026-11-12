@@ -64,7 +64,8 @@ for (const w of [390, 360, 320]) {
 }
 await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true }); await sleep(500);
 
-// «Filtros» no promete 500 filtros: sin filtros activos va a secas; con filtros, el número de activos. Géneros en español (CR-07).
+// «Filtros» no promete el total del catálogo: sin filtros activos va a secas; con filtros, el número de activos. Géneros en español (CR-07).
+// Inventario real: Categoría (2), Género (6, el único grupo que se pliega), Editorial (4); la hoja no trae formato, así que no hay grupo Formato.
 const fl = await ev(`(async () => { const ex = document.getElementById('explorer'); const btn = ex.querySelector('[data-cat-filters-btn]'); const w = x => new Promise(r => setTimeout(r, x));
   const idle = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
   btn.click(); await w(400);
@@ -78,11 +79,12 @@ const fl = await ev(`(async () => { const ex = document.getElementById('explorer
   const moreNow = ex.querySelector('[data-expand="g"]');
   const opened = { groups: groups(), top: Math.round(moreNow.getBoundingClientRect().top), scroll: ex.scrollTop, focus: document.activeElement === moreNow };
   const foot = ex.querySelector('.cat-filters-foot'); const fr = foot.getBoundingClientRect();
-  const sticky = { pos: getComputedStyle(foot).position, bottom: Math.round(fr.bottom), vh: innerHeight, text: foot.textContent.trim() };
-  const p = ex.querySelector('[data-expand="p"]'); p.click(); await w(300); const editorials = shownOpts([...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Editorial')); ex.querySelector('[data-expand="p"]').click(); await w(300);
-  const folding = { folded, before, opened, sticky, editorials, refolded: groups().find(g => g.legend === 'Editorial') };
+  const sticky = { pos: getComputedStyle(foot).position, bottom: Math.round(fr.bottom), vh: innerHeight, panel: Math.round(foot.parentElement.getBoundingClientRect().bottom), text: foot.textContent.trim() };
+  const labels = [...[...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género').querySelectorAll('label')].map(l => l.firstChild.textContent); // con el grupo abierto: todos
+  ex.querySelector('[data-expand="g"]').click(); await w(300); // vuelve a plegar Género (el panel se pintó de nuevo: otro botón)
+  const refolded = groups().find(g => g.legend === 'Género');
+  const folding = { folded, before, opened, sticky, refolded, legends: [...ex.querySelectorAll('.cat-group legend')].map(l => l.textContent), sorts: [...ex.querySelectorAll('[data-cat-sort] option')].map(o => o.value) };
   const genres = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género');
-  const labels = [...genres.querySelectorAll('label')].map(l => l.firstChild.textContent);
   const cb = genres.querySelector('input[type=checkbox]'); cb.click(); await w(500);
   const again = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género'); again.querySelectorAll('input[type=checkbox]')[1].click(); await w(500); // el panel se vuelve a pintar tras cada filtro
   const active = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
@@ -90,16 +92,20 @@ const fl = await ev(`(async () => { const ex = document.getElementById('explorer
   return { idle, active, back: btn.textContent.trim(), labels, folding };
 })()`);
 { const f = fl.folding; const g = f.folded.find(x => x.legend === 'Género'), og = f.opened.groups.find(x => x.legend === 'Género');
-  ck('móvil: el panel de filtros abre con 5 opciones como máximo por grupo (≤ 20 en total) y un «Ver las N» propio (aria-expanded, aria-controls, ≥ 44 px) en cada grupo plegable', f.folded.every(x => x.opts <= 5 && (x.btn === undefined || (/^Ver l[oa]s \d+ /.test(x.btn) && x.exp === 'false' && x.ctl && x.h >= 44))) && f.folded.reduce((n, x) => n + x.opts, 0) <= 20 && f.folded.filter(x => x.btn).length >= 2 && g.btn === 'Ver los 48 géneros', JSON.stringify(f.folded));
-  ck('móvil: «Ver los 48 géneros» despliega el grupo sin mover el botón ni el scroll y con el foco en él; pasa a «Ver menos géneros» (aria-expanded=true)', og.opts === 48 && og.btn === 'Ver menos géneros' && og.exp === 'true' && f.opened.focus && f.opened.top === f.before.top && f.opened.scroll === f.before.scroll, JSON.stringify({ og, before: f.before, top: f.opened.top, scroll: f.opened.scroll, focus: f.opened.focus }));
-  ck('móvil: cada grupo se pliega por su cuenta (Editorial abre todas y vuelve a 5) y «Ver N títulos» sigue pegado al pie', f.editorials > 5 && f.refolded.opts === 5 && f.refolded.exp === 'false' && f.sticky.pos === 'sticky' && f.sticky.bottom <= f.sticky.vh + 1 && f.sticky.bottom >= f.sticky.vh - 1 && /^Ver \d+ títulos?$/.test(f.sticky.text), JSON.stringify({ editorials: f.editorials, refolded: f.refolded, sticky: f.sticky })); }
-const EN = /Science Fiction|Middle Grade|Self-Help|Fiction|Romance(?!\s+(contempor|oscuro|paranormal|juvenil|y fantas))|Thriller|Mystery|History|Memoir|Parenting|True Crime|Business|Cooking|Health|Politics|Productivity|Spirituality|Biography|Fantasy|Horror|Dystopian|Graphic Novel/;
-ck('móvil: el botón dice «Filtros» sin número, con 2 filtros «Filtros 2» y vuelve a «Filtros» al limpiar (nunca 500)', fl.idle.text === 'Filtros' && fl.idle.label === 'Filtros' && fl.active.text === 'Filtros 2' && /2 activos/.test(fl.active.label) && fl.back === 'Filtros' && !/500/.test(JSON.stringify(fl.idle) + fl.active.text), JSON.stringify({ ...fl, labels: undefined }));
-ck('móvil: la barra Género de la hoja no muestra etiquetas en inglés (Science Fiction, Middle Grade, Self-Help…)', fl.labels.length >= 40 && !fl.labels.some(l => EN.test(l) || /(Science Fiction|Middle Grade|Self-Help)/.test(l)) && fl.labels.includes('Ciencia ficción') && fl.labels.includes('Superación personal'), JSON.stringify(fl.labels.filter(l => EN.test(l)).slice(0, 8)) + ' ' + fl.labels.length);
+  ck('móvil: el panel de filtros abre con 5 opciones como máximo por grupo (≤ 20 en total) y un «Ver los N» propio (aria-expanded, aria-controls, ≥ 44 px) solo en el grupo que pasa de 5 (Género)', f.folded.every(x => x.opts <= 5 && (x.btn === undefined || (/^Ver l[oa]s \d+ /.test(x.btn) && x.exp === 'false' && x.ctl && x.h >= 44))) && f.folded.reduce((n, x) => n + x.opts, 0) <= 20 && f.folded.filter(x => x.btn).length === 1 && g.btn === 'Ver los 6 géneros' && f.folded.filter(x => !x.btn).every(x => x.opts >= 2), JSON.stringify(f.folded));
+  ck('móvil: grupos solo con datos de la hoja (Categoría, Género, Editorial: sin Formato vacío) y sin «Más recientes» (no hay años)', JSON.stringify(f.legends) === '["Categoría","Género","Editorial"]' && f.folded.find(x => x.legend === 'Editorial').opts === 4 && JSON.stringify(f.sorts) === '["rel","az","autor"]', JSON.stringify({ legends: f.legends, sorts: f.sorts }));
+  ck('móvil: «Ver los 6 géneros» despliega el grupo sin mover el botón ni el scroll y con el foco en él; pasa a «Ver menos géneros» (aria-expanded=true)', og.opts === 6 && og.btn === 'Ver menos géneros' && og.exp === 'true' && f.opened.focus && f.opened.top === f.before.top && f.opened.scroll === f.before.scroll, JSON.stringify({ og, before: f.before, top: f.opened.top, scroll: f.opened.scroll, focus: f.opened.focus }));
+  ck('móvil: el grupo vuelve a plegarse a 5 y «Ver N títulos» sigue pegado al pie (o al final del panel, si el panel cabe en la pantalla)', f.refolded.opts === 5 && f.refolded.exp === 'false' && f.refolded.btn === 'Ver los 6 géneros' && f.sticky.pos === 'sticky' && f.sticky.bottom <= f.sticky.vh + 1 && f.sticky.bottom >= Math.min(f.sticky.vh, f.sticky.panel) - 1 && /^Ver \d+ títulos?$/.test(f.sticky.text), JSON.stringify({ refolded: f.refolded, sticky: f.sticky })); }
+const EN = /Science Fiction|Middle Grade|Self-Help|Fiction\b|Romance\b(?!\s+(contempor|oscuro|paranormal|juvenil|y fantas))|Thriller|Mystery|History\b|Memoir|Parenting|True Crime|Business|Cooking|Health|Politics|Productivity|Spirituality|Biography|Fantasy|Horror|Dystopian|Graphic Novel/;
+ck('móvil: el botón dice «Filtros» sin número, con 2 filtros «Filtros 2» y vuelve a «Filtros» al limpiar (nunca el total, 41)', fl.idle.text === 'Filtros' && fl.idle.label === 'Filtros' && fl.active.text === 'Filtros 2' && /2 activos/.test(fl.active.label) && fl.back === 'Filtros' && !/41/.test(JSON.stringify(fl.idle) + fl.active.text), JSON.stringify({ ...fl, labels: undefined }));
+ck('móvil: la barra Género lleva los 6 géneros del inventario en español, sin inglés', fl.labels.length === 6 && !fl.labels.some(l => EN.test(l)) && ['Narrativa', 'Poesía', 'Ensayo', 'Divulgación', 'Ensayo y poesía', 'Ensayo y narrativa'].every(l => fl.labels.includes(l)), JSON.stringify(fl.labels));
 
 // búsqueda dentro de la hoja
-const se = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.focus(); q.value = 'Freida'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 1200)); return { cards: ex.querySelectorAll('button.card').length, status: ex.querySelector('[data-cat-status]').textContent, first: ex.querySelector('button.card .cover-title')?.textContent }; })()`);
-ck('móvil: buscar «Freida» dentro de la hoja filtra el catálogo (5 de 500)', se.cards >= 1 && se.cards < 24 && /de 5 títulos|Mostrando 5/.test(se.status), JSON.stringify(se));
+const se = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.focus(); q.value = 'noche'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 1200));
+  const cards = [...ex.querySelectorAll('button.card')];
+  // nombre accesible del botón: el texto de la portada (real u tipográfica); la imagen real va sin alt
+  return { cards: cards.length, status: ex.querySelector('[data-cat-status]').textContent, names: cards.map(c => c.textContent.replace(/\\s+/g, ' ').trim()), imgs: cards.map(c => c.querySelector('img')?.getAttribute('alt') ?? null), real: cards.filter(c => c.querySelector('.cover--img')).length }; })()`);
+ck('móvil: buscar «noche» dentro de la hoja filtra el catálogo (3 de 41), con portadas reales y tipográficas nombradas por título y autor', se.cards === 3 && /Mostrando 3 de 3 títulos/.test(se.status) && se.real === 2 && se.imgs.filter(a => a !== null).every(a => a === '') && se.names.some(n => n.includes('El lugar de la noche') && n.includes('David Ornelas')) && se.names.some(n => n.includes('Las noches rotas')), JSON.stringify(se));
 
 // ficha encima de la hoja
 await realClick('#explorer button.card');
@@ -151,8 +157,18 @@ await sleep(4500);
 const dk = await ev(`(() => { const ex = document.getElementById('explorer'); const b = document.querySelector('[data-ex-open]'); const r = ex.getBoundingClientRect(); const cs = getComputedStyle(ex); return { open: ex.open, modal: ex.matches(':modal'), pos: cs.position, btn: getComputedStyle(b).display, top: getComputedStyle(ex.querySelector('.ex-top')).display, w: Math.round(r.width) }; })()`);
 ck('escritorio: el explorador está abierto en línea (no modal), sin botón ni cabecera de hoja', dk.open && !dk.modal && dk.pos === 'static' && dk.btn === 'none' && dk.top === 'none' && dk.w > 900, JSON.stringify(dk));
 await ev(`scrollTo(0, document.getElementById('catalogo').getBoundingClientRect().top + scrollY)`); await sleep(2000);
-const dc = await ev(`(async () => { const ex = document.getElementById('explorer'); for (let i = 0; i < 30 && !ex.querySelector('button.card'); i++) await new Promise(r => setTimeout(r, 200)); return { cards: ex.querySelectorAll('button.card').length, filters: ex.querySelectorAll('.cat-group').length }; })()`);
-ck('escritorio: el catálogo carga en línea con 24 tarjetas y filtros', dc.cards === 24 && dc.filters >= 3, JSON.stringify(dc));
+const dc = await ev(`(async () => { const ex = document.getElementById('explorer'); for (let i = 0; i < 30 && !ex.querySelector('button.card'); i++) await new Promise(r => setTimeout(r, 200)); return { cards: ex.querySelectorAll('button.card').length, filters: ex.querySelectorAll('.cat-group').length, status: ex.querySelector('[data-cat-status]').textContent, more: ex.querySelector('[data-cat-more]').textContent }; })()`);
+ck('escritorio: el catálogo carga en línea con 24 tarjetas (de 41) y filtros', dc.cards === 24 && dc.filters === 3 && /Mostrando 24 de 41 títulos/.test(dc.status) && /Ver 17 más · quedan 17/.test(dc.more), JSON.stringify(dc));
+// Portadas reales: ninguna rota, cada una con la forma de la tarjeta (sin deformar ni empujar la fila) y el texto oculto como nombre.
+const pc = await ev(`(async () => { const ex = document.getElementById('explorer'); ex.querySelector('[data-cat-more]').click(); await new Promise(r => setTimeout(r, 400));
+  const imgs = [...ex.querySelectorAll('.cover--img img')];
+  for (const i of imgs) i.loading = 'eager';
+  await Promise.all(imgs.map(i => i.decode().catch(() => {})));
+  const covers = [...ex.querySelectorAll('button.card .cover')].map(c => c.getBoundingClientRect());
+  const ratio = covers.map(r => +(r.height / r.width).toFixed(2));
+  return { cards: ex.querySelectorAll('button.card').length, imgs: imgs.length, broken: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.src), blank: ex.querySelectorAll('.cover--blank').length, ratios: [...new Set(ratio)], fit: [...new Set(imgs.map(i => getComputedStyle(i).objectFit))], fills: imgs.every(i => { const a = i.getBoundingClientRect(), b = i.parentElement.getBoundingClientRect(); return Math.abs(a.width - b.width) < 1 && Math.abs(a.height - b.height) < 1; }), named: [...ex.querySelectorAll('button.card')].every(c => c.textContent.trim().length > 3), more: ex.querySelector('[data-cat-more]').hidden }; })()`);
+ck('escritorio: las 41 tarjetas (32 con portada real, 9 tipográficas), ninguna imagen rota, todas con la misma forma y la foto llenando la portada (object-fit: cover)', pc.cards === 41 && pc.imgs === 32 && pc.blank === 9 && !pc.broken.length && pc.ratios.length === 1 && JSON.stringify(pc.fit) === '["cover"]' && pc.fills && pc.named && pc.more === true, JSON.stringify(pc));
+{ const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-escritorio.jpg', Buffer.from(shot.result.data, 'base64')); }
 // cambiar de escritorio a móvil sin recargar
 await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
 await sleep(1500);

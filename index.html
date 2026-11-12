@@ -205,11 +205,11 @@
         <h2 id="books-title" class="h2">Catálogo <em>por dónde empezar</em></h2>
         <p>Hojea una colección o pregúntanos por un tema.</p>
       </div>
-      <!-- Capa 1 de Libros: un vistazo (carrusel). Sin JS no se muestra; la muestra completa sigue más abajo. -->
+      <!-- Capa 1 de Libros: un vistazo (carrusel). Sin JS no se muestra; el catálogo completo sigue más abajo. -->
       <div class="rail" data-rail aria-labelledby="rail-title">
         <div class="rail-head">
           <h3 id="rail-title" class="sr-only">Libros por colección</h3>
-          <div class="rail-chips" role="radiogroup" aria-label="Colección" data-rail-chips><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></div>
+          <div class="rail-chips" role="radiogroup" aria-label="Colección" data-rail-chips><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></div>
           <div class="rail-trail">
             <progress class="rail-trail-bar" max="4" value="0" aria-label="Paradas hojeadas" data-rail-trail-bar></progress>
             <p class="rail-trail-text"><span data-rail-trail-text></span> <a class="rail-trail-all" href="#catalogo" data-rail-trail-all hidden>Ver todo el catálogo</a></p>
@@ -279,7 +279,7 @@
       </form>
       </div>
 
-    <!-- Capa 3 de Libros: ver todos y buscar (muestra) -->
+    <!-- Capa 3 de Libros: ver todos y buscar (inventario) -->
     <div id="catalogo" class="cat" data-tone="light" role="region" aria-labelledby="cat-title" data-state="idle">
       <div class="cat-head">
         <h3 id="cat-title" class="layer-title">Explora <em>el catálogo</em></h3>
@@ -363,7 +363,6 @@
             <p class="drawer-author" data-d-author></p>
             <button type="button" class="save save--wide" data-d-save aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-save-label>Guardar en mi lista</span></button>
           </div>
-          <p class="drawer-synopsis" data-d-synopsis hidden></p>
           <dl class="drawer-facts" data-d-facts></dl>
           <div class="drawer-ask">
             <p class="drawer-msg-label">Pásate a verlo</p>
@@ -373,6 +372,10 @@
             <p class="drawer-msg" data-d-msg></p>
             <a class="btn btn--line-ink" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Preguntar si lo tienen</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
             <p class="drawer-note">La librería confirma existencia y precio.</p>
+          </div>
+          <div class="drawer-about" data-d-synopsis-wrap hidden>
+            <h4>Sinopsis</h4>
+            <p class="drawer-synopsis" data-d-synopsis></p>
           </div>
           <div class="drawer-related" data-d-related-wrap>
             <h4>Del mismo género</h4>
