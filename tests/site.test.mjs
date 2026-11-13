@@ -1837,6 +1837,20 @@ test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té y 
   const [prep, prev] = [readFileSync_('scripts/prepare-public.mjs'), readFileSync_('tools/preview-site.mjs')];
   assert.ok(/"carousel3d\.js"/.test(prep) && /"cafe\.js"/.test(prep) && /"assets\/data\/menu\.json"/.test(prep) && /'\/carousel3d\.js', '\/cafe\.js'/.test(prev), 'se publican el motor, la carta y su JSON');
 });
+test('escena de carga (carreta): marca en el HTML, velo con token, sessionStorage y sin timer largo en reducido', async () => {
+  const [boot, carreta, app] = await Promise.all(['assets/js/boot.js', 'carreta.js', 'app.js'].map(f => readFile(here(`./${f}`), 'utf8')));
+  const splash = html.match(/<div id="carreta"[\s\S]*?<\/div>\s*\n\s*<a class="skip"/)?.[0] ?? '';
+  assert.ok(splash.includes('id="carreta"') && /Logo\.webp/.test(splash) && /Logo\.png/.test(splash), 'carreta con Logo.webp / Logo.png');
+  assert.ok(/iti-carreta-visto/.test(boot) && /showCarreta/.test(boot) && /classList\.add\('carreta-on'\)/.test(boot), 'boot: una vez por pestaña');
+  assert.ok(/carretaHash/.test(boot) && /id === 'inicio'/.test(boot), 'enlace profundo (salvo #inicio) salta la escena');
+  assert.ok(/SESSION_KEY = 'iti-carreta-visto'/.test(carreta) && /layer\.remove\(\)/.test(carreta) && /import \{ ms \}/.test(carreta), 'carreta.js quita el velo y usa motion.js');
+  assert.ok(/carreta--reduced/.test(carreta) && /\.carreta--reduced/.test(cssFlat), 'modo reducido: fundido sin hop largo');
+  assert.ok(!/classList\.add\('intro'\)/.test(boot), 'sin la intro anterior de 2 s en boot');
+  assert.ok(/initCarreta/.test(app) && /carretaReady/.test(app), 'app.js arranca la escena sin esperar el catálogo');
+  assert.ok(/var\(--carreta-degradado\)/.test(cssFlat) && /--carreta-degradado:/.test(readFileSync_('tokens.css')), 'degradado turquesa en tokens');
+  assert.ok(!/setTimeout\(\w+,\s*(?:2\d{3}|[3-9]\d{3})/.test(carreta), 'carreta.js no depende de un timer de varios segundos');
+});
+
 test('orden de la página: Inicio → La casa → Catálogo → Eventos y talleres → Novedades (solo con llegadas) → Visita → pie, con los mismos id', () => {
   const at = s => html.indexOf(s);
   const order = ['<section id="inicio"', '<section id="casa"', '<section id="libros"', '<section id="cartelera"', '<section id="novedades"', '<section id="visita"', '<footer class="ftr"'].map(at);

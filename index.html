@@ -52,6 +52,21 @@
     <symbol id="c-tetera" viewBox="0 0 24 24"><path d="M12 5v2M8.5 8.5h7M6.5 13a5.5 5.5 0 0 0 11 0c0-2.5-1.6-4.5-3.5-4.5h-4c-1.9 0-3.5 2-3.5 4.5zM6.6 12.2 3.5 9.5M17.4 11h.6a2.5 2.5 0 0 1 0 5h-1.3M8 20.5h8"/></symbol>
   </svg>
 
+  <!-- Escena de carga (carreta): velo turquesa, un saltito y apertura circular; no retrasa el LCP de #inicio. -->
+  <div id="carreta" class="carreta" hidden inert>
+    <div class="carreta-velo">
+      <div class="carreta-circulos" aria-hidden="true">
+        <span class="carreta-circulo carreta-circulo--a"></span>
+        <span class="carreta-circulo carreta-circulo--b"></span>
+        <span class="carreta-circulo carreta-circulo--c"></span>
+      </div>
+      <picture class="carreta-marca">
+        <source srcset="Logo.webp" type="image/webp">
+        <img src="Logo.png" width="112" height="112" alt="" decoding="async">
+      </picture>
+    </div>
+  </div>
+
   <a class="skip" href="#contenido">Saltar al contenido</a>
 
   <!-- Barra de navegación (MenuHamburguesa): vidrio de 44 px más el área segura. Móvil: marca y ☰. 761–1100 px: además Mi lista y «Cómo llegar». Desde 1101 px: las secciones en lugar del ☰. -->

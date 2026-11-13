@@ -16,10 +16,21 @@
   try { news = localStorage.getItem('iti-news-estado'); } catch (e) { /* almacenamiento bloqueado */ }
   if (news === 's' || news === 'p') r.classList.add('has-news');
   if (news === 'p') r.classList.add('news-hint');
-  if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  r.classList.add('motion');
-  if (!scrollY) {
-    r.classList.add('intro');
-    setTimeout(function () { r.classList.remove('intro'); }, 2000);
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!off && !saveData && !reduce) r.classList.add('motion');
+
+  var CARRETA_KEY = 'iti-carreta-visto';
+  function carretaHash() {
+    var id = (location.hash || '').replace(/^#/, '');
+    if (!id || id === 'inicio' || id === 'contenido') return false;
+    return true;
   }
+  function showCarreta() {
+    if (scrollY) return false;
+    if (carretaHash()) return false;
+    try { if (sessionStorage.getItem(CARRETA_KEY)) return false; } catch (e) { /* almacenamiento bloqueado */ }
+    if (off || saveData) return false;
+    return true;
+  }
+  if (showCarreta()) r.classList.add('carreta-on');
 })();
