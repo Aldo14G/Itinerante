@@ -211,7 +211,7 @@
       "origin": "images/brand/logo-96.webp"
     }
   ],
-  "fonts": "fonts/sources.json (Archivo, de Google Fonts, y Nunito, de Fontsource; licencia OFL incluida)",
+  "fonts": "fonts/sources.json (Inter variable, de Fontsource; licencia OFL incluida)",
   "covers": {
     "dir": "img/portadas/",
     "registry": "data/portadas.json",

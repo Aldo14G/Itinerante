@@ -2,12 +2,13 @@
 // Uso: node tools/qa/controles.mjs URL [DIR]   Sale con código 1 si algo falla. Con DIR guarda capturas: primer cuadro (350 ms), escritorio y móvil.
 // En 320×640, 390×844, 900×800 y 1440×900 comprueba, para cada control visible que no sea un enlace dentro de un párrafo:
 //   · tamaño ≥ 44×44 px (AAA 2.5.5; el mínimo AA de 24 px queda muy por debajo);
-//   · alto de la escala de controles: 44 (--ctl-sm), 48 (--ctl-md) o 56 (--ctl-lg); excepciones con nombre: casillas de la barra, paradas del recorrido,
-//     tarjetas, filas de tema y del menú, campos, el aviso de salto y los botones de icono sobre portadas (44);
-//   · ≥ 8 px hasta el control vecino (las casillas contiguas de la barra y «Guardar» sobre su portada son una sola pieza y se excluyen);
-//   · rótulo a 14 o 16 px.
+//   · alto de la escala del sistema «Itinerante Líquido»: 44 (--alto-sm: en línea y en las barras), 48 (--alto-md: estándar) o 56 (--alto-lg:
+//     acciones principales y filas del menú); excepciones con nombre: casillas de la barra inferior (49, la tab bar de iOS), paradas del recorrido
+//     (disco de 64), tarjetas de libro, opciones de filtro y sugerencias y el resumen de las tarjetas de evento;
+//   · ≥ 8 px hasta el control vecino (las casillas contiguas de la barra inferior y «Guardar» sobre su portada son una sola pieza y se excluyen);
+//   · rótulo a 17 px (Headline: botones de 48 y 56) o 15 px (Subheadline: botones de 44 y chips).
 // Y, como la revisión de MotionSites: sin errores de consola ni peticiones fallidas, sin imágenes rotas, sin desborde horizontal,
-// Nunito y Archivo cargadas, y el primer cuadro ya con el fondo claro del inicio (sin destello oscuro).
+// Inter cargada (respaldo de la letra de Apple: en Linux y Android es la que se pinta) y el primer cuadro ya con el fondo claro del inicio (sin destello oscuro).
 import { spawn } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -41,7 +42,7 @@ await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-m
 
 const SCALE = [44, 48, 56];
 // Piezas con alto propio, cada una con su razón: no son botones de la escala.
-const OWN = '.tabbar a, .tab-menu, .rail-stop, .rail-chip, .card, .topic, .sm-row, .rail-viewport, [data-news-viewport], .cat-bar input, .composer input, .cat-sort select, .explore-open, .cat-opt input, .cat-suggest li, .hdr-brand, .skip, summary, .ftr-mark, .wordmark';
+const OWN = '.tabbar a, .tab-list, .rail-stop, .rail-chip, .card, .rel, .menu-row, .rail-viewport, [data-news-viewport], .cat-opt input, .cat-suggest li, summary';
 const AUDIT = `(() => {
   const SCALE = ${JSON.stringify(SCALE)};
   const sel = 'a[href], button, input:not([type=hidden]), select, summary, [role=radio]';
@@ -56,7 +57,7 @@ const AUDIT = `(() => {
     const e = b.e, own = e.matches(${JSON.stringify(OWN)});
     if (Math.round(b.h) < 44 || Math.round(b.w) < 44) out.small.push(name(e) + ' ' + Math.round(b.w) + '×' + Math.round(b.h));
     if (!own && !SCALE.includes(Math.round(b.h)) && !e.matches('.save')) out.offScale.push(name(e) + ' ' + Math.round(b.h));
-    if (/^(BUTTON|A)$/.test(e.tagName) && !own && !e.matches('.save, .rail-btn, .act--icon') && ![14, 16].includes(Math.round(parseFloat(getComputedStyle(e).fontSize)))) out.font.push(name(e) + ' ' + getComputedStyle(e).fontSize);
+    if (/^(BUTTON|A)$/.test(e.tagName) && !own && !e.matches('.save, .btn--icono, .menu-btn, .ml-remove') && ![15, 17].includes(Math.round(parseFloat(getComputedStyle(e).fontSize)))) out.font.push(name(e) + ' ' + getComputedStyle(e).fontSize);
     let best = Infinity, who = '';
     for (const c of B) {
       if (c === b || c.fixed !== b.fixed || c.e.contains(e) || e.contains(c.e)) continue;
@@ -90,9 +91,14 @@ for (const [w, h, mobile] of SIZES) {
   check(tag, `${r.n} controles: todos ≥ 44×44 px`, !r.small.length, r.small.join(' | '));
   check(tag, 'altos de la escala 44 / 48 / 56 (salvo piezas con alto propio)', !r.offScale.length, r.offScale.join(' | '));
   check(tag, '≥ 8 px entre controles vecinos', !r.tight.length, r.tight.join(' | '));
-  check(tag, 'rótulos a 14 o 16 px', !r.font.length, r.font.join(' | '));
+  check(tag, 'rótulos a 15 o 17 px (Subheadline y Headline)', !r.font.length, r.font.join(' | '));
   check(tag, 'sin desborde horizontal ni imágenes rotas', !r.overflow && !r.broken.length, r.broken.join(' | '));
-  check(tag, 'Nunito y Archivo cargadas', r.fonts.includes('Nunito') && r.fonts.includes('Archivo'), r.fonts.join(', '));
+  // La letra que se pinta de verdad (CDP): en Linux y Android es Inter (la alojada o, si el sistema la trae, la del sistema); nunca Nunito ni Archivo.
+  await send('DOM.enable'); await send('CSS.enable');
+  const doc = (await send('DOM.getDocument')).result.root.nodeId;
+  const painted = [];
+  for (const sel of ['.entry-lede', '.entry-title', '.btn--primario']) { const n = (await send('DOM.querySelector', { nodeId: doc, selector: sel })).result.nodeId; if (n) painted.push(...((await send('CSS.getPlatformFontsForNode', { nodeId: n })).result.fonts || []).map(f => f.familyName)); }
+  check(tag, 'la letra pintada es Inter (sin Nunito ni Archivo)', painted.length && painted.every(f => /^Inter/.test(f)) && !r.fonts.some(f => /Nunito|Archivo/.test(f)), painted.join(', ') + ' | cargadas: ' + r.fonts.join(', '));
 }
 check('consola', 'sin errores de consola ni peticiones fallidas', !problems.length, problems.join(' | '));
 ws.close(); chrome.kill();

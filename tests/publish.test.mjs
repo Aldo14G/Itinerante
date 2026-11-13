@@ -59,11 +59,12 @@ test("la CSP del HTML no abre origenes externos", async () => {
   assert.match(csp, /default-src 'self'/);
 });
 
-test("cabecera de index.html: indexable, tema claro, sin dominio inventado", async () => {
+test("cabecera de index.html: indexable, color de la barra por tema (claro y oscuro), sin dominio inventado", async () => {
   const html = await readFile(join(out, "index.html"), "utf8");
   const head = html.slice(0, html.indexOf("</head>"));
   assert.ok(!/noindex|nofollow/i.test(head), "el sitio debe ser indexable");
-  assert.match(head, /<meta name="theme-color" content="#ffffff">/);
+  assert.match(head, /<meta name="theme-color" content="#ffffff" media="\(prefers-color-scheme: light\)">/);
+  assert.match(head, /<meta name="theme-color" content="#0b1d1b" media="\(prefers-color-scheme: dark\)">/);
   assert.match(head, /<link rel="icon" href="Logo\.png"/);
   assert.match(head, /<title>[^<]+<\/title>/);
   assert.match(head, /<meta name="description" content="[^"]{40,}"/);

@@ -133,15 +133,14 @@ await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`doc
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(1000);
 ck('móvil: el botón cerrar también cierra', (await ev(`!document.getElementById('explorer').open && location.hash === ''`)));
 
-// «Ver todo el catálogo» y hoja «Más»
+// «Ver todo el catálogo» y el menú
 await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`); await sleep(2500); await ev(`scrollBy(0, 1)`); await sleep(500);
 await ev(`document.querySelector('.rail-all').click()`);
 ck('móvil: «Ver todo el catálogo» abre la hoja', await waitFor(`document.getElementById('explorer').open`));
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
 await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800);
-await ev(`document.querySelector('#sheet-menu a[href="#catalogo"]').click()`);
-ck('móvil: «Buscar en el catálogo» de la hoja «Más» la cierra y abre Explorar', await waitFor(`document.getElementById('explorer').open && !document.getElementById('sheet-menu').open`));
-await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
+await ev(`document.querySelector('#menu a[href="#libros"]').click()`);
+ck('móvil: «Catálogo» del menú cierra la hoja y lleva al capítulo (con el buscador a la mano), sin abrir Explorar por su cuenta', await waitFor(`!document.getElementById('menu').open && !document.getElementById('explorer').open && Math.abs(document.getElementById('libros').getBoundingClientRect().top) < 120`));
 ck('móvil: sin errores de consola', !errs.length, errs.join(' | '));
 { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-cerrado.jpg', Buffer.from(shot.result.data, 'base64')); }
 await ev(`scrollTo(0, document.querySelector('[data-ex-open]').getBoundingClientRect().top + scrollY - 300)`); await sleep(1200);

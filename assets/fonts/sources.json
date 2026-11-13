@@ -1,18 +1,12 @@
 {
-  "cssSource": "https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap",
   "fonts": [
     {
-      "file": "archivo-normal-latin.woff2",
-      "source": "https://fonts.gstatic.com/s/archivo/v25/k3kQo8UDI-1M0wlSfdnoLg.woff2",
-      "family": "Archivo",
-      "style": "normal"
-    },
-    {
-      "file": "nunito-normal-latin.woff2",
-      "source": "npm:@fontsource-variable/nunito@5.3.0/files/nunito-latin-wght-normal.woff2",
-      "family": "Nunito",
+      "file": "inter-latin-opsz-normal.woff2",
+      "source": "npm:@fontsource-variable/inter@5.3.0/files/inter-latin-opsz-normal.woff2",
+      "family": "Inter",
       "style": "normal",
-      "license": "OFL-1.1 (assets/fonts/OFL-nunito.txt)"
+      "axes": "opsz 14–32, wght 100–900",
+      "license": "OFL-1.1 (assets/fonts/OFL-inter.txt)"
     }
   ]
 }

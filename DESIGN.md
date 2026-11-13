@@ -1,90 +1,92 @@
 ---
-name: "Itinerante B.4 · Función de la casa"
-description: "Moderno y minimalista en lo digital frente a rústico y clásico en la casa: la paleta es la del logo (turquesa y blanco) y lo rústico vive en las fotos."
+name: "Itinerante B.4 · piel «Itinerante Líquido»"
+description: "Minimalista al modo de Apple, con vidrio solo en lo que flota, los colores del logo (turquesa y blanco) y las fotos reales de la casa; primero el teléfono; tema claro y oscuro automáticos."
 colors:
-  logo-turq: "#7ac4b4"
-  logo-white: "#f8f8f8"
-  night: "#0f2724"
-  night-2: "#143431"
-  stone: "#1b3d39"
-  bone: "#f8f8f8"
-  bone-dim: "#b9d2cd"
-  tungsten: "#7ac4b4"
-  tungsten-hi: "#8fe0d5"
-  turq: "#7ac4b4"
-  turq-ink: "#0c2825"
-  turq-light: "#8fe0d5"
-  terra: "#1d7a70"
-  terra-deep: "#176b62"
-  terra-ink: "#0b3d37"
-  paper: "#ffffff"
-  paper-ink: "#10201e"
-  paper-dim: "#4b5e5b"
-  tone-light-bg: "#ffffff"
-  tone-light-ink: "#10201e"
-  tone-light-accent: "#176b62"
-  tone-mist-bg: "#eef6f4"
-  tone-mist-ink: "#10201e"
-  tone-mist-accent: "#14625a"
-  tone-deep-bg: "#0f2724"
-  tone-deep-ink: "#f8f8f8"
+  turquesa: "#7ac4b4"
+  fondo: { claro: "#ffffff", oscuro: "#0b1d1b" }
+  fondo-2: { claro: "#f4f8f7", oscuro: "#0f2724" }
+  superficie: { claro: "#ffffff", oscuro: "#143431" }
+  tinta: { claro: "#10201e", oscuro: "#f8f8f8" }
+  tinta-2: { claro: "#4b5e5b", oscuro: "#b9d2cd" }
+  primario: { claro: "#176b62", oscuro: "#7ac4b4" }
+  menta: { claro: "#dcf1ec", oscuro: "#1b4a44" }
 typography:
-  wordmark:
-    fontFamily: "Nunito"
-    fontWeight: 900
-    textTransform: "uppercase"
-    fontSize: "ajustado al ancho del contenedor (JS)"
-    lineHeight: 0.8
-  headline:
-    fontFamily: "Nunito"
-    fontWeight: 900
-    fontSize: "clamp(2.25rem, 4vw, 3rem)"
-    lineHeight: 1.1
-    letterSpacing: "-0.01em"
-    emphasis: "em en la misma familia y tamaño, peso 800, color de acento del tono"
-  layer:
-    fontFamily: "Nunito"
-    fontWeight: 900
-    fontSize: "1.75rem"
-    lineHeight: 1.1
-  control:
-    fontFamily: "Nunito"
-    fontWeight: 800
-    fontSize: "1rem (botones) · 0.875rem (chips, pestañas, rótulos) · 0.75rem (insignias)"
-  body:
-    fontFamily: "Archivo"
-    fontWeight: 480
-    fontStretch: "100%"
-    fontSize: "1rem"
-    lineHeight: 1.5
-  cover:
-    fontFamily: "Archivo"
-    fontWeight: 780
-    fontStretch: "70%"
-    textTransform: "uppercase"
-    use: "solo las portadas tipográficas de los libros"
+  family: "-apple-system, BlinkMacSystemFont, SF Pro Text / Display, Inter (alojada, OFL), system-ui"
+  scale: "Apple HIG en px CSS: 34/41, 28/34, 22/28, 20/25, 17/22, 16/21, 15/20, 13/18, 12/16; display 56 en escritorio"
 rounded:
-  logo: "8px"
-  cover: "12px"
-  control: "16px"
-  photo: "16px"
-  card: "20px"
-  pill: "999px (insignias y barras de progreso)"
+  sm: "12px"
+  md: "20px"
+  lg: "28px"
+  pill: "9999px"
+  cover: "6px"
+controls:
+  sm: "44px (en línea y barras)"
+  md: "48px (estándar)"
+  lg: "56px (principal)"
 spacing:
-  gutter: "clamp(16px, 3.2vw, 48px)"
-  section: "clamp(96px, 14vh, 190px)"
-  header: "68px (60px en móvil)"
+  grid: "4px"
+  margin: "16 / 20 (≥ 390) / 32 (≥ 1024)"
+  section: "48 móvil · 64 escritorio"
 motion:
-  ease-out: "cubic-bezier(0.16, 1, 0.3, 1)"
-  ease-io: "cubic-bezier(0.65, 0, 0.35, 1)"
-  scroll-damping: "exponencial, k 7–9"
+  durations: "120 · 240 · 400 · 700 ms; escalón 60 ms"
+  curva-salida: "cubic-bezier(0.16, 1, 0.3, 1)"
+  curva-resorte: "linear(0, 0.42 8%, 0.86 16%, 1.04 26%, 1.05 32%, 0.99 46%, 1.002 62%, 1)"
 ---
 
 # Itinerante B.4 · Función de la casa
 
-> **Estado: sistema vigente del sitio publicado en la raíz** (`index.html`), promovido desde el prototipo B.4 el 2026-11-01. Este archivo y `design/tokens.json` son la fuente de verdad visual. Los valores salen de `design/tokens.json` → `tokens.css` (generado con `npm run tokens`). El canon anterior (Claude Design/Higgsfield) vive en `design-system/libreria-itinerante-y-mas/MASTER.md` solo como referencia histórica. El sitio todavía no está desplegado.
+> **Estado: sistema vigente del sitio publicado en la raíz** (`index.html`), promovido desde el prototipo B.4 el 2026-11-01; **desde el 2026-11-13 su piel es «Itinerante Líquido»** (sección siguiente, que manda sobre todo lo demás de este archivo: lo que la contradiga más abajo es historia). Este archivo y `design/tokens.json` son la fuente de verdad visual. Los valores salen de `design/tokens.json` → `tokens.css` (generado con `npm run tokens`). El canon anterior (Claude Design/Higgsfield) vive en `design-system/libreria-itinerante-y-mas/MASTER.md` solo como referencia histórica. El sitio todavía no está desplegado.
 
-## Sistema táctil (vigente desde 2026-11-11; manda sobre lo que lo contradiga más abajo)
+## Itinerante Líquido (vigente desde 2026-11-13; manda sobre todo lo que sigue)
+
+Decisión de Aldo (2026-11-12): el sitio adopta el sistema **«Itinerante Líquido»** hecho en Claude Design (artefacto de Claude Design aprobado; su `README.md`, `motion.md`, `tokens.json` y las guías de cada componente son la norma visual). Minimalista, al modo de Apple, con superficies de vidrio («líquido») solo en lo que flota, los colores del logo y las fotos reales de la casa. **Primero el teléfono.** Sustituye al «Sistema táctil» (canto, Nunito, código de «elegido» menta con borde turquesa), que queda abajo solo como historia.
+
+### Tokens (design/tokens.json → tokens.css)
+
+- **Dos temas, mismos nombres**: claro en `:root` y oscuro con `@media (prefers-color-scheme: dark)`; sin selector manual ni tonos por sección (`data-tone` se retiró). `color-scheme: light dark` y `theme-color` por tema.
+- **Color**: `fondo` (página), `fondo-2` (bandas y listas agrupadas), `fondo-3` (campos, chips en reposo, deshabilitado), `superficie` (tarjetas y respaldo opaco del vidrio); `tinta` y `tinta-2` (texto, ≥ 4.5:1 en todo fondo y sobre el peor vidrio); `linea` (filete decorativo) y `linea-fuerte` (borde de control, ≥ 3:1); `turquesa` (#7ac4b4, el del logo: campo de color, nunca texto en claro), `turquesa-texto` (enlaces, rótulos), `primario`/`en-primario`/`primario-presionado` (la acción primaria), `menta`/`en-menta` (secundaria «tinted», pastilla activa), `vidrio`/`vidrio-hoja`/`vidrio-luz`, `velo`, `foco`, `abierto` y `cerrado` (solo el punto; la palabra va al lado). Desviación medida: `abierto` oscuro es #4aa47f (el #3fa877 del sistema con el croma bajado a 0.104 para no pasar el tope de acentos del sitio; 5.7:1 sobre `fondo`).
+- **Letra**: la del sistema de Apple con Inter de respaldo — `--font-texto: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif` y `--font-display` con «SF Pro Display». **Inter variable** (ejes de tamaño óptico y peso, subconjunto latino, OFL) se aloja en `assets/fonts/` (origen y licencia en `sources.json` y `OFL-inter.txt`) y se precarga; en iPhone, iPad y Mac no se pinta. Nunito y Archivo se retiraron (las portadas tipográficas usan la letra del sitio).
+- **Escala de Apple HIG** (px CSS = pt), como token `font` completo (`font: var(--t-cuerpo)`) más su interletra (`--ls-*`): `titulo-grande` 34/41 bold (el h1), `titulo-1` 28/34 (encabezado de sección; crece con `clamp(28px, 1.25vw + 18px, 40px)` desde 761 px), `titulo-2` 22/28, `titulo-3` 20/25, `display` 56 (tope del h1 en escritorio), `titular` y `cuerpo` 17/22, `llamada` 16/21, `subtitulo` 15/20 (mínimo de lectura), `nota-pie`/`rotulo` 13/18, `leyenda-1` 12/16, `leyenda-2` 11/13 (no se usa en el sitio: el mínimo real es 12); controles `boton` 17, `boton-chico` 15, `chip` 15 medium, `pestana` 12 semibold, `campo` 17 (nunca < 16). A lo sumo seis tamaños por pantalla.
+- **Espacio y forma**: escala de 4 px (`space-1` … `space-24`); márgenes `margen-movil` 16 (hasta 389 px), `margen-movil-amplio` 20 (desde 390) y `margen-escritorio` 32 (desde 1024; el contenido se queda en 1376 px); 48 px entre secciones en móvil y 64 en escritorio (`--sec`). Radios `radio-sm` 12, `radio-md` 20, `radio-lg` 28, `radio-pildora` y `radio-portada` 6 (un libro es casi recto).
+- **Sombras solo para lo que flota**: `sombra-flotante` (barras, botones de vidrio), `sombra-hoja` (menú, ficha, Mi lista), `sombra-portada`; `luz-vidrio` es el borde de luz del vidrio; `anillo-foco` (2 px de fondo y 2 de foco) es el foco de todo control. Nada apoyado en la página lleva sombra.
+- **Controles y barras**: `alto-sm` 44 (solo controles secundarios en línea y los de las barras), `alto-md` 48 (estándar: todo botón, chip, botón de icono y campo), `alto-lg` 56 (acciones principales, pie de las hojas y filas del menú); `separacion-tactil` 8 px entre vecinos (12 dentro de un grupo); `alto-barra-nav` 44 y `alto-barra-inferior` 49, más el área segura.
+- **Movimiento**: `dur-instantanea` 120, `dur-rapida` 240, `dur-base` 400, `dur-lenta` 700 y `escalon-linea` 60 ms; `curva-salida`, `curva-entrada-salida` y `curva-resorte`. Temporizadores de JavaScript aparte (`espera-larga`, `intencion-*`, `escalon-letra`); `motion.js` los lee (los nombres cortos de antes, `DUR('fast')`, siguen sirviendo).
+
+### Vidrio
+
+Superficie translúcida (`vidrio` o `vidrio-hoja`) con `filtro-vidrio`/`filtro-vidrio-hoja`, `luz-vidrio` y, si flota, `sombra-flotante`. **Solo** en lo que flota: barra de navegación, barra inferior, ☰/× del menú, hojas (menú, ficha, Mi lista), aviso, «Guardar» sobre una portada y botones de cerrar. Nunca en bandas, tarjetas, campos ni listas; nunca vidrio sobre vidrio; sobre vidrio el texto es `tinta` o `tinta-2`. **Respaldo obligatorio** (una sola lista de piezas en `style.css`): sin `backdrop-filter`, con `prefers-reduced-transparency: reduce`, con `prefers-contrast: more` (más borde de 2 px `linea-fuerte`) y en gama media (`data-glass="lite"`, `boot.js`) el vidrio es `superficie` opaca. Los alfas están calculados para el peor fondo (negro en claro, blanco en oscuro); `tests/site.test.mjs` lo comprueba con los tokens.
+
+### Componentes
+
+- **Botón** (`.btn` + `--primario` | `--secundario` | `--plano` | `--vidrio`, `--icono`, `--sm` 44, `--lg` 56; por omisión 48): píldora, rótulo Headline; al presionar escala 0.97 y vuelve con el resorte; foco `anillo-foco`; alternado (`aria-pressed`) = primario con el icono relleno. **Un solo primario por vista**: «Cómo llegar» en la página, la barra y el menú; «Preguntar por WhatsApp» en la ficha. WhatsApp fuera de la ficha es secundario o plano y nunca mayor que la primaria a la vista (la «Cómo llegar» de la barra mide 48).
+- **Chip** (temas, filtros, `cat-chip`): 48 px en `fondo-3`; elegido = `primario` con la palomita (la forma acompaña al color). La parada del recorrido y la colección activa comparten ese código.
+- **Campo de búsqueda**: píldora de 48 en `fondo-3`, letra de 17; con foco, `fondo` con borde `linea-fuerte` y anillo.
+- **Barra de navegación (MenuHamburguesa)**: `.hdr` pegada arriba, vidrio de 44 px más el área segura (64 desde 761 px); en el teléfono, marca (logo de 40 px con `radio-sm`) y ☰ de 44; de 761 a 1100 px, además Mi lista y «Cómo llegar»; desde 1101 px las secciones (pastilla menta en la actual) en lugar del ☰. Al desplazar flota (luz y sombra).
+- **Menú ☰** (`dialog#menu`): diálogo modal transparente a pantalla completa; su primera fila repite la barra con el × exactamente sobre el ☰ (las líneas se cruzan) y debajo la hoja de vidrio (8 px de margen; panel de 380 px desde 761) con Inicio, Catálogo, Eventos y talleres, Novedades, La casa, Visita y Mi lista en filas de 56 (Title 2, chevrón, la actual en menta), el estado de hoy y el horario, «Cómo llegar» (primario 56), WhatsApp (secundario de icono 56) e Instagram y Facebook. Detrás, el velo. Entra con escala 0.98 desde la esquina y las filas en cascada (30 ms); sin movimiento, se funde. `aria-expanded`, nombre «Abrir menú»/«Cerrar menú», foco a la primera sección, Tab atrapado (showModal), Escape, el velo y «atrás» cierran; elegir una sección lleva el foco a su titular.
+- **Barra inferior (BarraInferior)**: solo ≤ 760 px; cápsula de vidrio de 49 × 228 px, centrada 8 px sobre el área segura, con Inicio, Catálogo y Mi lista (botón que abre la hoja, con el conteo en un disco y en texto). La pastilla menta se desliza (resorte, solo CSS con `:has()`) a la casilla con `aria-current`; la actual rellena su icono al 18 % y engrosa el trazo. Fuera de Inicio y Catálogo no hay pastilla. Con una hoja abierta baja y se oculta. El final de la página deja libre su alto más el área segura.
+- **Hojas (FichaLibro)**: ficha, Mi lista y Explorar. En el teléfono la ficha y Mi lista suben desde abajo (hasta 48 px del borde, `radio-lg` arriba, asa) y en escritorio son diálogos centrados (680 y 520 px); Explorar es una hoja opaca a pantalla completa en el teléfono (lista larga) y queda en línea en escritorio. **Acciones fijas al pie**: ficha = «Preguntar por WhatsApp» (primario 56), Guardar (botón de icono 56, su rótulo es el nombre accesible) y «Cómo llegar» (secundario 56), con la nota «La librería confirma si lo tienen.» (el precio sale de la hoja de la librería); Mi lista = «Cómo llegar» y «Enviar mi lista por WhatsApp». Cerrar es un botón de vidrio de 48. Sinopsis y precio se conservan.
+- **Encabezado de sección (EncabezadoSeccion)**: `.sec-head` con rótulo (`rotulo`, `turquesa-texto`, minúsculas de oración), titular `.h2` (Title 1; su `em` va en su renglón en `tinta-2`) y entradilla (`cuerpo`, `tinta-2`, 60 caracteres).
+- **Tarjeta de evento**: `superficie` con `radio-md` sobre la banda `fondo-2`; foto 4:3 arriba, insignias de tipo (menta) y estado (callada) debajo, título Title 3, frase, descripción y acciones («Me interesa», Compartir de icono, «Preguntar por WhatsApp» en texto). Rejilla en escritorio y carrusel con imán y puntos en el teléfono; todas abiertas.
+
+### Páginas y secciones
+
+Orden: **Inicio** (h1 «Librería Itinerante y Más» en Large Title, estado de hoy con su punto, entradilla, «Cómo llegar» primario de 56 y, en escritorio, la consulta por WhatsApp; dirección; la foto real de la sala con `radio-lg`, sin texto encima: vertical en el teléfono, sala central en escritorio, dos columnas desde 1024) → **La casa** (`fondo-2`; tira de seis fotos que se pasa con el dedo) → **Catálogo** (`fondo`; su interior es del agente de catálogo) → **Eventos y talleres** (`fondo-2`) → **Novedades** (`fondo`) → **cita** y **llamado** (`fondo-2`) → **Visita** (`fondo`; dirección, estado, acciones de 56 y el horario como lista agrupada con «Hoy») → **pie** (`fondo-2`; redes y correo en botones de 44, «Pausar el movimiento»). Bandas vecinas siempre de fondo distinto. Se retiraron el manifiesto suelto (su frase es la entradilla de La casa), la marquesina, la cortinilla ajedrezada, la barra de progreso, el rótulo gigante «ITINERANTE» del inicio y del pie, la tira fijada de La casa y el escenario de fotos de Eventos.
+
+### Movimiento
+
+Los titulares de sección entran **por línea** (las líneas reales, medidas en pantalla, suben desde su máscara con `dur-lenta`, `curva-salida` y 60 ms de escalón; rótulo y entradilla se funden 8 px), las imágenes se **revelan** (recorte del 6 % y escala 1.06 → 1, la escala dura 1.6 × `dur-lenta`), los controles responden al toque (0.97 botones, 0.96 chips, 0.94 casillas). `app.js` prepara solo lo que aún no se ve, en reposo, y una sola vez; si cambia el ancho, los titulares vuelven a su texto. Con «reducir movimiento» (o la pausa del pie) no hay desplazamientos, escalas ni rebotes: todo aparece colocado y los colores siguen respondiendo.
+
+### Accesibilidad
+
+Texto ≥ 4.5:1 y bordes, iconos y foco ≥ 3:1 en ambos temas, también sobre el peor vidrio (prueba con tokens en `tests/site.test.mjs`; `tools/qa/contrast.mjs` barre la página en claro y oscuro). Objetivos de 48 × 48 con 8 px de separación; 44 solo en línea y en las barras; nada se desborda a 320 px. Estados con palabra o forma además del color (palomita del chip, icono relleno de la casilla, punto hueco de «Cerrado»).
+
+### Velo e INP (medido)
+
+El velo (`::backdrop` con `--velo`, solo opacidad, sin desenfoque) va detrás del menú, la ficha y Mi lista. Medido con `tools/qa/inp.mjs` a CPU 4× (390 × 844): ver la tabla de la entrega del 2026-11-13 en `docs/agentes/00-contexto-compartido.md`; si alguna apertura o cierre pasara de 200 ms por el velo, se quita el velo y la hoja conserva su sombra.
+
+## Sistema táctil (histórico: vigente del 2026-11-11 al 2026-11-12; lo sustituye «Itinerante Líquido»)
+
+> Se conserva como historia. Su canto, Nunito, el código de «elegido» menta con borde turquesa, la barra inferior de cinco casillas y la hoja «Más» se retiraron el 2026-11-13.
 
 Decisión de Aldo: los componentes deben sentirse como los de una app de aprendizaje bien hecha (piezas que se hunden al tocarlas, estados inequívocos, tipografía redonda), con **nuestra identidad**: paleta turquesa, blanco y menta del logo y fotos reales de la casa. No se copian colores, mascota, ilustraciones ni iconos de ninguna app. El sitio solo tiene que resolver cinco cosas: **menú, secciones, catálogo, eventos y talleres, novedades**.
 

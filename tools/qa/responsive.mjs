@@ -1,7 +1,7 @@
-// Barrido responsive: en cada ancho y orientación comprueba que no haya desborde horizontal, texto cortado, pie encimado ni rótulo recortado,
+// Barrido responsive: en cada ancho y orientación comprueba que no haya desborde horizontal, texto cortado ni pie encimado,
 // y que «Cómo llegar» y el párrafo del inicio queden dentro de la primera vista (bajo la cabecera y sobre la barra inferior).
 // Informa además el cromo fijo (cabecera + barra) como porcentaje del alto. Uso: node tools/qa/responsive.mjs URL
-// Falla (salida 1) con cualquiera de las cinco comprobaciones o con errores de consola. Corre con «reducir movimiento» (como el resto del arnés).
+// Falla (salida 1) con cualquiera de las comprobaciones o con errores de consola. Corre con «reducir movimiento» (como el resto del arnés).
 import { spawn } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
@@ -38,22 +38,22 @@ const FIRST = `(() => {
   const vis = e => e && e.getClientRects().length;
   const hdr = document.querySelector('.hdr').getBoundingClientRect();
   const bar = document.querySelector('.tabbar'); const barTop = vis(bar) ? bar.getBoundingClientRect().top : innerHeight;
-  const cta = document.querySelector('.entry-actions .btn--tungsten').getBoundingClientRect();
+  const cta = document.querySelector('.entry-actions .btn--primario').getBoundingClientRect();
   const lede = document.querySelector('.entry-lede').getBoundingClientRect();
   const top = Math.max(0, hdr.bottom) - 2;
   return { cta: [Math.round(cta.top), Math.round(cta.bottom)], ctaOk: cta.top >= top && cta.bottom <= barTop, ledeOk: lede.top >= top && lede.bottom <= barTop,
-    cromo: +(((getComputedStyle(document.querySelector('.hdr')).position === 'fixed' ? hdr.height : 0) + (innerHeight - barTop)) / innerHeight * 100).toFixed(1) };
+    cromo: +((((['fixed', 'sticky'].includes(getComputedStyle(document.querySelector('.hdr')).position)) ? hdr.height : 0) + (innerHeight - barTop)) / innerHeight * 100).toFixed(1) };
 })()`;
 const WALK = `(async () => { const h = innerHeight, H = document.documentElement.scrollHeight; for (let y = 0; y < H; y += h * 0.8) { scrollTo(0, y); await new Promise(r => setTimeout(r, 70)); } await new Promise(r => setTimeout(r, 400)); })()`;
 const PAGE = `(() => {
   const de = document.documentElement; const vis = e => e && e.getClientRects().length;
   const name = e => (typeof e.className === 'string' && e.className.trim() ? e.tagName.toLowerCase() + '.' + e.className.trim().split(/\\s+/)[0] : e.tagName.toLowerCase());
   // Los carruseles se desplazan en horizontal a propósito: lo que vive dentro de ellos no cuenta como desborde.
-  const SCROLLERS = '.house-track, .rail-viewport, .rail-chips, .bill-track, .marquee, .cat-suggest';
+  const SCROLLERS = '.house-track, .rail-viewport, .rail-chips, .bill-track, .cat-suggest';
   const wide = [...document.querySelectorAll('main *, .ftr *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > innerWidth + 1 && !e.closest(SCROLLERS) && getComputedStyle(e).position !== 'fixed'; }).slice(0, 3).map(name);
-  const mark = document.querySelector('.ftr-mark'); const idr = document.querySelector('.ftr-id').getBoundingClientRect(); const lk = document.querySelector('.ftr-links').getBoundingClientRect();
-  const cut = [...document.querySelectorAll('h1, h2, h3, .btn, .topic, .rail-chip-name, .rail-trail-text, .badge, .act, .hdr-brand, .status')].filter(e => vis(e) && !e.matches('.sr-only') && !e.closest('dialog:not([open]), [hidden], [data-wordmark], .ftr-mark') && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').slice(0, 3).map(e => name(e) + ' «' + e.textContent.trim().slice(0, 16) + '»');
-  return { pantallas: +(de.scrollHeight / innerHeight).toFixed(1), desborde: de.scrollWidth > innerWidth, wide, rotulo: mark.scrollWidth <= mark.clientWidth + 2,
+  const idr = document.querySelector('.ftr-id').getBoundingClientRect(); const lk = document.querySelector('.ftr-links').getBoundingClientRect();
+  const cut = [...document.querySelectorAll('h1, h2, h3, .btn, .topic, .rail-chip-name, .rail-trail-text, .badge, .act, .hdr-brand, .tab-lb, .menu-row')].filter(e => vis(e) && !e.matches('.sr-only') && !e.closest('dialog:not([open]), [hidden]') && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').slice(0, 3).map(e => name(e) + ' «' + e.textContent.trim().slice(0, 16) + '»');
+  return { pantallas: +(de.scrollHeight / innerHeight).toFixed(1), desborde: de.scrollWidth > innerWidth, wide,
     pie: !(idr.bottom <= lk.top + 1 || idr.right <= lk.left + 1 || lk.bottom <= idr.top + 1 || lk.right <= idr.left + 1), cut, contenido: Math.round(document.querySelector('.books-head').getBoundingClientRect().width) };
 })()`;
 
@@ -74,7 +74,6 @@ for (const [w, h] of SIZES) {
   if (p.wide.length) bad.push('se sale del ancho: ' + p.wide.join(', '));
   if (p.cut.length) bad.push('texto cortado: ' + p.cut.join(', '));
   if (p.pie) bad.push('pie encimado (dirección sobre enlaces)');
-  if (!p.rotulo) bad.push('rótulo «ITINERANTE» recortado');
   if (!f.ctaOk) bad.push(`«Cómo llegar» fuera de la primera vista (y ${f.cta.join('–')})`);
   if (!f.ledeOk) bad.push('párrafo del inicio fuera de la primera vista');
   if (bad.length) fails.push(`${tag} → ${bad.join('; ')}`);

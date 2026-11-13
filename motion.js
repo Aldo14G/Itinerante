@@ -1,6 +1,11 @@
-// Duraciones y curvas del movimiento hechas en JS, leídas de los tokens CSS (design/tokens.json):
+// Duraciones y curvas del movimiento hechas en JS, leídas de los tokens CSS (design/tokens.json, sistema «Itinerante Líquido»):
 // una sola fuente de verdad para CSS y WAAPI. Los valores de respaldo solo se usan si falta el CSS.
-const FALLBACK = { 'dur-instant': 120, 'dur-fast': 240, 'dur-base': 400, 'dur-slow': 700, 'dur-scene': 1200, 'stagger-char': 24, 'stagger-line': 60, 'intent-topic': 250, 'intent-disclosure': 320 };
+// Los nombres cortos de siempre (instant, fast, base, slow, scene; stagger-*, intent-*) siguen sirviendo: se traducen a los tokens nuevos.
+const ALIAS = {
+  'dur-instant': 'dur-instantanea', 'dur-fast': 'dur-rapida', 'dur-slow': 'dur-lenta', 'dur-scene': 'espera-larga',
+  'stagger-char': 'escalon-letra', 'stagger-line': 'escalon-linea', 'intent-topic': 'intencion-tema', 'intent-disclosure': 'intencion-despliegue'
+};
+const FALLBACK = { 'dur-instantanea': 120, 'dur-rapida': 240, 'dur-base': 400, 'dur-lenta': 700, 'espera-larga': 1200, 'escalon-letra': 24, 'escalon-linea': 60, 'intencion-tema': 250, 'intencion-despliegue': 320 };
 
 const cache = new Map();
 // Los tokens no cambian durante la sesión: se lee el estilo calculado una sola vez por nombre.
@@ -10,15 +15,16 @@ const token = name => {
   return cache.get(name);
 };
 
-/** Milisegundos de un token (--dur-*, --stagger-*, --intent-*). */
+/** Milisegundos de un token (--dur-*, --escalon-*, --intencion-*, --espera-larga; o su nombre corto de antes). */
 export function ms(name) {
-  const value = parseFloat(token(name));
-  return Number.isFinite(value) ? value : FALLBACK[name] ?? 0;
+  const real = ALIAS[name] ?? name;
+  const value = parseFloat(token(real));
+  return Number.isFinite(value) ? value : FALLBACK[real] ?? 0;
 }
 
 export const DUR = name => ms(`dur-${name}`);
-export const EASE = () => token('ease-out') || 'cubic-bezier(0.16, 1, 0.3, 1)';
-export const EASE_IO = () => token('ease-io') || 'cubic-bezier(0.65, 0, 0.35, 1)';
+export const EASE = () => token('curva-salida') || 'cubic-bezier(0.16, 1, 0.3, 1)';
+export const EASE_IO = () => token('curva-entrada-salida') || 'cubic-bezier(0.65, 0, 0.35, 1)';
 
 /**
  * Confirmar primero, trabajar después: corre `fn` cuando el navegador ya pintó el fotograma que sigue al clic.

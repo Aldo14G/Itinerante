@@ -19,7 +19,6 @@ export const ROOT_FILES = [
   "app.js",
   "catalog.js",
   "motion.js",
-  "scenes-desktop.js",
   "rail.js",
   "feed.js",
   "news.js",

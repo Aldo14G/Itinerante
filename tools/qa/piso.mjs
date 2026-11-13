@@ -21,8 +21,8 @@ const send = (method, params = {}) => new Promise(r => { const i = ++id; pend.se
 const ev = async x => { const r = await send('Runtime.evaluate', { expression: x, awaitPromise: true, returnByValue: true }); if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description || 'la página lanzó al evaluar'); return r.result?.result?.value; };
 await send('Page.enable'); await send('Runtime.enable');
 
-// El cartón de título «Itinerante» (inicio y pie) y la marquesina del llamado son el mundo comprometido (DESIGN.md): quedan fuera del tope de 6rem.
-const WORLD = '[data-wordmark], .marquee, [data-footmark]';
+// Ya no hay rótulo gigante ni marquesina (sistema «Itinerante Líquido»): ningún texto queda fuera del tope de 6rem.
+const WORLD = ':not(*)';
 const AUDIT = `(() => {
   const vis = el => { const c = getComputedStyle(el); const r = el.getBoundingClientRect(); return c.display !== 'none' && c.visibility !== 'hidden' && r.width > 0 && r.height > 0 && !el.closest('dialog:not([open]), [hidden], [inert]'); };
   const sel = el => (el.id ? '#' + el.id : typeof el.className === 'string' && el.className.trim() ? el.tagName.toLowerCase() + '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : el.tagName.toLowerCase());

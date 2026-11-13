@@ -1,4 +1,5 @@
-// Ficha móvil y sin JavaScript (navegacion-desplegables, ronda 2: CR-15, CR-18, QA1-03).
+// Ficha móvil (FichaLibro del sistema «Itinerante Líquido») y sin JavaScript (QA1-03).
+// La ficha es una hoja inferior con las acciones fijas al pie: «Preguntar por WhatsApp» (primaria de la ficha), Guardar y «Cómo llegar».
 // Uso: node tools/qa/ficha.mjs URL [DIR]   (necesita Chrome; DIR recibe capturas). Sale con 1 si algo falla.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
@@ -30,7 +31,7 @@ await send('Page.enable'); await send('Runtime.enable');
 const out = [];
 const ck = (n, ok, d = '') => out.push([ok ? '✓' : '✗', n, ok ? '' : d]);
 
-// CR-15: con un clic real en la tarjeta 2 del carrusel, el borde inferior de «Cómo llegar» queda dentro de la ventana y la hoja no se desplaza.
+// Con un clic real en la tarjeta 2 del carrusel: las acciones del pie quedan dentro de la ventana (sobre el área segura) y la hoja no se desplaza.
 for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
   await send('Page.navigate', { url: URL_ }); await sleep(1500);
@@ -42,12 +43,14 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   await click(...p); await sleep(1800);
   const m = await ev(`(() => {
     const d = document.querySelector('#cat-drawer'); const r = d.querySelector('[data-d-visit]').getBoundingClientRect(); const sc = d.querySelector('[data-d-scroll]');
+    const cta = d.querySelector('[data-d-cta]').getBoundingClientRect(); const save = d.querySelector('[data-d-save]').getBoundingClientRect(); const foot = d.querySelector('.drawer-foot').getBoundingClientRect();
     const note = d.querySelector('.drawer-note');
-    return { open: d.open, bottom: Math.round(r.bottom), scroll: sc.scrollTop, hover: document.documentElement.scrollWidth > innerWidth || sc.scrollWidth > sc.clientWidth,
+    return { open: d.open, bottom: Math.round(r.bottom), cta: [Math.round(cta.top), Math.round(cta.height)], save: [Math.round(save.width), Math.round(save.height)], inFoot: cta.top >= foot.top && r.bottom <= foot.bottom,
+      primary: d.querySelector('[data-d-cta]').classList.contains('btn--primario'), scroll: sc.scrollTop, hover: document.documentElement.scrollWidth > innerWidth || sc.scrollWidth > sc.clientWidth,
       note: note.textContent.trim(), seal: !!d.querySelector('.drawer-seal, .drawer-tag, .tag'), focus: document.activeElement.getAttribute('aria-label') };
   })()`);
-  ck(`${w}x${h}: «Cómo llegar» dentro del primer pliegue (borde ${m.bottom} <= ${h - 8}), hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.scroll === 0 && !m.hover, JSON.stringify(m));
-  ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma y el foco inicial va en Cerrar`, !m.seal && m.note === 'La librería confirma existencia y precio.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
+  ck(`${w}x${h}: acciones fijas al pie dentro de la ventana («Cómo llegar» ${m.bottom} <= ${h - 8}); WhatsApp primaria de 56, Guardar de 56 × 56; hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.inFoot && m.primary && m.cta[1] === 56 && m.save.join() === '56,56' && m.scroll === 0 && !m.hover, JSON.stringify(m));
+  ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma la existencia y el foco inicial va en Cerrar`, !m.seal && m.note === 'La librería confirma si lo tienen.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
   // Inventario real: la portada real carga, la ficha técnica trae el precio de la hoja y la sinopsis (con su encabezado) va bajo ella.
   const dd = await ev(`(async () => {
     const d = document.querySelector('#cat-drawer'); const id = d.dataset.book;
@@ -59,16 +62,16 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
     const ink = getComputedStyle(syn).color, bg = getComputedStyle(d).backgroundColor;
     return { id, img: !!img && img.complete && img.naturalWidth > 0, alt: img?.getAttribute('alt'), price: facts.Precio, want: b.pr ? '$' + b.pr + ' MXN' : null, editorial: facts.Editorial === b.p,
       synShown: !wrap.hidden && wrap.getBoundingClientRect().height > 0, synSame: syn.textContent === b.s, head: wrap.querySelector('h4')?.textContent,
-      order: pos('[data-d-visit]') < pos('[data-d-facts]') && pos('[data-d-facts]') < pos('[data-d-synopsis-wrap]'), ink, bg, noYear: !('Año' in facts) && !('Formato' in facts) && !('Páginas' in facts) };
+      order: pos('[data-d-facts]') < pos('[data-d-synopsis-wrap]') && d.querySelector('.drawer-foot').contains(d.querySelector('[data-d-visit]')), ink, bg, noYear: !('Año' in facts) && !('Formato' in facts) && !('Páginas' in facts) };
   })()`);
-  ck(`${w}x${h}: portada real cargada (sin alt), precio de la hoja («${dd.price}»), sinopsis completa con su encabezado bajo la ficha técnica, con la tinta de la hoja; sin renglones vacíos (año, formato, páginas)`, dd.img && dd.alt === '' && dd.price === dd.want && /^\$\d[\d,]* MXN$/.test(dd.price) && dd.editorial && dd.synShown && dd.synSame && dd.head === 'Sinopsis' && dd.order && dd.ink !== dd.bg && dd.noYear, JSON.stringify(dd));
+  ck(`${w}x${h}: portada real cargada (sin alt), precio de la hoja («${dd.price}»), sinopsis completa con su encabezado bajo la ficha técnica (las acciones, al pie), con la tinta de la hoja; sin renglones vacíos (año, formato, páginas)`, dd.img && dd.alt === '' && dd.price === dd.want && /^\$\d[\d,]* MXN$/.test(dd.price) && dd.editorial && dd.synShown && dd.synSame && dd.head === 'Sinopsis' && dd.order && dd.ink !== dd.bg && dd.noYear, JSON.stringify(dd));
   await shot(`ficha-m${w}x${h}.png`);
   await press('Escape', 'Escape', 27); await sleep(900);
   ck(`${w}x${h}: Escape cierra y libera el scroll`, await ev(`!document.querySelector('#cat-drawer').open && !document.documentElement.classList.contains('sheet-open')`));
 }
 
 // Títulos largos del inventario (hasta 94 caracteres, «descubrimiento» de 14 letras): ninguna palabra partida, subtítulo en su renglón
-// y «Cómo llegar» todavía en el primer pliegue, en el teléfono más angosto y en el más bajo.
+// y las acciones del pie a la vista, en el teléfono más angosto y en el más bajo.
 for (const [w, h] of [[320, 640], [375, 667]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
   await send('Page.navigate', { url: URL_ }); await sleep(4000);
@@ -87,18 +90,18 @@ for (const [w, h] of [[320, 640], [375, 667]]) {
       return { text, split: words, sub: sub ? getComputedStyle(sub).display : null, long: h3.classList.contains('is-long'), size: getComputedStyle(h3).fontSize, visit: Math.round(d.querySelector('[data-d-visit]').getBoundingClientRect().bottom), scroll: d.querySelector('[data-d-scroll]').scrollTop };
     })()`);
     const full = await ev(`fetch('assets/data/catalog.json').then(r => r.json()).then(j => j.books.find(b => b.id === '${id}').t)`);
-    ck(`${w}x${h} «${full.slice(0, 32)}…»: ninguna palabra partida, el encabezado es el título completo${full.includes(': ') ? ' (subtítulo en su renglón)' : ''} y «Cómo llegar» dentro del primer pliegue (${m.visit} <= ${h - 8})`, !m.split.length && m.text === full && (full.includes(': ') ? m.sub === 'block' : m.sub === null) && m.visit <= h - 8 && m.scroll === 0, JSON.stringify(m));
+    ck(`${w}x${h} «${full.slice(0, 32)}…»: ninguna palabra partida, el encabezado es el título completo${full.includes(': ') ? ' (subtítulo en su renglón)' : ''} y «Cómo llegar» a la vista, al pie (${m.visit} <= ${h - 8})`, !m.split.length && m.text === full && (full.includes(': ') ? m.sub === 'block' : m.sub === null) && m.visit <= h - 8 && m.scroll === 0, JSON.stringify(m));
     if (w === 320 && id.startsWith('lo-que')) await shot('ficha-titulo-largo-320.png');
   }
   await press('Escape', 'Escape', 27); await sleep(700);
 }
 
-// QA1-03: sin JavaScript, la barra inferior (con la casilla «Más») no se muestra y los capítulos son alcanzables desde la cabecera (Novedades necesita JavaScript: ni su sección ni su enlace existen).
+// QA1-03: sin JavaScript, la barra inferior (Mi lista necesita JS) y el ☰ no se muestran y los capítulos son alcanzables desde la barra de arriba (Novedades necesita JavaScript: ni su sección ni su enlace existen).
 await send('Emulation.setScriptExecutionDisabled', { value: true });
 await send('Page.navigate', { url: URL_ }); await sleep(2500);
-const nj = await ev(`(() => ({ js: document.documentElement.classList.contains('js'), more: getComputedStyle(document.querySelector('.tabbar')).display,
+const nj = await ev(`(() => ({ js: document.documentElement.classList.contains('js'), more: getComputedStyle(document.querySelector('.tabbar')).display, menu: getComputedStyle(document.querySelector('.menu-btn')).display,
   links: [...document.querySelectorAll('.hdr-nav a')].map(a => { const r = a.getBoundingClientRect(); return [a.getAttribute('href'), r.width > 0 && r.right > 0 && r.left < innerWidth, Math.round(r.height)]; }) }))()`);
-ck('sin JavaScript: la barra inferior con la casilla «Más» no se muestra', nj.js === false && nj.more === 'none', JSON.stringify(nj));
+ck('sin JavaScript: ni la barra inferior ni el ☰ (que necesitan JS) se muestran', nj.js === false && nj.more === 'none' && nj.menu === 'none', JSON.stringify(nj));
 ck('sin JavaScript: Catálogo, Eventos y Visita son alcanzables (>= 44 px de alto) y Novedades, que necesita JavaScript, no se ofrece', nj.links.filter(l => l[1]).map(l => l[0]).join() === '#libros,#cartelera,#visita' && nj.links.filter(l => l[1]).every(l => l[2] >= 44) && nj.links.some(l => l[0] === '#novedades' && !l[1]), JSON.stringify(nj));
 await shot('nojs-390-top.png');
 

@@ -30,8 +30,9 @@ const HOOK = `(() => {
 })()`;
 await send('Page.addScriptToEvaluateOnNewDocument', { source: HOOK });
 
-// Duraciones permitidas por los tokens (ms) + escalonados + intención.
-const TOKENS = new Set([120, 240, 400, 700, 1200, 24, 60, 250, 320]);
+// Duraciones permitidas por los tokens del sistema «Itinerante Líquido» (ms): dur-instantanea, dur-rapida, dur-base, dur-lenta y escalon-linea,
+// más la escala de la foto al revelarse (dur-lenta × 1.6, motion.md). Los temporizadores de JS (espera-larga, intención) no son transiciones.
+const TOKENS = new Set([120, 240, 400, 700, 60, 1120]);
 
 async function pass(name, w, h, mobile, reduced) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
@@ -42,13 +43,13 @@ async function pass(name, w, h, mobile, reduced) {
   const H = await ev(`document.documentElement.scrollHeight - innerHeight`);
   for (let y = 0; y <= H; y += Math.round(h * 0.6)) { await ev(`scrollTo(0, ${y})`); await sleep(260); }
   await ev(`scrollTo(0, 0)`); await sleep(500);
-  // interacciones: hoja «Más», chips del carrusel, tarjeta -> ficha
-  if (mobile) {
-    await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(700);
-    await ev(`document.querySelector('[data-sm-close]').click()`); await sleep(700);
-  } else {
-    await ev(`document.querySelector('.menu-btn')?.click()`); await sleep(500);
+  // interacciones: menú ☰ (cuando existe), Mi lista, chips del carrusel, tarjeta -> ficha
+  if (await ev(`getComputedStyle(document.querySelector('[data-menu-open]')).display !== 'none'`)) {
+    await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(900);
+    await ev(`document.querySelector('[data-menu-close]').click()`); await sleep(900);
   }
+  await ev(`document.querySelector('[data-open-mylist]:not([hidden])')?.click()`); await sleep(1200);
+  await ev(`document.querySelector('[data-ml-close]')?.click()`); await sleep(900);
   await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 100)`); await sleep(2500);
   await ev(`document.querySelectorAll('[data-rail] .rail-chip')[1]?.click()`); await sleep(600);
   await ev(`document.querySelector('[data-rail] .card')?.click()`); await sleep(1800);
@@ -83,12 +84,15 @@ results.push(await pass('móvil · movimiento normal', 390, 844, true, false));
 results.push(await pass('escritorio · movimiento normal', 1280, 800, false, false));
 results.push(await pass('móvil · movimiento reducido', 390, 844, true, true));
 
+let offTotal = 0;
 for (const r of results) {
   console.log('\n=== ' + r.name);
   console.log('eventos disparados (' + r.rows.length + ' tipos):', r.rows.slice(0, 14).map(([k, n]) => `${k}×${n}`).join(' · '));
   const off = r.dur.filter(([d]) => !TOKENS.has(d) && d > 1 && !(r.name.includes('reducido') && d <= 1));
+  offTotal += off.length;
   console.log('duraciones calculadas en el DOM (ms):', r.dur.map(([d, n]) => `${d}×${n}`).join(' '));
   console.log(off.length ? '  FUERA DE TOKENS: ' + off.map(([d, n, ex]) => `${d}ms (${n}) ej. ${ex.join(', ')}`).join(' | ') : '  todas las duraciones salen de los tokens');
 }
 chrome.kill();
-process.exit(0);
+console.log(offTotal ? `MOVIMIENTO: FALLAN ${offTotal} duraciones fuera de los tokens` : 'MOVIMIENTO: todas las duraciones salen de los tokens');
+process.exit(offTotal ? 1 : 0);

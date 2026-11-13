@@ -175,7 +175,7 @@ async function renderList(dlg) {
     const rm = document.createElement('button');
     rm.type = 'button'; rm.className = 'ml-remove'; rm.dataset.mlRemove = b.id;
     rm.setAttribute('aria-label', `Quitar «${b.t}» de mi lista`);
-    rm.append(icon('i-plus'));
+    rm.append(icon('i-close'));
     li.append(text, rm);
     return li;
   }));
@@ -189,14 +189,7 @@ function syncAll(e) {
   document.querySelectorAll(id ? `.save[data-save-id="${CSS.escape(id)}"]` : '.save[data-save-id]').forEach(paint);
   const n = savedIds().length;
   document.querySelectorAll('[data-saved-count]').forEach(el => { el.textContent = countText(n); });
-  // Chip de la cabecera: existe solo con libros guardados y su nombre accesible lleva el conteo («Mi lista, 3 libros»).
-  document.querySelectorAll('[data-saved-badge]').forEach(el => {
-    el.hidden = n === 0;
-    const c = el.querySelector('[data-saved-n]');
-    if (c) c.textContent = String(n);
-    el.setAttribute('aria-label', `Mi lista, ${countText(n)}`);
-  });
-  // Botón Menú de la barra inferior: con libros guardados lleva el conteo (la lista es la primera fila del menú). Decorativo: el nombre del botón sigue siendo «Menú».
+  // Conteo en Mi lista (barra inferior, cabecera y fila del menú): disco decorativo; el nombre accesible lleva el conteo en texto ([data-saved-count]).
   document.querySelectorAll('[data-saved-dot]').forEach(el => { el.hidden = n === 0; el.textContent = n ? String(n) : ''; });
   const dlg = document.getElementById('mylist');
   if (dlg?.open) renderList(dlg);
@@ -210,7 +203,7 @@ function openList() {
     openDialog(dlg);
     dlg.querySelector('[data-ml-close]')?.focus({ preventScroll: true });
   };
-  const menu = document.getElementById('sheet-menu');
+  const menu = document.getElementById('menu');
   const drawer = document.getElementById('cat-drawer');
   const other = [menu, drawer].find(d => d?.open);
   if (other) { other.addEventListener('close', () => setTimeout(open, 0), { once: true }); other.close(); } else open();
@@ -249,9 +242,9 @@ export function initSaved() {
     const dlg = document.getElementById('mylist');
     if (dlg?.open && (e.target === dlg || e.target.closest('[data-ml-close]'))) closeDialog(dlg); // sale primero; el cierre real corre después del fotograma
   });
-  // Al cerrar, el foco vuelve al primer abridor visible (el chip de la cabecera) o, si ya no hay libros, al botón del menú.
+  // Al cerrar, el foco vuelve al primer abridor visible (Mi lista en la cabecera o en la barra inferior) o, si no hay ninguno, al botón del menú.
   document.getElementById('mylist')?.addEventListener('close', () => {
-    const back = [...document.querySelectorAll('[data-open-mylist]:not(.toast-action)')].find(b => b.offsetParent !== null) || document.querySelector('.hdr-more');
+    const back = [...document.querySelectorAll('[data-open-mylist]:not(.toast-action)')].find(b => b.offsetParent !== null) || document.querySelector('[data-menu-open]');
     back?.focus?.({ preventScroll: true });
   });
 }

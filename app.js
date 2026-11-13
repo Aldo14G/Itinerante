@@ -1,6 +1,6 @@
-// Itinerante B.4 · escenas sincronizadas al scroll, sin dependencias.
+// Librería Itinerante y Más · sistema «Itinerante Líquido»: barra y menú, destino actual, entradas de los titulares, Eventos, Catálogo y estado de apertura. Sin dependencias.
 import { DUR, EASE, EASE_IO, ms, confirmThen } from './motion.js';
-import { openDialog, closeDialog, pushSheet, navigateFromSheet } from './sheets.js';
+import { openDialog, closeDialog, navigateFromSheet } from './sheets.js';
 
 const WA = 'https://wa.me/528180875940';
 
@@ -65,7 +65,7 @@ async function boot() {
   const root = document.documentElement;
   const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
   const fineMq = matchMedia('(hover: hover) and (pointer: fine)');
-  const pinMq = matchMedia('(min-width: 761px) and (min-height: 620px)');
+  const phone = matchMedia('(max-width: 760px)');
   const saveData = Boolean(navigator.connection && navigator.connection.saveData);
   let userOff = false;
   try { userOff = localStorage.getItem('iti-b4-motion') === 'off'; } catch { /* almacenamiento bloqueado */ }
@@ -73,75 +73,13 @@ async function boot() {
   const $ = (sel, el = document) => el.querySelector(sel);
   const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
-  const damp = (cur, target, k, dt) => cur + (target - cur) * (1 - Math.exp(-k * dt));
   const absTop = el => el.getBoundingClientRect().top + scrollY;
-  let desktopFailed = false; // si no llega el módulo de escritorio, la página queda estática y completa
-  const motionOn = () => !reduceMq.matches && !userOff && !saveData && !(desktopFailed && vw > 760);
+  const motionOn = () => !reduceMq.matches && !userOff && !saveData;
   const isMotion = () => root.classList.contains('motion');
 
   let vh = innerHeight;
-  let vw = innerWidth;
-  let vel = 0;
 
-  // ---------- Text splitting ----------
-  function splitChars(el) {
-    const text = el.textContent;
-    el.textContent = '';
-    return [...text].map((c, i) => {
-      const outer = document.createElement('span');
-      outer.className = 'ch';
-      outer.style.setProperty('--i', i);
-      const inner = document.createElement('span');
-      inner.textContent = c;
-      outer.append(inner);
-      el.append(outer);
-      return outer;
-    });
-  }
-
-  function splitWords(el) {
-    const words = [];
-    const walk = node => {
-      [...node.childNodes].forEach(n => {
-        if (n.nodeType === Node.TEXT_NODE) {
-          const frag = document.createDocumentFragment();
-          n.textContent.split(/(\s+)/).forEach(part => {
-            if (!part) return;
-            if (/^\s+$/.test(part)) { frag.append(part); return; }
-            const w = document.createElement('span');
-            w.className = 'w';
-            w.textContent = part;
-            frag.append(w);
-            words.push(w);
-          });
-          n.replaceWith(frag);
-        } else if (n.nodeType === Node.ELEMENT_NODE) walk(n);
-      });
-    };
-    walk(el);
-    return words;
-  }
-
-  function splitLines(h) {
-    const em = h.querySelector('em');
-    if (!em) return;
-    const ln = document.createElement('span');
-    ln.className = 'ln';
-    while (h.firstChild && h.firstChild !== em) ln.append(h.firstChild);
-    h.prepend(ln);
-    em.classList.add('ln-em');
-    em.style.setProperty('--d', 1);
-    h.dataset.lines = '';
-  }
-
-  function fitWord(el, chars) {
-    el.style.setProperty('--fit', '200px');
-    const natural = chars.reduce((w, c) => w + c.offsetWidth, 0);
-    if (natural) el.style.setProperty('--fit', `${(200 * el.clientWidth / natural) * 0.992}px`);
-  }
-
-  // ---------- Status (hora de Monterrey) ----------
+  // ---------- Estado de apertura (hora de Monterrey) ----------
   function updateStatus() {
     const now = monterreyNow();
     const st = openingStatus(now);
@@ -154,310 +92,40 @@ async function boot() {
   (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(updateStatus, { timeout: 2000 });
   setInterval(updateStatus, 60_000);
 
-  // ---------- Scenes ----------
-  const scenes = [];
-
-  // Versión ligera: separa el nombre en letras y lo ajusta al ancho. El recorrido por fotogramas (escritorio) llega con attach().
-  function entryScene() {
-    const sec = $('.entry');
-    const word = $('[data-wordmark]', sec);
-    const chars = splitChars(word);
-    let full = null;
-    return {
-      sec, word, chars,
-      attach(scene) { full = scene; },
-      enable() { if (full) full.enable(); },
-      measure() {
-        fitWord(word, chars); // escrituras antes que lecturas: evita un segundo layout completo
-        if (full) full.measure();
-      },
-      tick(dt, y) { return full ? full.tick(dt, y) : false; },
-      reset() { if (full) full.reset(); }
-    };
-  }
-
-  function manifestoScene() {
-    const sec = $('.manifesto');
-    const text = $('[data-words]', sec);
-    const words = splitWords(text);
-    const drifts = $$('[data-drift]', sec).map(el => ({ el, amt: Number(el.dataset.drift) }));
-    let top = 0, h = 1, start = 0, end = 1, lit = -1, inner = false;
-    // Las medidas del texto (descendiente) solo hacen falta con la sección a la vista: pedirlas antes obliga al navegador a
-    // maquetar un subárbol que `content-visibility: auto` (móvil) se salta. Aquí solo se mide la sección.
-    const measureInner = () => {
-      const tTop = absTop(text);
-      start = tTop - vh * 0.85;
-      end = tTop + text.offsetHeight / 2 - vh * 0.55; // todo encendido cuando el centro del bloque sube al 55 % de la ventana: centrado, se lee completo (CR0-12)
-      lit = -1;
-      inner = true;
-    };
-    return {
-      measure() {
-        top = absTop(sec);
-        h = sec.offsetHeight;
-        inner = false;
-        if (scrollY + vh >= top && scrollY <= top + h) measureInner();
-      },
-      tick(dt, y) {
-        if (!isMotion() || y + vh < top || y > top + h) return false;
-        if (!inner) measureInner();
-        const n = Math.round(clamp((y - start) / Math.max(1, end - start)) * words.length);
-        if (n !== lit) { words.forEach((w, i) => w.classList.toggle('is-lit', i < n)); lit = n; }
-        if (vw > 760) {
-          const c = clamp((y + vh / 2 - (top + h / 2)) / vh, -1, 1);
-          drifts.forEach(d => { d.el.style.transform = `translate3d(0, ${(c * d.amt).toFixed(1)}px, 0)`; });
-        }
-        return false;
-      },
-      reset() { drifts.forEach(d => { d.el.style.transform = ''; }); }
-    };
-  }
-
-  function houseScene() {
-    const sec = $('.house');
-    const track = $('[data-house-track]', sec);
-    const stills = $$('.still', track);
-    const idxEl = $('[data-house-index]', sec);
-    const bar = $('[data-house-bar]', sec);
-    let top = 0, h = 1, dist = 0, sp = 0, pinned = false, centers = [], lastIdx = -1, inner = false;
-
-    const bars = $$('.stories i', sec);
-    const setIndex = p => {
-      const idx = Math.round(p * (stills.length - 1));
-      if (idx !== lastIdx) {
-        bars.forEach((b, i) => b.classList.toggle('is-seen', i <= idx));
-        idxEl.textContent = String(idx + 1).padStart(2, '0');
-        stills.forEach((el, i) => el.classList.toggle('is-center', i === idx));
-        lastIdx = idx;
-      }
-      bar.style.transform = `scaleX(${p.toFixed(4)})`;
-    };
-
-    // Toque a la izquierda o a la derecha para pasar de foto, como en las historias.
-    track.addEventListener('click', e => {
-      if (pinned || vw > 760 || e.target.closest('a, button')) return;
-      const r = track.getBoundingClientRect();
-      const next = clamp((lastIdx < 0 ? 0 : lastIdx) + (e.clientX - r.left > r.width * 0.35 ? 1 : -1), 0, stills.length - 1);
-      track.scrollTo({ left: stills[next].offsetLeft - stills[0].offsetLeft, behavior: isMotion() ? 'smooth' : 'auto' });
-    });
-    track.addEventListener('scroll', () => {
-      if (pinned) return;
-      const max = track.scrollWidth - track.clientWidth;
-      setIndex(max > 0 ? clamp(track.scrollLeft / max) : 0);
-    }, { passive: true });
-
-    // Carrusel suelto (móvil): el índice inicial depende del ancho del carril, que solo se pide con la sección a la vista.
-    const measureLoose = () => {
-      const max = track.scrollWidth - track.clientWidth;
-      setIndex(max > 0 ? clamp(track.scrollLeft / max) : 0);
-      inner = true;
-    };
-
-    return {
-      measure() {
-        pinned = root.classList.contains('pin-house');
-        track.tabIndex = pinned ? -1 : 0;
-        if (pinned) track.removeAttribute('aria-label'); else track.setAttribute('aria-label', 'Fotografías de la casa, desplázate para ver más');
-        track.style.transform = '';
-        if (pinned) {
-          const last = stills[stills.length - 1];
-          const pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
-          dist = Math.max(0, last.offsetLeft + last.offsetWidth + pad - vw);
-          sec.style.setProperty('--house-h', `${Math.round(vh + dist / 1.6)}px`);
-        } else {
-          sec.style.removeProperty('--house-h');
-          stills.forEach(s => { s.firstElementChild.removeAttribute('style'); s.querySelector('img').removeAttribute('style'); });
-        }
-        top = absTop(sec);
-        h = sec.offsetHeight;
-        // Fijada (escritorio, sin content-visibility) se mide todo; suelta (móvil) la medida del carrusel espera a que la sección se vea.
-        inner = pinned;
-        if (pinned) centers = stills.map(s => s.offsetLeft + s.offsetWidth / 2);
-        else if (scrollY + vh >= top && scrollY <= top + h) measureLoose();
-      },
-      tick(dt, y) {
-        if (!pinned) { if (!inner && y + vh >= top && y <= top + h) measureLoose(); return false; }
-        if (y + vh < top || y > top + h) return false;
-        const p = clamp((y - top) / Math.max(1, h - vh));
-        sp = damp(sp, p, 9, dt);
-        const x = -sp * dist;
-        track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
-        stills.forEach((s, i) => {
-          const d = clamp((centers[i] + x - vw / 2) / (vw * 0.7), -1, 1);
-          const fig = s.firstElementChild;
-          fig.style.setProperty('--s', (1 - Math.abs(d) * 0.09).toFixed(4));
-          fig.style.setProperty('--dim', (Math.abs(d) * 0.58).toFixed(3));
-          s.querySelector('img').style.setProperty('--px', `${(-d * 6).toFixed(2)}%`);
-        });
-        setIndex(sp);
-        return Math.abs(sp - p) > 0.0004;
-      },
-      reset() { track.style.transform = ''; }
-    };
-  }
-
-  // Cortinilla de tiles: solo escritorio; llega con attach().
-  function wipeScene() {
-    let full = null;
-    return {
-      attach(scene) { full = scene; },
-      measure() { if (full) full.measure(); },
-      tick(dt, y) { return full ? full.tick(dt, y) : false; }
-    };
-  }
-
-  function marqueeScene() {
-    const sec = $('.call');
-    const rows = $$('[data-marquee]', sec).map(row => {
-      const span = row.firstElementChild;
-      for (let i = 0; i < 3; i++) row.append(span.cloneNode(true));
-      return { row, span, dir: Number(row.dataset.marquee), x: 0, w: 1 };
-    });
-    let top = 0, h = 1, sign = 1, shown = true, inner = false;
-    const measureInner = () => {
-      rows.forEach(r => { r.w = r.span.offsetWidth || 1; });
-      shown = rows.some(r => r.row.offsetWidth > 0); // en móvil la marquesina no se muestra (mobile.css): no se anima
-      inner = true;
-    };
-    return {
-      measure() {
-        top = absTop(sec);
-        h = sec.offsetHeight;
-        inner = false; // las filas son descendientes: se miden con la sección a la vista (ver manifestoScene)
-        if (scrollY + vh >= top && scrollY <= top + h) measureInner();
-      },
-      tick(dt, y) {
-        if (!isMotion() || y + vh < top || y > top + h) return false;
-        if (!inner) measureInner();
-        if (!shown) return false;
-        if (vel > 30) sign = 1; else if (vel < -30) sign = -1;
-        const speed = 48 + Math.min(Math.abs(vel) * 0.32, 900);
-        rows.forEach(r => {
-          r.x -= r.dir * sign * speed * dt;
-          if (r.x <= -r.w) r.x += r.w;
-          if (r.x > 0) r.x -= r.w;
-          r.row.style.transform = `translate3d(${r.x.toFixed(1)}px, 0, 0)`;
-        });
-        return true;
-      },
-      reset() { rows.forEach(r => { r.row.style.transform = ''; }); }
-    };
-  }
-
-  let holdHeader = 0; // hasta este instante (performance.now) el encabezado no se oculta
-  // Salto a un capítulo desde la barra inferior o el menú móvil: el capítulo cae al borde de la ventana (scroll-margin en mobile.css), así que la cabecera
-  // se queda oculta hasta que el desplazamiento termina; si reapareciera al subir taparía el titular recién alcanzado.
-  let dropHeader = 0;
-  const dropHeaderForJump = () => {
-    dropHeader = performance.now() + 1600;
-    addEventListener('scrollend', () => { dropHeader = Math.min(dropHeader, performance.now() + 250); }, { once: true });
-  };
-  function headerScene() {
-    const hdr = $('[data-hdr]');
-    const themed = $$('main [data-theme]');
-    const navLinks = $$('.hdr-nav a');
-    const tabLinks = $$('.tabbar a');
-    tabLinks.forEach(a => a.addEventListener('click', dropHeaderForJump));
-    $('[data-news-cta]')?.addEventListener('click', dropHeaderForJump); // el control de novedades del inicio salta igual que su casilla
-    // Zonas del recorrido: cada una marca su enlace de la cabecera y su casilla de la barra. «Inicio» abarca la entrada, el manifiesto y La casa.
-    // La cita, el llamado, Visita y el pie no tienen casilla (Visita vive en la hoja «Más»): ahí la barra no marca ninguna, y «Más» nunca se marca
-    // como lugar (abre una hoja, no es un capítulo). En la cabecera de escritorio Visita sí tiene enlace y se marca.
-    const zones = [['#inicio', '#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
-    let ranges = [], zoneRanges = [], hidden = false, current = null;
-    return {
-      measure() {
-        ranges = themed.map(el => ({ top: absTop(el), bottom: absTop(el) + el.offsetHeight, theme: el.dataset.theme }));
-        zoneRanges = zones.filter(z => z.from.offsetHeight && z.to.offsetHeight) // una sección que no existe (Novedades sin entradas) no tiene zona
-          .map(z => ({ hash: z.hash, top: absTop(z.from), bottom: absTop(z.to) + z.to.offsetHeight }));
-      },
-      tick(dt, y) {
-        hdr.classList.toggle('is-solid', y > 24);
-        const probe = y + 34;
-        const r = ranges.find(range => probe >= range.top && probe < range.bottom);
-        const on = r ? r.theme : '';
-        if ((hdr.dataset.on || '') !== on) { if (on) hdr.dataset.on = on; else delete hdr.dataset.on; }
-        if (hdr.classList.contains('is-menu') || hdr.contains(document.activeElement) || y < vh * 0.6 || performance.now() < holdHeader) hidden = false;
-        else if (vel > 60) hidden = true;
-        else if (vel < -60) hidden = false;
-        if (performance.now() < dropHeader && y >= vh * 0.6 && !hdr.contains(document.activeElement)) hidden = true;
-        hdr.classList.toggle('is-hidden', hidden);
-        const zone = zoneRanges.find(c => y + vh * 0.4 >= c.top && y + vh * 0.4 < c.bottom);
-        const hash = zone ? zone.hash : '';
-        if (hash !== current) {
-          navLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
-          tabLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
-          current = hash;
-        }
-        return false;
-      }
-    };
-  }
-
-  const entry = entryScene();
-  const wipe = wipeScene();
-  scenes.push(headerScene(), entry, manifestoScene(), houseScene(), wipe, marqueeScene());
-
-  // Escenas de escritorio (recorrido del hero y cortinilla): se descargan solo si hay movimiento y pantalla grande.
-  let desktopLoad = null;
-  function loadDesktop() {
-    if (desktopLoad || vw <= 760) return;
-    desktopLoad = import('./scenes-desktop.js').then(m => {
-      const c = { $, $$, clamp, smooth, damp, absTop, isMotion, kick, vw: () => vw, vh: () => vh };
-      if (entry.sec.dataset.seq) entry.attach(m.createEntryScene(c, entry)); // el recorrido por fotogramas solo existe si la entrada lo declara (data-seq); hoy el inicio es una fotografía fija de la casa
-      wipe.attach(m.createWipeScene(c));
-      applyMode();
-    }).catch(err => {
-      console.error('No se pudo cargar scenes-desktop.js; se muestra la versión estática.', err);
-      desktopFailed = true;
-      applyMode();
-    });
-  }
-
-  // ---------- Fotos diferidas ----------
-  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip, .topic-layer, .bill-layer')?.classList.add('is-loaded'); };
-  $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
-  document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
-  document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
-
-  await yieldNow();
-  // ---------- Loop ----------
-  let raf = 0, lastT = 0, lastY = scrollY, lastScrollAt = 0;
-  function loop(t) {
-    const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 1 / 60;
-    lastT = t;
-    const y = scrollY;
-    vel = damp(vel, (y - lastY) / dt, 10, dt);
-    lastY = y;
-    let busy = false;
-    for (const s of scenes) if (s.tick(dt, y)) busy = true;
-    if (busy || t - lastScrollAt < 700 || Math.abs(vel) > 1) raf = requestAnimationFrame(loop);
-    else { raf = 0; lastT = 0; vel = 0; }
-  }
-  function kick() {
-    lastScrollAt = performance.now();
-    if (!raf) raf = requestAnimationFrame(loop);
-  }
-  addEventListener('scroll', kick, { passive: true });
-
-  function measureAll() {
+  // ---------- Barra de navegación y destino actual (scroll-spy) ----------
+  // Zonas del recorrido: cada una marca su enlace de la barra, su fila del menú y, en el teléfono, su casilla de la barra inferior.
+  // «Inicio» abarca la entrada y La casa; la barra inferior solo tiene Inicio y Catálogo, así que en el resto de la página no marca ninguna.
+  const hdr = $('[data-hdr]');
+  const navLinks = $$('.hdr-nav a, .menu-row[href]');
+  const tabLinks = $$('.tabbar a');
+  const zones = [['#inicio', '#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
+  let zoneRanges = [], current = null, raf = 0;
+  const measureZones = () => {
     vh = innerHeight;
-    vw = innerWidth;
-    scenes.forEach(s => s.measure && s.measure());
-    kick();
+    zoneRanges = zones.filter(z => z.from && z.to && z.from.offsetHeight && z.to.offsetHeight) // una sección que no existe (Novedades sin entradas) no tiene zona
+      .map(z => ({ hash: z.hash, top: absTop(z.from), bottom: absTop(z.to) + z.to.offsetHeight }));
+  };
+  function spy() {
+    raf = 0;
+    const y = scrollY;
+    hdr.classList.toggle('is-solid', y > 8);
+    const probe = y + vh * 0.4;
+    const zone = zoneRanges.find(c => probe >= c.top && probe < c.bottom);
+    const hash = zone ? zone.hash : '';
+    if (hash === current) return;
+    current = hash;
+    navLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    // La entrada «#inicio» abarca La casa: su fila del menú «La casa» no se marca por separado.
+    tabLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
   }
-
+  const kick = () => { if (!raf) raf = requestAnimationFrame(spy); };
+  addEventListener('scroll', kick, { passive: true });
   let measureQueued = 0;
   const queueMeasure = () => {
     if (measureQueued) return;
-    measureQueued = requestAnimationFrame(() => { measureQueued = 0; measureAll(); });
+    measureQueued = requestAnimationFrame(() => { measureQueued = 0; measureZones(); current = null; kick(); });
   };
-  addEventListener('resize', () => {
-    root.classList.toggle('pin-house', isMotion() && pinMq.matches);
-    vw = innerWidth; // loadDesktop decide con el ancho actual, no con el de la última medición
-    vh = innerHeight;
-    if (isMotion()) loadDesktop();
-    queueMeasure();
-  });
+  addEventListener('resize', queueMeasure);
   if ('ResizeObserver' in window) {
     let lastH = document.body.offsetHeight, timer = 0;
     new ResizeObserver(() => {
@@ -469,7 +137,14 @@ async function boot() {
     }).observe(document.body);
   }
 
-  // ---------- Motion mode ----------
+  // ---------- Fotos diferidas ----------
+  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip, .topic-layer')?.classList.add('is-loaded'); };
+  $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
+  document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
+  document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
+
+  await yieldNow();
+  // ---------- Movimiento (preferencia del sistema, ahorro de datos y la pausa del pie) ----------
   const toggle = $('[data-motion-toggle]');
   function syncToggle() {
     if (reduceMq.matches) { toggle.disabled = true; toggle.textContent = 'Movimiento reducido por el sistema'; return; }
@@ -478,16 +153,10 @@ async function boot() {
     toggle.textContent = 'Pausar el movimiento';
     toggle.setAttribute('aria-pressed', String(userOff));
   }
-  function applyMode({ measure = true } = {}) {
+  function applyMode() {
     const on = motionOn();
     root.classList.toggle('motion', on);
-    root.classList.toggle('pin-house', on && pinMq.matches);
-    if (!on) {
-      root.classList.remove('intro');
-      scenes.forEach(s => s.reset && s.reset());
-    }
-    if (measure) measureAll();
-    if (on) { loadDesktop(); scenes.forEach(s => s.enable && s.enable()); }
+    if (!on) { root.classList.remove('intro'); revealAll(); }
     syncToggle();
   }
   toggle.addEventListener('click', () => {
@@ -499,88 +168,87 @@ async function boot() {
   });
   reduceMq.addEventListener('change', applyMode);
 
-  await yieldNow();
-  // ---------- Reveals ----------
-  $$('.h2, .call-title').forEach(splitLines);
-  const footMark = $('[data-footmark]');
-  const footChars = splitChars(footMark);
-  $$('.entry-lede, .entry-actions, .entry-facts').forEach((el, i) => el.style.setProperty('--d', i));
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        e.target.classList.add('is-in');
-        io.unobserve(e.target);
+  // ---------- Entradas (EncabezadoSeccion y revelado de imagen) ----------
+  // El titular se parte en sus líneas reales (medidas en pantalla) y cada línea sube desde su máscara; la imagen se abre desde un recorte.
+  // Solo se prepara lo que todavía no se ve y solo con movimiento: lo que ya está en pantalla nunca se oculta. Una vez por visita.
+  // Si cambia el ancho, los titulares vuelven a su texto original (las líneas medidas ya no valdrían).
+  const pending = new Set();
+  function splitHeading(h) {
+    const words = [];
+    const walk = (node, em) => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === Node.TEXT_NODE) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.append(' '); return; }
+            const w = document.createElement('span');
+            w.className = em ? 'pal pal-em' : 'pal';
+            w.textContent = part;
+            frag.append(w);
+            words.push(w);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === Node.ELEMENT_NODE) walk(n, em || n.tagName === 'EM');
       });
-    }, { threshold: 0.2, rootMargin: '0px 0px -6% 0px' });
-    [...$$('[data-reveal], [data-lines], [data-rules]'), footMark].forEach(el => io.observe(el));
-  } else {
-    [...$$('[data-reveal], [data-lines], [data-rules]'), footMark].forEach(el => el.classList.add('is-in'));
+    };
+    h.dataset.src = h.innerHTML;
+    walk(h, false);
+    const lines = [];
+    let top = null;
+    words.forEach(w => { const t = w.offsetTop; if (top === null || Math.abs(t - top) > 2) { lines.push([]); top = t; } lines.at(-1).push(w); });
+    h.replaceChildren(...lines.flatMap((ws, i) => {
+      const line = document.createElement('span');
+      line.className = 'linea';
+      const inner = document.createElement('span');
+      inner.className = 'linea-in';
+      ws.forEach((w, k) => { if (k) inner.append(' '); inner.append(w); });
+      line.append(inner);
+      return i ? [' ', line] : [line];
+    }));
   }
-
-  await yieldNow();
-  // ---------- Menu ----------
-  const hdr = $('[data-hdr]');
-  const menuBtn = $('.menu-btn');
-  const menu = $('#menu');
-  const menuLabel = $('.menu-btn-label', menuBtn);
-  $$('nav a', menu).forEach((a, i) => a.style.setProperty('--i', i));
-  let releaseMenu = null; // entrada de historial del menú de tableta: «atrás» lo cierra
-  function setMenu(open) {
-    if (open && !releaseMenu) releaseMenu = pushSheet({ close: () => setMenu(false), lock: null });
-    else if (!open && releaseMenu) { releaseMenu(); releaseMenu = null; }
-    menuBtn.setAttribute('aria-expanded', String(open));
-    menuLabel.textContent = open ? 'Cerrar' : 'Menú';
-    menu.hidden = !open;
-    menu.classList.toggle('is-open', open);
-    hdr.classList.toggle('is-menu', open);
-    $('main').inert = open;
-    $('.ftr').inert = open;
-    $('.skip').inert = open;
-    document.body.style.overflow = open ? 'hidden' : '';
-    if (open) $('nav a', menu).focus();
-  }
-  // «Cómo llegar» es la única acción primaria: la de la cabecera (escritorio) cede el sitio cuando hay otra a la vista.
-  if ('IntersectionObserver' in window) {
-    const onScreen = new Set();
-    const primaryIo = new IntersectionObserver(es => {
-      es.forEach(e => { if (e.isIntersecting) onScreen.add(e.target); else onScreen.delete(e.target); });
-      hdr.classList.toggle('has-primary', onScreen.size > 0);
+  const unsplit = () => $$('[data-src]').forEach(h => { h.innerHTML = h.dataset.src; delete h.dataset.src; });
+  function revealAll() { pending.forEach(el => el.classList.add('is-visible')); pending.clear(); }
+  let revealIo = null;
+  function prepareReveals() {
+    if (!isMotion() || !('IntersectionObserver' in window)) return;
+    revealIo = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-visible');
+      pending.delete(e.target);
+      revealIo.unobserve(e.target);
+    }), { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    $$('[data-revelar]').forEach(el => {
+      if (el.getBoundingClientRect().top < innerHeight) return; // ya a la vista: se queda como está
+      if (el.matches('.sec-head')) { const h = $('.h2', el); if (h) splitHeading(h); }
+      el.dataset.revelar = 'listo';
+      pending.add(el);
+      revealIo.observe(el);
     });
-    $$('main .btn--tungsten').forEach(b => primaryIo.observe(b));
   }
-  menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
-  menu.addEventListener('click', e => { if (e.target.closest('a')) { setMenu(false); holdHeader = performance.now() + 900; } });
-  addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); }
-  });
-  matchMedia('(min-width: 1101px)').addEventListener('change', e => { if (e.matches) setMenu(false); });
+  let lastW = innerWidth;
+  addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; unsplit(); revealAll(); });
 
   await yieldNow();
-  // ---------- Hoja «Más» (móvil): lo que la barra inferior no tiene ----------
-  (function sheetMenu() {
-    const dlg = $('#sheet-menu');
-    const opener = $('[data-menu-open]'); // «Más» es la quinta casilla de la barra inferior, al alcance del pulgar
+  // ---------- Menú (MenuHamburguesa): hoja de vidrio con todas las secciones ----------
+  (function menu() {
+    const dlg = $('#menu');
+    const opener = $('[data-menu-open]');
     if (!dlg || !opener) return;
-    const phone = matchMedia('(max-width: 760px)');
-    const nav = $('.sm-nav', dlg);
-    // Pista de que hay más abajo (en ventanas bajas las redes quedan bajo el pie fijo): el pie de la lista se funde
-    // mientras se pueda bajar (data-more; la máscara vive en mobile.css).
-    const more = () => { nav.dataset.more = nav.scrollTop + nav.clientHeight < nav.scrollHeight - 2 ? '1' : '0'; };
-    nav.addEventListener('scroll', more, { passive: true });
-    if ('ResizeObserver' in window) new ResizeObserver(more).observe(nav); else dlg.addEventListener('toggle', more);
     let landing = null; // sección a enfocar al cerrar tras elegir un destino
     const close = () => closeDialog(dlg); // botón y fondo: sale primero, el cierre real corre después del fotograma
     opener.addEventListener('click', () => {
       if (dlg.open) return;
-      opener.setAttribute('aria-expanded', 'true'); // el botón confirma el toque en este fotograma
+      opener.setAttribute('aria-expanded', 'true'); // las líneas se cruzan en × en este fotograma
+      opener.setAttribute('aria-label', 'Cerrar menú');
       confirmThen(opener, async () => { // volver inerte toda la página (showModal) es lo caro: va después de pintar
         await openDialog(dlg, { defer: true }); // el contenido se maqueta en otra tarea (ver openDialog)
-        if (dlg.open) $('[data-sm-close]', dlg).focus({ preventScroll: true });
+        if (dlg.open) $('.menu-row', dlg).focus({ preventScroll: true });
       });
     });
     dlg.addEventListener('close', () => {
       opener.setAttribute('aria-expanded', 'false');
+      opener.setAttribute('aria-label', 'Abrir menú');
       if (landing) { // la navegación lleva el foco al título de la sección, no de vuelta al botón
         const h = $('h1, h2, h3', landing) || landing;
         h.tabIndex = -1;
@@ -588,79 +256,35 @@ async function boot() {
         landing = null;
       } else opener.focus({ preventScroll: true });
     });
-    $('[data-sm-close]', dlg).addEventListener('click', close);
+    $('[data-menu-close]', dlg).addEventListener('click', close);
     dlg.addEventListener('click', e => {
-      if (e.target === dlg) return close(); // clic en el fondo
-      const link = e.target.closest('a[href]');
+      if (e.target === dlg) return close(); // clic en el velo (fuera de la hoja)
+      const link = e.target.closest('a[href^="#"]');
       if (!link) return;
-      dropHeaderForJump();
       const href = link.getAttribute('href');
-      landing = href.startsWith('#') ? $(href) : null;
-      if (href === '#catalogo') { // en móvil el catálogo es una hoja: se abre cuando el menú termina de cerrarse
-        landing = null;
-        e.preventDefault();
-        dlg.addEventListener('close', () => document.dispatchEvent(new CustomEvent('iti:open-explorer')), { once: true });
-      } else if (landing) { e.preventDefault(); navigateFromSheet(href); } // la entrada de historial de la hoja pasa a ser la del destino
+      landing = $(href);
+      if (landing) { e.preventDefault(); navigateFromSheet(href); } // la entrada de historial de la hoja pasa a ser la del destino
       dlg.close();
     });
-    phone.addEventListener('change', e => { if (!e.matches) close(); });
   })();
 
+  // «Cómo llegar» es la única acción primaria a la vista: la de la barra cede el sitio cuando hay otra en pantalla.
+  if ('IntersectionObserver' in window) {
+    const onScreen = new Set();
+    const primaryIo = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) onScreen.add(e.target); else onScreen.delete(e.target); });
+      hdr.classList.toggle('has-primary', onScreen.size > 0);
+    });
+    $$('main .btn--primario').forEach(b => primaryIo.observe(b));
+  }
+
   await yieldNow();
-  // ---------- Cartelera ----------
+  // ---------- Eventos y talleres: todas las propuestas abiertas; en el teléfono, carrusel con puntos ----------
   (function bill() {
     const items = $$('.bill-item');
-    const layers = $$('.bill-layer');
-    const caption = $('[data-bill-caption]');
-    let shown = 0;
-    const show = i => {
-      if (i === shown || !layers[i]) return;
-      layers.forEach((l, k) => {
-        l.classList.toggle('was-active', k === shown);
-        l.classList.toggle('is-active', k === i);
-      });
-      shown = i;
-      const item = items[i];
-      caption.textContent = item.dataset.caption;
-    };
-    items.forEach((d, i) => {
-      d.addEventListener('toggle', () => { if (d.open) show(i); });
-      const summary = $('summary', d);
-      let intent = 0, hovering = false, suppressed = false;
-      const arm = () => { clearTimeout(intent); if (hovering && !suppressed && !d.open) intent = setTimeout(() => { d.open = true; }, ms('intent-disclosure')); };
-      summary.addEventListener('pointerenter', () => {
-        if (!fineMq.matches) return;
-        hovering = true;
-        show(i);
-        arm();
-      });
-      summary.addEventListener('pointermove', arm);
-      summary.addEventListener('pointerleave', () => { hovering = false; suppressed = false; clearTimeout(intent); });
-      summary.addEventListener('click', () => { suppressed = true; clearTimeout(intent); });
-      summary.addEventListener('focus', () => show(i));
-      // Al salir con el teclado, la imagen vuelve al item que sigue abierto
-      summary.addEventListener('blur', () => { const open = items.findIndex(x => x.open); if (open >= 0) show(open); });
-    });
-    // Móvil: carrusel. Todas las tarjetas quedan abiertas (sin acordeón exclusivo) y los puntos siguen el desplazamiento.
+    items.forEach(d => { d.open = true; $('summary', d).tabIndex = -1; }); // el resumen no pliega nada: la tarjeta entera está a la vista
     const track = $('.bill-track');
     const dots = $$('.bill-dots i');
-    const phone = matchMedia('(max-width: 760px)');
-    const carousel = () => {
-      items.forEach(d => {
-        const summary = $('summary', d);
-        if (phone.matches) {
-          if (d.hasAttribute('name')) { d.dataset.name = d.getAttribute('name'); d.removeAttribute('name'); }
-          d.open = true;
-          summary.tabIndex = -1;
-        } else {
-          if (d.dataset.name) d.setAttribute('name', d.dataset.name);
-          summary.removeAttribute('tabindex');
-        }
-      });
-      if (!phone.matches) items.forEach((d, i) => { d.open = i === 0; });
-    };
-    carousel();
-    phone.addEventListener('change', carousel);
     track.addEventListener('scroll', () => {
       if (!phone.matches) return;
       const step = items[0].offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0);
@@ -668,10 +292,6 @@ async function boot() {
       dots.forEach((dot, i) => dot.classList.toggle('is-on', i === idx));
     }, { passive: true });
     dots[0]?.classList.add('is-on');
-    $('.bill-list').addEventListener('pointerleave', () => {
-      const open = items.findIndex(d => d.open);
-      if (open >= 0) show(open);
-    });
   })();
 
   await yieldNow();
@@ -878,7 +498,7 @@ async function boot() {
       // Cualquier enlace al catálogo abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href="#catalogo"]');
-        if (!a || a.closest('#sheet-menu')) return;
+        if (!a) return;
         if (phone.matches) { e.preventDefault(); confirmThen(a, openExplorer); } else focusSearch();
       });
       addEventListener('hashchange', () => { if (location.hash === '#catalogo') focusSearch(); });
@@ -924,23 +544,16 @@ async function boot() {
 
   await yieldNow();
   // ---------- Start ----------
-  applyMode({ measure: false }); // la primera medición va después de fuentes y póster (abajo)
+  applyMode();
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const posterReady = $('.entry-poster').decode().catch(() => {});
   Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
-    measureAll(); // entry.measure() ajusta el nombre antes de leer nada: un solo ajuste y un solo maquetado
+    measureZones(); // una sola medición, con la letra y la foto ya puestas
+    kick();
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
-    // Conteo de novedades (punto de la casilla y control del inicio): después de la foto y las fuentes, para no competir con el primer render.
-    // Su sitio ya está reservado (boot.js), así que al llegar no mueve nada.
+    // Las entradas se preparan en reposo: partir los titulares en líneas mide texto, y eso no debe competir con el primer render.
+    (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(prepareReveals, { timeout: 1500 });
+    // Conteo de novedades (control del inicio): después de la foto y las fuentes. Su sitio ya está reservado (boot.js), así que no mueve nada.
     loadNews().then(m => m.initNewsCount()).catch(() => {});
   });
-  // El nombre gigante del pie solo se ajusta cuando se acerca a la pantalla (cada ajuste fuerza un layout completo).
-  let footFitted = false;
-  const fitFoot = () => { footFitted = true; fitWord(footMark, footChars); };
-  if ('IntersectionObserver' in window) {
-    const footIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { footIo.disconnect(); fitFoot(); } }, { rootMargin: '600px 0px' });
-    footIo.observe(footMark);
-  } else fitFoot();
-  fontsReady.then(() => { if (footFitted) fitFoot(); });
-  addEventListener('resize', () => { if (footFitted) fitFoot(); });
 }

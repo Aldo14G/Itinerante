@@ -1,5 +1,5 @@
 // Auditoría automática de accesibilidad con axe-core (WCAG 2.x A/AA y buenas prácticas) en los estados principales:
-// inicio en móvil y escritorio, hoja «Más», hoja Explorar, Mi lista y ficha. Falla (código 1) con violaciones serias o críticas.
+// inicio en móvil y escritorio (claro y oscuro), menú, hoja Explorar, Mi lista y ficha. Falla (código 1) con violaciones serias o críticas.
 // Uso: node tools/qa/axe.mjs http://127.0.0.1:PORT/   (CHROME_PATH cambia el navegador; AXE_ALL=1 lista también las moderadas y leves)
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
@@ -40,32 +40,33 @@ async function open(w, h, mobile) {
 }
 const waitFor = async (expr, tries = 40) => { for (let i = 0; i < tries; i++) { if (await ev(expr)) return true; await sleep(200); } return false; };
 
-const MANIFESTO = [['.manifesto']]; // sus palabras entran al 17 % y llegan al 100 % con el scroll: se audita aparte, con el bloque centrado en la ventana (ahí debe estar todo revelado; app.js manifestoScene)
 await open(390, 844, true);
-await audit('móvil 390: inicio', MANIFESTO);
-await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
-await audit('móvil 390: manifiesto revelado');
-await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(700);
-await audit('móvil 390: hoja «Más» (filas, tarjeta de Visita con horario y redes)');
-await ev(`document.getElementById('sheet-menu').close()`); await sleep(500);
+await audit('móvil 390: inicio');
+await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('menu').open`); await sleep(900);
+await audit('móvil 390: menú (secciones, horario de hoy, «Cómo llegar», WhatsApp y redes)');
+await ev(`document.getElementById('menu').close()`); await sleep(500);
 await ev(`document.querySelector('[data-ex-open]').scrollIntoView()`); await sleep(1200);
 await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`document.getElementById('explorer').open`); await waitFor(`document.querySelector('#explorer [data-cat-grid]').getAttribute('aria-busy') === null`, 60); await sleep(600);
 await audit('móvil 390: hoja Explorar con el catálogo');
 await ev(`document.querySelector('#explorer button.card').click()`); await waitFor(`document.getElementById('cat-drawer') && document.getElementById('cat-drawer').open`); await sleep(800);
 await audit('móvil 390: ficha sobre Explorar');
 await ev(`document.getElementById('cat-drawer').close(); document.getElementById('explorer').close()`); await sleep(600);
-await ev(`document.querySelector('[data-open-mylist]') ? (document.querySelector('[data-menu-open]').click(), true) : false`); await waitFor(`document.getElementById('sheet-menu').open`); await sleep(500);
-await ev(`document.querySelector('[data-open-mylist]').click()`); await waitFor(`document.getElementById('mylist').open`, 30); await sleep(800);
+await ev(`document.querySelector('.tabbar [data-open-mylist]').click()`); await waitFor(`document.getElementById('mylist').open`, 30); await sleep(800);
 await audit('móvil 390: Mi lista (vacía)');
 
 await open(1280, 800, false);
-await audit('escritorio 1280: inicio', MANIFESTO);
-await ev(`(() => { const t = document.querySelector('.manifesto-text'); const r = t.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); })()`); await sleep(400); await ev(`scrollBy(0, 1)`); await sleep(1500);
-await audit('escritorio 1280: manifiesto revelado');
+await audit('escritorio 1280: inicio');
 await ev(`document.getElementById('catalogo').scrollIntoView()`); await waitFor(`document.querySelector('#catalogo [data-cat-grid]').getAttribute('aria-busy') === null`, 60); await sleep(800);
-await audit('escritorio 1280: catálogo en línea', MANIFESTO);
+await audit('escritorio 1280: catálogo en línea');
 await ev(`document.querySelector('#catalogo button.card').click()`); await waitFor(`document.getElementById('cat-drawer') && document.getElementById('cat-drawer').open`); await sleep(800);
-await audit('escritorio 1280: ficha', MANIFESTO);
+await audit('escritorio 1280: ficha');
+
+// Tema oscuro (prefers-color-scheme): mismas comprobaciones de contraste y nombres en el inicio y el menú.
+await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
+await open(390, 844, true);
+await audit('móvil 390 oscuro: inicio');
+await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('menu').open`); await sleep(900);
+await audit('móvil 390 oscuro: menú');
 
 let serious = 0;
 for (const s of states) {

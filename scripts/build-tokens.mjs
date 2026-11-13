@@ -1,4 +1,4 @@
-// Genera tokens.css (raíz del repo) desde design/tokens.json: un solo tema de sitio.
+// Genera tokens.css (raíz del repo) desde design/tokens.json: sistema «Itinerante Líquido», tema claro en :root y oscuro con prefers-color-scheme.
 // Uso: node scripts/build-tokens.mjs [--check]  (--check falla si el archivo generado está desactualizado)
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -9,38 +9,44 @@ export const TOKENS_PATH = join(root, 'design/tokens.json');
 export const SITE_CSS_PATH = join(root, 'tokens.css');
 
 const HEADER = '/* GENERADO por scripts/build-tokens.mjs desde design/tokens.json. No editar a mano. */';
-
-function groups() {
-  const lines = [];
-  const group = (title, entries) => {
-    lines.push(`  /* ${title} */`);
-    entries.forEach(([k, v]) => lines.push(`  --${k}: ${v};`));
-    lines.push('');
-  };
-  return { lines, group };
-}
+const own = obj => Object.entries(obj).filter(([k]) => !k.startsWith('$'));
 
 export function renderSite(tokens) {
   const { scales: s, themes } = tokens;
-  const t = themes.b4;
-  const { lines, group } = groups();
-  group('Color', Object.entries(t.color));
-  group('Tipografía', Object.entries(t.font));
-  group('Escala tipográfica', Object.entries(s.type).map(([k, v]) => [`fs-${k}`, v]));
-  group('Espaciado (múltiplos de 4)', Object.entries(s.space).map(([k, v]) => [`space-${k}`, `${v}px`]));
-  group('Radios', Object.entries(s.radius).map(([k, v]) => [`radius-${k}`, v]));
-  group('Movimiento', [...Object.entries(s.duration).map(([k, v]) => [`dur-${k}`, v]), ...Object.entries(s.stagger).map(([k, v]) => [`stagger-${k}`, v]), ...Object.entries(s.intent).map(([k, v]) => [`intent-${k}`, v]), ...Object.entries(t.ease)]);
-  group('Distribución', Object.entries(t.layout));
-  group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['ctl-sm', `${s.control.sm}px`], ['ctl-md', `${s.control.md}px`], ['ctl-lg', `${s.control.lg}px`], ['measure-max', `${s.measure.max}ch`]]);
-  lines.push(`  --hair: ${s.hair.base};`);
-  Object.entries(t.root).forEach(([k, v]) => lines.push(`  ${k}: ${v};`));
-  const print = Object.entries(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');
-  // Tonos por sección: el hero es oscuro; el resto redefine los mismos tokens (data-tone) y pinta su fondo.
-  const tones = Object.entries(t.tones ?? {}).map(([name, vars]) => {
-    const body = Object.entries(vars).map(([k, v]) => (k === 'color-scheme' ? `  ${k}: ${v};` : `  --${k}: ${v};`)).join('\n');
-    return `[data-tone="${name}"] {\n${body}\n  background: var(--night);\n  color: var(--bone);\n}\n`;
-  }).join('\n');
-  return `${HEADER}\n\n:root {\n${lines.join('\n')}\n}\n\n${tones}\n@media (min-resolution: 2dppx) {\n  :root { --hair: ${s.hair.dense}; }\n}\n\n@media print {\n  :root {\n${print}\n  }\n  [data-tone] { background: #fff; color: #000; }\n}\n`;
+  const t = themes.liquido;
+  const light = [];
+  const dark = [];
+  const group = (title, entries, out = light) => {
+    out.push(`  /* ${title} */`);
+    entries.forEach(([k, v]) => out.push(`  --${k}: ${v};`));
+    out.push('');
+  };
+  // Color y sombra: cada token trae su valor claro y oscuro; el claro va en :root y el oscuro en el bloque de prefers-color-scheme.
+  const themed = (title, obj) => {
+    group(`${title} (tema claro)`, own(obj).map(([k, v]) => [k, v.light]));
+    group(`${title} (tema oscuro)`, own(obj).map(([k, v]) => [k, v.dark]), dark);
+  };
+  themed('Color', t.color);
+  group('Portadas tipográficas (iguales en ambos temas)', own(t.portada));
+  group('Letra', own(t.font));
+  const typeEntries = own(s.type).flatMap(([k, v]) => [
+    [`t-${k}`, `${v.weight} ${v.size}/${v.line} var(--font-${v.family})`],
+    [`ls-${k}`, v.tracking],
+  ]);
+  group('Escala tipográfica (Apple HIG; px CSS = pt). font: var(--t-*) y letter-spacing: var(--ls-*)', typeEntries);
+  group('Espaciado (múltiplos de 4)', own(s.space).map(([k, v]) => [`space-${k}`, `${v}px`]));
+  group('Radios', own(s.radius));
+  themed('Sombras', t.shadow);
+  group('Controles', own(s.control));
+  group('Barras y márgenes', own(s.medidas));
+  group('Vidrio', own(s.filtro));
+  group('Movimiento', [...own(s.duration), ...own(s.easing)]);
+  group('Tiempos de JavaScript (no son transiciones)', own(s.tiempo));
+  group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
+  own(t.root).forEach(([k, v]) => light.push(`  ${k}: ${v};`));
+  const print = own(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');
+  const darkBody = dark.map(l => (l ? `  ${l}` : l)).join('\n').replace(/\n+$/, '');
+  return `${HEADER}\n\n:root {\n${light.join('\n')}\n}\n\n@media (prefers-color-scheme: dark) {\n  :root {\n${darkBody}\n  }\n}\n\n@media print {\n  :root {\n${print}\n  }\n}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

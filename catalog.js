@@ -231,7 +231,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     controls.forEach(c => { c.disabled = true; });
     const box = document.createElement('div');
     box.className = 'cat-error';
-    box.innerHTML = `<a class="btn btn--ghost" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, estoy buscando un libro.')}" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span></a> <button type="button" class="btn btn--ghost"><span>Reintentar</span></button>`;
+    box.innerHTML = `<a class="btn btn--secundario" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, estoy buscando un libro.')}" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span></a> <button type="button" class="btn btn--secundario"><span>Reintentar</span></button>`;
     status.after(box);
     box.querySelector('button').addEventListener('click', () => {
       box.remove();
@@ -306,7 +306,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       frag.append(fs);
     }
     // Salida del panel (SAT-03): en teléfono los filtros miden hasta dos pantallas; el pie pegajoso dice cuántos títulos quedan y lleva a ellos.
-    if (frag.childElementCount) frag.append(el('div', { class: 'cat-filters-foot' }, el('button', { type: 'button', class: 'btn btn--ghost', 'data-cat-filters-done': '' }, el('span', {}, results.length === 1 ? 'Ver 1 título' : `Ver ${results.length} títulos`))));
+    if (frag.childElementCount) frag.append(el('div', { class: 'cat-filters-foot' }, el('button', { type: 'button', class: 'btn btn--secundario', 'data-cat-filters-done': '' }, el('span', {}, results.length === 1 ? 'Ver 1 título' : `Ver ${results.length} títulos`))));
     filtersEl.replaceChildren(frag);
   }
 

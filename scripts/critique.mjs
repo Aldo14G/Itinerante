@@ -17,8 +17,8 @@ const flag = name => argv.includes(`--${name}`);
 const opt = (name, fallback) => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : fallback; };
 
 const SURFACES = {
-  site: { dir: '.', html: 'index.html', css: ['tokens.css', 'style.css', 'mobile.css'], theme: 'b4', labels: true },
-  fixture: { dir: 'tests/fixtures/critique-bad', html: 'index.html', css: ['style.css'], theme: 'b4', labels: false, hidden: true },
+  site: { dir: '.', html: 'index.html', css: ['tokens.css', 'style.css', 'mobile.css'], theme: 'liquido', labels: true },
+  fixture: { dir: 'tests/fixtures/critique-bad', html: 'index.html', css: ['style.css'], theme: 'liquido', labels: false, hidden: true },
 };
 
 // Reglas: familia y severidad. Las de severidad "error" bloquean (ratchet contra design/baseline.json).
@@ -64,7 +64,8 @@ const approx = (a, b) => Math.abs(a - b) < 0.0051;
 
 function staticCss(name, surface) {
   const findings = [];
-  const type = new Set(Object.values(tokens.scales.type).map(v => parseFloat(v)));
+  // La escala tipográfica del sistema Líquido está en px (Apple HIG: px CSS = pt); se compara en rem, como el CSS.
+  const type = new Set(Object.values(tokens.scales.type).map(v => parseFloat(v.size ?? v) / (/px$/.test(v.size ?? v) ? 16 : 1)));
   const radius = new Set([0, ...Object.values(tokens.scales.radius).map(v => parseFloat(v))]);
   const durations = new Set([0.01, ...Object.values(tokens.scales.duration).map(v => parseFloat(v))]);
   const themeColors = tokens.themes[surface.theme].color;

@@ -27,7 +27,7 @@ const SWEEP = `window.__sweep = (label) => {
   const ratio = (a, b) => { const p = lum(a), q = lum(b); return (Math.max(p, q) + 0.05) / (Math.min(p, q) + 0.05); };
   const alpha = c => { const m = num(c); return m.length > 3 ? m[3] : 1; };
   const blend = (top, bottom) => { const k = s => (s.startsWith('color(') ? 255 : 1); const a = alpha(top); const t = num(top).slice(0, 3).map(v => v * k(top)); const b = num(bottom).slice(0, 3).map(v => v * k(bottom)); return 'rgb(' + t.map((v, i) => v * a + b[i] * (1 - a)).join(',') + ')'; };
-  const bgOf = el => { const layers = []; for (let e = el; e; e = e.parentElement) { const c = getComputedStyle(e).backgroundColor; if (alpha(c) > 0) { layers.push(c); if (alpha(c) >= 0.99) break; } } let out = 'rgb(255,255,255)'; for (const c of layers.reverse()) out = blend(c, out); return out; };
+  const bgOf = el => { const layers = []; for (let e = el; e; e = e.parentElement) { const c = getComputedStyle(e).backgroundColor; if (alpha(c) > 0) { layers.push(c); if (alpha(c) >= 0.99) break; } } let out = getComputedStyle(document.documentElement).backgroundColor; for (const c of layers.reverse()) out = blend(c, out); return out; };
   const bad = [];
   document.querySelectorAll('body *').forEach(e => {
     if (e.closest('.cover, [inert], [hidden], .sprite, noscript, script, style')) return;
@@ -35,8 +35,7 @@ const SWEEP = `window.__sweep = (label) => {
     const cs = getComputedStyle(e); const r = e.getBoundingClientRect();
     if (cs.visibility === 'hidden' || cs.display === 'none' || r.width === 0 || r.height === 0 || Number(cs.opacity) < 0.5) return;
     if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) return;
-    if (e.closest('.hdr, .tabbar, .toast')) return; // su fondo es un pseudoelemento o vidrio: lo juzga el crítico con capturas
-    if (e.closest('.entry-media, .entry-beat, .house-pin .still-img')) return; // texto sobre foto: lo juzga el crítico con capturas (el texto del tema ya va debajo de la foto y se mide aquí)
+    if (e.closest('.hdr, .tabbar, .toast')) return; // vidrio que flota sobre cualquier cosa: su peor caso (negro en claro, blanco en oscuro) lo calcula tests/site.test.mjs con los tokens
     const big = parseFloat(cs.fontSize) >= 24 || (parseFloat(cs.fontSize) >= 18.66 && Number(cs.fontWeight) >= 700);
     const bg = bgOf(e); const rr = ratio(cs.color, bg);
     if (rr < (big ? 3 : 4.5)) bad.push({ state: label, el: (e.className && String(e.className).split(' ')[0]) || e.tagName, text: e.textContent.trim().slice(0, 28), ratio: +rr.toFixed(2), fg: cs.color, bg });
@@ -64,7 +63,9 @@ const fails = [];
 const wait = (expr, n = 40) => (async () => { for (let i = 0; i < n; i++) { if (await ev(expr)) return true; await sleep(200); } return false; })();
 const sweep = async label => { const r = await ev(`window.__sweep(${JSON.stringify(label)})`); fails.push(...(r || [])); };
 
-for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1280, 800, false]]) {
+// Los dos temas del sistema «Itinerante Líquido»: claro y oscuro (prefers-color-scheme).
+for (const [name, w, h, mobile, scheme] of [['móvil claro', 390, 844, true, 'light'], ['escritorio claro', 1280, 800, false, 'light'], ['móvil oscuro', 390, 844, true, 'dark'], ['escritorio oscuro', 1280, 800, false, 'dark']]) {
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 0 });
   await send('Page.navigate', { url: URL_ });
@@ -84,10 +85,10 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   // ficha
   await ev(`document.querySelector('[data-rail] button.card')?.click()`);
   if (await wait(`document.getElementById('cat-drawer')?.open`)) { await sleep(900); await sweep(`${name}: ficha`); await ev(`document.getElementById('cat-drawer').close()`); await sleep(500); }
-  // hoja «Más» (sin acordeones: las filas, la tarjeta de Visita y las redes están a la vista)
+  // menú (todas las secciones, horario, «Cómo llegar», WhatsApp y redes, a la vista)
+  await ev(`document.querySelector('[data-menu-open]:not([hidden])')?.click()`); await sleep(900); if (await ev(`document.getElementById('menu').open`)) { await sweep(`${name}: menú`); await ev(`document.getElementById('menu').close()`); await sleep(500); }
   if (mobile) {
-    await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800); await sweep(`${name}: hoja Más`);
-    await ev(`document.querySelector('#sheet-menu [data-open-mylist]').click()`); await sleep(1500); await sweep(`${name}: Mi lista`);
+    await ev(`document.querySelector('.tabbar [data-open-mylist]').click()`); await sleep(1500); await sweep(`${name}: Mi lista`);
     await ev(`document.getElementById('mylist').close()`); await sleep(600);
     await ev(`scrollTo(0, document.querySelector('[data-ex-open]').getBoundingClientRect().top + scrollY - 200)`); await sleep(1200);
     await ev(`document.querySelector('[data-ex-open]').click()`);

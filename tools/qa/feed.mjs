@@ -1,9 +1,9 @@
 // Móvil con sensación de red social (U03), Novedades (U04) y una sola acción primaria (U01/D10).
 // node feed.mjs <url> [outDir]   Sale con código ≠ 0 si algo falla.
-//  1. Primera vista (390x844): perfil (nombre, estado, dirección, «Cómo llegar» como única acción de contacto), sin burbujas de historias y con la barra inferior acoplada a la vista (cinco casillas con nombre); ≤ 6 destinos distintos a la vista en 390x844, 360x740 y 375x667 (U02/D11; la casilla Novedades y el control «N novedades…» llevan al mismo sitio y cuentan como uno); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
+//  1. Primera vista (390x844): inicio (nombre, estado, dirección, «Cómo llegar» de 56 px como única acción de contacto), sin burbujas de historias, con la barra de navegación (marca y ☰) y la barra inferior de vidrio (Inicio, Catálogo, Mi lista); ≤ 6 destinos distintos a la vista en 390x844, 360x740 y 375x667 (U02/D11; la casilla Novedades y el control «N novedades…» llevan al mismo sitio y cuentan como uno); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
 //  3. Eventos y talleres: cada tarjeta va foto → insignias (tipo y estado) → título → frase → descripción → acciones (DOM y pantalla); «Me interesa» (aria-pressed, persistente),
-//     «Compartir» (control de icono; Web Share y respaldo de copiar) y «Preguntar por WhatsApp», de ≥ 44 px y con nombre accesible propio; la tarjeta cabe en el alto útil
-//     (entre cabecera y barra, con 12 px de holgura) a 320×640, 360×640, 360×740, 375×667 y 390×844; el estado sale de data-fecha.
+//     «Compartir» (control de icono; Web Share y respaldo de copiar) y «Preguntar por WhatsApp», de 48 px y con nombre accesible propio; la tarjeta cabe en el alto útil
+//     (entre la barra de navegación y la barra inferior, con 12 px de holgura) a 320×640, 360×640, 360×740, 375×667 y 390×844; el estado sale de data-fecha.
 
 //  5. Barrido de acciones primarias en 390x844 y 1280x800: a lo sumo una por pantalla, siempre «Cómo llegar», y ningún WhatsApp mayor que ella.
 import { spawn } from 'node:child_process';
@@ -76,32 +76,32 @@ const first = await ev(`(()=>{
   const q = s => document.querySelector(s);
   const act = [...document.querySelectorAll('a[href], button')].filter(e => vis(e) && !e.closest('[aria-hidden="true"], [hidden]'));
   const hl = document.querySelectorAll('.hl, .hl-item, [data-story], dialog.story').length;
-  const cta = q('.entry-actions a:first-child'), wa = q('.entry-actions a:last-child');
+  const cta = q('.entry-actions a:first-child'), wa = q('.entry-actions a:last-child'), menu = q('[data-menu-open]');
   return {
     name: q('.entry-title').getBoundingClientRect().height > 10 && q('.entry-title').textContent.trim(),
     status: q('.entry-status [data-status-text]').textContent.trim(), statusVis: vis(q('.entry-status')),
-    address: /Mariano Matamoros Pte\\. 421/.test(q('.entry-facts').textContent) && vis(q('.entry-facts li:last-child')),
-    avatar: vis(q('.profile-av')),
+    address: /Mariano Matamoros Pte\\. 421/.test(q('.entry-address').textContent) && vis(q('.entry-address')),
+    avatar: vis(q('.hdr-brand img')),
     cta: { txt: cta.innerText.trim(), cls: cta.className, h: cta.getBoundingClientRect().height, vis: vis(cta) },
     wa: { txt: wa.innerText.trim(), cls: wa.className, h: wa.getBoundingClientRect().height, vis: vis(wa) },
     hl, tab: vis(q('.tabbar')), tabTop: Math.round(q('.tabbar').getBoundingClientRect().top), ctaBottom: Math.round(cta.getBoundingClientRect().bottom),
     news: (() => { const n = q('[data-news-cta]'); const r = n.getBoundingClientRect(); return { vis: vis(n), txt: n.innerText.trim(), cls: n.className, h: Math.round(r.height), top: Math.round(r.top), bottom: Math.round(r.bottom) }; })(),
-    tabItems: [...document.querySelectorAll('.tabbar a, .tab-menu')].filter(vis).map(e => { const r = e.getBoundingClientRect(); const l = e.querySelector('.tab-lb'); const lr = l.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), l.firstChild.textContent.trim(), lr.height > 8 && lr.width > 8 && lr.left >= r.left && lr.right <= r.right && getComputedStyle(l).clipPath === 'none', e.querySelector('svg use').getAttribute('href')]; }),
-    barBox: (() => { const r = q('.tabbar').getBoundingClientRect(); const cs = getComputedStyle(q('.tabbar')); return [Math.round(r.left), Math.round(innerWidth - r.right), Math.round(innerHeight - r.bottom), cs.borderTopWidth, cs.backgroundColor, cs.boxShadow, cs.borderTopLeftRadius]; })(), brandHidden: !vis(q('.hdr-brand')),
+    tabItems: [...document.querySelectorAll('.tabbar a, .tab-list')].filter(vis).map(e => { const r = e.getBoundingClientRect(); const l = e.querySelector('.tab-lb'); const lr = l.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), l.firstChild.textContent.trim(), lr.height > 8 && lr.width > 8 && lr.left >= r.left && lr.right <= r.right && getComputedStyle(l).clipPath === 'none', e.querySelector('svg use').getAttribute('href')]; }),
+    barBox: (() => { const r = q('.tabbar').getBoundingClientRect(); const cs = getComputedStyle(q('.tabbar')); return [Math.round(r.left), Math.round(innerWidth - r.right), Math.round(innerHeight - r.bottom), Math.round(r.height), Math.round(r.width), cs.boxShadow !== 'none', parseFloat(cs.borderTopLeftRadius) >= r.height / 2, document.documentElement.dataset.glass === 'lite' ? 'lite' : cs.backdropFilter]; })(), brand: vis(q('.hdr-brand')), menu: vis(menu) && Math.round(menu.getBoundingClientRect().height),
     dests: [...new Set(act.map(e => e.getAttribute('href') || e.getAttribute('aria-controls') || e.className))],
     actions: act.map(e => (e.className || e.tagName) + ':' + e.textContent.trim().slice(0, 20))
   };
 })()`);
 await shot('01-perfil-390x844.jpg');
-check('perfil', 'nombre, estado de hoy, dirección y avatar visibles', first.name && /Itinerante/.test(first.name) && first.statusVis && /Abierto|Cerrad|Cierra/.test(first.status) && first.address && first.avatar, JSON.stringify(first).slice(0, 400));
-check('perfil', '«Cómo llegar» primaria de ≥ 44 px y «Escribir» fuera de la primera vista (D11)', first.cta.vis && /^Cómo llegar/.test(first.cta.txt) && /btn--tungsten/.test(first.cta.cls) && first.cta.h >= 44 && !first.wa.vis && !first.actions.some(a => /Escribir|Pregunta por un libro/.test(a)), JSON.stringify([first.cta, first.wa]));
+check('perfil', 'nombre, estado de hoy, dirección y logotipo visibles', first.name && /Itinerante/.test(first.name) && first.statusVis && /Abierto|Cerrad|Cierra/.test(first.status) && first.address && first.avatar, JSON.stringify(first).slice(0, 400));
+check('perfil', '«Cómo llegar» primaria de 56 px y la consulta por WhatsApp fuera de la primera vista del teléfono (D11; vive en el menú)', first.cta.vis && /^Cómo llegar/.test(first.cta.txt) && /btn--primario/.test(first.cta.cls) && first.cta.h === 56 && !first.wa.vis && !first.actions.some(a => /Escribir|Pregunta por un libro/.test(a)), JSON.stringify([first.cta, first.wa]));
 check('primera vista', 'sin burbujas de historias: ni destacados ni visor', first.hl === 0, String(first.hl));
 const lastBottom = first.news.vis ? first.news.bottom : first.ctaBottom;
-check('barra inferior', 'a la vista desde la primera pantalla y acoplada: de borde a borde, pegada al fondo, blanca, con borde superior de 2 px, sin radio ni sombra', first.tab && first.barBox[0] === 0 && first.barBox[1] === 0 && first.barBox[2] === 0 && first.barBox[3] === '2px' && first.barBox[4] === 'rgb(255, 255, 255)' && first.barBox[5] === 'none' && first.barBox[6] === '0px', JSON.stringify(first.barBox));
+check('barra inferior', 'a la vista desde la primera pantalla: cápsula de vidrio de 49 × 228 px, centrada, 8 px sobre el borde, con sombra y desenfoque (opaca en gama media)', first.tab && Math.abs(first.barBox[0] - first.barBox[1]) <= 1 && first.barBox[2] === 8 && first.barBox[3] === 49 && first.barBox[4] === 228 && first.barBox[5] && first.barBox[6] && /blur|lite/.test(first.barBox[7]), JSON.stringify(first.barBox));
 check('barra inferior', 'no tapa «Cómo llegar» ni el control de novedades (≥ 8 px de aire)', first.tabTop >= lastBottom + 8, JSON.stringify([first.tabTop, first.ctaBottom, first.news]));
-check('barra inferior', 'cinco casillas iguales de ≥ 48 px con icono propio y nombre a la vista: Inicio, Catálogo, Eventos, Novedades y Más', first.tabItems.length === 5 && first.tabItems.every(t => t[0] >= 48 && t[1] >= 48 && t[0] === first.tabItems[0][0] && t[3]) && first.tabItems.map(t => t[2]).join('|') === 'Inicio|Catálogo|Eventos|Novedades|Más' && new Set(first.tabItems.map(t => t[4])).size === 5, JSON.stringify(first.tabItems));
-check('inicio', 'control de novedades bajo «Cómo llegar»: secundario (no primaria), táctil (≥ 48 px) y con el conteo en su texto', first.news.vis && first.news.top >= first.ctaBottom && first.news.h >= 48 && !/tungsten/.test(first.news.cls) && /^\d+ novedad(es)? recientes?$/.test(first.news.txt), JSON.stringify(first.news));
-check('primera vista', `destinos distintos en la primera vista (${first.dests.length} ≤ 6; ${first.actions.length} controles: «Cómo llegar», la barra y el control de novedades, que repite el destino de su casilla); la marca espera al desplazamiento`, first.tab && first.brandHidden && first.dests.length <= 6 && first.actions.length <= 7, JSON.stringify(first.actions));
+check('barra inferior', 'tres casillas iguales de 76 × 49 px con icono propio y nombre a la vista: Inicio, Catálogo y Mi lista', first.tabItems.length === 3 && first.tabItems.every(t => t[0] === 76 && t[1] === 49 && t[3]) && first.tabItems.map(t => t[2]).join('|') === 'Inicio|Catálogo|Mi lista' && new Set(first.tabItems.map(t => t[4])).size === 3, JSON.stringify(first.tabItems));
+check('inicio', 'control de novedades bajo «Cómo llegar»: secundario (no primaria), táctil (≥ 48 px) y con el conteo en su texto', first.news.vis && first.news.top >= first.ctaBottom && first.news.h >= 48 && !/primario/.test(first.news.cls) && /^\d+ novedad(es)? recientes?$/.test(first.news.txt), JSON.stringify(first.news));
+check('primera vista', `destinos distintos en la primera vista (${first.dests.length} ≤ 6; ${first.actions.length} controles: la marca y el ☰, «Cómo llegar», el control de novedades y la barra inferior)`, first.tab && first.brand && first.menu === 44 && first.dests.length <= 6 && first.actions.length <= 7, JSON.stringify(first.actions));
 for (const [vw, vh] of [[360, 740], [375, 667]]) {
   await open(vw, vh, { reset: true });
   const n = await ev(`[...new Set([...document.querySelectorAll('a[href], button')].filter(e => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && cs.visibility !== 'hidden' && cs.display !== 'none' && !e.closest('[aria-hidden="true"], [hidden], [inert]'); }).map(e => e.getAttribute('href') || e.getAttribute('aria-controls') || e.className))]`);
@@ -109,8 +109,8 @@ for (const [vw, vh] of [[360, 740], [375, 667]]) {
 }
 await open(390, 844, { reset: true });
 await ev(`scrollTo(0, 700)`); await sleep(700);
-const hdrWa = await ev(`(()=>{ const a = document.querySelector('.hdr-wa'); const r = a.getBoundingClientRect(); const cs = getComputedStyle(a); return { vis: r.width > 0 && cs.visibility !== 'hidden' && +cs.opacity > 0.9, w: r.width, href: a.href }; })()`);
-check('perfil', 'al desplazar, WhatsApp está en la cabecera (≥ 44 px)', hdrWa.vis && hdrWa.w >= 44 && /wa\.me\/528180875940/.test(hdrWa.href), JSON.stringify(hdrWa));
+const hdrWa = await ev(`(()=>{ const h = document.querySelector('.hdr').getBoundingClientRect(); const m = document.querySelector('[data-menu-open]').getBoundingClientRect(); const wa = document.querySelector('#menu a[href*="wa.me"]'); return { top: Math.round(h.top), h: Math.round(h.height), menu: [Math.round(m.width), Math.round(m.height)], wa: !!wa && /wa\\.me\\/528180875940/.test(wa.href) && wa.getAttribute('aria-label') === 'Escribir por WhatsApp' }; })()`);
+check('perfil', 'al desplazar, la barra de navegación sigue arriba (44 px) con el ☰ de 44 × 44, y WhatsApp está en el menú', hdrWa.top === 0 && hdrWa.h === 44 && hdrWa.menu.join() === '44,44' && hdrWa.wa, JSON.stringify(hdrWa));
 await open(390, 844, { reset: true });
 check('consola', 'sin errores de consola en la primera vista', !problems.length, problems.join(' | '));
 
@@ -121,11 +121,11 @@ await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(6
 const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const i = q('[data-interest]'), s = q('[data-share]');
   const rect = e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
   const wa = q('.bill-wa'); const badges = [...it.querySelectorAll('.bill-badges .badge')]; const img = q('.bill-card-img').getBoundingClientRect();
-  return { id: it.dataset.id, photo: !!q('.bill-card-img'), alt: q('.bill-card-img').alt, ratio: +(img.width / img.height).toFixed(2), badges: badges.map(b => b.textContent.trim()), onPhoto: badges.every(b => { const r = b.getBoundingClientRect(); return r.top >= img.top && r.bottom <= img.bottom && r.left >= img.left && r.right <= img.right; }), badgeFs: badges.map(b => getComputedStyle(b).fontSize).join(),
+  return { id: it.dataset.id, photo: !!q('.bill-card-img'), alt: q('.bill-card-img').alt, ratio: +(img.width / img.height).toFixed(2), badges: badges.map(b => b.textContent.trim()), onPhoto: badges.every(b => { const r = b.getBoundingClientRect(); return r.top >= img.bottom && r.left >= img.left && r.right <= img.right; }), badgeFs: badges.map(b => getComputedStyle(b).fontSize).join(),
     title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), wa: wa && rect(wa), waTxt: wa?.innerText.trim(), waHref: wa?.href, pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim(), sIcon: !!s?.querySelector('svg'), sRound: getComputedStyle(s).borderRadius, row: Math.abs(i.getBoundingClientRect().top - s.getBoundingClientRect().top) < 2, waBelow: wa.getBoundingClientRect().top >= i.getBoundingClientRect().bottom }; })`);
 const TIPOS = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
-check('eventos', '3 tarjetas con foto 4:3 descrita, título y dos insignias sobre la foto: el tipo (Lectura, Juego, Taller) y «Propuesta · sin fecha»', posts.length === 3 && posts.every(p => p.photo && p.alt && !/Recreación IA|Foto real/.test(p.alt) && Math.abs(p.ratio - 1.33) < 0.03 && p.title && p.badges.length === 2 && p.badges[0] === TIPOS[p.id] && p.badges[1] === 'Propuesta · sin fecha' && p.onPhoto && p.badgeFs === '12px,12px'), JSON.stringify(posts.map(p => [p.id, p.alt, p.ratio, p.badges, p.onPhoto, p.badgeFs])));
-check('eventos', 'tres acciones de ≥ 44 px: «Me interesa» y «Compartir» (control de icono redondo) en un renglón y «Preguntar por WhatsApp» debajo, con su mensaje', posts.every(p => p.iTxt === 'Me interesa' && p.sTxt === '' && p.sIcon && p.sRound === '50%' && p.interest[1] >= 44 && p.interest[0] >= 44 && p.share[1] >= 44 && p.share[0] >= 44 && p.pressed === 'false' && p.row && p.waBelow && p.waTxt === 'Preguntar por WhatsApp' && p.wa[1] >= 44 && /wa\.me\/528180875940\?text=Hola/.test(p.waHref)), JSON.stringify(posts.map(p => [p.id, p.iTxt, p.sTxt, p.interest, p.share, p.wa, p.waTxt, p.row, p.waBelow])));
+check('eventos', '3 tarjetas con foto 4:3 descrita, título y dos insignias bajo la foto (el texto no va sobre la foto): el tipo (Lectura, Juego, Taller) y «Propuesta · sin fecha»', posts.length === 3 && posts.every(p => p.photo && p.alt && !/Recreación IA|Foto real/.test(p.alt) && Math.abs(p.ratio - 1.33) < 0.03 && p.title && p.badges.length === 2 && p.badges[0] === TIPOS[p.id] && p.badges[1] === 'Propuesta · sin fecha' && p.onPhoto && p.badgeFs === '12px,12px'), JSON.stringify(posts.map(p => [p.id, p.alt, p.ratio, p.badges, p.onPhoto, p.badgeFs])));
+check('eventos', 'tres acciones de 48 px: «Me interesa» y «Compartir» (botón de icono redondo de 48 × 48) en un renglón y «Preguntar por WhatsApp» debajo, con su mensaje', posts.every(p => p.iTxt === 'Me interesa' && p.sTxt === '' && p.sIcon && parseFloat(p.sRound) >= 24 && p.interest[1] === 48 && p.interest[0] >= 48 && p.share.join() === '48,48' && p.pressed === 'false' && p.row && p.waBelow && p.waTxt === 'Preguntar por WhatsApp' && p.wa[1] === 48 && /wa\.me\/528180875940\?text=Hola/.test(p.waHref)), JSON.stringify(posts.map(p => [p.id, p.iTxt, p.sTxt, p.interest, p.share, p.wa, p.waTxt, p.row, p.waBelow])));
 // Tarjeta de evento: foto → insignias → título → frase → descripción → acciones, tanto en el DOM como en la pantalla; el título está una sola vez y ya no hay encabezado de red social.
 const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-card-img', '.bill-badges', '.bill-title', '.bill-sub', '.bill-detail > p', '.bill-acts'].map(q);
   const dom = els.every((e, i) => e && (i === 0 || (els[i - 1].compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)));
@@ -144,11 +144,11 @@ check('eventos', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos
 const when = await ev(`(async () => { const m = await import(new URL('feed.js', document.baseURI).href); const it = document.querySelector('.bill-item'); const b = it.querySelector('[data-bill-when]'); const read = () => ({ text: b.textContent, quiet: b.classList.contains('badge--quiet') });
   const out = { base: read() }; it.dataset.fecha = '2099-05-02'; m.initFeed(); out.fecha = read(); it.dataset.fecha = '2099-05-02T18:30'; m.initFeed(); out.hora = read(); it.dataset.fecha = '2001-01-01'; m.initFeed(); out.pasada = read(); delete it.dataset.fecha; m.initFeed(); out.sin = read(); return out; })()`);
 check('eventos', 'la insignia de estado sale de data-fecha: fecha vigente en español («Sáb 2 may 2099», con hora si la trae) en la insignia común; sin atributo o con fecha pasada, «Propuesta · sin fecha»', when && when.base.text === 'Propuesta · sin fecha' && when.base.quiet && when.fecha.text === 'Sáb 2 may 2099' && !when.fecha.quiet && when.hora.text === 'Sáb 2 may 2099 · 18:30' && when.pasada.text === 'Propuesta · sin fecha' && when.pasada.quiet && when.sin.text === 'Propuesta · sin fecha' && when.sin.quiet, JSON.stringify(when));
-// La tarjeta cabe en el alto útil: entre la cabecera y la barra inferior (--tabbar-h), con 12 px de holgura, desde 320×640.
+// La tarjeta cabe en el alto útil: entre la barra de navegación y la barra inferior (su alto más 8 px de aire), con 12 px de holgura, desde 320×640.
 for (const [vw, vh] of [[320, 640], [360, 640], [360, 740], [375, 667], [390, 844]]) {
   await open(vw, vh, { reset: true, wait: 2500 });
   await ev(`document.querySelector('.bill-track').scrollIntoView({ block: 'center' })`); await sleep(900);
-  const fit = await ev(`(() => { const cs = getComputedStyle(document.documentElement); const hdr = parseFloat(cs.getPropertyValue('--hdr-h')), tab = parseFloat(cs.getPropertyValue('--tabbar-h')); const cards = [...document.querySelectorAll('.bill-item')].map(c => Math.round(c.getBoundingClientRect().height));
+  const fit = await ev(`(() => { const hdr = document.querySelector('.hdr').getBoundingClientRect().height, tab = innerHeight - document.querySelector('.tabbar').getBoundingClientRect().top; const cards = [...document.querySelectorAll('.bill-item')].map(c => Math.round(c.getBoundingClientRect().height));
     const c = document.querySelector('.bill-item'); const acts = c.querySelector('.bill-acts').getBoundingClientRect(), box = c.getBoundingClientRect();
     return { util: innerHeight - hdr - tab, cards, actsInside: acts.bottom <= box.bottom, cut: [...c.querySelectorAll('.bill-title, .bill-sub, .bill-detail > p, .bill-acts > *')].filter(e => e.scrollWidth > e.clientWidth + 1).length, over: document.documentElement.scrollWidth > innerWidth }; })()`);
   const tallest = Math.max(...fit.cards);
@@ -193,10 +193,10 @@ const realData = JSON.parse(readFileSync(new URL('../../assets/data/collections.
 const dayAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const newsState = () => ev(`(()=>{ const s = document.querySelector('#novedades'); const links = [...document.querySelectorAll('[data-news-link]')]; const r = s.getBoundingClientRect();
   const shown = e => { const b = e.getBoundingClientRect(); return (b.width > 0 || b.height > 0) && getComputedStyle(e).visibility !== 'hidden'; };
-  const cta = document.querySelector('[data-news-cta]'), dot = document.querySelector('[data-news-dot]');
+  const cta = document.querySelector('[data-news-cta]'), dots = [...document.querySelectorAll('[data-news-dot]')];
   return { hidden: s.hidden, display: getComputedStyle(s).display, h: Math.round(r.height), cards: s.querySelectorAll('.rail-item:not(.card--sk)').length, links: links.map(l => ({ hidden: l.hidden, w: Math.round(l.getBoundingClientRect().width) })),
-    visibleNodes: [s, ...links, ...s.querySelectorAll('*')].filter(shown).length, tabs: [...document.querySelectorAll('.tabbar a, .tab-menu')].filter(shown).map(t => t.querySelector('.tab-lb').firstChild.textContent.trim()),
-    dot: shown(dot), sr: document.querySelector('[data-news-sr]').textContent, cta: shown(cta) ? cta.innerText.trim() : null, hasNews: document.documentElement.classList.contains('has-news'),
+    visibleNodes: [s, ...links, ...s.querySelectorAll('*')].filter(shown).length, tabs: [...document.querySelectorAll('.tabbar a, .tab-list')].filter(shown).map(t => t.querySelector('.tab-lb').firstChild.textContent.trim()),
+    dot: dots.length === 2 && dots.every(d => !d.hidden), sr: document.querySelector('[data-news-sr]').textContent, cta: shown(cta) ? cta.innerText.trim() : null, hasNews: document.documentElement.classList.contains('has-news'),
     status: s.querySelector('[data-news-status]').textContent, badges: [...s.querySelectorAll('.card')].map(c => !!c.querySelector('.badge-new')), names: [...s.querySelectorAll('.card')].slice(0, 2).map(c => c.textContent.trim().slice(0, 12)),
     ids: [...s.querySelectorAll('.card')].map(c => c.dataset.id), title: s.querySelector('h2').textContent.trim(), text: s.innerText, seen: localStorage.getItem('iti-news-visto'), state: localStorage.getItem('iti-news-estado') }; })()`);
 const approach = async () => { await ev(`document.querySelector('#cartelera').scrollIntoView({ block: 'end' })`); await sleep(2500); }; // la tira se pinta (y comprueba los ids contra el catálogo) al acercarse
@@ -207,7 +207,7 @@ for (const [label, data] of [['la lista que se publica (vacía hasta que haya fe
   await approach();
   await ev(`scrollTo(0, 0)`); await sleep(500);
   const st = await newsState();
-  check('novedades', `${label}: no quedan sección, casilla (cuatro casillas), enlaces, punto ni control; ningún nodo visible ni espacio vertical`, st.hidden && st.display === 'none' && st.h === 0 && st.cards === 0 && st.links.every(l => l.hidden && l.w === 0) && st.visibleNodes === 0 && st.tabs.join('|') === 'Inicio|Catálogo|Eventos|Más' && !st.dot && st.cta === null && !st.hasNews && st.state === 'n', JSON.stringify(st).slice(0, 600));
+  check('novedades', `${label}: no quedan sección, enlace de la barra, fila del menú, punto ni control; ningún nodo visible ni espacio vertical`, st.hidden && st.display === 'none' && st.h === 0 && st.cards === 0 && st.links.every(l => l.hidden && l.w === 0) && st.visibleNodes === 0 && st.tabs.join('|') === 'Inicio|Catálogo|Mi lista' && !st.dot && st.cta === null && !st.hasNews && st.state === 'n', JSON.stringify(st).slice(0, 600));
 }
 const ids = sample.slice(10, 17).map(b => b.id);
 // 3 llegadas en las dos últimas semanas, 3 anteriores y una sin fecha, en desorden: la tira ordena de lo más reciente a lo más antiguo y deja al final la que no trae fecha.
@@ -217,7 +217,7 @@ override = { ...realData, novedades: { titulo: 'Recién llegados', entradas: ids
 await ev(`localStorage.clear()`);
 await open(390, 844, { wait: 2500 });
 const early = await newsState();
-check('novedades', 'primera visita, antes de acercarse a la sección: punto en la casilla (con «, 3 sin ver» para lectores) y control «3 novedades recientes» en el inicio', early.dot && early.sr === ', 3 sin ver' && early.cta === '3 novedades recientes' && early.tabs.join('|') === 'Inicio|Catálogo|Eventos|Novedades|Más' && early.cards === 0, JSON.stringify({ dot: early.dot, sr: early.sr, cta: early.cta, tabs: early.tabs, cards: early.cards }));
+check('novedades', 'primera visita, antes de acercarse a la sección: punto en el enlace y en la fila del menú (con «, 3 sin ver» para lectores) y control «3 novedades recientes» en el inicio', early.dot && early.sr === ', 3 sin ver' && early.cta === '3 novedades recientes' && early.tabs.join('|') === 'Inicio|Catálogo|Mi lista' && early.cards === 0, JSON.stringify({ dot: early.dot, sr: early.sr, cta: early.cta, tabs: early.tabs, cards: early.cards }));
 await approach();
 const withData = await newsState();
 check('novedades', 'con entradas se pinta la tira, lo más reciente primero (sin fecha al final), con titular «Novedades» y «3 llegaron en las últimas dos semanas»', !withData.hidden && withData.cards === ids.length && JSON.stringify(withData.ids) === JSON.stringify(newsOrder) && withData.title === 'Novedades' && withData.status === '3 llegaron en las últimas dos semanas' && withData.links.every(l => !l.hidden), JSON.stringify(withData).slice(0, 600));
@@ -226,10 +226,11 @@ check('novedades', 'sin aviso de muestra, sin ranking y sin fechas impresas (la 
 await ev(`document.querySelector('#novedades').scrollIntoView()`); await sleep(600);
 await shot('04-novedades.jpg');
 const cardBox = await ev(`(()=>{ const s = document.querySelector('#novedades'); const c = s.querySelector('.card'), sv = s.querySelector('.save'), b = s.querySelector('.badge-new'); const cs = getComputedStyle(b); return { card: Math.round(c.getBoundingClientRect().width), save: [Math.round(sv.getBoundingClientRect().width), Math.round(sv.getBoundingClientRect().height)], badge: [cs.backgroundColor, cs.color, cs.fontSize], popup: c.getAttribute('aria-haspopup') }; })()`);
-check('novedades', 'la misma tarjeta del carrusel (portada que abre la ficha, guardar de ≥ 44 px) e insignia en turquesa profundo con texto blanco', cardBox.card >= 134 && cardBox.save[0] >= 44 && cardBox.save[1] >= 44 && cardBox.popup === 'dialog' && cardBox.badge[0] === 'rgb(23, 107, 98)' && cardBox.badge[1] === 'rgb(255, 255, 255)' && cardBox.badge[2] === '12px', JSON.stringify(cardBox));
+check('novedades', 'la misma tarjeta del carrusel (portada que abre la ficha, guardar de ≥ 44 px) e insignia «Nuevo» en primario (turquesa profundo) con texto blanco', cardBox.card >= 134 && cardBox.save[0] >= 44 && cardBox.save[1] >= 44 && cardBox.popup === 'dialog' && cardBox.badge[0] === 'rgb(23, 107, 98)' && cardBox.badge[1] === 'rgb(255, 255, 255)' && cardBox.badge[2] === '12px', JSON.stringify(cardBox));
 await sleep(1600);
 const looking = await newsState();
-check('novedades', '«visto» se guarda con la sección en pantalla; mientras se mira, las insignias y el punto siguen', looking.seen === dayAgo(0) && looking.badges.filter(Boolean).length === 3 && looking.dot, JSON.stringify({ seen: looking.seen, badges: looking.badges, dot: looking.dot }));
+const mtyToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date()); // «visto» es el día de Monterrey (news.js isoDay), no el del reloj de la máquina
+check('novedades', '«visto» se guarda con la sección en pantalla (día de Monterrey); mientras se mira, las insignias y el punto siguen', looking.seen === mtyToday && looking.badges.filter(Boolean).length === 3 && looking.dot, JSON.stringify({ seen: looking.seen, badges: looking.badges, dot: looking.dot }));
 await ev(`scrollTo(0, 0)`); await sleep(900);
 const left = await newsState();
 check('novedades', 'al salir de la sección se retiran insignias, punto y control, y la cabecera pasa a «Ya viste todo lo que ha llegado»', left.badges.every(b => !b) && !left.dot && left.sr === '' && left.cta === null && left.status === 'Ya viste todo lo que ha llegado' && left.state === 's', JSON.stringify({ badges: left.badges, dot: left.dot, cta: left.cta, status: left.status, state: left.state }));
@@ -261,7 +262,7 @@ async function sweep(w, h, mobile) {
     await ev(`scrollTo(0, ${y})`); await sleep(260);
     const r = await ev(`(()=>{
       const vis = e => { const b = e.getBoundingClientRect(); const cs = getComputedStyle(e); return b.width > 0 && b.height > 0 && b.bottom > 0 && b.top < innerHeight && cs.visibility !== 'hidden' && cs.display !== 'none' && !e.closest('[hidden], [inert]'); };
-      const prim = [...document.querySelectorAll('.btn--tungsten')].filter(vis);
+      const prim = [...document.querySelectorAll('.btn--primario')].filter(e => vis(e) && !e.closest('dialog'));
       const wa = [...document.querySelectorAll('a[href*="wa.me"].btn, a[href*="wa.me"].btn--sm')].filter(vis);
       const size = e => ({ h: Math.round(e.getBoundingClientRect().height), fs: parseFloat(getComputedStyle(e).fontSize) });
       return { y: scrollY, prim: prim.map(p => ({ t: p.innerText.trim(), ...size(p) })), wa: wa.map(a => ({ t: a.innerText.trim(), ...size(a) })) };
@@ -282,7 +283,7 @@ const sheetPrim = async (name, opener) => {
   await opener(); await sleep(900);
   const r = await ev(`(()=>{ const d=[...document.querySelectorAll('dialog')].find(x=>x.open && x.matches(':modal')); if(!d) return null;
     const vis = e => { const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[inert]'); };
-    const prim = [...d.querySelectorAll('.btn--tungsten')].filter(vis); const wa = [...d.querySelectorAll('a[href*="wa.me"]')].filter(vis);
+    const prim = [...d.querySelectorAll('.btn--primario')].filter(vis); const wa = [...d.querySelectorAll('a[href*="wa.me"]')].filter(vis);
     const h = e => Math.round(e.getBoundingClientRect().height);
     return { id: d.id || d.className, prim: prim.map(p => p.innerText.trim()), maxPrim: Math.max(0, ...prim.map(h)), maxWa: Math.max(0, ...wa.map(h)) }; })()`);
   sheets.push({ name, ...r });

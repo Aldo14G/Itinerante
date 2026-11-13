@@ -1,4 +1,4 @@
-// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en menú (abrir/cerrar), chip del carrusel, guardar y ficha.
+// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar y ficha.
 // Uso: node tools/qa/inp.mjs URL [corridas=3] [cpu=4] [ancho=390] [alto=844]
 // Cada corrida carga la página en frío. Mide con PerformanceObserver `event` (durationThreshold 16 ms, interacciones con
 // interactionId; el INP de una interacción es la mayor duración de sus eventos) y `long-animation-frame` / `longtask`.
@@ -53,7 +53,9 @@ const INSTALL = `
 
 const steps = [
   ['menú abrir', async () => { await click('[data-menu-open]'); }],
-  ['menú cerrar', async () => { await click('[data-sm-close]'); }],
+  ['menú cerrar', async () => { await click('[data-menu-close]'); }],
+  ['Mi lista abrir', async () => { await click('.tabbar [data-open-mylist]'); }],
+  ['Mi lista cerrar', async () => { await sleep(600); await click('[data-ml-close]'); }],
   ['chip carrusel', async () => { await ev(`document.querySelector('[data-rail]').scrollIntoView()`); await sleep(2500); await click('.rail-chip:not([aria-checked=true])'); }],
   ['guardar', async () => { await click('.rail-item .save'); }],
   ['ficha abrir', async () => { await click('.rail-item .card'); }],
@@ -79,7 +81,8 @@ for (let run = 1; run <= +RUNS; run++) {
   }
   await ev(`scrollTo(0, 0)`); await sleep(500);
   for (const [name, fn] of steps) {
-    if (+W >= 761 && name.startsWith('menú')) continue; // el menú lateral es solo móvil; en escritorio la navegación va en la cabecera
+    if (+W >= 1101 && name.startsWith('menú')) continue; // desde 1101 px las secciones van en la barra (sin ☰)
+    if (+W >= 761 && name.startsWith('Mi lista')) continue; // la barra inferior es solo del teléfono
     try { await fn(); await sleep(1800); const r = await collect(); rows.push({ run, name, ...r }); }
     catch (e) { rows.push({ run, name, error: String(e.message || e) }); }
   }
