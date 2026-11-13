@@ -5,7 +5,6 @@
 import { createCarousel3D, wireRadioChips, checkChip } from './carousel3d.js';
 import { afterPaint } from './motion.js';
 
-export const WA_NUMBER = '528180875940';
 export const MENU_URL = 'assets/data/menu.json';
 
 // ---------- Parte pura ----------
@@ -19,14 +18,6 @@ export function validMenu(menu) {
 }
 // Precio de un producto: solo si la librería lo dio («$45 MXN»); sin precio, nada (ni «por confirmar»).
 export const precioCarta = n => (typeof n === 'number' && Number.isFinite(n) && n >= 0 ? `$${Math.round(n)} MXN` : null);
-// «Preguntar por la carta»: WhatsApp con el mensaje listo, con la categoría a la vista.
-const noun = cat => String(cat?.nombre ?? 'café y té').toLocaleLowerCase('es');
-export const cartaMessage = cat => `Hola, quisiera preguntar por la carta de ${noun(cat)}. ¿Qué tienen hoy?`;
-export function cartaUrl(cat) {
-  const url = new URL(`https://wa.me/${WA_NUMBER}`);
-  url.searchParams.set('text', cartaMessage(cat));
-  return url.href;
-}
 
 const make = (tag, cls, text) => {
   const n = document.createElement(tag);
@@ -74,11 +65,10 @@ export async function initCafe({ isMotion = () => false } = {}) {
   const track = $('[data-cafe-track]');
   const live = $('[data-cafe-live]');
   const status = $('[data-cafe-status]');
-  const ask = $('[data-cafe-ask]');
 
   let cats;
   try { cats = validMenu(await loadMenu()); } catch { cats = []; }
-  if (!cats.length) { // sin carta no se promete nada: queda la foto y «Preguntar por la carta»
+  if (!cats.length) { // sin carta no se promete nada: queda la foto
     root.dataset.state = 'vacio';
     chipsEl.replaceChildren();
     track.replaceChildren();
@@ -100,7 +90,6 @@ export async function initCafe({ isMotion = () => false } = {}) {
     const cat = cats.find(c => c.id === id) ?? cats[0];
     current = cat.id;
     checkChip(chipsEl, cat.id, '.cafe-chip');
-    ask.href = cartaUrl(cat);
     const mine = ++paintId;
     if (!immediate) await afterPaint();
     if (mine !== paintId) return;

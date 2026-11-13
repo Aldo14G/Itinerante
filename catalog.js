@@ -151,6 +151,17 @@ export function facetCounts(books, f, dim) {
   return counts;
 }
 
+// Rejilla en línea (tableta y escritorio, 2026-11-13): sin búsqueda ni filtros muestra dos filas y «Ver los N títulos» despliega el resto en
+// su sitio (aria-expanded; el foco se queda en el botón, como «Ver todo» de Novedades). Con búsqueda o filtros, o en la hoja del teléfono,
+// los resultados van completos. No esconde inventario ni inventa orden: las dos filas son las primeras de la A a la Z.
+export const FOLD_ROWS = 2;
+export function foldView(total, cols, { inline = true, filtering = false, expanded = false, rows = FOLD_ROWS } = {}) {
+  const limit = Math.max(1, Math.floor(cols) || 1) * rows;
+  const fold = Boolean(inline) && !filtering && total > limit;
+  const folded = fold && !expanded;
+  return { fold, folded, limit: folded ? limit : total, label: folded ? `Ver los ${total} títulos` : 'Ver menos' };
+}
+
 // Opciones de un grupo de filtros (Hick): un grupo solo se pliega a partir de FACET_FOLD_AT opciones (con 6 géneros, todos a la vista).
 // Plegado muestra como máximo `limit`; las marcadas siempre entran y el resto se completa por conteo, en el orden recibido (por conteo),
 // así marcar una opción visible no mueve nada. Abierto, las primeras `limit` quedan arriba y el resto debajo del botón «Ver las N»
@@ -270,11 +281,13 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   const chipsEl = $('[data-cat-chips]', root);
   const grid = $('[data-cat-grid]', root);
   const moreBtn = $('[data-cat-more]', root);
+  const foldBtn = $('[data-cat-fold]', root);
+  const sheetQuery = matchMedia('(max-width: 760px)'); // en el teléfono la rejilla vive en la hoja Explorar y nunca se pliega
   const emptyEl = $('[data-cat-empty]', root);
   const drawer = $('#cat-drawer');
 
   // Orden: de la A a la Z y, con una búsqueda, por relevancia (el selector «Ordenar» se retiró el 2026-11-13). `open`: grupos de filtros desplegados.
-  const state = { q: '', k: new Set(), g: new Set(), f: new Set(), p: new Set(), sort: 'az', shown: PAGE_SIZE, open: new Set() };
+  const state = { q: '', k: new Set(), g: new Set(), f: new Set(), p: new Set(), sort: 'az', shown: PAGE_SIZE, open: new Set(), expanded: false };
   const names = {
     k: id => CATEGORY_ES[id] || data.categories[id] || id,
     g: id => genreLabel(id, data.subgenres[id]?.n),
@@ -386,7 +399,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     grid.append(frag);
     if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: EASE(), fill: 'backwards' }));
     const left = results.length - slice.length;
-    moreBtn.hidden = left <= 0;
+    const folded = applyFold();
+    moreBtn.hidden = left <= 0 || folded;
     moreBtn.textContent = `Ver ${Math.min(PAGE_SIZE, left)} más · quedan ${left}`;
     emptyEl.hidden = results.length > 0;
     grid.hidden = !results.length;
@@ -395,6 +409,33 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     status.textContent = !n ? 'No hay títulos con esa combinación.' : slice.length < n ? `Mostrando ${slice.length} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
     status.classList.toggle('sr-only', !n);
     return fresh;
+  }
+
+  // Pliegue de la rejilla en línea (foldView): las columnas salen de la rejilla pintada, así dos filas son dos filas a cualquier ancho.
+  const filtering = () => Boolean(state.q || state.k.size || state.g.size || state.f.size || state.p.size);
+  const gridCols = () => { const t = getComputedStyle(grid).gridTemplateColumns; return t && t !== 'none' ? t.split(' ').filter(Boolean).length : 0; };
+  let foldCols = 0, foldInline = null;
+  function applyFold() {
+    foldCols = gridCols() || foldCols || 1;
+    foldInline = !sheetQuery.matches;
+    const v = foldView(results.length, foldCols, { inline: foldInline, filtering: filtering(), expanded: state.expanded });
+    [...grid.children].forEach((li, i) => { li.hidden = i >= v.limit; });
+    foldBtn.hidden = !v.fold;
+    foldBtn.setAttribute('aria-expanded', String(!v.folded));
+    foldBtn.textContent = v.label;
+    return v.folded;
+  }
+  foldBtn.addEventListener('click', () => {
+    const y = foldBtn.getBoundingClientRect().top;
+    state.expanded = !state.expanded;
+    applyFold();
+    moreBtn.hidden = moreBtn.hidden || foldBtn.getAttribute('aria-expanded') === 'false';
+    // Al plegar, el botón se queda bajo el dedo o el cursor: la página sube lo que la rejilla encogió.
+    if (!state.expanded) window.scrollBy(0, foldBtn.getBoundingClientRect().top - y);
+  });
+  if ('ResizeObserver' in window) { // otro ancho (ventana, giro, hoja ↔ en línea): si cambian las columnas, se vuelve a plegar
+    let raf = 0;
+    new ResizeObserver(() => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; const c = gridCols(); if ((c && c !== foldCols) || foldInline !== !sheetQuery.matches) applyFold(); }); }).observe(grid);
   }
 
   function refresh({ keepShown = false, animate = true } = {}) {

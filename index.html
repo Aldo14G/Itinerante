@@ -139,7 +139,6 @@
         <p class="entry-lede">Libros, café y talleres en una casa de piedra del centro de Monterrey.</p>
         <div class="entry-actions">
           <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
-          <a class="btn btn--secundario btn--lg" href="https://wa.me/528180875940?text=Hola%2C%20quiero%20preguntar%20por%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Preguntar por un libro</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
         </div>
         <p class="entry-address"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mariano Matamoros Pte.&nbsp;421&nbsp;·&nbsp;Centro</p>
         <a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"></span><span data-news-cta-text></span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
@@ -165,7 +164,7 @@
       </ol>
     </section>
 
-    <!-- Catálogo (el id sigue siendo #libros): titular → «Buscar en el catálogo» → chips de colección → carrusel 3D → preguntar por la colección.
+    <!-- Catálogo (el id sigue siendo #libros): titular → «Buscar en el catálogo» → chips de colección → carrusel 3D (el contacto vive en el pie).
          En escritorio la rejilla de «Explora el catálogo» sigue en línea debajo; en el teléfono la búsqueda abre la hoja Explorar. -->
     <section id="libros" class="books" aria-labelledby="books-title">
       <div class="books-head">
@@ -198,11 +197,6 @@
         <div class="cf-pie">
           <div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title></p><p class="cf-meta" data-rail-meta></p></div>
         </div>
-        <!-- Preguntar por la colección a la vista (el mensaje lo arma rail.js al cambiar de colección) o pedir una recomendación sin rumbo fijo. -->
-        <div class="rail-ask">
-          <a class="btn btn--secundario" data-rail-ask href="https://wa.me/528180875940?text=Hola%2C%20me%20gustar%C3%ADa%20preguntar%20por%20libros%20de%20narrativa.%20%C2%BFQu%C3%A9%20me%20recomiendan%3F" target="_blank" rel="noopener noreferrer"><span data-rail-ask-label>Preguntar por narrativa</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
-          <a class="rail-libre" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20y%20no%20s%C3%A9%20por%20d%C3%B3nde%20empezar.%20%C2%BFMe%20ayudan%20a%20elegir%3F" target="_blank" rel="noopener noreferrer">Pide una recomendación por WhatsApp</a>
-        </div>
         <p class="sr-only" aria-live="polite" data-rail-live></p>
       </div>
 
@@ -234,7 +228,7 @@
           <div class="cat-main">
             <p class="cat-status" role="status" aria-live="polite" data-cat-status>Cargando el catálogo…</p>
             <ul class="cat-chips" data-cat-chips hidden></ul>
-            <ul class="cat-grid" data-cat-grid aria-busy="true">
+            <ul class="cat-grid" id="cat-grid" data-cat-grid aria-busy="true">
               <li class="card-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="card-t">&nbsp;</span><span class="card-m">&nbsp;</span></span></li>
               <li class="card-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="card-t">&nbsp;</span><span class="card-m">&nbsp;</span></span></li>
               <li class="card-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="card-t">&nbsp;</span><span class="card-m">&nbsp;</span></span></li>
@@ -282,6 +276,8 @@
               <button type="button" class="btn btn--secundario" data-cat-reset><span>Limpiar búsqueda y filtros</span></button>
               <a class="btn btn--secundario" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20que%20no%20encuentro%20en%20su%20sitio." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
             </div>
+            <!-- En línea (desde 761 px) y sin búsqueda ni filtros, la rejilla muestra dos filas; este botón despliega el resto en su sitio (catalog.js, foldView). -->
+            <button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid" hidden></button>
             <button type="button" class="btn btn--secundario cat-more" data-cat-more hidden></button>
           </div>
         </div>
@@ -330,8 +326,8 @@
 
 
     <!-- Eventos y talleres (el id sigue siendo #cartelera): Carrusel3D, variante evento (feed.js). Cada propuesta es una tarjeta (foto, insignias de tipo y
-         estado, título); debajo, la descripción de la del centro y una sola fila de acciones. Sin JavaScript, cada tarjeta muestra su descripción y su
-         consulta por WhatsApp y la fila se desliza con el dedo. -->
+         estado, título); debajo, la descripción de la del centro y «Compartir». Sin JavaScript, cada tarjeta muestra su descripción y la fila se
+         desliza con el dedo. La consulta por WhatsApp vive en el pie (Contacto). -->
     <section id="cartelera" class="bill" aria-labelledby="bill-title">
       <header class="sec-head" data-revelar>
         <h2 id="bill-title" class="h2">Eventos y talleres <em>en la casa</em></h2>
@@ -348,7 +344,6 @@
               <h3 class="bill-title" id="bill-t-circulo">Círculo de lectura</h3>
               <div class="bill-detail">
                 <p>Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
-                <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20c%C3%ADrculo%20de%20lectura.%20%C2%BFTienen%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Círculo de lectura"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a></div>
               </div>
             </article>
           </li>
@@ -359,7 +354,6 @@
               <h3 class="bill-title" id="bill-t-ajedrez">Ajedrez en la casa</h3>
               <div class="bill-detail">
                 <p>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
-                <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesan%20las%20partidas%20de%20ajedrez.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Ajedrez en la casa"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a></div>
               </div>
             </article>
           </li>
@@ -370,7 +364,6 @@
               <h3 class="bill-title" id="bill-t-taller">Taller de escritura</h3>
               <div class="bill-detail">
                 <p>Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
-                <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20taller%20de%20escritura.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Taller de escritura"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a></div>
               </div>
             </article>
           </li>
@@ -379,11 +372,10 @@
         <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-bill-prev disabled aria-label="Evento anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
         <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-bill-next disabled aria-label="Evento siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
       </div>
-      <!-- La propuesta del centro: su descripción (región viva) y una sola fila de acciones. feed.js las cambia con el carrusel. -->
+      <!-- La propuesta del centro: su descripción (región viva) y «Compartir». feed.js los cambia con el carrusel. -->
       <div class="bill-pie" data-bill-pie>
         <p class="bill-desc" aria-live="polite" data-bill-desc><span class="sr-only" data-bill-desc-title>Ajedrez en la casa. </span><span data-bill-desc-text>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</span></p>
         <div class="bill-fila">
-          <a class="btn btn--secundario bill-wa" data-bill-wa href="https://wa.me/528180875940?text=Hola%2C%20me%20interesan%20las%20partidas%20de%20ajedrez.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Ajedrez en la casa"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
           <button class="btn btn--secundario btn--icono act act--icon" type="button" data-share="ajedrez" data-title="Ajedrez en la casa" aria-label="Compartir «Ajedrez en la casa»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button>
         </div>
       </div>
@@ -407,7 +399,7 @@
     </section>
 
     <!-- Café y té (#cafe): la carta de la sala en un Carrusel3D, variante carta (cafe.js, datos en assets/data/menu.json: se edita sin tocar HTML ni JS).
-         Sin precios mientras la librería no los dé. Sin JavaScript queda la foto y «Preguntar por la carta». -->
+         Sin precios mientras la librería no los dé. Sin JavaScript queda la foto. -->
     <section id="cafe" class="cafe" aria-labelledby="cafe-title">
       <header class="sec-head" data-revelar>
         <h2 id="cafe-title" class="h2">Café y té <em>en la sala</em></h2>
@@ -432,9 +424,6 @@
           </div>
           <p class="sr-only" aria-live="polite" data-cafe-live></p>
           <p class="cafe-status" role="status" data-cafe-status></p>
-          <div class="cafe-ask">
-            <a class="btn btn--secundario" data-cafe-ask href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20preguntar%20por%20la%20carta%20de%20caf%C3%A9.%20%C2%BFQu%C3%A9%20tienen%20hoy%3F" target="_blank" rel="noopener noreferrer"><span>Preguntar por la carta</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
-          </div>
         </div>
       </div>
     </section>
@@ -453,7 +442,6 @@
         <p class="visit-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-long>Lunes a sábado de 11:00 a 20:00</span></p>
         <div class="visit-actions">
           <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
-          <a class="btn btn--secundario btn--lg" href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20informes%20para%20visitar%20la%20librer%C3%ADa." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
         </div>
       </div>
       <div class="visit-side">
@@ -473,14 +461,22 @@
     </section>
   </main>
 
-  <footer class="ftr">
-    <div class="ftr-row">
+  <!-- Pie: el único lugar de la página con el contacto (decisión de Aldo, 2026-11-13). Las secciones no repiten llamados a WhatsApp; se quedan
+       los que son la función de su objeto (ficha del libro, Mi lista, salida del estado vacío) y la fila del menú ☰. -->
+  <footer class="ftr" aria-labelledby="ftr-title">
+    <div class="ftr-contacto">
+      <div class="ftr-texto">
+        <h2 id="ftr-title" class="ftr-title">Contacto</h2>
+        <p class="ftr-lede">Escríbenos para preguntar por un libro, la carta o la próxima fecha de un taller.</p>
+      </div>
       <ul class="ftr-links">
-        <li><a class="btn btn--plano btn--sm" href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-ig"/></svg><span>Instagram</span></a></li>
-        <li><a class="btn btn--plano btn--sm" href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-fb"/></svg><span>Facebook</span></a></li>
-        <li><a class="btn btn--plano btn--sm" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span>WhatsApp</span></a></li>
-        <li><a class="btn btn--plano btn--sm" href="mailto:libreriaitineranteymasmty@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span>Correo</span></a></li>
+        <li><a class="ftr-link" href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span>WhatsApp</span><svg class="ic ftr-ne" aria-hidden="true"><use href="#i-ne"/></svg></a></li>
+        <li><a class="ftr-link" href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-ig"/></svg><span>Instagram</span><svg class="ic ftr-ne" aria-hidden="true"><use href="#i-ne"/></svg></a></li>
+        <li><a class="ftr-link" href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-fb"/></svg><span>Facebook</span><svg class="ic ftr-ne" aria-hidden="true"><use href="#i-ne"/></svg></a></li>
+        <li><a class="ftr-link" href="mailto:libreriaitineranteymasmty@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span>Correo</span><svg class="ic ftr-ne" aria-hidden="true"><use href="#i-ne"/></svg></a></li>
       </ul>
+    </div>
+    <div class="ftr-row">
       <button class="btn btn--plano btn--sm motion-btn" type="button" data-motion-toggle aria-pressed="false">Pausar el movimiento</button>
     </div>
   </footer>

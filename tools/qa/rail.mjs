@@ -79,15 +79,15 @@ const HELPERS = `(() => {
 const AFTER_CHIP = `async chip => { const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-c3d]'); const tr = r.querySelector('[data-rail-track]'); const name = chip.textContent.trim();
   await __itiQa.until(() => v.getAttribute('aria-label').includes(name) && !tr.hasAttribute('aria-busy') && tr.children.length > 0, 8000, 'colección ' + name);
   await __itiQa.stable(() => tr.children.length); }`;
-// Estado de la fila de chips, del botón «Preguntar por {colección}» y posición del carrusel dentro de la pieza (para vigilar que nada salte de alto).
+// Estado de la fila de chips, de lo que hay bajo el carrusel (desde el 2026-11-13, ningún llamado a WhatsApp) y posición del carrusel dentro de la pieza (para vigilar que nada salte de alto).
 const CHIPS = `(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); const top = r.querySelector('.rail-head').getBoundingClientRect().top;
   const chips = [...g.querySelectorAll('.rail-chip')].map(c => { const b = c.getBoundingClientRect(); const cs = getComputedStyle(c);
     return { id: c.dataset.id, name: c.textContent.trim(), role: c.getAttribute('role'), checked: c.getAttribute('aria-checked'), tab: c.tabIndex, w: Math.round(b.width), h: Math.round(b.height), left: b.left, right: b.right, top: Math.round(b.top), cut: c.scrollWidth > c.clientWidth + 1, fs: cs.fontSize, bg: cs.backgroundColor, mark: getComputedStyle(c, '::before').content }; });
-  const ask = r.querySelector('[data-rail-ask]'); const libre = r.querySelector('.rail-libre');
+  const pieTop = r.querySelector('.cf-pie').getBoundingClientRect().top;
   return { role: g.getAttribute('role'), label: g.getAttribute('aria-label'), chips, gap: chips.slice(1).map((c, i) => c.top === chips[i].top ? Math.round(c.left - chips[i].right) : 99),
-    ask: { text: ask.textContent.trim(), msg: new URL(ask.href).searchParams.get('text'), h: Math.round(ask.getBoundingClientRect().height) }, libre: { text: libre.textContent.trim(), h: Math.round(libre.getBoundingClientRect().height), msg: new URL(libre.href).searchParams.get('text') },
+    wa: [...r.querySelectorAll('a[href*="wa.me"]')].filter(a => a.getBoundingClientRect().height > 0).length,
     vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - top), noteTop: Math.round(r.querySelector('[data-rail-note]').getBoundingClientRect().top - top), headH: Math.round(r.querySelector('.rail-head').getBoundingClientRect().height),
-    askTop: Math.round(ask.getBoundingClientRect().top - top), live: r.querySelector('[data-rail-live]').textContent, stored: (() => { try { return JSON.parse(localStorage.getItem('iti-recorrido-v2') || '[]'); } catch { return []; } })(),
+    pieTop: Math.round(pieTop - top), live: r.querySelector('[data-rail-live]').textContent, stored: (() => { try { return JSON.parse(localStorage.getItem('iti-recorrido-v2') || '[]'); } catch { return []; } })(),
     progreso: r.querySelector('[data-rail-progreso]').textContent, links: [...g.querySelectorAll('.rail-conector')].map(l => [l.classList.contains('is-hecho'), Math.round(l.getBoundingClientRect().width), Math.round(l.getBoundingClientRect().height)]),
     hojeadas: chips.map(c => g.querySelector('.rail-chip[data-id="' + c.id + '"]').classList.contains('is-hojeada')), row: (() => { const all = [...g.children].map(e => e.getBoundingClientRect()); const pad = parseFloat(getComputedStyle(document.querySelector('.books')).paddingRight); return { one: new Set(all.map(b => Math.round(b.top + b.height / 2))).size === 1, right: Math.round(Math.max(...all.map(b => b.right))), limit: Math.round(innerWidth - pad) }; })() }; })()`;
 const READY = `document.querySelector('[data-rail]').classList.contains('is-ready') && !document.querySelector('[data-rail] .card--sk') && document.querySelectorAll('[data-rail] .rail-item').length > 0`;
@@ -126,7 +126,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
         caption: r.querySelector('[data-rail-title]').textContent, meta: meta.textContent, dots: r.querySelectorAll('[data-rail-dots], .cf-progreso, .rail-all, .rail-trail, .rail-stop').length,
         sk: r.querySelectorAll('.card--sk').length,
         flechas: [...r.querySelectorAll('.c3d-flecha')].map(b => { const x = b.getBoundingClientRect(); return [b.className.includes('btn--vidrio'), Math.round(x.width), Math.round(x.height)]; }),
-        small: [...r.querySelectorAll('.rail-chip, .c3d-flecha, [data-rail-ask], .rail-libre')].filter(b => b.getBoundingClientRect().width > 0 && (b.getBoundingClientRect().height < 44 || b.getBoundingClientRect().width < 44)).length,
+        small: [...r.querySelectorAll('.rail-chip, .c3d-flecha')].filter(b => b.getBoundingClientRect().width > 0 && (b.getBoundingClientRect().height < 44 || b.getBoundingClientRect().width < 44)).length,
         docW: document.documentElement.scrollWidth === document.documentElement.clientWidth
       };
     })()`);
@@ -166,7 +166,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     ck(name + ': chips = radiogroup «Colección» con 3 botones role=radio, uno marcado (primario con palomita) y un solo punto de tabulación', t0.role === 'radiogroup' && t0.label === 'Colección' && t0.chips.length === 3 && t0.chips.every(x => x.role === 'radio') && t0.chips.filter(x => x.checked === 'true').length === 1 && t0.chips.filter(x => x.tab === 0).length === 1 && t0.chips[0].checked === 'true' && t0.chips[0].tab === 0 && t0.chips[0].mark !== 'none', JSON.stringify(t0.chips.map(x => [x.role, x.checked, x.tab, x.mark.slice(0, 6)])));
     ck(name + ': cada chip mide 48 px de alto, con su nombre entero en 15 px y ≥ 8 px entre vecinos', t0.chips.every(x => x.h === 48 && !x.cut && x.fs === '15px') && t0.gap.every(g => g >= 8), JSON.stringify({ chips: t0.chips.map(x => [x.w, x.h, x.fs, x.cut]), gap: t0.gap }));
     ck(name + ': el esqueleto reserva la fila de chips (uno por colección): la cabecera del carrusel mide lo mismo antes y después de cargar', !sk.ready && sk.n === 3 && sk.headH === t0.headH, JSON.stringify({ sk, headH: t0.headH }));
-    ck(name + ': bajo el carrusel, «Preguntar por narrativa» (WhatsApp con el mensaje de la colección) y «Pide una recomendación por WhatsApp», con objetivos ≥ 44 px', t0.ask.text === 'Preguntar por narrativa' && /libros de narrativa\. ¿Qué me recomiendan\?$/.test(t0.ask.msg) && t0.ask.h >= 48 && t0.libre.text === 'Pide una recomendación por WhatsApp' && t0.libre.h >= 44 && /no sé por dónde empezar/.test(t0.libre.msg), JSON.stringify({ ask: t0.ask, libre: t0.libre }));
+    ck(name + ': bajo el carrusel, ningún llamado a WhatsApp (el contacto vive en el pie de la página desde el 2026-11-13)', t0.wa === 0, JSON.stringify({ wa: t0.wa }));
     ck(name + ': recorrido: tras elegir las tres colecciones, «3 de 3 paradas hojeadas», palomita en las tres, conectores de 2 px en primario y guardado en este dispositivo', t0.progreso === '3 de 3 paradas hojeadas' && t0.hojeadas.every(Boolean) && t0.links.length === 2 && t0.links.every(l => l[0] && l[1] >= 8 && l[2] === 2) && JSON.stringify([...t0.stored].sort()) === JSON.stringify(['ensayo', 'narrativa', 'poesia']), JSON.stringify({ p: t0.progreso, h: t0.hojeadas, l: t0.links, s: t0.stored }));
     ck(name + ': las paradas (con su palomita) y sus conectores caben en un renglón, sin partirse ni desbordar', t0.row.one && t0.row.right <= t0.row.limit + 1 && t0.chips.every(x => !x.cut), JSON.stringify(t0.row));
     // Teclado: las flechas mueven la selección y el foco juntos; Tab entra por el chip marcado.
@@ -183,8 +183,8 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     await run(`(${AFTER_CHIP})(document.activeElement)`);
     const k2 = await ev(CHIPS);
     ck(name + ': teclado: las flechas eligen y enfocan el chip vecino (dan la vuelta), queda un solo tabindex=0 y la región viva dice la colección y su número de libros', k1.chips[1].checked === 'true' && k1.chips.filter(x => x.tab === 0).length === 1 && k1.chips[1].tab === 0 && k1.live === 'Poesía: 8 libros.' && k2.chips[2].checked === 'true' && k2.chips[2].tab === 0 && k2.chips.filter(x => x.tab === 0).length === 1 && k2.live === 'Ensayo: 9 libros.', JSON.stringify({ k1: [k1.live, k1.chips.map(x => x.tab)], k2: [k2.live, k2.chips.map(x => x.tab)] }));
-    ck(name + ': «Preguntar por {colección}» sigue al chip (rótulo y mensaje)', k1.ask.text === 'Preguntar por poesía' && /libros de poesía\./.test(k1.ask.msg) && k2.ask.text === 'Preguntar por ensayo' && /libros de ensayo\./.test(k2.ask.msg), JSON.stringify([k1.ask, k2.ask]));
-    ck(name + ': elegir chips no mueve la nota ni el carrusel', [k1, k2].every(k => k.vpTop === t0.vpTop && k.noteTop === t0.noteTop && k.headH === t0.headH), JSON.stringify([t0, k1, k2].map(k => [k.noteTop, k.vpTop, k.headH, k.askTop])));
+    ck(name + ': elegir chips no agrega llamados bajo el carrusel', k1.wa === 0 && k2.wa === 0, JSON.stringify([k1.wa, k2.wa]));
+    ck(name + ': elegir chips no mueve la nota ni el carrusel', [k1, k2].every(k => k.vpTop === t0.vpTop && k.noteTop === t0.noteTop && k.headH === t0.headH), JSON.stringify([t0, k1, k2].map(k => [k.noteTop, k.vpTop, k.headH, k.pieTop])));
     await run(`document.querySelector('.rail-chip').click()`); // de vuelta al primer chip para lo que sigue
     await run(`(${AFTER_CHIP})(document.querySelector('.rail-chip'))`);
     // Norma del 2026-11-13 (skill ux-apple §3; tools/qa/carrusel.mjs la mide entera): 58 % del ancho en el teléfono (176–240 px, con tope contra el

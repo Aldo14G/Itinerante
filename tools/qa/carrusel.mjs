@@ -12,7 +12,8 @@
 //  · hueco visible entre la central y cada vecina ≥ 12 px (no se enciman);
 //  · flechas: con toque no se muestran (el control es deslizar o tocar la vecina); con puntero fino se ven, miden ≥ 44, no tapan la central
 //    (≥ 8 px de hueco), van centradas en el alto de la pieza (± 2 px) y, desde 1024 px, quedan ≥ 16 px fuera de la última pieza a la vista;
-//  · el bloque carrusel + pie + acción cabe en el alto útil (entre la barra de navegación y la barra inferior);
+//  · el bloque carrusel + pie + acción cabe en el alto útil (entre la barra de navegación y la barra inferior); desde el 2026-11-13 solo
+//    Eventos lleva acción («Compartir»): el contacto de Catálogo y Café vive en el pie de la página;
 //  · aire: lo de arriba → pieza 24–32 (± 2), pieza → pie 16–20 (± 2), pie → acción 24 (± 4; en la carta, pieza → acción);
 //  · texto: nada cortado en la pieza central ni en el pie; en las vecinas ningún texto visible cruza el borde de la ventana (el texto de
 //    una portada tipográfica es parte de la imagen y no cuenta);
@@ -100,10 +101,10 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   const cortesVecinas = info.filter((v, i) => i !== ci && v.shown && v.frac > 0).flatMap(v => leaves(items[v.i]).filter(visibleTxt).filter(e => { const r = R(e); return (r.left < vr.left - 0.5 && r.right > vr.left + 0.5) || (r.right > vr.right + 0.5 && r.left < vr.right - 0.5); }).map(e => e.textContent.trim().slice(0, 30)));
   // Arriba, pie y acción de cada variante.
   const q = s => sec.querySelector(s);
-  let arriba, pie = null, accion;
-  if (name === 'portada') { arriba = q('.rail-nota-fila'); pie = q('.cf-texto'); accion = q('.rail-ask .btn'); }
+  let arriba, pie = null, accion = null;
+  if (name === 'portada') { arriba = q('.rail-nota-fila'); pie = q('.cf-texto'); }
   else if (name === 'evento') { arriba = q('.sec-head'); pie = q('.bill-desc'); accion = q('.bill-fila'); }
-  else { arriba = q('.cafe-chips'); accion = q('.cafe-ask .btn'); }
+  else { arriba = q('.cafe-chips'); }
   const pieTxt = pie ? [...pie.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.sr-only')).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim().slice(0, 30)) : [];
   const hdr = document.querySelector('.hdr'), tab = document.querySelector('.tabbar');
   const top = hdr ? R(hdr).bottom : 0;
@@ -115,8 +116,8 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
     visibles: vis.length, parciales: info.filter(v => v.shown && v.frac > 0 && v.frac <= 0.5).length,
     hueco, asoma, flechas: fl, flechasTotal: flechas.length, flechasVisibles: fl.length,
     cortesCentro, cortesVecinas, pieTxt,
-    altoUtil: bottom - top, bloque: R(accion).bottom - cen.t,
-    aire: { arriba: cen.t - R(arriba).bottom, pie: pie ? R(pie).top - cen.b : null, accion: R(accion).top - (pie ? R(pie).bottom : cen.b) },
+    altoUtil: bottom - top, bloque: (accion ? R(accion).bottom : pie ? R(pie).bottom : cen.b) - cen.t,
+    aire: { arriba: cen.t - R(arriba).bottom, pie: pie ? R(pie).top - cen.b : null, accion: accion ? R(accion).top - (pie ? R(pie).bottom : cen.b) : null },
     poses: info.filter(v => v.shown).map(v => v.t3d)
   };
 })`;
@@ -179,14 +180,14 @@ for (const modo of MODOS) {
         check(where, 'carrusel + pie + acción caben en el alto útil', m.bloque <= m.altoUtil, `${Math.round(m.bloque)} / ${Math.round(m.altoUtil)} px`);
         check(where, 'aire arriba 24–32 px', m.aire.arriba >= 22 && m.aire.arriba <= 34, r1(m.aire.arriba));
         if (m.aire.pie != null) check(where, 'pieza → pie 16–20 px', m.aire.pie >= 14 && m.aire.pie <= 22, r1(m.aire.pie));
-        check(where, `${m.aire.pie != null ? 'pie' : 'pieza'} → acción 24 px`, m.aire.accion >= 20 && m.aire.accion <= 28, r1(m.aire.accion));
+        if (m.aire.accion != null) check(where, `${m.aire.pie != null ? 'pie' : 'pieza'} → acción 24 px`, m.aire.accion >= 20 && m.aire.accion <= 28, r1(m.aire.accion));
         // Texto
         check(where, 'sin texto cortado en la central ni en el pie', !m.cortesCentro.length && !m.pieTxt.length, [...m.cortesCentro, ...m.pieTxt].join(' | '));
         check(where, 'vecinas sin texto partido en el borde', !m.cortesVecinas.length, m.cortesVecinas.join(' | '));
         if (modo === 'reducido') check(where, 'movimiento reducido: plano, sin giro ni profundidad', m.poses.every(t => t === 'none' || t.startsWith('matrix(')), m.poses.filter(t => t.startsWith('matrix3d')).length + ' piezas en 3D');
         rows.push({ modo, size: `${w}×${h}`, name: v.name, w: m.nominal, pct: pct == null ? null : r1(pct), cw: m.cw, dx: r1(m.dxC3d), dxCol: r1(m.dxCol), visibles: m.visibles, parciales: m.parciales,
           hueco: m.hueco.map(x => x == null ? x : r1(x)), asoma: m.asoma.map(x => x == null ? x : Math.round(100 * x)), flechas: m.coarse ? (m.flechasVisibles ? `${m.flechasVisibles} a la vista con toque` : 'ocultas (toque)') : m.flechas.map(f => ({ hueco: r1(f.huecoCentral), fuera: r1(f.fuera), dy: r1(f.dy) })),
-          bloque: Math.round(m.bloque), altoUtil: Math.round(m.altoUtil), aire: { arriba: r1(m.aire.arriba), pie: m.aire.pie == null ? null : r1(m.aire.pie), accion: r1(m.aire.accion) } });
+          bloque: Math.round(m.bloque), altoUtil: Math.round(m.altoUtil), aire: { arriba: r1(m.aire.arriba), pie: m.aire.pie == null ? null : r1(m.aire.pie), accion: m.aire.accion == null ? null : r1(m.aire.accion) } });
         const vpRect = await ev(`(() => { const c = document.querySelector('${v.sec} ${v.c3d}'); const r = c.getBoundingClientRect(); return { x: Math.max(0, r.left - 8), y: Math.max(0, r.top - 120), width: Math.min(innerWidth, r.width + 16), height: Math.min(innerHeight - Math.max(0, r.top - 120), r.height + 320) }; })()`);
         const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 72, clip: { ...vpRect, scale: 1 } });
         writeFileSync(join(out, `${modo}-${v.name}-${w}x${h}.jpg`), Buffer.from(shot.result.data, 'base64'));

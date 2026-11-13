@@ -35,19 +35,19 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
     const g = document.querySelector('[data-cat-grid]'); const gk = g.querySelector('.card--sk');
     const num = c => c.match(/[0-9.]+/g).map(Number);
     return {
-      railH: (r => Math.round(r.querySelector('.rail-ask').getBoundingClientRect().bottom - r.querySelector('.rail-head').getBoundingClientRect().top))(r), railSkW: sk && Math.round(sk.getBoundingClientRect().width), railSkH: sk && Math.round(sk.getBoundingClientRect().height), railN: r.querySelectorAll('.rail-item').length,
+      railH: (r => Math.round(r.querySelector('.cf-pie').getBoundingClientRect().bottom - r.querySelector('.rail-head').getBoundingClientRect().top))(r), railSkW: sk && Math.round(sk.getBoundingClientRect().width), railSkH: sk && Math.round(sk.getBoundingClientRect().height), railN: r.querySelectorAll('.rail-item').length,
       skColor: sc && getComputedStyle(sc).backgroundColor, skAnim: sc && getComputedStyle(sc, '::before').animationName,
-      gridSkN: g.querySelectorAll('.card--sk').length, gridSkH: gk && Math.round(gk.getBoundingClientRect().height), gridSkW: gk && Math.round(gk.getBoundingClientRect().width)
+      gridSkN: g.querySelectorAll('.card--sk').length, mainH: Math.round(document.querySelector('.cat-main').getBoundingClientRect().height), gridSkH: gk && Math.round(gk.getBoundingClientRect().height), gridSkW: gk && Math.round(gk.getBoundingClientRect().width)
     };
   })()`);
   ck(`${name}: el carrusel tiene esqueletos con el ancho de una tarjeta real`, before.railN >= 5 && before.railSkW > 100, JSON.stringify(before));
   if (mobile) ck('móvil: los esqueletos no se animan (cuesta un recálculo de estilo por fotograma)', before.skAnim === 'none', before.skAnim);
   // 2) Carga del carrusel: ¿cambia de alto?
   await ev(`window.__cls = 0; window.__shifts = []`);
-  await ev(`scrollTo(0, document.querySelector('[data-rail] .rail-head').getBoundingClientRect().top + scrollY - 120)`); // en escritorio .rail es display: contents (A6): se mide de la cabecera del carrusel a «Preguntar por…»
+  await ev(`scrollTo(0, document.querySelector('[data-rail] .rail-head').getBoundingClientRect().top + scrollY - 120)`); // en escritorio .rail es display: contents (A6): se mide de la cabecera del carrusel al pie del libro (desde el 2026-11-13 no hay «Preguntar por…»)
   for (let i = 0; i < 40 && !(await ev(`document.querySelector('[data-rail]').classList.contains('is-ready')`)); i++) await sleep(250);
   await sleep(800);
-  const after = await ev(`(() => { const r = document.querySelector('[data-rail]'); const it = r.querySelector('.rail-item.is-centro'); /* carrusel 3D: la del centro va de frente, sin giro ni escala */ return { railH: (r => Math.round(r.querySelector('.rail-ask').getBoundingClientRect().bottom - r.querySelector('.rail-head').getBoundingClientRect().top))(r), itW: Math.round(it.getBoundingClientRect().width), itH: Math.round(it.getBoundingClientRect().height), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
+  const after = await ev(`(() => { const r = document.querySelector('[data-rail]'); const it = r.querySelector('.rail-item.is-centro'); /* carrusel 3D: la del centro va de frente, sin giro ni escala */ return { railH: (r => Math.round(r.querySelector('.cf-pie').getBoundingClientRect().bottom - r.querySelector('.rail-head').getBoundingClientRect().top))(r), itW: Math.round(it.getBoundingClientRect().width), itH: Math.round(it.getBoundingClientRect().height), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
   ck(`${name}: al cargar el carrusel el alto no salta (±8 px)`, Math.abs(after.railH - before.railH) <= 8, `esqueleto ${before.railH}px → real ${after.railH}px`);
   ck(`${name}: la tarjeta real ocupa el ancho y el alto del esqueleto (±8 px)`, Math.abs(after.itW - before.railSkW) <= 8 && Math.abs(after.itH - before.railSkH) <= 8, `esqueleto ${before.railSkW}×${before.railSkH} → real ${after.itW}×${after.itH}`);
   ck(`${name}: CLS durante la carga del carrusel ≤ 0.02`, after.cls <= 0.02, JSON.stringify(after.shifts));
@@ -57,10 +57,10 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
     await ev(`scrollTo(0, document.getElementById('catalogo').getBoundingClientRect().top + scrollY - 100)`);
     for (let i = 0; i < 40 && !(await ev(`document.querySelectorAll('[data-cat-grid] button.card').length > 0`)); i++) await sleep(250);
     await sleep(800);
-    const cat = await ev(`(() => { const g = document.querySelector('[data-cat-grid]'); const c = g.querySelector('button.card'); return { gridH: Math.round(g.getBoundingClientRect().height), cardH: Math.round(c.getBoundingClientRect().height), cardW: Math.round(c.getBoundingClientRect().width), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
+    const cat = await ev(`(() => { const g = document.querySelector('[data-cat-grid]'); const c = g.querySelector('button.card'); return { mainH: Math.round(document.querySelector('.cat-main').getBoundingClientRect().height), fold: document.querySelector('[data-cat-fold]').textContent, gridH: Math.round(g.getBoundingClientRect().height), cardH: Math.round(c.getBoundingClientRect().height), cardW: Math.round(c.getBoundingClientRect().width), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
     ck('escritorio: CLS durante la carga del catálogo ≤ 0.05', cat.cls <= 0.05, JSON.stringify(cat));
     ck('escritorio: la tarjeta real mide lo mismo que el esqueleto (±8 px de alto y ancho)', Math.abs(cat.cardH - before.gridSkH) <= 8 && Math.abs(cat.cardW - before.gridSkW) <= 8, `esqueleto ${before.gridSkW}×${before.gridSkH} → real ${cat.cardW}×${cat.cardH}`);
-    ck('escritorio: el esqueleto reserva tantas tarjetas como la primera página (24)', before.gridSkN >= 24, `${before.gridSkN} esqueletos antes de 24 tarjetas reales; la rejilla pasó a ${cat.gridH}px`);
+    ck('escritorio: el esqueleto reserva la rejilla plegada (dos filas y «Ver los N títulos», 2026-11-13): el bloque no cambia de alto al cargar (±8 px)', Math.abs(cat.mainH - before.mainH) <= 8 && /^Ver los \d+ títulos$/.test(cat.fold), `esqueleto ${before.mainH}px → real ${cat.mainH}px (${cat.fold}); rejilla ${cat.gridH}px`);
   }
 }
 console.log(out.every(Boolean) ? 'ESQUELETOS: todo en orden' : `ESQUELETOS: ${out.filter(x => !x).length} fallos`);

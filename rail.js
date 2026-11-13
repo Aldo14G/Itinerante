@@ -1,6 +1,6 @@
 // Carrusel de libros: una sola pieza para cualquier colección del inventario; una lista curada se escribe como `ids` en
-// assets/data/collections.json. Las colecciones se eligen en una fila de chips (Narrativa · Poesía · Ensayo) sobre el carrusel 3D y,
-// bajo él, «Preguntar por {colección}» abre WhatsApp con el mensaje listo. Los chips son también las paradas de un recorrido ligero (A4,
+// assets/data/collections.json. Las colecciones se eligen en una fila de chips (Narrativa · Poesía · Ensayo) sobre el carrusel 3D (el
+// contacto por WhatsApp vive en el pie desde el 2026-11-13). Los chips son también las paradas de un recorrido ligero (A4,
 // 2026-11-13): conector entre ellas, palomita en las hojeadas y «N de 3 paradas hojeadas» junto a la nota. El carrusel es la variante
 // «portada» del Carrusel3D (carousel3d.js).
 import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover, priceLabel } from './catalog.js';
@@ -10,18 +10,6 @@ import { afterPaint, confirmThen } from './motion.js';
 import { createCarousel3D, wireRadioChips, checkChip } from './carousel3d.js';
 
 export const RAIL_SIZE = 12;
-
-// ---------- Preguntar por la colección (parte pura) ----------
-export const WA_NUMBER = '528180875940';
-// «Preguntar por poesía»: el objeto es el nombre de la colección en minúsculas (el de la fila de chips).
-const noun = col => String(col?.titulo ?? '').toLocaleLowerCase('es');
-export const askLabel = col => `Preguntar por ${noun(col)}`;
-export const askMessage = col => `Hola, me gustaría preguntar por libros de ${noun(col)}. ¿Qué me recomiendan?`;
-export function askUrl(col) {
-  const url = new URL(`https://wa.me/${WA_NUMBER}`);
-  url.searchParams.set('text', askMessage(col));
-  return url.href;
-}
 
 // Libros de una colección: una lista curada (`ids`, en ese orden) o un filtro sobre el catálogo, por título.
 export function pickBooks(books, col, size = RAIL_SIZE) {
@@ -166,8 +154,6 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const live = $('[data-rail-live]');
   const region = $('[data-rail-c3d]');
   const progreso = $('[data-rail-progreso]');
-  const ask = $('[data-rail-ask]');
-  const askLabelEl = $('[data-rail-ask-label]');
   const status = $('[data-rail-status]');
   const errBox = $('[data-rail-error]');
 
@@ -237,8 +223,6 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     const col = cols.find(c => c.id === id) ?? cols[0];
     current = col.id;
     checkChip(chipsEl, col.id, '.rail-chip'); // el elegido es también el punto de tabulación del grupo
-    ask.href = askUrl(col); // «Preguntar por {colección}» cambia con el chip, en el mismo fotograma
-    askLabelEl.textContent = askLabel(col);
     const mine = ++paintId;
     if (!immediate) await afterPaint();
     if (mine !== paintId) return;

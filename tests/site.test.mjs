@@ -3,15 +3,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { readFile, access, readdir } from 'node:fs/promises';
-import { pickBooks, chipNode, askLabel, askMessage, askUrl, coverflowPose, nearestIndex, captionOf, CF_GIRO, readTrail, writeTrail, trailState, trailLine, TRAIL_KEY } from '../rail.js';
+import { pickBooks, chipNode, coverflowPose, nearestIndex, captionOf, CF_GIRO, readTrail, writeTrail, trailState, trailLine, TRAIL_KEY } from '../rail.js';
 import { coverflowPose as poseMotor, keyTarget, tiltPose, tiltTransform, ATENUADA } from '../carousel3d.js';
-import { validMenu, precioCarta, cartaMessage, cartaUrl } from '../cafe.js';
+import { validMenu, precioCarta } from '../cafe.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
-import { shareName, initFeed, eventBadge, NO_DATE, eventOf, waName } from '../feed.js';
+import { shareName, initFeed, eventBadge, NO_DATE, eventOf } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -67,21 +67,29 @@ const over = (top, under) => { const [r, g, b, a] = rgba(top); const [R, G, B] =
 const lumOf = hex => { const [r, g, b] = rgba(hex).slice(0, 3).map(c => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 const contrast = (a, b) => { const [x, y] = [lumOf(a), lumOf(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
 
-test('preguntar por la colección: rótulo y mensaje con el nombre del chip, y el enlace de WhatsApp codifica acentos y ampersand', () => {
-  assert.equal(askLabel({ titulo: 'Poesía' }), 'Preguntar por poesía');
-  assert.equal(askMessage({ titulo: 'Poesía' }), 'Hola, me gustaría preguntar por libros de poesía. ¿Qué me recomiendan?');
-  const url = new URL(askUrl({ titulo: 'Ensayo & crónica' }));
-  assert.equal(url.origin + url.pathname, 'https://wa.me/528180875940');
-  assert.equal(url.searchParams.get('text'), 'Hola, me gustaría preguntar por libros de ensayo & crónica. ¿Qué me recomiendan?');
-  // El marcado trae ya el enlace de la primera colección (sin esperar a rail.js) y el de «sin rumbo fijo», con su mensaje.
-  const first = JSON.parse(readFileSync_('assets/data/collections.json')).collections[0];
-  const ask = html.match(/<a class="btn btn--secundario" data-rail-ask href="([^"]+)"[^>]*><span data-rail-ask-label>([^<]+)<\/span>/);
-  assert.ok(ask, 'el botón «Preguntar por {colección}» va bajo el carrusel');
-  assert.equal(new URL(ask[1]).searchParams.get('text'), askMessage(first));
-  assert.equal(ask[2], askLabel(first));
-  const libre = html.match(/<a class="rail-libre" href="([^"]+)"[^>]*>([^<]+)<\/a>/);
-  assert.ok(libre && libre[2] === 'Pide una recomendación por WhatsApp', 'el enlace de recomendación sin rumbo fijo');
-  assert.equal(new URL(libre[1]).searchParams.get('text'), 'Hola, estoy buscando un libro y no sé por dónde empezar. ¿Me ayudan a elegir?');
+test('contacto en un solo lugar (decisión de Aldo, 2026-11-13): el pie; las secciones no repiten llamados a WhatsApp', () => {
+  const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
+  // Fuera de las hojas (ficha, Explorar) y de las salidas de error y vacío, ninguna sección enlaza a WhatsApp.
+  const outside = main.replace(/<dialog[\s\S]*?<\/dialog>/g, '').replace(/<div class="rail-error"[\s\S]*?<\/div>/, '').replace(/<noscript>[\s\S]*?<\/noscript>/g, '');
+  assert.ok(!/wa\.me/.test(outside), 'Inicio, Catálogo, Eventos, Café y Visita sin llamados a WhatsApp');
+  for (const gone of ['data-rail-ask', 'rail-libre', 'data-bill-wa', 'bill-wa', 'bill-acts', 'data-cafe-ask', 'cafe-ask', 'Pide una recomendación', 'Preguntar por la carta', 'Preguntar por un libro']) assert.ok(!html.includes(gone), `retirado: ${gone}`);
+  for (const gone of ['rail-ask', 'rail-libre', 'cafe-ask', 'bill-wa']) assert.ok(!(css + mobileCss).includes(gone), `sin CSS huérfano: ${gone}`);
+  for (const [f, names] of [['rail.js', ['askLabel', 'askMessage', 'askUrl', 'WA_NUMBER', 'data-rail-ask']], ['cafe.js', ['cartaMessage', 'cartaUrl', 'WA_NUMBER', 'data-cafe-ask']], ['feed.js', ['waName', 'data-bill-wa', '.bill-wa']]]) {
+    const src = readFileSync_(f);
+    for (const n of names) assert.ok(!src.includes(n), `${f}: sin código huérfano (${n})`);
+  }
+  // El pie es el bloque «Contacto»: titular, para qué escribir y los cuatro canales con su icono.
+  const ftr = html.match(/<footer class="ftr"[\s\S]*?<\/footer>/)[0];
+  assert.ok(/<h2 id="ftr-title" class="ftr-title">Contacto<\/h2>/.test(ftr) && /aria-labelledby="ftr-title"/.test(ftr), 'titular «Contacto» que nombra el pie');
+  assert.ok(/<p class="ftr-lede">Escríbenos para preguntar por un libro, la carta o la próxima fecha de un taller\.<\/p>/.test(ftr), 'una línea dice para qué escribir (sin prometer nada)');
+  const links = [...ftr.matchAll(/<li><a class="ftr-link" href="([^"]+)"[^>]*><svg class="ic" aria-hidden="true"><use href="#(i-[a-z]+)"\/><\/svg><span>([^<]+)<\/span>/g)].map(m => [m[1].split(/[/?]/)[2] || m[1].slice(0, 6), m[2], m[3]]);
+  assert.deepEqual(links, [['wa.me', 'i-chat', 'WhatsApp'], ['www.instagram.com', 'i-ig', 'Instagram'], ['www.facebook.com', 'i-fb', 'Facebook'], ['mailto', 'i-mail', 'Correo']], 'WhatsApp, Instagram, Facebook y Correo, cada uno con su icono');
+  // Se quedan los que son la función de su objeto: la ficha, Mi lista, el estado vacío de Explorar, Instagram en Eventos y el menú ☰.
+  assert.ok(/data-d-cta href="https:\/\/wa\.me/.test(html) && /data-ml-wa href="https:\/\/wa\.me/.test(html) && /<div class="cat-empty"[\s\S]*?wa\.me[\s\S]*?<\/div>/.test(html), 'ficha, Mi lista y estado vacío conservan su WhatsApp');
+  assert.ok(/class="sec-texto">Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\//.test(html), 'la entradilla de Eventos dice dónde se anuncian las fechas');
+  const menu = html.match(/<dialog class="menu"[\s\S]*?<\/dialog>/)[0];
+  assert.ok(/wa\.me/.test(menu) && /instagram\.com/.test(menu), 'el menú ☰ conserva su fila de contacto');
+  assert.ok(/\.ftr-link \{[^}]*min-height: var\(--alto-md\);/.test(cssFlat) && /\.ftr-links li \{ padding-block: var\(--space-1\); \}/.test(cssFlat) && /\.ftr-links \{[^}]*border-radius: var\(--radio-md\); background: var\(--fondo-2\);/.test(cssFlat), 'lista agrupada (fondo-2, radio-md) con filas de 56: enlaces de 48 con 9 px entre vecinos');
 });
 test('estado de apertura: límites de horario', () => {
   assert.equal(openingStatus({ day: 4, mins: 12 * 60 }).open, true);
@@ -272,9 +280,6 @@ test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
     'class="quote', 'class="call', 'call-title', 'sec-rotulo', 'class="ask', 'class="topic', 'data-composer', 'book-query', 'rail-trail', 'rail-stop', 'cf-progreso', 'rail-all', 'card-voltear', 'i-flip', 'data-d-redes', 'class="redes', 'data-interest', 'Me interesa', 'i-heart', 'data-cat-sort', 'ftr-id', 'ftr-route', 'bill-foot', 'bill-sub', 'cat-lede', 'Dominio público'])
     assert.ok(!html.includes(gone), `sigue en el marcado: ${gone}`);
   assert.ok(!existsSync(here('./scenes-desktop.js')) && !existsSync(here('./tools/qa/desk.mjs')), 'el módulo de escritorio (fotogramas y cortinilla) se retiró con su arnés');
-  const labels = [...html.matchAll(/class="bill-detail">[\s\S]*?class="btn btn--secundario bill-wa"[^>]*aria-label="([^"]+)"/g)].map(m => m[1].trim());
-  assert.equal(labels.length, 3);
-  assert.equal(new Set(labels).size, labels.length, 'los CTA de Cartelera son distintos');
 });
 test('curaduría: los esqueletos ocupan el lugar exacto del contenido y no se animan', async () => {
   assert.equal([...html.matchAll(/class="card-item card--sk"/g)].length, Math.min(PAGE_SIZE, data.books.length), 'un esqueleto por tarjeta de la primera página (hoy, los 41 títulos)');
@@ -549,11 +554,9 @@ test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poes
   // Lo retirado no vuelve: iconos de parada, <progress>, «Pregúntanos», puntos y «Ver todo el catálogo».
   for (const gone of ['iti-recorrido-v1', 'stopNode', 'rail-stop', 'iti:topic', 'cf-progreso', 'dotsEl', '<progress']) assert.ok(!railJs.includes(gone) && !html.includes(gone), `retirado: ${gone}`);
   assert.ok(!/rail-stop|rail-trail|--stop|--zig|\.topic\b|topic-layer|composer|cf-progreso|rail-all/.test(css + mobileCss), 'sin CSS del recorrido de antes, de «Pregúntanos», de los puntos ni de «Ver todo el catálogo»');
-  // Bajo el carrusel: «Preguntar por {colección}» cambia con el chip en el mismo fotograma.
-  assert.ok(/ask\.href = askUrl\(col\);/.test(railJs) && /askLabelEl\.textContent = askLabel\(col\);/.test(railJs) && railJs.indexOf('ask.href = askUrl(col)') < railJs.indexOf('await afterPaint()'), 'el botón de pregunta sigue al chip antes de repintar las portadas');
   const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.equal((rail.match(/aria-live=/g) || []).length, 2, 'dos regiones vivas: el progreso del recorrido y la del carrusel');
-  assert.ok(rail.indexOf('data-rail-chips') < rail.indexOf('data-rail-note') && rail.indexOf('data-rail-note') < rail.indexOf('data-rail-progreso') && rail.indexOf('data-rail-progreso') < rail.indexOf('data-rail-viewport') && rail.indexOf('data-rail-viewport') < rail.indexOf('cf-pie') && rail.indexOf('cf-pie') < rail.indexOf('data-rail-ask'), 'orden: chips, nota y progreso, carrusel, pie del libro, preguntar');
+  assert.ok(rail.indexOf('data-rail-chips') < rail.indexOf('data-rail-note') && rail.indexOf('data-rail-note') < rail.indexOf('data-rail-progreso') && rail.indexOf('data-rail-progreso') < rail.indexOf('data-rail-viewport') && rail.indexOf('data-rail-viewport') < rail.indexOf('cf-pie') && !rail.includes('data-rail-ask'), 'orden: chips, nota y progreso, carrusel, pie del libro (el contacto vive en el pie de la página)');
   assert.ok(/live\.textContent = `\$\{col\.titulo\}: \$\{list\.length\} libros\.`/.test(railJs), 'al elegir un chip la región viva dice la colección y cuántos libros trae');
   const visible = [html.replace(/<!--[\s\S]*?-->/g, ''), railJs.replace(/\/\/[^\n]*/g, '')].join('\n');
   assert.ok(!/\b(puntos?|puntaje|rachas?|retos?|niveles|medallas?|logros?|recompensas?|ranking)\b/i.test(visible.replace(/punto de (encuentro|tabulación)/gi, '')), 'sin mecánicas de juego ni ranking');
@@ -1090,7 +1093,7 @@ test('Novedades: nada se presenta como ranking ni como inventario', async () => 
   const preview = await readFile(here('./tools/preview-site.mjs'), 'utf8');
   for (const f of ['feed.js', 'news.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
 });
-test('Eventos y talleres: foto, «Preguntar por WhatsApp» y «Compartir» local; sin «Me interesa», contadores ni fechas inventadas', async () => {
+test('Eventos y talleres: foto y «Compartir» local (el contacto vive en el pie); sin «Me interesa», contadores ni fechas inventadas', async () => {
   const items = [...html.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
   assert.equal(items.length, 3);
   for (const [block, id] of items) {
@@ -1099,9 +1102,9 @@ test('Eventos y talleres: foto, «Preguntar por WhatsApp» y «Compartir» local
     assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
   }
   const fila = html.match(/<div class="bill-fila">[\s\S]*?<\/div>/)[0];
-  assert.ok(/<button class="btn btn--secundario btn--icono act act--icon" type="button" data-share="([a-z]+)" data-title="([^"]+)" aria-label="Compartir «\2»">/.test(fila), '«Compartir» es un botón de icono menta (secundario) junto a la consulta, cuyo nombre lleva el título');
+  assert.ok(/<button class="btn btn--secundario btn--icono act act--icon" type="button" data-share="([a-z]+)" data-title="([^"]+)" aria-label="Compartir «\2»">/.test(fila), '«Compartir» es un botón de icono menta (secundario) cuyo nombre lleva el título');
   assert.ok(html.includes('<symbol id="i-share"') && !html.includes('<symbol id="i-heart"'), 'el corazón salió del sprite con «Me interesa»');
-  assert.ok(/html:not\(\.js\) \.bill-pie \{ display: none; \}/.test(css) && /html\.js \.bill-card \.bill-detail \{ display: none; \}/.test(css), 'sin JavaScript cada tarjeta muestra su descripción y su consulta (la fila de abajo no existe); con JavaScript, la fila de la del centro');
+  assert.ok(/html:not\(\.js\) \.bill-pie \{ display: none; \}/.test(css) && /html\.js \.bill-card \.bill-detail \{ display: none; \}/.test(css), 'sin JavaScript cada tarjeta muestra su descripción (la fila de abajo no existe); con JavaScript, la de la del centro');
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/navigator\.share/.test(feed) && /AbortError/.test(feed) && /clipboard\.writeText/.test(feed), 'Web Share con respaldo de copiar enlace; cancelar no copia');
   assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage|toggleInterest|readInterest|iti-b4-interes/.test(feed), 'Eventos no guarda ni envía nada');
@@ -1109,39 +1112,38 @@ test('Eventos y talleres: foto, «Preguntar por WhatsApp» y «Compartir» local
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/e\.target\.closest\('\[data-share\]'\)/.test(app) && !/data-interest/.test(app), 'el único control que carga feed.js al tocar es Compartir');
 });
-test('Eventos (A2 + A7): Carrusel3D variante evento; debajo, la descripción de la del centro (región viva) y una sola fila de acciones que la sigue', async () => {
+test('Eventos (A2 + A7): Carrusel3D variante evento; debajo, la descripción de la del centro (región viva) y «Compartir», que la siguen', async () => {
   const bill = html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0];
   assert.ok(/<div class="c3d c3d--evento" role="region" aria-roledescription="carrusel" aria-label="Eventos y talleres" data-bill-c3d>/.test(bill), 'carrusel con rol y nombre');
   assert.ok(!/bill-dots|<details|<summary/.test(bill), 'sin puntos ni acordeón');
-  assert.equal((bill.match(/class="bill-fila"/g) || []).length, 1, 'una sola fila de acciones');
+  assert.equal((bill.match(/class="bill-fila"/g) || []).length, 1, 'una sola fila: «Compartir»');
   assert.equal((bill.match(/data-share=/g) || []).length, 1, 'un solo «Compartir»');
   const pie = bill.slice(bill.indexOf('data-bill-pie'));
-  assert.ok(/<p class="bill-desc" aria-live="polite" data-bill-desc>/.test(pie) && /<a class="btn btn--secundario bill-wa" data-bill-wa href="https:\/\/wa\.me\/528180875940\?text=[^"]+" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Ajedrez en la casa"><span>Preguntar por WhatsApp<\/span>/.test(pie), 'la descripción es región viva; «Preguntar por WhatsApp» lleva el título de la del centro (la del medio al cargar)');
+  assert.ok(/<p class="bill-desc" aria-live="polite" data-bill-desc>/.test(pie) && !/wa\.me/.test(bill), 'la descripción es región viva; sin consulta por WhatsApp en la sección (vive en el pie)');
   for (const [block, id] of bill.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)) {
     assert.ok(/<article class="bill-card c3d-card" aria-labelledby="bill-t-[a-z]+" data-inclina( tabindex="0")?>/.test(block) && /<h3 class="bill-title" id="bill-t-[a-z]+">/.test(block), `${id}: tarjeta (superficie) con su título`);
-    assert.ok(/class="btn btn--secundario bill-wa"[^>]*href="https:\/\/wa\.me\/528180875940\?text=Hola%2C%20me%20interesa/.test(block), `${id}: su consulta va en el marcado (sin JavaScript se lee y funciona)`);
+    assert.ok(/<div class="bill-detail">\s*<p>[^<]+<\/p>\s*<\/div>/.test(block), `${id}: su descripción va en el marcado (sin JavaScript se lee)`);
   }
   assert.ok(/\.bill-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && !/\.bill-card \{[^}]*vidrio/.test(cssFlat), 'tarjeta en superficie con radio 20, no de vidrio');
-  assert.ok(/\.bill-desc \{ min-height: var\(--bill-reserva, 3lh\);/.test(cssFlat) && /@media \(max-width: 400px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 4lh\); \} \}/.test(mobileFlat) && /measureDescs\(pie, events\.map\(e => e\.text\)\)/.test(readFileSync_('feed.js')), 'la descripción reserva la más larga (medida en feed.js; antes de medir, 3 o 4 renglones): cambiar de tarjeta no mueve las acciones');
-  // La fila sigue a la del centro: título en el nombre accesible, mensaje y «Compartir» de esa propuesta.
+  assert.ok(/\.bill-desc \{ min-height: var\(--bill-reserva, 3lh\);/.test(cssFlat) && /@media \(max-width: 400px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 4lh\); \} \}/.test(mobileFlat) && /measureDescs\(pie, events\.map\(e => e\.text\)\)/.test(readFileSync_('feed.js')), 'la descripción reserva la más larga (medida en feed.js; antes de medir, 3 o 4 renglones): cambiar de tarjeta no mueve «Compartir»');
+  // «Compartir» sigue a la del centro: su id y su título en el nombre accesible.
   const feed = await readFile(here('./feed.js'), 'utf8');
-  assert.ok(/wa\.href = ev\.wa;/.test(feed) && /wa\.setAttribute\('aria-label', waName\(ev\.title\)\);/.test(feed) && /share\.dataset\.share = ev\.id;/.test(feed) && /paintShare\(share\);/.test(feed), 'al cambiar la del centro cambian el enlace, su nombre accesible y «Compartir»');
-  assert.equal(waName('Taller de escritura'), 'Preguntar por WhatsApp: Taller de escritura');
-  const q = { '.bill-title': { textContent: ' Taller ' }, '.bill-detail > p': { textContent: 'Leer y escribir.' }, '.bill-wa': { getAttribute: () => 'https://wa.me/528180875940?text=x' } };
-  assert.deepEqual(eventOf({ dataset: { id: 'taller' }, querySelector: s => q[s] }), { id: 'taller', title: 'Taller', text: 'Leer y escribir.', wa: 'https://wa.me/528180875940?text=x' }, 'cada propuesta sale de su marcado');
+  assert.ok(/share\.dataset\.share = ev\.id;/.test(feed) && /paintShare\(share\);/.test(feed) && !/waName|ev\.wa/.test(feed), 'al cambiar la del centro cambia «Compartir» (sin consulta por WhatsApp)');
+  const q = { '.bill-title': { textContent: ' Taller ' }, '.bill-detail > p': { textContent: 'Leer y escribir.' } };
+  assert.deepEqual(eventOf({ dataset: { id: 'taller' }, querySelector: s => q[s] }), { id: 'taller', title: 'Taller', text: 'Leer y escribir.' }, 'cada propuesta sale de su marcado');
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/nearby\(\$\('\[data-bill-c3d\]'\), \(\) => loadFeed\(\)\.then\(m => m\.initEventos\(\{ isMotion \}\)\)/.test(app) && !/import .*feed\.js/m.test(app.split('\n').filter(l => l.startsWith('import')).join('\n')), 'se arma al acercarse (import diferido)');
 });
-test('tarjeta de evento: foto → insignias → título (→ descripción y consulta solo sin JavaScript), sin números de interacción; la fila de abajo nombra la propuesta', async () => {
+test('tarjeta de evento: foto → insignias → título (→ descripción solo sin JavaScript), sin números de interacción; «Compartir» nombra la propuesta', async () => {
   const items = [...html.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
   assert.equal(items.length, 3);
   for (const [block, id] of items) {
-    const order = [/class="bill-card-img"/, /class="bill-badges"/, /class="bill-title"/, /<p>/, /class="bill-acts"/, /class="btn btn--secundario bill-wa"/].map(re => block.search(re));
-    assert.ok(order.every((n, i) => n >= 0 && (i === 0 || n > order[i - 1])), `${id}: el DOM va de la foto a las insignias, el título, la descripción y la consulta (${order})`);
+    const order = [/class="bill-card-img"/, /class="bill-badges"/, /class="bill-title"/, /<p>/].map(re => block.search(re));
+    assert.ok(order.every((n, i) => n >= 0 && (i === 0 || n > order[i - 1])), `${id}: el DOM va de la foto a las insignias, el título y la descripción (${order})`);
     assert.ok(!/bill-sub|bill-post-head|bill-post-who|bill-av|bill-cap/.test(block), `${id}: sin subtítulo ni encabezado de red social`);
     const pick = re => block.match(re)[1];
     assert.equal((block.match(/class="bill-title"/g) || []).length, 1, `${id}: el título está una sola vez`);
-    assert.ok(block.includes(`aria-label="Preguntar por WhatsApp: ${pick(/class="bill-title"[^>]*>([^<]+)</)}"><span>Preguntar por WhatsApp</span>`), `${id}: la consulta dice «Preguntar por WhatsApp» y su nombre accesible lleva el título (empieza por el texto visible)`);
+    assert.ok(!/wa\.me|bill-acts/.test(block) && pick(/class="bill-title"[^>]*>([^<]+)</).length > 3, `${id}: sin consulta por WhatsApp en la tarjeta (vive en el pie)`);
     assert.ok(!/btn--primario/.test(block), `${id}: ninguna acción de la tarjeta es primaria`);
     assert.ok(!/\b\d+\s*(me gusta|likes?|reseñas|personas|interesad)/i.test(block.replace(/<[^>]+>/g, ' ')), `${id}: sin contadores ni números de interacción`);
   }
@@ -1155,7 +1157,7 @@ test('tarjeta de evento: foto → insignias → título (→ descripción y cons
   assert.equal(shareName(''), 'Compartir «esta propuesta»');
   assert.ok(/\.bill-card-fig \{ display: block; \}/.test(cssFlat) && !/bill-dots/.test(css + mobileCss), 'la foto va en la tarjeta en todo ancho; sin puntos');
   assert.ok(!/\.bill-(title|sub)[^{]*\{[^}]*display: none/.test(css + mobileCss), 'el título no se oculta en ningún tamaño');
-  assert.ok(/\.bill-fila \{ display: flex; justify-content: center; gap: var\(--space-3\);/.test(cssFlat) && /\.bill-fila \.bill-wa \{ flex: 0 1 auto; min-width: 0; white-space: nowrap; \}/.test(cssFlat) && /@container \(max-width: 330px\) \{ \.bill-fila \.bill-wa \{ flex: 1 1 auto; --pad: var\(--space-4\); \} \.bill-fila \.bill-wa \.ic \{ display: none; \} \}/.test(cssFlat), 'una fila: WhatsApp (48) sin partir su rótulo (a 320 px sin el icono) y «Compartir» (48) a 12 px');
+  assert.ok(/\.bill-fila \{ display: flex; justify-content: center; width: 100%; \}/.test(cssFlat) && !/bill-wa/.test(css + mobileCss), 'una fila centrada con «Compartir» (48); sin CSS de la consulta retirada');
   assert.ok(/@media \(max-height: 700px\) \{ \.bill-card-img \{ aspect-ratio: 16 \/ 9; \} \}/.test(mobileCss), 'tope contra el alto: en ventanas bajas la foto se acorta');
   assert.ok(/\.sec-texto a \{ position: relative; white-space: nowrap; color: var\(--turquesa-texto\); \}/.test(css) && /\.sec-texto a::after \{ content: ""; position: absolute; inset: calc\(-1 \* var\(--space-4\)\) 0; \}/.test(css), 'el enlace a Instagram de la entradilla es texto en línea con 44 px de objetivo');
   assert.ok(/<p class="sec-texto">Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/"[^>]*>Instagram<svg/.test(bill) && !/bill-foot|propuestas para la agenda/.test(bill), 'entradilla «Aún sin fecha. Las fechas se anuncian en Instagram.»');
@@ -1196,15 +1198,26 @@ test('horario de Visita: dos filas (lunes a sábado y domingo), hoy se marca por
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/tr\.dataset\.days\.split\(' '\)\.includes\(String\(now\.day\)\)/.test(app), 'is-today sale de la lista de días de la fila');
 });
-test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → chips → carrusel → «Preguntar por {colección}»; la rejilla de escritorio, debajo', () => {
+test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → chips → carrusel; la rejilla de escritorio, debajo (plegada a dos filas)', () => {
   const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
   assert.equal((libros.match(/class="h2"/g) || []).length, 1, 'un solo H2 visual en el capítulo');
   assert.equal((libros.match(/<h2[\s>]/g) || []).length, 1, 'un solo h2 en el marcado');
   const chips = [...libros.matchAll(/role="radiogroup"[^>]*aria-label="([^"]+)"/g)].map(m => m[1]);
   assert.deepEqual(chips, ['Colección'], 'una sola fila de chips: la de colección (los temas de «Pregúntanos» se retiraron)');
   const at = k => libros.indexOf(k);
-  const order = ['id="books-title"', 'data-ex-open', 'data-rail-chips', 'data-rail-viewport', 'data-rail-ask', 'class="rail-libre"', 'id="catalogo"', 'class="books-foot"'].map(at);
-  assert.ok(order.every((x, i) => x >= 0 && (!i || x > order[i - 1])), `orden: titular, búsqueda, chips, carrusel, preguntar, recomendación, rejilla, cierre (${order})`);
+  const order = ['id="books-title"', 'data-ex-open', 'data-rail-chips', 'data-rail-viewport', 'id="catalogo"', 'class="books-foot"'].map(at);
+  assert.ok(order.every((x, i) => x >= 0 && (!i || x > order[i - 1])), `orden: titular, búsqueda, chips, carrusel, rejilla, cierre (${order})`);
+  // Rejilla en línea (2026-11-13): dos filas y «Ver los 41 títulos», que despliega en su sitio; con búsqueda o filtros, completa.
+  assert.equal(FOLD_ROWS, 2);
+  assert.deepEqual(foldView(41, 5), { fold: true, folded: true, limit: 10, label: 'Ver los 41 títulos' }, 'cinco columnas: diez títulos y el botón');
+  assert.deepEqual(foldView(41, 3, { expanded: true }), { fold: true, folded: false, limit: 41, label: 'Ver menos' }, 'desplegada: todos y «Ver menos»');
+  assert.equal(foldView(41, 5, { filtering: true }).folded, false, 'con búsqueda o filtros, los resultados completos');
+  assert.equal(foldView(41, 2, { inline: false }).fold, false, 'en la hoja del teléfono no se pliega');
+  assert.equal(foldView(8, 5).fold, false, 'si caben en dos filas, no hay botón');
+  assert.ok(/<button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid" hidden><\/button>/.test(libros) && /<ul class="cat-grid" id="cat-grid"/.test(libros), 'el botón nombra la rejilla que controla (aria-expanded, aria-controls)');
+  const catJs = readFileSync_('catalog.js');
+  assert.ok(/window\.scrollBy\(0, foldBtn\.getBoundingClientRect\(\)\.top - y\)/.test(catJs) && !/foldBtn[^;\n]*\.blur\(|focus\(\)[^;\n]*foldBtn/.test(catJs), 'al plegar el botón se queda bajo el cursor y conserva el foco');
+  assert.ok(/@media \(min-width: 761px\) \{ \.cat-grid\[aria-busy="true"\] \{ grid-template-rows: auto auto; grid-auto-rows: 0; row-gap: 0; overflow: clip; margin-bottom: var\(--alto-md\); \}/.test(cssFlat), 'el esqueleto reserva lo mismo que la rejilla plegada (dos filas y el botón)');
   assert.ok(!/class="ask"|data-topic|data-composer|book-query|ask-title|topic-stage|rail-all|cat-lede/.test(libros), 'sin «Pregúntanos» (foto del tema, redactor, Crónica e Infantil), sin «Ver todo el catálogo» y sin entradilla de Explora');
   assert.ok(!/<p\b/.test(libros.match(/<div class="books-head">[\s\S]*?<\/div>/)[0]), 'la cabecera es el titular y la búsqueda: sin entradilla');
   assert.ok(/<h3 id="rail-title" class="sr-only">/.test(libros), 'el carrusel conserva su nombre accesible sin segundo titular visible');
@@ -1529,7 +1542,8 @@ test('Inicio: foto real de la sala, nombre, estado de hoy y «Cómo llegar» de 
   assert.ok(/<h1 id="entry-title" class="entry-title">Librería Itinerante <span class="entry-title-mas">y Más<\/span><\/h1>/.test(sec), 'el nombre es el h1 (Large Title)');
   assert.ok(/<p class="entry-status" data-status><span class="status-dot" aria-hidden="true"><\/span><span data-status-text>/.test(sec), 'estado de hoy con su punto y la palabra');
   assert.ok(/<div class="entry-actions">\s*<a class="btn btn--primario btn--lg" href="https:\/\/www\.google\.com\/maps\/dir\/[^"]*"[^>]*><span>Cómo llegar<\/span>/.test(sec), '«Cómo llegar» primario de 56 px');
-  assert.ok(/<a class="btn btn--secundario btn--lg" href="https:\/\/wa\.me\/528180875940/.test(sec), 'la consulta por WhatsApp es secundaria, del mismo grupo (56)');
+  assert.ok(!/wa\.me/.test(sec) && (sec.match(/<div class="entry-actions">[\s\S]*?<\/div>/)[0].match(/class="btn /g) || []).length === 1, 'una sola acción: «Cómo llegar» (el contacto vive en el pie desde el 2026-11-13)');
+  assert.ok(/@media \(min-width: 1024px\) \{[^}]*\.entry \{ grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\); align-items: center;[^}]*\}\s*\.entry-copy \{ padding-bottom: var\(--space-8\); \}/.test(css.replace(/\/\*[\s\S]*?\*\//g, '')), 'en escritorio el texto se centra en el alto de la foto, 16 px arriba (centro óptico)');
   assert.ok(/<figure class="entry-media">\s*<picture><source media="\(max-width: 760px\)" srcset="assets\/img\/inicio-sala-m\.webp" width="648" height="864"><img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp" width="1080" height="608" alt="[^"]+" fetchpriority="high"/.test(sec), 'foto real: vertical en el teléfono y la sala central en escritorio, con alt y prioridad alta');
   assert.ok(sec.indexOf('entry-copy') < sec.indexOf('entry-media'), 'el texto va antes que la foto: nada se escribe encima de la foto');
   assert.ok(/\.entry-media \{[^}]*overflow: hidden; border-radius: var\(--radio-lg\);/.test(cssFlat) && !/entry-shade|entry-canvas|entry-beat|wordmark|profile-av/.test(html + css + mobileCss), 'foto limpia con radio-lg, sin velos, lienzo de fotogramas ni rótulo gigante');
@@ -1596,13 +1610,13 @@ test('Eventos y talleres: tarjetas en un Carrusel3D en todo ancho (sin rejilla n
   assert.ok(/\.badge, \.badge-new, \.hours tr\.is-today th::after \{[^}]*border-radius: var\(--radio-pildora\); background: var\(--menta\); color: var\(--en-menta\);/.test(cssFlat) && /\.badge--quiet \{ background: var\(--fondo-3\); color: var\(--tinta-2\); \}/.test(cssFlat), 'insignia de tipo en menta y la de estado (no confirmado) callada');
   assert.ok(!/bill-stage|bill-layer|bill-ic|data-bill-stage/.test(html + css + mobileCss + app), 'se retiraron el escenario de fotos y el acordeón de escritorio');
 });
-test('Visita y pie: horario como lista agrupada con «Hoy», acciones de 56 y redes en botones de 44', () => {
+test('Visita y pie: horario como lista agrupada con «Hoy», «Cómo llegar» de 56 y el pie con el bloque Contacto', () => {
   const visit = html.match(/<section id="visita"[\s\S]*?<\/section>/)[0];
   assert.ok(/<table class="hours">\s*<caption>Horario habitual<\/caption>/.test(visit) && /<tr data-days="1 2 3 4 5 6"><th scope="row">Lunes a sábado<\/th><td>11:00–20:00<\/td><\/tr>/.test(visit) && /<tr data-days="0"><th scope="row">Domingo<\/th><td>Cerrado<\/td><\/tr>/.test(visit), 'dos filas reales; sin JavaScript se lee igual');
   assert.ok(/\.hours \{[^}]*border-radius: var\(--radio-md\); background: var\(--fondo\);/.test(cssFlat) && /\.hours tr \+ tr :is\(th, td\) \{ border-top: 1px solid var\(--linea\); \}/.test(cssFlat) && /\.hours tr\.is-today th::after \{ content: "Hoy";/.test(cssFlat), 'lista agrupada con filete entre filas; hoy lleva su insignia');
-  assert.ok(/<div class="visit-actions">\s*<a class="btn btn--primario btn--lg"[\s\S]*?<a class="btn btn--secundario btn--lg"[^>]*><span>Preguntar por WhatsApp<\/span>/.test(visit), '«Cómo llegar» y «Preguntar por WhatsApp», 56 px');
-  const ftr = html.match(/<footer class="ftr">[\s\S]*?<\/footer>/)[0];
-  assert.deepEqual([...ftr.matchAll(/<li><a class="btn btn--plano btn--sm" href="([^"]+)"/g)].map(m => m[1].split(/[/?]/)[2] || m[1].slice(0, 6)), ['www.instagram.com', 'www.facebook.com', 'wa.me', 'mailto'], 'redes y correo como botones de 44');
+  assert.ok(/<div class="visit-actions">\s*<a class="btn btn--primario btn--lg"[^>]*><span>Cómo llegar<\/span>[\s\S]*?<\/a>\s*<\/div>/.test(visit) && !/wa\.me/.test(visit), '«Cómo llegar» (56 px) es la única acción de Visita; el contacto, en el pie');
+  const ftr = html.match(/<footer class="ftr"[^>]*>[\s\S]*?<\/footer>/)[0];
+  assert.deepEqual([...ftr.matchAll(/<li><a class="ftr-link" href="([^"]+)"/g)].map(m => m[1].split(/[/?]/)[2] || m[1].slice(0, 6)), ['wa.me', 'www.instagram.com', 'www.facebook.com', 'mailto'], 'Contacto: WhatsApp, redes y correo en filas de 56');
   assert.ok(/<button class="btn btn--plano btn--sm motion-btn" type="button" data-motion-toggle aria-pressed="false">Pausar el movimiento<\/button>/.test(ftr), '«Pausar el movimiento», discreto');
   assert.ok(!/maps\/dir|ftr-brand|Matamoros/.test(ftr), 'el pie no repite la marca, la dirección ni «Cómo llegar»: Visita, justo encima, ya los trae');
   assert.ok(!/<blockquote|Cervantes/.test(html), 'sin la cita de Cervantes (retirada el 2026-11-13)');
@@ -1651,14 +1665,11 @@ test('Café y té (#cafe): menu.json válido (categorías con id, nombre y produ
   assert.equal(precioCarta(null), null, 'sin precio no se imprime nada (ni «por confirmar»)');
   assert.equal(precioCarta(45), '$45 MXN');
   assert.equal(precioCarta('45'), null);
-  assert.equal(cartaMessage({ nombre: 'Té' }), 'Hola, quisiera preguntar por la carta de té. ¿Qué tienen hoy?');
-  assert.equal(new URL(cartaUrl({ nombre: 'Café' })).searchParams.get('text'), 'Hola, quisiera preguntar por la carta de café. ¿Qué tienen hoy?');
-  assert.ok(/^https:\/\/wa\.me\/528180875940\?text=/.test(cartaUrl({ nombre: 'Café' })));
   const cafeJs = readFileSync_('cafe.js');
   assert.ok(/s\.dataset\.fuente = 'carta';/.test(cafeJs) && !/por confirmar/i.test(cafeJs.replace(/\/\/[^\n]*/g, '')), 'un precio de la carta va marcado con data-fuente; sin precio, nada');
   assert.ok(prov.menuData && /Carta genérica indicada por Aldo el 2026-11-13/.test(prov.menuData.origin) && /sin precios hasta que la librería los dé/.test(prov.menuData.origin), 'el origen de la carta está registrado en provenance.json');
 });
-test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té, Carrusel3D variante carta y «Preguntar por la carta»; en la barra, el menú y el scroll-spy', async () => {
+test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té y Carrusel3D variante carta (el contacto vive en el pie); en la barra, el menú y el scroll-spy', async () => {
   const sec = html.match(/<section id="cafe"[\s\S]*?\n {4}<\/section>/)[0];
   assert.ok(/<header class="sec-head" data-revelar>\s*<h2 id="cafe-title" class="h2">Café y té <em>en la sala<\/em><\/h2>\s*<p class="sec-texto">[^<]{10,60}<\/p>/.test(sec), 'titular «Nombre *frase*» sin antetítulo y una entradilla corta');
   const img = sec.match(/<img src="assets\/(img\/[^"]+)"[^>]*>/);
@@ -1667,7 +1678,7 @@ test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té, C
   assert.ok(!page.includes(img[1].replace('img/', 'assets/img/')), 'la foto no se repite en otra sección');
   assert.ok(/<div class="rail-chips cafe-chips" role="radiogroup" aria-label="Carta" data-cafe-chips>/.test(sec), 'chips en radiogroup');
   assert.ok(/<div class="c3d c3d--carta" role="region" aria-roledescription="carrusel" aria-label="Carta" data-cafe-c3d>/.test(sec) && /aria-label="Bebida anterior"/.test(sec) && /aria-label="Bebida siguiente"/.test(sec), 'Carrusel3D, variante carta, con flechas');
-  assert.ok(/<a class="btn btn--secundario" data-cafe-ask href="https:\/\/wa\.me\/528180875940\?text=[^"]+"[^>]*><span>Preguntar por la carta<\/span>/.test(sec) && !/btn--primario/.test(sec), '«Preguntar por la carta»: secundario (menta), WhatsApp con el mensaje listo; ninguna primaria');
+  assert.ok(!/wa\.me|data-cafe-ask/.test(sec) && !/btn--primario/.test(sec), 'sin «Preguntar por la carta» (el contacto vive en el pie); ninguna primaria');
   assert.ok(!/\$\s?\d|MXN|por confirmar/.test(sec), 'sin precios en el marcado');
   const at = s => html.indexOf(s);
   assert.ok(at('<section id="novedades"') < at('<section id="cafe"') && at('<section id="cafe"') < at('<section id="visita"') && at('<section id="cartelera"') < at('<section id="cafe"'), 'entre Eventos/Novedades y Visita');
@@ -1675,12 +1686,12 @@ test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té, C
   assert.ok(/card\.setAttribute\('role', 'group'\);/.test(cafeJs) && /card\.setAttribute\('aria-roledescription', 'bebida'\);/.test(cafeJs) && /document\.getElementById\(`c-\$\{cat\.icono\}`\)/.test(cafeJs) && !/<img|createElement\('img'\)/.test(cafeJs), 'tarjeta tipográfica con icono de trazo de la categoría; sin fotos de producto');
   assert.ok(/wireRadioChips\(chipsEl, \{ selector: '\.cafe-chip'/.test(cafeJs) && /createCarousel3D\(\{/.test(cafeJs), 'mismos chips y mismo motor que el Catálogo');
   assert.ok(/\.cafe-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && /\.cafe-ic \{[^}]*background: var\(--menta\); color: var\(--en-menta\); \}/.test(cssFlat), 'tarjeta en superficie, radio 20; icono en menta');
-  assert.ok(/html:not\(\.js\) :is\(\.cafe-chips, \.c3d--carta\)/.test(css), 'sin JavaScript quedan la foto y «Preguntar por la carta»');
+  assert.ok(/html:not\(\.js\) :is\(\.cafe-chips, \.c3d--carta\)/.test(css), 'sin JavaScript queda la foto');
   const app = readFileSync_('app.js');
   assert.ok(/nearby\(\$\('\[data-cafe\]'\), \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app), 'se carga al acercarse');
   assert.ok(/<a href="#cafe">Café<\/a>/.test(html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0]) && /<a class="menu-row" href="#cafe"><span>Café y té<\/span>/.test(html) && !/#cafe/.test(html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0]), 'en la barra de escritorio y el menú; la barra inferior no cambia');
   assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.cafe \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-carta \{ grid-column: 1 \/ -1; grid-row: 2; justify-items: center;/.test(css) && /\.bill > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'escritorio (A6, afinada el 2026-11-13): encabezados en dos columnas; en Café, titular y foto arriba y la carta a todo el ancho debajo, centrada como los otros carruseles');
-  assert.ok(/data-cafe-status><\/p>\s*<div class="cafe-ask">/.test(sec), '«Preguntar por la carta» va dentro de la carta, bajo su carrusel (mismo bloque en el teléfono y en escritorio)');
+  assert.ok(/data-cafe-status><\/p>\s*<\/div>/.test(sec), 'la carta termina en su carrusel (mismo bloque en el teléfono y en escritorio)');
   const [prep, prev] = [readFileSync_('scripts/prepare-public.mjs'), readFileSync_('tools/preview-site.mjs')];
   assert.ok(/"carousel3d\.js"/.test(prep) && /"cafe\.js"/.test(prep) && /"assets\/data\/menu\.json"/.test(prep) && /'\/carousel3d\.js', '\/cafe\.js'/.test(prev), 'se publican el motor, la carta y su JSON');
 });
@@ -1712,7 +1723,7 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   // P23: un solo rótulo genérico para WhatsApp; los específicos conservan su objeto; el pie dice «WhatsApp».
   const labels = [...html.matchAll(/href="https:\/\/wa\.me\/[^"]*"[^>]*>(?:<svg[^>]*><use[^>]*\/><\/svg>)?<span[^>]*>([^<]+)<\/span>/g)].map(m => m[1]);
   assert.ok(!labels.some(l => /^(Pedir informes|Pregúntanos por WhatsApp|Pregunta por un libro|Escribir por WhatsApp)$/.test(l)) && !/Escribir por WhatsApp|Pedir informes|Pregúntanos por WhatsApp/.test(html), `sin rótulos viejos: ${labels.join(' · ')}`);
-  assert.ok(new Set(labels).size <= 6 && labels.every(l => /^(Preguntar por WhatsApp|Preguntar por un libro|Preguntar por narrativa|Preguntar por la carta|Enviar mi lista por WhatsApp|WhatsApp)$/.test(l)), `rótulos: genérico «Preguntar por WhatsApp», específicos con su objeto («Preguntar por la carta» en Café) y «WhatsApp» en el pie (${[...new Set(labels)].join(' · ')})`);
+  assert.ok(new Set(labels).size <= 3 && labels.every(l => /^(Preguntar por WhatsApp|Enviar mi lista por WhatsApp|WhatsApp)$/.test(l)), `rótulos (2026-11-13, contacto en el pie): «Preguntar por WhatsApp» (ficha, estado vacío, menú), «Enviar mi lista por WhatsApp» y «WhatsApp» en el pie (${[...new Set(labels)].join(' · ')})`);
   assert.ok(/aria-label="Preguntar por WhatsApp"><svg class="ic" aria-hidden="true"><use href="#i-chat"/.test(html), 'el botón de icono del menú se nombra igual');
   // P20: los pies de foto de La casa dicen solo el nombre del cuarto (el alt describe la foto).
   const caps = [...html.matchAll(/<li class="still">[\s\S]*?<figcaption data-kind="real">([\s\S]*?)<\/figcaption>/g)].map(m => m[1]);

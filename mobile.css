@@ -52,8 +52,7 @@ html:not(.js) .tabbar { display: none; }
 .entry { gap: var(--space-6); padding-top: var(--space-3); }
 .entry-media { max-height: 70svh; }
 .entry-news { width: 100%; }
-/* Una sola acción en la primera vista del teléfono (Hick, ≤ 6 destinos con la barra): la consulta por WhatsApp vive en el menú, en Eventos, en el Catálogo y en Visita. */
-.entry-actions .btn--secundario { display: none; }
+/* Una sola acción en la primera vista («Cómo llegar»); el contacto vive en el pie (bloque Contacto) y en el menú ☰. */
 
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
 .still { width: 78vw; scroll-snap-align: center; } /* la siguiente foto asoma lo bastante para invitar a deslizar */
@@ -67,12 +66,10 @@ html:not(.js) .tabbar { display: none; }
 .visit-actions .btn { flex: 1 1 auto; }
 
 /* ---------- Catálogo en el teléfono ---------- */
-/* Titular → «Buscar en el catálogo» (abre la hoja Explorar) → chips → carrusel → preguntar. La capa «Explora el catálogo» no ocupa sitio en la
+/* Titular → «Buscar en el catálogo» (abre la hoja Explorar) → chips → carrusel → cierre con «Cómo llegar». La capa «Explora el catálogo» no ocupa sitio en la
    página: es la hoja; su titular queda para lectores de pantalla (la región sigue nombrada). */
 .books-head { margin-bottom: var(--space-5); }
 .explore-open { width: 100%; }
-.rail-ask .btn { width: 100%; }
-.cafe-ask .btn { width: 100%; }
 /* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón: 12 px de relleno y, con palomita, 8 y la
    palomita más junta. Nunca se parten. */
 @media (max-width: 389px) {
@@ -139,11 +136,11 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 /* Primer pintado: bajo el inicio nada se maqueta hasta acercarse; el navegador recuerda la altura real (auto). Cifras medidas a 360–414 px. */
 .house { content-visibility: auto; contain-intrinsic-size: auto 520px; }
 .bill { content-visibility: auto; contain-intrinsic-size: auto 760px; }
-.books { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
+.books { content-visibility: auto; contain-intrinsic-size: auto 1076px; }
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
-.cafe { content-visibility: auto; contain-intrinsic-size: auto 880px; }
-.visit { content-visibility: auto; contain-intrinsic-size: auto 900px; }
-.ftr { content-visibility: auto; contain-intrinsic-size: auto 320px; }
+.cafe { content-visibility: auto; contain-intrinsic-size: auto 828px; }
+.visit { content-visibility: auto; contain-intrinsic-size: auto 832px; }
+.ftr { content-visibility: auto; contain-intrinsic-size: auto 567px; } /* 2026-11-13, contacto en el pie: el Catálogo −124, Café −52, Visita −68 y el pie +247 px (medido de 360 a 414) */
 
 /* ---------- Ventanas bajas: teléfono en horizontal (≤ 500 px de alto) ---------- */
 @media (orientation: landscape) and (max-height: 500px) {

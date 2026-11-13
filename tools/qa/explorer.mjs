@@ -155,7 +155,28 @@ const dk = await ev(`(() => { const ex = document.getElementById('explorer'); co
 ck('escritorio: el explorador está abierto en línea (no modal), sin cabecera de hoja; «Buscar en el catálogo» arriba del capítulo lleva a él', dk.open && !dk.modal && dk.pos === 'static' && dk.btn === 'flex' && dk.top === 'none' && dk.w > 900, JSON.stringify(dk));
 await ev(`scrollTo(0, document.getElementById('catalogo').getBoundingClientRect().top + scrollY)`); await sleep(2000);
 const dc = await ev(`(async () => { const ex = document.getElementById('explorer'); for (let i = 0; i < 30 && !ex.querySelector('button.card'); i++) await new Promise(r => setTimeout(r, 200)); return { cards: ex.querySelectorAll('button.card').length, filters: ex.querySelectorAll('.cat-group').length, status: ex.querySelector('[data-cat-status]').textContent, moreHidden: ex.querySelector('[data-cat-more]').hidden }; })()`);
-ck('escritorio: el catálogo carga en línea con los 41 títulos sin paginar («41 títulos», sin «Ver más») y dos grupos de filtros', dc.cards === 41 && dc.filters === 2 && dc.status === '41 títulos' && dc.moreHidden, JSON.stringify(dc));
+ck('escritorio: el catálogo carga en línea con los 41 títulos en el marcado («41 títulos», sin «Ver más») y dos grupos de filtros', dc.cards === 41 && dc.filters === 2 && dc.status === '41 títulos' && dc.moreHidden, JSON.stringify(dc));
+// Rejilla plegada (2026-11-13): dos filas y «Ver los 41 títulos», que despliega en su sitio; «Ver menos» la pliega sin mover el botón y el foco
+// se queda en él; con una búsqueda, los resultados completos y sin botón.
+const foldState = `(() => { const g = document.querySelector('[data-cat-grid]'); const b = document.querySelector('[data-cat-fold]'); const cols = getComputedStyle(g).gridTemplateColumns.split(' ').length;
+  return { cols, visible: [...g.children].filter(li => li.getBoundingClientRect().height > 0).length, hidden: b.hidden, text: b.textContent, expanded: b.getAttribute('aria-expanded'), controls: b.getAttribute('aria-controls'), top: Math.round(b.getBoundingClientRect().top), focus: document.activeElement === b, h: Math.round(b.getBoundingClientRect().height) }; })()`;
+const f0 = await ev(foldState);
+ck('escritorio: plegada, la rejilla muestra dos filas (2 × columnas) y «Ver los 41 títulos» (48 px, aria-expanded="false", aria-controls="cat-grid")', f0.visible === 2 * f0.cols && !f0.hidden && f0.text === 'Ver los 41 títulos' && f0.expanded === 'false' && f0.controls === 'cat-grid' && f0.h === 48, JSON.stringify(f0));
+await ev(`document.querySelector('[data-cat-fold]').focus(); document.querySelector('[data-cat-fold]').click()`); await sleep(500);
+const f1 = await ev(foldState);
+ck('escritorio: «Ver los 41 títulos» despliega los 41 en su sitio; el botón dice «Ver menos», aria-expanded="true" y conserva el foco', f1.visible === 41 && f1.text === 'Ver menos' && f1.expanded === 'true' && f1.focus, JSON.stringify(f1));
+await ev(`document.querySelector('[data-cat-fold]').scrollIntoView({ block: 'center' })`); await sleep(300);
+const f1b = await ev(foldState);
+await ev(`document.querySelector('[data-cat-fold]').click()`); await sleep(500);
+const f2 = await ev(foldState);
+ck('escritorio: «Ver menos» vuelve a dos filas sin mover el botón bajo el cursor (±2 px) y el foco sigue en él', f2.visible === 2 * f2.cols && f2.text === 'Ver los 41 títulos' && f2.expanded === 'false' && f2.focus && Math.abs(f2.top - f1b.top) <= 2, JSON.stringify({ antes: f1b.top, despues: f2 }));
+await ev(`(() => { const i = document.getElementById('cat-q'); i.value = 'a'; i.dispatchEvent(new Event('input', { bubbles: true })); })()`); await sleep(900);
+const f3 = await ev(`(() => ({ ...${foldState}, status: document.querySelector('[data-cat-status]').textContent }))()`);
+ck('escritorio: con una búsqueda los resultados van completos y sin botón', f3.hidden && f3.visible === parseInt(f3.status, 10) && f3.visible > 2 * f3.cols, JSON.stringify(f3));
+await ev(`(() => { const i = document.getElementById('cat-q'); i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); document.activeElement.blur(); })()`); await sleep(900);
+const f4 = await ev(foldState);
+ck('escritorio: al borrar la búsqueda vuelve a dos filas', f4.visible === 2 * f4.cols && !f4.hidden, JSON.stringify(f4));
+await ev(`document.querySelector('[data-cat-fold]').click()`); await sleep(500); // desplegada para revisar las 41 portadas
 // Portadas reales: ninguna rota, cada una con la forma de la tarjeta (sin deformar ni empujar la fila) y el texto oculto como nombre.
 const pc = await ev(`(async () => { const ex = document.getElementById('explorer');
   const imgs = [...ex.querySelectorAll('.cover--img img')];

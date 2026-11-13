@@ -53,10 +53,11 @@ genérico.
   se retiró el 2026-11-13: no servía a la persona ni a la librería.
 - Crítica minimalista aprobada por Aldo el 2026-11-13: cada cosa se dice una vez.
   El Catálogo va titular → «Buscar en el catálogo» → chips Narrativa · Poesía ·
-  Ensayo → carrusel 3D → «Preguntar por {colección}» (sin «Pregúntanos»; el
+  Ensayo → carrusel 3D (sin «Pregúntanos»; el
   recorrido volvió ligero sobre los mismos chips el 2026-11-13: conector, palomita
   en las hojeadas y «N de 3 paradas hojeadas», un dato local, nunca un ranking); la rejilla de Explorar muestra los 41 títulos sin
-  paginar, cada tarjeta con título y «autor · precio» (sin tarjeta que voltea); la
+  paginar (en tableta y escritorio, plegada a dos filas con «Ver los 41 títulos» hasta que la persona la despliega, busca o
+  filtra; no se esconde inventario ni se inventa orden), cada tarjeta con título y «autor · precio» (sin tarjeta que voltea); la
   ficha es una sola (sin «modo redes»); no hay cita, llamado suelto ni
   antetítulos; el pie no repite la dirección ni «Cómo llegar».
 - Novedades es un capítulo propio que **solo existe con llegadas registradas**
@@ -80,12 +81,21 @@ genérico.
   `precio: null` no se imprime nada de precio (ni «por confirmar»); cuando haya
   un precio real se muestra «$NN MXN» marcado como dato de la carta. Se edita en
   `assets/data/menu.json` sin tocar HTML ni JS (añadir «Para comer» es añadir un
-  objeto); su origen queda en `assets/provenance.json` (`menuData`). La consulta
-  es «Preguntar por la carta» por WhatsApp; sin fotos de producto.
+  objeto); su origen queda en `assets/provenance.json` (`menuData`). Sin fotos de
+  producto; la consulta por la carta se hace desde el bloque Contacto del pie.
 - Eventos y talleres van en el mismo carrusel 3D que el Catálogo (2026-11-13):
-  la propuesta del centro muestra su descripción y una sola fila de acciones
-  («Preguntar por WhatsApp» y «Compartir»); las fechas siguen saliendo solo de
-  `data-fecha` en el marcado.
+  la propuesta del centro muestra su descripción y «Compartir»; las fechas siguen
+  saliendo solo de `data-fecha` en el marcado.
+- **Contacto en un solo lugar** (decisión de Aldo, 2026-11-13: «Los contactos irán
+  en un solo lugar específico para no sobresaltar el área»): el pie es el bloque
+  «Contacto» (WhatsApp, Instagram, Facebook y Correo, con la línea «Escríbenos para
+  preguntar por un libro, la carta o la próxima fecha de un taller.»). Inicio,
+  Catálogo, Eventos, Café y Visita no repiten llamados a WhatsApp; «Cómo llegar»
+  sigue como la acción primaria. Conservan su WhatsApp, por ser la función de su
+  objeto, la ficha del libro (confirmar existencia), «Enviar mi lista por
+  WhatsApp», la salida del estado vacío y del error de Explorar, y la fila de
+  contacto del menú ☰; el enlace «Instagram» de la entradilla de Eventos dice dónde
+  se anuncian las fechas.
 - El precio de la hoja de la librería se muestra en la ficha, bajo el carrusel 3D del Catálogo
   y bajo cada tarjeta de la rejilla («autor · $250 MXN»); va marcado como dato de la hoja
   (`data-fuente="hoja"`) y la existencia se sigue confirmando por WhatsApp.

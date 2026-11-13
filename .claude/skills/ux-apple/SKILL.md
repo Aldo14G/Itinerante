@@ -81,5 +81,5 @@ Objetivo: **la pieza central se lee como protagonista, centrada al píxel, con a
 
 ## 6. Complementos
 
-- **Impeccable** (`pbakaus/impeccable`, Apache 2.0): sus referencias `critique`, `audit`, `layout`, `polish`, `adapt`, `craft-floor`, `ios` y `mode-persuade` se leen como guía. Su lanzador descarga un binario y sus hooks se instalan en `.claude/`: no se ejecutan ni se instalan sin permiso explícito de Aldo en la sesión.
+- **Impeccable** (`pbakaus/impeccable`, Apache 2.0): sus referencias `critique`, `audit`, `layout`, `polish`, `adapt`, `craft-floor`, `ios` y `mode-persuade` se leen como guía. Desde el 2026-11-13 está instalado con sus hooks por decisión de Aldo (`.claude/skills/impeccable/`, `.claude/settings.json`); su lanzador descarga el motor verificado por checksum a una caché fuera del repositorio. Úsalo: `context` una vez por sesión, `detect` sobre los archivos tocados y atiende los avisos del hook.
 - Fuentes con citas y licencias: `docs/ux/FUENTES.md`.

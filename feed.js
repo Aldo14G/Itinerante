@@ -1,7 +1,7 @@
 // Eventos y talleres (Cartelera) sin inventar nada: «Compartir» es local (no se envía nada y no hay contadores) y el estado de cada
 // propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Las propuestas van en un Carrusel3D, variante «evento»
-// (carousel3d.js, 2026-11-13): tarjeta con foto, insignias y título; debajo, la descripción de la del centro (región viva) y una sola fila de
-// acciones («Preguntar por WhatsApp» con el título de la del centro y «Compartir»). Se carga al acercarse a la sección o al primer toque.
+// (carousel3d.js, 2026-11-13): tarjeta con foto, insignias y título; debajo, la descripción de la del centro (región viva) y «Compartir»
+// (la consulta por WhatsApp vive en el pie desde el 2026-11-13). Se carga al acercarse a la sección o al primer toque.
 // Las historias de los destacados se retiraron el 2026-11-11, «Me interesa» el 2026-11-13 y los puntos bajo el carrusel también el 2026-11-13.
 import { notify } from './saved.js';
 import { createCarousel3D } from './carousel3d.js';
@@ -68,13 +68,12 @@ export function initFeed() {
   document.querySelectorAll('.bill-item').forEach(paintWhen);
 }
 
-// ---------- La propuesta del centro: su descripción y la fila de acciones ----------
-// Lo que la fila necesita de cada tarjeta: id, título, descripción y el enlace de WhatsApp con su mensaje (todo sale del marcado).
+// ---------- La propuesta del centro: su descripción y «Compartir» ----------
+// Lo que la fila necesita de cada tarjeta: id, título y descripción (todo sale del marcado).
 export function eventOf(item) {
   const q = s => item.querySelector(s);
-  return { id: item.dataset.id, title: q('.bill-title')?.textContent.trim() ?? '', text: q('.bill-detail > p')?.textContent.trim() ?? '', wa: q('.bill-wa')?.getAttribute('href') ?? '' };
+  return { id: item.dataset.id, title: q('.bill-title')?.textContent.trim() ?? '', text: q('.bill-detail > p')?.textContent.trim() ?? '' };
 }
-export const waName = title => `Preguntar por WhatsApp: ${title}`;
 
 // Reserva de la descripción (--bill-reserva): la más larga de las propuestas a este ancho, medida de una vez en una copia oculta. Cambiar de
 // tarjeta no mueve las acciones y el aire de la descripción a la fila es de 24 en la más larga (antes se reservaban 3 o 4 renglones fijos).
@@ -100,7 +99,6 @@ export function initEventos({ isMotion = () => false } = {}) {
   const events = items.map(eventOf);
   const descTitle = document.querySelector('[data-bill-desc-title]');
   const descText = document.querySelector('[data-bill-desc-text]');
-  const wa = document.querySelector('[data-bill-wa]');
   const share = document.querySelector('.bill-fila [data-share]');
   createCarousel3D({
     viewport: region.querySelector('[data-bill-viewport]'),
@@ -112,8 +110,6 @@ export function initEventos({ isMotion = () => false } = {}) {
     onCenter: i => {
       const ev = events[i];
       if (descText.textContent !== ev.text) { descTitle.textContent = `${ev.title}. `; descText.textContent = ev.text; } // la región viva dice la propuesta del centro
-      wa.href = ev.wa;
-      wa.setAttribute('aria-label', waName(ev.title));
       share.dataset.share = ev.id;
       share.dataset.title = ev.title;
       paintShare(share);
