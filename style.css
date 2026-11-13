@@ -80,7 +80,9 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 }
 .h2 em, .layer-title em, .h2 .pal-em { font-style: normal; color: var(--tinta-2); }
 .h2 em, .layer-title em { display: block; }
-@media (min-width: 761px) { .h2 { font-size: clamp(28px, 1.25vw + 18px, 40px); line-height: 1.18; } }
+@media (min-width: 761px) {
+  .h2, .ftr-title { font-size: clamp(28px, 1.25vw + 18px, 40px); line-height: 1.18; }
+}
 
 /* Titular de capa (una capa dentro de un capítulo): Title 2. */
 .layer-title { margin: 0; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); text-wrap: balance; }
@@ -361,7 +363,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
    la descripción de la propuesta del centro (región viva) y una sola fila de acciones: «Preguntar por WhatsApp» y «Compartir» (icono menta).
    Sin JavaScript cada tarjeta muestra su descripción y su consulta (la fila de abajo no existe) y la pista se desliza con el dedo. */
 .bill { padding: var(--sec) var(--margen); background: var(--fondo-2); }
-.bill > .sec-head { margin-bottom: var(--space-4); }
+.bill > .sec-head { margin-bottom: var(--space-8); }
 .bill-item .cf-pose, .bill-card { height: 100%; }
 .bill-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
 .bill-card-fig { display: block; }
@@ -414,8 +416,8 @@ html:not(.js) .bill-pie { display: none; }
    movimiento». Sin marca, dirección ni «Cómo llegar» (Visita, justo encima, ya los trae). Las secciones no repiten llamados a WhatsApp. */
 .ftr { padding: var(--sec) var(--margen) var(--space-8); background: var(--fondo); }
 .ftr-contacto { display: grid; gap: var(--space-6); }
-.ftr-title { margin: 0; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); }
-.ftr-lede { max-width: 46ch; margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; } /* nota del pie: Subheadline 15/20, un paso bajo el cuerpo de las secciones */
+.ftr-title { margin: 0; font: var(--t-titulo-1); letter-spacing: var(--ls-titulo-1); text-wrap: balance; }
+.ftr-lede { max-width: 60ch; margin: var(--space-3) 0 0; font: var(--t-cuerpo); color: var(--tinta-2); text-wrap: pretty; }
 .ftr-links { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--space-8); margin: 0; padding: 0 var(--space-4); list-style: none; border-radius: var(--radio-md); background: var(--fondo-2); }
 .ftr-links li { padding-block: var(--space-1); } /* fila de 56: enlace de 48 y 4 px arriba y abajo; entre dos enlaces quedan 9 px (≥ 8 entre vecinos) */
 .ftr-links li + li { border-top: 1px solid var(--linea); }
@@ -464,9 +466,9 @@ html:not(.js) .bill-pie { display: none; }
 /* ---------- Catálogo (#libros): la piel nueva sobre la estructura de siempre ---------- */
 
 .books { padding: var(--sec) var(--margen) 0; background: var(--fondo); }
-.books > .cat { margin: var(--sec) calc(-1 * var(--margen)) 0; }
+.books > .cat { margin: var(--space-12) calc(-1 * var(--margen)) 0; }
 /* Cabecera del capítulo: titular y, justo debajo, «Buscar en el catálogo» (la tarea principal del capítulo va primero). */
-.books-head { display: grid; justify-items: start; gap: var(--space-5); margin-bottom: var(--space-6); }
+.books-head { display: grid; justify-items: start; gap: var(--space-5); margin-bottom: var(--space-8); }
 .books-head .h2 { max-width: 16ch; }
 /* «Buscar en el catálogo»: enlace con cara de campo (la misma caja que el buscador). En el teléfono abre la hoja Explorar; en escritorio baja a
    la rejilla en línea y deja el foco en su buscador (app.js). */
@@ -516,7 +518,7 @@ html:not(.js) .bill-pie { display: none; }
 .cat-clear .ic { width: 20px; height: 20px; }
 .cat-clear:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .cat-clear:hover { color: var(--tinta); } }
-.books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec) 0; }
+.books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--space-12) 0 var(--sec); }
 .books-foot p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
 
 /* Explorar el catálogo (capa 2). En escritorio el diálogo queda abierto en línea; en móvil es una hoja a pantalla completa (mobile.css). */
@@ -972,9 +974,9 @@ html:not(.js) :is(.menu-btn, .hdr-list, .explore-open, .motion-btn, .cat-bar, .c
 html:not(.js) .hdr { flex-wrap: wrap; height: auto; padding-bottom: var(--space-1); }
 html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; overflow-x: auto; }
 
-/* ---------- Composición Café (A6 apaisado y tableta ancha, desde 667 px; Aldo 2026-11-13) ---------- */
-/* Titular y foto en la misma fila (como 1024×768) para que el centro vertical coincida; la carta sigue debajo a todo el ancho. */
-@media (min-width: 667px) {
+/* ---------- Composición Café: el mismo marco que el resto, desde 1024 px ---------- */
+/* En tableta vertical Café se apila como Catálogo y Eventos. Titular y foto comparten fila en escritorio y en el teléfono apaisado (ventana baja), para que no queden a cientos de px. La carta sigue debajo, a todo el ancho. */
+@media (min-width: 1024px), (max-height: 500px) and (min-width: 667px) {
   .cafe { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: center; }
   .cafe > .sec-head { grid-column: 1; grid-row: 1; margin: 0; }
   .cafe-cuerpo { display: contents; }
