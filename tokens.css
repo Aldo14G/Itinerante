@@ -140,6 +140,9 @@
   --perspectiva-carrusel-ancha: 1200px;
   --giro-carrusel: 52deg;
   --perspectiva-tarjeta: 1000px;
+  --perspectiva-inclinacion: 800px;
+  --inclinacion-max: 6deg;
+  --adelanto-profundidad: 12px;
 
   /* Movimiento */
   --dur-instantanea: 120ms;

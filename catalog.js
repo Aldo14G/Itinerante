@@ -363,7 +363,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     const price = priceLabel(b.pr);
     const meta = el('span', { class: 'card-m' }, b.a, price ? [b.a ? '\u00a0· ' : '', el('span', { class: 'card-pr', 'data-fuente': 'hoja' }, price)] : null);
     const btn = el('button', { type: 'button', class: 'card', 'data-id': b.id, 'aria-haspopup': 'dialog' }, cover(b, tones.get(b.id), true, false), el('span', { class: 'card-t' }, b.t), meta);
-    return el('li', { class: 'card-item' }, btn, saveButton(b));
+    return el('li', { class: 'card-item', 'data-inclina': '' }, btn, saveButton(b));
   }
 
   let results = [];

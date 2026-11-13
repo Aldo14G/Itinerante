@@ -35,7 +35,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
     const g = document.querySelector('[data-cat-grid]'); const gk = g.querySelector('.card--sk');
     const num = c => c.match(/[0-9.]+/g).map(Number);
     return {
-      railH: Math.round(r.getBoundingClientRect().height), railSkW: sk && Math.round(sk.getBoundingClientRect().width), railSkH: sk && Math.round(sk.getBoundingClientRect().height), railN: r.querySelectorAll('.rail-item').length,
+      railH: (r => Math.round(r.querySelector('.rail-ask').getBoundingClientRect().bottom - r.querySelector('.rail-head').getBoundingClientRect().top))(r), railSkW: sk && Math.round(sk.getBoundingClientRect().width), railSkH: sk && Math.round(sk.getBoundingClientRect().height), railN: r.querySelectorAll('.rail-item').length,
       skColor: sc && getComputedStyle(sc).backgroundColor, skAnim: sc && getComputedStyle(sc, '::before').animationName,
       gridSkN: g.querySelectorAll('.card--sk').length, gridSkH: gk && Math.round(gk.getBoundingClientRect().height), gridSkW: gk && Math.round(gk.getBoundingClientRect().width)
     };
@@ -44,10 +44,10 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   if (mobile) ck('móvil: los esqueletos no se animan (cuesta un recálculo de estilo por fotograma)', before.skAnim === 'none', before.skAnim);
   // 2) Carga del carrusel: ¿cambia de alto?
   await ev(`window.__cls = 0; window.__shifts = []`);
-  await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
+  await ev(`scrollTo(0, document.querySelector('[data-rail] .rail-head').getBoundingClientRect().top + scrollY - 120)`); // en escritorio .rail es display: contents (A6): se mide de la cabecera del carrusel a «Preguntar por…»
   for (let i = 0; i < 40 && !(await ev(`document.querySelector('[data-rail]').classList.contains('is-ready')`)); i++) await sleep(250);
   await sleep(800);
-  const after = await ev(`(() => { const r = document.querySelector('[data-rail]'); const it = r.querySelector('.rail-item.is-centro'); /* carrusel 3D: la del centro va de frente, sin giro ni escala */ return { railH: Math.round(r.getBoundingClientRect().height), itW: Math.round(it.getBoundingClientRect().width), itH: Math.round(it.getBoundingClientRect().height), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
+  const after = await ev(`(() => { const r = document.querySelector('[data-rail]'); const it = r.querySelector('.rail-item.is-centro'); /* carrusel 3D: la del centro va de frente, sin giro ni escala */ return { railH: (r => Math.round(r.querySelector('.rail-ask').getBoundingClientRect().bottom - r.querySelector('.rail-head').getBoundingClientRect().top))(r), itW: Math.round(it.getBoundingClientRect().width), itH: Math.round(it.getBoundingClientRect().height), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
   ck(`${name}: al cargar el carrusel el alto no salta (±8 px)`, Math.abs(after.railH - before.railH) <= 8, `esqueleto ${before.railH}px → real ${after.railH}px`);
   ck(`${name}: la tarjeta real ocupa el ancho y el alto del esqueleto (±8 px)`, Math.abs(after.itW - before.railSkW) <= 8 && Math.abs(after.itH - before.railSkH) <= 8, `esqueleto ${before.railSkW}×${before.railSkH} → real ${after.itW}×${after.itH}`);
   ck(`${name}: CLS durante la carga del carrusel ≤ 0.02`, after.cls <= 0.02, JSON.stringify(after.shifts));

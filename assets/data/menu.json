@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "nota": "Carta de Café y té (#cafe, cafe.js). Carta genérica indicada por Aldo el 2026-11-13: los cafés y tés que maneja cualquier cafetería; sin precios hasta que la librería los dé. Cada categoría es un chip (id, nombre, icono y productos); añadir una categoría (p. ej. «Para comer») es añadir un objeto a «categorias». `icono` es el nombre de un icono del sprite de index.html sin el prefijo «c-» (taza, tetera); si no existe, la tarjeta va sin icono. Cada producto lleva id, nombre, descripcion y precio: null mientras no haya precio de la librería (no se imprime nada); con un número se muestra «$NN MXN»."
+  },
+  "categorias": [
+    {
+      "id": "cafe",
+      "nombre": "Café",
+      "icono": "taza",
+      "productos": [
+        { "id": "espresso", "nombre": "Espresso", "descripcion": "Una carga corta e intensa.", "precio": null },
+        { "id": "americano", "nombre": "Americano", "descripcion": "Espresso alargado con agua caliente.", "precio": null },
+        { "id": "capuchino", "nombre": "Capuchino", "descripcion": "Espresso, leche vaporizada y mucha espuma.", "precio": null },
+        { "id": "latte", "nombre": "Latte", "descripcion": "Espresso con más leche y poca espuma.", "precio": null },
+        { "id": "moka", "nombre": "Moka", "descripcion": "Espresso, chocolate y leche vaporizada.", "precio": null },
+        { "id": "macchiato", "nombre": "Macchiato", "descripcion": "Espresso manchado con un poco de espuma.", "precio": null },
+        { "id": "cortado", "nombre": "Cortado", "descripcion": "Espresso con la misma medida de leche.", "precio": null },
+        { "id": "cafe-frio", "nombre": "Café frío", "descripcion": "Café con hielo, para las tardes de calor.", "precio": null }
+      ]
+    },
+    {
+      "id": "te",
+      "nombre": "Té",
+      "icono": "tetera",
+      "productos": [
+        { "id": "te-negro", "nombre": "Té negro", "descripcion": "Hojas de té negro, con o sin leche.", "precio": null },
+        { "id": "te-verde", "nombre": "Té verde", "descripcion": "Suave y herbal.", "precio": null },
+        { "id": "manzanilla", "nombre": "Manzanilla", "descripcion": "Infusión de flores, sin cafeína.", "precio": null },
+        { "id": "hierbabuena", "nombre": "Hierbabuena", "descripcion": "Infusión fresca de hojas de hierbabuena.", "precio": null },
+        { "id": "chai", "nombre": "Chai", "descripcion": "Té negro con especias y leche.", "precio": null },
+        { "id": "frutos-rojos", "nombre": "Té de frutos rojos", "descripcion": "Infusión frutal, sin cafeína.", "precio": null }
+      ]
+    }
+  ]
+}

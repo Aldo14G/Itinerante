@@ -1,6 +1,6 @@
 /* Librería Itinerante y Más · teléfono (se carga solo con max-width: 760px). Sistema «Itinerante Líquido».
    Aquí vive lo que solo existe en el teléfono: la barra inferior de vidrio (Inicio, Catálogo, Mi lista), las hojas que suben desde abajo
-   (ficha, Mi lista) y Explorar a pantalla completa, y los carruseles de Eventos y La casa. La piel de cada pieza es la de style.css. */
+   (ficha, Mi lista) y Explorar a pantalla completa, y la tira de La casa. Los tres Carrusel3D (portada, evento, carta) son de style.css. La piel de cada pieza es la de style.css. */
 
 /* El final de la página deja libre el alto de la barra más el área segura y 16 px. */
 html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-6)); }
@@ -58,18 +58,10 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
 .still { width: 84vw; scroll-snap-align: center; }
 
-/* ---------- Eventos y talleres: carrusel de tarjetas abiertas, con puntos ---------- */
-.bill-track {
-  display: flex; gap: var(--space-3); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--margen);
-  margin-inline: calc(-1 * var(--margen)); padding: var(--space-1) var(--margen) var(--space-2); overscroll-behavior-x: contain; scrollbar-width: none;
-}
-.bill-track::-webkit-scrollbar { display: none; }
-.bill-item { flex: 0 0 min(84vw, 340px); scroll-snap-align: start; }
-html:not(.js) .bill-item summary { pointer-events: auto; }
+/* ---------- Eventos y talleres: el Carrusel3D (style.css); en ventanas bajas la foto se acorta para que la tarjeta quepa ---------- */
 @media (max-height: 700px) { .bill-card-img { aspect-ratio: 16 / 9; } }
-.bill-dots { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-3); }
-.bill-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--linea-fuerte); opacity: 0.45; transition: opacity var(--dur-rapida) var(--curva-salida), scale var(--dur-base) var(--curva-resorte); }
-.bill-dots i.is-on { opacity: 1; scale: 1.4; background: var(--primario); }
+/* A 320–400 px la descripción de la propuesta del centro llega a cuatro renglones: se reservan para que la fila de acciones no salte. */
+@media (max-width: 400px) { .bill-desc { min-height: 4lh; } }
 
 /* ---------- Visita y pie ---------- */
 .visit-actions .btn { flex: 1 1 auto; }
@@ -80,8 +72,13 @@ html:not(.js) .bill-item summary { pointer-events: auto; }
 .books-head { margin-bottom: var(--space-5); }
 .explore-open { width: 100%; }
 .rail-ask .btn { width: 100%; }
-/* A 320 px los tres chips caben en un renglón (12 px de relleno en vez de 16). */
-@media (max-width: 359px) { .rail-chips .chip { padding: 0 var(--space-3); } }
+.cafe-ask .btn { width: 100%; }
+/* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón: 12 px de relleno y, con palomita, 8 y la
+   palomita más junta. Nunca se parten. */
+@media (max-width: 389px) {
+  .rail-chips .chip { padding: 0 var(--space-3); }
+  .rail-chips .chip:is([aria-checked="true"], .is-hojeada) { gap: var(--space-1); padding: 0 var(--space-2); }
+}
 .books > .cat { margin: 0; padding: 0; border: 0; }
 .cat-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .books-foot { padding-block: var(--space-8); }
@@ -141,9 +138,10 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 
 /* Primer pintado: bajo el inicio nada se maqueta hasta acercarse; el navegador recuerda la altura real (auto). Cifras medidas a 360–414 px. */
 .house { content-visibility: auto; contain-intrinsic-size: auto 520px; }
-.bill { content-visibility: auto; contain-intrinsic-size: auto 1000px; }
+.bill { content-visibility: auto; contain-intrinsic-size: auto 760px; }
 .books { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
+.cafe { content-visibility: auto; contain-intrinsic-size: auto 880px; }
 .visit { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 320px; }
 
@@ -157,8 +155,9 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-actions { grid-template-columns: repeat(2, minmax(0, max-content)); margin-top: var(--space-4); }
   .entry-media { aspect-ratio: 4 / 3; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }
   .still { width: min(84vw, calc((100svh - 150px) * 1.333)); }
-  .rail { --cf-w: min(44vw, calc((100svh - 150px) / 1.5)); }
-  .bill-item { flex-basis: min(60vw, 300px); }
+  .rail { --c3d-w: min(44vw, calc((100svh - 150px) / 1.5)); }
+  .c3d--evento { --c3d-w: min(60vw, 300px); }
+  .c3d--carta { --c3d-w: min(40vw, calc((100svh - 150px) / 1.25)); }
   .bill-card-img { aspect-ratio: 16 / 9; }
   .drawer-body { grid-template-columns: 24% minmax(0, 1fr); }
   .drawer { height: calc(100dvh - var(--space-4)); }

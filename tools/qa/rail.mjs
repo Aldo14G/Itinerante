@@ -1,7 +1,10 @@
 // Carrusel de libros (capa 1 de Libros): fila de chips de colección (radiogroup, 48 px, teclado, región viva, «Preguntar por {colección}» que
 // sigue al chip, sin salto de alto), carrusel 3D de portadas (la del centro de frente, las vecinas giradas; flechas, ← → Inicio Fin, toque en
 // una vecina la trae al centro y en la del centro abre la ficha; plano con movimiento reducido), «autor · precio» sin cortar en ningún libro,
-// ficha y foco, a 390, 360, 320 y 1280. El recorrido de paradas (progreso, palomitas, persistencia) se retiró el 2026-11-13.
+// ficha y foco, a 390, 360, 320 y 1280. El carrusel es la variante «portada» del Carrusel3D (carousel3d.js): flechas de vidrio a los lados, región
+// con rol de carrusel. Recorrido ligero (A4, 2026-11-13): los chips son las paradas (conector, palomita en las hojeadas, «N de 3 paradas
+// hojeadas» y su dato en localStorage) y caben en un renglón a 320 px. En escritorio (≥ 1024) .rail es display: contents (dos columnas,
+// A6): las medidas toman como referencia la cabecera del carrusel (.rail-head), que sí tiene caja.
 // node tools/qa/rail.mjs URL [DIR]   Las capturas van a DIR (por defecto, el directorio actual).
 // Robusto con la máquina cargada (QA1-04): ev() devuelve un valor definido o lanza un error legible (nunca un TypeError
 // «of undefined» en el script), y las esperas son por condición con tope en vez de pausas fijas. Si una pantalla aborta,
@@ -73,18 +76,20 @@ const HELPERS = `(() => {
   window.__itiQa = { until, stable, settled }; return true;
 })()`;
 // Cambio de colección: la etiqueta del carrusel nombra la colección, la pista deja aria-busy y la lista deja de crecer.
-const AFTER_CHIP = `async chip => { const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const tr = r.querySelector('[data-rail-track]'); const name = chip.textContent.trim();
+const AFTER_CHIP = `async chip => { const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-c3d]'); const tr = r.querySelector('[data-rail-track]'); const name = chip.textContent.trim();
   await __itiQa.until(() => v.getAttribute('aria-label').includes(name) && !tr.hasAttribute('aria-busy') && tr.children.length > 0, 8000, 'colección ' + name);
   await __itiQa.stable(() => tr.children.length); }`;
 // Estado de la fila de chips, del botón «Preguntar por {colección}» y posición del carrusel dentro de la pieza (para vigilar que nada salte de alto).
-const CHIPS = `(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); const top = r.getBoundingClientRect().top;
+const CHIPS = `(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); const top = r.querySelector('.rail-head').getBoundingClientRect().top;
   const chips = [...g.querySelectorAll('.rail-chip')].map(c => { const b = c.getBoundingClientRect(); const cs = getComputedStyle(c);
     return { id: c.dataset.id, name: c.textContent.trim(), role: c.getAttribute('role'), checked: c.getAttribute('aria-checked'), tab: c.tabIndex, w: Math.round(b.width), h: Math.round(b.height), left: b.left, right: b.right, top: Math.round(b.top), cut: c.scrollWidth > c.clientWidth + 1, fs: cs.fontSize, bg: cs.backgroundColor, mark: getComputedStyle(c, '::before').content }; });
   const ask = r.querySelector('[data-rail-ask]'); const libre = r.querySelector('.rail-libre');
   return { role: g.getAttribute('role'), label: g.getAttribute('aria-label'), chips, gap: chips.slice(1).map((c, i) => c.top === chips[i].top ? Math.round(c.left - chips[i].right) : 99),
     ask: { text: ask.textContent.trim(), msg: new URL(ask.href).searchParams.get('text'), h: Math.round(ask.getBoundingClientRect().height) }, libre: { text: libre.textContent.trim(), h: Math.round(libre.getBoundingClientRect().height), msg: new URL(libre.href).searchParams.get('text') },
     vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - top), noteTop: Math.round(r.querySelector('[data-rail-note]').getBoundingClientRect().top - top), headH: Math.round(r.querySelector('.rail-head').getBoundingClientRect().height),
-    askTop: Math.round(ask.getBoundingClientRect().top - top), live: r.querySelector('[data-rail-live]').textContent, stored: (() => { try { return Object.keys(localStorage).filter(k => /recorrido/.test(k)); } catch { return []; } })() }; })()`;
+    askTop: Math.round(ask.getBoundingClientRect().top - top), live: r.querySelector('[data-rail-live]').textContent, stored: (() => { try { return JSON.parse(localStorage.getItem('iti-recorrido-v2') || '[]'); } catch { return []; } })(),
+    progreso: r.querySelector('[data-rail-progreso]').textContent, links: [...g.querySelectorAll('.rail-conector')].map(l => [l.classList.contains('is-hecho'), Math.round(l.getBoundingClientRect().width), Math.round(l.getBoundingClientRect().height)]),
+    hojeadas: chips.map(c => g.querySelector('.rail-chip[data-id="' + c.id + '"]').classList.contains('is-hojeada')), row: (() => { const all = [...g.children].map(e => e.getBoundingClientRect()); const pad = parseFloat(getComputedStyle(document.querySelector('.books')).paddingRight); return { one: new Set(all.map(b => Math.round(b.top + b.height / 2))).size === 1, right: Math.round(Math.max(...all.map(b => b.right))), limit: Math.round(innerWidth - pad) }; })() }; })()`;
 const READY = `document.querySelector('[data-rail]').classList.contains('is-ready') && !document.querySelector('[data-rail] .card--sk') && document.querySelectorAll('[data-rail] .rail-item').length > 0`;
 
 const out = [];
@@ -100,12 +105,13 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     await ev(HELPERS);
     // Esqueleto de los chips: reserva la fila real (se mide antes de acercarse, con el carrusel sin cargar).
     const sk = await ev(`(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); return { ready: r.classList.contains('is-ready'), n: g.querySelectorAll('.sk-chip').length, rowH: Math.round(g.getBoundingClientRect().height), headH: Math.round(r.querySelector('.rail-head').getBoundingClientRect().height) }; })()`);
-    await run(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
+    await run(`try { localStorage.removeItem('iti-recorrido-v2'); } catch {}`); // cada pantalla empieza el recorrido de cero
+    await run(`scrollTo(0, document.querySelector('[data-rail] .rail-head').getBoundingClientRect().top + scrollY - 120)`);
     await run(`scrollBy(0, 1)`);
     await waitFor(READY, 'el carrusel listo (is-ready, sin esqueletos)', 30000);
     await ev(`__itiQa.stable(() => document.querySelectorAll('[data-rail] .rail-item').length)`);
     const st = await ev(`(() => {
-      const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]');
+      const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const reg = r.querySelector('[data-rail-c3d]');
       const items = [...r.querySelectorAll('.rail-item')]; const c = r.querySelector('.rail-item.is-centro'); const ci = items.indexOf(c); const cb = c.getBoundingClientRect(); const vb = v.getBoundingClientRect();
       const pose = it => it.querySelector('.cf-pose')?.style.transform || '';
       const meta = r.querySelector('[data-rail-meta]'); const strong = meta.querySelector('strong');
@@ -116,10 +122,11 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
         vw: v.clientWidth, sw: v.scrollWidth, centerW: Math.round(c.offsetWidth), ci, mid: Math.floor(items.length / 2),
         centered: Math.abs(cb.left + cb.width / 2 - (vb.left + vb.width / 2)) <= 2, front: /rotateY\\(-?0(\\.0+)?deg\\)/.test(pose(c)),
         turned: [items[ci - 1], items[ci + 1]].every(n => n && /rotateY\\(-?[1-9]/.test(pose(n))), both: !!items[ci - 1] && !!items[ci + 1],
-        snap: getComputedStyle(v).scrollSnapType, role: v.getAttribute('aria-roledescription'), tab: v.tabIndex, cardTabs: items.filter(i => i.querySelector('.card').tabIndex === 0).map(i => items.indexOf(i)),
+        snap: getComputedStyle(v).scrollSnapType, role: reg.getAttribute('aria-roledescription') + '/' + reg.getAttribute('role'), tab: v.tabIndex, progreso: r.querySelector('[data-rail-progreso]').textContent, cardTabs: items.filter(i => i.querySelector('.card').tabIndex === 0).map(i => items.indexOf(i)),
         caption: r.querySelector('[data-rail-title]').textContent, meta: meta.textContent, dots: r.querySelectorAll('[data-rail-dots], .cf-progreso, .rail-all, .rail-trail, .rail-stop').length,
         sk: r.querySelectorAll('.card--sk').length,
-        small: [...r.querySelectorAll('.rail-chip, .rail-btn, [data-rail-ask], .rail-libre')].filter(b => b.getBoundingClientRect().width > 0 && (b.getBoundingClientRect().height < 44 || b.getBoundingClientRect().width < 44)).length,
+        flechas: [...r.querySelectorAll('.c3d-flecha')].map(b => { const x = b.getBoundingClientRect(); return [b.className.includes('btn--vidrio'), Math.round(x.width), Math.round(x.height)]; }),
+        small: [...r.querySelectorAll('.rail-chip, .c3d-flecha, [data-rail-ask], .rail-libre')].filter(b => b.getBoundingClientRect().width > 0 && (b.getBoundingClientRect().height < 44 || b.getBoundingClientRect().width < 44)).length,
         docW: document.documentElement.scrollWidth === document.documentElement.clientWidth
       };
     })()`);
@@ -128,10 +135,11 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
       const covers = [...r.querySelectorAll('.rail-item .cover')].map(c => ({ width: c.offsetWidth, height: c.offsetHeight })); const cards = [...r.querySelectorAll('.rail-item .card')]; // tamaño propio: el giro no cuenta
       return { imgs: imgs.length, broken: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.getAttribute('src')), alt: [...new Set(imgs.map(i => i.getAttribute('alt')))], sizes: [...new Set(covers.map(c => Math.round(c.width) + 'x' + Math.round(c.height)))], named: cards.every(c => c.textContent.trim().length > 3 && c.querySelector('.cover-title')) }; })()`);
     ck(name + ': portadas reales en el carrusel: ninguna rota, sin alt (el título y el autor nombran el botón) y todas del mismo tamaño', pics.imgs >= 8 && !pics.broken.length && JSON.stringify(pics.alt) === '[""]' && pics.sizes.length === 1 && pics.named, JSON.stringify(pics));
-    ck(name + ': imán, rol de carrusel y una sola parada de tabulador: la portada del centro', /x mandatory/.test(st.snap) && st.role === 'carrusel' && st.tab === -1 && JSON.stringify(st.cardTabs) === JSON.stringify([st.ci]), JSON.stringify(st));
+    ck(name + ': imán, rol de carrusel y una sola parada de tabulador: la portada del centro', /x mandatory/.test(st.snap) && st.role === 'carrusel/region' && st.tab === -1 && JSON.stringify(st.cardTabs) === JSON.stringify([st.ci]), JSON.stringify(st));
     const reduced = await ev(`!document.documentElement.classList.contains('motion')`);
     ck(name + ': empieza por el libro del medio, centrado y de frente, con vecinas a los dos lados' + (reduced ? ' (sin movimiento: planas)' : ' giradas hacia el centro'), st.ci === st.mid && st.centered && st.front && st.both && (reduced ? !st.turned : st.turned) && st.sw > st.vw, JSON.stringify(st));
     ck(name + ': bajo el carrusel, el título y «autor · precio» del libro del centro; sin puntos, recorrido ni «Ver todo el catálogo»', st.caption.length > 2 && /\s· \$\d+ MXN$/.test(st.meta) && st.dots === 0, JSON.stringify({ caption: st.caption, meta: st.meta, retirados: st.dots }));
+    ck(name + ': flechas de vidrio de 48 px a los lados; el recorrido empieza en «0 de 3 paradas hojeadas»', st.flechas.length === 2 && st.flechas.every(f => f[0] && f[2] === 48) && st.progreso === '0 de 3 paradas hojeadas', JSON.stringify([st.flechas, st.progreso]));
     ck(name + ': sin desborde de la página', st.docW);
     ck(name + ': objetivos de 44px o más', st.small === 0, String(st.small));
     // «autor · precio» de cada libro de las tres colecciones: nunca cortado y el precio entero en un renglón (defecto de 320 px).
@@ -154,11 +162,12 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     ck(name + ': título y «autor · precio» de los ' + metas.n + ' libros sin cortarse y con el precio entero (si no cabe, baja de renglón)', metas.n >= 25 && !metas.bad.length, JSON.stringify(metas.bad));
     // ---------- Chips de colección ----------
     const t0 = await ev(CHIPS);
-    ck(name + ': chips = radiogroup «Colección» con 3 botones role=radio, uno marcado (primario con palomita) y un solo punto de tabulación', t0.role === 'radiogroup' && t0.label === 'Colección' && t0.chips.length === 3 && t0.chips.every(x => x.role === 'radio') && t0.chips.filter(x => x.checked === 'true').length === 1 && t0.chips.filter(x => x.tab === 0).length === 1 && t0.chips[0].checked === 'true' && t0.chips[0].tab === 0 && t0.chips[0].mark !== 'none' && t0.chips[1].mark === 'none', JSON.stringify(t0.chips.map(x => [x.role, x.checked, x.tab, x.mark.slice(0, 6)])));
+    ck(name + ': chips = radiogroup «Colección» con 3 botones role=radio, uno marcado (primario con palomita) y un solo punto de tabulación', t0.role === 'radiogroup' && t0.label === 'Colección' && t0.chips.length === 3 && t0.chips.every(x => x.role === 'radio') && t0.chips.filter(x => x.checked === 'true').length === 1 && t0.chips.filter(x => x.tab === 0).length === 1 && t0.chips[0].checked === 'true' && t0.chips[0].tab === 0 && t0.chips[0].mark !== 'none', JSON.stringify(t0.chips.map(x => [x.role, x.checked, x.tab, x.mark.slice(0, 6)])));
     ck(name + ': cada chip mide 48 px de alto, con su nombre entero en 15 px y ≥ 8 px entre vecinos', t0.chips.every(x => x.h === 48 && !x.cut && x.fs === '15px') && t0.gap.every(g => g >= 8), JSON.stringify({ chips: t0.chips.map(x => [x.w, x.h, x.fs, x.cut]), gap: t0.gap }));
     ck(name + ': el esqueleto reserva la fila de chips (uno por colección): la cabecera del carrusel mide lo mismo antes y después de cargar', !sk.ready && sk.n === 3 && sk.headH === t0.headH, JSON.stringify({ sk, headH: t0.headH }));
     ck(name + ': bajo el carrusel, «Preguntar por narrativa» (WhatsApp con el mensaje de la colección) y «Pide una recomendación por WhatsApp», con objetivos ≥ 44 px', t0.ask.text === 'Preguntar por narrativa' && /libros de narrativa\. ¿Qué me recomiendan\?$/.test(t0.ask.msg) && t0.ask.h >= 48 && t0.libre.text === 'Pide una recomendación por WhatsApp' && t0.libre.h >= 44 && /no sé por dónde empezar/.test(t0.libre.msg), JSON.stringify({ ask: t0.ask, libre: t0.libre }));
-    ck(name + ': sin recorrido: nada se guarda en este dispositivo al hojear colecciones', !t0.stored.length, JSON.stringify(t0.stored));
+    ck(name + ': recorrido: tras elegir las tres colecciones, «3 de 3 paradas hojeadas», palomita en las tres, conectores de 2 px en primario y guardado en este dispositivo', t0.progreso === '3 de 3 paradas hojeadas' && t0.hojeadas.every(Boolean) && t0.links.length === 2 && t0.links.every(l => l[0] && l[1] >= 8 && l[2] === 2) && JSON.stringify([...t0.stored].sort()) === JSON.stringify(['ensayo', 'narrativa', 'poesia']), JSON.stringify({ p: t0.progreso, h: t0.hojeadas, l: t0.links, s: t0.stored }));
+    ck(name + ': las paradas (con su palomita) y sus conectores caben en un renglón, sin partirse ni desbordar', t0.row.one && t0.row.right <= t0.row.limit + 1 && t0.chips.every(x => !x.cut), JSON.stringify(t0.row));
     // Teclado: las flechas mueven la selección y el foco juntos; Tab entra por el chip marcado.
     await run(`document.querySelector('.rail-chip[tabindex="0"]').focus()`);
     await key('ArrowRight', 'ArrowRight', 39);
@@ -190,7 +199,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
       const r = document.querySelector('[data-rail]'); const first = [...r.querySelectorAll('.rail-item .cover-title')].map(t => t.textContent).join('|');
       const chip = r.querySelectorAll('.rail-chip')[1]; chip.click(); await (${AFTER_CHIP})(chip);
       await __itiQa.stable(() => r.querySelector('[data-rail-viewport]').scrollLeft); const items = [...r.querySelectorAll('.rail-item')];
-      return { changed: items.map(i => i.querySelector('.cover-title').textContent).join('|') !== first, label: r.querySelector('[data-rail-viewport]').getAttribute('aria-label'), live: r.querySelector('[data-rail-live]').textContent, n: items.length, centro: items.findIndex(i => i.classList.contains('is-centro')) };
+      return { changed: items.map(i => i.querySelector('.cover-title').textContent).join('|') !== first, label: r.querySelector('[data-rail-c3d]').getAttribute('aria-label'), live: r.querySelector('[data-rail-live]').textContent, n: items.length, centro: items.findIndex(i => i.classList.contains('is-centro')) };
     })()`);
     ck(name + ': cambiar de colección renueva libros, etiqueta y aviso', col.changed && /Poesía/.test(col.label) && /Poesía/.test(col.live) && col.n > 0 && col.centro === Math.floor(col.n / 2), JSON.stringify(col));
     // Plantilla: junto al carrusel solo va la nota de la colección, que cambia con cada una; ningún sello de muestra.
@@ -199,7 +208,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
       for (const chip of r.querySelectorAll('.rail-chip')) {
         chip.click(); await (${AFTER_CHIP})(chip);
         const n = r.querySelector('[data-rail-note]'); const b = n.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(n);
-        out.push({ col: chip.textContent.trim(), vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - r.getBoundingClientRect().top), shown: b.width > 0 && b.height > 0 && getComputedStyle(n).visibility === 'visible' && !n.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, seal: !!r.querySelector('[data-rail-seal], .rail-seal') || /Datos de muestra|no es inventario/.test(document.body.innerText), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
+        out.push({ col: chip.textContent.trim(), vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - r.querySelector('.rail-head').getBoundingClientRect().top), shown: b.width > 0 && b.height > 0 && getComputedStyle(n).visibility === 'visible' && !n.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, seal: !!r.querySelector('[data-rail-seal], .rail-seal') || /Datos de muestra|no es inventario/.test(document.body.innerText), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
       }
       return out;
     })()`);

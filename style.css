@@ -293,7 +293,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-lista li { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-salida); transition-delay: calc(var(--i, 0) * var(--escalon-linea) / 2); }
 @starting-style { .motion .menu[open] .menu-lista li { opacity: 0; transform: translateY(8px); } }
 .menu-lista li:nth-child(2) { --i: 1; } .menu-lista li:nth-child(3) { --i: 2; } .menu-lista li:nth-child(4) { --i: 3; }
-.menu-lista li:nth-child(5) { --i: 4; } .menu-lista li:nth-child(6) { --i: 5; } .menu-lista li:nth-child(7) { --i: 6; }
+.menu-lista li:nth-child(5) { --i: 4; } .menu-lista li:nth-child(6) { --i: 5; } .menu-lista li:nth-child(7) { --i: 6; } .menu-lista li:nth-child(8) { --i: 7; }
 
 /* La barra inferior solo existe en el teléfono (mobile.css). */
 .tabbar { display: none; }
@@ -347,41 +347,45 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .still figcaption { padding-top: var(--space-3); }
 .still figcaption b { font: var(--t-titular); letter-spacing: var(--ls-titular); }
 
-/* ---------- Eventos y talleres (#cartelera): tarjetas, todas abiertas ---------- */
-
+/* ---------- Eventos y talleres (#cartelera): Carrusel3D, variante evento ---------- */
+/* Tarjeta en superficie con radio-md (no es vidrio: no flota), foto real 4:3 arriba, insignias de tipo y estado y el título. Debajo del carrusel,
+   la descripción de la propuesta del centro (región viva) y una sola fila de acciones: «Preguntar por WhatsApp» y «Compartir» (icono menta).
+   Sin JavaScript cada tarjeta muestra su descripción y su consulta (la fila de abajo no existe) y la pista se desliza con el dedo. */
 .bill { padding: var(--sec) var(--margen); background: var(--fondo-2); }
-.bill > .sec-head { margin-bottom: var(--space-8); }
-.bill-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); align-items: start; }
-.bill-item { position: relative; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
-.bill-item summary { display: block; padding: 0; list-style: none; cursor: default; pointer-events: none; }
-.bill-item summary::-webkit-details-marker { display: none; }
+.bill > .sec-head { margin-bottom: var(--space-4); }
+.c3d--evento { --c3d-w: clamp(240px, 72vw, 320px); --c3d-alcance: 1.15; }
+.bill-item .cf-pose, .bill-card { height: 100%; }
+.bill-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
 .bill-card-fig { display: block; }
 .bill-card-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 /* Insignias de la propuesta: tipo (Lectura, Juego, Taller) y estado («Propuesta · sin fecha» o la fecha confirmada, ver feed.js). */
 .bill-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4) 0; }
-.bill-title { display: block; margin-top: var(--space-3); padding: 0 var(--space-4); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
-.bill-detail { display: grid; gap: var(--space-3); padding: var(--space-3) var(--space-4) var(--space-4); }
-.bill-detail p { max-width: 54ch; margin: 0; font: var(--t-cuerpo); color: var(--tinta); }
-/* Acciones: «Preguntar por WhatsApp» (secundario) a todo el ancho, con su rótulo entero, y «Compartir» como botón de icono de vidrio que flota
-   sobre la esquina de la foto (el vidrio va en lo que flota sobre una imagen, con su respaldo opaco). Sin «Me interesa». */
-.bill-acts { display: flex; align-items: center; container-type: inline-size; }
-.bill-acts .bill-wa { flex: 1 1 auto; white-space: nowrap; }
-.bill-acts .act--icon { position: absolute; z-index: 1; top: var(--space-3); right: var(--space-3); }
-/* Tarjeta angosta (320 px): el rótulo entero cabe sin el icono de chat. */
-@container (max-width: 263px) { .bill-acts .bill-wa .ic { display: none; } }
-html:not(.js) .bill-acts .act { display: none; }
-.bill-dots { display: none; }
+.bill-title { margin: 0; padding: var(--space-3) var(--space-4) var(--space-4); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
+.bill-detail { display: grid; gap: var(--space-3); padding: 0 var(--space-4) var(--space-4); }
+.bill-detail p { max-width: 54ch; margin: 0; font: var(--t-cuerpo); line-height: var(--space-6); color: var(--tinta); }
+/* Párrafos de varias líneas (descripción de la propuesta): Body con interlínea de 24 px, más cómoda para un texto centrado. */
+.bill-track { line-height: var(--space-6); }
+.bill-detail .bill-wa { width: 100%; white-space: normal; }
+html.js .bill-card .bill-detail { display: none; }
+/* La propuesta del centro: descripción (tres renglones reservados: cambiar de tarjeta no mueve las acciones) y la fila de acciones. */
+.bill-pie { display: grid; justify-items: center; gap: var(--space-4); max-width: 36rem; margin: 0 auto; text-align: center; }
+.bill-desc { min-height: 3lh; margin: 0; font: var(--t-cuerpo); line-height: var(--space-6); color: var(--tinta); text-wrap: pretty; }
+.bill-fila { display: flex; justify-content: center; gap: var(--space-3); width: 100%; container-type: inline-size; }
+.bill-fila .bill-wa { flex: 0 1 auto; min-width: 0; white-space: nowrap; }
+/* Fila angosta (320 px): el rótulo entero cabe sin el icono de chat y con 16 px de relleno. */
+@container (max-width: 330px) { .bill-fila .bill-wa { flex: 1 1 auto; --pad: var(--space-4); } .bill-fila .bill-wa .ic { display: none; } }
+html:not(.js) .bill-pie { display: none; }
 
 /* ---------- Visita y pie ---------- */
 
-.visit { display: grid; gap: var(--space-8); padding: var(--sec) var(--margen); background: var(--fondo); }
+.visit { display: grid; gap: var(--space-8); padding: var(--sec) var(--margen); background: var(--fondo-2); }
 .visit address { margin: var(--space-6) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); font-style: normal; }
 .visit address span { display: inline-block; margin-top: var(--space-2); font: var(--t-subtitulo); color: var(--tinta-2); }
 .visit-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-4) 0 0; font: var(--t-titular); }
 .visit-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .visit-side { display: grid; align-content: start; }
 /* Horario: lista agrupada (fondo-2, radio-md), una fila por renglón; hoy lleva la insignia «Hoy». */
-.hours { width: 100%; padding: 0 var(--space-4); border-collapse: separate; border-spacing: 0; border-radius: var(--radio-md); background: var(--fondo-2); font-variant-numeric: tabular-nums; }
+.hours { width: 100%; padding: 0 var(--space-4); border-collapse: separate; border-spacing: 0; border-radius: var(--radio-md); background: var(--fondo); font-variant-numeric: tabular-nums; }
 .hours caption { padding: 0 0 var(--space-2); text-align: left; font: var(--t-rotulo); color: var(--tinta-2); }
 .hours th, .hours td { padding: var(--space-4) 0; text-align: left; font: var(--t-cuerpo); }
 .hours th { font-weight: 400; }
@@ -398,7 +402,7 @@ html:not(.js) .bill-acts .act { display: none; }
 .frame-clip img { width: 100%; height: 100%; object-fit: cover; }
 @media (min-width: 1024px) { .visit { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-16); } }
 
-.ftr { padding: var(--space-10) var(--margen) var(--space-8); background: var(--fondo-2); }
+.ftr { padding: var(--space-10) var(--margen) var(--space-8); background: var(--fondo); }
 /* Pie: redes, correo y «Pausar el movimiento». Sin marca, dirección ni «Cómo llegar» (Visita, justo encima, ya los trae). */
 .ftr-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4) var(--space-8); align-items: center; }
 .ftr-links { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 0 calc(-1 * var(--space-4)); padding: 0; list-style: none; }
@@ -450,15 +454,15 @@ html:not(.js) .bill-acts .act { display: none; }
 /* Chip (Chip): píldora de 48 px en fondo-3; elegido = primario con la palomita (la forma acompaña al color). */
 .chip, .cat-filters-btn, .cat-chip {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
-  min-height: var(--alto-md); margin: 0; padding: 0 var(--space-4);
+  min-height: var(--alto-md); min-width: var(--alto-md); margin: 0; padding: 0 var(--space-4);
   border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); color: var(--tinta);
   font: var(--t-chip); letter-spacing: var(--ls-chip); white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
   transition: background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida);
 }
 .chip:active, .cat-filters-btn:active, .cat-chip:active { transform: scale(0.96); }
 .chip[aria-checked="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip { background: var(--primario); color: var(--en-primario); }
-.chip[aria-checked="true"]::before {
-  content: ""; width: 18px; height: 18px; margin-left: calc(-1 * var(--space-1)); background: currentColor;
+.chip[aria-checked="true"]::before, .rail-chip.is-hojeada::before {
+  content: ""; flex: none; width: 18px; height: 18px; margin-left: calc(-1 * var(--space-1)); background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.3 4.3 8.7-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.3 4.3 8.7-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
 }
@@ -705,40 +709,75 @@ html:not(.js) .bill-acts .act { display: none; }
 .toast-action { min-height: var(--alto-md); padding: 0 var(--space-4); border: 0; border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); font: var(--t-boton-chico); white-space: nowrap; cursor: pointer; }
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 
-/* ---------- Carrusel de libros (capa 1 del Catálogo) ---------- */
-.rail[hidden], html:not(.js) .rail { display: none; }
-.rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
-/* Fila de chips (una colección por chip, de collections.json) y, debajo, la nota de la colección elegida (su renglón está reservado). */
-.rail-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.rail-note { min-height: 1lh; margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
-/* Carrusel de portadas en 3D (CarruselPortadas): la pista se desplaza con el dedo (imán al centro) y rail.js gira las vecinas según su
-   distancia al centro, una vez por fotograma. La portada mide el 44 % del ancho entre 148 y 240 px (172 a 390 px; 240 desde 768).
-   La perspectiva va en la ventana del carrusel (su punto de fuga no se mueve al desplazar) y la pista conserva el 3D de sus portadas.
-   Sin movimiento (reducir movimiento o «Pausar el movimiento») las vecinas solo se achican y se atenúan: la pose la decide rail.js. */
-.rail { --cf-w: clamp(148px, 44vw, 240px); }
-.rail-viewport {
-  position: relative; margin-inline: calc(-1 * var(--margen)); padding: var(--space-6) 0 var(--space-8);
+/* ---------- Carrusel3D (carousel3d.js): un solo motor para portada, evento y carta ---------- */
+/* La pista se desplaza con el dedo (imán al centro) y carousel3d.js gira las vecinas según su distancia al centro, una vez por fotograma.
+   La perspectiva va en la ventana (su punto de fuga no se mueve al desplazar) y la pista conserva el 3D de sus piezas. --c3d-w es el ancho de
+   una pieza (lo pone cada variante). Sin movimiento (reducir movimiento o «Pausar el movimiento») las vecinas solo se achican al 88 % y se
+   atenúan: la pose la decide carousel3d.js. Solo la pieza del centro lleva sombra-portada. Flechas de vidrio de 48 a los lados. */
+.c3d { position: relative; margin-inline: calc(-1 * var(--margen)); }
+.c3d-viewport {
+  position: relative; padding: var(--space-6) 0 var(--space-8);
   overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
   perspective: var(--perspectiva-carrusel); touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-.rail-viewport::-webkit-scrollbar { display: none; }
-.rail-track { display: flex; width: max-content; margin: 0; padding: 0 calc(50% - var(--cf-w) / 2); list-style: none; transform-style: preserve-3d; }
-.rail-item { flex: 0 0 var(--cf-w); scroll-snap-align: center; transform-style: preserve-3d; }
-/* La envoltura lleva la pose; el <li> (blanco del imán) no se transforma ni recibe toques: el toque va a la portada que se ve. */
-.rail-track:has(.cf-pose), .rail-item:has(> .cf-pose) { pointer-events: none; } /* en 3D el plano de la pista queda delante de las vecinas hundidas */
+.c3d-viewport::-webkit-scrollbar { display: none; }
+.c3d-track { display: flex; width: max-content; margin: 0; padding: 0 calc(50% - var(--c3d-w) / 2); list-style: none; transform-style: preserve-3d; }
+.c3d-track > li { flex: 0 0 var(--c3d-w); scroll-snap-align: center; transform-style: preserve-3d; }
+/* La envoltura lleva la pose; el <li> (blanco del imán) no se transforma ni recibe toques: el toque va a la pieza que se ve. */
+.c3d-track:has(.cf-pose), .c3d-item:has(> .cf-pose) { pointer-events: none; } /* en 3D el plano de la pista queda delante de las vecinas hundidas */
 .cf-pose { position: relative; pointer-events: auto; will-change: transform; }
+/* Flechas: vidrio de 48 que flota a los lados de las piezas a la vista (en el teléfono, sobre el borde de las vecinas). */
+.c3d-flecha { position: absolute; z-index: 2; top: calc(50% - var(--space-1)); translate: 0 -50%; }
+/* --c3d-alcance: hasta dónde llegan las piezas a la vista, en anchos de pieza (1.6 con cinco a la vista; Eventos, con tres, 1.15). */
+.c3d-flecha--prev { left: max(var(--margen), calc(50% - var(--c3d-w) * var(--c3d-alcance, 1.6) - var(--space-16))); }
+.c3d-flecha--next { right: max(var(--margen), calc(50% - var(--c3d-w) * var(--c3d-alcance, 1.6) - var(--space-16))); }
+.c3d-flecha:disabled { opacity: 0; visibility: hidden; }
+/* Carrusel plano (sin movimiento): la imagen de las vecinas se atenúa (ATENUADA en carousel3d.js); el texto queda entero (≥ 4.5:1). */
+.c3d-item.is-atenuada img { opacity: 0.6; }
+.c3d-card:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco), var(--sombra-portada); }
+.c3d-item.is-centro :is(.bill-card, .cafe-card) { box-shadow: var(--sombra-portada); }
+@media (min-width: 768px) { .c3d-viewport { perspective: var(--perspectiva-carrusel-ancha); } }
+
+/* Profundidad (A5): la pieza central de cada carrusel y, en escritorio, la tarjeta de la rejilla se inclinan hacia el cursor (hasta
+   --inclinacion-max) y se adelantan --adelanto-profundidad (carousel3d.js escribe el transform una vez por fotograma; solo con puntero fino,
+   hover y movimiento). Al salir vuelven con el resorte; al presionar bajan a 0.97 en dur-instantanea y la sombra baja a sombra-flotante. */
+.motion [data-inclina] { transition: transform var(--dur-base) var(--curva-resorte), scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
+.motion [data-inclina].is-inclinada { transition: scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
+.motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active { scale: 0.97; }
+.motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active .cover { transform: none; }
+.c3d-item.is-centro :is(.bill-card, .cafe-card):active, .rail-item.is-centro .card:active .cover, .card-item:active .cover { box-shadow: var(--sombra-flotante); }
+
+/* ---------- Carrusel de libros (capa 1 del Catálogo): Carrusel3D, variante portada ---------- */
+.rail[hidden], html:not(.js) .rail { display: none; }
+.rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
+/* Fila de chips (una colección por chip, de collections.json): son también las paradas del recorrido (A4), unidas por un conector de 2 px
+   (linea-fuerte atenuada; primario entre dos paradas hojeadas). Una hojeada lleva la palomita y, si no es la elegida, borde primario. */
+.rail-chips { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--space-2); }
+.rail-chips .chip { flex: none; } /* un chip nunca se encoge ni se parte: cede el conector */
+/* En el recorrido el conector es la separación: va de chip a chip (≥ 8 px), sin hueco aparte. */
+.rail-chips:has(.rail-conector) { gap: 0; }
+.rail-conector { flex: 0 1 var(--space-6); min-width: var(--space-2); height: 2px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.45; transition: background-color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida); }
+.rail-conector.is-hecho { background: var(--primario); opacity: 1; }
+.rail-chip.is-hojeada:not([aria-checked="true"]) { box-shadow: inset 0 0 0 2px var(--primario); }
+.rail-chip.is-hojeada:not([aria-checked="true"])::before { background: var(--primario); }
+/* Debajo, la nota de la colección y, a su derecha, «N de 3 paradas hojeadas» (si no caben, el conteo baja y queda a la derecha). Los dos
+   renglones están reservados desde el esqueleto: el conteo tiene su ancho aunque llegue vacío. */
+.rail-nota-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); max-width: 480px; } /* el ancho de «Buscar en el catálogo»: el conteo queda cerca de sus paradas */
+.rail-note { flex: 1 1 14rem; min-height: 1lh; margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
+.rail-progreso { flex: 0 0 auto; min-width: 12.5em; min-height: 1lh; margin: 0 0 0 auto; font: var(--t-nota-pie); font-weight: 600; color: var(--turquesa-texto); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Portadas del 44 % del ancho entre 148 y 240 px (172 a 390 px; 240 desde 768). */
+.rail { --c3d-w: clamp(148px, 44vw, 240px); }
 .rail-item .card { content-visibility: visible; }
 .rail-item.is-centro .cover { box-shadow: var(--sombra-portada); }
 /* Guardar solo sobre la portada del centro: en una vecina girada no se leería ni se tocaría bien. */
 .rail-item .save { transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
 .rail-item:not(.is-centro) .save { opacity: 0; visibility: hidden; }
-.cf-pie { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); }
 /* Pie del libro del centro: el título (Title 3) y «autor · precio» (Subheadline), enteros y sin cortar: si no caben, bajan de renglón y el precio
-   nunca se parte. En un pie angosto el bloque reserva dos renglones de cada uno (2 × 25 + 2 × 20 px) y se centra entre las flechas, así pasar
-   de un libro a otro casi nunca mueve lo de abajo; con un pie de 600 px o más basta lo que mida. */
-.cf-pie { container-type: inline-size; }
-.cf-texto { display: grid; align-content: center; min-width: 0; min-height: 90px; text-align: center; }
-@container (min-width: 600px) { .cf-texto { min-height: 0; } }
+   nunca se parte. En un pie angosto el bloque reserva dos renglones de cada uno (2 × 25 + 2 × 20 px), así pasar de un libro a otro casi nunca
+   mueve lo de abajo; con un pie de 600 px o más, un renglón de cada uno. */
+.cf-pie { display: grid; justify-items: center; width: 100%; container-type: inline-size; }
+.cf-texto { display: grid; align-content: center; width: 100%; min-width: 0; min-height: 90px; text-align: center; }
+@container (min-width: 600px) { .cf-texto { min-height: 2lh; } } /* un renglón de cada uno: el esqueleto ya los reserva */
 .cf-titulo { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); color: var(--tinta); text-wrap: balance; overflow-wrap: break-word; }
 .cf-meta { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; text-wrap: balance; }
 .cf-meta strong { font-weight: 600; color: var(--tinta); white-space: nowrap; }
@@ -748,18 +787,42 @@ html:not(.js) .bill-acts .act { display: none; }
 .rail-libre:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .rail-libre:hover { background: var(--fondo-3); } }
 @media (min-width: 768px) {
-  .rail { --cf-w: 240px; }
-  .rail-viewport { perspective: var(--perspectiva-carrusel-ancha); }
+  .rail { --c3d-w: 240px; }
   .cf-pie { max-width: 640px; margin-inline: auto; }
 }
 .rail-status { margin: 0; font: var(--t-titular); }
 .rail-status:empty { position: absolute; }
 .rail-error { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .rail-error[hidden] { display: none; }
-.rail[data-state="error"] :is(.rail-chips, .rail-note, .rail-viewport, .cf-pie, .rail-ask) { display: none; }
-@media print { .rail { display: none; } }
+.rail[data-state="error"] :is(.rail-chips, .rail-nota-fila, .c3d, .cf-pie, .rail-ask) { display: none; }
+@media print { .rail, .c3d { display: none; } }
 /* El foco de «Guardar» sobre una portada se separa con el color de esa portada. */
 :is(.rail-item, .card-item) .save:not(.save--wide):focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
+
+/* ---------- Café y té (#cafe): Carrusel3D, variante carta ---------- */
+/* Titular, entradilla, foto real de la casa, chips Café · Té (radiogroup) y la carta: tarjetas tipográficas en superficie con un icono de
+   trazo (taza, tetera), el nombre, la descripción y, solo si la librería lo da, el precio. Debajo, «Preguntar por la carta» (secundario). */
+.cafe { padding: var(--sec) var(--margen); background: var(--fondo); }
+.cafe > .sec-head { margin-bottom: var(--space-8); }
+.cafe-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+.cafe-foto { margin: 0; }
+.cafe-foto .frame-clip { aspect-ratio: 4 / 3; }
+.cafe-carta { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); min-width: 0; }
+.c3d--carta { --c3d-w: clamp(168px, 46vw, 208px); }
+.cafe-item .cf-pose, .cafe-card { height: 100%; }
+.cafe-card {
+  display: flex; flex-direction: column; gap: var(--space-2); min-height: calc(var(--c3d-w) * 1.15); padding: var(--space-5);
+  border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea);
+}
+.cafe-ic { display: grid; place-items: center; width: var(--alto-md); height: var(--alto-md); border-radius: 50%; background: var(--menta); color: var(--en-menta); }
+.cafe-nombre { margin-top: auto; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); text-wrap: balance; }
+.cafe-desc { font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; }
+.cafe-precio { font: var(--t-titular); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cafe-item.card--sk .cafe-card { display: block; background: var(--fondo-3); box-shadow: none; }
+.cafe-status:empty { position: absolute; }
+.cafe-ask { display: grid; justify-items: center; }
+html:not(.js) :is(.cafe-chips, .c3d--carta), .cafe-carta[data-state="vacio"] :is(.cafe-chips, .c3d--carta) { display: none; }
+@media print { .cafe-carta { display: none; } }
 
 /* Esqueletos: ocupan el lugar exacto del contenido; quietos, con colores de los tokens. */
 .sk-line { position: relative; display: block; height: 12px; overflow: hidden; border-radius: var(--radio-portada); background: var(--fondo-3); }
@@ -811,11 +874,12 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
   .news.is-open .news-list { grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); }
 }
 @media print { .news { display: none; } }
-/* Con Novedades (fondo) entre Eventos (fondo-2) y Visita, Visita y el pie invierten su banda para que los vecinos sigan siendo de fondo distinto;
-   el horario, lista agrupada, pasa a fondo sobre la banda fondo-2. Sin llegadas (hoy) no cambia nada. */
-.has-news .visit { background: var(--fondo-2); }
-.has-news .visit .hours { background: var(--fondo); }
-.has-news .ftr { background: var(--fondo); }
+/* Bandas (2026-11-13, con Café y té): Eventos (fondo-2) → Café (fondo) → Visita (fondo-2, su horario en fondo) → pie (fondo). Con Novedades (fondo)
+   entre Eventos y Café, Café, Visita y el pie invierten su banda para que los vecinos sigan siendo de fondo distinto. Sin llegadas (hoy) no cambia nada. */
+.has-news .cafe { background: var(--fondo-2); }
+.has-news .visit { background: var(--fondo); }
+.has-news .visit .hours { background: var(--fondo-2); }
+.has-news .ftr { background: var(--fondo-2); }
 
 /* ---------- Sin JavaScript ---------- */
 /* Lo que necesita JS no se ofrece: el ☰, Mi lista, el buscador y «Pausar el movimiento». Las secciones quedan en la barra. */
@@ -823,12 +887,30 @@ html:not(.js) :is(.menu-btn, .hdr-list, .explore-open, .motion-btn, .cat-bar, .c
 html:not(.js) .hdr { flex-wrap: wrap; height: auto; padding-bottom: var(--space-1); }
 html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; overflow-x: auto; }
 
-/* ---------- Escritorio angosto y tableta ---------- */
-@media (min-width: 761px) and (max-width: 1023px) { .bill-track { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* ---------- Composición en escritorio (A6, 2026-11-13) ---------- */
+/* Desde 1024 px los encabezados de Catálogo, Eventos y Café van en dos columnas (titular a la izquierda; búsqueda, chips o entradilla a la
+   derecha) y el carrusel a todo el ancho debajo, centrado. En el Catálogo la cabecera y la pieza del carrusel se funden con la rejilla del
+   capítulo (display: contents) para que la búsqueda y los chips compartan la columna derecha. Café: la foto a la izquierda y la carta a la derecha. */
+@media (min-width: 1024px) {
+  .books { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: start; }
+  .books-head, .rail:not([hidden]) { display: contents; }
+  .books-head .h2 { grid-column: 1; grid-row: 1 / span 2; }
+  .books-head .explore-open { grid-column: 2; grid-row: 1; }
+  .rail-head { grid-column: 2; grid-row: 2; margin: var(--space-4) 0 0; }
+  .books > :not(.books-head, .rail), .rail > :not(.rail-head) { grid-column: 1 / -1; }
+  .rail > .c3d { margin-top: var(--space-4); }
+  :is(.bill, .cafe) > .sec-head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: last baseline; max-width: none; }
+  :is(.bill, .cafe) > .sec-head .sec-texto { margin: 0; }
+  .cafe-cuerpo { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "foto carta" "foto ask"; column-gap: var(--space-12); row-gap: var(--space-4); align-items: start; }
+  .cafe-foto { grid-area: foto; }
+  .cafe-carta { grid-area: carta; }
+  .cafe-ask { grid-area: ask; }
+  .cafe .c3d { margin-inline: 0; }
+}
 
 /* ---------- Impresión ---------- */
 @media print {
-  .hdr, .tabbar, .menu, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer, .save, .toast, .mylist, .card--sk, .sk-group, .bill-acts { display: none !important; }
+  .hdr, .tabbar, .menu, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer, .save, .toast, .mylist, .card--sk, .sk-group, .bill-fila, .c3d-flecha { display: none !important; }
   *, *::before, *::after { opacity: 1 !important; transform: none !important; clip-path: none !important; visibility: visible !important; color: var(--tinta) !important; background: transparent !important; box-shadow: none !important; }
   img { filter: grayscale(1); }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.7em; word-break: break-all; }
@@ -847,4 +929,5 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
   .btn:active, .menu-btn:active, .chip:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover { transform: none; }
+  [data-inclina]:active { scale: none; }
 }

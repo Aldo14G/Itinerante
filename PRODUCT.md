@@ -45,16 +45,17 @@ genérico.
   y «Cómo llegar» como única acción de contacto) sin burbujas de historias (se
   retiraron el 2026-11-11). La navegación vive en una barra inferior de vidrio con
   **tres casillas** con nombre: Inicio, Catálogo y Mi lista; el resto de los
-  destinos (Eventos y talleres, Novedades si hay llegadas, La casa, Visita, el
+  destinos (Eventos y talleres, Novedades si hay llegadas, Café y té, La casa, Visita, el
   horario, WhatsApp y las redes) está en el menú ☰. El orden de la página es
   Inicio (con La casa), Catálogo, Eventos y talleres, Novedades (solo con
-  llegadas), Visita y pie. En Eventos y talleres (antes Cartelera), «Compartir» es
+  llegadas), Café y té, Visita y pie. En Eventos y talleres (antes Cartelera), «Compartir» es
   local: no envía nada ni muestra contadores, reseñas o reacciones. «Me interesa»
   se retiró el 2026-11-13: no servía a la persona ni a la librería.
 - Crítica minimalista aprobada por Aldo el 2026-11-13: cada cosa se dice una vez.
   El Catálogo va titular → «Buscar en el catálogo» → chips Narrativa · Poesía ·
-  Ensayo → carrusel 3D → «Preguntar por {colección}» (sin recorrido de paradas ni
-  bloque «Pregúntanos»); la rejilla de Explorar muestra los 41 títulos sin
+  Ensayo → carrusel 3D → «Preguntar por {colección}» (sin «Pregúntanos»; el
+  recorrido volvió ligero sobre los mismos chips el 2026-11-13: conector, palomita
+  en las hojeadas y «N de 3 paradas hojeadas», un dato local, nunca un ranking); la rejilla de Explorar muestra los 41 títulos sin
   paginar, cada tarjeta con título y «autor · precio» (sin tarjeta que voltea); la
   ficha es una sola (sin «modo redes»); no hay cita, llamado suelto ni
   antetítulos; el pie no repite la dirección ni «Cómo llegar».
@@ -73,6 +74,18 @@ genérico.
   se muestran con llegadas («3 llegaron en las últimas dos semanas», «3 novedades desde tu
   visita») son conteos reales de esa lista frente a la última vez que la persona vio la
   sección en su dispositivo: no se inventa ninguna.
+- **Café y té** (`#cafe`, 2026-11-13): la carta de la sala en un carrusel (Café ·
+  Té), con los cafés y tés habituales de cualquier cafetería que indicó Aldo. Es
+  una **carta genérica sin precios** hasta que la librería los dé: con
+  `precio: null` no se imprime nada de precio (ni «por confirmar»); cuando haya
+  un precio real se muestra «$NN MXN» marcado como dato de la carta. Se edita en
+  `assets/data/menu.json` sin tocar HTML ni JS (añadir «Para comer» es añadir un
+  objeto); su origen queda en `assets/provenance.json` (`menuData`). La consulta
+  es «Preguntar por la carta» por WhatsApp; sin fotos de producto.
+- Eventos y talleres van en el mismo carrusel 3D que el Catálogo (2026-11-13):
+  la propuesta del centro muestra su descripción y una sola fila de acciones
+  («Preguntar por WhatsApp» y «Compartir»); las fechas siguen saliendo solo de
+  `data-fecha` en el marcado.
 - El precio de la hoja de la librería se muestra en la ficha, bajo el carrusel 3D del Catálogo
   y bajo cada tarjeta de la rejilla («autor · $250 MXN»); va marcado como dato de la hoja
   (`data-fuente="hoja"`) y la existencia se sigue confirmando por WhatsApp.

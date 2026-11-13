@@ -28,7 +28,7 @@ Después de cada cambio visual, antes de pedir commit. Nadie juzga una página q
 ## Los diez criterios (1–10)
 
 1. **Primer vistazo (3 s):** un solo foco. Se entiende qué es y adónde mirar.
-2. **Firma:** algo memorable y nuestro. Aquí: la foto real de la casa con radio grande, el turquesa del logo, el vidrio de las barras y el carrusel 3D de portadas (el recorrido de colecciones se retiró el 2026-11-13 con la crítica minimalista).
+2. **Firma:** algo memorable y nuestro. Aquí: la foto real de la casa con radio grande, el turquesa del logo, el vidrio de las barras, el Carrusel3D (portadas, eventos y la carta de Café y té) y el recorrido ligero de colecciones (los chips Narrativa · Poesía · Ensayo como paradas, con conector y «N de 3 paradas hojeadas»; se retiró con la crítica minimalista y volvió ligero el mismo 2026-11-13).
 3. **Tipografía:** la del sistema de Apple (Inter de respaldo) en la escala de Apple HIG: Large Title solo en el h1, Title 1 en secciones, Body 17/22 en el texto; nada de lectura bajo 15 px; como máximo 6 tamaños por pantalla.
 4. **Composición:** el texto y sus acciones juntos (proximidad), bordes alineados, recorrido de la vista titular → mensaje → acción. Nada huérfano.
 5. **Color y luz:** `fondo`/`fondo-2` alternos, `tinta`, `tinta-2` y un acento (turquesa). Un solo primario por vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»); el secundario es menta. Sombras solo en lo que flota. Los dos temas se ven igual de cuidados.

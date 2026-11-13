@@ -1,7 +1,10 @@
 // Eventos y talleres (Cartelera) sin inventar nada: «Compartir» es local (no se envía nada y no hay contadores) y el estado de cada
-// propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Se carga al primer toque o en reposo.
-// Las historias de los destacados se retiraron el 2026-11-11 y «Me interesa» el 2026-11-13 (crítica minimalista: no servía a nadie).
+// propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Las propuestas van en un Carrusel3D, variante «evento»
+// (carousel3d.js, 2026-11-13): tarjeta con foto, insignias y título; debajo, la descripción de la del centro (región viva) y una sola fila de
+// acciones («Preguntar por WhatsApp» con el título de la del centro y «Compartir»). Se carga al acercarse a la sección o al primer toque.
+// Las historias de los destacados se retiraron el 2026-11-11, «Me interesa» el 2026-11-13 y los puntos bajo el carrusel también el 2026-11-13.
 import { notify } from './saved.js';
+import { createCarousel3D } from './carousel3d.js';
 
 // ---------- Estado de la propuesta: «Propuesta · sin fecha» o la fecha confirmada ----------
 // Cómo se actualiza: cuando la librería confirma una fecha, se añade `data-fecha="AAAA-MM-DD"` (o `AAAA-MM-DDTHH:MM`, hora de Monterrey)
@@ -41,7 +44,8 @@ function paintWhen(item) {
 export async function shareItem(btn) {
   const title = btn.dataset.title || 'Cartelera';
   const url = `${location.origin}${location.pathname}#cartelera`;
-  const when = eventBadge(btn.closest?.('.bill-item')?.dataset.fecha);
+  const item = btn.closest?.('.bill-item') ?? (typeof document !== 'undefined' ? document.querySelector?.(`.bill-item[data-id="${btn.dataset.share}"]`) : null); // «Compartir» va en la fila de acciones, no dentro de la tarjeta
+  const when = eventBadge(item?.dataset.fecha);
   const state = when.kind === 'propuesta' ? 'una propuesta de la Cartelera de Librería Itinerante y Más (sin fecha confirmada todavía)' : `${when.text} en Librería Itinerante y Más`;
   const data = { title: `${title} · Librería Itinerante y Más`, text: `${title}: ${state}.`, url };
   if (navigator.share) {
@@ -62,4 +66,43 @@ const paintShare = btn => btn.setAttribute('aria-label', shareName(btn.dataset.t
 export function initFeed() {
   document.querySelectorAll('[data-share]').forEach(paintShare);
   document.querySelectorAll('.bill-item').forEach(paintWhen);
+}
+
+// ---------- La propuesta del centro: su descripción y la fila de acciones ----------
+// Lo que la fila necesita de cada tarjeta: id, título, descripción y el enlace de WhatsApp con su mensaje (todo sale del marcado).
+export function eventOf(item) {
+  const q = s => item.querySelector(s);
+  return { id: item.dataset.id, title: q('.bill-title')?.textContent.trim() ?? '', text: q('.bill-detail > p')?.textContent.trim() ?? '', wa: q('.bill-wa')?.getAttribute('href') ?? '' };
+}
+export const waName = title => `Preguntar por WhatsApp: ${title}`;
+
+export function initEventos({ isMotion = () => false } = {}) {
+  const region = document.querySelector('[data-bill-c3d]');
+  if (!region || region.dataset.ready) return;
+  region.dataset.ready = '1';
+  initFeed();
+  const items = [...region.querySelectorAll('.bill-item')];
+  const events = items.map(eventOf);
+  const descTitle = document.querySelector('[data-bill-desc-title]');
+  const descText = document.querySelector('[data-bill-desc-text]');
+  const wa = document.querySelector('[data-bill-wa]');
+  const share = document.querySelector('.bill-fila [data-share]');
+  createCarousel3D({
+    viewport: region.querySelector('[data-bill-viewport]'),
+    track: region.querySelector('[data-bill-track]'),
+    prev: region.querySelector('[data-bill-prev]'),
+    next: region.querySelector('[data-bill-next]'),
+    isMotion,
+    focusSel: '.bill-card',
+    onCenter: i => {
+      const ev = events[i];
+      if (descText.textContent !== ev.text) { descTitle.textContent = `${ev.title}. `; descText.textContent = ev.text; } // la región viva dice la propuesta del centro
+      wa.href = ev.wa;
+      wa.setAttribute('aria-label', waName(ev.title));
+      share.dataset.share = ev.id;
+      share.dataset.title = ev.title;
+      paintShare(share);
+    }
+  }).setItems(items);
+  region.classList.add('is-ready');
 }

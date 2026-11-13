@@ -1,4 +1,4 @@
-// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar, ficha,
+// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar, ficha, flecha de Eventos, chip y flecha de Café,
 // carrusel 3D, «Buscar en el catálogo» (la hoja Explorar con los 41 títulos) y la ficha desde la rejilla.
 // Uso: node tools/qa/inp.mjs URL [corridas=3] [cpu=4] [ancho=390] [alto=844]
 // Cada corrida carga la página en frío. Mide con PerformanceObserver `event` (durationThreshold 16 ms, interacciones con
@@ -64,6 +64,10 @@ const steps = [
   // Carrusel 3D: la flecha y el toque en una vecina mueven el centro (el giro se pinta por fotograma).
   ['carrusel flecha', async () => { await sleep(600); await click('[data-rail-next]'); }],
   ['carrusel vecina', async () => { await click('.rail-item.is-centro + .rail-item .card'); }],
+  // Eventos y Café (Carrusel3D, variantes evento y carta): la flecha mueve el centro y la fila de acciones lo sigue; el chip «Té» cambia la carta.
+  ['eventos flecha', async () => { await ev(`document.querySelector('[data-bill-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('[data-bill-next]'); }],
+  ['café chip', async () => { await ev(`document.querySelector('[data-cafe-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('.cafe-chip:not([aria-checked=true])'); }],
+  ['café flecha', async () => { await sleep(600); await click('[data-cafe-next]'); }],
   // Explorar con los 41 títulos sin paginar (hoja en el teléfono, en línea en escritorio): abrir la búsqueda y abrir y cerrar la ficha de una tarjeta.
   ['Explorar abrir', async () => { if (+W < 761) { await ev(`document.getElementById('libros').scrollIntoView()`); await sleep(800); await click('[data-ex-open]'); } else { await ev(`document.getElementById('catalogo').scrollIntoView()`); await sleep(1200); await click('[data-ex-open]'); } }],
   ['rejilla ficha', async () => { await sleep(2500); await click('#explorer .card-item:nth-child(5) .card'); }],

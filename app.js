@@ -34,14 +34,12 @@ if (typeof document !== 'undefined') boot();
 async function boot() {
   const root = document.documentElement;
   const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
-  const phone = matchMedia('(max-width: 760px)');
   const saveData = Boolean(navigator.connection && navigator.connection.saveData);
   let userOff = false;
   try { userOff = localStorage.getItem('iti-b4-motion') === 'off'; } catch { /* almacenamiento bloqueado */ }
 
   const $ = (sel, el = document) => el.querySelector(sel);
   const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
-  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const absTop = el => el.getBoundingClientRect().top + scrollY;
   const motionOn = () => !reduceMq.matches && !userOff && !saveData;
   const isMotion = () => root.classList.contains('motion');
@@ -67,7 +65,7 @@ async function boot() {
   const hdr = $('[data-hdr]');
   const navLinks = $$('.hdr-nav a, .menu-row[href]');
   const tabLinks = $$('.tabbar a');
-  const zones = [['#inicio', '#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
+  const zones = [['#inicio', '#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#cafe'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
   let zoneRanges = [], current = null, raf = 0;
   const measureZones = () => {
     vh = innerHeight;
@@ -248,22 +246,6 @@ async function boot() {
   }
 
   await yieldNow();
-  // ---------- Eventos y talleres: todas las propuestas abiertas; en el teléfono, carrusel con puntos ----------
-  (function bill() {
-    const items = $$('.bill-item');
-    items.forEach(d => { d.open = true; $('summary', d).tabIndex = -1; }); // el resumen no pliega nada: la tarjeta entera está a la vista
-    const track = $('.bill-track');
-    const dots = $$('.bill-dots i');
-    track.addEventListener('scroll', () => {
-      if (!phone.matches) return;
-      const step = items[0].offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0);
-      const idx = clamp(Math.round(track.scrollLeft / step), 0, items.length - 1);
-      dots.forEach((dot, i) => dot.classList.toggle('is-on', i === idx));
-    }, { passive: true });
-    dots[0]?.classList.add('is-on');
-  })();
-
-  await yieldNow();
   // ---------- Novedades: un módulo ligero que se pide dos veces sin repetirse (el conteo, pronto; la tira, al acercarse) ----------
   let newsLoad;
   const loadNews = () => (newsLoad ??= import('./news.js').catch(err => {
@@ -363,7 +345,7 @@ async function boot() {
       const bootRail = () => import('./rail.js').then(m => m.initRail({ ensureCatalog: bootCatalog, isMotion })).catch(() => { railEl.hidden = true; });
       if ('IntersectionObserver' in window) {
         const railIo = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { railIo.disconnect(); bootRail(); } }, { rootMargin: '700px 0px' });
-        railIo.observe(railEl);
+        railIo.observe(railEl.querySelector('.c3d') || railEl); // en escritorio .rail es display: contents (sin caja): se observa su carrusel
       } else bootRail();
     }
 
@@ -382,14 +364,24 @@ async function boot() {
   (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
 
   await yieldNow();
-  // ---------- Eventos y talleres: «Compartir» y la fecha de cada propuesta ----------
+  // ---------- Eventos y talleres: Carrusel3D (variante evento), «Compartir» y la fecha de cada propuesta ----------
+  // El carrusel se arma al acercarse (como el del Catálogo); «Compartir» carga el módulo al primer toque si aún no llegó.
   let feedLoad;
   const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => { feedLoad = undefined; throw err; }));
   document.addEventListener('click', e => {
     const act = e.target.closest('[data-share]');
     if (act) loadFeed().then(m => m.onAct(act)).catch(() => {});
   });
-  (window.requestIdleCallback || (cb => setTimeout(cb, 800)))(() => loadFeed().then(m => m.initFeed()).catch(() => {}), { timeout: 4000 });
+  const nearby = (el, boot, margin = '700px 0px') => {
+    if (!el) return;
+    if (!('IntersectionObserver' in window)) { boot(); return; }
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); boot(); } }, { rootMargin: margin });
+    io.observe(el);
+  };
+  nearby($('[data-bill-c3d]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
+
+  // ---------- Café y té: la carta (Carrusel3D, variante carta) se pide al acercarse ----------
+  nearby($('[data-cafe]'), () => import('./cafe.js').then(m => m.initCafe({ isMotion })).catch(() => {}));
 
   await yieldNow();
   // ---------- Start ----------

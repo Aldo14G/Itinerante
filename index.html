@@ -47,6 +47,8 @@
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15.5V4m-4 4 4-4 4 4M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
     <symbol id="i-prev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
     <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="c-taza" viewBox="0 0 24 24"><path d="M4.5 9.5h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 11h1.25a2.25 2.25 0 0 1 0 4.5H15M3.5 21h14M8.5 3.5c-.7.9-.7 1.8 0 2.7M12 3.5c-.7.9-.7 1.8 0 2.7"/></symbol>
+    <symbol id="c-tetera" viewBox="0 0 24 24"><path d="M12 5v2M8.5 8.5h7M6.5 13a5.5 5.5 0 0 0 11 0c0-2.5-1.6-4.5-3.5-4.5h-4c-1.9 0-3.5 2-3.5 4.5zM6.6 12.2 3.5 9.5M17.4 11h.6a2.5 2.5 0 0 1 0 5h-1.3M8 20.5h8"/></symbol>
   </svg>
 
   <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -61,6 +63,7 @@
       <a href="#libros">Catálogo</a>
       <a href="#cartelera">Eventos</a>
       <a href="#novedades" data-news-link>Novedades<span class="news-dot" data-news-dot hidden aria-hidden="true"></span><span class="sr-only" data-news-sr></span></a>
+      <a href="#cafe">Café</a>
       <a href="#visita">Visita</a>
     </nav>
     <div class="hdr-end">
@@ -81,6 +84,7 @@
           <li><a class="menu-row" href="#libros"><span>Catálogo</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#cartelera"><span>Eventos y talleres</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li data-news-link><a class="menu-row" href="#novedades"><span>Novedades<span class="sr-only" data-news-sr></span></span><span class="news-dot" data-news-dot hidden aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
+          <li><a class="menu-row" href="#cafe"><span>Café y té</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#casa"><span>La casa</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#visita"><span>Visita</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><button class="menu-row" type="button" data-open-mylist><span>Mi lista<span class="sr-only">, <span data-saved-count>Vacía</span></span></span><span class="count-badge" data-saved-dot hidden aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></button></li>
@@ -172,24 +176,26 @@
         <div class="rail-head">
           <h3 id="rail-title" class="sr-only">Libros por colección</h3>
           <div class="rail-chips" role="radiogroup" aria-label="Colección" data-rail-chips><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></div>
-          <p class="rail-note" data-rail-note></p>
+          <div class="rail-nota-fila"><p class="rail-note" data-rail-note></p><p class="rail-progreso" aria-live="polite" data-rail-progreso></p></div>
           <p class="rail-status" role="status" data-rail-status></p>
           <div class="rail-error" data-rail-error hidden><button class="btn btn--secundario" type="button" data-rail-retry><span>Reintentar</span></button><a class="btn btn--secundario" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a></div>
         </div>
-        <!-- Carrusel de portadas en 3D (CarruselPortadas): la del centro de frente; las vecinas giran según su distancia al centro (rail.js, con el desplazamiento nativo e imán al centro). Sin movimiento queda plano. -->
-        <div class="rail-viewport" role="region" aria-roledescription="carrusel" aria-label="Libros de la colección" data-rail-viewport>
-          <ul class="rail-track" data-rail-track aria-busy="true">
-            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-            <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-          </ul>
+        <!-- Carrusel3D, variante portada (CarruselPortadas): la del centro de frente; las vecinas giran según su distancia al centro (carousel3d.js, con el desplazamiento nativo e imán al centro). Sin movimiento queda plano. Flechas de vidrio a los lados. -->
+        <div class="c3d c3d--portada" role="region" aria-roledescription="carrusel" aria-label="Libros de la colección" data-rail-c3d>
+          <div class="rail-viewport c3d-viewport" data-rail-viewport>
+            <ul class="rail-track c3d-track" data-rail-track aria-busy="true">
+              <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
+              <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
+              <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
+              <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
+              <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
+            </ul>
+          </div>
+          <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-rail-prev disabled aria-label="Libro anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+          <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-rail-next disabled aria-label="Libro siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
         </div>
         <div class="cf-pie">
-          <button class="btn btn--secundario btn--icono rail-btn" type="button" data-rail-prev disabled aria-label="Libro anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
           <div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title></p><p class="cf-meta" data-rail-meta></p></div>
-          <button class="btn btn--secundario btn--icono rail-btn" type="button" data-rail-next disabled aria-label="Libro siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
         </div>
         <!-- Preguntar por la colección a la vista (el mensaje lo arma rail.js al cambiar de colección) o pedir una recomendación sin rumbo fijo. -->
         <div class="rail-ask">
@@ -321,38 +327,63 @@
     </section>
 
 
-    <!-- Eventos y talleres (el id sigue siendo #cartelera): propuestas en tarjetas, todas abiertas. -->
+    <!-- Eventos y talleres (el id sigue siendo #cartelera): Carrusel3D, variante evento (feed.js). Cada propuesta es una tarjeta (foto, insignias de tipo y
+         estado, título); debajo, la descripción de la del centro y una sola fila de acciones. Sin JavaScript, cada tarjeta muestra su descripción y su
+         consulta por WhatsApp y la fila se desliza con el dedo. -->
     <section id="cartelera" class="bill" aria-labelledby="bill-title">
       <header class="sec-head" data-revelar>
         <h2 id="bill-title" class="h2">Eventos y talleres <em>en la casa</em></h2>
         <p class="sec-texto">Aún sin fecha. Las fechas se anuncian en <a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram<svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>.</p>
       </header>
-      <div class="bill-list">
-        <!-- Fecha confirmada: añade data-fecha="AAAA-MM-DD" (o AAAA-MM-DDTHH:MM, hora de Monterrey) al elemento details de la propuesta; feed.js sustituye «Propuesta · sin fecha». -->
-        <div class="bill-track">
-        <details class="bill-item" data-item="0" data-id="circulo" data-caption="La sala central" data-kind="real" open>
-          <summary><span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async"></span><span class="bill-badges"><span class="badge" data-bill-type>Lectura</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span><span class="bill-title">Círculo de lectura</span></summary>
-          <div class="bill-detail">
-            <p>Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
-            <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20c%C3%ADrculo%20de%20lectura.%20%C2%BFTienen%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Círculo de lectura"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a><button class="btn btn--vidrio btn--icono act act--icon" type="button" data-share="circulo" data-title="Círculo de lectura" aria-label="Compartir «Círculo de lectura»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></div>
-          </div>
-        </details>
-        <details class="bill-item" data-item="1" data-id="ajedrez" data-caption="La mesa de ajedrez" data-kind="real" open>
-          <summary><span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async"></span><span class="bill-badges"><span class="badge" data-bill-type>Juego</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span><span class="bill-title">Ajedrez en la casa</span></summary>
-          <div class="bill-detail">
-            <p>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
-            <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesan%20las%20partidas%20de%20ajedrez.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Ajedrez en la casa"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a><button class="btn btn--vidrio btn--icono act act--icon" type="button" data-share="ajedrez" data-title="Ajedrez en la casa" aria-label="Compartir «Ajedrez en la casa»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></div>
-          </div>
-        </details>
-        <details class="bill-item" data-item="2" data-id="taller" data-caption="El rincón de lectura" data-kind="real" open>
-          <summary><span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async"></span><span class="bill-badges"><span class="badge" data-bill-type>Taller</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span><span class="bill-title">Taller de escritura</span></summary>
-          <div class="bill-detail">
-            <p>Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
-            <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20taller%20de%20escritura.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Taller de escritura"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a><button class="btn btn--vidrio btn--icono act act--icon" type="button" data-share="taller" data-title="Taller de escritura" aria-label="Compartir «Taller de escritura»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></div>
-          </div>
-        </details>
+      <!-- Fecha confirmada: añade data-fecha="AAAA-MM-DD" (o AAAA-MM-DDTHH:MM, hora de Monterrey) al elemento li.bill-item de la propuesta; feed.js sustituye «Propuesta · sin fecha». -->
+      <div class="c3d c3d--evento" role="region" aria-roledescription="carrusel" aria-label="Eventos y talleres" data-bill-c3d>
+        <div class="bill-viewport c3d-viewport" data-bill-viewport>
+          <ul class="bill-track c3d-track" data-bill-track>
+          <li class="bill-item" data-item="0" data-id="circulo" data-caption="La sala central" data-kind="real">
+            <article class="bill-card c3d-card" aria-labelledby="bill-t-circulo" data-inclina>
+              <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async"></span>
+              <span class="bill-badges"><span class="badge" data-bill-type>Lectura</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span>
+              <h3 class="bill-title" id="bill-t-circulo">Círculo de lectura</h3>
+              <div class="bill-detail">
+                <p>Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
+                <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20c%C3%ADrculo%20de%20lectura.%20%C2%BFTienen%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Círculo de lectura"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a></div>
+              </div>
+            </article>
+          </li>
+          <li class="bill-item" data-item="1" data-id="ajedrez" data-caption="La mesa de ajedrez" data-kind="real">
+            <article class="bill-card c3d-card" aria-labelledby="bill-t-ajedrez" data-inclina tabindex="0">
+              <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async"></span>
+              <span class="bill-badges"><span class="badge" data-bill-type>Juego</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span>
+              <h3 class="bill-title" id="bill-t-ajedrez">Ajedrez en la casa</h3>
+              <div class="bill-detail">
+                <p>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
+                <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesan%20las%20partidas%20de%20ajedrez.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Ajedrez en la casa"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a></div>
+              </div>
+            </article>
+          </li>
+          <li class="bill-item" data-item="2" data-id="taller" data-caption="El rincón de lectura" data-kind="real">
+            <article class="bill-card c3d-card" aria-labelledby="bill-t-taller" data-inclina>
+              <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async"></span>
+              <span class="bill-badges"><span class="badge" data-bill-type>Taller</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span>
+              <h3 class="bill-title" id="bill-t-taller">Taller de escritura</h3>
+              <div class="bill-detail">
+                <p>Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
+                <div class="bill-acts"><a class="btn btn--secundario bill-wa" href="https://wa.me/528180875940?text=Hola%2C%20me%20interesa%20el%20taller%20de%20escritura.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Taller de escritura"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a></div>
+              </div>
+            </article>
+          </li>
+          </ul>
         </div>
-        <div class="bill-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-bill-prev disabled aria-label="Evento anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-bill-next disabled aria-label="Evento siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+      </div>
+      <!-- La propuesta del centro: su descripción (región viva) y una sola fila de acciones. feed.js las cambia con el carrusel. -->
+      <div class="bill-pie" data-bill-pie>
+        <p class="bill-desc" aria-live="polite" data-bill-desc><span class="sr-only" data-bill-desc-title>Ajedrez en la casa. </span><span data-bill-desc-text>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</span></p>
+        <div class="bill-fila">
+          <a class="btn btn--secundario bill-wa" data-bill-wa href="https://wa.me/528180875940?text=Hola%2C%20me%20interesan%20las%20partidas%20de%20ajedrez.%20%C2%BFHay%20pr%C3%B3xima%20fecha%3F" target="_blank" rel="noopener noreferrer" aria-label="Preguntar por WhatsApp: Ajedrez en la casa"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+          <button class="btn btn--secundario btn--icono act act--icon" type="button" data-share="ajedrez" data-title="Ajedrez en la casa" aria-label="Compartir «Ajedrez en la casa»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button>
+        </div>
       </div>
     </section>
 
@@ -371,6 +402,39 @@
         <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
         <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
       </ul>
+    </section>
+
+    <!-- Café y té (#cafe): la carta de la sala en un Carrusel3D, variante carta (cafe.js, datos en assets/data/menu.json: se edita sin tocar HTML ni JS).
+         Sin precios mientras la librería no los dé. Sin JavaScript queda la foto y «Preguntar por la carta». -->
+    <section id="cafe" class="cafe" aria-labelledby="cafe-title">
+      <header class="sec-head" data-revelar>
+        <h2 id="cafe-title" class="h2">Café y té <em>en la sala</em></h2>
+        <p class="sec-texto">Algo de tomar mientras hojeas.</p>
+      </header>
+      <div class="cafe-cuerpo">
+        <figure class="cafe-foto" data-kind="real">
+          <div class="frame-clip" data-revelar><img src="assets/img/oficial-mesa-800.webp" width="800" height="600" alt="Mesa con novelas de bolsillo frente a un muro de piedra; al fondo, libreros y el piso ajedrezado" loading="lazy" decoding="async"></div>
+        </figure>
+        <div class="cafe-carta" data-cafe>
+          <div class="rail-chips cafe-chips" role="radiogroup" aria-label="Carta" data-cafe-chips><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></div>
+          <div class="c3d c3d--carta" role="region" aria-roledescription="carrusel" aria-label="Carta" data-cafe-c3d>
+            <div class="cafe-viewport c3d-viewport" data-cafe-viewport>
+              <ul class="cafe-track c3d-track" data-cafe-track aria-busy="true">
+                <li class="cafe-item card--sk" aria-hidden="true"><span class="cafe-card"></span></li>
+                <li class="cafe-item card--sk" aria-hidden="true"><span class="cafe-card"></span></li>
+                <li class="cafe-item card--sk" aria-hidden="true"><span class="cafe-card"></span></li>
+              </ul>
+            </div>
+            <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-cafe-prev disabled aria-label="Bebida anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+            <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-cafe-next disabled aria-label="Bebida siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+          </div>
+          <p class="sr-only" aria-live="polite" data-cafe-live></p>
+          <p class="cafe-status" role="status" data-cafe-status></p>
+        </div>
+        <div class="cafe-ask">
+          <a class="btn btn--secundario" data-cafe-ask href="https://wa.me/528180875940?text=Hola%2C%20quisiera%20preguntar%20por%20la%20carta%20de%20caf%C3%A9.%20%C2%BFQu%C3%A9%20tienen%20hoy%3F" target="_blank" rel="noopener noreferrer"><span>Preguntar por la carta</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+        </div>
+      </div>
     </section>
 
     <!-- Visita -->

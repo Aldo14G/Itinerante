@@ -43,7 +43,7 @@ await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-m
 
 const SCALE = [44, 48, 56];
 // Piezas con alto propio, cada una con su razón: no son botones de la escala.
-const OWN = '.tabbar a, .tab-list, .card, .rel, .menu-row, .rail-viewport, .cat-opt input, .cat-suggest li, summary, .news-book'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card
+const OWN = '.tabbar a, .tab-list, .card, .rel, .menu-row, .c3d-viewport, .cat-opt input, .cat-suggest li, summary, .news-book'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card
 const AUDIT = `(() => {
   const SCALE = ${JSON.stringify(SCALE)};
   const sel = 'a[href], button, input:not([type=hidden]), select, summary, [role=radio]';
@@ -63,7 +63,8 @@ const AUDIT = `(() => {
     for (const c of B) {
       if (c === b || c.fixed !== b.fixed || c.e.contains(e) || e.contains(c.e)) continue;
       if (b.e.closest('.tabbar') && c.e.closest('.tabbar')) continue; // casillas contiguas de una sola barra
-      if (b.e.matches('.save, .bill-acts .act--icon') || c.e.matches('.save, .bill-acts .act--icon')) continue; // «Guardar» va sobre su portada y «Compartir» sobre la foto de su evento: un solo objeto, alto propio
+      if (b.e.matches('.save') || c.e.matches('.save')) continue; // «Guardar» va sobre su portada: un solo objeto, alto propio
+      if ((b.e.matches('.c3d-flecha') && c.e.closest('.c3d-track')) || (c.e.matches('.c3d-flecha') && b.e.closest('.c3d-track'))) continue; // las flechas de vidrio del Carrusel3D flotan sobre el borde de las piezas vecinas (que solo vienen al centro)
       const dx = Math.max(0, Math.max(b.x, c.x) - Math.min(b.x + b.w, c.x + c.w)), dy = Math.max(0, Math.max(b.y, c.y) - Math.min(b.y + b.h, c.y + c.h));
       const d = Math.hypot(dx, dy); if (d < best) { best = d; who = name(c.e); }
     }

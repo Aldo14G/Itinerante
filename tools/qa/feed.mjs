@@ -1,10 +1,12 @@
 // Móvil con sensación de red social (U03), Novedades (U04) y una sola acción primaria (U01/D10).
 // node feed.mjs <url> [outDir]   Sale con código ≠ 0 si algo falla.
 //  1. Primera vista (390x844): inicio (nombre, estado, dirección, «Cómo llegar» de 56 px como única acción de contacto), sin burbujas de historias, con la barra de navegación (marca y ☰) y la barra inferior de vidrio (Inicio, Catálogo, Mi lista); ≤ 6 destinos distintos a la vista en 390x844, 360x740 y 375x667 (U02/D11; la casilla Novedades y el control «N novedades…» llevan al mismo sitio y cuentan como uno); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
-//  3. Eventos y talleres: cada tarjeta va foto → insignias (tipo y estado) → título → descripción → acciones (DOM y pantalla); «Preguntar por WhatsApp» (secundario,
-//     ocupa el renglón) y «Compartir» (control de icono; Web Share y respaldo de copiar), de 48 px y con nombre accesible propio; sin «Me interesa» (retirado el
-//     2026-11-13); la tarjeta cabe en el alto útil (entre la barra de navegación y la barra inferior, con 12 px de holgura) a 320×640, 360×640, 360×740, 375×667 y
-//     390×844; el estado sale de data-fecha.
+//  3. Eventos y talleres (Carrusel3D, variante evento, 2026-11-13): tarjeta foto → insignias (tipo y estado) → título; debajo, la descripción de la del centro
+//     (región viva) y una sola fila: «Preguntar por WhatsApp» (secundario, nombre con el título de la del centro) y «Compartir» (icono menta; Web Share y respaldo
+//     de copiar); flechas y teclado mueven el centro y la fila lo sigue; sin puntos ni «Me interesa»; la tarjeta cabe en el alto útil a 320×640, 360×640, 360×740,
+//     375×667 y 390×844; el estado sale de data-fecha; sin JavaScript cada tarjeta muestra su descripción y su consulta.
+//  3b. Café y té (#cafe): chips Café · Té (radiogroup), Carrusel3D variante carta (tarjetas tipográficas con icono, sin fotos ni precios), «Preguntar por la carta»
+//     (secundario, mensaje de la categoría), foto real de la casa (a la izquierda en escritorio), teclado y región viva, a 390, 320 y 1280.
 //  4. Novedades (CarruselNovedades): sin llegadas válidas no existen la sección, su enlace de la barra, su fila del menú ni el control del inicio; con llegadas, la tira
 //     son solo esas (lo más reciente primero) y «Nuevo» solo en lo reciente; «Ver todo» / «Ver menos» (aria-expanded, foco quieto, rejilla de 3 columnas a 390 y 2 a
 //     320); cada libro abre la ficha única (WhatsApp prellenado, Guardar, Compartir con respaldo de copiar, «Cómo llegar»; foco de vuelta al libro; enlace #libro-<id>).
@@ -120,68 +122,115 @@ check('perfil', 'al desplazar, la barra de navegación sigue arriba (44 px) con 
 await open(390, 844, { reset: true });
 check('consola', 'sin errores de consola en la primera vista', !problems.length, problems.join(' | '));
 
-// ---------- 3. Cartelera como publicaciones ----------
+// ---------- 3. Eventos y talleres: Carrusel3D, variante evento (2026-11-13) ----------
+// Tarjeta (foto 4:3, insignias de tipo y estado, título) en el carrusel; debajo, la descripción de la del centro (región viva) y una sola fila de
+// acciones: «Preguntar por WhatsApp» (secundario, nombre accesible con el título de la del centro) y «Compartir» (icono menta, junto a ella). Sin puntos.
 await open(390, 844, { reset: true });
 await ev(`localStorage.clear()`);
-await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(600); // fuera de pantalla, content-visibility omite el texto (innerText vacío)
-const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const s = q('[data-share]');
-  const rect = e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
-  const wa = q('.bill-wa'); const badges = [...it.querySelectorAll('.bill-badges .badge')]; const img = q('.bill-card-img').getBoundingClientRect();
-  return { id: it.dataset.id, photo: !!q('.bill-card-img'), alt: q('.bill-card-img').alt, ratio: +(img.width / img.height).toFixed(2), badges: badges.map(b => b.textContent.trim()), onPhoto: badges.every(b => { const r = b.getBoundingClientRect(); return r.top >= img.bottom && r.left >= img.left && r.right <= img.right; }), badgeFs: badges.map(b => getComputedStyle(b).fontSize).join(),
-    title: q('.bill-title')?.textContent, interest: it.querySelectorAll('[data-interest]').length, share: s && rect(s), wa: wa && rect(wa), waTxt: wa?.innerText.trim(), waHref: wa?.href, waCls: wa?.className, sTxt: s?.textContent.trim(), sIcon: !!s?.querySelector('svg'), sRound: getComputedStyle(s).borderRadius, onPhoto: (() => { const a = s.getBoundingClientRect(); return a.top >= img.top && a.bottom <= img.bottom && a.right <= img.right && a.left >= img.left; })(), full: Math.round(wa.getBoundingClientRect().width) === Math.round(q('.bill-acts').getBoundingClientRect().width), sCls: s.className }; })`);
+await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(1200); // fuera de pantalla, content-visibility omite el texto (innerText vacío); el carrusel se arma al acercarse
+const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s);
+  const badges = [...it.querySelectorAll('.bill-badges .badge')]; const img = q('.bill-card-img').getBoundingClientRect();
+  return { id: it.dataset.id, photo: !!q('.bill-card-img'), alt: q('.bill-card-img').alt, ratio: +(q('.bill-card-img').offsetWidth / q('.bill-card-img').offsetHeight).toFixed(2), badges: badges.map(b => b.textContent.trim()), under: badges.every(b => { const r = b.getBoundingClientRect(); return r.top >= img.bottom - 1; }), badgeFs: badges.map(b => getComputedStyle(b).fontSize).join(),
+    title: q('.bill-title')?.textContent, interest: it.querySelectorAll('[data-interest]').length, inCard: it.querySelectorAll('[data-share]').length, detail: getComputedStyle(q('.bill-detail')).display, bg: getComputedStyle(q('.bill-card')).backgroundColor, radius: getComputedStyle(q('.bill-card')).borderRadius, glass: getComputedStyle(q('.bill-card')).backdropFilter }; })`);
 const TIPOS = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
-check('eventos', '3 tarjetas con foto 4:3 descrita, título y dos insignias bajo la foto (el texto no va sobre la foto): el tipo (Lectura, Juego, Taller) y «Propuesta · sin fecha»', posts.length === 3 && posts.every(p => p.photo && p.alt && !/Recreación IA|Foto real/.test(p.alt) && Math.abs(p.ratio - 1.33) < 0.03 && p.title && p.badges.length === 2 && p.badges[0] === TIPOS[p.id] && p.badges[1] === 'Propuesta · sin fecha' && p.onPhoto && p.badgeFs === '12px,12px'), JSON.stringify(posts.map(p => [p.id, p.alt, p.ratio, p.badges, p.onPhoto, p.badgeFs])));
-check('eventos', 'dos acciones de 48 px: «Preguntar por WhatsApp» (secundario, a todo el ancho, con su mensaje) y «Compartir» (botón de icono de vidrio, redondo de 48 × 48, sobre la esquina de la foto); sin «Me interesa»', posts.every(p => p.interest === 0 && p.sTxt === '' && p.sIcon && parseFloat(p.sRound) >= 24 && p.share.join() === '48,48' && p.onPhoto && p.full && /btn--vidrio/.test(p.sCls) && p.waTxt === 'Preguntar por WhatsApp' && /btn--secundario/.test(p.waCls) && p.wa[1] === 48 && p.wa[0] >= 160 && /wa\.me\/528180875940\?text=Hola/.test(p.waHref)), JSON.stringify(posts.map(p => [p.id, p.interest, p.sTxt, p.share, p.wa, p.waTxt, p.onPhoto, p.full])));
-// Tarjeta de evento: foto → insignias → título → frase → descripción → acciones, tanto en el DOM como en la pantalla; el título está una sola vez y ya no hay encabezado de red social.
-const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-card-img', '.bill-badges', '.bill-title', '.bill-detail > p', '.bill-acts'].map(q);
-  const dom = els.every((e, i) => e && (i === 0 || (els[i - 1].compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)));
-  const tops = els.map(e => e ? Math.round(e.getBoundingClientRect().top) : null); const vis = tops.every((t, i) => t !== null && (i === 0 || t >= tops[i - 1]));
-  return { id: it.dataset.id, dom, vis, tops, head: it.querySelectorAll('.bill-post-head, .bill-post-who, .bill-cap').length, once: [...it.querySelectorAll('.bill-title')].filter(e => e.getBoundingClientRect().height > 0).length, titles: it.querySelectorAll('.bill-title').length }; })`);
-check('eventos', 'orden del DOM y de la pantalla: foto → insignias → título → descripción → acciones (sin subtítulo); sin encabezado «Itinerante · propuesta»; el título está y se ve una sola vez', order.length === 3 && order.every(o => o.dom && o.vis && o.head === 0 && o.once === 1 && o.titles === 1), JSON.stringify(order));
-// Nombres accesibles (árbol de accesibilidad del navegador): cada «Compartir» y «Preguntar por WhatsApp» lleva el título de su propuesta.
-await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(600); // Eventos ya no queda junto al inicio: el árbol de accesibilidad se lee con el capítulo a la vista (fuera de pantalla, content-visibility lo omite)
+check('eventos', '3 tarjetas (superficie, radio 20, sin vidrio) con foto 4:3 descrita, título y dos insignias bajo la foto: el tipo (Lectura, Juego, Taller) y «Propuesta · sin fecha»; descripción y consulta fuera de la tarjeta', posts.length === 3 && posts.every(p => p.photo && p.alt && !/Recreación IA|Foto real/.test(p.alt) && Math.abs(p.ratio - 1.33) < 0.03 && p.title && p.badges.length === 2 && p.badges[0] === TIPOS[p.id] && p.badges[1] === 'Propuesta · sin fecha' && p.under && p.badgeFs === '12px,12px' && p.interest === 0 && p.inCard === 0 && p.detail === 'none' && p.radius === '20px' && (p.glass === 'none' || !p.glass)), JSON.stringify(posts));
+const pie = async () => ev(`(() => { const q = s => document.querySelector(s); const wa = q('[data-bill-wa]'), sh = q('.bill-fila [data-share]'), d = q('[data-bill-desc]'); const c = document.querySelector('.bill-item.is-centro'); const r = e => { const b = e.getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height), Math.round(b.top)]; };
+  return { centro: c?.dataset.id, title: c?.querySelector('.bill-title').textContent, desc: d.textContent.trim(), live: d.getAttribute('aria-live'), wa: { txt: wa.innerText.trim(), name: wa.getAttribute('aria-label'), href: wa.href, cls: wa.className, box: r(wa) }, share: { txt: sh.textContent.trim(), name: sh.getAttribute('aria-label'), cls: sh.className, box: r(sh), bg: getComputedStyle(sh).backgroundColor, id: sh.dataset.share }, gap: Math.round(sh.getBoundingClientRect().left - wa.getBoundingClientRect().right), dots: document.querySelectorAll('.bill-dots').length, rows: document.querySelectorAll('.bill-fila').length, focusable: [...document.querySelectorAll('.bill-card')].map(x => x.tabIndex), region: [document.querySelector('[data-bill-c3d]').getAttribute('role'), document.querySelector('[data-bill-c3d]').getAttribute('aria-roledescription')] }; })()`);
+const p0 = await pie();
+const menta = await ev(`getComputedStyle(document.querySelector('.btn--secundario')).backgroundColor`);
+check('eventos', 'carrusel con role="region" y aria-roledescription="carrusel"; empieza por la del medio; una sola parada de tabulador (la del centro); sin puntos', p0.region.join() === 'region,carrusel' && p0.centro === 'ajedrez' && p0.focusable.join() === '-1,0,-1' && p0.dots === 0, JSON.stringify(p0));
+check('eventos', 'debajo: la descripción de la del centro (región viva) y una sola fila: «Preguntar por WhatsApp» (secundario de 48, nombre con el título, mensaje de esa propuesta) y «Compartir» (icono menta de 48 × 48, a 12 px, en el mismo renglón)', p0.rows === 1 && p0.live === 'polite' && p0.desc.includes('El tablero ya está en la casa') && p0.wa.txt === 'Preguntar por WhatsApp' && p0.wa.name === `Preguntar por WhatsApp: ${p0.title}` && /btn--secundario/.test(p0.wa.cls) && p0.wa.box[1] === 48 && /wa\.me\/528180875940\?text=Hola.*ajedrez/.test(p0.wa.href) && p0.share.txt === '' && p0.share.name === `Compartir «${p0.title}»` && /btn--secundario/.test(p0.share.cls) && p0.share.box.slice(0, 2).join() === '48,48' && p0.share.bg === menta && p0.gap === 12 && p0.share.box[2] === p0.wa.box[2], JSON.stringify(p0));
+await clickSel('[data-bill-next]'); await sleep(1200);
+const p1 = await pie();
+check('eventos', 'la flecha trae la siguiente al centro: la descripción, el mensaje de WhatsApp, su nombre accesible y «Compartir» la siguen', p1.centro === 'taller' && p1.desc.includes('Taller de escritura') && p1.desc.includes('Leer, escribir') && p1.wa.name === 'Preguntar por WhatsApp: Taller de escritura' && /taller%20de%20escritura/.test(p1.wa.href) && p1.share.id === 'taller' && p1.share.name === 'Compartir «Taller de escritura»' && p1.focusable.join() === '-1,-1,0', JSON.stringify(p1));
+// Teclado: ← en la tarjeta del centro la mueve y el foco la sigue.
+await ev(`document.querySelector('.bill-item.is-centro .bill-card').focus()`);
+await key('ArrowLeft', 'ArrowLeft', 37); await sleep(1100);
+const kb = await ev(`({ active: document.activeElement.closest('.bill-item')?.dataset.id, centro: document.querySelector('.bill-item.is-centro')?.dataset.id })`);
+check('eventos', 'teclado: ← en la tarjeta del centro trae la anterior y el foco va con ella', kb.active === 'ajedrez' && kb.centro === 'ajedrez', JSON.stringify(kb));
+// Nombres accesibles (árbol de accesibilidad): un «Compartir» y un «Preguntar por WhatsApp» con el título de la del centro; ningún «Me interesa».
 await send('Accessibility.enable');
 const axNodes = (await send('Accessibility.getFullAXTree')).result.nodes;
-const ax = axNodes.filter(n => n.role?.value === 'button' && /^(Compartir|Me interesa)/.test(n.name?.value || '')).map(n => n.name.value);
-const shareNames = ax.filter(n => n.startsWith('Compartir')), likeNames = ax.filter(n => n.startsWith('Me interesa'));
-const waNames = axNodes.filter(n => n.role?.value === 'link' && /^Preguntar por WhatsApp/.test(n.name?.value || '')).map(n => n.name.value);
-check('eventos', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos que llevan el título (y 3 «Preguntar por WhatsApp» igual); ningún «Me interesa»', shareNames.length === 3 && new Set(shareNames).size === 3 && shareNames.every(n => /^Compartir «.+»$/.test(n)) && likeNames.length === 0 && waNames.filter(n => n.includes(':')).length === 3 && new Set(waNames.filter(n => n.includes(':'))).size === 3, JSON.stringify([...ax, ...waNames]));
+const shareNames = axNodes.filter(n => n.role?.value === 'button' && /^Compartir «/.test(n.name?.value || '')).map(n => n.name.value);
+const likeNames = axNodes.filter(n => /^Me interesa/.test(n.name?.value || ''));
+const waNames = axNodes.filter(n => n.role?.value === 'link' && /^Preguntar por WhatsApp: /.test(n.name?.value || '')).map(n => n.name.value);
+check('eventos', 'árbol de accesibilidad: un solo «Compartir» y un solo «Preguntar por WhatsApp», con el título de la propuesta del centro; ningún «Me interesa»', shareNames.length === 1 && shareNames[0] === 'Compartir «Ajedrez en la casa»' && waNames.length === 1 && waNames[0] === 'Preguntar por WhatsApp: Ajedrez en la casa' && likeNames.length === 0, JSON.stringify([shareNames, waNames]));
 // Estado de la propuesta: sale de data-fecha (hora de Monterrey); sin atributo, «Propuesta · sin fecha».
 const when = await ev(`(async () => { const m = await import(new URL('feed.js', document.baseURI).href); const it = document.querySelector('.bill-item'); const b = it.querySelector('[data-bill-when]'); const read = () => ({ text: b.textContent, quiet: b.classList.contains('badge--quiet') });
   const out = { base: read() }; it.dataset.fecha = '2099-05-02'; m.initFeed(); out.fecha = read(); it.dataset.fecha = '2099-05-02T18:30'; m.initFeed(); out.hora = read(); it.dataset.fecha = '2001-01-01'; m.initFeed(); out.pasada = read(); delete it.dataset.fecha; m.initFeed(); out.sin = read(); return out; })()`);
 check('eventos', 'la insignia de estado sale de data-fecha: fecha vigente en español («Sáb 2 may 2099», con hora si la trae) en la insignia común; sin atributo o con fecha pasada, «Propuesta · sin fecha»', when && when.base.text === 'Propuesta · sin fecha' && when.base.quiet && when.fecha.text === 'Sáb 2 may 2099' && !when.fecha.quiet && when.hora.text === 'Sáb 2 may 2099 · 18:30' && when.pasada.text === 'Propuesta · sin fecha' && when.pasada.quiet && when.sin.text === 'Propuesta · sin fecha' && when.sin.quiet, JSON.stringify(when));
-// La tarjeta cabe en el alto útil: entre la barra de navegación y la barra inferior (su alto más 8 px de aire), con 12 px de holgura, desde 320×640.
+// La tarjeta del centro cabe en el alto útil (entre la barra de navegación y la barra inferior), con 12 px de holgura, desde 320×640; nada cortado.
 for (const [vw, vh] of [[320, 640], [360, 640], [360, 740], [375, 667], [390, 844]]) {
   await open(vw, vh, { reset: true, wait: 2500 });
-  await ev(`document.querySelector('.bill-track').scrollIntoView({ block: 'center' })`); await sleep(900);
-  const fit = await ev(`(() => { const hdr = document.querySelector('.hdr').getBoundingClientRect().height, tab = innerHeight - document.querySelector('.tabbar').getBoundingClientRect().top; const cards = [...document.querySelectorAll('.bill-item')].map(c => Math.round(c.getBoundingClientRect().height));
-    const c = document.querySelector('.bill-item'); const acts = c.querySelector('.bill-acts').getBoundingClientRect(), box = c.getBoundingClientRect();
-    return { util: innerHeight - hdr - tab, cards, actsInside: acts.bottom <= box.bottom, cut: [...c.querySelectorAll('.bill-title, .bill-detail > p, .bill-acts > *')].filter(e => e.scrollWidth > e.clientWidth + 1).length, over: document.documentElement.scrollWidth > innerWidth }; })()`);
+  await ev(`document.querySelector('[data-bill-c3d]').scrollIntoView({ block: 'center' })`); await sleep(1400);
+  const fit = await ev(`(() => { const hdr = document.querySelector('.hdr').getBoundingClientRect().height, tab = innerHeight - document.querySelector('.tabbar').getBoundingClientRect().top; const cards = [...document.querySelectorAll('.bill-card')].map(c => Math.round(c.offsetHeight));
+    const fila = document.querySelector('.bill-fila'); const kids = [...fila.children].map(e => e.getBoundingClientRect());
+    return { util: innerHeight - hdr - tab, cards, cut: [...document.querySelectorAll('.bill-item.is-centro .bill-title, .bill-desc, .bill-fila > *')].filter(e => e.scrollWidth > e.clientWidth + 1).length, oneRow: new Set(kids.map(k => Math.round(k.top))).size === 1, rowRight: Math.round(Math.max(...kids.map(k => k.right))), over: document.documentElement.scrollWidth > innerWidth }; })()`);
   const tallest = Math.max(...fit.cards);
-  check('eventos', `${vw}×${vh}: la tarjeta (${tallest} px) cabe en el alto útil (${fit.util} px) con ≥ 12 px de holgura (${(tallest / fit.util).toFixed(2)}×), sin texto cortado`, tallest <= fit.util - 12 && fit.actsInside && fit.cut === 0 && !fit.over, JSON.stringify(fit));
+  check('eventos', `${vw}×${vh}: la tarjeta (${tallest} px) cabe en el alto útil (${fit.util} px) con ≥ 12 px de holgura; la fila de acciones en un renglón; sin texto cortado ni desborde`, tallest <= fit.util - 12 && fit.cut === 0 && fit.oneRow && !fit.over && fit.rowRight <= vw, JSON.stringify(fit));
 }
 await open(390, 844, { reset: true });
 await ev(`localStorage.clear()`);
-await ev(`document.querySelector('.bill-item').scrollIntoView({block:'start'}); scrollBy(0, 120)`); await sleep(600);
-await shot('03-cartelera-publicacion.jpg');
+await ev(`document.querySelector('[data-bill-c3d]').scrollIntoView({block:'start'}); scrollBy(0, -80)`); await sleep(1200);
+await shot('03-cartelera-carrusel.jpg');
 // Web Share
 await ev(`window.__shared = null; navigator.share = async d => { window.__shared = d; }`);
-await clickSel('[data-share]', 1); await sleep(500);
+await clickSel('.bill-fila [data-share]'); await sleep(500);
 const sh = await ev(`window.__shared`);
-check('cartelera', '«Compartir» usa Web Share con título y enlace a #cartelera', sh && /Ajedrez en la casa/.test(sh.title) && /#cartelera$/.test(sh.url) && !/\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i.test(sh.text), JSON.stringify(sh));
+check('cartelera', '«Compartir» usa Web Share con el título de la del centro y enlace a #cartelera', sh && /Ajedrez en la casa/.test(sh.title) && /#cartelera$/.test(sh.url) && !/\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i.test(sh.text), JSON.stringify(sh));
 // respaldo: copiar enlace
 await ev(`window.__copied = null; Object.defineProperty(navigator, 'share', { value: undefined, configurable: true }); Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.__copied = t; } }, configurable: true })`);
-await clickSel('[data-share]', 2); await sleep(500);
+await clickSel('.bill-fila [data-share]'); await sleep(500);
 const cp = await ev(`({copied:window.__copied, toast:document.querySelector('.toast')?.textContent})`);
 check('cartelera', '«Compartir» sin Web Share copia el enlace y avisa', /#cartelera$/.test(cp.copied || '') && /Enlace copiado/.test(cp.toast || ''), JSON.stringify(cp));
 // AbortError no copia
 await ev(`window.__copied = null; Object.defineProperty(navigator, 'share', { value: async () => { const e = new Error('x'); e.name = 'AbortError'; throw e; }, configurable: true })`);
-await clickSel('[data-share]', 0); await sleep(400);
+await clickSel('.bill-fila [data-share]'); await sleep(400);
 check('cartelera', 'cancelar la hoja de compartir no copia nada', (await ev(`window.__copied`)) === null);
 check('cartelera', 'sin errores de consola', !problems.length, problems.join(' | '));
+// Sin JavaScript: cada tarjeta muestra su descripción y su consulta (la fila de abajo no existe) y data-fecha sigue en el marcado.
+await send('Emulation.setScriptExecutionDisabled', { value: true });
+await send('Page.navigate', { url: URL_ }); await sleep(2000);
+const nojs = await ev(`(() => { document.querySelector('#cartelera').scrollIntoView(); const it = [...document.querySelectorAll('.bill-item')]; return { n: it.length, detail: it.map(i => getComputedStyle(i.querySelector('.bill-detail')).display), wa: it.map(i => !!i.querySelector('.bill-wa')?.getBoundingClientRect().height), pie: getComputedStyle(document.querySelector('.bill-pie')).display }; })()`);
+await send('Emulation.setScriptExecutionDisabled', { value: false });
+check('eventos', 'sin JavaScript: las tres tarjetas muestran su descripción y su «Preguntar por WhatsApp» (la fila de abajo no se ofrece)', nojs.n === 3 && nojs.detail.every(d => d !== 'none') && nojs.wa.every(Boolean) && nojs.pie === 'none', JSON.stringify(nojs));
 // sin números ni reseñas inventadas en el feed
-const feedText = await ev(`[...document.querySelectorAll('.hl, .profile-av, .bill-acts, .entry-copy, .news')].map(e => e.innerText).join(' ')`);
-check('verdad', 'sin contadores, reseñas, precios ni fechas inventadas en perfil y publicaciones', !/(\\d+\\s*(me gusta|likes?|seguidores|reseñas|opiniones|vistas))|★|\\$\\s?\\d|\\bmás leídos\\b|\\bagotad/i.test(feedText || ''), feedText);
+await open(390, 844, { reset: true });
+await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(1200);
+const feedText = await ev(`[...document.querySelectorAll('.hl, .profile-av, .bill-pie, .bill-card, .entry-copy, .news, .cafe')].map(e => e.innerText).join(' ')`);
+check('verdad', 'sin contadores, reseñas, precios ni fechas inventadas en perfil, publicaciones y carta', !/(\d+\s*(me gusta|likes?|seguidores|reseñas|opiniones|vistas))|★|\$\s?\d|\bmás leídos\b|\bagotad/i.test(feedText || ''), feedText);
+
+// ---------- 3b. Café y té (#cafe): chips Café · Té, Carrusel3D variante carta, «Preguntar por la carta» ----------
+const menu = JSON.parse(readFileSync(new URL('../../assets/data/menu.json', import.meta.url), 'utf8'));
+for (const [vw, vh, mobile] of [[390, 844, true], [320, 640, true], [1280, 800, false]]) {
+  await open(vw, vh, { reset: true, mobile, wait: 2500 });
+  await ev(`document.querySelector('[data-cafe-c3d]').scrollIntoView({ block: 'center' })`); await sleep(1800);
+  const cafe = await ev(`(() => { const q = s => document.querySelector(s); const sec = q('#cafe'); const chips = [...sec.querySelectorAll('.cafe-chip')]; const cards = [...sec.querySelectorAll('.cafe-card')]; const c = sec.querySelector('.cafe-item.is-centro .cafe-card'); const ask = q('[data-cafe-ask]');
+    const r = e => e.getBoundingClientRect(); const foto = r(sec.querySelector('.cafe-foto')), carta = r(sec.querySelector('.c3d--carta'));
+    return { ready: q('[data-cafe]').classList.contains('is-ready'), group: [sec.querySelector('[data-cafe-chips]').getAttribute('role'), sec.querySelector('[data-cafe-chips]').getAttribute('aria-label')], chips: chips.map(x => [x.textContent.trim(), x.getAttribute('role'), x.getAttribute('aria-checked'), x.tabIndex, Math.round(r(x).height)]),
+      region: [q('[data-cafe-c3d]').getAttribute('role'), q('[data-cafe-c3d]').getAttribute('aria-roledescription'), q('[data-cafe-c3d]').getAttribute('aria-label')], n: cards.length, tabs: cards.filter(x => x.tabIndex === 0).length, icons: cards.filter(x => x.querySelector('.cafe-ic use')).length, imgs: sec.querySelectorAll('.cafe-card img').length,
+      centro: c && { name: c.querySelector('.cafe-nombre').textContent, role: c.getAttribute('role'), desc: c.querySelector('.cafe-desc')?.textContent, shadow: getComputedStyle(c).boxShadow !== 'none', bg: getComputedStyle(c).backgroundColor, radius: getComputedStyle(c).borderRadius },
+      prices: sec.querySelectorAll('.cafe-precio').length, text: sec.innerText, ask: { txt: ask.innerText.trim(), cls: ask.className, h: Math.round(r(ask).height), msg: new URL(ask.href).searchParams.get('text') },
+      photo: { real: sec.querySelector('.cafe-foto').dataset.kind, alt: sec.querySelector('.cafe-foto img').alt, left: foto.right <= carta.left + 1, above: foto.bottom <= carta.top + 1 }, over: document.documentElement.scrollWidth > innerWidth,
+      flechas: [...sec.querySelectorAll('.c3d-flecha')].map(b => [b.className.includes('btn--vidrio'), Math.round(r(b).width), Math.round(r(b).height)]), primary: sec.querySelectorAll('.btn--primario').length }; })()`);
+  const tag = `${vw}×${vh}`;
+  check('café', `${tag}: chips Café · Té en un radiogroup «Carta» (48 px, el elegido marcado y un solo tabindex=0)`, cafe.ready && cafe.group.join() === 'radiogroup,Carta' && cafe.chips.map(c => c[0]).join() === 'Café,Té' && cafe.chips.every(c => c[1] === 'radio' && c[4] === 48) && cafe.chips[0][2] === 'true' && cafe.chips.filter(c => c[3] === 0).length === 1, JSON.stringify(cafe.chips));
+  check('café', `${tag}: Carrusel3D variante carta: región con rol de carrusel, ${menu.categorias[0].productos.length} tarjetas tipográficas (superficie, radio 20, icono de trazo, sin fotos de producto), la del centro con sombra y la única parada de tabulador; flechas de vidrio de 48`, cafe.region.slice(0, 2).join() === 'region,carrusel' && /Café/.test(cafe.region[2]) && cafe.n === menu.categorias[0].productos.length && cafe.icons === cafe.n && cafe.imgs === 0 && cafe.tabs === 1 && cafe.centro?.role === 'group' && cafe.centro.shadow && cafe.centro.radius === '20px' && cafe.centro.desc && cafe.flechas.length === 2 && cafe.flechas.every(f => f[0] && f[2] === 48), JSON.stringify({ region: cafe.region, n: cafe.n, icons: cafe.icons, imgs: cafe.imgs, tabs: cafe.tabs, centro: cafe.centro, flechas: cafe.flechas }));
+  check('café', `${tag}: sin precios (la librería no los ha dado: ni cifras ni «por confirmar»)`, cafe.prices === 0 && !/\$\s?\d|MXN|por confirmar/i.test(cafe.text), cafe.text.slice(0, 300));
+  check('café', `${tag}: «Preguntar por la carta» secundario (menta) de 48 px con el mensaje de la categoría; ninguna primaria en la sección`, cafe.ask.txt === 'Preguntar por la carta' && /btn--secundario/.test(cafe.ask.cls) && cafe.ask.h === 48 && cafe.ask.msg === 'Hola, quisiera preguntar por la carta de café. ¿Qué tienen hoy?' && cafe.primary === 0, JSON.stringify(cafe.ask));
+  check('café', `${tag}: foto real de la casa con alt; ${mobile ? 'encima de la carta' : 'a la izquierda de la carta (A6)'}; sin desborde`, cafe.photo.real === 'real' && cafe.photo.alt.length > 20 && (mobile ? cafe.photo.above : cafe.photo.left) && !cafe.over, JSON.stringify(cafe.photo));
+  if (vw === 390) {
+    await shot('05-cafe-390.jpg');
+    await clickSel('.cafe-chip[data-id="te"]'); await sleep(1400);
+    const te = await ev(`(() => ({ n: document.querySelectorAll('#cafe .cafe-card').length, checked: document.querySelector('.cafe-chip[aria-checked="true"]')?.dataset.id, live: document.querySelector('[data-cafe-live]').textContent, msg: new URL(document.querySelector('[data-cafe-ask]').href).searchParams.get('text'), icon: document.querySelector('#cafe .cafe-ic use')?.getAttribute('href') }))()`);
+    check('café', 'elegir «Té» cambia la carta (tarjetas con la tetera), la región viva y el mensaje de «Preguntar por la carta»', te.checked === 'te' && te.n === menu.categorias[1].productos.length && te.icon === '#c-tetera' && /^Té: \d+ en la carta\.$/.test(te.live) && te.msg === 'Hola, quisiera preguntar por la carta de té. ¿Qué tienen hoy?', JSON.stringify(te));
+    await ev(`document.querySelector('#cafe .cafe-item.is-centro .cafe-card').focus()`);
+    await key('ArrowRight', 'ArrowRight', 39); await sleep(1100);
+    const kc = await ev(`(() => { const items = [...document.querySelectorAll('#cafe .cafe-item')]; return { active: items.indexOf(document.activeElement.closest('.cafe-item')), centro: items.findIndex(i => i.classList.contains('is-centro')), mid: Math.floor(items.length / 2), live: document.querySelector('[data-cafe-live]').textContent }; })()`);
+    check('café', 'teclado: → en la tarjeta del centro trae la siguiente, el foco va con ella y la región viva la anuncia', kc.active === kc.mid + 1 && kc.centro === kc.mid + 1 && / de \d+\.$/.test(kc.live), JSON.stringify(kc));
+  }
+  check('café', `${tag}: sin errores de consola`, !problems.length, problems.join(' | '));
+}
 
 // ---------- 4. Novedades (CarruselNovedades): solo existe con llegadas registradas; «Nuevo» solo en lo reciente ----------
 const sample = JSON.parse(readFileSync(new URL('../../assets/data/catalog.json', import.meta.url), 'utf8')).books;

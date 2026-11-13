@@ -50,7 +50,7 @@ async function open(width, height, { mobile = true, reduced = false } = {}) {
 }
 
 // Un elemento recortado por un antepasado con overflow hidden/clip que sí cabe en la ventana (la IMG escalada 1.22 dentro de .frame-clip al revelarse) no desborda nada.
-const overflow = () => ev(`(()=>{const d=document.documentElement; const clipped=e=>{for(let p=e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX; if((o==='hidden'||o==='clip')&&p.getBoundingClientRect().right<=d.clientWidth+1) return true;} return false;}; return {sw:d.scrollWidth, cw:d.clientWidth, wide:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(); return r.width>0 && r.right>d.clientWidth+1 && getComputedStyle(e).position!=='absolute' && !clipped(e) && !e.closest('.bill-track, .rail-chips, .rail-viewport, .house-track, .news-list, dialog, .tabbar')}).slice(0,4).map(e=>(e.className||e.tagName)+' <'+(e.parentElement&&e.parentElement.className)+'>')}})()`);
+const overflow = () => ev(`(()=>{const d=document.documentElement; const clipped=e=>{for(let p=e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX; if((o==='hidden'||o==='clip')&&p.getBoundingClientRect().right<=d.clientWidth+1) return true;} return false;}; return {sw:d.scrollWidth, cw:d.clientWidth, wide:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(); return r.width>0 && r.right>d.clientWidth+1 && getComputedStyle(e).position!=='absolute' && !clipped(e) && !e.closest('.c3d-viewport, .rail-chips, .house-track, .news-list, dialog, .tabbar')}).slice(0,4).map(e=>(e.className||e.tagName)+' <'+(e.parentElement&&e.parentElement.className)+'>')}})()`);
 
 // ---------- 1. Desbordes en varios anchos ----------
 for (const [w, h, mobile] of [[360, 740, true], [390, 844, true], [414, 896, true], [768, 1024, true], [1280, 800, false], [1920, 1080, false]]) {
@@ -73,7 +73,7 @@ for (const w of [360, 390]) {
   check(A, 'abre como modal titulado «Menú», el foco entra a la primera sección, el × queda en el sitio del ☰, scroll bloqueado y la barra inferior se oculta', s1.open && s1.modal && s1.active === 'Inicio' && s1.xOnTop && s1.sheet && s1.lock === 'hidden' && s1.exp === 'true' && s1.label === 'Cerrar menú' && s1.tabbarHidden && s1.title === 'Menú', JSON.stringify(s1));
   check(A, 'hoja de vidrio con 8 px de margen, bajo la barra de navegación', s1.left === 8 && s1.right === 8 && s1.top >= 44, JSON.stringify(s1));
   const rows = await ev(`[...document.querySelectorAll('#menu .menu-row')].filter(r=>r.getClientRects().length).map(r=>[r.querySelector('span').firstChild.textContent.trim(), Math.round(r.getBoundingClientRect().height)])`);
-  check(A, 'filas de 56 px con todas las secciones y Mi lista', rows.every(r => r[1] === 56) && rows.map(r => r[0]).join('|') === 'Inicio|Catálogo|Eventos y talleres|Novedades|La casa|Visita|Mi lista', JSON.stringify(rows));
+  check(A, 'filas de 56 px con todas las secciones y Mi lista', rows.every(r => r[1] === 56) && rows.map(r => r[0]).join('|') === 'Inicio|Catálogo|Eventos y talleres|Novedades|Café y té|La casa|Visita|Mi lista', JSON.stringify(rows));
   const redes = await ev(`[...document.querySelectorAll('#menu .menu-redes a')].map(r=>[r.textContent.trim(), Math.round(r.getBoundingClientRect().height), Math.round(r.getBoundingClientRect().width)])`);
   check(A, 'Instagram y Facebook como botones de 44 px', redes.length === 2 && redes.every(c => c[1] === 44 && c[2] >= 44) && redes.map(c => c[0]).join() === 'Instagram,Facebook', JSON.stringify(redes));
   const flatSheet = await ev(`(()=>{const d=document.getElementById('menu'); return {collapsed:d.querySelectorAll('[aria-expanded="false"], details').length, inert:d.querySelectorAll('[inert]').length, dead:[...d.querySelectorAll('a[href^="#"]')].filter(a=>a.getClientRects().length).filter(a=>{const t=document.querySelector(a.getAttribute('href')); return !t || !t.getClientRects().length}).map(a=>a.getAttribute('href'))}})()`);
@@ -116,10 +116,10 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
     await open(w, h, { mobile });
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
-    const t = await ev(`(()=>{${lumFn} const out={}; for (const sel of ['#inicio','#casa','#libros','#cartelera','#novedades','#visita','.ftr']) { const s=document.querySelector(sel); const cs=getComputedStyle(s); let bg=cs.backgroundColor; if (/, 0\\)$/.test(bg) || bg==='transparent') bg=getComputedStyle(document.body).backgroundColor; out[sel]={bg, fg:cs.color, ratio:+ratio(cs.color,bg).toFixed(1)}; } return out})()`);
+    const t = await ev(`(()=>{${lumFn} const out={}; for (const sel of ['#inicio','#casa','#libros','#cartelera','#novedades','#cafe','#visita','.ftr']) { const s=document.querySelector(sel); const cs=getComputedStyle(s); let bg=cs.backgroundColor; if (/, 0\\)$/.test(bg) || bg==='transparent') bg=getComputedStyle(document.body).backgroundColor; out[sel]={bg, fg:cs.color, ratio:+ratio(cs.color,bg).toFixed(1)}; } return out})()`);
     for (const [sel, v] of Object.entries(t)) check(`tema ${scheme} ${tag}`, `${sel}: tinta sobre su fondo ≥ 7:1`, v.ratio >= 7, JSON.stringify(v));
     const fills = Object.values(t).map(v => v.bg);
-    check(`tema ${scheme} ${tag}`, 'bandas alternas: La casa → Catálogo → Eventos → Novedades → Visita → pie, vecinos de fondo distinto', ['#inicio', '#casa', '#libros', '#cartelera', '#novedades', '#visita', '.ftr'].map(s => t[s].bg).every((f, i, a) => i === 0 || f !== a[i - 1]), JSON.stringify(fills));
+    check(`tema ${scheme} ${tag}`, 'bandas alternas: La casa → Catálogo → Eventos → Novedades → Café → Visita → pie, vecinos de fondo distinto', ['#inicio', '#casa', '#libros', '#cartelera', '#novedades', '#cafe', '#visita', '.ftr'].map(s => t[s].bg).every((f, i, a) => i === 0 || f !== a[i - 1]), JSON.stringify(fills));
     const dark = await ev(`(()=>{ const m=getComputedStyle(document.body).backgroundColor.match(/[\\d.]+/g).map(Number); return (m[0]+m[1]+m[2])/3 })()`);
     check(`tema ${scheme} ${tag}`, scheme === 'dark' ? 'el tema oscuro pinta la página oscura (prefers-color-scheme)' : 'el tema claro pinta la página blanca', scheme === 'dark' ? dark < 40 : dark > 240, String(dark));
   }
@@ -137,7 +137,7 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
       if (hv[1] !== r[1] || hv[2] !== r[2] || hv[3] !== r[3] || r[2] !== 44) bad.push({ rest: r, hover: hv });
     }
     await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 640, y: 500 }); await sleep(300);
-    check('barra ' + tag, 'enlaces de 44 px; con el cursor ni el enlace ni la barra cambian de tamaño', !bad.length && rest.length === 4, JSON.stringify(bad.length ? bad : rest));
+    check('barra ' + tag, 'enlaces de 44 px; con el cursor ni el enlace ni la barra cambian de tamaño', !bad.length && rest.length === 5, JSON.stringify(bad.length ? bad : rest));
     await ev(`scrollTo(0, document.getElementById('cartelera').getBoundingClientRect().top + scrollY + 200)`); await sleep(1200); await ev(`scrollBy(0,1)`); await sleep(600);
     const cur = await ev(`(()=>{const a=document.querySelector('.hdr-nav a[aria-current="true"]'); return a ? [a.getAttribute('href'), getComputedStyle(a).backgroundColor] : null})()`);
     check('barra ' + tag, 'en Eventos la barra marca «Eventos» con la pastilla menta', cur && cur[0] === '#cartelera' && cur[1] === 'rgb(220, 241, 236)', JSON.stringify(cur));
@@ -147,7 +147,7 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
 // ---------- 4. Barra inferior, Eventos, inicio (móvil) ----------
 await open(390, 844);
 // Cada tramo de la página y la casilla que debe marcar: Inicio abarca la entrada y La casa; el Catálogo, su capítulo; en el resto no hay casilla.
-for (const [sel, want] of [['#inicio', '#inicio'], ['#casa', '#inicio'], ['#libros', '#libros'], ['[data-rail]', '#libros'], ['#cartelera', ''], ['#novedades', ''], ['#visita', ''], ['.ftr', '']]) {
+for (const [sel, want] of [['#inicio', '#inicio'], ['#casa', '#inicio'], ['#libros', '#libros'], ['[data-rail]', '#libros'], ['#cartelera', ''], ['#novedades', ''], ['#cafe', ''], ['#visita', ''], ['.ftr', '']]) {
   // En el teléfono #catalogo no ocupa sitio (es la hoja Explorar): el Catálogo se mide en su titular y en el carrusel.
   for (let i = 0; i < 4; i++) { await ev(`scrollTo(0, document.querySelector('${sel}').getBoundingClientRect().top + scrollY + ${['#inicio'].includes(sel) ? 0 : 120})`); await sleep(900); }
   await ev(`scrollBy(0,1)`); await sleep(600);
@@ -160,11 +160,12 @@ check('barra inferior', 'tres casillas iguales de 76 × 49 px con nombre a la vi
 const steady = await ev(`(async()=>{const box=()=>[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>{const r=a.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)].join()}).join('|'); scrollTo(0,0); await new Promise(r=>setTimeout(r,1200)); const a=box(); scrollTo(0, document.querySelector('#libros').getBoundingClientRect().top+scrollY+120); await new Promise(r=>setTimeout(r,1200)); const b=box(); return a===b})()`);
 check('barra inferior', 'las casillas no cambian de tamaño ni de sitio al cambiar la activa (solo se desliza la pastilla)', steady === true, String(steady));
 const secs = await ev(`Object.fromEntries([...document.querySelectorAll('main > section')].map(s=>[s.id||s.className.split(' ')[0], Math.round(s.getBoundingClientRect().top+scrollY)]))`);
-const car = await ev(`(()=>{const items=[...document.querySelectorAll('.bill-item')]; const tr=document.querySelector('.bill-track'); return {n:items.length, allOpen:items.every(d=>d.open), snap:getComputedStyle(tr).scrollSnapType, img:items.every(d=>d.querySelector('img').naturalWidth>0||!d.querySelector('img').complete), dots:document.querySelectorAll('.bill-dots i').length, sumTab:items.every(d=>d.querySelector('summary').tabIndex===-1)}})()`);
-check('eventos', 'carrusel con 3 tarjetas abiertas, snap y puntos; el resumen no es un control', car.n === 3 && car.allOpen && /x mandatory/.test(car.snap) && car.dots === 3 && car.sumTab, JSON.stringify(car));
 await ev(`scrollTo(0,${secs.cartelera + 150})`); await sleep(1500);
-await ev(`document.querySelector('.bill-track').scrollTo({left:700, behavior:'instant'})`); await sleep(700);
-check('eventos', 'el punto activo sigue el desplazamiento', (await ev(`[...document.querySelectorAll('.bill-dots i')].findIndex(i=>i.classList.contains('is-on'))`)) >= 1);
+const car = await ev(`(()=>{const items=[...document.querySelectorAll('.bill-item')]; const v=document.querySelector('[data-bill-viewport]'); return {n:items.length, snap:getComputedStyle(v).scrollSnapType, img:items.every(d=>d.querySelector('img').naturalWidth>0||!d.querySelector('img').complete), dots:document.querySelectorAll('.bill-dots').length, centro:items.findIndex(d=>d.classList.contains('is-centro')), rows:document.querySelectorAll('.bill-fila').length}})()`);
+check('eventos', 'Carrusel3D (variante evento) con 3 tarjetas, imán y la del medio al centro; sin puntos; una sola fila de acciones', car.n === 3 && /x mandatory/.test(car.snap) && car.dots === 0 && car.centro === 1 && car.rows === 1, JSON.stringify(car));
+await ev(`(() => { const v = document.querySelector('[data-bill-viewport]'); v.scrollTo({ left: v.scrollWidth, behavior: 'instant' }); })()`); await sleep(900);
+const ev2 = await ev(`({ centro: document.querySelector('.bill-item.is-centro')?.dataset.id, wa: document.querySelector('[data-bill-wa]').getAttribute('aria-label') })`);
+check('eventos', 'al deslizar, la del centro y la fila de acciones siguen al desplazamiento', ev2.centro === 'taller' && ev2.wa === 'Preguntar por WhatsApp: Taller de escritura', JSON.stringify(ev2));
 await shot('m-cartelera.jpg');
 // inicio (como primera visita: sin lo que dejó el recorrido anterior, para que el control de novedades tenga su sitio reservado)
 await ev(`localStorage.removeItem('iti-news-visto'); localStorage.removeItem('iti-news-estado')`);
@@ -182,7 +183,7 @@ for (let i = 0; i < 12 && !(await ev(`document.querySelectorAll('.cover--blank')
 const cov = await ev(`(()=>{const num=c=>c.match(/[0-9.]+/g).slice(0,3).map(Number); const lum=c=>{const [r,g,b]=num(c).map(v=>v/255).map(v=>v<=0.03928?v/12.92:((v+0.055)/1.055)**2.4); return 0.2126*r+0.7152*g+0.0722*b}; const ratio=(a,b)=>{const x=lum(a),y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)}; return [...document.querySelectorAll('.cover--blank')].slice(0,24).map(c=>{ const cs=getComputedStyle(c); const stops=cs.backgroundImage.match(/rgba?\\([^)]*\\)/g)||(cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'?[cs.backgroundColor]:[]); const worst=sel=>Math.min(...stops.map(s=>ratio(getComputedStyle(c.querySelector(sel)).color,s))); return stops.length?[worst('.cover-title'), worst('.cover-author')]:[0,0]})})()`);
 const covCount = await ev(`document.querySelectorAll('.cover--blank').length`);
 check('portadas', 'título y autor se leen sobre el campo plano de su portada tipográfica (≥ 4.5:1), si hay alguna sin imagen', !covCount || (cov?.length > 0 && cov.every(r => r[0] >= 4.5 && r[1] >= 4.5)), JSON.stringify((cov || []).slice(0, 3)));
-for (const [id, how] of [['libros', 'tab'], ['cartelera', 'menu'], ['novedades', 'menu'], ['inicio', 'tab']]) {
+for (const [id, how] of [['libros', 'tab'], ['cartelera', 'menu'], ['novedades', 'menu'], ['cafe', 'menu'], ['inicio', 'tab']]) {
   await ev(`scrollTo(0, ${id === 'inicio' ? 3000 : 0})`); await sleep(600);
   if (how === 'tab') await ev(`document.querySelector('.tabbar a[href="#${id}"]').click()`);
   else { await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(900); await ev(`document.querySelector('#menu a[href="#${id}"]').click()`); }
@@ -219,7 +220,7 @@ check('movimiento reducido', 'sin errores de consola', !problems.length, problem
 // ---------- 7. Escritorio: barra y anclas ----------
 await open(1280, 800, { mobile: false });
 const dk = await ev(`(()=>{const q=s=>document.querySelector(s); return {menu:getComputedStyle(q('[data-menu-open]')).display, tab:getComputedStyle(q('.tabbar')).display, nav:[...document.querySelectorAll('.hdr-nav a')].map(a=>a.getAttribute('href')), list:getComputedStyle(q('.hdr-list')).display, cta:!!q('.hdr-cta'), canvas:!!q('canvas')}})()`);
-check('escritorio', 'sin ☰ ni barra inferior; la barra lleva Catálogo, Eventos, Novedades y Visita en el orden de la página, Mi lista y «Cómo llegar»; el inicio es una foto fija (sin lienzo)', dk.menu === 'none' && dk.tab === 'none' && dk.nav.join() === '#libros,#cartelera,#novedades,#visita' && dk.list !== 'none' && dk.cta && !dk.canvas, JSON.stringify(dk));
+check('escritorio', 'sin ☰ ni barra inferior; la barra lleva Catálogo, Eventos, Novedades, Café y Visita en el orden de la página, Mi lista y «Cómo llegar»; el inicio es una foto fija (sin lienzo)', dk.menu === 'none' && dk.tab === 'none' && dk.nav.join() === '#libros,#cartelera,#novedades,#cafe,#visita' && dk.list !== 'none' && dk.cta && !dk.canvas, JSON.stringify(dk));
 await open(900, 800, { mobile: false });
 const tb = await ev(`(()=>{const q=s=>document.querySelector(s); return {menu:getComputedStyle(q('[data-menu-open]')).display, nav:getComputedStyle(q('.hdr-nav')).display, list:getComputedStyle(q('.hdr-list')).display, tab:getComputedStyle(q('.tabbar')).display}})()`);
 check('escritorio', '761–1100 px: Mi lista, «Cómo llegar» y el ☰ (las secciones en el menú)', tb.menu !== 'none' && tb.nav === 'none' && tb.list !== 'none' && tb.tab === 'none', JSON.stringify(tb));

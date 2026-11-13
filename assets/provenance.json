@@ -479,5 +479,10 @@
     "file": "data/catalog.json",
     "origin": "Catálogo Itinerante.xlsx (hoja de la librería), importada con scripts/import-inventario.py; copia fiel con avisos por renglón en data/inventario-itinerante.json",
     "note": "Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp."
+  },
+  "menuData": {
+    "file": "data/menu.json",
+    "origin": "Carta genérica indicada por Aldo el 2026-11-13: cafés y tés habituales; sin precios hasta que la librería los dé",
+    "rule": "precio: null mientras la librería no dé el precio; con un número se muestra «$NN MXN» (data-fuente=\"carta\"). Sin fotos de producto: tarjeta tipográfica con icono."
   }
 }
