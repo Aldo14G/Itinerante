@@ -4,7 +4,7 @@
 
 /* El final de la página deja libre el alto de la barra más el área segura y 16 px. */
 html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-6)); }
-.ftr { padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-8)); }
+.ftr { padding-bottom: calc(var(--alto-barra-inferior) - 1px + env(safe-area-inset-bottom, 0px) + var(--space-8)); } /* 49 + 32 = 80 px en la cuadrícula de 4 (barra inferior 49) */
 
 /* Barra superior en el teléfono: marca y ☰. Mi lista vive en la barra inferior y «Cómo llegar» en cada capítulo. */
 .hdr-list, .hdr-cta { display: none; }
