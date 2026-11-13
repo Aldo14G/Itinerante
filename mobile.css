@@ -68,7 +68,7 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- Catálogo en el teléfono ---------- */
 /* Titular → «Buscar en el catálogo» (abre la hoja Explorar) → chips → carrusel → cierre con «Cómo llegar». La capa «Explora el catálogo» no ocupa sitio en la
    página: es la hoja; su titular queda para lectores de pantalla (la región sigue nombrada). */
-.books-head { margin-bottom: var(--space-5); }
+.books-head { margin-bottom: var(--space-8); }
 .explore-open { width: 100%; }
 /* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón: 12 px de relleno y, con palomita, 8 y la
    palomita más junta. Nunca se parten. */

@@ -1278,7 +1278,7 @@ test('horario de Visita: dos filas (lunes a sábado y domingo), hoy se marca por
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/tr\.dataset\.days\.split\(' '\)\.includes\(String\(now\.day\)\)/.test(app), 'is-today sale de la lista de días de la fila');
 });
-test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → chips → carrusel; la rejilla de escritorio, debajo (plegada a dos filas)', () => {
+test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → chips → carrusel; la rejilla solo al buscar o al pedirla', () => {
   const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
   assert.equal((libros.match(/class="h2"/g) || []).length, 1, 'un solo H2 visual en el capítulo');
   assert.equal((libros.match(/<h2[\s>]/g) || []).length, 1, 'un solo h2 en el marcado');
@@ -1287,27 +1287,27 @@ test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → 
   const at = k => libros.indexOf(k);
   const order = ['id="books-title"', 'data-ex-open', 'data-rail-chips', 'data-rail-viewport', 'id="catalogo"', 'class="books-foot"'].map(at);
   assert.ok(order.every((x, i) => x >= 0 && (!i || x > order[i - 1])), `orden: titular, búsqueda, chips, carrusel, rejilla, cierre (${order})`);
-  // Rejilla en línea (2026-11-13): dos filas y «Ver los 41 títulos», que despliega en su sitio; con búsqueda o filtros, completa.
+  // Rejilla en línea: cerrada hasta una búsqueda, un filtro o «Ver los N títulos».
   assert.equal(FOLD_ROWS, 2);
-  assert.deepEqual(foldView(41, 5), { fold: true, folded: true, limit: 10, label: 'Ver los 41 títulos' }, 'cinco columnas: diez títulos y el botón');
-  assert.deepEqual(foldView(41, 3, { expanded: true }), { fold: true, folded: false, limit: 41, label: 'Ver menos' }, 'desplegada: todos y «Ver menos»');
+  assert.deepEqual(foldView(41, 5), { fold: true, folded: true, limit: 0, label: 'Ver los 41 títulos' }, 'sin búsqueda la rejilla no muestra tarjetas');
+  assert.deepEqual(foldView(41, 3, { expanded: true }), { fold: true, folded: false, limit: 41, label: 'Ver menos' }, 'pedida: todos y «Ver menos»');
   assert.equal(foldView(41, 5, { filtering: true }).folded, false, 'con búsqueda o filtros, los resultados completos');
   assert.equal(foldView(41, 2, { inline: false }).fold, false, 'en la hoja del teléfono no se pliega');
-  assert.equal(foldView(8, 5).fold, false, 'si caben en dos filas, no hay botón');
+  assert.equal(foldView(8, 5).folded, true, 'aunque quepan en dos filas, la vista sigue siendo el carrusel');
   // Más de PAGE_SIZE títulos: «Ver los N títulos» enseña los N (antes desplegaba una página y «Ver más» no volvía: el resto quedaba inalcanzable).
   const N = PAGE_SIZE + 12;
-  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4)), { count: PAGE_SIZE, left: 12, more: false, label: '' }, 'plegada: dos filas y solo el botón de plegado, sin «Ver más» suelto');
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4)), { count: PAGE_SIZE, left: 12, more: false, label: '' }, 'rejilla cerrada: solo el botón, sin «Ver más» suelto');
   assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4, { expanded: true })), { count: N, left: 0, more: false, label: '' }, 'desplegada en línea: todos los títulos de una vez');
   assert.deepEqual(pageView(N, N, foldView(N, 4)), { count: N, left: 0, more: false, label: '' }, 'al volver a plegar no queda «Ver más»');
   assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 2, { inline: false })), { count: PAGE_SIZE, left: 12, more: true, label: 'Ver 12 más · quedan 12' }, 'la hoja del teléfono pagina');
   assert.deepEqual(pageView(PAGE_SIZE * 2 + 5, PAGE_SIZE, foldView(PAGE_SIZE * 2 + 5, 4, { filtering: true })), { count: PAGE_SIZE, left: PAGE_SIZE + 5, more: true, label: `Ver ${PAGE_SIZE} más · quedan ${PAGE_SIZE + 5}` }, 'con búsqueda o filtros, por páginas también en línea');
   assert.deepEqual(pageView(N, PAGE_SIZE * 2, foldView(N, 2, { inline: false })), { count: N, left: 0, more: false, label: '' }, 'la última página no pasa del total');
   for (const view of [foldView(41, 5), foldView(41, 5, { expanded: true }), foldView(41, 5, { filtering: true }), foldView(41, 2, { inline: false })]) assert.deepEqual(pageView(41, PAGE_SIZE, view), { count: 41, left: 0, more: false, label: '' }, 'con 41 títulos todo cabe en una página: nunca hay «Ver más»');
-  assert.ok(/<button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid" hidden><\/button>/.test(libros) && /<ul class="cat-grid" id="cat-grid"/.test(libros), 'el botón nombra la rejilla que controla (aria-expanded, aria-controls)');
+  assert.ok(/<button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid">Ver los títulos<\/button>/.test(libros) && /<ul class="cat-grid" id="cat-grid"/.test(libros), 'el botón nombra la rejilla que controla (aria-expanded, aria-controls)');
   const catJs = readFileSync_('catalog.js');
   assert.ok(/const page = pageView\(results\.length, state\.shown, v\);/.test(catJs) && /moreBtn\.hidden = !page\.more;/.test(catJs) && !/moreBtn\.hidden = moreBtn\.hidden \|\|/.test(catJs), '«Ver más» sale de pageView cada vez que se pliega o despliega');
   assert.ok(/window\.scrollBy\(0, foldBtn\.getBoundingClientRect\(\)\.top - y\)/.test(catJs) && !/foldBtn[^;\n]*\.blur\(|focus\(\)[^;\n]*foldBtn/.test(catJs), 'al plegar el botón se queda bajo el cursor y conserva el foco');
-  assert.ok(/@media \(min-width: 761px\) \{ \.cat-grid\[aria-busy="true"\] \{ grid-template-rows: auto auto; grid-auto-rows: 0; row-gap: 0; overflow: clip; margin-bottom: var\(--alto-md\); \}/.test(cssFlat), 'el esqueleto reserva lo mismo que la rejilla plegada (dos filas y el botón)');
+  assert.ok(/\.cat:not\(\.cat-results\) :is\(\.cat-filters, \.cat-grid, \.cat-head, \.cat-empty\) \{ display: none; \}/.test(cssFlat), 'en línea la rejilla no se ve hasta que hay resultados');
   assert.ok(!/class="ask"|data-topic|data-composer|book-query|ask-title|topic-stage|rail-all|cat-lede/.test(libros), 'sin «Pregúntanos» (foto del tema, redactor, Crónica e Infantil), sin «Ver todo el catálogo» y sin entradilla de Explora');
   assert.ok(!/<p\b/.test(libros.match(/<div class="books-head">[\s\S]*?<\/div>/)[0]), 'la cabecera es el titular y la búsqueda: sin entradilla');
   assert.ok(/<h3 id="rail-title" class="sr-only">/.test(libros), 'el carrusel conserva su nombre accesible sin segundo titular visible');
@@ -1348,7 +1348,7 @@ test('rejilla: render con más de PAGE_SIZE títulos aplica pliegue, «Ver más�
   };
   renderGrid();
   assert.equal(grid.children.length, PAGE_SIZE, 'plegada: una página en el DOM');
-  assert.equal(grid.children.filter(li => !li.hidden).length, cols * FOLD_ROWS, 'plegada: solo dos filas visibles');
+  assert.equal(grid.children.filter(li => !li.hidden).length, 0, 'cerrada: ninguna tarjeta visible');
   assert.equal(ui.status, `${total} títulos`);
   assert.ok(ui.foldHidden === false && ui.foldLabel === `Ver los ${total} títulos`, 'botón de plegado con el total');
   assert.ok(ui.moreHidden, 'plegada en línea: sin «Ver más»');
@@ -1701,7 +1701,7 @@ test('secciones: encabezado (EncabezadoSeccion) sin antetítulo, «Nombre *frase
     assert.ok(new RegExp(`<header class="sec-head" data-revelar>\\s*<h2 id="[a-z]+-title" class="h2">${h}</h2>`).test(sec), `#${id}: el titular abre la sección y lleva su nombre («Nombre *frase*»)`);
   }
   assert.ok(!/sec-rotulo/.test(html + css + mobileCss), 'sin antetítulos sobre los titulares (retirados el 2026-11-13; piso.mjs los marca)');
-  assert.ok(/\.h2 \{ margin: 0; font: var\(--t-titulo-1\); letter-spacing: var\(--ls-titulo-1\); text-wrap: balance;/.test(cssFlat) && /@media \(min-width: 761px\) \{ \.h2 \{ font-size: clamp\(28px, 1\.25vw \+ 18px, 40px\);/.test(cssFlat), 'Title 1 que crece hasta 40 en escritorio');
+  assert.ok(/\.h2 \{ margin: 0; font: var\(--t-titulo-1\); letter-spacing: var\(--ls-titulo-1\); text-wrap: balance;/.test(cssFlat) && /@media \(min-width: 761px\) \{ \.h2, \.ftr-title \{ font-size: clamp\(28px, 1\.25vw \+ 18px, 40px\);/.test(cssFlat) && /\.ftr-title \{ margin: 0; font: var\(--t-titulo-1\);/.test(cssFlat), 'Title 1, también en Contacto, que crece hasta 40 en escritorio');
   assert.ok(/\.sec-texto \{ margin: var\(--space-3\) 0 0; max-width: 60ch; font: var\(--t-cuerpo\); color: var\(--tinta-2\); \}/.test(cssFlat), 'entradilla en Body, tinta-2, 60 caracteres');
   const fills = ['.house', '.books', '.bill', '.news', '.cafe', '.visit', '.ftr'].map(s => rule(cssFlat, s).match(/background: var\(--(fondo(?:-2)?)\)/)?.[1]);
   assert.deepEqual(fills, ['fondo-2', 'fondo', 'fondo-2', 'fondo', 'fondo', 'fondo-2', 'fondo'], 'La casa → Catálogo → Eventos → (Novedades, si hay llegadas) → Café → Visita → pie: sin Novedades, todos los vecinos son de fondo distinto');
@@ -1832,11 +1832,26 @@ test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té y 
   const app = readFileSync_('app.js');
   assert.ok(/nearby\(\$\('\[data-cafe\]'\), \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app), 'se carga al acercarse');
   assert.ok(/<a href="#cafe">Café<\/a>/.test(html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0]) && /<a class="menu-row" href="#cafe"><span>Café y té<\/span>/.test(html) && !/#cafe/.test(html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0]), 'en la barra de escritorio y el menú; la barra inferior no cambia');
-  assert.ok(/@media \(min-width: 667px\) \{[\s\S]*?\.cafe \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-carta \{ grid-column: 1 \/ -1; grid-row: 2; justify-items: center;/.test(css) && /\.bill > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'A6: Café en dos columnas desde 667 px (apaisado); encabezados de Catálogo y Eventos desde 1024 px');
+  assert.ok(/@media \(min-width: 1024px\), \(max-height: 500px\) and \(min-width: 667px\) \{[\s\S]*?\.cafe \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-carta \{ grid-column: 1 \/ -1; grid-row: 2; justify-items: center;/.test(css) && /\.bill > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'Un marco: Café en dos columnas desde 1024 px y en el teléfono apaisado; Catálogo y Eventos desde 1024 px');
   assert.ok(/data-cafe-status><\/p>\s*<\/div>/.test(sec), 'la carta termina en su carrusel (mismo bloque en el teléfono y en escritorio)');
   const [prep, prev] = [readFileSync_('scripts/prepare-public.mjs'), readFileSync_('tools/preview-site.mjs')];
   assert.ok(/"carousel3d\.js"/.test(prep) && /"cafe\.js"/.test(prep) && /"assets\/data\/menu\.json"/.test(prep) && /'\/carousel3d\.js', '\/cafe\.js'/.test(prev), 'se publican el motor, la carta y su JSON');
 });
+test('escena de carga (carreta): marca en el HTML, velo con token, sessionStorage y sin timer largo en reducido', async () => {
+  const [boot, carreta, app] = await Promise.all(['assets/js/boot.js', 'carreta.js', 'app.js'].map(f => readFile(here(`./${f}`), 'utf8')));
+  const splash = html.match(/<div id="carreta"[\s\S]*?<\/div>\s*\n\s*<a class="skip"/)?.[0] ?? '';
+  assert.ok(splash.includes('id="carreta"') && /Logo\.webp/.test(splash) && /Logo\.png/.test(splash), 'carreta con Logo.webp / Logo.png');
+  assert.ok(/iti-carreta-visto/.test(boot) && /showCarreta/.test(boot) && /sessionStorage\.setItem\(CARRETA_KEY, '1'\)/.test(boot) && /classList\.add\('carreta-on'\)/.test(boot), 'boot marca la pestaña antes de mostrar el velo');
+  assert.ok(/carretaHash/.test(boot) && /id === 'inicio'/.test(boot) && /back_forward/.test(boot) && /reduce/.test(boot), 'enlace profundo, atrás/adelante y movimiento reducido saltan la escena');
+  assert.ok(/SESSION_KEY = 'iti-carreta-visto'/.test(carreta) && /layer\.remove\(\)/.test(carreta) && /import \{ ms \}/.test(carreta) && /classList\.remove\('carreta-stage-enter'\)/.test(carreta), 'carreta.js quita el velo, no repite la entrada y usa motion.js');
+  assert.ok(/if \(!motionOn\(\)\) \{[\s\S]*?done\(\);/.test(carreta) && /prefers-reduced-motion: reduce\)[\s\S]*?animation: none !important/.test(css), 'modo reducido: sin saltito');
+  assert.ok(!/classList\.add\('intro'\)/.test(boot), 'sin la intro anterior de 2 s en boot');
+  assert.ok(/carretaReady = Promise\.resolve\(initCarreta\(\{ root, motionOn \}\)\)\.catch\(clearCarreta\)/.test(app) && /fontsReady, posterReady, carretaReady/.test(app), 'app.js arranca la escena y la usa en el arranque, sin esperar el catálogo');
+  assert.ok(/html\.carreta-on,\s*html\.carreta-on body \{ overflow: hidden;/.test(css), 'el velo bloquea el scroll de la página');
+  assert.ok(/var\(--carreta-degradado\)/.test(cssFlat) && /--carreta-degradado:/.test(readFileSync_('tokens.css')), 'degradado turquesa en tokens');
+  assert.ok(!/setTimeout\(\w+,\s*(?:2\d{3}|[3-9]\d{3})/.test(carreta), 'carreta.js no depende de un timer de varios segundos');
+});
+
 test('orden de la página: Inicio → La casa → Catálogo → Eventos y talleres → Novedades (solo con llegadas) → Visita → pie, con los mismos id', () => {
   const at = s => html.indexOf(s);
   const order = ['<section id="inicio"', '<section id="casa"', '<section id="libros"', '<section id="cartelera"', '<section id="novedades"', '<section id="visita"', '<footer class="ftr"'].map(at);
@@ -1857,7 +1872,7 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   assert.ok(PAGE_SIZE >= data.books.length, `una página cabe todo el inventario (${PAGE_SIZE} ≥ ${data.books.length}): sin «Ver N más»`);
   assert.ok(/n === 1 \? '1 título' : `\$\{n\} títulos`/.test(cat) && !/Mostrando \$\{slice\.length\} de \$\{results\.length\}/.test(cat), 'el estado dice «41 títulos» (o «N títulos» al filtrar)');
   // P18: estado vacío con una sola frase visible; la línea de estado solo la anuncia.
-  assert.ok(/'No hay títulos con esa combinación\.'/.test(cat) && /status\.classList\.toggle\('sr-only', !n\);/.test(cat) && !/Ningún título coincide/.test(cat), 'sin resultados se ve una sola frase («No hay títulos con esa combinación.»)');
+  assert.ok(/'No hay títulos con esa combinación\.'/.test(cat) && /status\.classList\.toggle\('sr-only', !n \|\| v\.folded\);/.test(cat) && !/Ningún título coincide/.test(cat), 'sin resultados se ve una sola frase («No hay títulos con esa combinación.»)');
   assert.ok(/<div class="cat-empty" data-cat-empty hidden>\s*<p>No hay títulos con esa combinación\.<\/p>/.test(html));
   // P21: Mi lista y su aviso, más cortos; la nota de dispositivo y confirmación se queda.
   assert.ok(/data-ml-empty hidden>Aún no guardas libros\. Toca el marcador de un libro para anotarlo\.<\/p>/.test(html) && /<p class="ml-note">Se guarda solo en este dispositivo\. La librería confirma si los tienen\.<\/p>/.test(html), 'Mi lista vacía en una frase; la nota de verdad sigue');

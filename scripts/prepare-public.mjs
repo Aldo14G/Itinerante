@@ -28,6 +28,7 @@ export const ROOT_FILES = [
   "tag.js",
   "saved.js",
   "sheets.js",
+  "carreta.js",
   "Logo.png",
   "Logo.webp",
   "robots.txt",

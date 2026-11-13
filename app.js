@@ -1,6 +1,7 @@
 // Librería Itinerante y Más · sistema «Itinerante Líquido»: barra y menú, destino actual, entradas de los titulares, Eventos, Catálogo y estado de apertura. Sin dependencias.
 import { confirmThen } from './motion.js';
 import { openDialog, closeDialog, navigateFromSheet } from './sheets.js';
+import { initCarreta } from './carreta.js';
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
@@ -43,6 +44,14 @@ async function boot() {
   const absTop = el => el.getBoundingClientRect().top + scrollY;
   const motionOn = () => !reduceMq.matches && !userOff && !saveData;
   const isMotion = () => root.classList.contains('motion');
+  const clearCarreta = () => {
+    root.classList.remove('carreta-on', 'carreta-stage-enter', 'carreta-stage-hop', 'carreta-stage-out', 'carreta--reduced');
+    $('#carreta')?.remove();
+  };
+  let carretaReady = Promise.resolve();
+  try {
+    carretaReady = Promise.resolve(initCarreta({ root, motionOn })).catch(clearCarreta);
+  } catch { clearCarreta(); }
 
   let vh = innerHeight;
 
@@ -123,7 +132,11 @@ async function boot() {
   function applyMode() {
     const on = motionOn();
     root.classList.toggle('motion', on);
-    if (!on) { root.classList.remove('intro'); revealAll(); }
+    if (!on) {
+      root.classList.remove('carreta-on');
+      $('#carreta')?.remove();
+      revealAll();
+    }
     syncToggle();
   }
   toggle.addEventListener('click', () => {
@@ -388,10 +401,9 @@ async function boot() {
   applyMode();
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const posterReady = $('.entry-poster').decode().catch(() => {});
-  Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
+  Promise.race([Promise.all([fontsReady, posterReady, carretaReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
     measureZones(); // una sola medición, con la letra y la foto ya puestas
     kick();
-    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
     // Las entradas se preparan en reposo: partir los titulares en líneas mide texto, y eso no debe competir con el primer render.
     (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(prepareReveals, { timeout: 1500 });
     // Conteo de novedades (control del inicio): después de la foto y las fuentes. Su sitio ya está reservado (boot.js), así que no mueve nada.

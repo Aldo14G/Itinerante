@@ -16,10 +16,46 @@
   try { news = localStorage.getItem('iti-news-estado'); } catch (e) { /* almacenamiento bloqueado */ }
   if (news === 's' || news === 'p') r.classList.add('has-news');
   if (news === 'p') r.classList.add('news-hint');
-  if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  r.classList.add('motion');
-  if (!scrollY) {
-    r.classList.add('intro');
-    setTimeout(function () { r.classList.remove('intro'); }, 2000);
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!off && !saveData && !reduce) r.classList.add('motion');
+
+  var CARRETA_KEY = 'iti-carreta-visto';
+  function navType() {
+    try {
+      var nav = performance.getEntriesByType('navigation')[0];
+      return (nav && nav.type) || '';
+    } catch (e) { return ''; }
+  }
+  function carretaHash() {
+    var id = (location.hash || '').replace(/^#/, '');
+    if (!id || id === 'inicio' || id === 'contenido') return false;
+    return true;
+  }
+  // Una pestaña abierta desde otra hereda sessionStorage. Solo en esa navegación nueva se ignora la marca copiada.
+  function openedFromAnotherTab() {
+    try { return !!(window.opener && navType() === 'navigate'); } catch (e) { return false; }
+  }
+  function showCarreta() {
+    if (navType() === 'back_forward') return false;
+    if (scrollY) return false;
+    if (carretaHash()) return false;
+    if (off || saveData || reduce) return false;
+    var seen = null;
+    try { seen = sessionStorage.getItem(CARRETA_KEY); } catch (e) { return false; }
+    if (seen && !openedFromAnotherTab()) return false;
+    try { sessionStorage.setItem(CARRETA_KEY, '1'); } catch (e) { return false; }
+    return true;
+  }
+  function dropCarreta() {
+    r.classList.remove('carreta-on');
+    var el = document.getElementById('carreta');
+    if (el) el.remove();
+  }
+  if (showCarreta()) {
+    r.classList.add('carreta-on');
+    // La restauración de scroll ocurre después de este script. Si la página no abre arriba, el velo no se queda.
+    requestAnimationFrame(function () { if (scrollY) dropCarreta(); });
+    // Si app.js o carreta.js no arrancan, el velo no puede tapar la página.
+    setTimeout(function () { if (r.classList.contains('carreta-on')) dropCarreta(); }, 2500);
   }
 })();
