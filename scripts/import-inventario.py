@@ -3,7 +3,8 @@
 
 Uso:  python3 scripts/import-inventario.py RUTA/Catálogo_Itinerante.xlsx
 
-- Lee la hoja (columnas: Editorial, Título, Autor, Precio, Sinopsis, Género, ISBN, Foto) desde la fila 3 y salta los renglones vacíos.
+- Lee la hoja (columnas: Editorial, Título, Autor, Precio, Sinopsis, Género, ISBN, Foto (ID)) desde la fila 3 y salta los renglones vacíos.
+  «Foto (ID)» trae una clave por renglón (I1, A3, «A2 (falta)»…): se copia tal cual al inventario y no se publica.
 - Escribe data/inventario-itinerante.json (copia fiel de la hoja, con avisos por renglón) y assets/data/catalog.json (lo que lee el sitio).
 - Portadas: data/portadas.json dice de dónde sale cada una (fuente y URL, revisadas a mano); si falta su WebP en assets/img/portadas/,
   la descarga y la convierte (600 px de ancho). Un libro sin entrada en data/portadas.json usa la portada tipográfica.
@@ -43,8 +44,13 @@ def isbn13(raw):
     return d if (10 - s % 10) % 10 == int(d[12]) else None
 
 
+def entero(v):
+    """La hoja exportada desde Google Sheets trae los números como flotantes (250.0, 9798872431039.0): un entero se lee como entero."""
+    return int(v) if isinstance(v, float) and v.is_integer() else v
+
+
 def clean(v):
-    return re.sub(r'\s+', ' ', str(v)).strip() if v not in (None, '') else None
+    return re.sub(r'\s+', ' ', str(entero(v))).strip() if v not in (None, '') else None
 
 
 def cover(key, entry):
@@ -87,7 +93,7 @@ def main(xlsx):
     for fila, row in enumerate(ws.iter_rows(min_row=3, max_col=8, values_only=True), start=3):
         ed, t, a, precio, sinopsis, genero, isbn, foto = row
         if not clean(t): continue
-        rows.append({'fila': fila, 'editorial': clean(ed), 'titulo': clean(t), 'autor': clean(a), 'precio': precio, 'sinopsis': clean(sinopsis),
+        rows.append({'fila': fila, 'editorial': clean(ed), 'titulo': clean(t), 'autor': clean(a), 'precio': entero(precio), 'sinopsis': clean(sinopsis),
                      'genero': clean(genero), 'isbn': clean(isbn), 'foto': clean(foto), 'avisos': []})
     for r in rows:
         n = isbn13(r['isbn'])
