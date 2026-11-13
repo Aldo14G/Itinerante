@@ -31,3 +31,12 @@ supabase/.temp/
 
 # Informe local del auditor de diseño
 design/report.json
+
+# Impeccable (motor descargado y estado local)
+.claude/skills/impeccable/scripts/bin/
+**/.impeccable/hook.cache.json
+.impeccable/live/sessions/
+.impeccable/live/previews/
+.impeccable/live/annotations/
+.impeccable/live/artifacts/
+.impeccable/live/server.json
