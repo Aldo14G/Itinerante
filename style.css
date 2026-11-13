@@ -561,7 +561,7 @@ html:not(.js) .bill-pie { display: none; }
 .cat-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
 .cat-chips[hidden] { display: none; }
 .cat-clear { min-height: var(--alto-sm); padding: 0 var(--space-3); border: 0; border-radius: var(--radio-pildora); background: none; color: var(--turquesa-texto); font: var(--t-boton-chico); cursor: pointer; }
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: var(--space-8) var(--space-6); align-items: start; margin: 0; padding: 0; list-style: none; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: var(--space-8) var(--space-6); align-items: stretch; margin: 0; padding: 0; list-style: none; }
 .cat-grid[hidden] { display: none; }
 .cat-more { margin-top: var(--space-10); }
 /* «Ver los 41 títulos» / «Ver menos» (catalog.js, foldView): bajo la rejilla, a 32 px de la última fila, en el mismo eje que la rejilla. */
@@ -597,8 +597,9 @@ html:not(.js) .bill-pie { display: none; }
 /* Una sola regla de alto para la tarjeta y su esqueleto: la portada 2:3 (150 % del ancho del contenedor); en la rejilla, además, el título
    (dos renglones reservados) y «autor · precio» (el esqueleto lleva los mismos renglones). */
 .rail-item { --card-h: 150cqw; }
-.card-item { --card-h: calc(150cqw + 80px); }
+.card-item { --card-h: calc(150cqw + var(--space-2) + 2lh + var(--space-1) + 2lh); }
 :is(.rail-item, .card-item) .card { min-height: var(--card-h); align-content: start; }
+.card-item .card { height: 100%; }
 /* Debajo de la portada: el título en Subheadline semibold (dos renglones como máximo) y «autor · $250 MXN» en Footnote. El precio (dato de la
    hoja, data-fuente="hoja") no se parte ni se corta: si no cabe, baja entero al renglón siguiente. */
 .card-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2lh; margin-top: var(--space-2); overflow: hidden; font: var(--t-subtitulo); font-weight: 600; color: var(--tinta); overflow-wrap: anywhere; }
@@ -832,10 +833,10 @@ html:not(.js) .bill-pie { display: none; }
 
 /* ---------- Carrusel de libros (capa 1 del Catálogo): Carrusel3D, variante portada ---------- */
 .rail[hidden], html:not(.js) .rail { display: none; }
-.rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
+.rail-head { display: grid; gap: var(--space-3); justify-items: center; margin-bottom: var(--space-4); }
 /* Fila de chips (una colección por chip, de collections.json): son también las paradas del recorrido (A4), unidas por un conector de 2 px
    (linea-fuerte atenuada; primario entre dos paradas hojeadas). Una hojeada lleva la palomita y, si no es la elegida, borde primario. */
-.rail-chips { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--space-2); }
+.rail-chips { display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: var(--space-2); width: 100%; }
 .rail-chips .chip { flex: none; } /* un chip nunca se encoge ni se parte: cede el conector */
 /* En el recorrido el conector es la separación: va de chip a chip (≥ 8 px), sin hueco aparte. */
 .rail-chips:has(.rail-conector) { gap: 0; }
@@ -845,7 +846,7 @@ html:not(.js) .bill-pie { display: none; }
 .rail-chip.is-hojeada:not([aria-checked="true"])::before { background: var(--primario); }
 /* Debajo, la nota de la colección y, a su derecha, «N de 3 paradas hojeadas» (si no caben, el conteo baja y queda a la derecha). Los dos
    renglones están reservados desde el esqueleto: el conteo tiene su ancho aunque llegue vacío. */
-.rail-nota-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); max-width: 480px; } /* el ancho de «Buscar en el catálogo»: el conteo queda cerca de sus paradas */
+.rail-nota-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); max-width: 480px; margin-inline: auto; } /* el ancho de «Buscar en el catálogo»: el conteo queda cerca de sus paradas; centrado sobre el carrusel */
 .rail-note { flex: 1 1 14rem; min-height: 1lh; margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
 @media (min-width: 390px) { .rail-note { font: var(--t-subtitulo); } } /* Subheadline 15 donde la nota cabe en un renglón; antes, Footnote 13 */
 .rail-progreso { flex: 0 0 auto; min-width: 12.5em; min-height: 1lh; margin: 0 0 0 auto; font: var(--t-nota-pie); font-weight: 600; color: var(--turquesa-texto); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -868,7 +869,13 @@ html:not(.js) .bill-pie { display: none; }
 .cf-titulo { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); color: var(--tinta); text-wrap: balance; overflow-wrap: break-word; }
 .cf-meta { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; text-wrap: balance; }
 .cf-meta strong { font-weight: 600; color: var(--tinta); white-space: nowrap; }
-@media (min-width: 761px) { .cf-pie { max-width: 640px; margin-inline: auto; } }
+@media (min-width: 761px) {
+  .cf-pie { max-width: 640px; margin-inline: auto; }
+  /* Control del carrusel de portadas sobre el mismo eje que la pieza central (Aldo, 2026-11-13; antes solo desde 1024). */
+  .rail-nota-fila { justify-content: center; width: min(100%, 720px); max-width: none; }
+  .rail-note { flex: 0 1 auto; text-align: center; }
+  .rail-conector { flex: none; width: var(--space-6); }
+}
 .rail-status { margin: 0; font: var(--t-titular); }
 .rail-status:empty { position: absolute; }
 .rail-error { display: flex; flex-wrap: wrap; gap: var(--space-3); }
@@ -965,11 +972,22 @@ html:not(.js) :is(.menu-btn, .hdr-list, .explore-open, .motion-btn, .cat-bar, .c
 html:not(.js) .hdr { flex-wrap: wrap; height: auto; padding-bottom: var(--space-1); }
 html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; overflow-x: auto; }
 
+/* ---------- Composición Café (A6 apaisado y tableta ancha, desde 667 px; Aldo 2026-11-13) ---------- */
+/* Titular y foto en la misma fila (como 1024×768) para que el centro vertical coincida; la carta sigue debajo a todo el ancho. */
+@media (min-width: 667px) {
+  .cafe { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: center; }
+  .cafe > .sec-head { grid-column: 1; grid-row: 1; margin: 0; }
+  .cafe-cuerpo { display: contents; }
+  .cafe-foto { grid-column: 2; grid-row: 1; }
+  .cafe-foto .frame-clip { aspect-ratio: auto; height: clamp(120px, 28svh, 260px); }
+  .cafe-foto img { width: 100%; height: 100%; object-fit: cover; }
+  .cafe-carta { grid-column: 1 / -1; grid-row: 2; justify-items: center; margin-top: var(--space-8); }
+}
+
 /* ---------- Composición en escritorio (A6, 2026-11-13; afinada el mismo día) ---------- */
 /* Desde 1024 px el titular va a la izquierda y la búsqueda o la entradilla a la derecha (5/12 y 7/12); el carrusel va debajo a todo el ancho de
    la columna de contenido y **su control va sobre su eje**: en el Catálogo, los chips y la nota centrados encima del carrusel (proximidad y
-   simetría; .books-head y .rail son display: contents para compartir la rejilla del capítulo). Café y té: titular y entradilla a la izquierda,
-   la foto a la derecha con el alto acotado, y debajo la carta a todo el ancho, centrada, como Catálogo y Eventos. */
+   simetría; .books-head y .rail son display: contents para compartir la rejilla del capítulo). */
 @media (min-width: 1024px) {
   .books { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: start; }
   .books-head, .rail:not([hidden]) { display: contents; }
@@ -984,13 +1002,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .books > :not(.books-head, .rail), .rail > :not(.rail-head) { grid-column: 1 / -1; }
   .bill > .sec-head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: last baseline; max-width: none; }
   .bill > .sec-head .sec-texto { margin: 0; }
-  .cafe { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: center; }
-  .cafe > .sec-head { grid-column: 1; margin: 0; }
-  .cafe-cuerpo { display: contents; }
-  .cafe-foto { grid-column: 2; grid-row: 1; }
-  .cafe-foto .frame-clip { aspect-ratio: auto; height: clamp(200px, 30svh, 260px); }
-  .cafe-foto img { width: 100%; height: 100%; object-fit: cover; }
-  .cafe-carta { grid-column: 1 / -1; grid-row: 2; justify-items: center; margin-top: var(--space-8); }
+  .cafe-foto .frame-clip { height: clamp(200px, 30svh, 260px); }
 }
 
 /* ---------- Impresión ---------- */

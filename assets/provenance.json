@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-12",
+  "updated": "2026-11-13",
   "rule": "Todas las imágenes del sitio son fotografías reales de la casa, salvo las portadas de los libros (img/portadas/, registradas aparte en «covers»): el lote oficial entregado por Aldo (2026-10-27), fotos publicadas por la cuenta oficial de Instagram (con su autor) y fotos de Aldo (2026-11-10). No quedan recreaciones generadas con IA; la secuencia de fotogramas del inicio se retiró el 2026-11-10. La procedencia es un dato interno (data-kind y este archivo): la página no imprime rótulos. Pendiente de la librería: confirmar el permiso de uso de las fotos de @sharonmirelesgong y @alfonso_boeta, o sustituirlas por la sesión profesional.",
   "real": [
     {
@@ -215,8 +215,19 @@
   "covers": {
     "dir": "img/portadas/",
     "registry": "data/portadas.json",
-    "rule": "Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 600 px de ancho como máximo. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).",
+    "rule": "Portadas de los libros del inventario, de dos orígenes: bases públicas (Goodreads y Amazon) y la carpeta de Drive de la librería («Fotos Catálogo», fuente «Librería»: la imagen que la librería subió con la clave de «Foto (ID)» de su hoja; se registra con esa clave y el id del archivo, y las originales no entran al repositorio). Todas revisadas a mano una por una, recortadas a la portada si traían borde y convertidas a WebP de 600 px de ancho como máximo (nunca menos de 300). Un libro sin portada admitida usa la portada tipográfica (catalog.js).",
     "files": [
+      {
+        "file": "img/portadas/hipercodex-emmanuel-vizcaya.webp",
+        "book": "hipercodex-emmanuel-vizcaya",
+        "isbn": "9786075954097",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/1U-dj_HWor_Gs0B1sWMR1Dz0yKuewUXfc/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "I1",
+        "driveId": "1U-dj_HWor_Gs0B1sWMR1Dz0yKuewUXfc"
+      },
       {
         "file": "img/portadas/las-hojas-de-fabre-jesus-ferreiro.webp",
         "book": "las-hojas-de-fabre-jesus-ferreiro",
@@ -234,12 +245,67 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/pongo-esta-fruta-degustada-en-tu-cuerpo-mariana-del-vergel.webp",
+        "book": "pongo-esta-fruta-degustada-en-tu-cuerpo-mariana-del-vergel",
+        "isbn": "9786075954080",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/1pBeOgyB2qLQd9LmzqwDqhoZ_rmBEE9wK/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "I4",
+        "driveId": "1pBeOgyB2qLQd9LmzqwDqhoZ_rmBEE9wK"
+      },
+      {
+        "file": "img/portadas/tres-tristes-tristes-iasura-esquivel.webp",
+        "book": "tres-tristes-tristes-iasura-esquivel",
+        "isbn": "9786075954035",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/1_KvvMCqxlDKfU3qzUHHJ7nmllXP53Ust/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "I5",
+        "driveId": "1_KvvMCqxlDKfU3qzUHHJ7nmllXP53Ust"
+      },
+      {
+        "file": "img/portadas/las-noches-rotas-abraham-valenzuela-hernandez.webp",
+        "book": "las-noches-rotas-abraham-valenzuela-hernandez",
+        "isbn": "9786075954028",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/1AGGRseeGPefGm6rMlrdrDA8qFQDF0PIJ/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "I6",
+        "driveId": "1AGGRseeGPefGm6rMlrdrDA8qFQDF0PIJ"
+      },
+      {
+        "file": "img/portadas/yenpox-enrique-ortega.webp",
+        "book": "yenpox-enrique-ortega",
+        "isbn": "9786075954011",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/1qLLM1gJg7BdKcqOHavjvY8EejpgFynHl/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "I7",
+        "driveId": "1qLLM1gJg7BdKcqOHavjvY8EejpgFynHl"
+      },
+      {
         "file": "img/portadas/acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h.webp",
         "book": "acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h",
         "isbn": "9786075954066",
         "source": "Goodreads",
         "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1741979045i/229147380.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/tuneles-cabellos-y-otros-miedos-maitane-aguirre-gonzalez.webp",
+        "book": "tuneles-cabellos-y-otros-miedos-maitane-aguirre-gonzalez",
+        "isbn": "9786075954042",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/1mQJYGhr4ZaAbE5841JVRfPlwctDjYU4t/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "I10",
+        "driveId": "1mQJYGhr4ZaAbE5841JVRfPlwctDjYU4t"
       },
       {
         "file": "img/portadas/amigos-rodrigo-garnica.webp",
@@ -256,6 +322,23 @@
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/51OVHVqODCL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/cronicas-de-lo-habitual-claudia-guillen.webp",
+        "book": "cronicas-de-lo-habitual-claudia-guillen",
+        "isbn": "9781092379458",
+        "source": "Librería",
+        "url": "https://drive.google.com/file/d/15F58bwCFFppo8GUDorC-6ENNS_ROfKHU/view",
+        "reviewed": "2026-11-13",
+        "origin": "Imagen de la portada entregada por la librería en su carpeta de Drive «Fotos Catálogo»",
+        "photo": "A3",
+        "driveId": "15F58bwCFFppo8GUDorC-6ENNS_ROfKHU",
+        "crop": [
+          0,
+          0,
+          1634,
+          2399
+        ]
       },
       {
         "file": "img/portadas/perorata-luis-felipe-lomeli.webp",
@@ -276,7 +359,7 @@
       {
         "file": "img/portadas/las-ruinas-de-la-caza-alfredo-leal.webp",
         "book": "las-ruinas-de-la-caza-alfredo-leal",
-        "isbn": null,
+        "isbn": "9786079906702",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/61nalhU1ylL.jpg",
         "reviewed": "2026-11-12"
@@ -478,7 +561,69 @@
   "catalogData": {
     "file": "data/catalog.json",
     "origin": "Catálogo Itinerante.xlsx (hoja de la librería), importada con scripts/import-inventario.py; copia fiel con avisos por renglón en data/inventario-itinerante.json",
-    "note": "Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp."
+    "note": "Inventario real: título, autor y precio (MXN) salen de la hoja. Editorial, género, ISBN y sinopsis salen de la hoja cuando la hoja los trae; cuando no (o cuando el ISBN de la hoja es de otro libro), de data/complementos.json con sus fuentes en «complements.applied». La existencia no se publica: se confirma por WhatsApp.",
+    "complements": {
+      "registry": "data/complementos.json",
+      "rule": "Lo que la hoja no trae (o el ISBN que trae de otro libro) se completa solo con datos confirmados por una fuente primaria (agencia ISBN, editorial) o por dos fuentes independientes, de la misma edición; las sinopsis son el texto de la editorial, tal cual. Si la hoja trae después otro valor, gana la hoja. El precio nunca se completa: sale solo de la hoja.",
+      "applied": [
+        {
+          "book": "hipercodex-emmanuel-vizcaya",
+          "field": "isbn",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-59540-9-7",
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-59540-0-4",
+            "https://libreriacasatomada.mx/productos/hipercodex-19ekr/"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "editorial",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://www.elem.mx/obra/datos/236048",
+            "https://booksfrommexico.com/product/las-ruinas-de-la-caza",
+            "https://www.fondodeculturaeconomica.com/Noticia/3871"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "genero",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-99067-0-2",
+            "https://www.elem.mx/obra/datos/236048"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "isbn",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-99067-0-2",
+            "https://www.elem.mx/obra/datos/236048",
+            "https://booksfrommexico.com/product/las-ruinas-de-la-caza"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "sinopsis",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://www.libros.unam.mx/gd-las-ruinas-de-la-caza-9786073041836-libro.html",
+            "https://www.elem.mx/obra/datos/236048"
+          ]
+        },
+        {
+          "book": "los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux",
+          "field": "sinopsis",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://capitulosiete.com.mx/product/los-habitantes-antologia-de-cuentos/"
+          ]
+        }
+      ]
+    }
   },
   "menuData": {
     "file": "data/menu.json",

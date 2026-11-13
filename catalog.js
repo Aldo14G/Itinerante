@@ -7,7 +7,7 @@ import { openDialog, closeDialog } from './sheets.js';
 export { loadSample };
 // La parte pura (sin DOM) se prueba con check.mjs; initCatalog() solo corre en el navegador.
 
-// Una página basta para todo el inventario (41 títulos): sin «Ver más». Si el catálogo crece por encima, vuelve el botón.
+// Una página basta para todo el inventario (41 títulos): sin «Ver más». Si el catálogo crece por encima, vuelve el botón (pageView).
 export const PAGE_SIZE = 48;
 export const WA_NUMBER = '528180875940';
 
@@ -160,6 +160,16 @@ export function foldView(total, cols, { inline = true, filtering = false, expand
   const fold = Boolean(inline) && !filtering && total > limit;
   const folded = fold && !expanded;
   return { fold, folded, limit: folded ? limit : total, label: folded ? `Ver los ${total} títulos` : 'Ver menos' };
+}
+
+// Página de la rejilla cuando los resultados pasan de PAGE_SIZE. La hoja del teléfono y los resultados de una búsqueda o un filtro se pintan
+// por páginas, con «Ver N más · quedan N». La rejilla en línea desplegada va completa («Ver los N títulos» enseña los N, no una página) y,
+// plegada, no lleva «Ver más»: bajo las dos filas solo va el botón de plegado. `view` es lo que devuelve foldView.
+export function pageView(total, shown, { fold = false, folded = false } = {}) {
+  const count = fold && !folded ? total : Math.max(0, Math.min(shown, total));
+  const left = total - count;
+  const more = left > 0 && !folded;
+  return { count, left, more, label: more ? `Ver ${Math.min(PAGE_SIZE, left)} más · quedan ${left}` : '' };
 }
 
 // Opciones de un grupo de filtros (Hick): un grupo solo se pliega a partir de FACET_FOLD_AT opciones (con 6 géneros, todos a la vista).
@@ -398,20 +408,14 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     grid.removeAttribute('aria-busy');
     grid.append(frag);
     if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: EASE(), fill: 'backwards' }));
-    const left = results.length - slice.length;
-    const folded = applyFold();
-    moreBtn.hidden = left <= 0 || folded;
-    moreBtn.textContent = `Ver ${Math.min(PAGE_SIZE, left)} más · quedan ${left}`;
     emptyEl.hidden = results.length > 0;
     grid.hidden = !results.length;
-    // «41 títulos» / «N títulos»; sin resultados la frase visible es la del estado vacío y esta línea solo la anuncia (sr-only).
-    const n = results.length;
-    status.textContent = !n ? 'No hay títulos con esa combinación.' : slice.length < n ? `Mostrando ${slice.length} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
-    status.classList.toggle('sr-only', !n);
+    applyFold();
     return fresh;
   }
 
   // Pliegue de la rejilla en línea (foldView): las columnas salen de la rejilla pintada, así dos filas son dos filas a cualquier ancho.
+  // Con él van «Ver más» y la línea de estado (pageView), que dependen de si la rejilla está plegada, desplegada o paginada.
   const filtering = () => Boolean(state.q || state.k.size || state.g.size || state.f.size || state.p.size);
   const gridCols = () => { const t = getComputedStyle(grid).gridTemplateColumns; return t && t !== 'none' ? t.split(' ').filter(Boolean).length : 0; };
   let foldCols = 0, foldInline = null;
@@ -419,17 +423,27 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     foldCols = gridCols() || foldCols || 1;
     foldInline = !sheetQuery.matches;
     const v = foldView(results.length, foldCols, { inline: foldInline, filtering: filtering(), expanded: state.expanded });
+    const page = pageView(results.length, state.shown, v);
+    // Desplegada en línea va completa: se pintan las tarjetas que faltaban de la página.
+    if (grid.children.length < page.count) grid.append(...results.slice(grid.children.length, page.count).map(b => card(b)));
+    state.shown = Math.max(state.shown, page.count);
     [...grid.children].forEach((li, i) => { li.hidden = i >= v.limit; });
     foldBtn.hidden = !v.fold;
     foldBtn.setAttribute('aria-expanded', String(!v.folded));
     foldBtn.textContent = v.label;
+    moreBtn.hidden = !page.more;
+    moreBtn.textContent = page.label;
+    // «41 títulos» / «N títulos»; sin resultados la frase visible es la del estado vacío y esta línea solo la anuncia (sr-only).
+    const n = results.length;
+    const line = !n ? 'No hay títulos con esa combinación.' : page.more ? `Mostrando ${page.count} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
+    if (status.textContent !== line) status.textContent = line; // plegar o desplegar no vuelve a anunciar la misma línea (role="status")
+    status.classList.toggle('sr-only', !n);
     return v.folded;
   }
   foldBtn.addEventListener('click', () => {
     const y = foldBtn.getBoundingClientRect().top;
     state.expanded = !state.expanded;
     applyFold();
-    moreBtn.hidden = moreBtn.hidden || foldBtn.getAttribute('aria-expanded') === 'false';
     // Al plegar, el botón se queda bajo el dedo o el cursor: la página sube lo que la rejilla encogió.
     if (!state.expanded) window.scrollBy(0, foldBtn.getBoundingClientRect().top - y);
   });

@@ -125,11 +125,17 @@ genérico.
   lleva en su hoja «Catálogo Itinerante.xlsx» (41 títulos de editoriales
   independientes). Título, autor, editorial, género, ISBN, sinopsis y precio
   salen de esa hoja; el precio es el de la librería y se muestra en la ficha,
-  pero la existencia se sigue confirmando por WhatsApp. Se importa con
+  pero la existencia se sigue confirmando por WhatsApp. Lo que la hoja no trae
+  (una editorial, un género, un ISBN, una sinopsis) solo entra si lo confirma
+  la agencia ISBN o la editorial, o dos fuentes independientes, y queda en
+  `data/complementos.json` con su fuente y su fecha; la sinopsis es el texto de
+  la editorial, tal cual. Si la hoja lo trae después, gana la hoja. El precio
+  nunca se busca fuera: sin precio en la hoja, el libro se muestra sin precio. Se importa con
   `python3 scripts/import-inventario.py RUTA.xlsx`. Las portadas salen de bases
-  públicas (Goodreads y Amazon), revisadas a mano una por una; su fuente queda en
-  `data/portadas.json`. Sin portada encontrada, el libro usa la portada
-  tipográfica. Los 500 registros de prueba ya no están en el sitio.
+  públicas (Goodreads y Amazon) y, desde el 2026-11-13, de la carpeta de Drive
+  de la librería («Fotos Catálogo», una imagen por clave de «Foto (ID)»),
+  revisadas a mano una por una; su fuente queda en `data/portadas.json`. Sin
+  portada admitida, el libro usa la portada tipográfica (hoy, 2 de 41). Los 500 registros de prueba ya no están en el sitio.
 - Los datos de prueba no pueden presentarse como inventario real.
 - La plantilla no imprime avisos de maqueta («Recreación IA», «Foto real», «Datos de
   muestra», «Imagen ilustrativa»): decisión de Aldo del 2026-11-10. La procedencia de

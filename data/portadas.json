@@ -50,7 +50,7 @@
  },
  "las-ruinas-de-la-caza-alfredo-leal": {
   "titulo": "Las ruinas de la caza",
-  "isbn": null,
+  "isbn": "9786079906702",
   "fuente": "Amazon",
   "url": "https://m.media-amazon.com/images/I/61nalhU1ylL.jpg",
   "revisada": "2026-11-12"
@@ -222,5 +222,74 @@
   "fuente": "Amazon",
   "url": "https://m.media-amazon.com/images/I/51E4cK+I3NL.jpg",
   "revisada": "2026-11-12"
+ },
+ "hipercodex-emmanuel-vizcaya": {
+  "titulo": "Hipercódex: Ensayo poético hiperbólico",
+  "isbn": "9786075954097",
+  "fuente": "Librería",
+  "foto": "I1",
+  "drive": "1U-dj_HWor_Gs0B1sWMR1Dz0yKuewUXfc",
+  "url": "https://drive.google.com/file/d/1U-dj_HWor_Gs0B1sWMR1Dz0yKuewUXfc/view",
+  "revisada": "2026-11-13"
+ },
+ "pongo-esta-fruta-degustada-en-tu-cuerpo-mariana-del-vergel": {
+  "titulo": "Pongo esta fruta degustada en tu cuerpo",
+  "isbn": "9786075954080",
+  "fuente": "Librería",
+  "foto": "I4",
+  "drive": "1pBeOgyB2qLQd9LmzqwDqhoZ_rmBEE9wK",
+  "url": "https://drive.google.com/file/d/1pBeOgyB2qLQd9LmzqwDqhoZ_rmBEE9wK/view",
+  "revisada": "2026-11-13"
+ },
+ "tres-tristes-tristes-iasura-esquivel": {
+  "titulo": "Tres tristes. Tristes",
+  "isbn": "9786075954035",
+  "fuente": "Librería",
+  "foto": "I5",
+  "drive": "1_KvvMCqxlDKfU3qzUHHJ7nmllXP53Ust",
+  "url": "https://drive.google.com/file/d/1_KvvMCqxlDKfU3qzUHHJ7nmllXP53Ust/view",
+  "revisada": "2026-11-13"
+ },
+ "las-noches-rotas-abraham-valenzuela-hernandez": {
+  "titulo": "Las noches rotas",
+  "isbn": "9786075954028",
+  "fuente": "Librería",
+  "foto": "I6",
+  "drive": "1AGGRseeGPefGm6rMlrdrDA8qFQDF0PIJ",
+  "url": "https://drive.google.com/file/d/1AGGRseeGPefGm6rMlrdrDA8qFQDF0PIJ/view",
+  "revisada": "2026-11-13"
+ },
+ "yenpox-enrique-ortega": {
+  "titulo": "Yenpox",
+  "isbn": "9786075954011",
+  "fuente": "Librería",
+  "foto": "I7",
+  "drive": "1qLLM1gJg7BdKcqOHavjvY8EejpgFynHl",
+  "url": "https://drive.google.com/file/d/1qLLM1gJg7BdKcqOHavjvY8EejpgFynHl/view",
+  "revisada": "2026-11-13"
+ },
+ "tuneles-cabellos-y-otros-miedos-maitane-aguirre-gonzalez": {
+  "titulo": "Túneles, cabellos y otros miedos",
+  "isbn": "9786075954042",
+  "fuente": "Librería",
+  "foto": "I10",
+  "drive": "1mQJYGhr4ZaAbE5841JVRfPlwctDjYU4t",
+  "url": "https://drive.google.com/file/d/1mQJYGhr4ZaAbE5841JVRfPlwctDjYU4t/view",
+  "revisada": "2026-11-13"
+ },
+ "cronicas-de-lo-habitual-claudia-guillen": {
+  "titulo": "Crónicas de lo habitual",
+  "isbn": "9781092379458",
+  "fuente": "Librería",
+  "foto": "A3",
+  "drive": "15F58bwCFFppo8GUDorC-6ENNS_ROfKHU",
+  "url": "https://drive.google.com/file/d/15F58bwCFFppo8GUDorC-6ENNS_ROfKHU/view",
+  "revisada": "2026-11-13",
+  "recorte": [
+   0,
+   0,
+   1634,
+   2399
+  ]
  }
 }

@@ -11,7 +11,7 @@ import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
 import { shareName, initFeed, eventBadge, NO_DATE, eventOf } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, pageView, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -162,8 +162,9 @@ test('catálogo: sugerencias, relacionados y mensaje de ficha', () => {
   assert.ok(rel.length <= 3 && rel.every(r => r.g === b.g && r.id !== b.id));
   assert.match(bookMessage(b), new RegExp(`«${b.t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}»`));
   assert.equal(new URL(bookWaUrl(b)).searchParams.get('text'), bookMessage(b));
-  const sinGenero = data.books.find(x => !x.g);
-  assert.ok(sinGenero, 'el inventario trae un libro sin género (fila incompleta de la hoja)');
+  // Un renglón incompleto de la hoja (sin género ni ISBN). Hoy ninguno llega así al catálogo («Las ruinas de la caza» se completó desde
+  // data/complementos.json el 2026-11-13), pero la hoja puede volver a traer uno: se prueba con un libro real al que se le quitan esos campos.
+  const sinGenero = { ...b, g: null, k: null, n: null };
   assert.deepEqual(relatedBooks(data.books, sinGenero), [], 'sin género no hay relacionados');
   assert.equal(bookMessage(sinGenero), `Hola, ¿tienen «${sinGenero.t}» de ${sinGenero.a}? Vi el título en su sitio.`, 'sin ISBN el mensaje no lo menciona');
 });
@@ -191,6 +192,9 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
     assert.ok(!('priceMxnCents' in b) && !('stockQty' in b) && !('stock' in b), `${b.id}: la existencia no se publica (se confirma por WhatsApp)`);
   }
   // Portadas: archivo local, registrado con su fuente, con las medidas reales (la tarjeta reserva su forma con width/height).
+  // Dos orígenes: bases públicas (Goodreads, Amazon) y la carpeta de Drive de la librería («Librería»: clave de «Foto (ID)» e id del archivo).
+  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
+  const claveFoto = id => (inv.filas[data.books.findIndex(b => b.id === id)].foto ?? '').match(/^[A-Z]+\d+/)?.[0] ?? null;
   const conPortada = data.books.filter(b => b.c);
   assert.equal(data.meta.covers, conPortada.length);
   assert.ok(conPortada.length >= 30, `la mayoría trae portada real (${conPortada.length})`);
@@ -198,11 +202,30 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
     assert.equal(b.c, `assets/img/portadas/${b.id}.webp`, `${b.id}: ruta de portada`);
     assert.ok(existsSync(here(`./${b.c}`)), `${b.id}: la portada existe en disco`);
     const reg = portadas[b.id];
-    assert.ok(reg && ['Goodreads', 'Amazon'].includes(reg.fuente) && /^https:\/\//.test(reg.url) && reg.revisada, `${b.id}: portada registrada en data/portadas.json con fuente, URL y revisión`);
+    assert.ok(reg && ['Goodreads', 'Amazon', 'Librería'].includes(reg.fuente) && /^https:\/\//.test(reg.url) && /^\d{4}-\d{2}-\d{2}$/.test(reg.revisada), `${b.id}: portada registrada en data/portadas.json con fuente, URL y revisión`);
+    if (reg.fuente === 'Librería') {
+      assert.ok(/^[A-Z]+\d+$/.test(reg.foto) && /^[\w-]{20,}$/.test(reg.drive), `${b.id}: la portada de la librería lleva la clave de «Foto (ID)» y el id del archivo de Drive`);
+      assert.equal(reg.url, `https://drive.google.com/file/d/${reg.drive}/view`, `${b.id}: la URL es la del archivo en Drive, sin parámetros (ni claves ni tokens)`);
+      assert.equal(reg.foto, claveFoto(b.id), `${b.id}: la clave registrada es la de «Foto (ID)» de su renglón en la hoja`);
+      assert.ok(reg.recorte === undefined || (reg.recorte.length === 4 && reg.recorte.every(Number.isInteger) && reg.recorte[0] < reg.recorte[2] && reg.recorte[1] < reg.recorte[3]), `${b.id}: el recorte es [izquierda, arriba, derecha, abajo]`);
+    } else if (reg.fuente === 'Amazon') {
+      assert.ok(/^https:\/\/m\.media-amazon\.com\/images\/I\//.test(reg.url) && !('foto' in reg) && !('drive' in reg) && !('recorte' in reg), `${b.id}: portada de Amazon con su URL de imagen y nada de Drive`);
+    } else if (reg.fuente === 'Goodreads') {
+      assert.ok(/^https:\/\/(m\.media-amazon\.com\/images\/S\/compressed\.photo\.goodreads\.com\/|i\.gr-assets\.com\/)/.test(reg.url) && !('foto' in reg) && !('drive' in reg) && !('recorte' in reg), `${b.id}: portada de Goodreads con su URL de imagen y nada de Drive`);
+    } else {
+      assert.fail(`${b.id}: fuente de portada no admitida (${reg.fuente})`);
+    }
     assert.equal(reg.isbn ?? null, b.n, `${b.id}: el registro de la portada es del mismo ISBN`);
     assert.deepEqual(webpSize(await readFile(here(`./${b.c}`))), [b.cw, b.ch], `${b.id}: cw/ch son las medidas del archivo`);
-    assert.ok(b.cw <= 600 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 600 px como máximo (${b.cw}×${b.ch})`);
+    assert.ok(b.cw >= 300 && b.cw <= 600 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 300 a 600 px de ancho (${b.cw}×${b.ch})`);
   }
+  const deLibreria = Object.values(portadas).filter(r => r.fuente === 'Librería');
+  assert.ok(deLibreria.length >= 7, `la carpeta de la librería da portadas (${deLibreria.length})`);
+  assert.equal(new Set(deLibreria.map(r => r.foto)).size, deLibreria.length, 'ninguna clave de foto sirve a dos libros');
+  assert.equal(new Set(deLibreria.map(r => r.drive)).size, deLibreria.length, 'ningún archivo de Drive sirve a dos libros');
+  const importador = await readFile(here('./scripts/import-inventario.py'), 'utf8');
+  assert.ok(!/access_token|refresh_token|client_secret|api_?key|resourcekey|Bearer |AIza[\w-]{10}|ya29\./i.test(importador + JSON.stringify(portadas)), 'ni el importador ni el registro de portadas guardan credenciales ni tokens');
+  assert.ok(/--fotos CARPETA/.test(importador) && /uc\?export=download&id=/.test(importador), 'el importador baja la foto de la carpeta pública o la toma de una carpeta local (--fotos)');
   for (const b of data.books.filter(x => !x.c)) assert.ok(b.cw === null && b.ch === null && !portadas[b.id], `${b.id}: sin portada no hay medidas ni registro`);
   const files = await readdir(here('./assets/img/portadas'));
   assert.deepEqual(files.sort(), conPortada.map(b => `${b.id}.webp`).sort(), 'ninguna portada huérfana en assets/img/portadas');
@@ -211,9 +234,64 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
   const titles = new Set(data.books.map(b => b.t));
   for (const t of ['The Let Them Theory', 'Project Hail Mary', 'Lessons in Chemistry', 'The Midnight Library', 'Spare']) assert.ok(!titles.has(t), `título de la muestra: ${t}`);
   assert.ok(!ids.some(id => id.startsWith('libro-')) && !Object.keys(data.subgenres).some(g => /^(non-)?fiction-/.test(g)), 'ni ids ni géneros de la muestra');
-  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
   assert.equal(inv.filas.length, data.books.length, 'la copia fiel de la hoja tiene un renglón por libro');
   assert.deepEqual(inv.filas.map(f => f.titulo), data.books.map(b => b.t), 'mismo orden y mismos títulos que la hoja');
+});
+test('complementos: lo que la hoja no trae entra con fuente y fecha, la hoja manda y el precio sale solo de la hoja', async t => {
+  const comp = JSON.parse(await readFile(here('./data/complementos.json'), 'utf8'));
+  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
+  const digits = v => String(v ?? '').replace(/\D/g, '');
+  const enCatalogo = { editorial: b => b.p, genero: b => (b.g ? data.subgenres[b.g].n : null), isbn: b => b.n, sinopsis: b => b.s };
+  const aplicados = [];
+  assert.ok(Object.keys(comp.libros).length >= 3, 'hay complementos registrados');
+  for (const [id, libro] of Object.entries(comp.libros)) {
+    const i = data.books.findIndex(b => b.id === id);
+    assert.ok(i >= 0, `${id}: el complemento es de un libro del catálogo`);
+    const b = data.books[i], fila = inv.filas[i];
+    for (const [campo, c] of Object.entries(libro.campos)) {
+      const donde = `${id}, ${campo}`;
+      assert.ok(Object.hasOwn(enCatalogo, campo), `${donde}: solo se complementan editorial, genero, isbn y sinopsis (el precio, nunca)`);
+      assert.ok(typeof c.valor === 'string' && c.valor.trim() && /^\d{4}-\d{2}-\d{2}$/.test(c.consulta), `${donde}: valor y fecha de consulta`);
+      assert.ok(Array.isArray(c.fuentes) && c.fuentes.length && c.fuentes.every(f => f.nombre && /^https:\/\//.test(f.url)), `${donde}: fuentes con nombre y URL`);
+      assert.ok(c.fuentes.some(f => ['agencia-isbn', 'editorial'].includes(f.tipo)) || new Set(c.fuentes.map(f => new URL(f.url).hostname)).size >= 2, `${donde}: una fuente primaria (agencia ISBN o editorial) o dos independientes`);
+      if (campo === 'isbn') assert.ok(isbnOk(c.valor) && (c.corrige === undefined || (isbnOk(c.corrige) && c.corrige !== c.valor)), `${donde}: ISBN-13 válidos`);
+      else assert.ok(!('corrige' in c), `${donde}: «corrige» es solo para un ISBN de la hoja que es de otro libro`);
+      if (campo === 'sinopsis') assert.ok(c.fuentes.some(f => f.tipo === 'editorial'), `${donde}: la sinopsis es el texto de la editorial`);
+      const hoja = fila[campo];
+      const vacio = hoja === null || hoja === '';
+      const ajeno = campo === 'isbn' && c.corrige !== undefined && digits(hoja) === c.corrige;
+      if (vacio || ajeno) {
+        assert.equal(enCatalogo[campo](b), c.valor, `${donde}: el complemento está aplicado en el catálogo`);
+        assert.ok(fila.avisos.some(a => /complementos\.json/.test(a)), `${donde}: el renglón avisa de que el dato no es de la hoja`);
+        aplicados.push({ book: id, field: campo, consulted: c.consulta, sources: c.fuentes.map(f => f.url) });
+      } else {
+        assert.equal(norm(enCatalogo[campo](b) ?? ''), norm(campo === 'isbn' ? digits(hoja) : hoja), `${donde}: la hoja trae el dato y gana la hoja`);
+      }
+    }
+  }
+  // La copia fiel no se toca: el renglón de «Hipercódex» conserva el ISBN que trae la hoja y el catálogo lleva el suyo.
+  const hiper = data.books.findIndex(b => b.id === 'hipercodex-emmanuel-vizcaya');
+  assert.equal(digits(inv.filas[hiper].isbn), comp.libros['hipercodex-emmanuel-vizcaya'].campos.isbn.corrige);
+  assert.equal(data.books[hiper].n, '9786075954097');
+  assert.equal(book('las-hojas-de-fabre-jesus-ferreiro').n, '9786075954004', 'el ISBN repetido se queda con su libro');
+  // Procedencia: lo aplicado queda registrado, en el mismo orden que la hoja.
+  const orden = id => data.books.findIndex(b => b.id === id);
+  assert.equal(prov.catalogData.complements.registry, 'data/complementos.json');
+  assert.match(prov.catalogData.complements.rule, /gana la hoja/);
+  assert.match(prov.catalogData.note, /título, autor y precio.*salen de la hoja/, 'los campos siempre de la hoja no se mezclan con los complementables');
+  assert.match(prov.catalogData.note, /Editorial, género, ISBN y sinopsis.*complementos\.json/, 'lo complementado no se atribuye solo a la hoja');
+  assert.ok(!/editorial, género, ISBN, sinopsis y precio \(MXN\) salen de la hoja/.test(prov.catalogData.note), 'la nota no dice que todo el inventario sale de la hoja');
+  assert.deepEqual([...prov.catalogData.complements.applied].sort((x, y) => orden(x.book) - orden(y.book) || x.field.localeCompare(y.field)), aplicados.sort((x, y) => orden(x.book) - orden(y.book) || x.field.localeCompare(y.field)), 'assets/provenance.json registra cada complemento aplicado con sus fuentes');
+  // El precio no se busca fuera: es el de la hoja o no hay.
+  data.books.forEach((b, i) => assert.equal(b.pr, Number.isInteger(inv.filas[i].precio) ? inv.filas[i].precio : null, `${b.id}: el precio es el de la hoja`));
+  assert.equal(book('las-ruinas-de-la-caza-alfredo-leal').pr, null, '«Las ruinas de la caza» sigue sin precio hasta que la hoja lo traiga');
+  assert.equal(priceLabel(book('las-ruinas-de-la-caza-alfredo-leal').pr), null, 'sin precio no se imprime nada');
+  // La regla del importador (vacío, ISBN ajeno registrado, gana la hoja) se prueba en Python, que es donde vive.
+  const { spawnSync } = await import('node:child_process');
+  const py = cmd => spawnSync('python3', ['-B', ...cmd], { cwd: here('.'), encoding: 'utf8' });
+  if (py(['-c', 'import openpyxl, PIL']).status !== 0) return t.diagnostic('sin python3 con openpyxl y Pillow: tests/test_import_inventario.py no se corrió aquí');
+  const run = py(['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_import_inventario.py']);
+  assert.equal(run.status, 0, `tests/test_import_inventario.py: ${run.stderr}`);
 });
 test('recursos referenciados existen', async () => {
   const refs = [...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m => m[1]);
@@ -231,7 +309,7 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
   // Portadas de los libros: no son fotos de la casa; cada una registrada con su fuente (las mismas de data/portadas.json).
   assert.equal(prov.covers.dir, 'img/portadas/');
   assert.equal(prov.covers.registry, 'data/portadas.json');
-  assert.match(prov.covers.rule, /Goodreads/);
+  assert.ok(/Goodreads y Amazon/.test(prov.covers.rule) && /carpeta de Drive de la librería/.test(prov.covers.rule) && /no entran al repositorio/.test(prov.covers.rule), 'la norma nombra los dos orígenes de las portadas');
   const covers = new Map(prov.covers.files.map(f => [f.file, f]));
   const onDisk = await readdir(here('./assets/img/portadas'));
   assert.equal(covers.size, onDisk.length, 'una entrada por portada');
@@ -239,7 +317,9 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
     const reg = covers.get(`img/portadas/${f}`);
     assert.ok(reg, `portada sin procedencia: img/portadas/${f}`);
     const src = portadas[reg.book];
-    assert.ok(src && reg.source === src.fuente && reg.url === src.url && reg.isbn === (src.isbn ?? null), `img/portadas/${f}: la procedencia coincide con data/portadas.json`);
+    assert.ok(src && reg.source === src.fuente && reg.url === src.url && reg.isbn === (src.isbn ?? null) && reg.reviewed === src.revisada, `img/portadas/${f}: la procedencia coincide con data/portadas.json`);
+    if (src.fuente === 'Librería') assert.ok(reg.photo === src.foto && reg.driveId === src.drive && /entregada por la librería/.test(reg.origin), `img/portadas/${f}: la procedencia dice que la imagen la entregó la librería, con su clave y su archivo`);
+    else assert.ok(!('photo' in reg) && !('driveId' in reg) && !('origin' in reg), `img/portadas/${f}: una portada de base pública no se registra como imagen de la librería`);
     assert.ok(!kind.has(`img/portadas/${f}`), 'una portada no se registra como foto de la casa');
   }
   assert.ok(!('sampleData' in prov) && /inventario-itinerante\.json/.test(prov.catalogData.origin), 'el origen del catálogo es la hoja de la librería');
@@ -283,7 +363,7 @@ test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
 });
 test('curaduría: los esqueletos ocupan el lugar exacto del contenido y no se animan', async () => {
   assert.equal([...html.matchAll(/class="card-item card--sk"/g)].length, Math.min(PAGE_SIZE, data.books.length), 'un esqueleto por tarjeta de la primera página (hoy, los 41 títulos)');
-  assert.ok(/\.rail-item \{ --card-h: 150cqw; \}/.test(css) && /\.card-item \{ --card-h: calc\(150cqw \+ 80px\); \}/.test(css) && /:is\(\.rail-item, \.card-item\) \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto');
+  assert.ok(/\.rail-item \{ --card-h: 150cqw; \}/.test(css) && /\.card-item \{ --card-h: calc\(150cqw \+ var\(--space-2\) \+ 2lh \+ var\(--space-1\) \+ 2lh\); \}/.test(css) && /:is\(\.rail-item, \.card-item\) \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto');
   assert.ok(!/class="sk-line/.test(/data-rail-track[\s\S]*?<\/ul>/.exec(html)[0]), 'el esqueleto del carrusel es solo la portada');
   assert.ok(/class="card-item card--sk" aria-hidden="true"><span class="card"><span class="cover"><\/span><span class="card-t">&nbsp;<\/span><span class="card-m">&nbsp;<\/span><\/span><\/li>/.test(html) && /\.card-t \{[^}]*min-height: 2lh;/.test(css), 'el esqueleto de la rejilla lleva los renglones del título (dos, reservados) y de «autor · precio»');
   assert.ok(/data-rail-chips>(<span class="sk-chip" aria-hidden="true"><\/span>){3,}<\/div>/.test(html), 'el esqueleto del carrusel reserva la fila de chips');
@@ -1214,8 +1294,18 @@ test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → 
   assert.equal(foldView(41, 5, { filtering: true }).folded, false, 'con búsqueda o filtros, los resultados completos');
   assert.equal(foldView(41, 2, { inline: false }).fold, false, 'en la hoja del teléfono no se pliega');
   assert.equal(foldView(8, 5).fold, false, 'si caben en dos filas, no hay botón');
+  // Más de PAGE_SIZE títulos: «Ver los N títulos» enseña los N (antes desplegaba una página y «Ver más» no volvía: el resto quedaba inalcanzable).
+  const N = PAGE_SIZE + 12;
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4)), { count: PAGE_SIZE, left: 12, more: false, label: '' }, 'plegada: dos filas y solo el botón de plegado, sin «Ver más» suelto');
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4, { expanded: true })), { count: N, left: 0, more: false, label: '' }, 'desplegada en línea: todos los títulos de una vez');
+  assert.deepEqual(pageView(N, N, foldView(N, 4)), { count: N, left: 0, more: false, label: '' }, 'al volver a plegar no queda «Ver más»');
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 2, { inline: false })), { count: PAGE_SIZE, left: 12, more: true, label: 'Ver 12 más · quedan 12' }, 'la hoja del teléfono pagina');
+  assert.deepEqual(pageView(PAGE_SIZE * 2 + 5, PAGE_SIZE, foldView(PAGE_SIZE * 2 + 5, 4, { filtering: true })), { count: PAGE_SIZE, left: PAGE_SIZE + 5, more: true, label: `Ver ${PAGE_SIZE} más · quedan ${PAGE_SIZE + 5}` }, 'con búsqueda o filtros, por páginas también en línea');
+  assert.deepEqual(pageView(N, PAGE_SIZE * 2, foldView(N, 2, { inline: false })), { count: N, left: 0, more: false, label: '' }, 'la última página no pasa del total');
+  for (const view of [foldView(41, 5), foldView(41, 5, { expanded: true }), foldView(41, 5, { filtering: true }), foldView(41, 2, { inline: false })]) assert.deepEqual(pageView(41, PAGE_SIZE, view), { count: 41, left: 0, more: false, label: '' }, 'con 41 títulos todo cabe en una página: nunca hay «Ver más»');
   assert.ok(/<button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid" hidden><\/button>/.test(libros) && /<ul class="cat-grid" id="cat-grid"/.test(libros), 'el botón nombra la rejilla que controla (aria-expanded, aria-controls)');
   const catJs = readFileSync_('catalog.js');
+  assert.ok(/const page = pageView\(results\.length, state\.shown, v\);/.test(catJs) && /moreBtn\.hidden = !page\.more;/.test(catJs) && !/moreBtn\.hidden = moreBtn\.hidden \|\|/.test(catJs), '«Ver más» sale de pageView cada vez que se pliega o despliega');
   assert.ok(/window\.scrollBy\(0, foldBtn\.getBoundingClientRect\(\)\.top - y\)/.test(catJs) && !/foldBtn[^;\n]*\.blur\(|focus\(\)[^;\n]*foldBtn/.test(catJs), 'al plegar el botón se queda bajo el cursor y conserva el foco');
   assert.ok(/@media \(min-width: 761px\) \{ \.cat-grid\[aria-busy="true"\] \{ grid-template-rows: auto auto; grid-auto-rows: 0; row-gap: 0; overflow: clip; margin-bottom: var\(--alto-md\); \}/.test(cssFlat), 'el esqueleto reserva lo mismo que la rejilla plegada (dos filas y el botón)');
   assert.ok(!/class="ask"|data-topic|data-composer|book-query|ask-title|topic-stage|rail-all|cat-lede/.test(libros), 'sin «Pregúntanos» (foto del tema, redactor, Crónica e Infantil), sin «Ver todo el catálogo» y sin entradilla de Explora');
@@ -1225,6 +1315,58 @@ test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → 
   assert.ok(/\.explore-open \{[^}]*display: flex;[^}]*min-height: var\(--alto-md\);/.test(cssFlat) && /\.explore-open \{ width: 100%; \}/.test(mobileCss), 'la búsqueda tiene cara de campo de 48 px en todo ancho; a lo ancho en el teléfono');
   assert.ok(/\.cat-head \{ position: absolute; width: 1px; height: 1px;/.test(mobileCss) && /\.books > \.cat \{ margin: 0; padding: 0; border: 0; \}/.test(mobileCss), 'en el teléfono «Explora el catálogo» es solo la hoja: su titular queda para lectores de pantalla y no deja hueco');
   assert.ok(/data-open-mylist/.test(html) && /href="#catalogo"/.test(libros), 'siguen las rutas a Explorar y a Mi lista');
+});
+test('rejilla: render con más de PAGE_SIZE títulos aplica pliegue, «Ver más» y la línea de estado', () => {
+  const mk = i => ({ id: `tmp-${i}`, t: `Título ${String(i).padStart(2, '0')}`, a: 'Autor', p: 'Ed', y: null, f: null, g: null, k: 'literatura', n: null, c: null, cw: null, ch: null, pg: null, lg: 'es', s: null, pr: 250 });
+  const total = PAGE_SIZE + 12;
+  const books = Array.from({ length: total }, (_, i) => mk(i));
+  const results = () => sortBooks(books, 'az', '');
+  const cols = 4;
+  const grid = { children: [] };
+  let shown = PAGE_SIZE;
+  let expanded = false;
+  const ui = { foldHidden: true, moreHidden: true, foldLabel: '', moreLabel: '', status: '' };
+  const filtering = () => false;
+  const inline = true;
+  // Réplica mínima de renderGrid + applyFold (catalog.js): pinta tarjetas y luego recalcula pliegue y paginación.
+  const renderGrid = () => {
+    grid.children = results().slice(0, shown).map(b => ({ id: b.id, hidden: false }));
+    applyFold();
+  };
+  const applyFold = () => {
+    const v = foldView(results().length, cols, { inline, filtering: filtering(), expanded });
+    const page = pageView(results().length, shown, v);
+    if (grid.children.length < page.count) grid.children.push(...results().slice(grid.children.length, page.count).map(b => ({ id: b.id, hidden: false })));
+    shown = Math.max(shown, page.count);
+    grid.children.forEach((li, i) => { li.hidden = i >= v.limit; });
+    ui.foldHidden = !v.fold;
+    ui.moreHidden = !page.more;
+    ui.foldLabel = v.label;
+    ui.moreLabel = page.label;
+    const n = results().length;
+    ui.status = !n ? 'No hay títulos con esa combinación.' : page.more ? `Mostrando ${page.count} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
+  };
+  renderGrid();
+  assert.equal(grid.children.length, PAGE_SIZE, 'plegada: una página en el DOM');
+  assert.equal(grid.children.filter(li => !li.hidden).length, cols * FOLD_ROWS, 'plegada: solo dos filas visibles');
+  assert.equal(ui.status, `${total} títulos`);
+  assert.ok(ui.foldHidden === false && ui.foldLabel === `Ver los ${total} títulos`, 'botón de plegado con el total');
+  assert.ok(ui.moreHidden, 'plegada en línea: sin «Ver más»');
+  expanded = true;
+  applyFold();
+  assert.equal(grid.children.length, total, 'desplegada: todas las tarjetas');
+  assert.equal(grid.children.filter(li => !li.hidden).length, total);
+  assert.equal(ui.foldLabel, 'Ver menos');
+  assert.ok(ui.moreHidden);
+  expanded = false;
+  shown = PAGE_SIZE;
+  grid.children = results().slice(0, shown).map(b => ({ id: b.id, hidden: false }));
+  const vSheet = foldView(total, 2, { inline: false });
+  const pageSheet = pageView(total, shown, vSheet);
+  assert.ok(pageSheet.more && pageSheet.label === 'Ver 12 más · quedan 12', 'en la hoja del teléfono aparece «Ver más»');
+  assert.equal(`Mostrando ${pageSheet.count} de ${total} títulos.`, `Mostrando ${PAGE_SIZE} de ${total} títulos.`, 'línea de estado con el avance');
+  const renderGridBody = readFileSync_('catalog.js').match(/function renderGrid\(\{[\s\S]*?\n  \}/)?.[0] ?? '';
+  assert.ok(/applyFold\(\)/.test(renderGridBody), 'renderGrid invoca applyFold tras actualizar la rejilla');
 });
 test('cierre de Libros: una frase y «Cómo llegar» en el mismo bloque, sin vacío tras el buscador ni rellenos con vh', () => {
   const foot = html.match(/<div class="books-foot">[\s\S]*?<\/div>/)[0];
@@ -1502,7 +1644,7 @@ test('barra inferior (BarraInferior): cápsula de vidrio de 49 px con Inicio, Ca
   assert.ok(/\.tabbar a\[aria-current\] \.tab-ic \{ fill: currentColor; fill-opacity: 0\.18; stroke-width: 2\.1;/.test(mobileFlat) && /\.tabbar a\[aria-current\] \{ color: var\(--en-menta\); \}/.test(mobileFlat), 'lo actual no depende solo del color: icono relleno y trazo más grueso');
   assert.ok(!/\.tabbar a\[aria-current\][^{]*\{[^}]*(?<![-\w])(width|height|padding|margin|font)\s*:/.test(mobileFlat), 'la casilla actual no cambia de tamaño');
   assert.ok(/html\.sheet-open \.tabbar \{ translate: -50% calc\(100% \+ var\(--space-6\)\); opacity: 0; \}/.test(mobileFlat), 'con una hoja abierta la barra baja y se oculta');
-  assert.ok(/\.ftr \{ padding-bottom: calc\(var\(--alto-barra-inferior\) \+ env\(safe-area-inset-bottom, 0px\) \+ var\(--space-8\)\); \}/.test(mobileFlat), 'el final de la página deja libre la barra más el área segura');
+  assert.ok(/\.ftr \{ padding-bottom: calc\(var\(--alto-barra-inferior\) - 1px \+ env\(safe-area-inset-bottom, 0px\) \+ var\(--space-8\)\); \}/.test(mobileFlat), 'el final de la página deja libre la barra más el área segura (80 px en la cuadrícula de 4)');
   assert.ok(/\.tabbar \{ display: none; \}/.test(cssFlat) && /<link rel="stylesheet" href="mobile\.css" media="\(max-width: 760px\)">/.test(html), 'solo en el teléfono');
   assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileFlat), 'sin JavaScript no se muestra (Mi lista lo necesita)');
 });
@@ -1593,7 +1735,7 @@ test('controles: 48 estándar, 44 en línea y en las barras, 56 principales; chi
   assert.ok(/\.chip\[aria-checked="true"\], \.cat-filters-btn\[aria-expanded="true"\], \.cat-chip \{ background: var\(--primario\); color: var\(--en-primario\); \}/.test(cssFlat) && /\.chip\[aria-checked="true"\]::before, \.rail-chip\.is-hojeada::before \{ content: "";[^}]*mask: url\("data:image\/svg\+xml/.test(cssFlat), 'chip elegido en primario con la palomita: la forma acompaña al color');
   assert.ok(/\.cat-bar input\[type="search"\] \{[^}]*min-height: var\(--alto-md\);[^}]*border-radius: var\(--radio-pildora\); background: var\(--fondo-3\);[^}]*font: var\(--t-campo\);/.test(cssFlat), 'campo de 48 px en píldora, letra de 17 px');
   assert.ok(/\.cat-bar input\[type="search"\]:focus \{ background: var\(--fondo\); box-shadow: inset 0 0 0 2px var\(--linea-fuerte\);/.test(cssFlat), 'con foco: fondo de la página y borde linea-fuerte');
-  assert.ok(/\.rail-chips \{ display: flex; flex-wrap: nowrap; align-items: center; gap: var\(--space-2\); \}/.test(cssFlat) && /\.entry-actions \{[^}]*gap: var\(--space-3\);/.test(cssFlat) && /\.drawer-actions \{[^}]*gap: var\(--space-3\);/.test(cssFlat) && /\.menu-acciones \{[^}]*gap: var\(--space-3\);/.test(cssFlat), '8 px entre vecinos, 12 dentro de un grupo de acciones');
+  assert.ok(/\.rail-chips \{ display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: var\(--space-2\); width: 100%; \}/.test(cssFlat) && /\.entry-actions \{[^}]*gap: var\(--space-3\);/.test(cssFlat) && /\.drawer-actions \{[^}]*gap: var\(--space-3\);/.test(cssFlat) && /\.menu-acciones \{[^}]*gap: var\(--space-3\);/.test(cssFlat), '8 px entre vecinos, 12 dentro de un grupo de acciones');
   assert.ok(/\.save \{[^}]*width: var\(--alto-sm\); height: var\(--alto-sm\);[^}]*background: var\(--vidrio\);/.test(cssFlat), 'Guardar sobre la portada: vidrio de 44 (flota sobre una imagen)');
   assert.ok(/\.ml-remove \{[^}]*width: var\(--alto-md\); height: var\(--alto-md\);/.test(cssFlat) && /\.menu-row \{[^}]*min-height: var\(--alto-lg\);/.test(cssFlat), 'quitar de la lista 48, filas del menú 56');
   const qa = readFileSync_('tools/qa/controles.mjs');
@@ -1690,7 +1832,7 @@ test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té y 
   const app = readFileSync_('app.js');
   assert.ok(/nearby\(\$\('\[data-cafe\]'\), \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app), 'se carga al acercarse');
   assert.ok(/<a href="#cafe">Café<\/a>/.test(html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0]) && /<a class="menu-row" href="#cafe"><span>Café y té<\/span>/.test(html) && !/#cafe/.test(html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0]), 'en la barra de escritorio y el menú; la barra inferior no cambia');
-  assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.cafe \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-carta \{ grid-column: 1 \/ -1; grid-row: 2; justify-items: center;/.test(css) && /\.bill > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'escritorio (A6, afinada el 2026-11-13): encabezados en dos columnas; en Café, titular y foto arriba y la carta a todo el ancho debajo, centrada como los otros carruseles');
+  assert.ok(/@media \(min-width: 667px\) \{[\s\S]*?\.cafe \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-carta \{ grid-column: 1 \/ -1; grid-row: 2; justify-items: center;/.test(css) && /\.bill > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'A6: Café en dos columnas desde 667 px (apaisado); encabezados de Catálogo y Eventos desde 1024 px');
   assert.ok(/data-cafe-status><\/p>\s*<\/div>/.test(sec), 'la carta termina en su carrusel (mismo bloque en el teléfono y en escritorio)');
   const [prep, prev] = [readFileSync_('scripts/prepare-public.mjs'), readFileSync_('tools/preview-site.mjs')];
   assert.ok(/"carousel3d\.js"/.test(prep) && /"cafe\.js"/.test(prep) && /"assets\/data\/menu\.json"/.test(prep) && /'\/carousel3d\.js', '\/cafe\.js'/.test(prev), 'se publican el motor, la carta y su JSON');
