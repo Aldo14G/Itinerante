@@ -1316,6 +1316,58 @@ test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → 
   assert.ok(/\.cat-head \{ position: absolute; width: 1px; height: 1px;/.test(mobileCss) && /\.books > \.cat \{ margin: 0; padding: 0; border: 0; \}/.test(mobileCss), 'en el teléfono «Explora el catálogo» es solo la hoja: su titular queda para lectores de pantalla y no deja hueco');
   assert.ok(/data-open-mylist/.test(html) && /href="#catalogo"/.test(libros), 'siguen las rutas a Explorar y a Mi lista');
 });
+test('rejilla: render con más de PAGE_SIZE títulos aplica pliegue, «Ver más» y la línea de estado', () => {
+  const mk = i => ({ id: `tmp-${i}`, t: `Título ${String(i).padStart(2, '0')}`, a: 'Autor', p: 'Ed', y: null, f: null, g: null, k: 'literatura', n: null, c: null, cw: null, ch: null, pg: null, lg: 'es', s: null, pr: 250 });
+  const total = PAGE_SIZE + 12;
+  const books = Array.from({ length: total }, (_, i) => mk(i));
+  const results = () => sortBooks(books, 'az', '');
+  const cols = 4;
+  const grid = { children: [] };
+  let shown = PAGE_SIZE;
+  let expanded = false;
+  const ui = { foldHidden: true, moreHidden: true, foldLabel: '', moreLabel: '', status: '' };
+  const filtering = () => false;
+  const inline = true;
+  // Réplica mínima de renderGrid + applyFold (catalog.js): pinta tarjetas y luego recalcula pliegue y paginación.
+  const renderGrid = () => {
+    grid.children = results().slice(0, shown).map(b => ({ id: b.id, hidden: false }));
+    applyFold();
+  };
+  const applyFold = () => {
+    const v = foldView(results().length, cols, { inline, filtering: filtering(), expanded });
+    const page = pageView(results().length, shown, v);
+    if (grid.children.length < page.count) grid.children.push(...results().slice(grid.children.length, page.count).map(b => ({ id: b.id, hidden: false })));
+    shown = Math.max(shown, page.count);
+    grid.children.forEach((li, i) => { li.hidden = i >= v.limit; });
+    ui.foldHidden = !v.fold;
+    ui.moreHidden = !page.more;
+    ui.foldLabel = v.label;
+    ui.moreLabel = page.label;
+    const n = results().length;
+    ui.status = !n ? 'No hay títulos con esa combinación.' : page.more ? `Mostrando ${page.count} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
+  };
+  renderGrid();
+  assert.equal(grid.children.length, PAGE_SIZE, 'plegada: una página en el DOM');
+  assert.equal(grid.children.filter(li => !li.hidden).length, cols * FOLD_ROWS, 'plegada: solo dos filas visibles');
+  assert.equal(ui.status, `${total} títulos`);
+  assert.ok(ui.foldHidden === false && ui.foldLabel === `Ver los ${total} títulos`, 'botón de plegado con el total');
+  assert.ok(ui.moreHidden, 'plegada en línea: sin «Ver más»');
+  expanded = true;
+  applyFold();
+  assert.equal(grid.children.length, total, 'desplegada: todas las tarjetas');
+  assert.equal(grid.children.filter(li => !li.hidden).length, total);
+  assert.equal(ui.foldLabel, 'Ver menos');
+  assert.ok(ui.moreHidden);
+  expanded = false;
+  shown = PAGE_SIZE;
+  grid.children = results().slice(0, shown).map(b => ({ id: b.id, hidden: false }));
+  const vSheet = foldView(total, 2, { inline: false });
+  const pageSheet = pageView(total, shown, vSheet);
+  assert.ok(pageSheet.more && pageSheet.label === 'Ver 12 más · quedan 12', 'en la hoja del teléfono aparece «Ver más»');
+  assert.equal(`Mostrando ${pageSheet.count} de ${total} títulos.`, `Mostrando ${PAGE_SIZE} de ${total} títulos.`, 'línea de estado con el avance');
+  const renderGridBody = readFileSync_('catalog.js').match(/function renderGrid\(\{[\s\S]*?\n  \}/)?.[0] ?? '';
+  assert.ok(/applyFold\(\)/.test(renderGridBody), 'renderGrid invoca applyFold tras actualizar la rejilla');
+});
 test('cierre de Libros: una frase y «Cómo llegar» en el mismo bloque, sin vacío tras el buscador ni rellenos con vh', () => {
   const foot = html.match(/<div class="books-foot">[\s\S]*?<\/div>/)[0];
   assert.ok(/<p>[^<]+<\/p>/.test(foot) && (foot.match(/btn--primario/g) || []).length === 1, 'frase + una sola primaria');
