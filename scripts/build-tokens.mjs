@@ -40,6 +40,7 @@ export function renderSite(tokens) {
   group('Controles', own(s.control));
   group('Barras y márgenes', own(s.medidas));
   group('Vidrio', own(s.filtro));
+  group('Profundidad (carrusel 3D y tarjeta que voltea)', own(s.profundidad ?? {}));
   group('Movimiento', [...own(s.duration), ...own(s.easing)]);
   group('Tiempos de JavaScript (no son transiciones)', own(s.tiempo));
   group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);

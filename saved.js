@@ -77,7 +77,8 @@ function paint(btn) {
   btn.setAttribute('aria-pressed', String(on));
   const label = btn.querySelector('[data-save-label]');
   if (label) { // con texto visible, el nombre accesible lo contiene (WCAG 2.5.3): el título va oculto detrás, no en aria-label
-    label.textContent = on ? 'Guardado en mi lista · Quitar' : 'Guardar en mi lista';
+    // Rótulo corto («Guardar» / «Guardado»): el reverso de la tarjeta y la fila de redes de la ficha; el estado lo dice aria-pressed.
+    label.textContent = 'saveShort' in btn.dataset ? (on ? 'Guardado' : 'Guardar') : on ? 'Guardado en mi lista · Quitar' : 'Guardar en mi lista';
     btn.removeAttribute('aria-label');
     let sr = btn.querySelector('[data-save-title]');
     if (!sr) { sr = document.createElement('span'); sr.className = 'sr-only'; sr.dataset.saveTitle = ''; btn.append(sr); }
@@ -85,14 +86,16 @@ function paint(btn) {
   } else btn.setAttribute('aria-label', on ? `Quitar «${title}» de mi lista` : `Guardar «${title}» en mi lista`);
 }
 
-export function saveButton(book, { wide = false } = {}) {
+// `reverso`: el botón de icono (44 px, menta) del reverso de la tarjeta que voltea; su rótulo corto va oculto a la vista y es su nombre.
+export function saveButton(book, { wide = false, reverso = false } = {}) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = wide ? 'save save--wide' : 'save';
+  btn.className = reverso ? 'save save--wide save--icono save--reverso' : wide ? 'save save--wide' : 'save';
+  if (reverso) btn.dataset.saveShort = '';
   btn.dataset.saveId = book.id;
   btn.dataset.saveTitle = book.t;
   btn.append(icon('i-mark'));
-  if (wide) { const l = document.createElement('span'); l.dataset.saveLabel = ''; btn.append(l); }
+  if (wide || reverso) { const l = document.createElement('span'); l.dataset.saveLabel = ''; if (reverso) l.className = 'sr-only'; btn.append(l); }
   paint(btn);
   return btn;
 }
@@ -222,6 +225,7 @@ export function initSaved() {
       if (res.on) pickPop(save); // rebote solo por el toque: los marcadores que se pintan ya guardados no rebotan
       afterPaint(() => { // el aviso (capa superior) va después de pintar
         if (res.full) toast(`Tu lista llegó a ${MAX_SAVED} libros: quita alguno para sumar otro.`, true);
+        else if (save.closest('.redes')) return; // en la fila de redes de la ficha el botón ya dice «Guardado»: el aviso taparía Instagram, Facebook y Compartir
         else if (res.on) toast('Guardado en tu lista para la visita.');
         else toast('Quitado de tu lista.', false);
       });

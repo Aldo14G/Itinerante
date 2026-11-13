@@ -36,20 +36,25 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
   await sleep(4500);
   await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
   await sleep(2500); await ev(`scrollBy(0, 1)`); await sleep(800);
+  // El carrusel 3D, a media ventana: el aviso de «Guardado» (abajo, sobre la barra) no tapa el «Guardar» de la portada del centro.
+  await ev(`scrollTo(0, document.querySelector('[data-rail-viewport]').getBoundingClientRect().top + scrollY - 160)`); await sleep(800);
 
   // Mi lista: en el teléfono, la casilla de la barra inferior; en escritorio, el botón de la barra de arriba. Siempre a mano; el disco del conteo aparece con libros.
   const ENTRY = mobile ? '.tabbar .tab-list' : '.hdr-list';
   const st = await ev(`(() => {
+    // Carrusel 3D: cada portada trae su «Guardar», pero solo el de la portada del centro está a la vista (en una vecina girada no se tocaría bien).
     const b = [...document.querySelectorAll('[data-rail] .save')];
-    const small = b.filter(x => { const r = x.getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); }).length;
-    return { n: b.length, pressed: b.filter(x => x.getAttribute('aria-pressed') === 'true').length, label: b[0]?.getAttribute('aria-label'), small, menuCount: document.querySelector('#menu [data-saved-count]')?.textContent, badgeHidden: document.querySelector('${ENTRY} [data-saved-dot]')?.hidden };
+    const shown = b.filter(x => getComputedStyle(x).visibility !== 'hidden');
+    const small = shown.filter(x => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length;
+    return { n: b.length, shown: shown.length, centro: !!shown[0]?.closest('.rail-item.is-centro'), pressed: b.filter(x => x.getAttribute('aria-pressed') === 'true').length, label: b[0]?.getAttribute('aria-label'), small, menuCount: document.querySelector('#menu [data-saved-count]')?.textContent, badgeHidden: document.querySelector('${ENTRY} [data-saved-dot]')?.hidden };
   })()`);
-  ck(name + ': cada libro del carrusel tiene botón de guardar de 44px con nombre', st.n === 12 && st.pressed === 0 && /^Guardar «/.test(st.label) && st.small === 0, JSON.stringify(st));
+  ck(name + ': cada libro del carrusel tiene botón de guardar de 44px con nombre; a la vista, solo el de la portada del centro', st.n === 12 && st.shown === 1 && st.centro && st.pressed === 0 && /^Guardar «/.test(st.label) && st.small === 0, JSON.stringify(st));
   ck(name + ': lista vacía al inicio', st.menuCount === 'Vacía' && st.badgeHidden === true, JSON.stringify(st));
 
-  // guardar dos libros con clic real
-  const pos = await ev(`(() => { const b = document.querySelectorAll('[data-rail] .save'); return [0, 1].map(i => { const r = b[i].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }); })()`);
-  for (const [x, y] of pos) {
+  // guardar dos libros con clic real: el del centro, luego la flecha «Libro siguiente» y el nuevo centro
+  for (let i = 0; i < 2; i++) {
+    if (i) { await ev(`document.querySelector('[data-rail-next]').click(), true`); await sleep(1500); }
+    const [x, y] = await ev(`(() => { const r = document.querySelector('[data-rail] .rail-item.is-centro .save').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
     await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
     await sleep(500);
@@ -123,8 +128,8 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
 
   // guardar desde la ficha
   await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`); await sleep(2500); await ev(`scrollBy(0, 1)`); await sleep(800);
-  for (let i = 0; i < 30 && !(await ev(`!!document.querySelector('[data-rail] button.card[data-id]')`)); i++) await sleep(300);
-  await ev(`document.querySelector('[data-rail] button.card').click()`);
+  for (let i = 0; i < 30 && !(await ev(`!!document.querySelector('[data-rail] .rail-item.is-centro button.card[data-id]')`)); i++) await sleep(300);
+  await ev(`document.querySelector('[data-rail] .rail-item.is-centro button.card').click()`);
   for (let i = 0; i < 40; i++) { await sleep(200); if (await ev(`document.getElementById('cat-drawer')?.open`)) break; }
   await sleep(1000);
   console.log('DIAG', name, JSON.stringify(await ev(`({ drawerOpen: document.getElementById('cat-drawer')?.open, ready: document.getElementById('catalogo').dataset.ready, state: document.getElementById('catalogo').dataset.state, status: document.querySelector('[data-cat-status]')?.textContent, modalOpen: [...document.querySelectorAll('dialog[open]')].map(d => d.id), popovers: [...document.querySelectorAll(':popover-open')].length })`)), JSON.stringify(errs));

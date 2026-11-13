@@ -3,13 +3,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { readFile, access, readdir } from 'node:fs/promises';
-import { pickBooks, stopIcon, STOP_ICON, trailProgress, readTrail, writeTrail, TRAIL_KEY } from '../rail.js';
+import { pickBooks, stopIcon, STOP_ICON, trailProgress, readTrail, writeTrail, TRAIL_KEY, coverflowPose, nearestIndex, captionOf, CF_GIRO } from '../rail.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { buildMessage, ctaText, waUrl, openingStatus, monterreyNow, TOPICS } from '../app.js';
-import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
+import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS, shelfPlan, STATUS_ALL } from '../news.js';
 import { readInterest, shareName, initFeed, eventBadge, NO_DATE } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, INSTAGRAM, FACEBOOK, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -273,7 +273,7 @@ test('curaduría: sin relleno de maqueta ni elementos retirados', () => {
 });
 test('curaduría: los esqueletos ocupan el lugar exacto del contenido y no se animan', async () => {
   assert.equal([...html.matchAll(/class="card-item card--sk"/g)].length, PAGE_SIZE, 'un esqueleto por tarjeta de la primera página');
-  assert.ok(/--card-h: 150cqw;/.test(css) && /:is\(\.rail-item, \.card-item\) > \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto');
+  assert.ok(/--card-h: 150cqw;/.test(css) && /:is\(\.rail-item, \.card-item\) \.card \{ min-height: var\(--card-h\)/.test(css), 'tarjeta y esqueleto comparten una sola regla de alto (también dentro de las caras de la tarjeta que voltea)');
   assert.ok(!/class="sk-line/.test(/data-rail-track[\s\S]*?<\/ul>/.exec(html)[0]) && !/class="card-item card--sk"[^>]*><span class="card"><span class="cover"><\/span><span class="sk-line/.test(html), 'el esqueleto de tarjeta es solo la portada: el título y el autor van dentro de ella');
   assert.ok(/data-rail-chips>(<span class="sk-chip" aria-hidden="true"><\/span>){3,}<\/div>/.test(html), 'el esqueleto del carrusel reserva la fila de paradas');
   const reserved = html.match(/data-rail-chips>((?:<span class="sk-chip" aria-hidden="true"><\/span>)+)<\/div>/)[1].split('sk-chip').length - 1;
@@ -442,7 +442,7 @@ test('ficha: sinopsis y precio de la hoja de la librería; sin dato, sin rengló
 test('portadas: la ficha repite el tono de la tarjeta pulsada y la composición vive en CSS', async () => {
   const [cat, rail, news] = await Promise.all(['catalog.js', 'rail.js', 'news.js'].map(f => readFile(here(`./${f}`), 'utf8')));
   assert.ok(/data-cover-tone/.test(cat) && /dataset\.coverTone/.test(cat) && /dataset\.coverTone/.test(rail), 'la tarjeta guarda su tono');
-  assert.ok(/openBook\(id, \{ trigger, tone \}/.test(cat) && /cover\(b, tone\)/.test(cat), 'la ficha usa el tono recibido');
+  assert.ok(/openBook\(id, \{ trigger, tone, redes = false \}/.test(cat) && /cover\(b, tone\)/.test(cat), 'la ficha usa el tono recibido');
   assert.ok(/iti:open-book[\s\S]{0,160}tone: toneOf\(card\)/.test(rail), 'el carrusel manda el tono con la petición');
   assert.ok(/coverTones\(list\)/.test(rail) && /coverTones\(plan\.books\)/.test(news), 'carrusel y Novedades reparten tonos por lista');
   for (let i = 1; i < COVER_LAYOUTS; i++) assert.ok(css.includes(`[data-cover-layout="${i}"]`), `falta la composición ${i}`);
@@ -495,15 +495,15 @@ test('servidor de vista previa: lista de permitidos del sitio, sin código, prue
 test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimentado por colecciones', async () => {
   const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.ok(/data-rail-viewport[^>]*role="region"[^>]*aria-roledescription="carrusel"/.test(rail) || /role="region" aria-roledescription="carrusel"[^>]*data-rail-viewport/.test(rail), 'región con rol de carrusel');
-  assert.ok(/tabindex="0"/.test(rail) && /aria-label="Libros anteriores"/.test(rail) && /aria-label="Libros siguientes"/.test(rail), 'foco y botones con nombre');
+  assert.ok(/aria-label="Libro anterior"/.test(rail) && /aria-label="Libro siguiente"/.test(rail) && !/data-rail-viewport[^>]*tabindex|tabindex[^>]*data-rail-viewport/.test(rail), 'flechas con nombre; la parada de tabulador es la portada del centro (no la ventana del carrusel)');
   assert.ok(/aria-live="polite" data-rail-live/.test(rail), 'aviso al cambiar de colección');
   assert.ok(/html:not\(\.js\) \.rail \{?[^}]*display: none|\.rail\[hidden\], html:not\(\.js\) \.rail \{ display: none; \}/.test(css), 'sin JS no se muestra');
   assert.ok(/scroll-snap-type: x mandatory/.test(css) && !/rail[^{]*\{[^}]*animation/.test(css), 'snap y sin animación automática');
-  assert.ok(/\(hover: hover\) and \(pointer: fine\) \{ \.rail-ctrl \{ display: flex; \}/.test(css), 'flechas solo con puntero fino');
+  assert.ok(/<div class="cf-pie">\s*<button class="btn btn--secundario btn--icono rail-btn"[^>]*data-rail-prev/.test(rail) && !/\.rail-ctrl/.test(css), 'flechas de 48 px a los lados del título del libro del centro, en todo ancho (alternativa de un toque al deslizar, WCAG 2.5.7)');
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
   assert.ok(/import\('\.\/rail\.js'\)/.test(app) && !/^import .*rail\.js/m.test(app), 'se carga bajo demanda');
   const railJs = await readFile(new URL('../rail.js', import.meta.url), 'utf8');
-  assert.ok(/track\.addEventListener\('focusin'[\s\S]{0,500}scrollPaddingInlineStart[\s\S]{0,300}viewport\.scrollBy\(\{ left: b\.left - v\.left - pad, behavior: isMotion\(\)/.test(railJs), 'Tab: la tarjeta enfocada que asoma recortada se alinea dentro del carrusel');
+  assert.ok(/card\.focus\(\{ preventScroll: true \}\)/.test(railJs) && /n\.querySelector\('\.card'\)\.tabIndex = k === i \? 0 : -1/.test(railJs), 'teclado: las flechas mueven el centro y el foco (sin que el navegador desplace la portada enfocada por su cuenta)');
   const cols = JSON.parse(await readFile(new URL('../assets/data/collections.json', import.meta.url), 'utf8'));
   const sample = JSON.parse(await readFile(new URL('../assets/data/catalog.json', import.meta.url), 'utf8'));
   assert.equal(cols.meta.kind, 'inventario');
@@ -832,7 +832,7 @@ const SAMPLE_META = { kind: 'sample', label: 'Datos de muestra · no es inventar
 
 const HOY = '2026-11-11'; // las pruebas de fechas no dependen del reloj
 const entry = (i, llegada) => ({ id: data.books[i].id, llegada });
-test('Novedades: sin entradas válidas el plan no muestra nada, ni siquiera todo el catálogo', () => {
+test('Novedades: sin entradas válidas no hay llegadas que contar (ni punto ni control; la tira es el catálogo completo, ver shelfPlan)', () => {
   const sinDatos = [{ meta: SAMPLE_META }, { meta: SAMPLE_META, novedades: {} }, { meta: SAMPLE_META, novedades: { entradas: [] } }, { novedades: { entradas: [{ id: 'no-existe', llegada: '2026-11-01' }, { id: 'tampoco', llegada: '2026-11-02' }] } },
     { novedades: { entradas: 'x' } }, { novedades: { entradas: [{ llegada: '2026-11-01' }, null, 'libro', { id: 7, llegada: '2026-11-01' }] } }, { novedades: { entradas: [entry(0, '2026-12-24')] } }, { novedades: { ids: [] } }, { novedades: { ids: ['no-existe'] } }, null, undefined];
   for (const d of sinDatos) {
@@ -842,7 +842,7 @@ test('Novedades: sin entradas válidas el plan no muestra nada, ni siquiera todo
     assert.equal(plan.n, 0, 'sin entradas no hay nada que contar');
   }
 });
-test('Novedades: toda entrada que exista es un libro real con fecha válida; con la lista vacía el capítulo no existe', async () => {
+test('Novedades: toda entrada que exista es un libro real con fecha válida; con la lista vacía no hay llegadas ni «Nuevo»', async () => {
   const shipped = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8'));
   const list = shipped.novedades.entradas;
   assert.ok(Array.isArray(list), 'la fuente es una lista');
@@ -862,16 +862,17 @@ test('Novedades: toda entrada que exista es un libro real con fecha válida; con
     assert.equal(plan.show, true);
     assert.deepEqual(plan.ids, newsEntries(shipped, HOY).filter(e => byId.has(e.id)).slice(0, NEWS_SIZE).map(e => e.id), 'lo más reciente primero, hasta NEWS_SIZE');
   } else {
-    // Hoy: la librería no ha registrado fechas de llegada. Sin entradas no hay plan, ni conteo temprano, ni tarjetas.
-    assert.equal(plan.show, false, 'sin entradas no se muestra el capítulo');
+    // Hoy: la librería no ha registrado fechas de llegada. Sin entradas no hay llegadas, ni conteo temprano, ni «Nuevo» (la tira es el catálogo).
+    assert.equal(plan.show, false, 'sin entradas no hay llegadas que contar');
     assert.deepEqual([plan.books, plan.ids, plan.n], [[], [], 0]);
     assert.equal(newsPlan(null, shipped, { hoy: HOY }).show, false, 'el conteo temprano (sin catálogo) tampoco muestra nada');
     assert.match(shipped.meta.nota, /vac[ií]a mientras la librer[ií]a no registre fechas de llegada/, 'la nota del JSON dice cómo activarla');
   }
-  // Lo que hace la interfaz con un plan vacío: oculta sección, enlaces, punto y control, recuerda «n» para boot.js y no pinta la tira.
+  // Lo que hace la interfaz sin llegadas: la sección y sus enlaces siguen (con JavaScript existen siempre); sin punto ni control en el inicio.
   const news = await readFile(here('./news.js'), 'utf8');
   const apply = news.slice(news.indexOf('function apply('), news.indexOf('export function initNewsCount'));
-  assert.ok(/if \(section\) section\.hidden = !plan\.show;/.test(apply) && /\[data-news-link\]'\)\.forEach\(l => \{ l\.hidden = !plan\.show; \}\)/.test(apply), 'sin plan: sección y enlaces (cabecera, menú, casilla) ocultos');
+  assert.ok(/root\.classList\.add\('has-news'\);/.test(apply) && /if \(section\) section\.hidden = false;/.test(apply) && /\[data-news-link\]'\)\.forEach\(l => \{ l\.hidden = false; \}\)/.test(apply), 'sin llegadas la sección y sus enlaces (barra, menú) siguen: Novedades es el catálogo completo');
+  assert.ok(/writeState\(n \? 'p' : 's'\)/.test(apply), 'boot.js solo reserva el control del inicio si quedaron llegadas sin ver');
   assert.ok(/\[data-news-dot\]'\)\.forEach\(d => \{ d\.hidden = n === 0; \}\)/.test(apply) && /cta\.hidden = n === 0;/.test(apply), 'sin novedades: ni punto en la casilla ni control en el inicio');
 });
 test('Novedades: «nuevo» es lo que llegó después de la última visita; en la primera, lo de las dos últimas semanas', () => {
@@ -921,43 +922,157 @@ test('Novedades: «nuevo» es lo que llegó después de la última visita; en la
   assert.equal(hintLine(5, true), '5 novedades recientes');
   assert.equal(hintLine(1, true), '1 novedad reciente');
 });
-test('Novedades: capítulo propio, reservado sin saltos, ausente sin entradas y sin fechas impresas', async () => {
+test('Novedades: capítulo propio que existe siempre con JavaScript; tira por todo el catálogo que «Ver todo» despliega, sin huecos reservados ni fechas impresas', async () => {
   const [news, boot, app] = await Promise.all(['news.js', 'assets/js/boot.js', 'app.js'].map(f => readFile(here(`./${f}`), 'utf8')));
   const markup = html.match(/\n {4}<section id="novedades"[\s\S]*?\n {4}<\/section>/)[0];
   assert.ok(/<section id="novedades" class="news" data-news aria-labelledby="news-title">/.test(markup) && !/\bhidden\b/.test(markup.match(/<section[^>]*>/)[0]), 'sección de primer nivel');
   const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
   assert.ok(!libros.includes('novedades') && !libros.includes('data-news'), 'Novedades salió de dentro de Libros');
-  assert.ok(/<h2 id="news-title" class="h2">Novedades<\/h2>\s*<p class="news-status" data-news-status><\/p>/.test(markup) && /\.news-status \{[^}]*min-height: 1lh;/.test(css), 'titular de capítulo y línea de estado con su renglón reservado');
-  assert.equal((markup.match(/class="rail-item card--sk"/g) || []).length, 5, 'la tira reserva su forma con esqueletos, como el carrusel');
-  assert.ok(/role="region" aria-roledescription="carrusel"[^>]*tabindex="0" data-news-viewport/.test(markup) && /data-news-prev disabled aria-label="Novedades anteriores"/.test(markup) && /data-news-next disabled aria-label="Novedades siguientes"/.test(markup), 'carrusel con foco, progreso y flechas con nombre');
-  // Existencia: una clase en <html>, puesta antes del primer render, y los atributos hidden que pone news.js.
-  assert.ok(/html:not\(\.has-news\) :is\(\.news, \[data-news-link\]\), \.news\[hidden\], \[data-news-link\]\[hidden\] \{ display: none; \}/.test(css), 'sin has-news (sin JS o sin entradas) no existen ni la sección ni sus enlaces');
-  assert.ok(/localStorage\.getItem\('iti-news-estado'\)/.test(boot) && /if \(news !== 'n'\) \{ r\.classList\.add\('has-news'\); if \(news !== 's'\) r\.classList\.add\('news-hint'\); \}/.test(boot) && boot.indexOf("classList.add('has-news')") < boot.indexOf("matchMedia('(prefers-reduced-motion: reduce)')"), 'boot.js reserva sección y control con lo que dejó la visita anterior, también con movimiento reducido');
+  // Cabecera (CarruselNovedades): titular, «Ver todo» plano de 44 px con aria-expanded y aria-controls, y la línea de estado ya escrita (sin salto).
+  assert.ok(/<h2 id="news-title" class="h2">Novedades<\/h2>\s*<button class="btn btn--plano btn--sm news-toggle" type="button" aria-expanded="false" aria-controls="news-list" data-news-toggle disabled>Ver todo<\/button>/.test(markup), '«Ver todo» junto al titular: plano de 44 px, con aria-expanded y aria-controls; deshabilitado hasta que llega la tira');
+  assert.ok(markup.includes(`<p class="news-status" data-news-status>${STATUS_ALL}</p>`) && /\.news-status \{[^}]*min-height: 1lh;/.test(css), 'la línea de estado nace escrita y con su renglón: no salta al llegar el catálogo');
+  assert.ok(/<ul class="news-list" id="news-list" aria-label="Libros del catálogo" data-news-track aria-busy="true">/.test(markup) && (markup.match(/class="news-item card--sk"/g) || []).length === 5, 'la tira reserva su forma con esqueletos');
+  assert.ok(/\.news-list \{[^}]*grid-auto-flow: column; grid-auto-columns: var\(--nov-w\);[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*touch-action: manipulation;/.test(cssFlat) && /\.news \{ --nov-w: 120px;/.test(css) && /\.news \{ --nov-w: 152px; \}/.test(css), 'tira de 120 px (152 desde 768) con imán, sin arrastrar la página al llegar al borde');
+  assert.ok(/\.news\.is-open \.news-list \{ grid-auto-flow: row;[^}]*grid-template-columns: repeat\(auto-fill, minmax\(96px, 1fr\)\);/.test(css), 'desplegada: rejilla de 96 px como mínimo (3 columnas a 390, 2 a 320)');
+  // Existencia: con JavaScript siempre (boot.js pone has-news antes del primer render); sin JavaScript no hay tira ni enlaces.
+  assert.ok(/html:not\(\.has-news\) :is\(\.news, \[data-news-link\]\), \.news\[hidden\], \[data-news-link\]\[hidden\] \{ display: none; \}/.test(css), 'sin JavaScript no existen ni la sección ni sus enlaces');
+  assert.ok(/localStorage\.getItem\('iti-news-estado'\)/.test(boot) && /r\.classList\.add\('has-news'\);\s*if \(news === 'p'\) r\.classList\.add\('news-hint'\);/.test(boot) && boot.indexOf("classList.add('has-news')") < boot.indexOf("matchMedia('(prefers-reduced-motion: reduce)')"), 'boot.js: la sección siempre; el renglón del control del inicio solo si la visita anterior dejó llegadas sin ver (nada de hueco vacío en una primera visita)');
   assert.ok(/const STATE_KEY = 'iti-news-estado';/.test(news) && /const SEEN_KEY = 'iti-news-visto';/.test(news), 'news.js escribe la misma clave que lee boot.js');
   const links = [...html.matchAll(/<a[^>]*href="#novedades"[^>]*>/g)].map(m => m[0]);
   assert.equal(links.length, 3, 'tres entradas a la sección: la barra de escritorio, la fila del menú y el control del inicio');
-  assert.ok(links.every(l => /data-news-link|data-news-cta hidden/.test(l) || /<li data-news-link><a class="menu-row" href="#novedades">/.test(html)), 'todas desaparecen sin entradas');
   // Control del inicio: secundario, oculto de salida, con su sitio reservado solo bajo news-hint.
   const copy = html.match(/<div class="entry-copy"[\s\S]*?<\/section>/)[0];
   assert.ok(/<a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"><\/span><span data-news-cta-text><\/span>/.test(copy) && copy.indexOf('entry-news') > copy.indexOf('btn--primario'), 'control secundario (48 px) después de «Cómo llegar», con texto propio (el punto es decorativo)');
   assert.ok(/\.entry-news \{ display: none; margin-top: var\(--space-4\); \}\s*\.news-hint \.entry-news \{ display: inline-flex; visibility: hidden; \}\s*\.news-hint \.entry-news:not\(\[hidden\]\) \{ visibility: visible; \}/.test(css), 'sin reserva no ocupa sitio; con reserva lo ocupa invisible hasta que llega el conteo: nada salta');
-  assert.ok(/\.entry-news \{ width: 100%; \}/.test(mobileCss), 'en el teléfono el control ocupa el ancho, bajo la dirección');
   assert.ok(/root\.classList\.toggle\('news-hint'/.test(news) && /new IntersectionObserver\(es => \{\s*if \(es\.some\(e => e\.isIntersecting\)\) return;/.test(news), 'si la reserva no coincide, se corrige con el inicio fuera de la vista');
-  // Carga: módulo ligero para el conteo temprano; carrusel y catálogo solo al pintar la tira.
-  assert.ok(!/^import [^;]*(rail|catalog|saved)\.js/m.test(news) && /import\('\.\/rail\.js'\), import\('\.\/catalog\.js'\)/.test(news), 'news.js no arrastra el catálogo para contar');
+  // Carga: módulo ligero para el conteo temprano; el catálogo solo al pintar la tira.
+  assert.ok(!/^import [^;]*(rail|catalog|saved)\.js/m.test(news) && /import\('\.\/catalog\.js'\)/.test(news), 'news.js no arrastra el catálogo para contar');
   assert.ok(/newsPlan\(null, await loadCollections\(\)/.test(news) && /loadNews\(\)\.then\(m => m\.initNewsCount\(\)\)/.test(app) && /loadNews\(\)\.then\(m => m\.initNews\(\{ ensureCatalog: bootCatalog, isMotion \}\)\)/.test(app), 'el conteo se pide pronto (solo collections.json) y la tira al acercarse');
   assert.ok(app.indexOf('m.initNewsCount()') > app.indexOf('const posterReady'), 'el conteo va después de la foto y las fuentes: no compite con el primer render');
-  // «Visto»: almacenamiento siempre protegido; se guarda con la sección en pantalla y lo visible cambia al salir.
   for (const line of news.split('\n').filter(l => /getItem|setItem/.test(l))) assert.ok(/try \{/.test(line) && /catch/.test(line), `localStorage siempre en try/catch: ${line.trim().slice(0, 60)}`);
   const watch = news.slice(news.indexOf('function watchSeen'), news.indexOf('export async function initNews'));
   assert.ok(/new IntersectionObserver/.test(watch) && /intersectionRatio >= 0\.5/.test(watch) && /setTimeout\(\(\) => \{[^}]*writeSeen\(isoDay\(\)\);[^}]*\}, DUR\('scene'\)\)/.test(watch), 'se guarda cuando la sección está en pantalla de verdad, un momento (duración de token)');
   assert.ok(watch.indexOf('if (!e.isIntersecting && seen)') > 0 && watch.indexOf(".badge-new').forEach(b => b.remove())") > watch.indexOf('if (!e.isIntersecting && seen)'), 'las insignias se retiran solo al salir de la sección, no mientras se miran');
-  // Insignia «Nuevo» y verdad: dentro del botón (nombre accesible), turquesa profundo con blanco; la fecha no se imprime.
-  assert.ok(/li\.querySelector\('\.card'\)\.prepend\(badge\(\)\)/.test(news) && /b\.textContent = 'Nuevo';/.test(news), '«Nuevo» va dentro del botón de la tarjeta: entra en su nombre accesible');
+  // Cada libro es un solo botón (portada, título y autor); «Nuevo» va dentro (nombre accesible) y solo para llegadas con fecha.
+  assert.ok(/const btn = make\('button', 'news-book'\);/.test(news) && /if \(nuevo\) btn\.append\(badge\(\)\);/.test(news) && /make\('span', 'badge-new', 'Nuevo'\)/.test(news) && /newsItem\(b, tones\[i\], fresh\.has\(b\.id\), i, cat\)/.test(news), '«Nuevo» dentro del botón del libro, solo para los que shelfPlan marca');
   assert.ok(/\.badge-new \{[^}]*background: var\(--primario\); color: var\(--en-primario\);/.test(cssFlat) && /\.motion \.news\.is-in \.badge-new \{ animation: il-pop var\(--dur-base\) var\(--curva-resorte\); \}/.test(css), 'insignia «Nuevo» en primario; rebote solo con movimiento');
-  assert.ok(!/toLocale|datetime|<time/.test(news) && !/Intl\.|\.llegada\b|\bllegada:/.test(news.slice(news.indexOf('// Interfaz (solo navegador)'))), 'la fecha de llegada no llega a la interfaz: solo ordena y decide «Nuevo» (Intl solo calcula el día de Monterrey en la lógica pura, nunca formatea texto visible)');
+  assert.ok(!/toLocale|datetime|<time/.test(news) && !/Intl\.|\.llegada\b|\bllegada:/.test(news.slice(news.indexOf('// Interfaz (solo navegador)'))), 'la fecha de llegada no llega a la interfaz: solo ordena y decide «Nuevo»');
   assert.equal(isoDay(new Date('2026-11-12T05:30:00Z')), '2026-11-11', '«visto» y «hoy» se cuentan en el día de Monterrey (23:30 del 11 allá), no en el del dispositivo');
-  assert.ok(/rail\.bookCard\(b, tones\[i\]\)/.test(news) && /rail\.wireBookOpen\(track, ensureCatalog\)/.test(news), 'misma tarjeta, guardar y ficha que el carrusel de colecciones');
+  // «Ver todo» / «Ver menos»: aria-expanded, el foco se queda en el botón, FLIP solo con transform y altura interpolada; sin movimiento, al instante.
+  const toggle = news.slice(news.indexOf('export function wireToggle'), news.indexOf('function watchSeen'));
+  assert.ok(/toggle\.setAttribute\('aria-expanded', String\(open\)\);/.test(toggle) && /toggle\.textContent = open \? 'Ver menos' : 'Ver todo';/.test(toggle) && !/\.focus\(/.test(toggle), '«Ver todo» ↔ «Ver menos» con aria-expanded; el foco no se mueve del botón');
+  assert.ok(/if \(!motion\) return;/.test(toggle) && toggle.indexOf('if (!motion) return;') < toggle.indexOf('.animate(') && /n\.animate\(\[\{ transform: `translate\(\$\{dx\}px, \$\{dy\}px\)` \}, \{ transform: 'none' \}\], \{ duration, easing \}\)/.test(toggle) && /duration = DUR\('base'\), easing = EASE\(\)/.test(toggle), 'FLIP en dur-base con curva-salida, solo transform; sin movimiento el cambio es inmediato');
+  assert.ok(/list\.scrollLeft = 0;/.test(toggle) && /section\.scrollIntoView\(\{ block: 'start'/.test(toggle), '«Ver menos» regresa la tira al principio y, si la sección quedó arriba, la trae a la vista');
+  // Abrir: la ficha del catálogo en modo «redes», después de pintar; al cerrar, el foco vuelve al libro.
+  assert.ok(/confirmThen\(book,/.test(news) && /detail: \{ id: book\.dataset\.id, tone: toneOf\(book\), redes: true \}/.test(news) && /book\.isConnected && book\.focus\(\{ preventScroll: true \}\)/.test(news), 'el libro abre su ficha con redes y recupera el foco al cerrarla');
+});
+test('Novedades = el catálogo completo (decisión del 2026-11-13): sin fechas, los 41 libros de la A a la Z y ningún «Nuevo»; con fechas reales, las llegadas primero', () => {
+  const shipped = JSON.parse(readFileSync_('assets/data/collections.json'));
+  for (const visto of [null, '2026-11-01', HOY]) {
+    const plan = shelfPlan(data.books, shipped, { hoy: HOY, visto });
+    assert.equal(plan.show, true, 'la sección existe');
+    assert.equal(plan.books.length, data.books.length, 'todo el catálogo');
+    assert.equal(plan.books.length, 41);
+    assert.deepEqual(plan.books.map(b => b.t), [...data.books.map(b => b.t)].sort((x, y) => x.localeCompare(y, 'es')), 'de la A a la Z: no es un ranking');
+    assert.deepEqual([plan.nuevos, plan.n, plan.llegadas], [[], 0, []], 'sin fechas registradas nada es «Nuevo»');
+    assert.equal(plan.estado, STATUS_ALL);
+  }
+  assert.ok(!/lleg|nuev|reci[eé]n|[uú]ltim|m[aá]s (le[ií]d|vendid)/i.test(STATUS_ALL), 'sin fechas el encabezado no afirma que algo acaba de llegar ni ordena por éxito');
+  const raw = { novedades: { entradas: [entry(3, '2026-10-01'), entry(5, '2026-11-10'), { id: 'no-existe', llegada: '2026-11-09' }, entry(7, '2026-12-24')] } };
+  const p = shelfPlan(data.books, raw, { hoy: HOY });
+  assert.deepEqual(p.books.slice(0, 2).map(b => b.id), [data.books[5].id, data.books[3].id], 'las llegadas con fecha van primero, lo más reciente primero');
+  assert.equal(p.books.length, 41, 'y luego el resto del catálogo, sin repetir ni inventar');
+  assert.equal(new Set(p.books.map(b => b.id)).size, 41);
+  assert.deepEqual(p.books.slice(2).map(b => b.t), [...p.books.slice(2).map(b => b.t)].sort((x, y) => x.localeCompare(y, 'es')), 'el resto, de la A a la Z');
+  assert.deepEqual(p.nuevos, [data.books[5].id], '«Nuevo» solo para lo que llegó en las últimas dos semanas (lo futuro espera su día)');
+  assert.equal(p.estado, '1 llegó en las últimas dos semanas');
+  assert.equal(shelfPlan(data.books, raw, { hoy: HOY, visto: HOY }).n, 0, 'de regreso, lo ya visto no es «Nuevo»');
+  assert.equal(shelfPlan([], shipped, { hoy: HOY }).show, false, 'sin catálogo no se promete nada');
+  assert.equal(shelfPlan(null, null, { hoy: HOY }).show, false);
+});
+test('carrusel 3D (CarruselPortadas): la portada del centro de frente, las vecinas giran hasta 52°; con movimiento reducido queda plano, sin giro', async () => {
+  const railJs = await readFile(here('./rail.js'), 'utf8');
+  assert.equal(CF_GIRO, 52);
+  assert.equal(tokensJson.scales.profundidad['giro-carrusel'], '52deg', 'el giro máximo es un token');
+  assert.ok(tokensCss.includes('--perspectiva-carrusel: 900px;') && tokensCss.includes('--perspectiva-carrusel-ancha: 1200px;') && tokensCss.includes('--perspectiva-tarjeta: 1000px;'), 'perspectivas en tokens.css');
+  const c = coverflowPose(0, { w: 172 });
+  assert.ok(/rotateY\(0\.00deg\)/.test(c.transform) && c.opacity === 1 && c.zIndex === 100 && !c.hidden, 'la del centro, de frente y encima');
+  const r = coverflowPose(1, { w: 172 }), l = coverflowPose(-1, { w: 172 });
+  assert.ok(/rotateY\(-52\.00deg\)/.test(r.transform) && /rotateY\(52\.00deg\)/.test(l.transform), 'cada vecina gira hacia el centro');
+  assert.ok(/translateZ\(-/.test(r.transform) && r.zIndex < 100 && /translateX\(-/.test(r.transform) && /translateX\(\d/.test(l.transform), 'se hunden y se enciman hacia el centro');
+  assert.ok(Math.abs(parseFloat(/rotateY\((-?[\d.]+)deg\)/.exec(coverflowPose(0.5, { w: 172 }).transform)[1])) === 26, 'el giro sigue a la distancia: a media portada, la mitad');
+  assert.ok(coverflowPose(3).hidden && coverflowPose(-7).hidden && coverflowPose(10).transform === coverflowPose(3).transform, 'lo lejano ni se ve ni se toca');
+  for (const d of [-2.4, -1, -0.5, 0, 0.5, 1, 2]) {
+    const f = coverflowPose(d, { flat: true, w: 172 });
+    assert.ok(/^scale\(0?\.?\d/.test(f.transform) && !/rotate|translate/.test(f.transform), `movimiento reducido (d = ${d}): sin giro ni profundidad (${f.transform})`);
+  }
+  assert.equal(coverflowPose(1, { flat: true }).transform, 'scale(0.880)', 'plano: las vecinas al 88 %');
+  assert.ok([0, 1, 2, -2].every(d => coverflowPose(d).opacity === 1 && coverflowPose(d, { flat: true }).opacity === 1) && coverflowPose(2.3).opacity < 1, 'hasta dos portadas del centro, enteras (el texto de una portada no pierde contraste); más allá se desvanecen');
+  assert.ok(/const flat = !isMotion\(\);/.test(railJs) && /coverflowPose\(\(centers\[i\] - mid\) \/ width, \{ flat, giro, w: width \}\)/.test(railJs), 'la pose sale del desplazamiento y de la preferencia de movimiento (también «Pausar el movimiento»)');
+  assert.ok(/viewport\.addEventListener\('scroll', request, \{ passive: true \}\)/.test(railJs) && /requestAnimationFrame\(paint\)/.test(railJs) && /getPropertyValue\('--giro-carrusel'\)/.test(railJs), 'una pose por fotograma, con el giro del token');
+  assert.equal(nearestIndex([86, 258, 430], 300), 1, 'el centro es la portada más cercana');
+  assert.deepEqual(captionOf({ t: 'Hipercódex: Ensayo poético hiperbólico', a: 'Emmanuel Vizcaya' }, '$250 MXN'), { title: 'Hipercódex', author: 'Emmanuel Vizcaya', price: '$250 MXN' }, 'bajo el carrusel: título (sin subtítulo), autor y precio de la hoja');
+  // Desliz nativo con imán al centro; perspectiva en la ventana (punto de fuga fijo) y 3D conservado en la pista.
+  assert.ok(/\.rail-viewport \{[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*perspective: var\(--perspectiva-carrusel\); touch-action: manipulation;/.test(cssFlat), 'ventana: imán, sin arrastrar la página y con su perspectiva');
+  assert.ok(/\.rail-track \{[^}]*padding: 0 calc\(50% - var\(--cf-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.rail-item \{ flex: 0 0 var\(--cf-w\); scroll-snap-align: center;/.test(css) && /\.rail \{ --cf-w: clamp\(148px, 44vw, 240px\); \}/.test(css), 'portadas del 44 % del ancho (148–240 px) centradas por el imán');
+  // Toque y teclado: una vecina viene al centro; la del centro abre la ficha. Una sola parada de tabulador; ← → Inicio Fin.
+  assert.ok(/item\.classList\.contains\('is-centro'\)\) return;\s*e\.stopImmediatePropagation\(\);/.test(railJs) && /wireBookOpen\(track, ensureCatalog\)/.test(railJs), 'tocar una vecina la trae al centro; tocar la del centro abre la ficha (iti:open-book)');
+  assert.ok(/\{ ArrowRight: actual \+ 1, ArrowLeft: actual - 1, Home: 0, End: items\.length - 1 \}\[e\.key\]/.test(railJs), 'teclado: ← → Inicio y Fin');
+  assert.ok(/\.rail-item:not\(\.is-centro\) \.save \{ opacity: 0; visibility: hidden; \}/.test(css), 'Guardar solo sobre la portada del centro');
+  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  assert.ok(/<div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title><\/p><p class="cf-meta" data-rail-meta><\/p><\/div>/.test(rail), 'título y «autor · precio» del libro del centro');
+  assert.ok(/if \(say === i\) \{ say = -1; live\.textContent =/.test(railJs), 'con flechas o teclado, el libro que llega al centro se anuncia en la única región viva');
+});
+test('tarjeta que voltea (TarjetaLibro): «Voltear» con aria-pressed y aria-controls, reverso inerte con título, autor, editorial, precio, «Guardar» y «Ver ficha»; sin giro con movimiento reducido', async () => {
+  const cat = await readFile(here('./catalog.js'), 'utf8');
+  const saved = await readFile(here('./saved.js'), 'utf8');
+  const card = cat.slice(cat.indexOf('function card(b)'), cat.indexOf('let results = [];'));
+  assert.ok(/class: 'btn btn--vidrio btn--icono btn--sm card-voltear', 'data-card-flip': '', 'aria-pressed': 'false', 'aria-controls': back, 'aria-label': `Voltear «\$\{b\.t\}»`/.test(card), 'un botón de 44 px con aria-pressed, aria-controls y el título en su nombre');
+  assert.ok(/el\('div', \{ class: 'card-cara card-reverso', id: back, inert: true \}/.test(card), 'el reverso nace inerte (ni foco ni toque)');
+  assert.ok(/'rev-t' \}, b\.t\)/.test(card) && /'rev-a' \}, b\.a\)/.test(card) && /'rev-p' \}, b\.p\)/.test(card) && /const price = priceLabel\(b\.pr\);/.test(card) && /saveButton\(b, \{ reverso: true \}\)/.test(card) && /'data-card-open': b\.id/.test(card) && /'Ver ficha'/.test(card), 'reverso: título, autor, editorial, precio de la hoja, «Guardar» y «Ver ficha»');
+  assert.ok(/el\('button', \{ type: 'button', class: 'card', 'data-id': b\.id, 'aria-haspopup': 'dialog' \}/.test(card), 'la portada sigue abriendo la ficha: búsqueda, filtros y ficha no cambian');
+  const flip = cat.slice(cat.indexOf('function flipCard('), cat.indexOf('let results = [];'));
+  assert.ok(/li\.querySelector\('\.card-frente'\)\.inert = on;/.test(flip) && /li\.querySelector\('\.card-reverso'\)\.inert = !on;/.test(flip) && /setAttribute\('aria-pressed', String\(on\)\)/.test(flip), 'la cara oculta es inerte y aria-pressed dice el estado');
+  assert.ok(/if \(on && flipped && flipped !== li && flipped\.isConnected\) flipCard\(flipped, false\);/.test(flip), 'una sola tarjeta volteada a la vez');
+  assert.ok(/e\.key === 'Escape' && e\.target\.closest\('\.card-item\.is-volteada'\)/.test(cat) && /e\.stopPropagation\(\);\s*flipCard\(li, false\);\s*li\.querySelector\('\[data-card-flip\]'\)\.focus/.test(cat), 'Escape la regresa (sin cerrar la hoja de Explorar) y el foco vuelve a «Voltear»');
+  assert.ok(/\.card-item\.is-volteada \[data-card-open="\$\{id\}"\]/.test(cat), 'al cerrar la ficha abierta desde el reverso, el foco vuelve a «Ver ficha»');
+  assert.ok(/\.card-giro \{ display: grid; transform-style: preserve-3d; transition: transform var\(--dur-lenta\) var\(--curva-salida\); \}/.test(css) && /\.motion \.card-item\.is-volteada \.card-giro \{ transform: rotateY\(180deg\); \}/.test(css), 'gira 180° en dur-lenta con curva-salida, solo con movimiento');
+  assert.ok(/\.card-cara \{[^}]*backface-visibility: hidden; \}/.test(css) && /\.card-item \{ perspective: var\(--perspectiva-tarjeta\); \}/.test(css), 'dos caras con su perspectiva');
+  assert.ok(/html:not\(\.motion\) \.card-giro \{ transition: none; \}/.test(css) && /html:not\(\.motion\) \.card-reverso \{ transform: none; opacity: 0; transition: opacity var\(--dur-rapida\) linear, visibility var\(--dur-rapida\); \}/.test(css) && /html:not\(\.motion\) \.card-item\.is-volteada \.card-reverso \{ opacity: 1; \}/.test(css) && /\.card-item\.is-volteada \.card-frente \{ visibility: hidden;/.test(css), 'sin movimiento no gira: las caras se funden (al instante con «reducir movimiento»)');
+  assert.ok(/@container \(max-width: 159px\) \{/.test(css), 'tarjeta angosta (320 px): relleno y título más chicos, nada se desborda');
+  assert.ok(/'saveShort' in btn\.dataset \? \(on \? 'Guardado' : 'Guardar'\)/.test(saved), '«Guardar» del reverso y de las redes: rótulo corto, el título va en su nombre accesible');
+});
+test('ficha en modo «redes» (Novedades): WhatsApp con título y autor, Guardar, Instagram, Facebook y Compartir con respaldo de copiar el enlace', async () => {
+  const cat = await readFile(here('./catalog.js'), 'utf8');
+  const app = await readFile(here('./app.js'), 'utf8');
+  const redes = html.match(/<ul class="redes"[\s\S]*?<\/ul>/)[0];
+  assert.equal((redes.match(/<li>/g) || []).length, 4, 'cuatro: Guardar, Instagram, Facebook, Compartir');
+  assert.ok(redes.indexOf('Guardar') < redes.indexOf('Instagram') && redes.indexOf('Instagram') < redes.indexOf('Facebook') && redes.indexOf('Facebook') < redes.indexOf('Compartir'));
+  assert.equal(INSTAGRAM, 'https://www.instagram.com/libreriaitineranteymasmty/');
+  assert.equal(FACEBOOK, 'https://www.facebook.com/profile.php?id=100095548961064');
+  for (const [href, k] of [[INSTAGRAM, 'ig'], [FACEBOOK, 'fb']]) assert.ok(new RegExp(`<a class="red" data-d-red-${k} href="${href.replace(/[?.]/g, '\\$&')}" target="_blank" rel="noopener noreferrer">`).test(redes), `${k}: perfil de la librería en otra pestaña, con noopener`);
+  assert.ok(/<button type="button" class="save save--wide red" data-d-red-save data-save-short aria-pressed="false">/.test(redes) && /<button type="button" class="red" data-d-share>/.test(redes), 'Guardar (alternado) y Compartir son botones');
+  assert.ok(/\.drawer\[data-modo="redes"\] \.redes \{ display: grid; \}/.test(css) && /\.drawer\[data-modo="redes"\] :is\(\[data-d-save\], \[data-d-visit\]\) \{ display: none; \}/.test(css), 'solo en modo redes; la ficha de siempre no cambia');
+  assert.ok(/aria-label', `Instagram: preguntar por «\$\{b\.t\}»`/.test(cat) && /aria-label', `Facebook: preguntar por «\$\{b\.t\}»`/.test(cat) && /aria-label', `Compartir «\$\{b\.t\}»`/.test(cat), 'cada nombre accesible empieza con el nombre visible y lleva el título');
+  const b = book('las-hojas-de-fabre-jesus-ferreiro');
+  const wa = new URL(bookWaUrl(b));
+  assert.ok(wa.href.startsWith('https://wa.me/528180875940?text=') && wa.searchParams.get('text').includes(`«${b.t}» de ${b.a}`), 'WhatsApp prellenado con título y autor');
+  const share = bookShareData(b, 'https://itinerante.example/#novedades');
+  assert.deepEqual(share.url, `https://itinerante.example/#libro-${b.id}`, 'el enlace lleva a la ficha del libro');
+  assert.ok(share.text.includes(`«${b.t}» de ${b.a}`) && !/disponible|en existencia|\$\d/i.test(share.text), 'texto sin promesa de existencia ni precio');
+  const said = [];
+  let got = null;
+  assert.equal(await shareBook(b, { nav: { share: async d => { got = d; } }, href: 'https://x.example/', say: t => said.push(t) }), 'compartido');
+  assert.ok(got && got.url === `https://x.example/#libro-${b.id}` && !said.length, 'con Web Share se abre la hoja del teléfono');
+  let copied = null;
+  const abort = Object.assign(new Error('x'), { name: 'AbortError' });
+  assert.equal(await shareBook(b, { nav: { share: async () => { throw abort; }, clipboard: { writeText: async t => { copied = t; } } }, href: 'https://x.example/', say: t => said.push(t) }), 'cancelado');
+  assert.equal(copied, null, 'cancelar la hoja no copia nada');
+  assert.equal(await shareBook(b, { nav: { clipboard: { writeText: async t => { copied = t; } } }, href: 'https://x.example/', say: t => said.push(t) }), 'copiado');
+  assert.ok(copied === `https://x.example/#libro-${b.id}` && said.at(-1) === 'Enlace copiado.', 'sin Web Share se copia el enlace y se avisa');
+  assert.equal(await shareBook(b, { nav: { clipboard: { writeText: async () => { throw new Error('no'); } } }, href: 'https://x.example/', say: t => said.push(t) }), 'sin copiar');
+  assert.ok(/Copia la dirección/.test(said.at(-1)), 'si tampoco se puede copiar, se dice qué hacer');
+  assert.ok(/\/\^#libro-\(\[a-z0-9-\]\+\)\$\/\.exec\(location\.hash\)/.test(app) && /detail: \{ id: m\[1\], redes: true \}/.test(app), 'un enlace compartido abre la ficha de su libro');
 });
 test('Novedades: nada se presenta como ranking ni como inventario', async () => {
   const files = await Promise.all(['index.html', 'app.js', 'news.js', 'feed.js', 'rail.js', 'catalog.js', 'saved.js'].map(f => readFile(here(`./${f}`), 'utf8')));
@@ -1045,7 +1160,7 @@ test('INP: los botones confirman primero y la hoja se abre o se cierra después 
   assert.ok(!/hasAttribute\('data-opening'\)|dataset\.opening/.test(app + rail + cat), 'ninguna pieza lleva su propia guarda de doble toque');
   assert.ok(/closeDialog\(drawer\)/.test(cat), 'la ficha se cierra por closeDialog');
   assert.ok(/\.menu\.is-closing \.menu-hoja/.test(css) && /\.drawer\.is-closing, \.mylist\.is-closing/.test(css) && /\.motion \.drawer\.is-closing, \.motion \.mylist\.is-closing/.test(mobileCss), 'cada hoja define su salida en CSS');
-  assert.ok(/FIRST_CHUNK/.test(rail) && /if \(mine !== paintId\) return;/.test(rail), 'el chip confirma ya y las tarjetas se cambian después, por tandas');
+  assert.ok(/if \(!immediate\) await afterPaint\(\);\s*if \(mine !== paintId\) return;/.test(rail), 'el chip confirma ya y las portadas se cambian después de pintar (gana el último toque)');
   // Explorar y Mi lista también confirman primero (su INP era toda la apertura: 250-540 ms con CPU 4x)
   const savedSrc = await readFile(here('saved.js'), 'utf8');
   assert.ok(/confirmThen\(e\.currentTarget, openExplorer\)/.test(app) && /closeDialog\(explorer\)/.test(app), 'Explorar abre y cierra después de pintar');
@@ -1178,7 +1293,9 @@ test('tokens Líquido: claro por omisión y oscuro con prefers-color-scheme, mis
   assert.equal(tokensJson.scales.medidas['alto-barra-nav'], '44px');
   assert.equal(tokensJson.scales.medidas['alto-barra-inferior'], '49px');
   assert.deepEqual(['margen-movil', 'margen-movil-amplio', 'margen-escritorio'].map(k => tokensJson.scales.medidas[k]), ['16px', '20px', '32px']);
-  assert.ok(/:root \{ --margen: var\(--margen-movil\);/.test(css) && /@media \(min-width: 390px\) \{ :root \{ --margen: var\(--margen-movil-amplio\); \} \}/.test(css) && /@media \(min-width: 1024px\) \{ :root \{ --margen: var\(--margen-escritorio\);/.test(css), 'márgenes 16 → 20 (390 px) → 32 (1024 px)');
+  assert.ok(/:root \{ --seguro-x: max\(env\(safe-area-inset-left, 0px\), env\(safe-area-inset-right, 0px\)\); --margen: max\(var\(--margen-movil\), var\(--seguro-x\)\);/.test(css) && /@media \(min-width: 376px\) \{ :root \{ --margen: max\(var\(--margen-movil-amplio\), var\(--seguro-x\)\); \} \}/.test(css) && /@media \(min-width: 1024px\) \{ :root \{ --margen: max\(var\(--margen-escritorio\), var\(--seguro-x\)\);/.test(css), 'márgenes de Apple HIG: 16 hasta 375 px → 20 (376 px) → 32 (1024 px), nunca menos que el área segura (muesca en horizontal)');
+  assert.ok(/-webkit-text-size-adjust: 100%;\s*text-size-adjust: 100%;/.test(css) && /a, button, summary, label, select, input \{ -webkit-tap-highlight-color: transparent; touch-action: manipulation; \}/.test(css), 'Safari y Chromium: sin agrandar el texto al girar, sin destello gris al tocar y sin espera de doble toque (el zoom con dos dedos sigue)');
+  assert.ok(/\.cat-sort select \{[^}]*font: var\(--t-campo\)/.test(cssFlat), 'el selector de orden usa la letra de campo (17 px): iOS no acerca la página al tocarlo');
   // Movimiento: duraciones y curvas del sistema.
   assert.deepEqual(tokensJson.scales.duration, { 'dur-instantanea': '120ms', 'dur-rapida': '240ms', 'dur-base': '400ms', 'dur-lenta': '700ms', 'escalon-linea': '60ms' });
   assert.equal(tokensJson.scales.easing['curva-resorte'], 'linear(0, 0.42 8%, 0.86 16%, 1.04 26%, 1.05 32%, 0.99 46%, 1.002 62%, 1)');
@@ -1417,7 +1534,7 @@ test('secciones: encabezado (EncabezadoSeccion) con rótulo, titular y entradill
   assert.ok(/\.sec-texto \{ margin: var\(--space-3\) 0 0; max-width: 60ch; font: var\(--t-cuerpo\); color: var\(--tinta-2\); \}/.test(cssFlat), 'entradilla en Body, tinta-2, 60 caracteres');
   const fills = ['.house', '.bill', '.books', '.news', '.quote', '.visit', '.ftr'].map(s => rule(cssFlat, s).match(/background: var\(--(fondo(?:-2)?)\)/)?.[1]);
   assert.deepEqual(fills, ['fondo-2', 'fondo-2', 'fondo', 'fondo', 'fondo-2', 'fondo', 'fondo-2'], 'La casa → Catálogo → Eventos → Novedades → cierre → Visita → pie: vecinos de fondo distinto (bandas fondo-2 alternas)');
-  assert.ok(/:root \{ --margen: var\(--margen-movil\); --sec: var\(--space-12\);/.test(css) && /--sec: var\(--space-16\);/.test(css), 'aire entre secciones: 48 en móvil, 64 en escritorio');
+  assert.ok(/--margen: max\(var\(--margen-movil\), var\(--seguro-x\)\); --sec: var\(--space-12\);/.test(css) && /--sec: var\(--space-16\);/.test(css), 'aire entre secciones: 48 en móvil, 64 en escritorio');
   for (const sel of ['.house', '.bill', '.books', '.news', '.visit']) assert.ok(/var\(--sec\)/.test(rule(cssFlat, sel)) && !/vh/.test(rule(cssFlat, sel)), `${sel}: ritmo de la escala, no del alto de la pantalla`);
   assert.ok(!/\.(marquee|wipe|progress|manifesto|house-meter|stories|ftr-mark|wordmark)\b/.test(css + mobileCss) && !/class="(marquee|wipe|progress|manifesto|house-meter|stories|ftr-mark)/.test(html), 'se retiraron la marquesina, la cortinilla, la barra de progreso, el manifiesto suelto, el medidor de La casa y el rótulo gigante del pie');
 });

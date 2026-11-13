@@ -1,7 +1,7 @@
 // Catálogo (inventario real de la librería, assets/data/catalog.json): búsqueda predictiva, filtros con conteo, rejilla y ficha.
 import { DUR, EASE, ms, confirmThen } from './motion.js';
 import { loadSample } from './sample.js';
-import { saveButton, bindSaveButton, initSaved } from './saved.js';
+import { saveButton, bindSaveButton, initSaved, notify } from './saved.js';
 import { openDialog, closeDialog } from './sheets.js';
 
 export { loadSample };
@@ -207,6 +207,24 @@ export function bookWaUrl(book) {
   return url.href;
 }
 
+// Redes de la librería (las del pie y el menú): la ficha de Novedades las ofrece junto a WhatsApp. Son sus perfiles, no logotipos ni contadores.
+export const INSTAGRAM = 'https://www.instagram.com/libreriaitineranteymasmty/';
+export const FACEBOOK = 'https://www.facebook.com/profile.php?id=100095548961064';
+// Compartir un libro: el enlace lleva a su ficha (#libro-<id>, app.js la abre al llegar). El texto no afirma que lo tengan.
+export function bookShareData(book, href = '') {
+  const url = `${String(href).split('#')[0]}#libro-${book.id}`;
+  const by = book.a && book.a !== 'Autor no indicado' ? ` de ${book.a}` : '';
+  return { title: `${book.t} · Librería Itinerante y Más`, text: `«${book.t}»${by} en Librería Itinerante y Más. La librería confirma si lo tiene.`, url };
+}
+// Web Share (la hoja del teléfono) y, si no existe o falla, copiar el enlace y avisarlo. Cancelar la hoja no copia nada.
+export async function shareBook(book, { nav = globalThis.navigator, href = globalThis.location?.href ?? '', say = notify } = {}) {
+  const data = bookShareData(book, href);
+  if (nav?.share) {
+    try { await nav.share(data); return 'compartido'; } catch (e) { if (e?.name === 'AbortError') return 'cancelado'; /* sin hoja de compartir: se copia */ }
+  }
+  try { await nav.clipboard.writeText(data.url); say('Enlace copiado.'); return 'copiado'; } catch { say('No se pudo copiar. Copia la dirección desde el navegador.'); return 'sin copiar'; }
+}
+
 // ---------------------------------------------------------------------------------------------
 export async function initCatalog({ isMotion = () => false } = {}) {
   const $ = (s, el = document) => el.querySelector(s);
@@ -338,9 +356,39 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     return el('span', attrs, el('span', { class: 'cover-title', ...hidden }, b.t), el('span', { class: 'cover-author', ...hidden }, b.a));
   }
 
+  // Tarjeta que voltea (TarjetaLibro): la portada abre la ficha como siempre; «Voltear» (botón de vidrio con aria-pressed, que no cambia de
+  // sitio ni pierde el foco) gira la tarjeta y muestra en el reverso título, autor, editorial, el precio de la hoja, «Guardar» y «Ver ficha».
+  // La cara que no se ve es inerte (ni foco ni toque).
+  const svgIcon = id => {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'ic'); svg.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS(NS, 'use'); use.setAttribute('href', `#${id}`);
+    svg.append(use);
+    return svg;
+  };
   function card(b) {
     const btn = el('button', { type: 'button', class: 'card', 'data-id': b.id, 'aria-haspopup': 'dialog' }, cover(b, tones.get(b.id), true, true));
-    return el('li', { class: 'card-item' }, btn, saveButton(b));
+    const back = `rev-${b.id}`;
+    const price = priceLabel(b.pr);
+    const flip = el('button', { type: 'button', class: 'btn btn--vidrio btn--icono btn--sm card-voltear', 'data-card-flip': '', 'aria-pressed': 'false', 'aria-controls': back, 'aria-label': `Voltear «${b.t}»` }, svgIcon('i-flip'));
+    return el('li', { class: 'card-item' }, flip, el('div', { class: 'card-giro' },
+      el('div', { class: 'card-cara card-frente' }, btn, saveButton(b)),
+      el('div', { class: 'card-cara card-reverso', id: back, inert: true },
+        el('div', { class: 'rev-cab' }, saveButton(b, { reverso: true })),
+        el('div', { class: 'rev-texto' }, el('p', { class: 'rev-t' }, b.t), el('p', { class: 'rev-a' }, b.a), b.p ? el('p', { class: 'rev-p' }, b.p) : null),
+        price ? el('p', { class: 'rev-pr', 'data-fuente': 'hoja' }, price) : null,
+        el('button', { type: 'button', class: 'btn btn--secundario btn--sm rev-ficha', 'data-card-open': b.id, 'aria-haspopup': 'dialog' }, el('span', {}, 'Ver ficha'), el('span', { class: 'sr-only' }, `: «${b.t}»`)))));
+  }
+  // Una sola tarjeta volteada a la vez: voltear otra regresa la anterior. El foco se queda en «Voltear» (no cambia de sitio).
+  let flipped = null;
+  function flipCard(li, on) {
+    if (on && flipped && flipped !== li && flipped.isConnected) flipCard(flipped, false);
+    li.classList.toggle('is-volteada', on);
+    li.querySelector('.card-frente').inert = on;
+    li.querySelector('.card-reverso').inert = !on;
+    li.querySelector('[data-card-flip]').setAttribute('aria-pressed', String(on));
+    flipped = on ? li : flipped === li ? null : flipped;
   }
 
   let results = [];
@@ -495,9 +543,17 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     h.classList.toggle('is-long', titleSize(main, sub) === 'long');
   }
   function row(k, v) { return v ? [el('dt', {}, k), el('dd', {}, String(v))] : []; }
-  function openBook(id, { trigger, tone } = {}) {
+  // `redes` (la ficha que abre Novedades): bajo «Preguntar por WhatsApp», Guardar, Instagram, Facebook y Compartir.
+  function openBook(id, { trigger, tone, redes = false } = {}) {
     const b = byId.get(id);
     if (!b) return;
+    if (redes) drawer.dataset.modo = 'redes'; else delete drawer.dataset.modo;
+    if (redes) {
+      bindSaveButton($('[data-d-red-save]', drawer), b);
+      $('[data-d-red-ig]', drawer).setAttribute('aria-label', `Instagram: preguntar por «${b.t}»`);
+      $('[data-d-red-fb]', drawer).setAttribute('aria-label', `Facebook: preguntar por «${b.t}»`);
+      $('[data-d-share]', drawer).setAttribute('aria-label', `Compartir «${b.t}»`);
+    }
     $('[data-d-cover]', drawer).replaceChildren(cover(b, tone)); // el tono de la tarjeta pulsada; sin él, el del libro
     titleInto($('[data-d-title]', drawer), b.t);
     $('[data-d-author]', drawer).textContent = b.a;
@@ -532,12 +588,26 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     });
   }
   grid.addEventListener('click', e => {
+    const flip = e.target.closest('[data-card-flip]');
+    if (flip) { const li = flip.closest('.card-item'); flipCard(li, !li.classList.contains('is-volteada')); return; }
+    const open = e.target.closest('[data-card-open]');
+    if (open) { confirmThen(open, () => openBook(open.dataset.cardOpen, { trigger: open.dataset.cardOpen, tone: toneOf(open.closest('.card-item')) })); return; }
     const c = e.target.closest('.card');
     if (c) confirmThen(c, () => openBook(c.dataset.id, { trigger: c.dataset.id, tone: toneOf(c) })); // confirma ya; la hoja (lo caro) va después de pintar
   });
-  // Otras piezas (el carrusel de libros) piden abrir una ficha sin conocer el diálogo.
-  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; openBook(e.detail.id, { tone: e.detail.tone }); } });
-  $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id, { tone: toneOf(r) }); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
+  // Escape regresa la tarjeta volteada (y no cierra la hoja de Explorar en el teléfono); el foco vuelve a «Voltear».
+  grid.addEventListener('keydown', e => {
+    const li = e.key === 'Escape' && e.target.closest('.card-item.is-volteada');
+    if (!li) return;
+    e.preventDefault();
+    e.stopPropagation();
+    flipCard(li, false);
+    li.querySelector('[data-card-flip]').focus({ preventScroll: true });
+  });
+  // Otras piezas (el carrusel de libros, Novedades) piden abrir una ficha sin conocer el diálogo.
+  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; openBook(e.detail.id, { tone: e.detail.tone, redes: !!e.detail.redes }); } });
+  $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id, { tone: toneOf(r), redes: drawer.dataset.modo === 'redes' }); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
+  $('[data-d-share]', drawer).addEventListener('click', () => { const b = byId.get(drawer.dataset.book); if (b) shareBook(b); });
   $('[data-d-close]', drawer).addEventListener('click', () => closeDialog(drawer)); // sale primero; el cierre real corre después del fotograma
   drawer.addEventListener('click', e => { if (e.target === drawer) closeDialog(drawer); });
   // Hoja inferior (móvil): se arrastra desde el asa o la parte alta y se cierra al soltar pasado un umbral.
@@ -570,7 +640,9 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     drawer.addEventListener('pointercancel', end);
   })();
   drawer.addEventListener('close', () => {
-    const t = drawer.dataset.trigger && grid.querySelector(`.card[data-id="${CSS.escape(drawer.dataset.trigger)}"]`);
+    const id = drawer.dataset.trigger && CSS.escape(drawer.dataset.trigger);
+    // Si se abrió desde el reverso («Ver ficha»), el foco vuelve ahí; si no, a la portada.
+    const t = id && (grid.querySelector(`.card-item.is-volteada [data-card-open="${id}"]`) || grid.querySelector(`.card-item:not(.is-volteada) .card[data-id="${id}"]`));
     if (t) t.focus({ preventScroll: true });
   });
 

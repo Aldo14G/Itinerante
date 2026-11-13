@@ -57,9 +57,20 @@ const steps = [
   ['Mi lista abrir', async () => { await click('.tabbar [data-open-mylist]'); }],
   ['Mi lista cerrar', async () => { await sleep(600); await click('[data-ml-close]'); }],
   ['chip carrusel', async () => { await ev(`document.querySelector('[data-rail]').scrollIntoView()`); await sleep(2500); await click('.rail-chip:not([aria-checked=true])'); }],
-  ['guardar', async () => { await click('.rail-item .save'); }],
-  ['ficha abrir', async () => { await click('.rail-item .card'); }],
+  ['guardar', async () => { await click('.rail-item.is-centro .save'); }],
+  ['ficha abrir', async () => { await click('.rail-item.is-centro .card'); }],
   ['ficha cerrar', async () => { await sleep(600); await click('[data-d-close]'); }],
+  // Carrusel 3D: la flecha y el toque en una vecina mueven el centro (el giro se pinta por fotograma).
+  ['carrusel flecha', async () => { await sleep(600); await click('[data-rail-next]'); }],
+  ['carrusel vecina', async () => { await click('.rail-item.is-centro + .rail-item .card'); }],
+  // Novedades: «Ver todo» despliega las 41 portadas en rejilla (FLIP) y «Ver menos» las regresa; un libro abre su ficha con redes.
+  ['Novedades ver todo', async () => { await ev(`document.getElementById('novedades').scrollIntoView()`); await sleep(2500); await click('[data-news-toggle]'); }],
+  ['Novedades ver menos', async () => { await sleep(600); await click('[data-news-toggle]'); }],
+  ['Novedades ficha', async () => { await sleep(800); await click('.news-book'); }],
+  ['Novedades ficha cerrar', async () => { await sleep(600); await click('[data-d-close]'); }],
+  // Tarjeta que voltea, en la rejilla de Explorar (hoja en el teléfono, en línea en escritorio).
+  ['tarjeta voltear', async () => { if (+W < 761) { await click('[data-ex-open]'); await sleep(2500); } else { await ev(`document.getElementById('catalogo').scrollIntoView()`); await sleep(2500); } await click('[data-card-flip]'); }],
+  ['tarjeta regresar', async () => { await sleep(900); await click('[data-card-flip]'); }],
 ];
 
 const rows = [];

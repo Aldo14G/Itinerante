@@ -81,9 +81,9 @@ for (const [name, w, h, mobile, scheme] of [['móvil claro', 390, 844, true, 'li
   await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 100)`); await sleep(2500); await sweep(`${name}: carrusel`);
   fails.push(...((await ev(`window.__covers()`)) || []));
   // guardar un libro para tener la lista con contenido
-  await ev(`document.querySelector('[data-rail] .save')?.click()`); await sleep(600); await sweep(`${name}: aviso`);
+  await ev(`document.querySelector('[data-rail] .rail-item.is-centro .save')?.click()`); await sleep(600); await sweep(`${name}: aviso`);
   // ficha
-  await ev(`document.querySelector('[data-rail] button.card')?.click()`);
+  await ev(`document.querySelector('[data-rail] .rail-item.is-centro button.card')?.click()`);
   if (await wait(`document.getElementById('cat-drawer')?.open`)) { await sleep(900); await sweep(`${name}: ficha`); await ev(`document.getElementById('cat-drawer').close()`); await sleep(500); }
   // menú (todas las secciones, horario, «Cómo llegar», WhatsApp y redes, a la vista)
   await ev(`document.querySelector('[data-menu-open]:not([hidden])')?.click()`); await sleep(900); if (await ev(`document.getElementById('menu').open`)) { await sweep(`${name}: menú`); await ev(`document.getElementById('menu').close()`); await sleep(500); }

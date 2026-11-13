@@ -451,6 +451,16 @@ async function boot() {
       catIo.observe(catalogSection);
     } else bootCatalog();
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
+    // Un enlace compartido desde la ficha (#libro-<id>, «Compartir» de Novedades) abre la ficha de ese libro con sus redes. La dirección
+    // queda limpia antes de abrir: cerrar la ficha no deja un ancla que la vuelva a abrir al recargar.
+    const openShared = () => {
+      const m = /^#libro-([a-z0-9-]+)$/.exec(location.hash);
+      if (!m) return;
+      history.replaceState(null, '', location.pathname + location.search);
+      bootCatalog().then(() => document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: m[1], redes: true } })));
+    };
+    addEventListener('hashchange', openShared);
+    openShared();
 
     await yieldNow();
     // Explorar el catálogo: en móvil es una hoja a pantalla completa (la rejilla deja de alargar el capítulo);

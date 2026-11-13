@@ -1,21 +1,21 @@
-// Novedades: lo que ha llegado a la casa. Se alimenta de `novedades.entradas` de assets/data/collections.json, una lista de
-// { "id": "…", "llegada": "AAAA-MM-DD" }: para actualizarla basta añadir renglones al JSON (no hay que tocar HTML ni JS).
-// Sin entradas no existe: la sección, su casilla en la barra, sus enlaces y el control del inicio quedan ocultos.
-// Nunca se simula ni se presenta como ranking: solo muestra lo que la librería ponga en la lista. La fecha de llegada no se
-// imprime; sirve para ordenar (lo más reciente primero) y para saber qué es «Nuevo» para esta persona.
-// Este módulo es ligero a propósito (el conteo se pide pronto): el carrusel y el catálogo se importan solo al pintar la tira.
+// Novedades (CarruselNovedades): una tira que se desliza por todo el catálogo y que «Ver todo» despliega en rejilla; cada libro abre su ficha
+// con WhatsApp, Guardar, Instagram, Facebook y Compartir. Decisión de Aldo (2026-11-13): mientras la librería no registre fechas de llegada,
+// la tira es el catálogo completo, de la A a la Z, y ningún libro lleva «Nuevo». Las llegadas se registran en `novedades.entradas` de
+// assets/data/collections.json, una lista de { "id": "…", "llegada": "AAAA-MM-DD" }: basta añadir renglones (no hay que tocar HTML ni JS).
+// Entonces esas van primero (lo más reciente primero) y solo ellas pueden ser «Nuevo», con su punto en la barra y el control del inicio.
+// Nunca se simula ni se presenta como ranking. La fecha de llegada no se imprime; sirve para ordenar y para saber qué es «Nuevo».
+// Este módulo es ligero a propósito (el conteo se pide pronto): el catálogo se importa solo al pintar la tira.
 import { loadSample, loadCollections } from './sample.js';
-import { DUR } from './motion.js';
+import { DUR, EASE, confirmThen } from './motion.js';
 
 export const NEWS_SIZE = 12;
 export const NEW_DAYS = 14; // primera visita: cuentan como nuevas las llegadas de las últimas dos semanas
 const SEEN_KEY = 'iti-news-visto'; // fecha (AAAA-MM-DD) de la última vez que esta persona vio Novedades
-const STATE_KEY = 'iti-news-estado'; // lo que boot.js reserva antes del primer render: n = sin novedades, s = sin pendientes, p = con pendientes
+const STATE_KEY = 'iti-news-estado'; // lo que boot.js lee antes del primer render: p = quedaron llegadas sin ver (reserva el control del inicio); s = nada pendiente
 
 // ---------------------------------------------------------------------------------------------
 // Lógica pura (se prueba con fechas en tests/site.test.mjs)
 
-/** Fecha local del dispositivo como AAAA-MM-DD. */
 /** El día (AAAA-MM-DD) en hora de Monterrey, el mismo reloj que el estado de apertura y las fechas de los eventos. Sin soporte de zonas horarias, el día local del dispositivo. */
 export function isoDay(date = new Date()) {
   try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); }
@@ -82,9 +82,9 @@ export function hintLine(n, primera) {
 }
 
 /**
- * Plan de la sección: qué libros (las entradas cuyo id existe en `books`, en orden, hasta NEWS_SIZE), cuáles son nuevos y qué
- * dice la cabecera. Sin `books` (el conteo temprano, antes de pedir el catálogo) confía en los ids del JSON.
- * `show` es falso sin entradas válidas.
+ * Plan de las llegadas: qué libros llegaron (las entradas cuyo id existe en `books`, en orden, hasta NEWS_SIZE), cuáles son nuevos y
+ * qué dice la cabecera. Sin `books` (el conteo temprano, antes de pedir el catálogo) confía en los ids del JSON. `show` es falso sin
+ * entradas válidas: entonces no hay llegadas que contar (la tira sigue siendo el catálogo completo: ver shelfPlan).
  */
 export function newsPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
   const entries = newsEntries(data, hoy);
@@ -104,6 +104,32 @@ export function newsPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
   };
 }
 
+/**
+ * La tira de Novedades (CarruselNovedades). Decisión de Aldo (2026-11-13): mientras la librería no registre fechas de llegada, Novedades
+ * recorre el catálogo completo. Las llegadas con fecha real (las entradas de `novedades.entradas` que existen en el catálogo) van primero,
+ * en su orden (lo más reciente primero), y solo ellas pueden ser «Nuevo»; después, el resto del catálogo de la A a la Z. Sin entradas, la
+ * línea de estado no dice que algo haya llegado: dice qué es la tira. Nunca es un ranking: el orden es el de las llegadas o el alfabético.
+ */
+export const STATUS_ALL = 'Todo el catálogo, de la A a la Z.';
+export function shelfPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
+  const all = Array.isArray(books) ? books : [];
+  const byId = new Map(all.map(b => [b.id, b]));
+  const entries = newsEntries(data, hoy).filter(e => byId.has(e.id));
+  const first = new Set(entries.map(e => e.id));
+  const rest = all.filter(b => !first.has(b.id)).sort((a, b) => String(a.t).localeCompare(String(b.t), 'es'));
+  const nuevos = entries.filter(e => isNew(e.llegada, { visto, hoy })).map(e => e.id);
+  const primera = !validDay(visto);
+  return {
+    show: all.length > 0,
+    books: [...entries.map(e => byId.get(e.id)), ...rest],
+    llegadas: entries.map(e => e.id),
+    nuevos,
+    n: nuevos.length,
+    primera,
+    estado: entries.length ? statusLine(nuevos.length, primera) : STATUS_ALL
+  };
+}
+
 // ---------------------------------------------------------------------------------------------
 // Interfaz (solo navegador)
 
@@ -113,10 +139,10 @@ const writeSeen = day => { try { store()?.setItem(SEEN_KEY, day); } catch { /* s
 const writeState = s => { try { store()?.setItem(STATE_KEY, s); } catch { /* sin almacenamiento */ } };
 
 let visto; // la fecha con la que se pinta esta visita; no cambia mientras la persona mira la sección
-let shown = null; // último plan aplicado
+let shown = null; // último plan de llegadas aplicado (punto, control y línea de estado)
 
-// El renglón del control del inicio se reserva antes del primer render (boot.js, clase news-hint). Si la reserva no coincide con
-// lo que resultó, se corrige cuando el inicio está fuera de la vista: así nada salta a los ojos de la persona.
+// El renglón del control del inicio solo se reserva antes del primer render (boot.js, clase news-hint) si la visita anterior dejó llegadas sin
+// ver. Si lo que resultó no coincide, se corrige cuando el inicio está fuera de la vista: así nada salta a los ojos de la persona.
 function settleHint(wanted) {
   const root = document.documentElement;
   const entry = document.getElementById('inicio');
@@ -130,15 +156,15 @@ function settleHint(wanted) {
   io.observe(entry);
 }
 
-// Aplica el plan a todo lo que depende de él fuera de la tira: existencia de la sección y sus enlaces, punto de la casilla,
-// control del inicio y línea de estado.
+// Aplica el plan de llegadas a lo que depende de él fuera de la tira: punto de la barra y del menú, control del inicio y línea de estado.
+// La sección y sus enlaces existen siempre (con JavaScript): la tira es el catálogo completo aunque no haya llegadas.
 function apply(plan, { remember = true } = {}) {
   shown = plan;
   const root = document.documentElement;
   const section = document.querySelector('[data-news]');
-  root.classList.toggle('has-news', plan.show);
-  if (section) section.hidden = !plan.show;
-  document.querySelectorAll('[data-news-link]').forEach(l => { l.hidden = !plan.show; });
+  root.classList.add('has-news');
+  if (section) section.hidden = false;
+  document.querySelectorAll('[data-news-link]').forEach(l => { l.hidden = false; });
   const n = plan.show ? plan.n : 0;
   document.querySelectorAll('[data-news-dot]').forEach(d => { d.hidden = n === 0; });
   document.querySelectorAll('[data-news-sr]').forEach(s => { s.textContent = n ? `, ${n} sin ver` : ''; });
@@ -148,15 +174,16 @@ function apply(plan, { remember = true } = {}) {
     cta.hidden = n === 0;
   }
   const status = section?.querySelector('[data-news-status]');
-  if (status && plan.show && status.textContent !== plan.estado) status.textContent = plan.estado;
+  const estado = plan.show ? plan.estado : STATUS_ALL;
+  if (status && status.textContent !== estado) status.textContent = estado;
   settleHint(n > 0);
-  if (remember) writeState(!plan.show ? 'n' : n ? 'p' : 's');
+  if (remember) writeState(n ? 'p' : 's');
 }
 
 let counted;
 /**
- * Conteo temprano: solo pide collections.json (pequeño) para decidir si la sección existe y cuántas llegadas no ha visto la
- * persona. No pinta libros ni pide el catálogo; no bloquea el primer render (app.js lo llama después de la foto y las fuentes).
+ * Conteo temprano: solo pide collections.json (pequeño) para saber cuántas llegadas no ha visto la persona (punto y control del inicio).
+ * No pinta libros ni pide el catálogo; no bloquea el primer render (app.js lo llama después de la foto y las fuentes).
  */
 export function initNewsCount() {
   if (typeof document === 'undefined') return Promise.resolve(null);
@@ -165,58 +192,83 @@ export function initNewsCount() {
     let plan = { show: false, n: 0 }, ok = true;
     try { plan = newsPlan(null, await loadCollections(), { visto, hoy: isoDay() }); } catch { ok = false; counted = undefined; } // sin datos no se promete nada
     apply(plan, { remember: ok }); // un fallo de red no se recuerda: la próxima visita vuelve a reservar
-    if (plan.show && location.hash === '#novedades') document.getElementById('novedades')?.scrollIntoView(); // el ancla no existía al cargar
     return plan;
   })());
 }
 
-// Progreso, flechas y foco de la tira: lo mismo que hace el carrusel de colecciones con su propio marcado.
-function wireScroll(section, viewport, track, isMotion) {
-  const prev = section.querySelector('[data-news-prev]');
-  const next = section.querySelector('[data-news-next]');
-  const thumb = section.querySelector('[data-news-thumb]');
-  const sync = () => {
-    const max = track.scrollWidth - viewport.clientWidth;
-    const p = max > 0 ? viewport.scrollLeft / max : 0;
-    const w = track.scrollWidth ? viewport.clientWidth / track.scrollWidth : 1;
-    thumb.style.width = `${Math.max(8, Math.min(100, w * 100)).toFixed(1)}%`;
-    thumb.style.transform = `translateX(${(p * (100 / Math.max(w, 0.01) - 100)).toFixed(1)}%)`;
-    prev.disabled = viewport.scrollLeft <= 2;
-    next.disabled = viewport.scrollLeft >= max - 2;
-    section.classList.toggle('is-static', max <= 2);
-  };
-  const go = dir => {
-    const first = track.firstElementChild;
-    const step = first ? first.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0) : viewport.clientWidth;
-    viewport.scrollBy({ left: dir * Math.max(step, viewport.clientWidth * 0.85), behavior: isMotion() ? 'smooth' : 'auto' });
-  };
-  prev.addEventListener('click', () => go(-1));
-  next.addEventListener('click', () => go(1));
-  viewport.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
-  viewport.addEventListener('keydown', e => {
-    if (e.target !== viewport) return;
-    if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-  });
-  track.addEventListener('focusin', e => { // Tab: la tarjeta asomada que recibe el foco se alinea al inicio
-    const item = e.target.closest('.rail-item');
-    if (!item) return;
-    const pad = parseFloat(getComputedStyle(viewport).scrollPaddingInlineStart) || 0;
-    const v = viewport.getBoundingClientRect();
-    const b = item.getBoundingClientRect();
-    if (b.left >= v.left + pad - 1 && b.right <= v.right - pad + 1) return;
-    viewport.scrollBy({ left: b.left - v.left - pad, behavior: isMotion() ? 'smooth' : 'auto' });
-  });
-  if ('ResizeObserver' in window) new ResizeObserver(sync).observe(viewport);
-  sync();
+const make = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const badge = () => make('span', 'badge-new', 'Nuevo');
+
+// Un libro de la tira: un solo botón (portada, título y autor) que abre su ficha con las redes. «Nuevo» va dentro: entra en su nombre accesible.
+function newsItem(b, tone, nuevo, i, cat) {
+  let cover;
+  if (b.c) cover = cat.imageCover(b, tone, { named: false, eager: i < 6 }); // el título y el autor ya van debajo, a la vista
+  else {
+    cover = make('span', `cover cover--blank tone-${tone}`);
+    cover.dataset.coverTone = tone;
+    cover.dataset.coverLayout = cat.coverLayout(b);
+    const t = make('span', 'cover-title', b.t), a = make('span', 'cover-author', b.a);
+    t.setAttribute('aria-hidden', 'true'); a.setAttribute('aria-hidden', 'true');
+    cover.append(t, a);
+  }
+  const btn = make('button', 'news-book');
+  btn.type = 'button';
+  btn.dataset.id = b.id;
+  btn.setAttribute('aria-haspopup', 'dialog');
+  btn.append(cover);
+  if (nuevo) btn.append(badge());
+  btn.append(make('span', 'news-t', b.t), make('span', 'news-a', b.a));
+  const li = make('li', 'news-item');
+  li.append(btn);
+  return li;
 }
 
-const badge = () => {
-  const b = document.createElement('span');
-  b.className = 'badge-new';
-  b.textContent = 'Nuevo';
-  return b;
-};
+// Tocar un libro abre la ficha del catálogo en modo «redes» (WhatsApp, Guardar, Instagram, Facebook y Compartir); al cerrarla, el foco vuelve al libro.
+function wireOpen(track, ensureCatalog, toneOf) {
+  track.addEventListener('click', e => {
+    const book = e.target.closest('.news-book');
+    if (!book) return;
+    confirmThen(book, async () => { // el libro confirma el toque ya; la hoja (lo caro) va después de pintar
+      try { await ensureCatalog?.(); } catch { return; }
+      document.getElementById('cat-drawer')?.addEventListener('close', () => book.isConnected && book.focus({ preventScroll: true }), { once: true });
+      document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: book.dataset.id, tone: toneOf(book), redes: true } }));
+    });
+  });
+}
+
+// «Ver todo» / «Ver menos»: la tira se despliega en rejilla dentro de la misma sección. Cada portada viaja de su lugar en la tira a su lugar en
+// la rejilla (FLIP: se mide antes y después y se anima solo transform) mientras la altura de la lista se interpola, en dur-base con
+// curva-salida: la página no brinca. «Ver menos» hace lo inverso, regresa la tira al principio y, si la sección quedó arriba, la trae a la
+// vista. El foco se queda en el botón. Sin movimiento el cambio es inmediato.
+export function wireToggle(section, list, toggle, isMotion = () => false) {
+  const set = open => {
+    const motion = isMotion();
+    const items = [...list.children];
+    const before = motion ? items.map(n => n.getBoundingClientRect()) : null;
+    const h0 = list.offsetHeight;
+    section.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Ver menos' : 'Ver todo';
+    if (!open) {
+      list.scrollLeft = 0;
+      if (section.getBoundingClientRect().top < 0) section.scrollIntoView({ block: 'start', behavior: motion ? 'smooth' : 'auto' });
+    }
+    if (!motion) return;
+    const h1 = list.offsetHeight;
+    const vh = innerHeight, duration = DUR('base'), easing = EASE();
+    list.classList.add('is-moving');
+    items.forEach((n, i) => {
+      const a = before[i], b = n.getBoundingClientRect();
+      if ((a.bottom < -vh || a.top > 2 * vh) && (b.bottom < -vh || b.top > 2 * vh)) return; // lo que no se ve ni antes ni después no viaja
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) n.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration, easing });
+    });
+    const done = () => list.classList.remove('is-moving');
+    list.animate([{ height: `${h0}px` }, { height: `${h1}px` }], { duration, easing }).finished.then(done, done);
+  };
+  toggle.addEventListener('click', () => set(toggle.getAttribute('aria-expanded') !== 'true'));
+  return set;
+}
 
 // «Visto»: la fecha se guarda cuando la sección está en pantalla de verdad (la mitad de la sección, o media ventana si la sección
 // no cabe, durante un momento: pasar de largo no cuenta). Lo que se ve no cambia mientras la persona mira: las insignias, el
@@ -239,34 +291,36 @@ function watchSeen(section, track) {
   io.observe(section);
 }
 
-/** Pinta la tira (al acercarse a la sección): pide el catálogo, comprueba los ids y arma las tarjetas con la pieza del carrusel. */
+/** Pinta la tira (al acercarse a la sección): pide el catálogo y arma un botón por libro. */
 export async function initNews({ ensureCatalog, isMotion = () => false } = {}) {
   const section = document.querySelector('[data-news]');
   if (!section || section.dataset.ready) return;
   section.dataset.ready = '1';
   await initNewsCount();
   const track = section.querySelector('[data-news-track]');
-  const viewport = section.querySelector('[data-news-viewport]');
-  let plan = { show: false, n: 0 }, ok = true;
-  let rail, cat;
+  const toggle = section.querySelector('[data-news-toggle]');
+  const status = section.querySelector('[data-news-status]');
+  let plan = { show: false }, cat;
   try {
-    const [sample, data, railMod, catMod, savedMod] = await Promise.all([loadSample(), loadCollections(), import('./rail.js'), import('./catalog.js'), import('./saved.js')]);
-    rail = railMod; cat = catMod;
-    savedMod.initSaved(); // los marcadores de guardar de las tarjetas
-    plan = newsPlan(sample.books, data, { visto, hoy: isoDay() });
-  } catch { ok = false; /* sin datos no se promete nada: la sección se retira hasta la próxima carga */ }
-  apply(plan, { remember: ok });
-  if (!plan.show) { track.replaceChildren(); track.removeAttribute('aria-busy'); return; }
+    const [sample, data, catMod] = await Promise.all([loadSample(), loadCollections(), import('./catalog.js')]);
+    cat = catMod;
+    plan = shelfPlan(sample.books, data, { visto, hoy: isoDay() });
+    apply(newsPlan(sample.books, data, { visto, hoy: isoDay() })); // el conteo temprano confió en los ids del JSON; con el catálogo, solo cuentan los que existen
+  } catch { /* abajo: estado de error con salida */ }
+  if (!plan.show) { // sin catálogo no se promete nada: se dice y se ofrece WhatsApp; la próxima vez que se acerque se vuelve a pedir
+    delete section.dataset.ready;
+    track.replaceChildren();
+    track.removeAttribute('aria-busy');
+    status.textContent = 'No pudimos cargar el catálogo.';
+    return;
+  }
+  if (status.textContent !== plan.estado) status.textContent = plan.estado;
   const tones = cat.coverTones(plan.books);
   const fresh = new Set(plan.nuevos);
-  track.replaceChildren(...plan.books.map((b, i) => {
-    const li = rail.bookCard(b, tones[i]);
-    if (fresh.has(b.id)) li.querySelector('.card').prepend(badge()); // dentro del botón: «Nuevo» entra en su nombre accesible
-    return li;
-  }));
+  track.replaceChildren(...plan.books.map((b, i) => newsItem(b, tones[i], fresh.has(b.id), i, cat)));
   track.removeAttribute('aria-busy');
-  viewport.setAttribute('aria-label', plan.titulo);
-  rail.wireBookOpen(track, ensureCatalog);
-  wireScroll(section, viewport, track, isMotion);
+  wireOpen(track, ensureCatalog, cat.toneOf);
+  wireToggle(section, track, toggle, isMotion);
+  toggle.disabled = false;
   watchSeen(section, track);
 }

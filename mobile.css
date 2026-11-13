@@ -98,12 +98,9 @@ html:not(.js) .bill-item summary { pointer-events: auto; }
   border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); color: var(--tinta-2); font: var(--t-campo); text-align: left; cursor: pointer;
 }
 .explore-open .ic { width: 22px; height: 22px; flex: none; }
-/* Carrusel: 2.3 portadas por vista; las tarjetas fuera de la vista no cuestan estilo (cada una mide lo mismo). */
-.rail-item { --rail-w: clamp(134px, 42vw, 200px); flex-basis: var(--rail-w); content-visibility: auto; contain-intrinsic-size: auto var(--rail-w) auto calc(var(--rail-w) * 1.5); }
+/* Carrusel 3D: el foco de la portada del centro se dibuja en la portada (el botón no lleva sombra propia). */
 .rail-item .card:focus-visible { box-shadow: none; }
 .rail-item .card:focus-visible .cover { outline: 2px solid var(--foco); outline-offset: 2px; }
-.news .rail-item { content-visibility: visible; }
-.rail-track { --rail-gap: var(--space-3); }
 .rail-chips { --per: 4; --pitch: clamp(72px, calc((100vw - var(--margen) - var(--stop) / 2) / var(--per)), 128px); --name-h: var(--space-8); }
 @media (max-width: 359px) { .rail-chips { --per: 3; } }
 @media (min-width: 360px) { .rail-chips:has(> :nth-child(4):last-child) { --pitch: clamp(72px, calc((100vw - 2 * var(--margen) - var(--stop)) / 3), 128px); } }
@@ -181,7 +178,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-actions { grid-template-columns: repeat(2, minmax(0, max-content)); margin-top: var(--space-4); }
   .entry-media { aspect-ratio: 4 / 3; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }
   .still { width: min(84vw, calc((100svh - 150px) * 1.333)); }
-  .rail-item { --rail-w: min(42vw, calc((100svh - 150px) / 1.5)); }
+  .rail { --cf-w: min(44vw, calc((100svh - 150px) / 1.5)); }
   .topic-layers { aspect-ratio: auto; height: calc(100svh - 150px); max-height: none; }
   .bill-item { flex-basis: min(60vw, 300px); }
   .bill-card-img { aspect-ratio: 16 / 9; }

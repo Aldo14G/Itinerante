@@ -42,7 +42,7 @@ await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-m
 
 const SCALE = [44, 48, 56];
 // Piezas con alto propio, cada una con su razón: no son botones de la escala.
-const OWN = '.tabbar a, .tab-list, .rail-stop, .rail-chip, .card, .rel, .menu-row, .rail-viewport, [data-news-viewport], .cat-opt input, .cat-suggest li, summary';
+const OWN = '.tabbar a, .tab-list, .rail-stop, .rail-chip, .card, .rel, .menu-row, .rail-viewport, [data-news-viewport], .cat-opt input, .cat-suggest li, summary, .news-book'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card
 const AUDIT = `(() => {
   const SCALE = ${JSON.stringify(SCALE)};
   const sel = 'a[href], button, input:not([type=hidden]), select, summary, [role=radio]';
@@ -62,7 +62,7 @@ const AUDIT = `(() => {
     for (const c of B) {
       if (c === b || c.fixed !== b.fixed || c.e.contains(e) || e.contains(c.e)) continue;
       if (b.e.closest('.tabbar') && c.e.closest('.tabbar')) continue; // casillas contiguas de una sola barra
-      if (b.e.matches('.save') || c.e.matches('.save')) continue; // «Guardar» va sobre su portada: un solo objeto, 44 px propios
+      if (b.e.matches('.save, .card-voltear') || c.e.matches('.save, .card-voltear')) continue; // «Guardar» y «Voltear» van sobre su portada: un solo objeto, 44 px propios
       const dx = Math.max(0, Math.max(b.x, c.x) - Math.min(b.x + b.w, c.x + c.w)), dy = Math.max(0, Math.max(b.y, c.y) - Math.min(b.y + b.h, c.y + c.h));
       const d = Math.hypot(dx, dy); if (d < best) { best = d; who = name(c.e); }
     }

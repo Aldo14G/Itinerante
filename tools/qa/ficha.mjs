@@ -39,7 +39,7 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   await send('Page.navigate', { url: URL_ }); await sleep(4500);
   await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
   await sleep(2500); await ev(`scrollBy(0, 1)`); await sleep(800);
-  const p = await ev(`(() => { const r = document.querySelectorAll('[data-rail] .rail-item .card')[1].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
+  const p = await ev(`(() => { const r = document.querySelector('[data-rail] .rail-item.is-centro .card').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
   await click(...p); await sleep(1800);
   const m = await ev(`(() => {
     const d = document.querySelector('#cat-drawer'); const r = d.querySelector('[data-d-visit]').getBoundingClientRect(); const sc = d.querySelector('[data-d-scroll]');

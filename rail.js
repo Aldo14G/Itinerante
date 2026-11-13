@@ -1,7 +1,7 @@
 // Carrusel de libros: una sola pieza para cualquier colección del inventario; una lista curada se escribe como `ids` en
 // assets/data/collections.json. Las colecciones se eligen en un recorrido de paradas (DESIGN.md, «Catálogo como recorrido»):
 // cada una con su icono (`icono` en el JSON), y las que la persona ya hojeó quedan marcadas en este dispositivo.
-import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover } from './catalog.js';
+import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover, priceLabel } from './catalog.js';
 import { loadSample, loadCollections } from './sample.js';
 import { saveButton, initSaved } from './saved.js';
 import { afterPaint, confirmThen, pickPop } from './motion.js';
@@ -119,6 +119,44 @@ export function wireBookOpen(track, ensureCatalog) {
   });
 }
 
+// ---------- Carrusel de portadas en 3D (CarruselPortadas): parte pura ----------
+// La portada del centro va de frente; cada vecina gira hacia el centro según su distancia `d` (en anchos de portada, con signo),
+// se hunde y se encima un poco. Lo mueve el dedo (desplazamiento nativo con imán al centro): aquí solo se traduce la distancia en
+// una pose, una vez por fotograma. `flat` (movimiento reducido o «Pausar el movimiento»): sin giro ni profundidad; las vecinas se
+// achican al 88 %. `giro` es el giro máximo en grados (token --giro-carrusel). Hasta dos portadas del centro todo se ve entero (el texto de
+// una portada conserva su contraste); más allá se desvanece y a 2.6 se oculta.
+export const CF_GIRO = 52;
+const fade = ac => (ac <= 2 ? 1 : +Math.max(0, 1 - (ac - 2) / 0.6).toFixed(3));
+export function coverflowPose(d, { flat = false, giro = CF_GIRO, w = 1 } = {}) {
+  const raw = Number(d) || 0;
+  const c = Math.abs(raw) < 0.02 ? 0 : Math.max(-3, Math.min(3, raw)); // el imán deja la del centro a medio píxel: va de frente, sin encogerse
+  const ac = Math.abs(c), s = c < 0 ? -1 : 1, near = Math.min(ac, 1), far = Math.max(0, ac - 1);
+  const zIndex = 100 - Math.round(ac * 10);
+  const hidden = ac >= 2.6; // lo que ya no se ve no se toca ni se enfoca
+  if (flat) return { transform: `scale(${(1 - near * 0.12).toFixed(3)})`, opacity: fade(ac), zIndex, hidden };
+  const rot = -s * near * giro;
+  const tx = -s * (near * 0.28 + far * 0.42) * w;
+  const tz = -(near * 0.8 + far * 0.4) * w;
+  return {
+    transform: `translateX(${tx.toFixed(1)}px) translateZ(${tz.toFixed(1)}px) rotateY(${rot.toFixed(2)}deg)`,
+    opacity: fade(ac),
+    zIndex,
+    hidden
+  };
+}
+// La portada que queda al centro: la de menor distancia. `centers` son los centros de cada portada en la pista; `mid`, el centro de la ventana.
+export function nearestIndex(centers, mid) {
+  let best = 0, dist = Infinity;
+  centers.forEach((x, i) => { const dd = Math.abs(x - mid); if (dd < dist) { dist = dd; best = i; } });
+  return best;
+}
+// Pie del carrusel: título (sin subtítulo) y «autor · precio» del libro del centro. El precio es el de la hoja de la librería.
+export function captionOf(b, price = null) {
+  const at = String(b?.t ?? '').indexOf(': ');
+  const title = at > 0 ? b.t.slice(0, at) : String(b?.t ?? '');
+  return { title, author: b?.a || '', price };
+}
+
 export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const root = document.querySelector('[data-rail]');
   if (!root || root.dataset.ready) return;
@@ -131,7 +169,9 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const noteEl = $('[data-rail-note]');
   const prev = $('[data-rail-prev]');
   const next = $('[data-rail-next]');
-  const thumb = $('[data-rail-thumb]');
+  const capTitle = $('[data-rail-title]');
+  const capMeta = $('[data-rail-meta]');
+  const dotsEl = $('[data-rail-dots]');
   const live = $('[data-rail-live]');
   const trailBar = $('[data-rail-trail-bar]');
   const trailText = $('[data-rail-trail-text]');
@@ -172,21 +212,60 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   status.textContent = '';
   errBox.hidden = true;
 
-  const step = () => {
-    const first = track.firstElementChild;
-    return first ? first.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0) : viewport.clientWidth;
+  // ---------- Coverflow: pose por fotograma, a partir del desplazamiento ----------
+  const giro = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--giro-carrusel')) || CF_GIRO;
+  let list = []; // libros de la colección pintada
+  let items = []; // sus <li>
+  let centers = []; // centro de cada portada en la pista (no cambia con las transformaciones: se mide al pintar y al cambiar el ancho)
+  let width = 1;
+  let actual = -1;
+  let frame = 0;
+  let keep = -1; // portada que el teclado va a enfocar: visible aunque esté lejos
+  let say = -1; // una flecha o el teclado llevan un libro al centro: se anuncia cuando llega (deslizar con el dedo no anuncia nada)
+  const measure = () => {
+    width = items[0]?.offsetWidth || 1;
+    centers = items.map(it => it.offsetLeft + it.offsetWidth / 2);
   };
-  const sync = () => {
-    const max = track.scrollWidth - viewport.clientWidth;
-    const p = max > 0 ? viewport.scrollLeft / max : 0;
-    const w = track.scrollWidth ? viewport.clientWidth / track.scrollWidth : 1;
-    thumb.style.width = `${Math.max(8, Math.min(100, w * 100)).toFixed(1)}%`;
-    thumb.style.transform = `translateX(${(p * (100 / Math.max(w, 0.01) - 100)).toFixed(1)}%)`;
-    prev.disabled = viewport.scrollLeft <= 2;
-    next.disabled = viewport.scrollLeft >= max - 2;
-    root.classList.toggle('is-static', max <= 2);
+  function center(i) {
+    if (items[actual]) items[actual].classList.remove('is-centro');
+    actual = i;
+    const it = items[i];
+    it.classList.add('is-centro');
+    items.forEach((n, k) => { n.querySelector('.card').tabIndex = k === i ? 0 : -1; }); // una sola parada de tabulador: la portada del centro
+    const b = list[i];
+    const cap = captionOf(b, priceLabel(b.pr));
+    capTitle.textContent = cap.title;
+    capMeta.replaceChildren(cap.author);
+    if (cap.price) { const strong = document.createElement('strong'); strong.textContent = cap.price; strong.dataset.fuente = 'hoja'; capMeta.append(cap.author ? ' · ' : '', strong); }
+    [...dotsEl.children].forEach((d, k) => d.classList.toggle('is-activo', k === i));
+    if (keep === i) keep = -1;
+    if (say === i) { say = -1; live.textContent = `${b.t}, ${b.a}${cap.price ? `, ${cap.price}` : ''}. ${i + 1} de ${items.length}.`; } // la única región viva del carrusel
+    prev.disabled = i <= 0;
+    next.disabled = i >= items.length - 1;
+  }
+  function paint() {
+    frame = 0;
+    if (!items.length) return;
+    const mid = viewport.scrollLeft + viewport.clientWidth / 2;
+    const flat = !isMotion();
+    items.forEach((it, i) => {
+      const p = coverflowPose((centers[i] - mid) / width, { flat, giro, w: width });
+      const pose = it.firstElementChild;
+      pose.style.transform = p.transform;
+      pose.style.opacity = String(p.opacity);
+      it.style.zIndex = String(p.zIndex);
+      it.style.visibility = p.hidden && i !== keep ? 'hidden' : ''; // la portada a la que va el foco no se oculta mientras viaja (perdería el foco)
+    });
+    const i = nearestIndex(centers, mid);
+    if (i !== actual) center(i);
+  }
+  const request = () => { if (!frame) frame = requestAnimationFrame(paint); };
+  const go = (i, smooth = true) => {
+    const k = Math.max(0, Math.min(items.length - 1, i));
+    if (!items[k]) return k;
+    viewport.scrollTo({ left: centers[k] - viewport.clientWidth / 2, behavior: smooth && isMotion() ? 'smooth' : 'auto' });
+    return k;
   };
-  const go = dir => viewport.scrollBy({ left: dir * Math.max(step(), viewport.clientWidth * 0.85), behavior: isMotion() ? 'smooth' : 'auto' });
 
   // Recorrido: una parada queda hojeada cuando la persona la elige y su carrusel se pinta. La que no eligió con un toque (la primera, o la que
   // marca un tema de «Pregúntanos») cuenta cuando ese carrusel llega a la pantalla, no al cargar.
@@ -225,8 +304,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
 
   let current = null;
   let paintId = 0; // el último cambio de colección gana si se toca otra parada antes de terminar de pintar
-  const FIRST_CHUNK = 6; // lo que se ve al llegar; el resto se pinta en el fotograma siguiente para no hacer una tarea larga
-  // `immediate` (primera carga) pinta de una vez. Al tocar una parada, la parada confirma ya y las tarjetas se cambian después de pintar.
+  // `immediate` (primera carga) pinta de una vez. Al tocar una parada, la parada confirma ya y las portadas se cambian después de pintar.
   // `announce` es verdadero solo cuando la persona eligió la parada (toque o teclado): se anuncia y cuenta como hojeada al pintarse.
   async function show(id, announce, immediate = false) {
     const col = cols.find(c => c.id === id) ?? cols[0];
@@ -240,24 +318,25 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     const mine = ++paintId;
     if (!immediate) await afterPaint();
     if (mine !== paintId) return;
-    const list = pickBooks(books, col);
+    list = pickBooks(books, col);
     const tones = coverTones(list);
-    const cards = list.map((b, i) => bookCard(b, tones[i]));
-    track.replaceChildren(...cards.slice(0, FIRST_CHUNK));
+    say = -1; // el cambio de colección se anuncia una sola vez (abajo), no también el libro del centro
+    // La pose (giro, profundidad, opacidad) va en una envoltura: el <li> queda sin transformar y es el blanco del imán, así el imán
+    // centra la portada en su sitio real y no persigue su silueta girada.
+    items = list.map((b, i) => { const li = bookCard(b, tones[i]); const pose = document.createElement('div'); pose.className = 'cf-pose'; pose.append(...li.childNodes); li.append(pose); return li; });
+    track.replaceChildren(...items);
     track.removeAttribute('aria-busy');
-    viewport.scrollTo({ left: 0, behavior: 'auto' });
+    dotsEl.replaceChildren(...list.map(() => document.createElement('span')));
     viewport.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
     noteEl.textContent = col.nota || ''; // la nota de la colección
+    actual = -1;
+    measure();
+    go(Math.floor(list.length / 2), false); // se empieza por el libro del medio: hay vecinas a los dos lados
+    paint();
     painted = col.id;
     markSeen(col.id, announce);
     const trail = paintTrail();
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros. ${trail.text}${trail.complete ? '' : '.'}`; // una sola región viva: la colección y el progreso del recorrido
-    if (cards.length > FIRST_CHUNK) {
-      if (!immediate) await afterPaint();
-      if (mine !== paintId) return;
-      track.append(...cards.slice(FIRST_CHUNK));
-    }
-    sync();
   }
 
   chipsEl.replaceChildren(...cols.map(stopNode));
@@ -298,30 +377,37 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     }, { threshold: 0.5 }).observe(viewport);
   }
 
-  prev.addEventListener('click', () => go(-1));
-  next.addEventListener('click', () => go(1));
-  viewport.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
-  viewport.addEventListener('keydown', e => {
-    if (e.target !== viewport) return;
-    if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-  });
-  // Tab: el navegador no desplaza una tarjeta asomada (recortada) al enfocarla; se alinea al inicio, donde la deja el snap.
-  track.addEventListener('focusin', e => {
+  // Flechas, teclado y toque. Tocar una vecina la trae al centro; tocar la del centro abre la ficha (wireBookOpen).
+  const step = dir => { const k = go(actual + dir); say = k === actual ? -1 : k; };
+  prev.addEventListener('click', () => step(-1));
+  next.addEventListener('click', () => step(1));
+  viewport.addEventListener('scroll', request, { passive: true });
+  track.addEventListener('click', e => {
     const item = e.target.closest('.rail-item');
-    if (!item) return;
-    const pad = parseFloat(getComputedStyle(viewport).scrollPaddingInlineStart) || 0;
-    const v = viewport.getBoundingClientRect();
-    const b = item.getBoundingClientRect();
-    if (b.left >= v.left + pad - 1 && b.right <= v.right - pad + 1) return;
-    viewport.scrollBy({ left: b.left - v.left - pad, behavior: isMotion() ? 'smooth' : 'auto' });
+    if (!item || e.target.closest('.save') || item.classList.contains('is-centro')) return;
+    e.stopImmediatePropagation(); // no abre la ficha: primero viene al centro
+    e.preventDefault();
+    go(items.indexOf(item));
+  }, true);
+  track.addEventListener('keydown', e => {
+    if (!e.target.closest('.card')) return;
+    const to = { ArrowRight: actual + 1, ArrowLeft: actual - 1, Home: 0, End: items.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    const k = go(to);
+    say = k === actual ? -1 : k;
+    const card = items[k]?.querySelector('.card');
+    if (card) { keep = k; items[k].style.visibility = ''; items.forEach(n => { n.querySelector('.card').tabIndex = n === items[k] ? 0 : -1; }); card.focus({ preventScroll: true }); }
   });
-  if ('ResizeObserver' in window) new ResizeObserver(sync).observe(viewport);
+  if ('ResizeObserver' in window) new ResizeObserver(() => { if (!items.length) return; const keep = actual; measure(); go(keep, false); request(); }).observe(viewport);
+  // «Pausar el movimiento» (clase motion de <html>) y «reducir movimiento» cambian la pose: plano o en 3D.
+  new MutationObserver(request).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', request);
 
   wireBookOpen(track, ensureCatalog);
 
   chipsEl.querySelectorAll('.rail-chip').forEach((c, i) => { c.tabIndex = i ? -1 : 0; });
   paintTrail(); // lo guardado de visitas anteriores se pinta sin rebote: no hubo toque
-  show(cols[0].id, false, true);
+  await show(cols[0].id, false, true);
   root.classList.add('is-ready');
 }

@@ -49,7 +49,7 @@ const PAGE = `(() => {
   const de = document.documentElement; const vis = e => e && e.getClientRects().length;
   const name = e => (typeof e.className === 'string' && e.className.trim() ? e.tagName.toLowerCase() + '.' + e.className.trim().split(/\\s+/)[0] : e.tagName.toLowerCase());
   // Los carruseles se desplazan en horizontal a propósito: lo que vive dentro de ellos no cuenta como desborde.
-  const SCROLLERS = '.house-track, .rail-viewport, .rail-chips, .bill-track, .cat-suggest';
+  const SCROLLERS = '.house-track, .rail-viewport, .rail-chips, .bill-track, .cat-suggest, .news-list'; // .news-list: la tira de Novedades (plegada)
   const wide = [...document.querySelectorAll('main *, .ftr *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > innerWidth + 1 && !e.closest(SCROLLERS) && getComputedStyle(e).position !== 'fixed'; }).slice(0, 3).map(name);
   const idr = document.querySelector('.ftr-id').getBoundingClientRect(); const lk = document.querySelector('.ftr-links').getBoundingClientRect();
   const cut = [...document.querySelectorAll('h1, h2, h3, .btn, .topic, .rail-chip-name, .rail-trail-text, .badge, .act, .hdr-brand, .tab-lb, .menu-row')].filter(e => vis(e) && !e.matches('.sr-only') && !e.closest('dialog:not([open]), [hidden]') && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').slice(0, 3).map(e => name(e) + ' «' + e.textContent.trim().slice(0, 16) + '»');

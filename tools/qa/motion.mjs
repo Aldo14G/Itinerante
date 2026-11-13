@@ -52,7 +52,7 @@ async function pass(name, w, h, mobile, reduced) {
   await ev(`document.querySelector('[data-ml-close]')?.click()`); await sleep(900);
   await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 100)`); await sleep(2500);
   await ev(`document.querySelectorAll('[data-rail] .rail-chip')[1]?.click()`); await sleep(600);
-  await ev(`document.querySelector('[data-rail] .card')?.click()`); await sleep(1800);
+  await ev(`document.querySelector('[data-rail] .rail-item.is-centro .card')?.click()`); await sleep(1800);
   await ev(`document.getElementById('cat-drawer')?.close()`); await sleep(600);
 
   const rows = await ev(`(() => {

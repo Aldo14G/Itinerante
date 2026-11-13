@@ -4,12 +4,13 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Márgenes como las listas de iOS: 16 hasta 389 px, 20 desde 390 y 32 desde 1024. El contenido se queda en 1376 px en pantallas muy anchas.
+/* Márgenes como los de iOS (Apple HIG): 16 hasta 375 px (iPhone SE y mini), 20 desde 376 y 32 desde 1024. El contenido se queda en 1376 px en
+   pantallas muy anchas. Con el teléfono en horizontal el margen nunca es menor que el área segura (la muesca): --seguro-x.
    --sec: aire entre secciones (48 en móvil, 64 en escritorio). --hdr-h: la barra de navegación más el área segura. */
-:root { --margen: var(--margen-movil); --sec: var(--space-12); --hdr-h: calc(var(--alto-barra-nav) + env(safe-area-inset-top, 0px)); }
-@media (min-width: 390px) { :root { --margen: var(--margen-movil-amplio); } }
+:root { --seguro-x: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)); --margen: max(var(--margen-movil), var(--seguro-x)); --sec: var(--space-12); --hdr-h: calc(var(--alto-barra-nav) + env(safe-area-inset-top, 0px)); }
+@media (min-width: 376px) { :root { --margen: max(var(--margen-movil-amplio), var(--seguro-x)); } }
 @media (min-width: 761px) { :root { --hdr-h: calc(var(--space-16) + env(safe-area-inset-top, 0px)); } }
-@media (min-width: 1024px) { :root { --margen: var(--margen-escritorio); --sec: var(--space-16); } }
+@media (min-width: 1024px) { :root { --margen: max(var(--margen-escritorio), var(--seguro-x)); --sec: var(--space-16); } }
 @media (min-width: 1440px) { :root { --margen: max(var(--margen-escritorio), calc((100vw - 1376px) / 2)); } }
 
 html {
@@ -20,6 +21,7 @@ html {
   scrollbar-color: var(--linea-fuerte) var(--fondo);
   scrollbar-gutter: stable;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 html.sheet-open, html.explorer-open { overflow: hidden; }
 
@@ -42,6 +44,8 @@ img { height: auto; }
 a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 p { text-wrap: pretty; }
 button { font: inherit; }
+/* Toque al modo de iOS: sin el destello gris de WebKit (cada control tiene su propio estado al presionar) y sin la espera del doble toque. */
+a, button, summary, label, select, input { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 /* Foco de teclado: 2 px de foco separados 2 px del control (anillo-foco sigue su radio). Nunca se quita sin reponerlo. */
 :focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; }
@@ -316,8 +320,9 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .entry-title { font-size: clamp(34px, 3.2vw + 2px, 56px); line-height: 1.08; letter-spacing: var(--ls-display); }
 }
 @media (min-width: 1024px) {
-  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; gap: var(--space-12); min-height: min(calc(100svh - var(--hdr-h)), 900px); padding-block: var(--space-8) var(--space-12); }
-  .entry-media { aspect-ratio: 4 / 3; }
+  /* El titular arranca a la altura del borde superior de la foto (antes la columna se centraba en una pantalla entera y dejaba ~270 px de aire sobre él a 1440 × 900). */
+  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; gap: var(--space-12); padding-block: var(--space-12) var(--space-16); }
+  .entry-media { aspect-ratio: 3 / 2; }
 }
 
 /* ---------- La casa ---------- */
@@ -522,7 +527,7 @@ html:not(.js) .bill-acts .act { display: none; }
 .cat-suggest li[aria-selected="true"] .sg-k, .cat-suggest li:hover .sg-k { color: inherit; }
 .cat-sort select {
   min-height: var(--alto-md); margin: 0; padding: 0 var(--space-10) 0 var(--space-4);
-  border: 0; border-radius: var(--radio-pildora); background-color: var(--fondo-3); color: var(--tinta); font: var(--t-chip); cursor: pointer;
+  border: 0; border-radius: var(--radio-pildora); background-color: var(--fondo-3); color: var(--tinta); font: var(--t-campo); cursor: pointer;
   appearance: none; -webkit-appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
   background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat;
@@ -581,7 +586,7 @@ html:not(.js) .bill-acts .act { display: none; }
 .card-item, .rail-item { position: relative; container-type: inline-size; }
 /* Una sola regla de alto para la tarjeta y su esqueleto: la portada 2:3 (150 % del ancho del contenedor). */
 .rail-item, .card-item { --card-h: 150cqw; }
-:is(.rail-item, .card-item) > .card { min-height: var(--card-h); align-content: start; }
+:is(.rail-item, .card-item) .card { min-height: var(--card-h); align-content: start; }
 /* Portada real: 2:3 de siempre; si la foto es más alta se recorta abajo. Título y autor van como texto oculto (nombre accesible del botón). */
 .cover--img { background: var(--fondo-3); }
 .cover--img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
@@ -627,6 +632,46 @@ html:not(.js) .bill-acts .act { display: none; }
   -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; font: var(--t-boton); letter-spacing: var(--ls-boton);
 }
 .save--wide .ic { width: 20px; height: 20px; }
+
+/* Tarjeta que voltea (TarjetaLibro), en la rejilla de «Explora el catálogo». La portada sigue abriendo la ficha; el botón de vidrio «Voltear»
+   (44 px, arriba a la derecha, aria-pressed) gira la tarjeta 180° en dur-lenta y muestra en el reverso título, autor, editorial, precio de la
+   hoja, «Guardar» y «Ver ficha». La cara oculta es inerte. Sin movimiento no gira: las caras se funden (al instante con «reducir movimiento»). */
+.card-item { perspective: var(--perspectiva-tarjeta); }
+.card-giro { display: grid; transform-style: preserve-3d; transition: transform var(--dur-lenta) var(--curva-salida); }
+.card-cara { grid-area: 1 / 1; min-width: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.card-frente { position: relative; }
+.card-reverso {
+  display: flex; flex-direction: column; min-height: 0; padding: var(--space-3); overflow: hidden;
+  border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea);
+  transform: rotateY(180deg); visibility: hidden; transition: visibility var(--dur-lenta);
+}
+/* La cara que no se ve tampoco se pinta ni se toca (además de inerte): visibility se interpola como «visible» hasta el final del giro. */
+.card-item.is-volteada .card-reverso { visibility: visible; }
+.card-item.is-volteada .card-frente { visibility: hidden; transition: visibility var(--dur-lenta); }
+.motion .card-item.is-volteada .card-giro { transform: rotateY(180deg); }
+html:not(.motion) .card-giro { transition: none; }
+html:not(.motion) .card-reverso { transform: none; opacity: 0; transition: opacity var(--dur-rapida) linear, visibility var(--dur-rapida); }
+html:not(.motion) .card-frente { transition: opacity var(--dur-rapida) linear; }
+html:not(.motion) .card-item.is-volteada .card-reverso { opacity: 1; }
+html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: opacity var(--dur-rapida) linear, visibility var(--dur-rapida); }
+.card-voltear { position: absolute; top: var(--space-2); right: var(--space-2); z-index: 3; }
+/* Volteada: el botón pasa a primario opaco (también donde el vidrio cae a superficie: así su icono claro nunca queda sobre blanco). */
+.card-item .card-voltear[aria-pressed="true"] { background: var(--primario) !important; color: var(--en-primario); }
+.rev-cab { display: flex; flex: none; align-items: center; height: var(--alto-sm); margin-bottom: var(--space-1); }
+.save.save--reverso { width: var(--alto-sm); min-height: var(--alto-sm); }
+.save--reverso .ic { width: 22px; height: 22px; }
+.rev-texto { flex: 1; min-height: 0; overflow: hidden; }
+.rev-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin: 0; overflow: hidden; font: var(--t-titular); letter-spacing: var(--ls-titular); overflow-wrap: anywhere; }
+.rev-a, .rev-p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-nota-pie); color: var(--tinta-2); }
+.rev-pr { flex: none; margin: 0; font: var(--t-titular); font-variant-numeric: tabular-nums; }
+.rev-ficha { flex: none; width: 100%; margin-top: var(--space-2); }
+/* Tarjeta angosta (menos de 160 px, p. ej. a 320): relleno de 8 px y título en Subheadline. Nada se recorta ni se desborda. */
+@container (max-width: 159px) {
+  .card-reverso { padding: var(--space-2); }
+  .rev-t { font: var(--t-subtitulo); font-weight: 600; }
+  .rev-pr { font: var(--t-subtitulo); font-weight: 600; }
+  .rev-ficha { margin-top: 0; }
+}
 
 /* Ficha del libro (FichaLibro): hoja de vidrio. En escritorio, diálogo centrado de hasta 680 px; en móvil sube desde abajo (mobile.css).
    Las acciones van fijas al pie: «Preguntar por WhatsApp» (primaria de la ficha) y «Cómo llegar». */
@@ -674,6 +719,27 @@ html:not(.js) .bill-acts .act { display: none; }
 .save--icono .ic { width: 24px; height: 24px; }
 .save--icono [data-save-label] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .drawer-note { margin: var(--space-2) 0 0; font: var(--t-nota-pie); color: var(--tinta-2); text-align: center; }
+/* Modo «redes» de la ficha (la abre Novedades): «Preguntar por WhatsApp» a todo el ancho y debajo Guardar · Instagram · Facebook · Compartir,
+   cuatro botones de 48 × 48 (círculo menta; guardado en primario) con su nombre en Caption 1, 8 px entre ellos. Sin «Cómo llegar» en este modo. */
+.redes { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.drawer[data-modo="redes"] .redes { display: grid; }
+.drawer[data-modo="redes"] :is([data-d-save], [data-d-visit]) { display: none; }
+.drawer[data-modo="redes"] .drawer-actions { grid-template-columns: minmax(0, 1fr); }
+.redes .red, .redes .red.save {
+  position: static; display: flex; flex-direction: column; align-items: center; gap: var(--space-1); width: 100%; height: auto; min-width: var(--alto-md); min-height: var(--alto-md);
+  margin: 0; padding: 0; border: 0; border-radius: var(--radio-sm); background: none; color: var(--tinta); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+  font: var(--t-leyenda-1); text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.red-ic { display: grid; place-items: center; width: var(--alto-md); height: var(--alto-md); border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida); }
+.red-ic .ic { width: 22px; height: 22px; }
+.red:active .red-ic { transform: scale(0.94); }
+.redes .red.save:active { transform: none; }
+.redes .red.save[aria-pressed="true"] { background: none; color: var(--tinta); }
+.red[aria-pressed="true"] .red-ic { background: var(--primario); color: var(--en-primario); }
+.red[aria-pressed="true"] .ic { fill: currentColor; fill-opacity: 0.25; }
+.red:focus-visible { outline: 2px solid transparent; box-shadow: none; }
+.red:focus-visible .red-ic { box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .red:not([aria-pressed="true"]):hover .red-ic { background: color-mix(in oklab, var(--menta), var(--en-menta) 10%); } }
 
 /* Mi lista: hoja de vidrio (diálogo en escritorio, hoja inferior en móvil) con las acciones fijas al pie. */
 .mylist {
@@ -726,7 +792,7 @@ html:not(.js) .bill-acts .act { display: none; }
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 
 /* ---------- Carrusel de libros (capa 1 del Catálogo) ---------- */
-.rail { --rail-gap: var(--space-4); margin-bottom: var(--sec); }
+.rail { margin-bottom: var(--sec); }
 .rail[hidden], html:not(.js) .rail { display: none; }
 .rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
 .rail-note { margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
@@ -780,25 +846,43 @@ html:not(.js) .bill-acts .act { display: none; }
 .rail-trail-text { margin: 0; font: var(--t-nota-pie); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
 .rail-trail-all[hidden] { display: none; }
 .rail.is-complete .rail-all { visibility: hidden; }
+/* Carrusel de portadas en 3D (CarruselPortadas): la pista se desplaza con el dedo (imán al centro) y rail.js gira las vecinas según su
+   distancia al centro, una vez por fotograma. La portada mide el 44 % del ancho entre 148 y 240 px (172 a 390 px; 240 desde 768).
+   La perspectiva va en la ventana del carrusel (su punto de fuga no se mueve al desplazar) y la pista conserva el 3D de sus portadas.
+   Sin movimiento (reducir movimiento o «Pausar el movimiento») las vecinas solo se achican y se atenúan: la pose la decide rail.js. */
+.rail { --cf-w: clamp(148px, 44vw, 240px); }
 .rail-viewport {
-  margin-inline: calc(-1 * var(--margen)); padding: var(--space-3) var(--margen) var(--space-4);
-  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--margen); scrollbar-width: none;
+  position: relative; margin-inline: calc(-1 * var(--margen)); padding: var(--space-6) 0 var(--space-8);
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+  perspective: var(--perspectiva-carrusel); touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .rail-viewport::-webkit-scrollbar { display: none; }
-.rail-viewport:focus-visible { outline-offset: -4px; }
-.rail-track { display: flex; gap: var(--rail-gap); margin: 0; padding: 0; list-style: none; }
-.rail-item { flex: 0 0 clamp(148px, 17vw, 210px); scroll-snap-align: start; }
+.rail-track { display: flex; width: max-content; margin: 0; padding: 0 calc(50% - var(--cf-w) / 2); list-style: none; transform-style: preserve-3d; }
+.rail-item { flex: 0 0 var(--cf-w); scroll-snap-align: center; transform-style: preserve-3d; }
+/* La envoltura lleva la pose; el <li> (blanco del imán) no se transforma ni recibe toques: el toque va a la portada que se ve. */
+.rail-track:has(.cf-pose), .rail-item:has(> .cf-pose) { pointer-events: none; } /* en 3D el plano de la pista queda delante de las vecinas hundidas */
+.cf-pose { position: relative; pointer-events: auto; will-change: transform; }
 .rail-item .card { content-visibility: visible; }
-.rail-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
-.rail-progress { position: relative; flex: 1 1 120px; height: 4px; overflow: hidden; border-radius: var(--radio-pildora); background: var(--fondo-3); }
-.rail-progress i { position: absolute; inset: 0 auto 0 0; width: 30%; border-radius: inherit; background: var(--tinta-2); }
-.rail-ctrl { display: none; gap: var(--space-2); }
-@media (hover: hover) and (pointer: fine) { .rail-ctrl { display: flex; } }
-.rail-btn:is([data-rail-prev], [data-news-prev]) .ic { rotate: 90deg; }
-.rail-btn:is([data-rail-next], [data-news-next]) .ic { rotate: -90deg; }
+.rail-item.is-centro .cover { box-shadow: var(--sombra-portada); }
+/* Guardar solo sobre la portada del centro: en una vecina girada no se leería ni se tocaría bien. */
+.rail-item .save { transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
+.rail-item:not(.is-centro) .save { opacity: 0; visibility: hidden; }
+.cf-pie { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); }
+.cf-texto { min-width: 0; text-align: center; }
+.cf-titulo { min-height: 1lh; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); color: var(--tinta); }
+.cf-meta { min-height: 1lh; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.cf-meta strong { font-weight: 600; color: var(--tinta); }
+.cf-progreso { display: flex; justify-content: center; align-items: center; gap: var(--space-2); height: var(--space-2); margin: var(--space-4) 0 0; }
+.cf-progreso span { width: 6px; height: 6px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.45; transition: scale var(--dur-base) var(--curva-resorte), opacity var(--dur-rapida) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida); }
+.cf-progreso span.is-activo { scale: 1.5; opacity: 1; background: var(--primario); }
+.rail-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-2); }
 .rail-all { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--alto-sm); margin-inline-start: auto; padding: 0 var(--space-3); border-radius: var(--radio-pildora); color: var(--turquesa-texto); font: var(--t-boton-chico); text-decoration: none; }
 .rail-all .ic { width: 18px; height: 18px; }
-.rail.is-static .rail-progress, .rail.is-static .rail-ctrl { display: none; }
+@media (min-width: 768px) {
+  .rail { --cf-w: 240px; }
+  .rail-viewport { perspective: var(--perspectiva-carrusel-ancha); }
+  .cf-pie { max-width: 640px; margin-inline: auto; }
+}
 .rail-status { margin: 0; font: var(--t-titular); }
 .rail-status:empty { position: absolute; }
 .rail-error { display: flex; flex-wrap: wrap; gap: var(--space-3); }
@@ -806,7 +890,7 @@ html:not(.js) .bill-acts .act { display: none; }
 .rail[data-state="error"] :is(.rail-chips, .rail-trail, .rail-info, .rail-viewport, .rail-foot) { display: none; }
 @media print { .rail { display: none; } }
 /* El foco de «Guardar» sobre una portada se separa con el color de esa portada. */
-:is(.rail-item, .card-item) > .save:focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
+:is(.rail-item, .card-item) .save:not(.save--wide):focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
 
 /* Esqueletos: ocupan el lugar exacto del contenido; quietos, con colores de los tokens. */
 .sk-line { position: relative; display: block; height: 12px; overflow: hidden; border-radius: var(--radio-portada); background: var(--fondo-3); }
@@ -821,15 +905,45 @@ html:not(.js) .bill-acts .act { display: none; }
     linear-gradient(var(--sk), var(--sk)) 50% calc(var(--stop) + var(--space-3)) / var(--space-12) var(--space-3) no-repeat;
 }
 
-/* ---------- Novedades: capítulo propio; sin entradas no existe ---------- */
+/* ---------- Novedades (CarruselNovedades): una tira por todo el catálogo que «Ver todo» despliega en rejilla ---------- */
+/* Sin JavaScript no existe (la tira la arma news.js): ni sección ni enlaces. Con JavaScript está siempre (boot.js pone has-news). */
 html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link][hidden] { display: none; }
-.news { --rail-gap: var(--space-4); padding: var(--sec) var(--margen); background: var(--fondo); }
-.news-head { display: grid; justify-items: start; gap: var(--space-2); margin-bottom: var(--space-6); }
-.news-status { margin: 0; min-height: 1lh; font: var(--t-titular); color: var(--turquesa-texto); }
-.news .rail-viewport { padding-top: var(--space-4); }
-.news.is-static :is(.rail-progress, .rail-ctrl) { display: none; }
+.news { --nov-w: 120px; padding: var(--sec) 0; background: var(--fondo); }
+.news-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--margen); }
+.news-toggle { flex: none; margin-inline-end: calc(-1 * var(--space-3)); }
+.news-toggle:disabled { background: transparent; color: var(--tinta-2); }
+.news-status { min-height: 1lh; margin: var(--space-2) var(--margen) 0; font: var(--t-subtitulo); color: var(--tinta-2); }
+/* Tira: portadas de 120 px (152 desde 768) con 12 px entre ellas e imán al borde; se asoma la siguiente (2.6 a 390 px, 2.2 a 320). */
+.news-list {
+  display: grid; grid-auto-flow: column; grid-auto-columns: var(--nov-w); gap: var(--space-3);
+  margin: var(--space-4) 0 0; padding: var(--space-1) var(--margen) var(--space-2); list-style: none;
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--margen); scrollbar-width: none;
+  touch-action: manipulation;
+}
+.news-list::-webkit-scrollbar { display: none; }
+.news-item { position: relative; min-width: 0; scroll-snap-align: start; container-type: inline-size; }
+/* Desplegada: rejilla de columnas de 96 px como mínimo (3 a 390 px, 2 a 320; 152 en escritorio), 12 px entre columnas y 20 entre filas. */
+.news.is-open .news-list { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); row-gap: var(--space-5); overflow: visible; scroll-snap-type: none; }
+.news-list.is-moving { overflow: hidden; }
+/* Cada libro es un solo botón (portada, título y autor) que abre su ficha con las redes. */
+.news-book { display: block; width: 100%; padding: 0; border: 0; border-radius: var(--radio-portada); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-instantanea) var(--curva-salida); }
+.news-book:active, .news-book[data-opening] { transform: scale(0.97); }
+.news-book:focus-visible { outline: 2px solid transparent; }
+.news-book:focus-visible .cover { box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .news-book:hover .cover { box-shadow: var(--sombra-portada); } }
+.news .cover--blank { gap: var(--space-2); padding: var(--space-3) var(--space-3) var(--space-4); }
+.news .cover-title { font: var(--t-subtitulo); font-weight: 600; }
+.news .cover-author { padding-right: 0; }
+.news-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-top: var(--space-2); overflow: hidden; font: var(--t-subtitulo); font-weight: 600; color: var(--tinta); }
+.news-a { display: block; min-height: 1lh; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-nota-pie); color: var(--tinta-2); }
+.news-item.card--sk .cover { background: var(--fondo-3); box-shadow: none; }
+.news-item.card--sk :is(.news-t, .news-a) { visibility: hidden; }
 .badge-new { position: absolute; z-index: 2; top: var(--space-2); left: var(--space-2); background: var(--primario); color: var(--en-primario); box-shadow: 0 0 0 2px var(--fondo); pointer-events: none; }
 .motion .news.is-in .badge-new { animation: il-pop var(--dur-base) var(--curva-resorte); }
+@media (min-width: 768px) {
+  .news { --nov-w: 152px; }
+  .news.is-open .news-list { grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); }
+}
 @media print { .news { display: none; } }
 
 /* ---------- Sin JavaScript ---------- */

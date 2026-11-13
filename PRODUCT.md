@@ -49,17 +49,25 @@ genérico.
   Eventos y talleres, Novedades, Visita. En
   Eventos y talleres (antes Cartelera), «Me interesa» y «Compartir» son locales: no envían nada ni muestran
   contadores, reseñas o reacciones, porque no hay datos que los respalden.
-- Novedades es un capítulo propio que existe solo si la librería entrega su lista:
-  `novedades.entradas` en `assets/data/collections.json`, un renglón por libro con
-  `{ "id": "…", "llegada": "AAAA-MM-DD" }`. **Se actualiza añadiendo renglones a ese
-  archivo**, sin tocar HTML ni JS. Sin entradas no aparecen la sección, su casilla, sus
-  enlaces ni el control del inicio. No es un ranking ni una promesa de existencia.
-- **Hoy las entradas de Novedades son datos de ejemplo**: 12 libros del catálogo de prueba
-  con fechas de llegada de ejemplo. La fecha no se imprime; solo ordena (lo más reciente
-  primero) y decide qué lleva «Nuevo». Las cifras que sí se muestran («5 llegaron en las
-  últimas dos semanas», «3 novedades desde tu visita») son conteos reales de esa lista
-  frente a la última vez que la persona vio la sección en su dispositivo: no se inventa
-  ninguna. Antes de publicar, la lista se sustituye por las llegadas reales.
+- Novedades es un capítulo propio que **existe siempre** (decisión de Aldo del 2026-11-13):
+  mientras la librería no registre fechas de llegada, es una tira que recorre **todo el
+  catálogo** de la A a la Z (con «Ver todo» se despliega en rejilla) y su línea dice «Todo el
+  catálogo, de la A a la Z.»: no afirma que nada acabe de llegar y ningún libro lleva «Nuevo».
+  Cada libro abre su ficha con «Preguntar por WhatsApp» (mensaje con título y autor), Guardar
+  en Mi lista, los perfiles de la librería en Instagram y Facebook y Compartir (la hoja del
+  teléfono o copiar el enlace). Las llegadas se registran en `novedades.entradas` de
+  `assets/data/collections.json`, un renglón por libro con `{ "id": "…", "llegada": "AAAA-MM-DD" }`;
+  **se actualiza añadiendo renglones a ese archivo**, sin tocar HTML ni JS. Con entradas, esas
+  van primero y solo ellas pueden ser «Nuevo», con su punto y el control del inicio. No es un
+  ranking ni una promesa de existencia.
+- **Hoy la lista de llegadas está vacía** (la librería aún no registra fechas). La fecha no
+  se imprime; solo ordena (lo más reciente primero) y decide qué lleva «Nuevo». Las cifras que
+  se muestran con llegadas («3 llegaron en las últimas dos semanas», «3 novedades desde tu
+  visita») son conteos reales de esa lista frente a la última vez que la persona vio la
+  sección en su dispositivo: no se inventa ninguna.
+- El precio de la hoja de la librería se muestra en la ficha, bajo el carrusel 3D del Catálogo
+  y en el reverso de las tarjetas que voltean; va marcado como dato de la hoja
+  (`data-fuente="hoja"`) y la existencia se sigue confirmando por WhatsApp.
 - El catálogo es una muestra estática de 500 registros de prueba con búsqueda
   local; no depende de ningún servicio para funcionar.
 - El recorrido audiovisual acompaña la entrada y las secciones de la casa; la

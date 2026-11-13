@@ -46,6 +46,9 @@
     <symbol id="t-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15.5V4m-4 4 4-4 4 4M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L19.5 9"/><path d="M19.5 4.5V9H15"/><path d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4.5 15"/><path d="M4.5 19.5V15H9"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
     <!-- Recorrido del catálogo: una parada por colección (`icono` en assets/data/collections.json; sin él, c-libro) y la marca de «hojeada». Dibujos propios. -->
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4.3 4.3 8.7-9.3" fill="none"/></symbol>
     <symbol id="c-libro" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M8 4h8.5A1.5 1.5 0 0 1 18 5.5v13a1.5 1.5 0 0 1-1.5 1.5H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3.5 4v2.5H15V8z"/><path d="M9 4v16" fill="none"/></symbol><symbol id="c-ensayo" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V17h5v-1.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/><path d="M9.5 19h5v1a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1z"/></symbol>
@@ -188,7 +191,8 @@
           <p class="rail-status" role="status" data-rail-status></p>
           <div class="rail-error" data-rail-error hidden><button class="btn btn--secundario" type="button" data-rail-retry><span>Reintentar</span></button><a class="btn btn--secundario" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a></div>
         </div>
-        <div class="rail-viewport" role="region" aria-roledescription="carrusel" aria-label="Libros de la colección" tabindex="0" data-rail-viewport>
+        <!-- Carrusel de portadas en 3D (CarruselPortadas): la del centro de frente; las vecinas giran según su distancia al centro (rail.js, con el desplazamiento nativo e imán al centro). Sin movimiento queda plano. -->
+        <div class="rail-viewport" role="region" aria-roledescription="carrusel" aria-label="Libros de la colección" data-rail-viewport>
           <ul class="rail-track" data-rail-track aria-busy="true">
             <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
             <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
@@ -197,12 +201,13 @@
             <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
           </ul>
         </div>
+        <div class="cf-pie">
+          <button class="btn btn--secundario btn--icono rail-btn" type="button" data-rail-prev disabled aria-label="Libro anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+          <div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title></p><p class="cf-meta" data-rail-meta></p></div>
+          <button class="btn btn--secundario btn--icono rail-btn" type="button" data-rail-next disabled aria-label="Libro siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+        </div>
+        <div class="cf-progreso" aria-hidden="true" data-rail-dots></div>
         <div class="rail-foot">
-          <div class="rail-progress" aria-hidden="true"><i data-rail-thumb></i></div>
-          <div class="rail-ctrl">
-            <button class="btn btn--secundario btn--icono rail-btn" type="button" data-rail-prev disabled aria-label="Libros anteriores"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></button>
-            <button class="btn btn--secundario btn--icono rail-btn" type="button" data-rail-next disabled aria-label="Libros siguientes"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></button>
-          </div>
           <a class="rail-all" href="#catalogo"><span>Ver todo el catálogo</span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
         </div>
         <p class="sr-only" aria-live="polite" data-rail-live></p>
@@ -350,6 +355,13 @@
             <button type="button" class="save save--wide save--icono" data-d-save aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-save-label>Guardar en mi lista</span></button>
             <a class="btn btn--secundario btn--lg" data-d-visit href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
           </div>
+          <!-- Modo «redes» (la ficha que abre Novedades): bajo WhatsApp, Guardar, Instagram, Facebook y Compartir. Los perfiles son los de la librería; Compartir usa la hoja del teléfono o copia el enlace. -->
+          <ul class="redes" aria-label="Guardar y redes de la librería" data-d-redes>
+            <li><button type="button" class="save save--wide red" data-d-red-save data-save-short aria-pressed="false"><span class="red-ic"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg></span><span class="red-nombre" data-save-label>Guardar</span></button></li>
+            <li><a class="red" data-d-red-ig href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer"><span class="red-ic"><svg class="ic" aria-hidden="true"><use href="#i-ig"/></svg></span><span class="red-nombre">Instagram</span></a></li>
+            <li><a class="red" data-d-red-fb href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer"><span class="red-ic"><svg class="ic" aria-hidden="true"><use href="#i-fb"/></svg></span><span class="red-nombre">Facebook</span></a></li>
+            <li><button type="button" class="red" data-d-share><span class="red-ic"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></span><span class="red-nombre">Compartir</span></button></li>
+          </ul>
           <p class="drawer-note">La librería confirma si lo tienen.</p>
         </div>
       </dialog>
@@ -401,28 +413,21 @@
       </div>
     </section>
 
-    <!-- Novedades: se alimenta de «novedades.entradas» de assets/data/collections.json ({ id, llegada }). Sin entradas no existe: ni sección, ni enlaces, ni el control del inicio. -->
+    <!-- Novedades (CarruselNovedades): una tira que se desliza por todo el catálogo y que «Ver todo» despliega en rejilla. Las llegadas con fecha real
+         («novedades.entradas» de assets/data/collections.json, { id, llegada }) van primero y solo ellas pueden llevar «Nuevo»; hoy la lista está vacía y la tira es el catálogo de la A a la Z. -->
     <section id="novedades" class="news" data-news aria-labelledby="news-title">
       <div class="news-head">
         <h2 id="news-title" class="h2">Novedades</h2>
-        <p class="news-status" data-news-status></p>
+        <button class="btn btn--plano btn--sm news-toggle" type="button" aria-expanded="false" aria-controls="news-list" data-news-toggle disabled>Ver todo</button>
       </div>
-      <div class="rail-viewport" role="region" aria-roledescription="carrusel" aria-label="Recién llegados" tabindex="0" data-news-viewport>
-        <ul class="rail-track" data-news-track aria-busy="true">
-          <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-          <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-          <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-          <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-          <li class="rail-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span></span></li>
-        </ul>
-      </div>
-      <div class="rail-foot">
-        <div class="rail-progress" aria-hidden="true"><i data-news-thumb></i></div>
-        <div class="rail-ctrl">
-          <button class="btn btn--secundario btn--icono rail-btn" type="button" data-news-prev disabled aria-label="Novedades anteriores"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></button>
-          <button class="btn btn--secundario btn--icono rail-btn" type="button" data-news-next disabled aria-label="Novedades siguientes"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></button>
-        </div>
-      </div>
+      <p class="news-status" data-news-status>Todo el catálogo, de la A a la Z.</p>
+      <ul class="news-list" id="news-list" aria-label="Libros del catálogo" data-news-track aria-busy="true">
+        <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
+        <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
+        <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
+        <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
+        <li class="news-item card--sk" aria-hidden="true"><span class="news-book"><span class="cover"></span><span class="news-t">&nbsp;<br>&nbsp;</span><span class="news-a">&nbsp;</span></span></li>
+      </ul>
     </section>
 
     <!-- Cita -->
