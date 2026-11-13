@@ -11,7 +11,7 @@ import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
 import { shareName, initFeed, eventBadge, NO_DATE, eventOf } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, pageView, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -1214,8 +1214,18 @@ test('Catálogo simple (2026-11-13): titular → «Buscar en el catálogo» → 
   assert.equal(foldView(41, 5, { filtering: true }).folded, false, 'con búsqueda o filtros, los resultados completos');
   assert.equal(foldView(41, 2, { inline: false }).fold, false, 'en la hoja del teléfono no se pliega');
   assert.equal(foldView(8, 5).fold, false, 'si caben en dos filas, no hay botón');
+  // Más de PAGE_SIZE títulos: «Ver los N títulos» enseña los N (antes desplegaba una página y «Ver más» no volvía: el resto quedaba inalcanzable).
+  const N = PAGE_SIZE + 12;
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4)), { count: PAGE_SIZE, left: 12, more: false, label: '' }, 'plegada: dos filas y solo el botón de plegado, sin «Ver más» suelto');
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 4, { expanded: true })), { count: N, left: 0, more: false, label: '' }, 'desplegada en línea: todos los títulos de una vez');
+  assert.deepEqual(pageView(N, N, foldView(N, 4)), { count: N, left: 0, more: false, label: '' }, 'al volver a plegar no queda «Ver más»');
+  assert.deepEqual(pageView(N, PAGE_SIZE, foldView(N, 2, { inline: false })), { count: PAGE_SIZE, left: 12, more: true, label: 'Ver 12 más · quedan 12' }, 'la hoja del teléfono pagina');
+  assert.deepEqual(pageView(PAGE_SIZE * 2 + 5, PAGE_SIZE, foldView(PAGE_SIZE * 2 + 5, 4, { filtering: true })), { count: PAGE_SIZE, left: PAGE_SIZE + 5, more: true, label: `Ver ${PAGE_SIZE} más · quedan ${PAGE_SIZE + 5}` }, 'con búsqueda o filtros, por páginas también en línea');
+  assert.deepEqual(pageView(N, PAGE_SIZE * 2, foldView(N, 2, { inline: false })), { count: N, left: 0, more: false, label: '' }, 'la última página no pasa del total');
+  for (const view of [foldView(41, 5), foldView(41, 5, { expanded: true }), foldView(41, 5, { filtering: true }), foldView(41, 2, { inline: false })]) assert.deepEqual(pageView(41, PAGE_SIZE, view), { count: 41, left: 0, more: false, label: '' }, 'con 41 títulos todo cabe en una página: nunca hay «Ver más»');
   assert.ok(/<button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid" hidden><\/button>/.test(libros) && /<ul class="cat-grid" id="cat-grid"/.test(libros), 'el botón nombra la rejilla que controla (aria-expanded, aria-controls)');
   const catJs = readFileSync_('catalog.js');
+  assert.ok(/const page = pageView\(results\.length, state\.shown, v\);/.test(catJs) && /moreBtn\.hidden = !page\.more;/.test(catJs) && !/moreBtn\.hidden = moreBtn\.hidden \|\|/.test(catJs), '«Ver más» sale de pageView cada vez que se pliega o despliega');
   assert.ok(/window\.scrollBy\(0, foldBtn\.getBoundingClientRect\(\)\.top - y\)/.test(catJs) && !/foldBtn[^;\n]*\.blur\(|focus\(\)[^;\n]*foldBtn/.test(catJs), 'al plegar el botón se queda bajo el cursor y conserva el foco');
   assert.ok(/@media \(min-width: 761px\) \{ \.cat-grid\[aria-busy="true"\] \{ grid-template-rows: auto auto; grid-auto-rows: 0; row-gap: 0; overflow: clip; margin-bottom: var\(--alto-md\); \}/.test(cssFlat), 'el esqueleto reserva lo mismo que la rejilla plegada (dos filas y el botón)');
   assert.ok(!/class="ask"|data-topic|data-composer|book-query|ask-title|topic-stage|rail-all|cat-lede/.test(libros), 'sin «Pregúntanos» (foto del tema, redactor, Crónica e Infantil), sin «Ver todo el catálogo» y sin entradilla de Explora');
