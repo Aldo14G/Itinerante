@@ -191,6 +191,9 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
     assert.ok(!('priceMxnCents' in b) && !('stockQty' in b) && !('stock' in b), `${b.id}: la existencia no se publica (se confirma por WhatsApp)`);
   }
   // Portadas: archivo local, registrado con su fuente, con las medidas reales (la tarjeta reserva su forma con width/height).
+  // Dos orígenes: bases públicas (Goodreads, Amazon) y la carpeta de Drive de la librería («Librería»: clave de «Foto (ID)» e id del archivo).
+  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
+  const claveFoto = id => (inv.filas[data.books.findIndex(b => b.id === id)].foto ?? '').match(/^[A-Z]+\d+/)?.[0] ?? null;
   const conPortada = data.books.filter(b => b.c);
   assert.equal(data.meta.covers, conPortada.length);
   assert.ok(conPortada.length >= 30, `la mayoría trae portada real (${conPortada.length})`);
@@ -198,11 +201,26 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
     assert.equal(b.c, `assets/img/portadas/${b.id}.webp`, `${b.id}: ruta de portada`);
     assert.ok(existsSync(here(`./${b.c}`)), `${b.id}: la portada existe en disco`);
     const reg = portadas[b.id];
-    assert.ok(reg && ['Goodreads', 'Amazon'].includes(reg.fuente) && /^https:\/\//.test(reg.url) && reg.revisada, `${b.id}: portada registrada en data/portadas.json con fuente, URL y revisión`);
+    assert.ok(reg && ['Goodreads', 'Amazon', 'Librería'].includes(reg.fuente) && /^https:\/\//.test(reg.url) && /^\d{4}-\d{2}-\d{2}$/.test(reg.revisada), `${b.id}: portada registrada en data/portadas.json con fuente, URL y revisión`);
+    if (reg.fuente === 'Librería') {
+      assert.ok(/^[A-Z]+\d+$/.test(reg.foto) && /^[\w-]{20,}$/.test(reg.drive), `${b.id}: la portada de la librería lleva la clave de «Foto (ID)» y el id del archivo de Drive`);
+      assert.equal(reg.url, `https://drive.google.com/file/d/${reg.drive}/view`, `${b.id}: la URL es la del archivo en Drive, sin parámetros (ni claves ni tokens)`);
+      assert.equal(reg.foto, claveFoto(b.id), `${b.id}: la clave registrada es la de «Foto (ID)» de su renglón en la hoja`);
+      assert.ok(reg.recorte === undefined || (reg.recorte.length === 4 && reg.recorte.every(Number.isInteger) && reg.recorte[0] < reg.recorte[2] && reg.recorte[1] < reg.recorte[3]), `${b.id}: el recorte es [izquierda, arriba, derecha, abajo]`);
+    } else {
+      assert.ok(/^https:\/\/m\.media-amazon\.com\//.test(reg.url) && !('foto' in reg) && !('drive' in reg) && !('recorte' in reg), `${b.id}: una portada de base pública trae la URL de la imagen y nada de Drive`);
+    }
     assert.equal(reg.isbn ?? null, b.n, `${b.id}: el registro de la portada es del mismo ISBN`);
     assert.deepEqual(webpSize(await readFile(here(`./${b.c}`))), [b.cw, b.ch], `${b.id}: cw/ch son las medidas del archivo`);
-    assert.ok(b.cw <= 600 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 600 px como máximo (${b.cw}×${b.ch})`);
+    assert.ok(b.cw >= 300 && b.cw <= 600 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 300 a 600 px de ancho (${b.cw}×${b.ch})`);
   }
+  const deLibreria = Object.values(portadas).filter(r => r.fuente === 'Librería');
+  assert.ok(deLibreria.length >= 7, `la carpeta de la librería da portadas (${deLibreria.length})`);
+  assert.equal(new Set(deLibreria.map(r => r.foto)).size, deLibreria.length, 'ninguna clave de foto sirve a dos libros');
+  assert.equal(new Set(deLibreria.map(r => r.drive)).size, deLibreria.length, 'ningún archivo de Drive sirve a dos libros');
+  const importador = await readFile(here('./scripts/import-inventario.py'), 'utf8');
+  assert.ok(!/access_token|refresh_token|client_secret|api_?key|resourcekey|Bearer |AIza[\w-]{10}|ya29\./i.test(importador + JSON.stringify(portadas)), 'ni el importador ni el registro de portadas guardan credenciales ni tokens');
+  assert.ok(/--fotos CARPETA/.test(importador) && /uc\?export=download&id=/.test(importador), 'el importador baja la foto de la carpeta pública o la toma de una carpeta local (--fotos)');
   for (const b of data.books.filter(x => !x.c)) assert.ok(b.cw === null && b.ch === null && !portadas[b.id], `${b.id}: sin portada no hay medidas ni registro`);
   const files = await readdir(here('./assets/img/portadas'));
   assert.deepEqual(files.sort(), conPortada.map(b => `${b.id}.webp`).sort(), 'ninguna portada huérfana en assets/img/portadas');
@@ -211,7 +229,6 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
   const titles = new Set(data.books.map(b => b.t));
   for (const t of ['The Let Them Theory', 'Project Hail Mary', 'Lessons in Chemistry', 'The Midnight Library', 'Spare']) assert.ok(!titles.has(t), `título de la muestra: ${t}`);
   assert.ok(!ids.some(id => id.startsWith('libro-')) && !Object.keys(data.subgenres).some(g => /^(non-)?fiction-/.test(g)), 'ni ids ni géneros de la muestra');
-  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
   assert.equal(inv.filas.length, data.books.length, 'la copia fiel de la hoja tiene un renglón por libro');
   assert.deepEqual(inv.filas.map(f => f.titulo), data.books.map(b => b.t), 'mismo orden y mismos títulos que la hoja');
 });
@@ -231,7 +248,7 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
   // Portadas de los libros: no son fotos de la casa; cada una registrada con su fuente (las mismas de data/portadas.json).
   assert.equal(prov.covers.dir, 'img/portadas/');
   assert.equal(prov.covers.registry, 'data/portadas.json');
-  assert.match(prov.covers.rule, /Goodreads/);
+  assert.ok(/Goodreads y Amazon/.test(prov.covers.rule) && /carpeta de Drive de la librería/.test(prov.covers.rule) && /no entran al repositorio/.test(prov.covers.rule), 'la norma nombra los dos orígenes de las portadas');
   const covers = new Map(prov.covers.files.map(f => [f.file, f]));
   const onDisk = await readdir(here('./assets/img/portadas'));
   assert.equal(covers.size, onDisk.length, 'una entrada por portada');
@@ -239,7 +256,9 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
     const reg = covers.get(`img/portadas/${f}`);
     assert.ok(reg, `portada sin procedencia: img/portadas/${f}`);
     const src = portadas[reg.book];
-    assert.ok(src && reg.source === src.fuente && reg.url === src.url && reg.isbn === (src.isbn ?? null), `img/portadas/${f}: la procedencia coincide con data/portadas.json`);
+    assert.ok(src && reg.source === src.fuente && reg.url === src.url && reg.isbn === (src.isbn ?? null) && reg.reviewed === src.revisada, `img/portadas/${f}: la procedencia coincide con data/portadas.json`);
+    if (src.fuente === 'Librería') assert.ok(reg.photo === src.foto && reg.driveId === src.drive && /entregada por la librería/.test(reg.origin), `img/portadas/${f}: la procedencia dice que la imagen la entregó la librería, con su clave y su archivo`);
+    else assert.ok(!('photo' in reg) && !('driveId' in reg) && !('origin' in reg), `img/portadas/${f}: una portada de base pública no se registra como imagen de la librería`);
     assert.ok(!kind.has(`img/portadas/${f}`), 'una portada no se registra como foto de la casa');
   }
   assert.ok(!('sampleData' in prov) && /inventario-itinerante\.json/.test(prov.catalogData.origin), 'el origen del catálogo es la hoja de la librería');
