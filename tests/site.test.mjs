@@ -208,8 +208,12 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
       assert.equal(reg.url, `https://drive.google.com/file/d/${reg.drive}/view`, `${b.id}: la URL es la del archivo en Drive, sin parámetros (ni claves ni tokens)`);
       assert.equal(reg.foto, claveFoto(b.id), `${b.id}: la clave registrada es la de «Foto (ID)» de su renglón en la hoja`);
       assert.ok(reg.recorte === undefined || (reg.recorte.length === 4 && reg.recorte.every(Number.isInteger) && reg.recorte[0] < reg.recorte[2] && reg.recorte[1] < reg.recorte[3]), `${b.id}: el recorte es [izquierda, arriba, derecha, abajo]`);
+    } else if (reg.fuente === 'Amazon') {
+      assert.ok(/^https:\/\/m\.media-amazon\.com\/images\/I\//.test(reg.url) && !('foto' in reg) && !('drive' in reg) && !('recorte' in reg), `${b.id}: portada de Amazon con su URL de imagen y nada de Drive`);
+    } else if (reg.fuente === 'Goodreads') {
+      assert.ok(/^https:\/\/(m\.media-amazon\.com\/images\/S\/compressed\.photo\.goodreads\.com\/|i\.gr-assets\.com\/)/.test(reg.url) && !('foto' in reg) && !('drive' in reg) && !('recorte' in reg), `${b.id}: portada de Goodreads con su URL de imagen y nada de Drive`);
     } else {
-      assert.ok(/^https:\/\/m\.media-amazon\.com\//.test(reg.url) && !('foto' in reg) && !('drive' in reg) && !('recorte' in reg), `${b.id}: una portada de base pública trae la URL de la imagen y nada de Drive`);
+      assert.fail(`${b.id}: fuente de portada no admitida (${reg.fuente})`);
     }
     assert.equal(reg.isbn ?? null, b.n, `${b.id}: el registro de la portada es del mismo ISBN`);
     assert.deepEqual(webpSize(await readFile(here(`./${b.c}`))), [b.cw, b.ch], `${b.id}: cw/ch son las medidas del archivo`);
