@@ -93,6 +93,21 @@ class Complementos(unittest.TestCase):
     for libro in libros.values():
       self.assertTrue(libro['campos'])
 
+  def test_la_nota_de_catalogo_distingue_hoja_y_complementos(self):
+    path = ROOT / 'assets/provenance.json'
+    backup = path.read_text(encoding='utf-8')
+    try:
+      books = json.loads((ROOT / 'assets/data/catalog.json').read_text(encoding='utf-8'))['books']
+      portadas = json.loads((ROOT / 'data/portadas.json').read_text(encoding='utf-8'))
+      aplicados = json.loads(backup)['catalogData']['complements']['applied']
+      imp.provenance(books, portadas, aplicados)
+      note = json.loads(path.read_text(encoding='utf-8'))['catalogData']['note']
+      self.assertIn('complementos.json', note)
+      self.assertRegex(note, r'título, autor y precio.*salen de la hoja')
+      self.assertNotIn('editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja', note)
+    finally:
+      path.write_text(backup, encoding='utf-8')
+
 
 if __name__ == '__main__':
   unittest.main()

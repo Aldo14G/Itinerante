@@ -278,6 +278,9 @@ test('complementos: lo que la hoja no trae entra con fuente y fecha, la hoja man
   const orden = id => data.books.findIndex(b => b.id === id);
   assert.equal(prov.catalogData.complements.registry, 'data/complementos.json');
   assert.match(prov.catalogData.complements.rule, /gana la hoja/);
+  assert.match(prov.catalogData.note, /título, autor y precio.*salen de la hoja/, 'los campos siempre de la hoja no se mezclan con los complementables');
+  assert.match(prov.catalogData.note, /Editorial, género, ISBN y sinopsis.*complementos\.json/, 'lo complementado no se atribuye solo a la hoja');
+  assert.ok(!/editorial, género, ISBN, sinopsis y precio \(MXN\) salen de la hoja/.test(prov.catalogData.note), 'la nota no dice que todo el inventario sale de la hoja');
   assert.deepEqual([...prov.catalogData.complements.applied].sort((x, y) => orden(x.book) - orden(y.book) || x.field.localeCompare(y.field)), aplicados.sort((x, y) => orden(x.book) - orden(y.book) || x.field.localeCompare(y.field)), 'assets/provenance.json registra cada complemento aplicado con sus fuentes');
   // El precio no se busca fuera: es el de la hoja o no hay.
   data.books.forEach((b, i) => assert.equal(b.pr, Number.isInteger(inv.filas[i].precio) ? inv.filas[i].precio : null, `${b.id}: el precio es el de la hoja`));
