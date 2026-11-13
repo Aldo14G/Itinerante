@@ -151,15 +151,16 @@ export function facetCounts(books, f, dim) {
   return counts;
 }
 
-// Rejilla en línea (tableta y escritorio, 2026-11-13): sin búsqueda ni filtros muestra dos filas y «Ver los N títulos» despliega el resto en
-// su sitio (aria-expanded; el foco se queda en el botón, como «Ver todo» de Novedades). Con búsqueda o filtros, o en la hoja del teléfono,
-// los resultados van completos. No esconde inventario ni inventa orden: las dos filas son las primeras de la A a la Z.
+// Rejilla en línea (2026-11-13, corte del mismo día): el carrusel es la vista. Sin búsqueda ni filtros la rejilla no se pinta;
+// «Ver los N títulos» la abre en su sitio y «Ver menos» la cierra. Con búsqueda o filtros, o en la hoja del teléfono, los resultados van completos.
+// `cols` y `rows` se conservan para quien ya llama a foldView; ya no reservan filas.
 export const FOLD_ROWS = 2;
 export function foldView(total, cols, { inline = true, filtering = false, expanded = false, rows = FOLD_ROWS } = {}) {
-  const limit = Math.max(1, Math.floor(cols) || 1) * rows;
-  const fold = Boolean(inline) && !filtering && total > limit;
+  void cols;
+  void rows;
+  const fold = Boolean(inline) && !filtering && total > 0;
   const folded = fold && !expanded;
-  return { fold, folded, limit: folded ? limit : total, label: folded ? `Ver los ${total} títulos` : 'Ver menos' };
+  return { fold, folded, limit: folded ? 0 : total, label: folded ? `Ver los ${total} títulos` : 'Ver menos' };
 }
 
 // Página de la rejilla cuando los resultados pasan de PAGE_SIZE. La hoja del teléfono y los resultados de una búsqueda o un filtro se pintan
@@ -433,11 +434,12 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     foldBtn.textContent = v.label;
     moreBtn.hidden = !page.more;
     moreBtn.textContent = page.label;
-    // «41 títulos» / «N títulos»; sin resultados la frase visible es la del estado vacío y esta línea solo la anuncia (sr-only).
+    root.classList.toggle('cat-results', !v.folded);
+    // «41 títulos» / «N títulos»; sin resultados la frase visible es la del estado vacío. Con la rejilla cerrada, la línea solo la oye el lector de pantalla.
     const n = results.length;
     const line = !n ? 'No hay títulos con esa combinación.' : page.more ? `Mostrando ${page.count} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
-    if (status.textContent !== line) status.textContent = line; // plegar o desplegar no vuelve a anunciar la misma línea (role="status")
-    status.classList.toggle('sr-only', !n);
+    if (status.textContent !== line) status.textContent = line;
+    status.classList.toggle('sr-only', !n || v.folded);
     return v.folded;
   }
   foldBtn.addEventListener('click', () => {

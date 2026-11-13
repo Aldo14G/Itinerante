@@ -524,6 +524,11 @@ html:not(.js) .bill-pie { display: none; }
 /* Explorar el catálogo (capa 2). En escritorio el diálogo queda abierto en línea; en móvil es una hoja a pantalla completa (mobile.css). */
 .cat { padding: var(--space-12) var(--margen) var(--sec); border-top: 1px solid var(--linea); }
 .cat-head { margin-bottom: var(--space-8); }
+/* En línea la rejilla espera a una búsqueda, un filtro o «Ver los N títulos». El buscador se queda. */
+@media (min-width: 761px) {
+  .cat:not(.cat-results) .cat-layout { display: block; }
+  .cat:not(.cat-results) :is(.cat-filters, .cat-grid, .cat-head, .cat-empty) { display: none; }
+}
 .ex-top { display: none; }
 .explorer { position: static; inset: auto; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; overflow: visible; color: inherit; background: none; border: 0; }
 .explorer:not([open]) { display: none; }

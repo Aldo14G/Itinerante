@@ -60,7 +60,7 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1
     const cat = await ev(`(() => { const g = document.querySelector('[data-cat-grid]'); const c = g.querySelector('button.card'); return { mainH: Math.round(document.querySelector('.cat-main').getBoundingClientRect().height), fold: document.querySelector('[data-cat-fold]').textContent, gridH: Math.round(g.getBoundingClientRect().height), cardH: Math.round(c.getBoundingClientRect().height), cardW: Math.round(c.getBoundingClientRect().width), cls: +window.__cls.toFixed(4), shifts: window.__shifts.slice(0, 4) }; })()`);
     ck('escritorio: CLS durante la carga del catálogo ≤ 0.05', cat.cls <= 0.05, JSON.stringify(cat));
     ck('escritorio: la tarjeta real mide lo mismo que el esqueleto (±8 px de alto y ancho)', Math.abs(cat.cardH - before.gridSkH) <= 8 && Math.abs(cat.cardW - before.gridSkW) <= 8, `esqueleto ${before.gridSkW}×${before.gridSkH} → real ${cat.cardW}×${cat.cardH}`);
-    ck('escritorio: el esqueleto reserva la rejilla plegada (dos filas y «Ver los N títulos», 2026-11-13): el bloque no cambia de alto al cargar (±8 px)', Math.abs(cat.mainH - before.mainH) <= 8 && /^Ver los \d+ títulos$/.test(cat.fold), `esqueleto ${before.mainH}px → real ${cat.mainH}px (${cat.fold}); rejilla ${cat.gridH}px`);
+    ck('escritorio: la rejilla no ocupa la vista al cargar (carrusel primero) y el botón dice «Ver los N títulos»', cat.gridH === 0 && /^Ver los \d+ títulos$/.test(cat.fold), `bloque ${before.mainH}px → ${cat.mainH}px (${cat.fold}); rejilla ${cat.gridH}px`);
   }
 }
 console.log(out.every(Boolean) ? 'ESQUELETOS: todo en orden' : `ESQUELETOS: ${out.filter(x => !x).length} fallos`);
