@@ -271,7 +271,7 @@ La segunda línea de cada titular (`em`) va en la misma familia y el mismo tama�
 
 ## Accesibilidad y control
 
-- `prefers-reduced-motion`, ahorro de datos y el botón «Pausar el movimiento» del pie (persistente) desactivan todas las escenas. La página pasa a un flujo estático completo.
+- `prefers-reduced-motion`, ahorro de datos y el botón «Pausar el movimiento» del pie (persistente) desactivan todas las escenas, incluida la carga de la carreta. La página pasa a un flujo estático completo. Si `app.js` no arranca, el velo se quita solo: no puede dejar la página tapada.
 - El `h1` es «Librería Itinerante y Más» en texto accesible; en escritorio el nombre gigante es decorativo (`aria-hidden`) y en móvil el propio `h1` es el nombre visible del perfil.
 - El menú móvil vuelve inertes `main` y el pie, enfoca el primer enlace y se cierra con Escape devolviendo el foco.
 - Cada cambio de tema en Libros se anuncia en una región `aria-live` aparte.

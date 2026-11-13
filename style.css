@@ -1031,7 +1031,9 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   pointer-events: none;
   contain: strict;
 }
-html.carreta-on .carreta { display: block; pointer-events: auto; }
+html.carreta-on,
+html.carreta-on body { overflow: hidden; overscroll-behavior: none; }
+html.carreta-on .carreta { display: block; pointer-events: auto; overscroll-behavior: none; }
 .carreta-velo {
   position: absolute;
   inset: 0;

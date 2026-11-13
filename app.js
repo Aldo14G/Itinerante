@@ -44,7 +44,14 @@ async function boot() {
   const absTop = el => el.getBoundingClientRect().top + scrollY;
   const motionOn = () => !reduceMq.matches && !userOff && !saveData;
   const isMotion = () => root.classList.contains('motion');
-  const carretaReady = initCarreta({ root, motionOn });
+  const clearCarreta = () => {
+    root.classList.remove('carreta-on', 'carreta-stage-enter', 'carreta-stage-hop', 'carreta-stage-out', 'carreta--reduced');
+    $('#carreta')?.remove();
+  };
+  let carretaReady = Promise.resolve();
+  try {
+    carretaReady = Promise.resolve(initCarreta({ root, motionOn })).catch(clearCarreta);
+  } catch { clearCarreta(); }
 
   let vh = innerHeight;
 

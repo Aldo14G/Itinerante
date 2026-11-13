@@ -1841,12 +1841,13 @@ test('escena de carga (carreta): marca en el HTML, velo con token, sessionStorag
   const [boot, carreta, app] = await Promise.all(['assets/js/boot.js', 'carreta.js', 'app.js'].map(f => readFile(here(`./${f}`), 'utf8')));
   const splash = html.match(/<div id="carreta"[\s\S]*?<\/div>\s*\n\s*<a class="skip"/)?.[0] ?? '';
   assert.ok(splash.includes('id="carreta"') && /Logo\.webp/.test(splash) && /Logo\.png/.test(splash), 'carreta con Logo.webp / Logo.png');
-  assert.ok(/iti-carreta-visto/.test(boot) && /showCarreta/.test(boot) && /classList\.add\('carreta-on'\)/.test(boot), 'boot: una vez por pestaña');
-  assert.ok(/carretaHash/.test(boot) && /id === 'inicio'/.test(boot), 'enlace profundo (salvo #inicio) salta la escena');
-  assert.ok(/SESSION_KEY = 'iti-carreta-visto'/.test(carreta) && /layer\.remove\(\)/.test(carreta) && /import \{ ms \}/.test(carreta), 'carreta.js quita el velo y usa motion.js');
-  assert.ok(/carreta--reduced/.test(carreta) && /\.carreta--reduced/.test(cssFlat), 'modo reducido: fundido sin hop largo');
+  assert.ok(/iti-carreta-visto/.test(boot) && /showCarreta/.test(boot) && /sessionStorage\.setItem\(CARRETA_KEY, '1'\)/.test(boot) && /classList\.add\('carreta-on'\)/.test(boot), 'boot marca la pestaña antes de mostrar el velo');
+  assert.ok(/carretaHash/.test(boot) && /id === 'inicio'/.test(boot) && /back_forward/.test(boot) && /reduce/.test(boot), 'enlace profundo, atrás/adelante y movimiento reducido saltan la escena');
+  assert.ok(/SESSION_KEY = 'iti-carreta-visto'/.test(carreta) && /layer\.remove\(\)/.test(carreta) && /import \{ ms \}/.test(carreta) && /classList\.remove\('carreta-stage-enter'\)/.test(carreta), 'carreta.js quita el velo, no repite la entrada y usa motion.js');
+  assert.ok(/if \(!motionOn\(\)\) \{[\s\S]*?done\(\);/.test(carreta) && /prefers-reduced-motion: reduce\)[\s\S]*?animation: none !important/.test(css), 'modo reducido: sin saltito');
   assert.ok(!/classList\.add\('intro'\)/.test(boot), 'sin la intro anterior de 2 s en boot');
-  assert.ok(/initCarreta/.test(app) && /carretaReady/.test(app), 'app.js arranca la escena sin esperar el catálogo');
+  assert.ok(/carretaReady = Promise\.resolve\(initCarreta\(\{ root, motionOn \}\)\)\.catch\(clearCarreta\)/.test(app) && /fontsReady, posterReady, carretaReady/.test(app), 'app.js arranca la escena y la usa en el arranque, sin esperar el catálogo');
+  assert.ok(/html\.carreta-on,\s*html\.carreta-on body \{ overflow: hidden;/.test(css), 'el velo bloquea el scroll de la página');
   assert.ok(/var\(--carreta-degradado\)/.test(cssFlat) && /--carreta-degradado:/.test(readFileSync_('tokens.css')), 'degradado turquesa en tokens');
   assert.ok(!/setTimeout\(\w+,\s*(?:2\d{3}|[3-9]\d{3})/.test(carreta), 'carreta.js no depende de un timer de varios segundos');
 });

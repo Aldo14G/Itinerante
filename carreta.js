@@ -49,19 +49,19 @@ export function initCarreta({ root, motionOn }) {
     };
 
     requestAnimationFrame(() => {
+      // Movimiento reducido, pausa o ahorro de datos: la página se queda quieta. El velo no entra ni salta.
       if (!motionOn()) {
-        root.classList.add('carreta-stage-out', 'carreta--reduced');
-        once(layer, 'transitionend', done);
-        delay(ms('dur-rapida') + ms('escalon-linea')).then(done);
+        done();
         return;
       }
 
       root.classList.add('carreta-stage-enter');
       delay(ms('dur-rapida') + ms('escalon-linea')).then(() => {
+        root.classList.remove('carreta-stage-enter');
         root.classList.add('carreta-stage-hop');
         return delay(ms('dur-rapida'));
       }).then(() => {
-        root.classList.remove('carreta-stage-hop');
+        root.classList.remove('carreta-stage-enter', 'carreta-stage-hop');
         root.classList.add('carreta-stage-out');
         once(layer, 'animationend', done);
         return delay(ms('dur-base') + ms('escalon-linea'));
