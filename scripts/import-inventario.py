@@ -14,10 +14,15 @@ Uso:  python3 scripts/import-inventario.py RUTA/Catálogo_Itinerante.xlsx [--fot
   si hace falta quitar un borde, `recorte` [izquierda, arriba, derecha, abajo] en píxeles del original. La carpeta está compartida por
   enlace, así que se baja sin credenciales; si deja de estarlo, se bajan las fotos a mano a una carpeta (I1.jpg, A3.jpg…, o con el id
   de Drive por nombre) y se indica con --fotos CARPETA. Las originales no entran al repositorio y aquí no se guardan credenciales.
+- Complementos: data/complementos.json guarda, por libro y por campo, lo que la hoja no trae y se confirmó fuera (valor, fuentes con URL
+  y fecha de consulta). Se aplica solo si la hoja trae ese campo vacío o, para el ISBN, si trae exactamente el valor registrado en
+  `corrige` (un ISBN que es de otro libro). Si la hoja trae otro valor, gana la hoja y se avisa. Solo editorial, genero, isbn y
+  sinopsis: el precio sale siempre de la hoja. Lo aplicado queda en assets/provenance.json (catalogData.complements).
 - Nada se inventa: sin año, formato o páginas en la hoja, el campo queda en null y la ficha no lo muestra.
 Necesita openpyxl y Pillow; la descarga usa curl.
 """
 import json, os, re, subprocess, sys, unicodedata, io
+from urllib.parse import urlparse
 import openpyxl
 from PIL import Image
 
@@ -27,6 +32,8 @@ FUENTES = ('Goodreads', 'Amazon', 'Librería')
 DRIVE_VER = 'https://drive.google.com/file/d/{}/view'
 DRIVE_BAJAR = 'https://drive.google.com/uc?export=download&id={}'
 ANCHO_MIN, ANCHO_MAX = 300, 600
+COMPLEMENTABLES = ('editorial', 'genero', 'isbn', 'sinopsis')  # el precio no: solo sale de la hoja
+PRIMARIAS = ('agencia-isbn', 'editorial')
 
 GENEROS = {  # género de la hoja → (id, nombre, categoría)
     'narrativa': ('narrativa', 'Narrativa', 'literatura'),
@@ -109,6 +116,48 @@ def check_portadas(portadas, rows_by_key):
         if hoja and hoja != e['foto']: sys.exit(f"{key}: la hoja dice «Foto (ID)» {hoja} y data/portadas.json dice {e['foto']}")
 
 
+def load_complementos(path=None):
+    """data/complementos.json, revisado: cada dato con su fecha y con una fuente primaria o dos independientes."""
+    path = path or os.path.join(ROOT, 'data', 'complementos.json')
+    if not os.path.exists(path): return {}
+    with open(path, encoding='utf-8') as f: libros = json.load(f).get('libros', {})
+    for key, libro in libros.items():
+        for campo, c in libro.get('campos', {}).items():
+            donde = f'data/complementos.json, {key}, {campo}'
+            if campo not in COMPLEMENTABLES: sys.exit(f"{donde}: solo se complementan {', '.join(COMPLEMENTABLES)}; el precio sale siempre de la hoja")
+            if not clean(c.get('valor')): sys.exit(f'{donde}: falta `valor`')
+            fuentes = c.get('fuentes') or []
+            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', c.get('consulta') or '') or not fuentes or any(not f.get('nombre') or not str(f.get('url', '')).startswith('https://') for f in fuentes):
+                sys.exit(f'{donde}: lleva `consulta` (AAAA-MM-DD) y `fuentes` con nombre y URL')
+            if not any(f.get('tipo') in PRIMARIAS for f in fuentes) and len({urlparse(f['url']).hostname for f in fuentes}) < 2:
+                sys.exit(f'{donde}: lo confirma una fuente primaria (agencia ISBN o editorial) o dos fuentes independientes')
+            if campo == 'isbn' and not isbn13(c['valor']): sys.exit(f'{donde}: ISBN con dígito de control inválido')
+            if campo == 'genero' and plain(c['valor']) not in GENEROS: sys.exit(f"{donde}: género fuera de los de la hoja ({c['valor']})")
+            if 'corrige' in c and (campo != 'isbn' or not isbn13(c['corrige']) or isbn13(c['corrige']) == isbn13(c['valor'])): sys.exit(f'{donde}: `corrige` es solo para un ISBN de la hoja que pertenece a otro libro')
+    return libros
+
+
+def complementa(r, campos):
+    """Los valores que valen para el catálogo: los de la hoja y, donde la hoja calla (o trae el ISBN registrado como ajeno), el complemento.
+    El renglón no se toca (es la copia fiel de la hoja): solo recibe avisos. Devuelve (valores, campos aplicados)."""
+    val = {c: r[c] for c in COMPLEMENTABLES}
+    aplicados = []
+    for campo, c in campos.items():
+        hoja, nuevo = r[campo], clean(c['valor'])
+        if hoja in (None, ''):
+            val[campo] = nuevo; aplicados.append(campo)
+        elif campo == 'isbn' and c.get('corrige') and isbn13(hoja) == isbn13(c['corrige']):
+            val[campo] = nuevo; aplicados.append(campo)
+            r['avisos'].append(f"el ISBN de la hoja ({hoja}) es de otro libro: se usa {nuevo} (data/complementos.json)")
+        elif (isbn13(hoja) == isbn13(nuevo)) if campo == 'isbn' else (plain(str(hoja)) == plain(nuevo)):
+            r['avisos'].append(f'la hoja ya trae {campo}: su complemento en data/complementos.json sobra')
+        else:
+            r['avisos'].append(f'la hoja trae {campo} distinto del complemento: gana la hoja; revisa data/complementos.json')
+    vacios = [c for c in aplicados if r[c] in (None, '')]
+    if vacios: r['avisos'].append(f"completado con data/complementos.json: {', '.join(vacios)}")
+    return val, aplicados
+
+
 def cover_record(b, e):
     rec = {'file': b['c'].removeprefix('assets/'), 'book': b['id'], 'isbn': e.get('isbn'), 'source': e['fuente'], 'url': e['url'], 'reviewed': e.get('revisada')}
     if e['fuente'] == 'Librería':
@@ -117,7 +166,7 @@ def cover_record(b, e):
     return rec
 
 
-def provenance(books, portadas):
+def provenance(books, portadas, aplicados):
     """Registra en assets/provenance.json el origen del catálogo y de cada portada publicada (tests/site.test.mjs lo exige)."""
     path = os.path.join(ROOT, 'assets', 'provenance.json')
     prov = json.load(open(path, encoding='utf-8'))
@@ -125,7 +174,12 @@ def provenance(books, portadas):
     prov['catalogData'] = {
         'file': 'data/catalog.json',
         'origin': 'Catálogo Itinerante.xlsx (hoja de la librería), importada con scripts/import-inventario.py; copia fiel con avisos por renglón en data/inventario-itinerante.json',
-        'note': 'Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp.'
+        'note': 'Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp.',
+        'complements': {
+            'registry': 'data/complementos.json',
+            'rule': 'Lo que la hoja no trae (o el ISBN que trae de otro libro) se completa solo con datos confirmados por una fuente primaria (agencia ISBN, editorial) o por dos fuentes independientes, de la misma edición; las sinopsis son el texto de la editorial, tal cual. Si la hoja trae después otro valor, gana la hoja. El precio nunca se completa: sale solo de la hoja.',
+            'applied': aplicados
+        }
     }
     prov['covers'] = {
         'dir': 'img/portadas/',
@@ -140,7 +194,8 @@ def provenance(books, portadas):
 def main(xlsx, fotos=None):
     ws = openpyxl.load_workbook(xlsx, data_only=True).worksheets[0]
     portadas = json.load(open(os.path.join(ROOT, 'data', 'portadas.json'), encoding='utf-8'))
-    rows, books, seen = [], [], {}
+    comp = load_complementos()
+    rows, books, seen, aplicados = [], [], {}, []
     for fila, row in enumerate(ws.iter_rows(min_row=3, max_col=8, values_only=True), start=3):
         ed, t, a, precio, sinopsis, genero, isbn, foto = row
         if not clean(t): continue
@@ -155,19 +210,28 @@ def main(xlsx, fotos=None):
         if r['_n'] and len(seen[r['_n']]) > 1: r['avisos'].append(f"ISBN repetido en las filas {seen[r['_n']]}")
         for campo in ('editorial', 'autor', 'precio', 'genero', 'isbn', 'sinopsis'):
             if r[campo] in (None, ''): r['avisos'].append(f'sin {campo}')
-    # Un ISBN repetido solo lo conserva el libro al que pertenece según la base consultada (data/portadas.json); los demás quedan sin ISBN.
-    owners = {v['isbn'] for v in portadas.values() if v.get('isbn')}
     for r in rows: r['_id'] = slug(r['titulo'].split(':')[0] + ' ' + (r['autor'] or ''))[:60]
     check_portadas(portadas, {r['_id']: r for r in rows})
+    # Complementos: los valores que valen para el catálogo. El renglón sigue siendo el de la hoja.
+    usos = {}
     for r in rows:
-        key = r.pop('_id')
-        g = GENEROS.get(plain(r['genero'] or ''))
-        n = r['_n']
-        if n and len(seen[n]) > 1 and (n not in owners or portadas.get(key, {}).get('isbn') != n): n = None
+        r['_val'], campos = complementa(r, comp.get(r['_id'], {}).get('campos', {}))
+        r['_val']['isbn'] = isbn13(r['_val']['isbn'])
+        if r['_val']['isbn']: usos.setdefault(r['_val']['isbn'], []).append(r['fila'])
+        for campo in campos:
+            c = comp[r['_id']]['campos'][campo]
+            aplicados.append({'book': r['_id'], 'field': campo, 'consulted': c['consulta'], 'sources': [f['url'] for f in c['fuentes']]})
+    # Un ISBN repetido solo lo conserva el libro al que pertenece según la base consultada (data/portadas.json); los demás quedan sin ISBN.
+    owners = {v['isbn'] for v in portadas.values() if v.get('isbn')}
+    for r in rows:
+        key, val = r.pop('_id'), r.pop('_val')
+        g = GENEROS.get(plain(val['genero'] or ''))
+        n = val['isbn']
+        if n and len(usos[n]) > 1 and (n not in owners or portadas.get(key, {}).get('isbn') != n): n = None
         c = cover(key, portadas[key], fotos) if key in portadas else (None, None, None)
-        books.append({'id': key, 't': r['titulo'], 'a': r['autor'], 'p': r['editorial'], 'y': None, 'f': None,
+        books.append({'id': key, 't': r['titulo'], 'a': r['autor'], 'p': val['editorial'], 'y': None, 'f': None,
                       'g': g[0] if g else None, 'k': g[2] if g else None, 'n': n, 'c': c[0], 'cw': c[1], 'ch': c[2],
-                      'pg': None, 'lg': 'es', 's': r['sinopsis'], 'pr': r['precio'] if isinstance(r['precio'], (int, float)) else None})
+                      'pg': None, 'lg': 'es', 's': val['sinopsis'], 'pr': r['precio'] if isinstance(r['precio'], (int, float)) else None})
         r.pop('_n')
     ids = [b['id'] for b in books]
     assert len(ids) == len(set(ids)), 'ids repetidos'
@@ -178,10 +242,12 @@ def main(xlsx, fotos=None):
         json.dump({'meta': meta, 'filas': rows}, f, ensure_ascii=False, indent=1); f.write('\n')
     with open(os.path.join(ROOT, 'assets', 'data', 'catalog.json'), 'w', encoding='utf-8') as f:
         json.dump({'meta': meta, 'categories': cat, 'subgenres': sub, 'books': books}, f, ensure_ascii=False, separators=(',', ':')); f.write('\n')
-    provenance(books, portadas)
+    provenance(books, portadas, aplicados)
     print(f"{len(books)} libros, {meta['covers']} con portada; avisos:")
     for r in rows:
         if r['avisos']: print(f"  fila {r['fila']} «{r['titulo'][:40]}»: {'; '.join(r['avisos'])}")
+    for key in comp:
+        if key not in ids: print(f'  data/complementos.json: «{key}» ya no está en la hoja (¿cambió su título o su autor?); su complemento no se aplica')
 
 
 if __name__ == '__main__':

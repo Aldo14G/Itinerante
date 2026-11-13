@@ -220,7 +220,7 @@
       {
         "file": "img/portadas/hipercodex-emmanuel-vizcaya.webp",
         "book": "hipercodex-emmanuel-vizcaya",
-        "isbn": null,
+        "isbn": "9786075954097",
         "source": "Librería",
         "url": "https://drive.google.com/file/d/1U-dj_HWor_Gs0B1sWMR1Dz0yKuewUXfc/view",
         "reviewed": "2026-11-13",
@@ -359,7 +359,7 @@
       {
         "file": "img/portadas/las-ruinas-de-la-caza-alfredo-leal.webp",
         "book": "las-ruinas-de-la-caza-alfredo-leal",
-        "isbn": null,
+        "isbn": "9786079906702",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/61nalhU1ylL.jpg",
         "reviewed": "2026-11-12"
@@ -561,7 +561,69 @@
   "catalogData": {
     "file": "data/catalog.json",
     "origin": "Catálogo Itinerante.xlsx (hoja de la librería), importada con scripts/import-inventario.py; copia fiel con avisos por renglón en data/inventario-itinerante.json",
-    "note": "Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp."
+    "note": "Inventario real: título, autor, editorial, género, ISBN, sinopsis y precio (MXN) salen de la hoja. La existencia no se publica: se confirma por WhatsApp.",
+    "complements": {
+      "registry": "data/complementos.json",
+      "rule": "Lo que la hoja no trae (o el ISBN que trae de otro libro) se completa solo con datos confirmados por una fuente primaria (agencia ISBN, editorial) o por dos fuentes independientes, de la misma edición; las sinopsis son el texto de la editorial, tal cual. Si la hoja trae después otro valor, gana la hoja. El precio nunca se completa: sale solo de la hoja.",
+      "applied": [
+        {
+          "book": "hipercodex-emmanuel-vizcaya",
+          "field": "isbn",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-59540-9-7",
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-59540-0-4",
+            "https://libreriacasatomada.mx/productos/hipercodex-19ekr/"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "editorial",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://www.elem.mx/obra/datos/236048",
+            "https://booksfrommexico.com/product/las-ruinas-de-la-caza",
+            "https://www.fondodeculturaeconomica.com/Noticia/3871"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "genero",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-99067-0-2",
+            "https://www.elem.mx/obra/datos/236048"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "isbn",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-99067-0-2",
+            "https://www.elem.mx/obra/datos/236048",
+            "https://booksfrommexico.com/product/las-ruinas-de-la-caza"
+          ]
+        },
+        {
+          "book": "las-ruinas-de-la-caza-alfredo-leal",
+          "field": "sinopsis",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://www.libros.unam.mx/gd-las-ruinas-de-la-caza-9786073041836-libro.html",
+            "https://www.elem.mx/obra/datos/236048"
+          ]
+        },
+        {
+          "book": "los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux",
+          "field": "sinopsis",
+          "consulted": "2026-11-13",
+          "sources": [
+            "https://capitulosiete.com.mx/product/los-habitantes-antologia-de-cuentos/"
+          ]
+        }
+      ]
+    }
   },
   "menuData": {
     "file": "data/menu.json",

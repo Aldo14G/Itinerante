@@ -162,8 +162,9 @@ test('catálogo: sugerencias, relacionados y mensaje de ficha', () => {
   assert.ok(rel.length <= 3 && rel.every(r => r.g === b.g && r.id !== b.id));
   assert.match(bookMessage(b), new RegExp(`«${b.t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}»`));
   assert.equal(new URL(bookWaUrl(b)).searchParams.get('text'), bookMessage(b));
-  const sinGenero = data.books.find(x => !x.g);
-  assert.ok(sinGenero, 'el inventario trae un libro sin género (fila incompleta de la hoja)');
+  // Un renglón incompleto de la hoja (sin género ni ISBN). Hoy ninguno llega así al catálogo («Las ruinas de la caza» se completó desde
+  // data/complementos.json el 2026-11-13), pero la hoja puede volver a traer uno: se prueba con un libro real al que se le quitan esos campos.
+  const sinGenero = { ...b, g: null, k: null, n: null };
   assert.deepEqual(relatedBooks(data.books, sinGenero), [], 'sin género no hay relacionados');
   assert.equal(bookMessage(sinGenero), `Hola, ¿tienen «${sinGenero.t}» de ${sinGenero.a}? Vi el título en su sitio.`, 'sin ISBN el mensaje no lo menciona');
 });
@@ -231,6 +232,59 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
   assert.ok(!ids.some(id => id.startsWith('libro-')) && !Object.keys(data.subgenres).some(g => /^(non-)?fiction-/.test(g)), 'ni ids ni géneros de la muestra');
   assert.equal(inv.filas.length, data.books.length, 'la copia fiel de la hoja tiene un renglón por libro');
   assert.deepEqual(inv.filas.map(f => f.titulo), data.books.map(b => b.t), 'mismo orden y mismos títulos que la hoja');
+});
+test('complementos: lo que la hoja no trae entra con fuente y fecha, la hoja manda y el precio sale solo de la hoja', async t => {
+  const comp = JSON.parse(await readFile(here('./data/complementos.json'), 'utf8'));
+  const inv = JSON.parse(await readFile(here('./data/inventario-itinerante.json'), 'utf8'));
+  const digits = v => String(v ?? '').replace(/\D/g, '');
+  const enCatalogo = { editorial: b => b.p, genero: b => (b.g ? data.subgenres[b.g].n : null), isbn: b => b.n, sinopsis: b => b.s };
+  const aplicados = [];
+  assert.ok(Object.keys(comp.libros).length >= 3, 'hay complementos registrados');
+  for (const [id, libro] of Object.entries(comp.libros)) {
+    const i = data.books.findIndex(b => b.id === id);
+    assert.ok(i >= 0, `${id}: el complemento es de un libro del catálogo`);
+    const b = data.books[i], fila = inv.filas[i];
+    for (const [campo, c] of Object.entries(libro.campos)) {
+      const donde = `${id}, ${campo}`;
+      assert.ok(Object.hasOwn(enCatalogo, campo), `${donde}: solo se complementan editorial, genero, isbn y sinopsis (el precio, nunca)`);
+      assert.ok(typeof c.valor === 'string' && c.valor.trim() && /^\d{4}-\d{2}-\d{2}$/.test(c.consulta), `${donde}: valor y fecha de consulta`);
+      assert.ok(Array.isArray(c.fuentes) && c.fuentes.length && c.fuentes.every(f => f.nombre && /^https:\/\//.test(f.url)), `${donde}: fuentes con nombre y URL`);
+      assert.ok(c.fuentes.some(f => ['agencia-isbn', 'editorial'].includes(f.tipo)) || new Set(c.fuentes.map(f => new URL(f.url).hostname)).size >= 2, `${donde}: una fuente primaria (agencia ISBN o editorial) o dos independientes`);
+      if (campo === 'isbn') assert.ok(isbnOk(c.valor) && (c.corrige === undefined || (isbnOk(c.corrige) && c.corrige !== c.valor)), `${donde}: ISBN-13 válidos`);
+      else assert.ok(!('corrige' in c), `${donde}: «corrige» es solo para un ISBN de la hoja que es de otro libro`);
+      if (campo === 'sinopsis') assert.ok(c.fuentes.some(f => f.tipo === 'editorial'), `${donde}: la sinopsis es el texto de la editorial`);
+      const hoja = fila[campo];
+      const vacio = hoja === null || hoja === '';
+      const ajeno = campo === 'isbn' && c.corrige !== undefined && digits(hoja) === c.corrige;
+      if (vacio || ajeno) {
+        assert.equal(enCatalogo[campo](b), c.valor, `${donde}: el complemento está aplicado en el catálogo`);
+        assert.ok(fila.avisos.some(a => /complementos\.json/.test(a)), `${donde}: el renglón avisa de que el dato no es de la hoja`);
+        aplicados.push({ book: id, field: campo, consulted: c.consulta, sources: c.fuentes.map(f => f.url) });
+      } else {
+        assert.equal(norm(enCatalogo[campo](b) ?? ''), norm(campo === 'isbn' ? digits(hoja) : hoja), `${donde}: la hoja trae el dato y gana la hoja`);
+      }
+    }
+  }
+  // La copia fiel no se toca: el renglón de «Hipercódex» conserva el ISBN que trae la hoja y el catálogo lleva el suyo.
+  const hiper = data.books.findIndex(b => b.id === 'hipercodex-emmanuel-vizcaya');
+  assert.equal(digits(inv.filas[hiper].isbn), comp.libros['hipercodex-emmanuel-vizcaya'].campos.isbn.corrige);
+  assert.equal(data.books[hiper].n, '9786075954097');
+  assert.equal(book('las-hojas-de-fabre-jesus-ferreiro').n, '9786075954004', 'el ISBN repetido se queda con su libro');
+  // Procedencia: lo aplicado queda registrado, en el mismo orden que la hoja.
+  const orden = id => data.books.findIndex(b => b.id === id);
+  assert.equal(prov.catalogData.complements.registry, 'data/complementos.json');
+  assert.match(prov.catalogData.complements.rule, /gana la hoja/);
+  assert.deepEqual([...prov.catalogData.complements.applied].sort((x, y) => orden(x.book) - orden(y.book) || x.field.localeCompare(y.field)), aplicados.sort((x, y) => orden(x.book) - orden(y.book) || x.field.localeCompare(y.field)), 'assets/provenance.json registra cada complemento aplicado con sus fuentes');
+  // El precio no se busca fuera: es el de la hoja o no hay.
+  data.books.forEach((b, i) => assert.equal(b.pr, Number.isInteger(inv.filas[i].precio) ? inv.filas[i].precio : null, `${b.id}: el precio es el de la hoja`));
+  assert.equal(book('las-ruinas-de-la-caza-alfredo-leal').pr, null, '«Las ruinas de la caza» sigue sin precio hasta que la hoja lo traiga');
+  assert.equal(priceLabel(book('las-ruinas-de-la-caza-alfredo-leal').pr), null, 'sin precio no se imprime nada');
+  // La regla del importador (vacío, ISBN ajeno registrado, gana la hoja) se prueba en Python, que es donde vive.
+  const { spawnSync } = await import('node:child_process');
+  const py = cmd => spawnSync('python3', ['-B', ...cmd], { cwd: here('.'), encoding: 'utf8' });
+  if (py(['-c', 'import openpyxl, PIL']).status !== 0) return t.diagnostic('sin python3 con openpyxl y Pillow: tests/test_import_inventario.py no se corrió aquí');
+  const run = py(['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_import_inventario.py']);
+  assert.equal(run.status, 0, `tests/test_import_inventario.py: ${run.stderr}`);
 });
 test('recursos referenciados existen', async () => {
   const refs = [...html.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m => m[1]);

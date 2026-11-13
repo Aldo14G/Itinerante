@@ -18,7 +18,8 @@
    "isbn": "978-607-59540-0-4",
    "foto": "I1",
    "avisos": [
-    "ISBN repetido en las filas [3, 4]"
+    "ISBN repetido en las filas [3, 4]",
+    "el ISBN de la hoja (978-607-59540-0-4) es de otro libro: se usa 9786075954097 (data/complementos.json)"
    ]
   },
   {
@@ -206,7 +207,8 @@
     "sin precio",
     "sin genero",
     "sin isbn",
-    "sin sinopsis"
+    "sin sinopsis",
+    "completado con data/complementos.json: editorial, genero, isbn, sinopsis"
    ]
   },
   {
@@ -484,7 +486,8 @@
    "isbn": "978-607-98604-5-5",
    "foto": null,
    "avisos": [
-    "sin sinopsis"
+    "sin sinopsis",
+    "completado con data/complementos.json: sinopsis"
    ]
   },
   {

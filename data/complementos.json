@@ -1,0 +1,145 @@
+{
+ "nota": "Datos que la hoja «Catálogo Itinerante.xlsx» no trae (o trae en conflicto) y que se confirmaron fuera. La hoja manda: scripts/import-inventario.py aplica un complemento solo si la hoja trae ese campo vacío o, para el ISBN, si trae exactamente el valor registrado en `corrige` (un ISBN que es de otro libro). Si la hoja trae después otro valor, gana la hoja y el importador avisa. Solo se complementan editorial, genero, isbn y sinopsis; el precio sale siempre de la hoja. Cada dato lleva `consulta` (fecha) y `fuentes`: una primaria (`tipo` «agencia-isbn» o «editorial») o dos independientes que coincidan, de la misma edición. Las sinopsis son el texto de la editorial, tal cual; no se redactan ni se parafrasean.",
+ "libros": {
+  "hipercodex-emmanuel-vizcaya": {
+   "titulo": "Hipercódex: Ensayo poético hiperbólico",
+   "campos": {
+    "isbn": {
+     "valor": "9786075954097",
+     "corrige": "9786075954004",
+     "nota": "La hoja repite en este renglón el 978-607-59540-0-4, que la agencia tiene registrado a «Las hojas de Fabre» (Ramírez Ferreiro, Jesús).",
+     "consulta": "2026-11-13",
+     "fuentes": [
+      {
+       "tipo": "agencia-isbn",
+       "nombre": "Agencia ISBN México (Indautor)",
+       "url": "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-59540-9-7",
+       "dice": "Hipercódex · Vizcaya, Emmanuel · Cooperativa Intercolectividades · 2026-06-30"
+      },
+      {
+       "tipo": "agencia-isbn",
+       "nombre": "Agencia ISBN México (Indautor)",
+       "url": "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-59540-0-4",
+       "dice": "Las hojas de Fabre · Ramírez Ferreiro, Jesús · Cooperativa Intercolectividades · 2023-02-15"
+      },
+      {
+       "tipo": "libreria",
+       "nombre": "Librería Casa Tomada",
+       "url": "https://libreriacasatomada.mx/productos/hipercodex-19ekr/",
+       "dice": "HIPERCÓDEX · Iridiscencias Editorial · ISBN 9786075954097"
+      }
+     ]
+    }
+   }
+  },
+  "las-ruinas-de-la-caza-alfredo-leal": {
+   "titulo": "Las ruinas de la caza",
+   "nota": "Una sola edición impresa (2021, 128 páginas), coedición de la UNAM (Dirección General de Publicaciones y Fomento Editorial) y Abismos Casa Editorial, con un ISBN por coeditor: 978-607-99067-0-2 (Abismos) y 978-607-30-4183-6 (UNAM); el libro electrónico de la UNAM es 978-607-30-4609-1. Aquí va el de Abismos, la editorial con la que la librería lo tiene en la hoja. El precio no se busca fuera: queda vacío hasta que la hoja lo traiga.",
+   "campos": {
+    "editorial": {
+     "valor": "Abismos Casa Editorial",
+     "consulta": "2026-11-13",
+     "fuentes": [
+      {
+       "tipo": "otra",
+       "nombre": "Enciclopedia de la Literatura en México (ELEM)",
+       "url": "https://www.elem.mx/obra/datos/236048",
+       "dice": "Editorial: Universidad Nacional Autónoma de México / Casa Editorial Abismos · 2021"
+      },
+      {
+       "tipo": "otra",
+       "nombre": "Books from Mexico",
+       "url": "https://booksfrommexico.com/product/las-ruinas-de-la-caza",
+       "dice": "Editorial Abismos ; Universidad Nacional Autónoma de México, 2021"
+      },
+      {
+       "tipo": "otra",
+       "nombre": "Fondo de Cultura Económica (nota)",
+       "url": "https://www.fondodeculturaeconomica.com/Noticia/3871",
+       "dice": "Las ruinas de la caza, de Alfredo Leal, Abismos Casa Editorial"
+      }
+     ]
+    },
+    "genero": {
+     "valor": "Narrativa",
+     "consulta": "2026-11-13",
+     "fuentes": [
+      {
+       "tipo": "agencia-isbn",
+       "nombre": "Agencia ISBN México (Indautor)",
+       "url": "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-99067-0-2",
+       "dice": "Materia: Novelística mexicana"
+      },
+      {
+       "tipo": "otra",
+       "nombre": "Enciclopedia de la Literatura en México (ELEM)",
+       "url": "https://www.elem.mx/obra/datos/236048",
+       "dice": "Narrativa - Novela"
+      }
+     ]
+    },
+    "isbn": {
+     "valor": "9786079906702",
+     "consulta": "2026-11-13",
+     "fuentes": [
+      {
+       "tipo": "agencia-isbn",
+       "nombre": "Agencia ISBN México (Indautor)",
+       "url": "https://isbnmexico.indautor.cerlalc.org/catalogo.php?mode=resultados_rapidos&palabra=978-607-99067-0-2",
+       "dice": "Las ruinas de la caza · Leal Rodríguez, Alfredo · Ochoa Contreras Ángeles Sidharta (Abismos) · 2021-01-31"
+      },
+      {
+       "tipo": "otra",
+       "nombre": "Enciclopedia de la Literatura en México (ELEM)",
+       "url": "https://www.elem.mx/obra/datos/236048",
+       "dice": "ISBN: 9786079906702"
+      },
+      {
+       "tipo": "otra",
+       "nombre": "Books from Mexico",
+       "url": "https://booksfrommexico.com/product/las-ruinas-de-la-caza",
+       "dice": "ISBN : 9786079906702 (Abismos) ; 9786073041836 (UNAM)"
+      }
+     ]
+    },
+    "sinopsis": {
+     "valor": "Por medio de un tratamiento que oscila entre la novela negra y el texto posmoderno, Las ruinas de la caza desarrolla la historia del feminicidio de una preparatoriana. La investigación la lleva a cabo una mujer norteamericana radicada en México, profesora de literatura, desempleada, especialista en Sylvia Plath, a la que le gusta llamarse re-researcher, traducido literalmente como in-investigadora. Los dos posibles culpables son el profesor de filosofía de la joven (cuyo intento de realizar una tesis doctoral le ha sido negado tres veces consecutivas en un año), por un lado, y, por el otro, su psiquiatra (que regresó a dar consulta después de una fallida carrera como actor de cine). Los personajes centrales, la investigadora y la víctima, son un espejo el uno del otro. Todo lo que puede servir para resolver el crimen pasa por el lenguaje, ahí donde quedan los restos, las ruinas de lo que, queramos o no, somos.",
+     "consulta": "2026-11-13",
+     "nota": "Texto de la ficha del coeditor (UNAM), completo y tal cual. La contraportada de 2021 que transcribe la ELEM es una versión más breve del mismo texto.",
+     "fuentes": [
+      {
+       "tipo": "editorial",
+       "nombre": "Libros UNAM (coeditor)",
+       "url": "https://www.libros.unam.mx/gd-las-ruinas-de-la-caza-9786073041836-libro.html",
+       "dice": "Descripción / Resumen"
+      },
+      {
+       "tipo": "otra",
+       "nombre": "Enciclopedia de la Literatura en México (ELEM)",
+       "url": "https://www.elem.mx/obra/datos/236048",
+       "dice": "Contraportada de la edición de 2021"
+      }
+     ]
+    }
+   }
+  },
+  "los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux": {
+   "titulo": "Los habitantes: antología de cuentos",
+   "campos": {
+    "sinopsis": {
+     "valor": "En cada uno de los espacios que conforman este libro hay un habitante que no tiene tiempo sino para imaginar y escribir una historia que lo haga ser parte de estas paredes que, por muchos momentos, reflejan formas muy parecidas a nosotros. Todo cuento es un espejo. Todo cuento nos refleja lo que no queremos ver: son otros seres los que habitan la casa. Sus rostros se desvelan cuando la historia provoca girarnos para ver lo que existe detrás de nosotros. Y nos asustamos, porque nos parecen tan ajenos los fantasmas. Aquí los habitantes no ríen, no lloran, no se asustan: solo miran, solo les queda observar desde la oscuridad, en una de las esquinas de la habitación, a los que leen. Los habitantes murmuran, al caminar por los pasillos de este libro, a vuelta de cada página, que miremos bien adentro…: “escudriña la oscuridad”, dicen. Y entonces con las manos vamos quitando sombras; como si de una inmensa maleza se tratara nos abrimos paso en el aire que nos envuelve. ¿Qué hay en lo que sueña un escritor? Es la curiosidad la que nos hace darnos cuenta de que también, muchas veces, somos lo que leemos.",
+     "consulta": "2026-11-13",
+     "nota": "«Reseña» de la ficha de la editorial para la edición de 2020 (ISBN 978-607-98604-5-5, el de la hoja), completa y tal cual; los párrafos van seguidos.",
+     "fuentes": [
+      {
+       "tipo": "editorial",
+       "nombre": "Capítulo Siete (editorial)",
+       "url": "https://capitulosiete.com.mx/product/los-habitantes-antologia-de-cuentos/",
+       "dice": "Descripción · RESEÑA"
+      }
+     ]
+    }
+   }
+  }
+ }
+}
