@@ -1028,19 +1028,20 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   inset: 0;
   z-index: 10000;
   display: none;
-  place-items: center;
-  padding:
-    max(env(safe-area-inset-top, 0px), var(--space-2))
-    max(env(safe-area-inset-right, 0px), var(--space-2))
-    max(env(safe-area-inset-bottom, 0px), var(--space-2))
-    max(env(safe-area-inset-left, 0px), var(--space-2));
   pointer-events: none;
   contain: strict;
 }
-html.carreta-on .carreta { display: grid; pointer-events: auto; }
+html.carreta-on .carreta { display: block; pointer-events: auto; }
 .carreta-velo {
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: center;
+  padding:
+    max(env(safe-area-inset-top, 0px), var(--space-4))
+    max(env(safe-area-inset-right, 0px), var(--space-4))
+    max(env(safe-area-inset-bottom, 0px), var(--space-4))
+    max(env(safe-area-inset-left, 0px), var(--space-4));
   background: var(--carreta-degradado);
   overflow: hidden;
 }
@@ -1051,16 +1052,22 @@ html.carreta-on .carreta { display: grid; pointer-events: auto; }
   border: 1px solid color-mix(in srgb, var(--en-turquesa) 22%, transparent);
   opacity: 0.45;
 }
-.carreta-circulo--a { width: min(72vw, 420px); aspect-ratio: 1; left: 50%; top: 46%; translate: -50% -50%; }
+.carreta-circulo--a { width: min(72vw, 420px); aspect-ratio: 1; left: 50%; top: 50%; translate: -50% -50%; }
 .carreta-circulo--b { width: min(54vw, 300px); aspect-ratio: 1; left: 18%; top: 28%; translate: -50% -50%; opacity: 0.35; }
 .carreta-circulo--c { width: min(46vw, 260px); aspect-ratio: 1; right: 12%; bottom: 22%; translate: 50% 50%; opacity: 0.3; }
 .carreta-marca {
+  grid-area: 1 / 1;
   position: relative;
   z-index: 1;
-  width: clamp(88px, 26vw, 112px);
+  width: min(72vw, 240px);
+  max-width: 100%;
+  margin: 0;
   filter: drop-shadow(var(--sombra-flotante));
 }
-.carreta-marca img { width: 100%; height: auto; }
+@media (min-width: 761px) {
+  .carreta-marca { width: min(28vw, 280px); }
+}
+.carreta-marca img { width: 100%; height: auto; object-fit: contain; }
 html.carreta-on:not(.carreta-stage-enter, .carreta-stage-hop, .carreta-stage-out) .carreta-marca {
   opacity: 0;
   transform: translateY(12px) scale(0.94);
@@ -1092,14 +1099,24 @@ html.carreta-on.carreta-stage-out.carreta--reduced .carreta { opacity: 0; }
   62% { transform: translateY(2px) scale(0.99); }
 }
 @keyframes carreta-revela {
-  from { clip-path: circle(150vmax at 50% 44%); }
-  to { clip-path: circle(0% at 50% 44%); opacity: 0; }
+  from { clip-path: circle(150vmax at 50% 50%); }
+  to { clip-path: circle(0% at 50% 50%); opacity: 0; }
 }
 @keyframes carreta-circulo-sale {
   to { opacity: 0; scale: 1.08; }
 }
 @media print {
   .carreta { display: none !important; }
+}
+
+/* Fundido del velo con movimiento reducido: conserva dur-rapida (el bloque global la anula). */
+@media (prefers-reduced-motion: reduce) {
+  html.carreta-on.carreta--reduced .carreta-marca { opacity: 1; transform: none; animation: none !important; }
+  html.carreta-on.carreta-stage-out.carreta--reduced .carreta {
+    animation: none !important;
+    transition: opacity var(--dur-rapida) var(--curva-entrada-salida) !important;
+    transition-duration: var(--dur-rapida) !important;
+  }
 }
 
 /* ---------- Movimiento reducido ---------- */
