@@ -3,9 +3,10 @@
 // En 320×640, 390×844, 900×800 y 1440×900 comprueba, para cada control visible que no sea un enlace dentro de un párrafo:
 //   · tamaño ≥ 44×44 px (AAA 2.5.5; el mínimo AA de 24 px queda muy por debajo);
 //   · alto de la escala del sistema «Itinerante Líquido»: 44 (--alto-sm: en línea y en las barras), 48 (--alto-md: estándar) o 56 (--alto-lg:
-//     acciones principales y filas del menú); excepciones con nombre: casillas de la barra inferior (49, la tab bar de iOS), paradas del recorrido
-//     (disco de 64), tarjetas de libro, opciones de filtro y sugerencias y el resumen de las tarjetas de evento;
-//   · ≥ 8 px hasta el control vecino (las casillas contiguas de la barra inferior y «Guardar» sobre su portada son una sola pieza y se excluyen);
+//     acciones principales y filas del menú); excepciones con nombre: casillas de la barra inferior (49, la tab bar de iOS), tarjetas de libro
+//     (portada, título y «autor · precio»), opciones de filtro y sugerencias y el resumen de las tarjetas de evento;
+//   · ≥ 8 px hasta el control vecino (las casillas contiguas de la barra inferior, «Guardar» sobre su portada y «Compartir» sobre la foto de
+//     su evento son una sola pieza y se excluyen);
 //   · rótulo a 17 px (Headline: botones de 48 y 56) o 15 px (Subheadline: botones de 44 y chips).
 // Y, como la revisión de MotionSites: sin errores de consola ni peticiones fallidas, sin imágenes rotas, sin desborde horizontal,
 // Inter cargada (respaldo de la letra de Apple: en Linux y Android es la que se pinta) y el primer cuadro ya con el fondo claro del inicio (sin destello oscuro).
@@ -42,7 +43,7 @@ await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-m
 
 const SCALE = [44, 48, 56];
 // Piezas con alto propio, cada una con su razón: no son botones de la escala.
-const OWN = '.tabbar a, .tab-list, .rail-stop, .rail-chip, .card, .rel, .menu-row, .rail-viewport, [data-news-viewport], .cat-opt input, .cat-suggest li, summary, .news-book'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card
+const OWN = '.tabbar a, .tab-list, .card, .rel, .menu-row, .rail-viewport, .cat-opt input, .cat-suggest li, summary, .news-book'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card
 const AUDIT = `(() => {
   const SCALE = ${JSON.stringify(SCALE)};
   const sel = 'a[href], button, input:not([type=hidden]), select, summary, [role=radio]';
@@ -62,7 +63,7 @@ const AUDIT = `(() => {
     for (const c of B) {
       if (c === b || c.fixed !== b.fixed || c.e.contains(e) || e.contains(c.e)) continue;
       if (b.e.closest('.tabbar') && c.e.closest('.tabbar')) continue; // casillas contiguas de una sola barra
-      if (b.e.matches('.save, .card-voltear') || c.e.matches('.save, .card-voltear')) continue; // «Guardar» y «Voltear» van sobre su portada: un solo objeto, 44 px propios
+      if (b.e.matches('.save, .bill-acts .act--icon') || c.e.matches('.save, .bill-acts .act--icon')) continue; // «Guardar» va sobre su portada y «Compartir» sobre la foto de su evento: un solo objeto, alto propio
       const dx = Math.max(0, Math.max(b.x, c.x) - Math.min(b.x + b.w, c.x + c.w)), dy = Math.max(0, Math.max(b.y, c.y) - Math.min(b.y + b.h, c.y + c.h));
       const d = Math.hypot(dx, dy); if (d < best) { best = d; who = name(c.e); }
     }

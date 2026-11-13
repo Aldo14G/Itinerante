@@ -65,37 +65,25 @@ for (const w of [390, 360, 320]) {
 await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true }); await sleep(500);
 
 // «Filtros» no promete el total del catálogo: sin filtros activos va a secas; con filtros, el número de activos. Géneros en español (CR-07).
-// Inventario real: Categoría (2), Género (6, el único grupo que se pliega), Editorial (4); la hoja no trae formato, así que no hay grupo Formato.
+// Inventario real: Género (6, todos a la vista: un grupo solo se pliega desde 8) y Editorial (4). Sin «Categoría» (sale del género), sin
+// Formato (la hoja no lo trae) y sin selector «Ordenar» (retirados el 2026-11-13).
 const fl = await ev(`(async () => { const ex = document.getElementById('explorer'); const btn = ex.querySelector('[data-cat-filters-btn]'); const w = x => new Promise(r => setTimeout(r, x));
   const idle = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
   btn.click(); await w(400);
-  // Filtros plegados (Hick): cada grupo abre con 5 opciones como máximo y su propio «Ver las N»; al abrirlo el botón no se mueve, conserva el foco y el scroll no cambia.
   const shownOpts = g => [...g.querySelectorAll('.cat-opt')].filter(o => o.getBoundingClientRect().height > 0).length;
-  const groups = () => [...ex.querySelectorAll('.cat-group')].map(g => { const b = g.querySelector('[data-expand]'); return { legend: g.querySelector('legend').textContent, opts: shownOpts(g), btn: b?.textContent, exp: b?.getAttribute('aria-expanded'), ctl: !!b && !!document.getElementById(b.getAttribute('aria-controls')), h: b ? Math.round(b.getBoundingClientRect().height) : null }; });
-  const folded = groups();
-  const more = ex.querySelector('[data-expand="g"]'); more.scrollIntoView({ block: 'center' }); await w(200);
-  const before = { top: Math.round(more.getBoundingClientRect().top), scroll: ex.scrollTop };
-  more.focus(); more.click(); await w(300);
-  const moreNow = ex.querySelector('[data-expand="g"]');
-  const opened = { groups: groups(), top: Math.round(moreNow.getBoundingClientRect().top), scroll: ex.scrollTop, focus: document.activeElement === moreNow };
+  const groups = [...ex.querySelectorAll('.cat-group')].map(g => ({ legend: g.querySelector('legend').textContent, opts: shownOpts(g), all: g.querySelectorAll('.cat-opt').length, fold: !!g.querySelector('[data-expand]') }));
   const foot = ex.querySelector('.cat-filters-foot'); const fr = foot.getBoundingClientRect();
   const sticky = { pos: getComputedStyle(foot).position, bottom: Math.round(fr.bottom), vh: innerHeight, panel: Math.round(foot.parentElement.getBoundingClientRect().bottom), text: foot.textContent.trim() };
-  const labels = [...[...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género').querySelectorAll('label')].map(l => l.firstChild.textContent); // con el grupo abierto: todos
-  ex.querySelector('[data-expand="g"]').click(); await w(300); // vuelve a plegar Género (el panel se pintó de nuevo: otro botón)
-  const refolded = groups().find(g => g.legend === 'Género');
-  const folding = { folded, before, opened, sticky, refolded, legends: [...ex.querySelectorAll('.cat-group legend')].map(l => l.textContent), sorts: [...ex.querySelectorAll('[data-cat-sort] option')].map(o => o.value) };
+  const labels = [...[...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género').querySelectorAll('label')].map(l => l.firstChild.textContent);
   const genres = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género');
   const cb = genres.querySelector('input[type=checkbox]'); cb.click(); await w(500);
   const again = [...ex.querySelectorAll('.cat-group')].find(g => g.querySelector('legend').textContent === 'Género'); again.querySelectorAll('input[type=checkbox]')[1].click(); await w(500); // el panel se vuelve a pintar tras cada filtro
   const active = { text: btn.textContent.trim(), label: btn.getAttribute('aria-label') };
   for (let i = 0; i < 6 && ex.querySelector('[data-chip-dim]'); i++) { ex.querySelector('[data-chip-dim]').click(); await w(300); }
-  return { idle, active, back: btn.textContent.trim(), labels, folding };
+  return { idle, active, back: btn.textContent.trim(), labels, groups, sticky, sort: !!ex.querySelector('[data-cat-sort], .cat-sort') };
 })()`);
-{ const f = fl.folding; const g = f.folded.find(x => x.legend === 'Género'), og = f.opened.groups.find(x => x.legend === 'Género');
-  ck('móvil: el panel de filtros abre con 5 opciones como máximo por grupo (≤ 20 en total) y un «Ver los N» propio (aria-expanded, aria-controls, ≥ 44 px) solo en el grupo que pasa de 5 (Género)', f.folded.every(x => x.opts <= 5 && (x.btn === undefined || (/^Ver l[oa]s \d+ /.test(x.btn) && x.exp === 'false' && x.ctl && x.h >= 44))) && f.folded.reduce((n, x) => n + x.opts, 0) <= 20 && f.folded.filter(x => x.btn).length === 1 && g.btn === 'Ver los 6 géneros' && f.folded.filter(x => !x.btn).every(x => x.opts >= 2), JSON.stringify(f.folded));
-  ck('móvil: grupos solo con datos de la hoja (Categoría, Género, Editorial: sin Formato vacío) y sin «Más recientes» (no hay años)', JSON.stringify(f.legends) === '["Categoría","Género","Editorial"]' && f.folded.find(x => x.legend === 'Editorial').opts === 4 && JSON.stringify(f.sorts) === '["rel","az","autor"]', JSON.stringify({ legends: f.legends, sorts: f.sorts }));
-  ck('móvil: «Ver los 6 géneros» despliega el grupo sin mover el botón ni el scroll y con el foco en él; pasa a «Ver menos géneros» (aria-expanded=true)', og.opts === 6 && og.btn === 'Ver menos géneros' && og.exp === 'true' && f.opened.focus && f.opened.top === f.before.top && f.opened.scroll === f.before.scroll, JSON.stringify({ og, before: f.before, top: f.opened.top, scroll: f.opened.scroll, focus: f.opened.focus }));
-  ck('móvil: el grupo vuelve a plegarse a 5 y «Ver N títulos» sigue pegado al pie (o al final del panel, si el panel cabe en la pantalla)', f.refolded.opts === 5 && f.refolded.exp === 'false' && f.refolded.btn === 'Ver los 6 géneros' && f.sticky.pos === 'sticky' && f.sticky.bottom <= f.sticky.vh + 1 && f.sticky.bottom >= Math.min(f.sticky.vh, f.sticky.panel) - 1 && /^Ver \d+ títulos?$/.test(f.sticky.text), JSON.stringify({ refolded: f.refolded, sticky: f.sticky })); }
+ck('móvil: filtros Género (6) y Editorial (4), todas las opciones a la vista (nada que plegar con menos de 8), sin Categoría, Formato ni «Ordenar»', JSON.stringify(fl.groups.map(g => g.legend)) === '["Género","Editorial"]' && fl.groups.every(g => g.opts === g.all && !g.fold) && fl.groups[0].opts === 6 && fl.groups[1].opts === 4 && !fl.sort, JSON.stringify(fl.groups));
+ck('móvil: «Ver N títulos» queda pegado al pie (o al final del panel, si el panel cabe en la pantalla)', fl.sticky.pos === 'sticky' && fl.sticky.bottom <= fl.sticky.vh + 1 && fl.sticky.bottom >= Math.min(fl.sticky.vh, fl.sticky.panel) - 1 && /^Ver \d+ títulos?$/.test(fl.sticky.text), JSON.stringify(fl.sticky));
 const EN = /Science Fiction|Middle Grade|Self-Help|Fiction\b|Romance\b(?!\s+(contempor|oscuro|paranormal|juvenil|y fantas))|Thriller|Mystery|History\b|Memoir|Parenting|True Crime|Business|Cooking|Health|Politics|Productivity|Spirituality|Biography|Fantasy|Horror|Dystopian|Graphic Novel/;
 ck('móvil: el botón dice «Filtros» sin número, con 2 filtros «Filtros 2» y vuelve a «Filtros» al limpiar (nunca el total, 41)', fl.idle.text === 'Filtros' && fl.idle.label === 'Filtros' && fl.active.text === 'Filtros 2' && /2 activos/.test(fl.active.label) && fl.back === 'Filtros' && !/41/.test(JSON.stringify(fl.idle) + fl.active.text), JSON.stringify({ ...fl, labels: undefined }));
 ck('móvil: la barra Género lleva los 6 géneros del inventario en español, sin inglés', fl.labels.length === 6 && !fl.labels.some(l => EN.test(l)) && ['Narrativa', 'Poesía', 'Ensayo', 'Divulgación', 'Ensayo y poesía', 'Ensayo y narrativa'].every(l => fl.labels.includes(l)), JSON.stringify(fl.labels));
@@ -105,7 +93,7 @@ const se = await ev(`(async () => { const ex = document.getElementById('explorer
   const cards = [...ex.querySelectorAll('button.card')];
   // nombre accesible del botón: el texto de la portada (real u tipográfica); la imagen real va sin alt
   return { cards: cards.length, status: ex.querySelector('[data-cat-status]').textContent, names: cards.map(c => c.textContent.replace(/\\s+/g, ' ').trim()), imgs: cards.map(c => c.querySelector('img')?.getAttribute('alt') ?? null), real: cards.filter(c => c.querySelector('.cover--img')).length }; })()`);
-ck('móvil: buscar «noche» dentro de la hoja filtra el catálogo (3 de 41), con portadas reales y tipográficas nombradas por título y autor', se.cards === 3 && /Mostrando 3 de 3 títulos/.test(se.status) && se.real === 2 && se.imgs.filter(a => a !== null).every(a => a === '') && se.names.some(n => n.includes('El lugar de la noche') && n.includes('David Ornelas')) && se.names.some(n => n.includes('Las noches rotas')), JSON.stringify(se));
+ck('móvil: buscar «noche» dentro de la hoja filtra el catálogo (3 de 41: «3 títulos»), con tarjetas nombradas por título, autor y precio', se.cards === 3 && se.status === '3 títulos' && se.real === 2 && se.imgs.filter(a => a !== null).every(a => a === '') && se.names.some(n => n.includes('El lugar de la noche') && n.includes('David Ornelas')) && se.names.some(n => n.includes('Las noches rotas')), JSON.stringify(se));
 
 // ficha encima de la hoja
 await realClick('#explorer button.card');
@@ -133,10 +121,20 @@ await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`doc
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(1000);
 ck('móvil: el botón cerrar también cierra', (await ev(`!document.getElementById('explorer').open && location.hash === ''`)));
 
-// «Ver todo el catálogo» y el menú
-await ev(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`); await sleep(2500); await ev(`scrollBy(0, 1)`); await sleep(500);
-await ev(`document.querySelector('.rail-all').click()`);
-ck('móvil: «Ver todo el catálogo» abre la hoja', await waitFor(`document.getElementById('explorer').open`));
+// Estado vacío: una sola frase visible (la línea de estado solo la anuncia a lectores de pantalla).
+await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`document.getElementById('explorer').open`); await sleep(900);
+const vacio = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.value = 'zzzxqv'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 600));
+  const st = ex.querySelector('[data-cat-status]'); const e = ex.querySelector('[data-cat-empty]'); const vis = el => { const r = el.getBoundingClientRect(); return r.width > 1 && r.height > 1; };
+  const out = { status: st.textContent, statusSeen: vis(st), empty: !e.hidden && vis(e), phrase: e.querySelector('p').textContent, actions: [...e.querySelectorAll('.btn')].map(b => b.textContent.trim()) };
+  q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 400)); out.reset = st.textContent; return out; })()`);
+ck('móvil: sin resultados se ve una sola frase («No hay títulos con esa combinación.») con sus dos salidas; el estado solo la anuncia', vacio.empty && !vacio.statusSeen && vacio.status === vacio.phrase && vacio.phrase === 'No hay títulos con esa combinación.' && JSON.stringify(vacio.actions) === '["Limpiar búsqueda y filtros","Preguntar por WhatsApp"]' && vacio.reset === '41 títulos', JSON.stringify(vacio));
+await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
+// «Buscar en el catálogo», arriba del capítulo, abre la hoja (el antiguo «Ver todo el catálogo» bajo el carrusel se retiró).
+await ev(`scrollTo(0, document.getElementById('libros').getBoundingClientRect().top + scrollY)`); await sleep(1500);
+const top = await ev(`(() => { const h = document.getElementById('books-title').getBoundingClientRect(); const b = document.querySelector('[data-ex-open]').getBoundingClientRect(); return { dist: Math.round(b.top - h.bottom), text: document.querySelector('[data-ex-open]').textContent.trim(), allLink: !!document.querySelector('.rail-all') }; })()`);
+ck('móvil: «Buscar en el catálogo» va justo bajo el titular (≤ 40 px) y no queda «Ver todo el catálogo»', top.dist >= 0 && top.dist <= 40 && top.text === 'Buscar en el catálogo' && !top.allLink, JSON.stringify(top));
+await realClick('[data-ex-open]');
+ck('móvil: «Buscar en el catálogo» abre la hoja', await waitFor(`document.getElementById('explorer').open`));
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
 await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800);
 await ev(`document.querySelector('#menu a[href="#libros"]').click()`);
@@ -154,19 +152,19 @@ await send('Emulation.setTouchEmulationEnabled', { enabled: false });
 await send('Page.navigate', { url: URL_ });
 await sleep(4500);
 const dk = await ev(`(() => { const ex = document.getElementById('explorer'); const b = document.querySelector('[data-ex-open]'); const r = ex.getBoundingClientRect(); const cs = getComputedStyle(ex); return { open: ex.open, modal: ex.matches(':modal'), pos: cs.position, btn: getComputedStyle(b).display, top: getComputedStyle(ex.querySelector('.ex-top')).display, w: Math.round(r.width) }; })()`);
-ck('escritorio: el explorador está abierto en línea (no modal), sin botón ni cabecera de hoja', dk.open && !dk.modal && dk.pos === 'static' && dk.btn === 'none' && dk.top === 'none' && dk.w > 900, JSON.stringify(dk));
+ck('escritorio: el explorador está abierto en línea (no modal), sin cabecera de hoja; «Buscar en el catálogo» arriba del capítulo lleva a él', dk.open && !dk.modal && dk.pos === 'static' && dk.btn === 'flex' && dk.top === 'none' && dk.w > 900, JSON.stringify(dk));
 await ev(`scrollTo(0, document.getElementById('catalogo').getBoundingClientRect().top + scrollY)`); await sleep(2000);
-const dc = await ev(`(async () => { const ex = document.getElementById('explorer'); for (let i = 0; i < 30 && !ex.querySelector('button.card'); i++) await new Promise(r => setTimeout(r, 200)); return { cards: ex.querySelectorAll('button.card').length, filters: ex.querySelectorAll('.cat-group').length, status: ex.querySelector('[data-cat-status]').textContent, more: ex.querySelector('[data-cat-more]').textContent }; })()`);
-ck('escritorio: el catálogo carga en línea con 24 tarjetas (de 41) y filtros', dc.cards === 24 && dc.filters === 3 && /Mostrando 24 de 41 títulos/.test(dc.status) && /Ver 17 más · quedan 17/.test(dc.more), JSON.stringify(dc));
+const dc = await ev(`(async () => { const ex = document.getElementById('explorer'); for (let i = 0; i < 30 && !ex.querySelector('button.card'); i++) await new Promise(r => setTimeout(r, 200)); return { cards: ex.querySelectorAll('button.card').length, filters: ex.querySelectorAll('.cat-group').length, status: ex.querySelector('[data-cat-status]').textContent, moreHidden: ex.querySelector('[data-cat-more]').hidden }; })()`);
+ck('escritorio: el catálogo carga en línea con los 41 títulos sin paginar («41 títulos», sin «Ver más») y dos grupos de filtros', dc.cards === 41 && dc.filters === 2 && dc.status === '41 títulos' && dc.moreHidden, JSON.stringify(dc));
 // Portadas reales: ninguna rota, cada una con la forma de la tarjeta (sin deformar ni empujar la fila) y el texto oculto como nombre.
-const pc = await ev(`(async () => { const ex = document.getElementById('explorer'); ex.querySelector('[data-cat-more]').click(); await new Promise(r => setTimeout(r, 400));
+const pc = await ev(`(async () => { const ex = document.getElementById('explorer');
   const imgs = [...ex.querySelectorAll('.cover--img img')];
   for (const i of imgs) i.loading = 'eager';
   await Promise.all(imgs.map(i => i.decode().catch(() => {})));
   const covers = [...ex.querySelectorAll('button.card .cover')].map(c => c.getBoundingClientRect());
   const ratio = covers.map(r => +(r.height / r.width).toFixed(2));
-  return { cards: ex.querySelectorAll('button.card').length, imgs: imgs.length, broken: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.src), blank: ex.querySelectorAll('.cover--blank').length, ratios: [...new Set(ratio)], fit: [...new Set(imgs.map(i => getComputedStyle(i).objectFit))], fills: imgs.every(i => { const a = i.getBoundingClientRect(), b = i.parentElement.getBoundingClientRect(); return Math.abs(a.width - b.width) < 1 && Math.abs(a.height - b.height) < 1; }), named: [...ex.querySelectorAll('button.card')].every(c => c.textContent.trim().length > 3), more: ex.querySelector('[data-cat-more]').hidden }; })()`);
-ck('escritorio: las 41 tarjetas (32 con portada real, 9 tipográficas), ninguna imagen rota, todas con la misma forma y la foto llenando la portada (object-fit: cover)', pc.cards === 41 && pc.imgs === 32 && pc.blank === 9 && !pc.broken.length && pc.ratios.length === 1 && JSON.stringify(pc.fit) === '["cover"]' && pc.fills && pc.named && pc.more === true, JSON.stringify(pc));
+  return { cards: ex.querySelectorAll('button.card').length, imgs: imgs.length, broken: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.src), blank: ex.querySelectorAll('.cover--blank').length, ratios: [...new Set(ratio)], fit: [...new Set(imgs.map(i => getComputedStyle(i).objectFit))], fills: imgs.every(i => { const a = i.getBoundingClientRect(), b = i.parentElement.getBoundingClientRect(); return Math.abs(a.width - b.width) < 1 && Math.abs(a.height - b.height) < 1; }), named: [...ex.querySelectorAll('button.card')].every(c => c.textContent.trim().length > 3), cards2: [...ex.querySelectorAll('.card-item')].every(li => { const t = li.querySelector('.card-t'), m = li.querySelector('.card-m'), p = li.querySelector('.card-pr'); return t && m && t.scrollWidth <= t.clientWidth + 1 && m.scrollWidth <= m.clientWidth + 1 && (!p || p.getClientRects().length === 1) && !li.querySelector('.card-voltear, .card-reverso'); }), more: ex.querySelector('[data-cat-more]').hidden }; })()`);
+ck('escritorio: las 41 tarjetas (32 con portada real, 9 tipográficas), ninguna imagen rota, todas con la misma forma y la foto llenando la portada (object-fit: cover); debajo título y «autor · precio» sin cortar y sin «Voltear»', pc.cards === 41 && pc.imgs === 32 && pc.blank === 9 && !pc.broken.length && pc.ratios.length === 1 && JSON.stringify(pc.fit) === '["cover"]' && pc.fills && pc.named && pc.cards2 && pc.more === true, JSON.stringify(pc));
 { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-escritorio.jpg', Buffer.from(shot.result.data, 'base64')); }
 // cambiar de escritorio a móvil sin recargar
 await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });

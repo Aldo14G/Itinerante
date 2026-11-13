@@ -8,12 +8,13 @@
   // Gama media o baja (≤4 GB, ≤4 núcleos, ahorro de datos): vidrio sólido, sin desenfoque.
   var mem = navigator.deviceMemory, cores = navigator.hardwareConcurrency;
   if (saveData || (mem && mem <= 4) || (cores && cores <= 4)) r.dataset.glass = 'lite';
-  // Novedades existe siempre con JavaScript (la tira es el catálogo completo): has-news muestra la sección y sus enlaces desde el primer render.
-  // El renglón del control del inicio (news-hint) solo se reserva si la visita anterior dejó llegadas sin ver (p); en una primera visita no se
-  // reserva nada (ningún hueco vacío entre la dirección y la foto). news.js lo confirma con el JSON y, si no coincide, corrige fuera de la vista.
+  // Novedades solo existe con llegadas registradas. Antes del primer render se usa lo que dejó la visita anterior (iti-news-estado): s = había
+  // llegadas, todas vistas; p = había llegadas sin ver (además se reserva el renglón del control del inicio, news-hint); n o nada (primera
+  // visita, almacenamiento bloqueado) = sin sección. news.js lo confirma con el JSON: si aparecen llegadas, la sección (bajo el pliegue) se
+  // muestra entonces, y el control del inicio se corrige fuera de la vista.
   var news = null;
   try { news = localStorage.getItem('iti-news-estado'); } catch (e) { /* almacenamiento bloqueado */ }
-  r.classList.add('has-news');
+  if (news === 's' || news === 'p') r.classList.add('has-news');
   if (news === 'p') r.classList.add('news-hint');
   if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   r.classList.add('motion');

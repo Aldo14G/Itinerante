@@ -52,7 +52,7 @@ export async function confirmThen(el, fn) {
 }
 
 /**
- * Rebote corto del icono al elegir («Me interesa», guardar, parada del recorrido): solo cuando la persona toca y solo con movimiento.
+ * Rebote corto del icono al elegir (guardar un libro en Mi lista): solo cuando la persona toca y solo con movimiento.
  * Pone `.is-pop` en el control (la animación `pick-pop` vive en el CSS) y la retira al terminar, así restaurar un estado guardado al
  * pintar no rebota, y tampoco rebota después si el movimiento se reactiva.
  */

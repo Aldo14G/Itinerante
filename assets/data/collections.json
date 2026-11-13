@@ -1,12 +1,12 @@
 {
   "meta": {
     "kind": "inventario",
-    "nota": "Colecciones del inventario real (catalog.json, importado de la hoja de la librería con scripts/import-inventario.py). Cada colección es un filtro sobre el catálogo (`filtro`) o una lista curada (`ids`, en el orden en que se muestran); `icono` es un símbolo c-* del sprite de index.html (sin él, c-libro) y `tema` la une con el tema de Pregúntanos (narrativa, poesia, ensayo, cronica, infantil, libre). La clave «novedades» alimenta el capítulo Novedades: `entradas` es una lista de { id, llegada } (el id de un libro de catalog.json y su fecha de llegada real, AAAA-MM-DD). Está vacía mientras la librería no registre fechas de llegada: sin entradas no se muestra la sección, su casilla, sus enlaces ni el control del inicio. Para activarla basta con añadir renglones."
+    "nota": "Colecciones del inventario real (catalog.json, importado de la hoja de la librería con scripts/import-inventario.py). Cada colección es un chip del Catálogo (Narrativa · Poesía · Ensayo) sobre el carrusel 3D: un filtro sobre el catálogo (`filtro`) o una lista curada (`ids`, en el orden en que se muestran); `nota` es la línea bajo los chips y `titulo` también arma «Preguntar por {colección}». La clave «novedades» alimenta el capítulo Novedades: `entradas` es una lista de { id, llegada } (el id de un libro de catalog.json y su fecha de llegada real, AAAA-MM-DD). Está vacía mientras la librería no registre fechas de llegada: sin entradas no existen la sección, su enlace de la barra, su fila del menú ni el control del inicio. Para activarla basta con añadir renglones."
   },
   "collections": [
-    { "id": "narrativa", "icono": "c-libro", "titulo": "Narrativa", "nota": "Cuento y novela de editoriales independientes.", "tema": "narrativa", "filtro": { "g": ["narrativa", "ensayo-narrativa"] } },
-    { "id": "poesia", "icono": "c-memorias", "titulo": "Poesía", "nota": "Poemarios y antologías.", "tema": "poesia", "filtro": { "g": ["poesia", "ensayo-poesia"] } },
-    { "id": "ensayo", "icono": "c-ensayo", "titulo": "Ensayo", "nota": "Pensamiento, crítica y divulgación.", "tema": "ensayo", "filtro": { "g": ["ensayo", "divulgacion", "ensayo-poesia", "ensayo-narrativa"] } }
+    { "id": "narrativa", "titulo": "Narrativa", "nota": "Cuento y novela de editoriales independientes.", "filtro": { "g": ["narrativa", "ensayo-narrativa"] } },
+    { "id": "poesia", "titulo": "Poesía", "nota": "Poemarios y antologías.", "filtro": { "g": ["poesia", "ensayo-poesia"] } },
+    { "id": "ensayo", "titulo": "Ensayo", "nota": "Pensamiento, crítica y divulgación.", "filtro": { "g": ["ensayo", "divulgacion", "ensayo-poesia", "ensayo-narrativa"] } }
   ],
   "novedades": {
     "titulo": "Recién llegados",

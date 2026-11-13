@@ -1,13 +1,13 @@
 // Móvil con sensación de red social (U03), Novedades (U04) y una sola acción primaria (U01/D10).
 // node feed.mjs <url> [outDir]   Sale con código ≠ 0 si algo falla.
 //  1. Primera vista (390x844): inicio (nombre, estado, dirección, «Cómo llegar» de 56 px como única acción de contacto), sin burbujas de historias, con la barra de navegación (marca y ☰) y la barra inferior de vidrio (Inicio, Catálogo, Mi lista); ≤ 6 destinos distintos a la vista en 390x844, 360x740 y 375x667 (U02/D11; la casilla Novedades y el control «N novedades…» llevan al mismo sitio y cuentan como uno); «Escribir» (WhatsApp) reaparece en la cabecera al desplazar.
-//  3. Eventos y talleres: cada tarjeta va foto → insignias (tipo y estado) → título → frase → descripción → acciones (DOM y pantalla); «Me interesa» (aria-pressed, persistente),
-//     «Compartir» (control de icono; Web Share y respaldo de copiar) y «Preguntar por WhatsApp», de 48 px y con nombre accesible propio; la tarjeta cabe en el alto útil
-//     (entre la barra de navegación y la barra inferior, con 12 px de holgura) a 320×640, 360×640, 360×740, 375×667 y 390×844; el estado sale de data-fecha.
-
-//  4. Novedades (CarruselNovedades): sin fechas de llegada la tira es el catálogo completo (41, de la A a la Z) sin «Nuevo», punto ni control; «Ver todo» / «Ver menos»
-//     (aria-expanded, foco quieto, rejilla de 3 columnas a 390 y 2 a 320); la ficha en modo redes (WhatsApp prellenado, Guardar, Instagram, Facebook, Compartir con
-//     respaldo de copiar, foco de vuelta al libro, enlace #libro-<id>); con fechas reales, las llegadas primero y «Nuevo» solo en lo reciente.
+//  3. Eventos y talleres: cada tarjeta va foto → insignias (tipo y estado) → título → descripción → acciones (DOM y pantalla); «Preguntar por WhatsApp» (secundario,
+//     ocupa el renglón) y «Compartir» (control de icono; Web Share y respaldo de copiar), de 48 px y con nombre accesible propio; sin «Me interesa» (retirado el
+//     2026-11-13); la tarjeta cabe en el alto útil (entre la barra de navegación y la barra inferior, con 12 px de holgura) a 320×640, 360×640, 360×740, 375×667 y
+//     390×844; el estado sale de data-fecha.
+//  4. Novedades (CarruselNovedades): sin llegadas válidas no existen la sección, su enlace de la barra, su fila del menú ni el control del inicio; con llegadas, la tira
+//     son solo esas (lo más reciente primero) y «Nuevo» solo en lo reciente; «Ver todo» / «Ver menos» (aria-expanded, foco quieto, rejilla de 3 columnas a 390 y 2 a
+//     320); cada libro abre la ficha única (WhatsApp prellenado, Guardar, Compartir con respaldo de copiar, «Cómo llegar»; foco de vuelta al libro; enlace #libro-<id>).
 //  5. Barrido de acciones primarias en 390x844 y 1280x800: a lo sumo una por pantalla, siempre «Cómo llegar», y ningún WhatsApp mayor que ella.
 import { spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
@@ -115,7 +115,7 @@ for (const [vw, vh] of [[360, 740], [375, 667]]) {
 }
 await open(390, 844, { reset: true });
 await ev(`scrollTo(0, 700)`); await sleep(700);
-const hdrWa = await ev(`(()=>{ const h = document.querySelector('.hdr').getBoundingClientRect(); const m = document.querySelector('[data-menu-open]').getBoundingClientRect(); const wa = document.querySelector('#menu a[href*="wa.me"]'); return { top: Math.round(h.top), h: Math.round(h.height), menu: [Math.round(m.width), Math.round(m.height)], wa: !!wa && /wa\\.me\\/528180875940/.test(wa.href) && wa.getAttribute('aria-label') === 'Escribir por WhatsApp' }; })()`);
+const hdrWa = await ev(`(()=>{ const h = document.querySelector('.hdr').getBoundingClientRect(); const m = document.querySelector('[data-menu-open]').getBoundingClientRect(); const wa = document.querySelector('#menu a[href*="wa.me"]'); return { top: Math.round(h.top), h: Math.round(h.height), menu: [Math.round(m.width), Math.round(m.height)], wa: !!wa && /wa\\.me\\/528180875940/.test(wa.href) && wa.getAttribute('aria-label') === 'Preguntar por WhatsApp' }; })()`);
 check('perfil', 'al desplazar, la barra de navegación sigue arriba (44 px) con el ☰ de 44 × 44, y WhatsApp está en el menú', hdrWa.top === 0 && hdrWa.h === 44 && hdrWa.menu.join() === '44,44' && hdrWa.wa, JSON.stringify(hdrWa));
 await open(390, 844, { reset: true });
 check('consola', 'sin errores de consola en la primera vista', !problems.length, problems.join(' | '));
@@ -124,28 +124,28 @@ check('consola', 'sin errores de consola en la primera vista', !problems.length,
 await open(390, 844, { reset: true });
 await ev(`localStorage.clear()`);
 await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(600); // fuera de pantalla, content-visibility omite el texto (innerText vacío)
-const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const i = q('[data-interest]'), s = q('[data-share]');
+const posts = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const s = q('[data-share]');
   const rect = e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
   const wa = q('.bill-wa'); const badges = [...it.querySelectorAll('.bill-badges .badge')]; const img = q('.bill-card-img').getBoundingClientRect();
   return { id: it.dataset.id, photo: !!q('.bill-card-img'), alt: q('.bill-card-img').alt, ratio: +(img.width / img.height).toFixed(2), badges: badges.map(b => b.textContent.trim()), onPhoto: badges.every(b => { const r = b.getBoundingClientRect(); return r.top >= img.bottom && r.left >= img.left && r.right <= img.right; }), badgeFs: badges.map(b => getComputedStyle(b).fontSize).join(),
-    title: q('.bill-title')?.textContent, interest: i && rect(i), share: s && rect(s), wa: wa && rect(wa), waTxt: wa?.innerText.trim(), waHref: wa?.href, pressed: i?.getAttribute('aria-pressed'), iTxt: i?.textContent.trim(), sTxt: s?.textContent.trim(), sIcon: !!s?.querySelector('svg'), sRound: getComputedStyle(s).borderRadius, row: Math.abs(i.getBoundingClientRect().top - s.getBoundingClientRect().top) < 2, waBelow: wa.getBoundingClientRect().top >= i.getBoundingClientRect().bottom }; })`);
+    title: q('.bill-title')?.textContent, interest: it.querySelectorAll('[data-interest]').length, share: s && rect(s), wa: wa && rect(wa), waTxt: wa?.innerText.trim(), waHref: wa?.href, waCls: wa?.className, sTxt: s?.textContent.trim(), sIcon: !!s?.querySelector('svg'), sRound: getComputedStyle(s).borderRadius, onPhoto: (() => { const a = s.getBoundingClientRect(); return a.top >= img.top && a.bottom <= img.bottom && a.right <= img.right && a.left >= img.left; })(), full: Math.round(wa.getBoundingClientRect().width) === Math.round(q('.bill-acts').getBoundingClientRect().width), sCls: s.className }; })`);
 const TIPOS = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
 check('eventos', '3 tarjetas con foto 4:3 descrita, título y dos insignias bajo la foto (el texto no va sobre la foto): el tipo (Lectura, Juego, Taller) y «Propuesta · sin fecha»', posts.length === 3 && posts.every(p => p.photo && p.alt && !/Recreación IA|Foto real/.test(p.alt) && Math.abs(p.ratio - 1.33) < 0.03 && p.title && p.badges.length === 2 && p.badges[0] === TIPOS[p.id] && p.badges[1] === 'Propuesta · sin fecha' && p.onPhoto && p.badgeFs === '12px,12px'), JSON.stringify(posts.map(p => [p.id, p.alt, p.ratio, p.badges, p.onPhoto, p.badgeFs])));
-check('eventos', 'tres acciones de 48 px: «Me interesa» y «Compartir» (botón de icono redondo de 48 × 48) en un renglón y «Preguntar por WhatsApp» debajo, con su mensaje', posts.every(p => p.iTxt === 'Me interesa' && p.sTxt === '' && p.sIcon && parseFloat(p.sRound) >= 24 && p.interest[1] === 48 && p.interest[0] >= 48 && p.share.join() === '48,48' && p.pressed === 'false' && p.row && p.waBelow && p.waTxt === 'Preguntar por WhatsApp' && p.wa[1] === 48 && /wa\.me\/528180875940\?text=Hola/.test(p.waHref)), JSON.stringify(posts.map(p => [p.id, p.iTxt, p.sTxt, p.interest, p.share, p.wa, p.waTxt, p.row, p.waBelow])));
+check('eventos', 'dos acciones de 48 px: «Preguntar por WhatsApp» (secundario, a todo el ancho, con su mensaje) y «Compartir» (botón de icono de vidrio, redondo de 48 × 48, sobre la esquina de la foto); sin «Me interesa»', posts.every(p => p.interest === 0 && p.sTxt === '' && p.sIcon && parseFloat(p.sRound) >= 24 && p.share.join() === '48,48' && p.onPhoto && p.full && /btn--vidrio/.test(p.sCls) && p.waTxt === 'Preguntar por WhatsApp' && /btn--secundario/.test(p.waCls) && p.wa[1] === 48 && p.wa[0] >= 160 && /wa\.me\/528180875940\?text=Hola/.test(p.waHref)), JSON.stringify(posts.map(p => [p.id, p.interest, p.sTxt, p.share, p.wa, p.waTxt, p.onPhoto, p.full])));
 // Tarjeta de evento: foto → insignias → título → frase → descripción → acciones, tanto en el DOM como en la pantalla; el título está una sola vez y ya no hay encabezado de red social.
-const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-card-img', '.bill-badges', '.bill-title', '.bill-sub', '.bill-detail > p', '.bill-acts'].map(q);
+const order = await ev(`[...document.querySelectorAll('.bill-item')].map(it => { const q = s => it.querySelector(s); const els = ['.bill-card-img', '.bill-badges', '.bill-title', '.bill-detail > p', '.bill-acts'].map(q);
   const dom = els.every((e, i) => e && (i === 0 || (els[i - 1].compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING)));
   const tops = els.map(e => e ? Math.round(e.getBoundingClientRect().top) : null); const vis = tops.every((t, i) => t !== null && (i === 0 || t >= tops[i - 1]));
   return { id: it.dataset.id, dom, vis, tops, head: it.querySelectorAll('.bill-post-head, .bill-post-who, .bill-cap').length, once: [...it.querySelectorAll('.bill-title')].filter(e => e.getBoundingClientRect().height > 0).length, titles: it.querySelectorAll('.bill-title').length }; })`);
-check('eventos', 'orden del DOM y de la pantalla: foto → insignias → título → frase → descripción → acciones; sin encabezado «Itinerante · propuesta»; el título está y se ve una sola vez', order.length === 3 && order.every(o => o.dom && o.vis && o.head === 0 && o.once === 1 && o.titles === 1), JSON.stringify(order));
-// Nombres accesibles (árbol de accesibilidad del navegador): cada «Compartir», «Me interesa» y «Preguntar por WhatsApp» lleva el título de su propuesta.
+check('eventos', 'orden del DOM y de la pantalla: foto → insignias → título → descripción → acciones (sin subtítulo); sin encabezado «Itinerante · propuesta»; el título está y se ve una sola vez', order.length === 3 && order.every(o => o.dom && o.vis && o.head === 0 && o.once === 1 && o.titles === 1), JSON.stringify(order));
+// Nombres accesibles (árbol de accesibilidad del navegador): cada «Compartir» y «Preguntar por WhatsApp» lleva el título de su propuesta.
 await ev(`document.querySelector('#cartelera').scrollIntoView()`); await sleep(600); // Eventos ya no queda junto al inicio: el árbol de accesibilidad se lee con el capítulo a la vista (fuera de pantalla, content-visibility lo omite)
 await send('Accessibility.enable');
 const axNodes = (await send('Accessibility.getFullAXTree')).result.nodes;
 const ax = axNodes.filter(n => n.role?.value === 'button' && /^(Compartir|Me interesa)/.test(n.name?.value || '')).map(n => n.name.value);
 const shareNames = ax.filter(n => n.startsWith('Compartir')), likeNames = ax.filter(n => n.startsWith('Me interesa'));
 const waNames = axNodes.filter(n => n.role?.value === 'link' && /^Preguntar por WhatsApp/.test(n.name?.value || '')).map(n => n.name.value);
-check('eventos', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos que llevan el título (y 3 «Me interesa» y 3 «Preguntar por WhatsApp» igual)', shareNames.length === 3 && new Set(shareNames).size === 3 && shareNames.every(n => /^Compartir «.+»$/.test(n)) && likeNames.length === 3 && new Set(likeNames).size === 3 && waNames.length === 3 && new Set(waNames).size === 3 && waNames.every(n => /^Preguntar por WhatsApp: .+/.test(n)), JSON.stringify([...ax, ...waNames]));
+check('eventos', 'árbol de accesibilidad: 3 «Compartir» con nombres distintos que llevan el título (y 3 «Preguntar por WhatsApp» igual); ningún «Me interesa»', shareNames.length === 3 && new Set(shareNames).size === 3 && shareNames.every(n => /^Compartir «.+»$/.test(n)) && likeNames.length === 0 && waNames.filter(n => n.includes(':')).length === 3 && new Set(waNames.filter(n => n.includes(':'))).size === 3, JSON.stringify([...ax, ...waNames]));
 // Estado de la propuesta: sale de data-fecha (hora de Monterrey); sin atributo, «Propuesta · sin fecha».
 const when = await ev(`(async () => { const m = await import(new URL('feed.js', document.baseURI).href); const it = document.querySelector('.bill-item'); const b = it.querySelector('[data-bill-when]'); const read = () => ({ text: b.textContent, quiet: b.classList.contains('badge--quiet') });
   const out = { base: read() }; it.dataset.fecha = '2099-05-02'; m.initFeed(); out.fecha = read(); it.dataset.fecha = '2099-05-02T18:30'; m.initFeed(); out.hora = read(); it.dataset.fecha = '2001-01-01'; m.initFeed(); out.pasada = read(); delete it.dataset.fecha; m.initFeed(); out.sin = read(); return out; })()`);
@@ -156,7 +156,7 @@ for (const [vw, vh] of [[320, 640], [360, 640], [360, 740], [375, 667], [390, 84
   await ev(`document.querySelector('.bill-track').scrollIntoView({ block: 'center' })`); await sleep(900);
   const fit = await ev(`(() => { const hdr = document.querySelector('.hdr').getBoundingClientRect().height, tab = innerHeight - document.querySelector('.tabbar').getBoundingClientRect().top; const cards = [...document.querySelectorAll('.bill-item')].map(c => Math.round(c.getBoundingClientRect().height));
     const c = document.querySelector('.bill-item'); const acts = c.querySelector('.bill-acts').getBoundingClientRect(), box = c.getBoundingClientRect();
-    return { util: innerHeight - hdr - tab, cards, actsInside: acts.bottom <= box.bottom, cut: [...c.querySelectorAll('.bill-title, .bill-sub, .bill-detail > p, .bill-acts > *')].filter(e => e.scrollWidth > e.clientWidth + 1).length, over: document.documentElement.scrollWidth > innerWidth }; })()`);
+    return { util: innerHeight - hdr - tab, cards, actsInside: acts.bottom <= box.bottom, cut: [...c.querySelectorAll('.bill-title, .bill-detail > p, .bill-acts > *')].filter(e => e.scrollWidth > e.clientWidth + 1).length, over: document.documentElement.scrollWidth > innerWidth }; })()`);
   const tallest = Math.max(...fit.cards);
   check('eventos', `${vw}×${vh}: la tarjeta (${tallest} px) cabe en el alto útil (${fit.util} px) con ≥ 12 px de holgura (${(tallest / fit.util).toFixed(2)}×), sin texto cortado`, tallest <= fit.util - 12 && fit.actsInside && fit.cut === 0 && !fit.over, JSON.stringify(fit));
 }
@@ -164,15 +164,6 @@ await open(390, 844, { reset: true });
 await ev(`localStorage.clear()`);
 await ev(`document.querySelector('.bill-item').scrollIntoView({block:'start'}); scrollBy(0, 120)`); await sleep(600);
 await shot('03-cartelera-publicacion.jpg');
-await clickSel('[data-interest]', 0); await sleep(500);
-const p1 = await ev(`({pressed:document.querySelector('[data-interest]').getAttribute('aria-pressed'), stored:localStorage.getItem('iti-b4-interes-v1'), toast:document.querySelector('.toast')?.textContent})`);
-check('cartelera', '«Me interesa» marca aria-pressed, se guarda en este dispositivo y avisa que no se envía nada', p1.pressed === 'true' && /circulo/.test(p1.stored) && /No enviamos nada/.test(p1.toast || ''), JSON.stringify(p1));
-await open(390, 844); await sleep(800);
-const p2 = await ev(`document.querySelector('[data-interest]').getAttribute('aria-pressed')`);
-check('cartelera', '«Me interesa» persiste al recargar', p2 === 'true', p2);
-await clickSel('[data-interest]', 0); await sleep(400);
-const p3 = await ev(`({pressed:document.querySelector('[data-interest]').getAttribute('aria-pressed'), stored:localStorage.getItem('iti-b4-interes-v1')})`);
-check('cartelera', '«Me interesa» se quita con otro toque', p3.pressed === 'false' && p3.stored === '[]', JSON.stringify(p3));
 // Web Share
 await ev(`window.__shared = null; navigator.share = async d => { window.__shared = d; }`);
 await clickSel('[data-share]', 1); await sleep(500);
@@ -192,10 +183,9 @@ check('cartelera', 'sin errores de consola', !problems.length, problems.join(' |
 const feedText = await ev(`[...document.querySelectorAll('.hl, .profile-av, .bill-acts, .entry-copy, .news')].map(e => e.innerText).join(' ')`);
 check('verdad', 'sin contadores, reseñas, precios ni fechas inventadas en perfil y publicaciones', !/(\\d+\\s*(me gusta|likes?|seguidores|reseñas|opiniones|vistas))|★|\\$\\s?\\d|\\bmás leídos\\b|\\bagotad/i.test(feedText || ''), feedText);
 
-// ---------- 4. Novedades (CarruselNovedades): la tira recorre el catálogo completo; «Nuevo» solo con fechas reales ----------
+// ---------- 4. Novedades (CarruselNovedades): solo existe con llegadas registradas; «Nuevo» solo en lo reciente ----------
 const sample = JSON.parse(readFileSync(new URL('../../assets/data/catalog.json', import.meta.url), 'utf8')).books;
 const realData = JSON.parse(readFileSync(new URL('../../assets/data/collections.json', import.meta.url), 'utf8'));
-const AZ = [...sample].sort((a, b) => a.t.localeCompare(b.t, 'es')).map(b => b.id);
 // Fechas relativas a hoy (fecha local, como en news.js): la comprobación no caduca con el calendario.
 const dayAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const newsState = () => ev(`(()=>{ const s = document.querySelector('#novedades'); const links = [...document.querySelectorAll('[data-news-link]')]; const r = s.getBoundingClientRect();
@@ -209,15 +199,14 @@ const newsState = () => ev(`(()=>{ const s = document.querySelector('#novedades'
     ids: books.map(b => b.dataset.id), title: s.querySelector('h2').textContent.trim(), text: s.innerText, seen: localStorage.getItem('iti-news-visto'), state: localStorage.getItem('iti-news-estado'),
     toggle: { text: t.textContent.trim(), exp: t.getAttribute('aria-expanded'), ctrl: t.getAttribute('aria-controls'), dis: t.disabled, h: Math.round(t.getBoundingClientRect().height) } }; })()`);
 const approach = async () => { await ev(`document.querySelector('#cartelera').scrollIntoView({ block: 'end' })`); await sleep(2500); }; // la tira se pinta al acercarse
-// 4a. Sin fechas de llegada (la lista que se publica hoy y sus variantes): la tira es el catálogo completo, de la A a la Z, sin «Nuevo» ni punto ni control.
+// 4a. Sin llegadas válidas (la lista que se publica hoy y sus variantes): no existen la sección, su enlace de la barra, su fila del menú ni el control.
 for (const [label, data] of [['la lista que se publica (vacía hasta que haya fechas reales)', realData], ['sin la clave', { ...realData, novedades: undefined }], ['con entradas vacías', { ...realData, novedades: { titulo: 'Recién llegados', entradas: [] } }], ['con ids que no existen', { ...realData, novedades: { entradas: [{ id: 'no-existe-1', llegada: dayAgo(1) }, { id: 'no-existe-2', llegada: dayAgo(2) }] } }], ['con entradas que aún no llegan', { ...realData, novedades: { entradas: [{ id: sample[3].id, llegada: dayAgo(-5) }] } }]]) {
   override = data;
   await ev(`localStorage.clear()`);
   await open(390, 844, { wait: 2500 });
   await approach();
   const st = await newsState();
-  check('novedades', `${label}: la sección, su enlace de la barra y su fila del menú existen; la tira son los 41 libros de la A a la Z, sin «Nuevo», sin punto ni control, y dice «Todo el catálogo, de la A a la Z.»`, !st.hidden && st.display !== 'none' && st.hasNews && st.links.every(l => !l.hidden) && st.cards === 41 && JSON.stringify(st.ids) === JSON.stringify(AZ) && st.badges.every(b => !b) && !st.dot && st.sr === '' && st.cta === null && !st.hint && st.status === 'Todo el catálogo, de la A a la Z.' && st.title === 'Novedades' && st.state === 's' && st.tabs.join('|') === 'Inicio|Catálogo|Mi lista', JSON.stringify(st).slice(0, 700));
-  check('novedades', `${label}: «Ver todo» es un botón de 44 px con aria-expanded="false" y aria-controls`, st.toggle.text === 'Ver todo' && st.toggle.exp === 'false' && st.toggle.ctrl === 'news-list' && !st.toggle.dis && st.toggle.h === 44, JSON.stringify(st.toggle));
+  check('novedades', `${label}: no existen la sección, su enlace de la barra, su fila del menú ni el control del inicio (nada de «Todo el catálogo»); queda recordado «sin llegadas»`, st.display === 'none' && !st.hasNews && st.links.every(l => l.w === 0) && st.cards === 0 && !st.dot && st.sr === '' && st.cta === null && !st.hint && !/de la A a la Z/.test(st.text) && st.state === 'n' && st.tabs.join('|') === 'Inicio|Catálogo|Mi lista', JSON.stringify(st).slice(0, 700));
 }
 // El inicio de una primera visita no reserva un renglón vacío para el control: de la dirección a la foto, solo el aire del inicio (24 px).
 override = realData;
@@ -225,7 +214,10 @@ await ev(`localStorage.clear()`);
 await open(390, 844, { wait: 2500 });
 const gap = await ev(`(() => { const a = document.querySelector('.entry-address').getBoundingClientRect(), m = document.querySelector('.entry-media').getBoundingClientRect(); return { gap: Math.round(m.top - a.bottom), hint: document.documentElement.classList.contains('news-hint') }; })()`);
 check('inicio', `primera visita: sin hueco entre la dirección y la foto (${gap.gap} px, el aire del inicio) y sin renglón reservado`, gap.gap <= 25 && !gap.hint, JSON.stringify(gap));
-// 4b. «Ver todo» / «Ver menos»: despliega la tira en rejilla dentro de la sección y la vuelve a plegar; el foco se queda en el botón.
+// 4b. «Ver todo» / «Ver menos» (con siete llegadas): despliega la tira en rejilla dentro de la sección y la vuelve a plegar; el foco se queda en el botón.
+const ids = sample.slice(10, 17).map(b => b.id);
+const withSeven = { ...realData, novedades: { titulo: 'Recién llegados', entradas: ids.map((id, i) => ({ id, llegada: dayAgo([1, 3, 20, 2, 30, 35, 40][i]) })) } };
+override = withSeven;
 for (const [vw, vh, cols] of [[390, 844, 3], [320, 640, 2]]) {
   await open(vw, vh, { wait: 2500 });
   await approach();
@@ -239,43 +231,42 @@ for (const [vw, vh, cols] of [[390, 844, 3], [320, 640, 2]]) {
   await ev(`document.querySelector('[data-news-toggle]').scrollIntoView({ block: 'center' })`); await sleep(300);
   await clickSel('[data-news-toggle]'); await sleep(1000);
   const g2 = await grid();
-  check('novedades', `${vw}×${vh}: plegada es una tira de una fila que se desliza; «Ver todo» la despliega en rejilla de ${cols} columnas (aria-expanded, «Ver menos», foco en el botón) y «Ver menos» la regresa al principio`, g0.rows === 1 && g0.scrolls && g1.exp === 'true' && g1.text === 'Ver menos' && g1.focus && g1.cols === cols && g1.rows >= 14 && !g1.scrolls && g2.exp === 'false' && g2.text === 'Ver todo' && g2.focus && g2.rows === 1 && g2.sl === 0 && !g1.over && !g2.over, JSON.stringify({ g0, g1, g2 }));
+  check('novedades', `${vw}×${vh}: plegada es una tira de una fila que se desliza; «Ver todo» la despliega en rejilla de ${cols} columnas (aria-expanded, «Ver menos», foco en el botón) y «Ver menos» la regresa al principio`, g0.rows === 1 && g0.scrolls && g1.exp === 'true' && g1.text === 'Ver menos' && g1.focus && g1.cols === cols && g1.rows === Math.ceil(7 / cols) && !g1.scrolls && g2.exp === 'false' && g2.text === 'Ver todo' && g2.focus && g2.rows === 1 && g2.sl === 0 && !g1.over && !g2.over, JSON.stringify({ g0, g1, g2 }));
 }
-// 4c. Un libro abre su ficha con WhatsApp (prellenado), Guardar, Instagram, Facebook y Compartir (Web Share o copiar el enlace); al cerrar, el foco vuelve al libro.
+// 4c. Un libro abre la ficha única: WhatsApp (prellenado), Guardar, Compartir (Web Share o copiar el enlace) y «Cómo llegar»; al cerrar, el foco vuelve al libro.
 await open(390, 844, { wait: 2500 });
 await approach();
 await ev(`document.querySelector('#novedades').scrollIntoView()`); await sleep(400);
 const pick = await ev(`(() => { const b = document.querySelectorAll('.news-book')[1]; return { id: b.dataset.id, t: b.querySelector('.news-t').textContent, a: b.querySelector('.news-a').textContent }; })()`);
 await clickSel('.news-book', 1); await sleep(1800);
 const ficha = await ev(`(() => { const d = document.getElementById('cat-drawer'); const vis = e => e.getBoundingClientRect().width > 0 && getComputedStyle(e).display !== 'none';
-  const reds = [...d.querySelectorAll('.redes .red')].map(r => ({ name: r.getAttribute('aria-label') || r.textContent.trim(), vis: vis(r), w: Math.round(r.querySelector('.red-ic').getBoundingClientRect().width), h: Math.round(r.querySelector('.red-ic').getBoundingClientRect().height), href: r.getAttribute('href'), target: r.getAttribute('target'), rel: r.getAttribute('rel'), label: r.querySelector('.red-nombre').textContent.trim() }));
+  const share = d.querySelector('[data-d-share]'); const sr = share.getBoundingClientRect(); const reds = d.querySelectorAll('.redes, [data-d-red-ig], [data-d-red-fb], a[href*="instagram"], a[href*="facebook"]').length;
   const cta = d.querySelector('[data-d-cta]'); const foot = d.querySelector('.drawer-foot').getBoundingClientRect();
-  return { open: d.open, modo: d.dataset.modo, title: d.querySelector('[data-d-title]').textContent, wa: cta.href, waPrim: cta.classList.contains('btn--primario') && vis(cta), reds, visit: vis(d.querySelector('[data-d-visit]')), save56: vis(d.querySelector('[data-d-save]')), inView: foot.bottom <= innerHeight + 1, note: d.querySelector('.drawer-note').textContent }; })()`);
-await shot('05-ficha-redes.jpg');
+  return { open: d.open, modo: d.dataset.modo, title: d.querySelector('[data-d-title]').textContent, wa: cta.href, waPrim: cta.classList.contains('btn--primario') && vis(cta), reds, share: { name: share.getAttribute('aria-label'), w: Math.round(sr.width), h: Math.round(sr.height) }, visit: vis(d.querySelector('[data-d-visit]')), save56: vis(d.querySelector('[data-d-save]')), inView: foot.bottom <= innerHeight + 1, note: d.querySelector('.drawer-note').textContent }; })()`);
+await shot('05-ficha-novedades.jpg');
 const waText = new URL(ficha.wa).searchParams.get('text') || '';
-check('ficha redes', 'el libro de Novedades abre su ficha en modo redes: «Preguntar por WhatsApp» primaria con título y autor en el mensaje, y la nota de confirmación', ficha.open && ficha.modo === 'redes' && ficha.title.includes(pick.t.slice(0, 10)) && /^https:\/\/wa\.me\/528180875940\?text=/.test(ficha.wa) && waText.includes(`«${sample.find(b => b.id === pick.id).t}»`) && waText.includes(pick.a) && ficha.waPrim && ficha.note === 'La librería confirma si lo tienen.' && ficha.inView, JSON.stringify(ficha).slice(0, 600));
-check('ficha redes', 'debajo: Guardar · Instagram · Facebook · Compartir, cuatro botones de 48 × 48 con nombre visible; los perfiles de la librería en otra pestaña con noopener; sin «Cómo llegar» ni el Guardar de 56 de la ficha de siempre', ficha.reds.map(r => r.label).join('|') === 'Guardar|Instagram|Facebook|Compartir' && ficha.reds.every(r => r.vis && r.w === 48 && r.h === 48) && ficha.reds[1].href === 'https://www.instagram.com/libreriaitineranteymasmty/' && ficha.reds[2].href === 'https://www.facebook.com/profile.php?id=100095548961064' && ficha.reds.slice(1, 3).every(r => r.target === '_blank' && /noopener/.test(r.rel)) && /^Instagram: preguntar por «/.test(ficha.reds[1].name) && /^Compartir «/.test(ficha.reds[3].name) && !ficha.visit && !ficha.save56, JSON.stringify(ficha.reds));
-await clickSel('[data-d-red-save]'); await sleep(600);
-const rs = await ev(`({ pressed: document.querySelector('[data-d-red-save]').getAttribute('aria-pressed'), label: document.querySelector('[data-d-red-save] .red-nombre').textContent, stored: JSON.parse(localStorage.getItem('iti-saved-v1') || '[]') })`);
-check('ficha redes', '«Guardar» guarda en Mi lista (aria-pressed y «Guardado»)', rs.pressed === 'true' && rs.label === 'Guardado' && rs.stored.includes(pick.id), JSON.stringify(rs));
+check('ficha', 'el libro de Novedades abre la ficha única: «Preguntar por WhatsApp» primaria con título y autor en el mensaje, y la nota de confirmación', ficha.open && !ficha.modo && ficha.title.includes(pick.t.slice(0, 10)) && /^https:\/\/wa\.me\/528180875940\?text=/.test(ficha.wa) && waText.includes(`«${sample.find(b => b.id === pick.id).t}»`) && waText.includes(pick.a) && ficha.waPrim && ficha.note === 'La librería confirma si lo tienen.' && ficha.inView, JSON.stringify(ficha).slice(0, 600));
+check('ficha', 'debajo: Guardar y Compartir (iconos de 56 × 56; Compartir con el título en su nombre) y «Cómo llegar»; sin Instagram ni Facebook en la ficha', ficha.reds === 0 && ficha.visit && ficha.save56 && ficha.share.w === 56 && ficha.share.h === 56 && /^Compartir «.+»$/.test(ficha.share.name), JSON.stringify({ reds: ficha.reds, share: ficha.share, visit: ficha.visit }));
+await clickSel('[data-d-save]'); await sleep(600);
+const rs = await ev(`({ pressed: document.querySelector('[data-d-save]').getAttribute('aria-pressed'), stored: JSON.parse(localStorage.getItem('iti-saved-v1') || '[]'), toast: document.querySelector('.toast')?.textContent || '', above: (() => { const t = document.querySelector('.toast'), f = document.querySelector('#cat-drawer .drawer-foot'); return !!t && t.getBoundingClientRect().bottom <= f.getBoundingClientRect().top + 1; })() })`);
+check('ficha', '«Guardar» guarda en Mi lista (aria-pressed) y avisa «Guardado en Mi lista.» encima de las acciones del pie, sin taparlas', rs.pressed === 'true' && rs.stored.includes(pick.id) && /^Guardado en Mi lista\./.test(rs.toast) && rs.above, JSON.stringify(rs));
 await ev(`window.__shared = null; navigator.share = async d => { window.__shared = d; }`);
 await clickSel('[data-d-share]'); await sleep(600);
 const sh4 = await ev(`window.__shared`);
-check('ficha redes', '«Compartir» usa Web Share con el título y un enlace a la ficha del libro', sh4 && sh4.title.includes(sample.find(b => b.id === pick.id).t) && sh4.url.endsWith(`#libro-${pick.id}`), JSON.stringify(sh4));
+check('ficha', '«Compartir» usa Web Share con el título y un enlace a la ficha del libro', sh4 && sh4.title.includes(sample.find(b => b.id === pick.id).t) && sh4.url.endsWith(`#libro-${pick.id}`), JSON.stringify(sh4));
 await ev(`window.__copied = null; Object.defineProperty(navigator, 'share', { value: undefined, configurable: true }); Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.__copied = t; } }, configurable: true })`);
 await clickSel('[data-d-share]'); await sleep(600);
 const cp4 = await ev(`({ copied: window.__copied, toast: document.querySelector('.toast')?.textContent })`);
-check('ficha redes', 'sin Web Share, «Compartir» copia el enlace y lo avisa', (cp4.copied || '').endsWith(`#libro-${pick.id}`) && /Enlace copiado/.test(cp4.toast || ''), JSON.stringify(cp4));
+check('ficha', 'sin Web Share, «Compartir» copia el enlace y lo avisa', (cp4.copied || '').endsWith(`#libro-${pick.id}`) && /Enlace copiado/.test(cp4.toast || ''), JSON.stringify(cp4));
 await key('Escape', 'Escape', 27); await sleep(900);
 const back4 = await ev(`({ open: document.getElementById('cat-drawer').open, focus: document.activeElement?.classList.contains('news-book') && document.activeElement.dataset.id })`);
-check('ficha redes', 'Escape cierra la ficha y el foco vuelve al libro de Novedades', !back4.open && back4.focus === pick.id, JSON.stringify(back4));
-// El enlace compartido abre la ficha de ese libro, con sus redes.
+check('ficha', 'Escape cierra la ficha y el foco vuelve al libro de Novedades', !back4.open && back4.focus === pick.id, JSON.stringify(back4));
+// El enlace compartido abre la ficha de ese libro.
 await send('Page.navigate', { url: 'about:blank' });
 await send('Page.navigate', { url: `${URL_}#libro-${pick.id}` }); await sleep(4000);
 const deep = await ev(`({ open: document.getElementById('cat-drawer').open, modo: document.getElementById('cat-drawer').dataset.modo, hash: location.hash })`);
-check('ficha redes', 'un enlace #libro-<id> abre la ficha de ese libro con sus redes y deja la dirección limpia', deep.open && deep.modo === 'redes' && deep.hash === '', JSON.stringify(deep));
-// 4d. Con fechas de llegada reales: van primero (lo más reciente primero) y solo ellas pueden ser «Nuevo»; después, el resto del catálogo.
-const ids = sample.slice(10, 17).map(b => b.id);
+check('ficha', 'un enlace #libro-<id> abre la ficha de ese libro (la única) y deja la dirección limpia', deep.open && !deep.modo && deep.hash === '', JSON.stringify(deep));
+// 4d. Con fechas de llegada reales: la tira son esas llegadas (lo más reciente primero) y solo las recientes son «Nuevo»; nada del resto del catálogo.
 // 3 llegadas en las dos últimas semanas, 3 anteriores y una sin fecha, en desorden: la tira ordena de lo más reciente a lo más antiguo y deja al final la que no trae fecha.
 const ages = [1, 3, 20, 2, 30, null, 40];
 const newsOrder = [0, 3, 1, 2, 4, 6, 5].map(i => ids[i]);
@@ -288,8 +279,8 @@ check('novedades', 'primera visita con llegadas, antes de acercarse: punto en el
 await approach();
 const withData = await newsState();
 check('novedades', 'con el inicio fuera de la vista, el control «3 novedades recientes» toma su renglón (sin que nadie lo vea saltar)', withData.hint && withData.cta === '3 novedades recientes', JSON.stringify({ hint: withData.hint, cta: withData.cta }));
-check('novedades', 'con entradas, las llegadas van primero (lo más reciente primero, sin fecha al final) y luego el resto del catálogo de la A a la Z; titular «Novedades» y «3 llegaron en las últimas dos semanas»', withData.cards === 41 && JSON.stringify(withData.ids.slice(0, 7)) === JSON.stringify(newsOrder) && JSON.stringify(withData.ids.slice(7)) === JSON.stringify(AZ.filter(id => !ids.includes(id))) && withData.title === 'Novedades' && withData.status === '3 llegaron en las últimas dos semanas', JSON.stringify(withData).slice(0, 600));
-check('novedades', '«Nuevo» solo en las tres llegadas recientes, dentro del botón del libro y antes de su título (entra en su nombre accesible)', JSON.stringify(withData.badges.slice(0, 7)) === NEW7 && withData.badges.slice(7).every(b => !b) && withData.badgeFirst, JSON.stringify(withData.badges.slice(0, 9)));
+check('novedades', 'con entradas, la sección aparece sola con esas siete llegadas (lo más reciente primero, sin fecha al final) y nada más; titular «Novedades» y «3 llegaron en las últimas dos semanas»', withData.cards === 7 && !withData.hidden && withData.hasNews && JSON.stringify(withData.ids) === JSON.stringify(newsOrder) && withData.title === 'Novedades' && withData.status === '3 llegaron en las últimas dos semanas', JSON.stringify(withData).slice(0, 600));
+check('novedades', '«Nuevo» solo en las tres llegadas recientes, dentro del botón del libro y antes de su título (entra en su nombre accesible)', JSON.stringify(withData.badges) === NEW7 && withData.badgeFirst, JSON.stringify(withData.badges.slice(0, 9)));
 check('novedades', 'sin aviso de muestra, sin ranking y sin fechas impresas (la fecha de llegada solo ordena y decide «Nuevo»)', !/Datos de muestra|no es inventario|más leídos|más vendid/i.test(withData.text) && !/\d{4}-\d{2}-\d{2}|\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)|hace \d+ días/i.test(withData.text), withData.text.slice(0, 300));
 await ev(`document.querySelector('#novedades').scrollIntoView()`); await sleep(600);
 await shot('04-novedades.jpg');
@@ -314,7 +305,7 @@ await ev(`localStorage.clear()`);
 await open(390, 844, { wait: 2500 });
 await approach();
 const undated = await newsState();
-check('novedades', 'sin fecha de llegada (clave antigua `ids`) van primero en su orden, sin «Nuevo», ni punto ni control', undated.cards === 41 && JSON.stringify(undated.ids.slice(0, 7)) === JSON.stringify(ids) && undated.badges.every(b => !b) && !undated.dot && undated.cta === null, JSON.stringify({ cards: undated.cards, dot: undated.dot, cta: undated.cta }));
+check('novedades', 'sin fecha de llegada (clave antigua `ids`) la sección muestra esos libros en su orden, sin «Nuevo», ni punto ni control', undated.cards === 7 && JSON.stringify(undated.ids) === JSON.stringify(ids) && undated.badges.every(b => !b) && !undated.dot && undated.cta === null, JSON.stringify({ cards: undated.cards, dot: undated.dot, cta: undated.cta }));
 check('consola', 'sin errores de consola con Novedades', !problems.length, problems.join(' | '));
 override = null;
 await ev(`localStorage.clear()`);

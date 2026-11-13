@@ -23,11 +23,12 @@ Después de cada cambio visual, antes de pedir commit. Nadie juzga una página q
 - Vidrio sin respaldo opaco (sin `backdrop-filter`, transparencia reducida, contraste alto) o vidrio sobre vidrio.
 - Controles fuera de la escala, de menos de 44×44 px o a menos de 8 px de su vecino (`controles.mjs`).
 - Texto de relleno o cifras inventadas (`PRODUCT.md`).
+- Cejas o antetítulos sobre un titular: en mayúsculas o con interletra abierta, y también en minúsculas de oración con letra de 60 % o menos de la del titular (así eran los `.sec-rotulo`, retirados el 2026-11-13). El nombre de la sección va en el titular («Nombre *frase*»). Lo detecta `node tools/qa/piso.mjs URL`.
 
 ## Los diez criterios (1–10)
 
 1. **Primer vistazo (3 s):** un solo foco. Se entiende qué es y adónde mirar.
-2. **Firma:** algo memorable y nuestro. Aquí: la foto real de la casa con radio grande, el turquesa del logo, el vidrio de las barras y el recorrido de colecciones.
+2. **Firma:** algo memorable y nuestro. Aquí: la foto real de la casa con radio grande, el turquesa del logo, el vidrio de las barras y el carrusel 3D de portadas (el recorrido de colecciones se retiró el 2026-11-13 con la crítica minimalista).
 3. **Tipografía:** la del sistema de Apple (Inter de respaldo) en la escala de Apple HIG: Large Title solo en el h1, Title 1 en secciones, Body 17/22 en el texto; nada de lectura bajo 15 px; como máximo 6 tamaños por pantalla.
 4. **Composición:** el texto y sus acciones juntos (proximidad), bordes alineados, recorrido de la vista titular → mensaje → acción. Nada huérfano.
 5. **Color y luz:** `fondo`/`fondo-2` alternos, `tinta`, `tinta-2` y un acento (turquesa). Un solo primario por vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»); el secundario es menta. Sombras solo en lo que flota. Los dos temas se ven igual de cuidados.
@@ -45,7 +46,7 @@ Después de cada cambio visual, antes de pedir commit. Nadie juzga una página q
 | `--alto-md` | 48 px | Estándar móvil: todo botón, acción, chip, campo y botón de icono (también «Cómo llegar» de la barra) |
 | `--alto-sm` | 44 px | Controles secundarios en línea (pie, «Ver todo», «Ver las N»), los de las barras (☰, secciones, Mi lista) y «Guardar» sobre una portada |
 
-- **Piezas con alto propio** (cada una con su razón): casillas de la barra inferior (49 px, la tab bar de iOS), paradas del recorrido (64 px), tarjetas de libro, opciones de filtro y sugerencias.
+- **Piezas con alto propio** (cada una con su razón): casillas de la barra inferior (49 px, la tab bar de iOS), tarjetas de libro (portada, título y «autor · precio»), opciones de filtro y sugerencias.
 - **Separación:** ≥ 8 px entre controles vecinos; 12 px dentro de un grupo de acciones.
 - **Rótulos:** 17 px (Headline) en botones de 48 y 56; 15 px (Subheadline) en botones de 44 y chips.
 - **Botones de un mismo grupo** comparten alto.

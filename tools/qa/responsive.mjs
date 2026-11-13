@@ -51,8 +51,8 @@ const PAGE = `(() => {
   // Los carruseles se desplazan en horizontal a propósito: lo que vive dentro de ellos no cuenta como desborde.
   const SCROLLERS = '.house-track, .rail-viewport, .rail-chips, .bill-track, .cat-suggest, .news-list'; // .news-list: la tira de Novedades (plegada)
   const wide = [...document.querySelectorAll('main *, .ftr *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > innerWidth + 1 && !e.closest(SCROLLERS) && getComputedStyle(e).position !== 'fixed'; }).slice(0, 3).map(name);
-  const idr = document.querySelector('.ftr-id').getBoundingClientRect(); const lk = document.querySelector('.ftr-links').getBoundingClientRect();
-  const cut = [...document.querySelectorAll('h1, h2, h3, .btn, .topic, .rail-chip-name, .rail-trail-text, .badge, .act, .hdr-brand, .tab-lb, .menu-row')].filter(e => vis(e) && !e.matches('.sr-only') && !e.closest('dialog:not([open]), [hidden]') && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').slice(0, 3).map(e => name(e) + ' «' + e.textContent.trim().slice(0, 16) + '»');
+  const idr = document.querySelector('.motion-btn').getBoundingClientRect(); const lk = document.querySelector('.ftr-links').getBoundingClientRect(); // el pie: redes y correo, y «Pausar el movimiento»
+  const cut = [...document.querySelectorAll('h1, h2, h3, .btn, .chip, .cf-titulo, .cf-meta, .badge, .act, .hdr-brand, .tab-lb, .menu-row')].filter(e => vis(e) && !e.matches('.sr-only') && !e.closest('dialog:not([open]), [hidden]') && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').slice(0, 3).map(e => name(e) + ' «' + e.textContent.trim().slice(0, 16) + '»');
   return { pantallas: +(de.scrollHeight / innerHeight).toFixed(1), desborde: de.scrollWidth > innerWidth, wide,
     pie: !(idr.bottom <= lk.top + 1 || idr.right <= lk.left + 1 || lk.bottom <= idr.top + 1 || lk.right <= idr.left + 1), cut, contenido: Math.round(document.querySelector('.books-head').getBoundingClientRect().width) };
 })()`;
@@ -73,7 +73,7 @@ for (const [w, h] of SIZES) {
   if (p.desborde) bad.push('desborde horizontal');
   if (p.wide.length) bad.push('se sale del ancho: ' + p.wide.join(', '));
   if (p.cut.length) bad.push('texto cortado: ' + p.cut.join(', '));
-  if (p.pie) bad.push('pie encimado (dirección sobre enlaces)');
+  if (p.pie) bad.push('pie encimado («Pausar el movimiento» sobre los enlaces)');
   if (!f.ctaOk) bad.push(`«Cómo llegar» fuera de la primera vista (y ${f.cta.join('–')})`);
   if (!f.ledeOk) bad.push('párrafo del inicio fuera de la primera vista');
   if (bad.length) fails.push(`${tag} → ${bad.join('; ')}`);

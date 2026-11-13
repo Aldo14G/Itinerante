@@ -1,36 +1,6 @@
 // Librería Itinerante y Más · sistema «Itinerante Líquido»: barra y menú, destino actual, entradas de los titulares, Eventos, Catálogo y estado de apertura. Sin dependencias.
-import { DUR, EASE, EASE_IO, ms, confirmThen } from './motion.js';
+import { confirmThen } from './motion.js';
 import { openDialog, closeDialog, navigateFromSheet } from './sheets.js';
-
-const WA = 'https://wa.me/528180875940';
-
-export const TOPICS = {
-  narrativa: { name: 'Narrativa', msg: 'narrativa', line: 'Una historia lleva a otra. Novela y cuento, de aquí y de otros lados.', img: 'libro-narrativa.webp', w: 900, h: 720, alt: 'Libros de portadas de colores sobre una repisa de madera, junto a un muro de piedra', kind: 'real', place: 'La repisa de la entrada' },
-  poesia: { name: 'Poesía', msg: 'poesía', line: 'Para leer despacio y en voz alta. Pregunta por un poeta o deja que te recomienden.', img: 'libro-poesia.webp', w: 760, h: 608, alt: 'Diccionario antiguo sobre una mesa de libros, frente a un muro de piedra con cuadros', kind: 'real', place: 'Entre diccionarios y cuadros' },
-  ensayo: { name: 'Ensayo', msg: 'ensayo', line: 'Ideas para conversar después. Cuéntanos qué tema te ronda.', img: 'libro-ensayo.webp', w: 900, h: 720, alt: 'Portadas de colores sobre una mesa blanca, vistas de cerca', kind: 'real', place: 'La mesa de libros' },
-  cronica: { name: 'Crónica', msg: 'crónica', line: 'La realidad contada de cerca: ciudades, viajes y testimonios.', img: 'libro-cronica.webp', w: 760, h: 608, alt: 'Librero de madera con libros de periodismo, junto a un grabado enmarcado', kind: 'real', place: 'El rincón de lectura' },
-  infantil: { name: 'Infantil', msg: 'literatura infantil', line: 'Libros para leer juntos, en mesas con lugar para todos.', img: 'libro-infantil.webp', w: 760, h: 608, alt: 'Globo terráqueo antiguo junto a una fila de libros en un estante de madera', kind: 'real', place: 'El globo terráqueo' },
-  libre: { name: 'Sin rumbo fijo', msg: '', line: 'Empieza por una mesa, una portada o una conversación. Te ayudamos a buscar.', img: 'libro-libre.webp', w: 760, h: 608, alt: 'Pilas de libros sobre una mesa negra junto a una repisa', kind: 'real', place: 'El rincón de lectura' }
-};
-
-export function buildMessage(key, query = '') {
-  const text = Array.from(String(query).trim()).slice(0, 160).join('');
-  if (text) return `Hola, estoy buscando «${text}». ¿Me pueden confirmar si lo tienen?`;
-  if (key === 'libre' || !TOPICS[key]) return 'Hola, estoy buscando un libro y no sé por dónde empezar. ¿Me ayudan a elegir?';
-  return `Hola, me gustaría preguntar por libros de ${TOPICS[key].msg}. ¿Qué me recomiendan?`;
-}
-
-export function ctaText(key, query = '') {
-  if (String(query).trim()) return 'Preguntar por este libro';
-  if (key === 'libre' || !TOPICS[key]) return 'Pedir una recomendación';
-  return `Preguntar por ${TOPICS[key].msg}`;
-}
-
-export function waUrl(message) {
-  const url = new URL(WA);
-  url.searchParams.set('text', message);
-  return url.href;
-}
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
@@ -64,7 +34,6 @@ if (typeof document !== 'undefined') boot();
 async function boot() {
   const root = document.documentElement;
   const reduceMq = matchMedia('(prefers-reduced-motion: reduce)');
-  const fineMq = matchMedia('(hover: hover) and (pointer: fine)');
   const phone = matchMedia('(max-width: 760px)');
   const saveData = Boolean(navigator.connection && navigator.connection.saveData);
   let userOff = false;
@@ -138,7 +107,7 @@ async function boot() {
   }
 
   // ---------- Fotos diferidas ----------
-  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip, .topic-layer')?.classList.add('is-loaded'); };
+  const markLoaded = img => { img.classList.add('is-loaded'); img.closest('.still-img, .frame-clip')?.classList.add('is-loaded'); };
   $$('img[loading="lazy"]').forEach(img => { if (img.complete) markLoaded(img); });
   document.addEventListener('load', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
   document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) markLoaded(e.target); }, true);
@@ -295,136 +264,6 @@ async function boot() {
   })();
 
   await yieldNow();
-  // ---------- Libros ----------
-  (function books() {
-    const buttons = $$('.topic');
-    const layersWrap = $('[data-topic-layers]');
-    const nameEl = $('[data-topic-name]');
-    const lineEl = $('[data-topic-line]');
-    const tagEl = $('[data-topic-tag]');
-    const live = $('[data-topic-live]');
-    const input = $('#book-query');
-    const note = $('[data-note]');
-    const cta = $('[data-book-cta]');
-    const ctaLabel = $('[data-cta-label]');
-    const form = $('[data-composer]');
-    const ease = EASE();
-    let current = 'narrativa';
-    let token = 0;
-
-    const fillName = text => {
-      nameEl.textContent = '';
-      return [...text].map((c, i) => {
-        const s = document.createElement('span');
-        s.className = 'ch';
-        s.textContent = c;
-        nameEl.append(s);
-        return s;
-      });
-    };
-    fillName(nameEl.textContent);
-
-    const updateMessage = animate => {
-      const msg = buildMessage(current, input.value);
-      const label = ctaText(current, input.value);
-      if (note.textContent !== msg) {
-        note.textContent = msg;
-        if (animate && isMotion()) note.animate([{ opacity: 0.3, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('fast'), easing: ease });
-      }
-      cta.href = waUrl(msg);
-      if (ctaLabel.textContent !== label) {
-        ctaLabel.textContent = label;
-        if (animate && isMotion()) ctaLabel.animate([{ opacity: 0, transform: 'translateY(70%)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), easing: ease });
-      }
-    };
-
-    function select(key, quiet = false) {
-      if (key === current || !TOPICS[key]) return;
-      current = key;
-      const t = TOPICS[key];
-      const my = ++token;
-      buttons.forEach(b => { const on = b.dataset.topic === key; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
-      if (!quiet) {
-        live.textContent = `${t.name}. ${t.line}`;
-        document.dispatchEvent(new CustomEvent('iti:topic', { detail: { tema: key } })); // el carrusel marca la colección equivalente (rail.js)
-      }
-
-      const layer = document.createElement('div');
-      layer.className = 'topic-layer';
-      const img = new Image(t.w, t.h);
-      img.alt = t.alt;
-      img.decoding = 'async';
-      img.src = `assets/img/${t.img}`;
-      layer.append(img);
-      const prev = $$('.topic-layer', layersWrap);
-      const motion = isMotion();
-      if (motion) layer.style.clipPath = 'inset(0 100% 0 0)';
-      layersWrap.append(layer);
-
-      if (!motion) {
-        prev.forEach(p => p.remove());
-        nameEl.textContent = t.name;
-        lineEl.textContent = t.line;
-        tagEl.textContent = t.place;
-        updateMessage(false);
-        return;
-      }
-
-      img.decode().catch(() => {}).then(() => {
-        if (my !== token) return;
-        layer.style.clipPath = '';
-        layer.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], { duration: DUR('slow'), easing: ease, fill: 'backwards' });
-        img.animate([{ transform: 'scale(1.18) translateX(5%)' }, { transform: 'none' }], { duration: DUR('scene'), easing: ease });
-        prev.forEach(p => p.firstElementChild.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'translateX(-9%)', filter: 'brightness(0.4)' }], { duration: DUR('slow'), easing: ease, fill: 'forwards' }));
-        setTimeout(() => prev.forEach(p => p.remove()), DUR('slow') + 50);
-      });
-
-      const old = $$('.ch', nameEl);
-      old.forEach((c, i) => c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-105%)', opacity: 0 }], { duration: DUR('fast'), delay: i * ms('stagger-char') * 0.6, easing: EASE_IO(), fill: 'forwards' }));
-      [lineEl, tagEl].forEach(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: DUR('instant'), fill: 'forwards' }));
-      setTimeout(() => {
-        if (my !== token) return;
-        fillName(t.name).forEach((s, i) => s.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: ease, fill: 'backwards' }));
-        lineEl.textContent = t.line;
-        tagEl.textContent = t.place;
-        [lineEl, tagEl].forEach((el, i) => {
-          el.getAnimations().forEach(a => a.cancel());
-          el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: DUR('instant') * 0.6 + i * ms('stagger-line'), easing: ease, fill: 'backwards' });
-        });
-      }, DUR('fast') - 20 + old.length * 10);
-
-      updateMessage(true);
-    }
-
-    const topicsEl = $('.topics');
-    const preload = () => Object.values(TOPICS).forEach(t => { const pre = new Image(); pre.src = `assets/img/${t.img}`; });
-    ['pointerenter', 'focusin', 'touchstart'].forEach(ev => topicsEl.addEventListener(ev, preload, { once: true, passive: true }));
-
-    buttons.forEach((b, i) => {
-      let intent = 0;
-      b.addEventListener('click', () => select(b.dataset.topic));
-      const arm = e => {
-        if (e.pointerType !== 'mouse' || !fineMq.matches) return;
-        clearTimeout(intent);
-        intent = setTimeout(() => select(b.dataset.topic, true), ms('intent-topic'));
-      };
-      b.addEventListener('pointerenter', arm);
-      b.addEventListener('pointermove', arm);
-      b.addEventListener('pointerleave', () => clearTimeout(intent));
-      b.addEventListener('keydown', e => {
-        const dir = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
-        if (!dir) return;
-        e.preventDefault();
-        const next = buttons[(i + dir + buttons.length) % buttons.length];
-        next.focus();
-        select(next.dataset.topic);
-      });
-    });
-    input.addEventListener('input', () => updateMessage(true));
-    form.addEventListener('submit', e => { e.preventDefault(); cta.focus(); });
-  })();
-
-  await yieldNow();
   // ---------- Novedades: un módulo ligero que se pide dos veces sin repetirse (el conteo, pronto; la tira, al acercarse) ----------
   let newsLoad;
   const loadNews = () => (newsLoad ??= import('./news.js').catch(err => {
@@ -451,13 +290,13 @@ async function boot() {
       catIo.observe(catalogSection);
     } else bootCatalog();
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
-    // Un enlace compartido desde la ficha (#libro-<id>, «Compartir» de Novedades) abre la ficha de ese libro con sus redes. La dirección
-    // queda limpia antes de abrir: cerrar la ficha no deja un ancla que la vuelva a abrir al recargar.
+    // Un enlace compartido desde la ficha (#libro-<id>, su botón «Compartir») abre la ficha de ese libro. La dirección queda limpia antes
+    // de abrir: cerrar la ficha no deja un ancla que la vuelva a abrir al recargar.
     const openShared = () => {
       const m = /^#libro-([a-z0-9-]+)$/.exec(location.hash);
       if (!m) return;
       history.replaceState(null, '', location.pathname + location.search);
-      bootCatalog().then(() => document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: m[1], redes: true } })));
+      bootCatalog().then(() => document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: m[1] } })));
     };
     addEventListener('hashchange', openShared);
     openShared();
@@ -503,9 +342,9 @@ async function boot() {
       phone.addEventListener('change', settle);
       explorer.addEventListener('close', () => { if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true }); });
       $('[data-ex-close]', explorer).addEventListener('click', () => closeDialog(explorer)); // el cierre real (volver a activar la página) corre después del fotograma
-      $('[data-ex-open]')?.addEventListener('click', e => confirmThen(e.currentTarget, openExplorer)); // confirma el toque; la hoja (lo caro) va después de pintar
       document.addEventListener('iti:open-explorer', openExplorer);
-      // Cualquier enlace al catálogo abre la hoja en móvil (el menú lateral la abre al terminar de cerrarse).
+      // Cualquier enlace al catálogo («Buscar en el catálogo», arriba del capítulo, incluido) abre la hoja en móvil: confirma el toque y la hoja
+      // (lo caro) va después de pintar. En escritorio el enlace baja a la rejilla en línea y deja el foco en su buscador.
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href="#catalogo"]');
         if (!a) return;
@@ -543,11 +382,11 @@ async function boot() {
   (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
 
   await yieldNow();
-  // ---------- Publicaciones de Cartelera (móvil): «Me interesa» y «Compartir» ----------
+  // ---------- Eventos y talleres: «Compartir» y la fecha de cada propuesta ----------
   let feedLoad;
   const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => { feedLoad = undefined; throw err; }));
   document.addEventListener('click', e => {
-    const act = e.target.closest('[data-interest], [data-share]');
+    const act = e.target.closest('[data-share]');
     if (act) loadFeed().then(m => m.onAct(act)).catch(() => {});
   });
   (window.requestIdleCallback || (cb => setTimeout(cb, 800)))(() => loadFeed().then(m => m.initFeed()).catch(() => {}), { timeout: 4000 });

@@ -1,9 +1,9 @@
-// Novedades (CarruselNovedades): una tira que se desliza por todo el catálogo y que «Ver todo» despliega en rejilla; cada libro abre su ficha
-// con WhatsApp, Guardar, Instagram, Facebook y Compartir. Decisión de Aldo (2026-11-13): mientras la librería no registre fechas de llegada,
-// la tira es el catálogo completo, de la A a la Z, y ningún libro lleva «Nuevo». Las llegadas se registran en `novedades.entradas` de
-// assets/data/collections.json, una lista de { "id": "…", "llegada": "AAAA-MM-DD" }: basta añadir renglones (no hay que tocar HTML ni JS).
-// Entonces esas van primero (lo más reciente primero) y solo ellas pueden ser «Nuevo», con su punto en la barra y el control del inicio.
-// Nunca se simula ni se presenta como ranking. La fecha de llegada no se imprime; sirve para ordenar y para saber qué es «Nuevo».
+// Novedades (CarruselNovedades): lo que ha llegado a la casa. Se alimenta de `novedades.entradas` de assets/data/collections.json, una lista de
+// { "id": "…", "llegada": "AAAA-MM-DD" }: para actualizarla basta añadir renglones al JSON (no hay que tocar HTML ni JS).
+// Sin entradas válidas no existe: la sección, su enlace de la barra, su fila del menú y el control del inicio quedan ocultos (crítica minimalista
+// del 2026-11-13: una sección llamada «Novedades» que mostraba el catálogo de la A a la Z prometía lo que no tenía).
+// Con entradas, la tira muestra esas llegadas (lo más reciente primero) y «Nuevo» en lo que la persona no ha visto; «Ver todo» la despliega en
+// rejilla. Nunca se simula ni se presenta como ranking. La fecha no se imprime; sirve para ordenar y para saber qué es «Nuevo».
 // Este módulo es ligero a propósito (el conteo se pide pronto): el catálogo se importa solo al pintar la tira.
 import { loadSample, loadCollections } from './sample.js';
 import { DUR, EASE, confirmThen } from './motion.js';
@@ -11,7 +11,7 @@ import { DUR, EASE, confirmThen } from './motion.js';
 export const NEWS_SIZE = 12;
 export const NEW_DAYS = 14; // primera visita: cuentan como nuevas las llegadas de las últimas dos semanas
 const SEEN_KEY = 'iti-news-visto'; // fecha (AAAA-MM-DD) de la última vez que esta persona vio Novedades
-const STATE_KEY = 'iti-news-estado'; // lo que boot.js lee antes del primer render: p = quedaron llegadas sin ver (reserva el control del inicio); s = nada pendiente
+const STATE_KEY = 'iti-news-estado'; // lo que boot.js lee antes del primer render: n = sin llegadas (no hay sección), s = sin pendientes, p = con llegadas sin ver
 
 // ---------------------------------------------------------------------------------------------
 // Lógica pura (se prueba con fechas en tests/site.test.mjs)
@@ -84,7 +84,7 @@ export function hintLine(n, primera) {
 /**
  * Plan de las llegadas: qué libros llegaron (las entradas cuyo id existe en `books`, en orden, hasta NEWS_SIZE), cuáles son nuevos y
  * qué dice la cabecera. Sin `books` (el conteo temprano, antes de pedir el catálogo) confía en los ids del JSON. `show` es falso sin
- * entradas válidas: entonces no hay llegadas que contar (la tira sigue siendo el catálogo completo: ver shelfPlan).
+ * entradas válidas: entonces la sección no existe.
  */
 export function newsPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
   const entries = newsEntries(data, hoy);
@@ -101,32 +101,6 @@ export function newsPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
     primera,
     estado: statusLine(nuevos.length, primera),
     titulo: data?.novedades?.titulo || 'Recién llegados'
-  };
-}
-
-/**
- * La tira de Novedades (CarruselNovedades). Decisión de Aldo (2026-11-13): mientras la librería no registre fechas de llegada, Novedades
- * recorre el catálogo completo. Las llegadas con fecha real (las entradas de `novedades.entradas` que existen en el catálogo) van primero,
- * en su orden (lo más reciente primero), y solo ellas pueden ser «Nuevo»; después, el resto del catálogo de la A a la Z. Sin entradas, la
- * línea de estado no dice que algo haya llegado: dice qué es la tira. Nunca es un ranking: el orden es el de las llegadas o el alfabético.
- */
-export const STATUS_ALL = 'Todo el catálogo, de la A a la Z.';
-export function shelfPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
-  const all = Array.isArray(books) ? books : [];
-  const byId = new Map(all.map(b => [b.id, b]));
-  const entries = newsEntries(data, hoy).filter(e => byId.has(e.id));
-  const first = new Set(entries.map(e => e.id));
-  const rest = all.filter(b => !first.has(b.id)).sort((a, b) => String(a.t).localeCompare(String(b.t), 'es'));
-  const nuevos = entries.filter(e => isNew(e.llegada, { visto, hoy })).map(e => e.id);
-  const primera = !validDay(visto);
-  return {
-    show: all.length > 0,
-    books: [...entries.map(e => byId.get(e.id)), ...rest],
-    llegadas: entries.map(e => e.id),
-    nuevos,
-    n: nuevos.length,
-    primera,
-    estado: entries.length ? statusLine(nuevos.length, primera) : STATUS_ALL
   };
 }
 
@@ -156,15 +130,15 @@ function settleHint(wanted) {
   io.observe(entry);
 }
 
-// Aplica el plan de llegadas a lo que depende de él fuera de la tira: punto de la barra y del menú, control del inicio y línea de estado.
-// La sección y sus enlaces existen siempre (con JavaScript): la tira es el catálogo completo aunque no haya llegadas.
+// Aplica el plan a todo lo que depende de él fuera de la tira: existencia de la sección y de sus enlaces (barra y menú), punto, control del
+// inicio y línea de estado. Sin llegadas válidas no existe nada de eso.
 function apply(plan, { remember = true } = {}) {
   shown = plan;
   const root = document.documentElement;
   const section = document.querySelector('[data-news]');
-  root.classList.add('has-news');
-  if (section) section.hidden = false;
-  document.querySelectorAll('[data-news-link]').forEach(l => { l.hidden = false; });
+  root.classList.toggle('has-news', plan.show);
+  if (section) section.hidden = !plan.show;
+  document.querySelectorAll('[data-news-link]').forEach(l => { l.hidden = !plan.show; });
   const n = plan.show ? plan.n : 0;
   document.querySelectorAll('[data-news-dot]').forEach(d => { d.hidden = n === 0; });
   document.querySelectorAll('[data-news-sr]').forEach(s => { s.textContent = n ? `, ${n} sin ver` : ''; });
@@ -174,10 +148,9 @@ function apply(plan, { remember = true } = {}) {
     cta.hidden = n === 0;
   }
   const status = section?.querySelector('[data-news-status]');
-  const estado = plan.show ? plan.estado : STATUS_ALL;
-  if (status && status.textContent !== estado) status.textContent = estado;
+  if (status && plan.show && status.textContent !== plan.estado) status.textContent = plan.estado;
   settleHint(n > 0);
-  if (remember) writeState(n ? 'p' : 's');
+  if (remember) writeState(!plan.show ? 'n' : n ? 'p' : 's');
 }
 
 let counted;
@@ -192,6 +165,7 @@ export function initNewsCount() {
     let plan = { show: false, n: 0 }, ok = true;
     try { plan = newsPlan(null, await loadCollections(), { visto, hoy: isoDay() }); } catch { ok = false; counted = undefined; } // sin datos no se promete nada
     apply(plan, { remember: ok }); // un fallo de red no se recuerda: la próxima visita vuelve a reservar
+    if (plan.show && location.hash === '#novedades') document.getElementById('novedades')?.scrollIntoView(); // el ancla no existía al cargar
     return plan;
   })());
 }
@@ -199,7 +173,7 @@ export function initNewsCount() {
 const make = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 const badge = () => make('span', 'badge-new', 'Nuevo');
 
-// Un libro de la tira: un solo botón (portada, título y autor) que abre su ficha con las redes. «Nuevo» va dentro: entra en su nombre accesible.
+// Un libro de la tira: un solo botón (portada, título y autor) que abre su ficha. «Nuevo» va dentro: entra en su nombre accesible.
 function newsItem(b, tone, nuevo, i, cat) {
   let cover;
   if (b.c) cover = cat.imageCover(b, tone, { named: false, eager: i < 6 }); // el título y el autor ya van debajo, a la vista
@@ -223,7 +197,7 @@ function newsItem(b, tone, nuevo, i, cat) {
   return li;
 }
 
-// Tocar un libro abre la ficha del catálogo en modo «redes» (WhatsApp, Guardar, Instagram, Facebook y Compartir); al cerrarla, el foco vuelve al libro.
+// Tocar un libro abre la ficha del catálogo (la misma de siempre); al cerrarla, el foco vuelve al libro.
 function wireOpen(track, ensureCatalog, toneOf) {
   track.addEventListener('click', e => {
     const book = e.target.closest('.news-book');
@@ -231,7 +205,7 @@ function wireOpen(track, ensureCatalog, toneOf) {
     confirmThen(book, async () => { // el libro confirma el toque ya; la hoja (lo caro) va después de pintar
       try { await ensureCatalog?.(); } catch { return; }
       document.getElementById('cat-drawer')?.addEventListener('close', () => book.isConnected && book.focus({ preventScroll: true }), { once: true });
-      document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: book.dataset.id, tone: toneOf(book), redes: true } }));
+      document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: book.dataset.id, tone: toneOf(book) } }));
     });
   });
 }
@@ -291,7 +265,7 @@ function watchSeen(section, track) {
   io.observe(section);
 }
 
-/** Pinta la tira (al acercarse a la sección): pide el catálogo y arma un botón por libro. */
+/** Pinta la tira (al acercarse a la sección): pide el catálogo, comprueba los ids y arma un botón por llegada. */
 export async function initNews({ ensureCatalog, isMotion = () => false } = {}) {
   const section = document.querySelector('[data-news]');
   if (!section || section.dataset.ready) return;
@@ -304,16 +278,16 @@ export async function initNews({ ensureCatalog, isMotion = () => false } = {}) {
   try {
     const [sample, data, catMod] = await Promise.all([loadSample(), loadCollections(), import('./catalog.js')]);
     cat = catMod;
-    plan = shelfPlan(sample.books, data, { visto, hoy: isoDay() });
-    apply(newsPlan(sample.books, data, { visto, hoy: isoDay() })); // el conteo temprano confió en los ids del JSON; con el catálogo, solo cuentan los que existen
-  } catch { /* abajo: estado de error con salida */ }
-  if (!plan.show) { // sin catálogo no se promete nada: se dice y se ofrece WhatsApp; la próxima vez que se acerque se vuelve a pedir
+    plan = newsPlan(sample.books, data, { visto, hoy: isoDay() });
+    apply(plan); // el conteo temprano confió en los ids del JSON; con el catálogo, solo cuentan los que existen (sin ninguno, la sección se va)
+  } catch { // sin catálogo no se promete nada: se dice; la próxima vez que se acerque se vuelve a pedir
     delete section.dataset.ready;
     track.replaceChildren();
     track.removeAttribute('aria-busy');
-    status.textContent = 'No pudimos cargar el catálogo.';
+    status.textContent = 'No pudimos cargar las novedades.';
     return;
   }
+  if (!plan.show) return;
   if (status.textContent !== plan.estado) status.textContent = plan.estado;
   const tones = cat.coverTones(plan.books);
   const fresh = new Set(plan.nuevos);

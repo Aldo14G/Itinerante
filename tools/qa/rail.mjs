@@ -1,6 +1,7 @@
-// Carrusel de libros (capa 1 de Libros): recorrido de paradas (forma, objetivos, teclado, progreso local, persistencia, sin salto de alto),
-// carrusel 3D de portadas (la del centro de frente, las vecinas giradas; flechas, ← → Inicio Fin, toque en una vecina la trae al centro y en la
-// del centro abre la ficha; plano con movimiento reducido), ficha y foco, a 390, 360 y 1280, y una pasada con el almacenamiento bloqueado.
+// Carrusel de libros (capa 1 de Libros): fila de chips de colección (radiogroup, 48 px, teclado, región viva, «Preguntar por {colección}» que
+// sigue al chip, sin salto de alto), carrusel 3D de portadas (la del centro de frente, las vecinas giradas; flechas, ← → Inicio Fin, toque en
+// una vecina la trae al centro y en la del centro abre la ficha; plano con movimiento reducido), «autor · precio» sin cortar en ningún libro,
+// ficha y foco, a 390, 360, 320 y 1280. El recorrido de paradas (progreso, palomitas, persistencia) se retiró el 2026-11-13.
 // node tools/qa/rail.mjs URL [DIR]   Las capturas van a DIR (por defecto, el directorio actual).
 // Robusto con la máquina cargada (QA1-04): ev() devuelve un valor definido o lanza un error legible (nunca un TypeError
 // «of undefined» en el script), y las esperas son por condición con tope en vez de pausas fijas. Si una pantalla aborta,
@@ -72,97 +73,109 @@ const HELPERS = `(() => {
   window.__itiQa = { until, stable, settled }; return true;
 })()`;
 // Cambio de colección: la etiqueta del carrusel nombra la colección, la pista deja aria-busy y la lista deja de crecer.
-const AFTER_CHIP = `async chip => { const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const tr = r.querySelector('[data-rail-track]'); const name = chip.querySelector('.rail-chip-name').textContent.trim();
+const AFTER_CHIP = `async chip => { const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const tr = r.querySelector('[data-rail-track]'); const name = chip.textContent.trim();
   await __itiQa.until(() => v.getAttribute('aria-label').includes(name) && !tr.hasAttribute('aria-busy') && tr.children.length > 0, 8000, 'colección ' + name);
   await __itiQa.stable(() => tr.children.length); }`;
-// Estado del recorrido: paradas (forma, estado, icono), progreso y posición del carrusel dentro de la pieza (para vigilar que nada salte de alto).
-const TRAIL = `(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); const top = r.getBoundingClientRect().top;
-  const bar = r.querySelector('[data-rail-trail-bar]'); const all = r.querySelector('[data-rail-trail-all]'); const foot = r.querySelector('.rail-all');
-  const stops = [...g.querySelectorAll('.rail-stop')].map(st => { const c = st.querySelector('.rail-chip'); const b = c.getBoundingClientRect(); const n = c.querySelector('.rail-chip-name'); const nb = n.getBoundingClientRect(); const use = c.querySelector(':scope > svg use').getAttribute('href');
-    return { id: c.dataset.id, name: n.textContent.trim(), role: c.getAttribute('role'), checked: c.getAttribute('aria-checked'), tab: c.tabIndex, seen: st.classList.contains('is-seen'), sr: c.querySelector('[data-stop-seen]').textContent, badge: getComputedStyle(c.querySelector('.rail-chip-done')).display !== 'none', pop: c.classList.contains('is-pop'),
-      icon: use, sprite: !!document.querySelector(use), w: Math.round(c.offsetWidth), h: Math.round(c.offsetHeight), cx: b.left + b.width / 2, cy: b.top + b.height / 2, rr: b.width / 2, nameLines: Math.round(nb.height / parseFloat(getComputedStyle(n).lineHeight)), nameCut: n.scrollWidth > n.clientWidth + 1, nameBottom: nb.bottom, fs: getComputedStyle(n).fontSize, ff: getComputedStyle(n).fontFamily.split(',')[0].replaceAll('"', ''), fw: getComputedStyle(n).fontWeight }; });
-  const gb = g.getBoundingClientRect();
-  return { role: g.getAttribute('role'), label: g.getAttribute('aria-label'), stops, gap: stops.slice(1).map((st, i) => Math.round(Math.hypot(st.cx - stops[i].cx, st.cy - stops[i].cy) - st.rr - stops[i].rr)), zig: stops.length > 1 ? Math.round(Math.abs(stops[1].cy - stops[0].cy)) : 0,
-    rowBottom: gb.bottom, namesInside: stops.every(st => st.nameBottom <= gb.bottom + 1), scrolls: g.scrollWidth > g.clientWidth + 1, overY: g.scrollHeight > g.clientHeight + 1,
-    bar: { tag: bar.tagName, value: bar.value, max: bar.max, name: bar.getAttribute('aria-label'), valuetext: bar.getAttribute('aria-valuetext'), h: Math.round(bar.getBoundingClientRect().height) },
-    text: r.querySelector('[data-rail-trail-text]').textContent, allShown: !all.hidden && all.getBoundingClientRect().width > 0, footShown: getComputedStyle(foot).visibility !== 'hidden',
+// Estado de la fila de chips, del botón «Preguntar por {colección}» y posición del carrusel dentro de la pieza (para vigilar que nada salte de alto).
+const CHIPS = `(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); const top = r.getBoundingClientRect().top;
+  const chips = [...g.querySelectorAll('.rail-chip')].map(c => { const b = c.getBoundingClientRect(); const cs = getComputedStyle(c);
+    return { id: c.dataset.id, name: c.textContent.trim(), role: c.getAttribute('role'), checked: c.getAttribute('aria-checked'), tab: c.tabIndex, w: Math.round(b.width), h: Math.round(b.height), left: b.left, right: b.right, top: Math.round(b.top), cut: c.scrollWidth > c.clientWidth + 1, fs: cs.fontSize, bg: cs.backgroundColor, mark: getComputedStyle(c, '::before').content }; });
+  const ask = r.querySelector('[data-rail-ask]'); const libre = r.querySelector('.rail-libre');
+  return { role: g.getAttribute('role'), label: g.getAttribute('aria-label'), chips, gap: chips.slice(1).map((c, i) => c.top === chips[i].top ? Math.round(c.left - chips[i].right) : 99),
+    ask: { text: ask.textContent.trim(), msg: new URL(ask.href).searchParams.get('text'), h: Math.round(ask.getBoundingClientRect().height) }, libre: { text: libre.textContent.trim(), h: Math.round(libre.getBoundingClientRect().height), msg: new URL(libre.href).searchParams.get('text') },
     vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - top), noteTop: Math.round(r.querySelector('[data-rail-note]').getBoundingClientRect().top - top), headH: Math.round(r.querySelector('.rail-head').getBoundingClientRect().height),
-    stored: (() => { try { return localStorage.getItem('iti-recorrido-v1'); } catch { return 'bloqueado'; } })(), live: r.querySelector('[data-rail-live]').textContent }; })()`;
+    askTop: Math.round(ask.getBoundingClientRect().top - top), live: r.querySelector('[data-rail-live]').textContent, stored: (() => { try { return Object.keys(localStorage).filter(k => /recorrido/.test(k)); } catch { return []; } })() }; })()`;
 const READY = `document.querySelector('[data-rail]').classList.contains('is-ready') && !document.querySelector('[data-rail] .card--sk') && document.querySelectorAll('[data-rail] .rail-item').length > 0`;
 
 const out = [];
 const ck = (n, ok, d = '') => out.push([ok ? '✓' : '✗', n, ok ? '' : d]);
-const document_text = t => [t.text, t.live, t.bar.name, t.bar.valuetext, ...t.stops.map(x => x.name + x.sr)].join(' ');
 
-for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 360, 740, true], ['escritorio', 1280, 800, false]]) {
+for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 360, 740, true], ['móvil 320', 320, 640, true], ['escritorio', 1280, 800, false]]) {
   errs.length = 0;
   try {
     await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
     await send('Emulation.setTouchEmulationEnabled', mobile ? { enabled: true, maxTouchPoints: 5 } : { enabled: false }); // maxTouchPoints 0 es un error de CDP (antes se ignoraba en silencio)
     await send('Page.navigate', { url: URL_ });
     await waitFor(`document.readyState === 'complete' && document.querySelector('[data-rail]') && document.documentElement.classList.contains('js')`, 'la página cargada', 30000);
-    await run(`localStorage.removeItem('iti-recorrido-v1')`); // cada pantalla empieza el recorrido de cero (el carrusel aún no se ha cargado: está lejos de la vista)
     await ev(HELPERS);
-    // Esqueleto de las paradas: reserva la caja exacta de la fila real (se mide antes de acercarse, con el carrusel sin cargar).
-    const sk = await ev(`(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); return { ready: r.classList.contains('is-ready'), n: g.querySelectorAll('.sk-chip').length, rowH: Math.round(g.getBoundingClientRect().height), headH: Math.round(r.querySelector('.rail-head').getBoundingClientRect().height), text: r.querySelector('[data-rail-trail-text]').textContent }; })()`);
+    // Esqueleto de los chips: reserva la fila real (se mide antes de acercarse, con el carrusel sin cargar).
+    const sk = await ev(`(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); return { ready: r.classList.contains('is-ready'), n: g.querySelectorAll('.sk-chip').length, rowH: Math.round(g.getBoundingClientRect().height), headH: Math.round(r.querySelector('.rail-head').getBoundingClientRect().height) }; })()`);
     await run(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
     await run(`scrollBy(0, 1)`);
-    // El carrusel se carga al acercarse: esperar a que esté listo y sin esqueletos (con la máquina cargada tarda más que una pausa fija).
-    await waitFor(`document.querySelector('[data-rail]').classList.contains('is-ready') && !document.querySelector('[data-rail] .card--sk') && document.querySelectorAll('[data-rail] .rail-item').length > 0`, 'el carrusel listo (is-ready, sin esqueletos)', 30000);
+    await waitFor(READY, 'el carrusel listo (is-ready, sin esqueletos)', 30000);
     await ev(`__itiQa.stable(() => document.querySelectorAll('[data-rail] .rail-item').length)`);
     const st = await ev(`(() => {
       const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]');
       const items = [...r.querySelectorAll('.rail-item')]; const c = r.querySelector('.rail-item.is-centro'); const ci = items.indexOf(c); const cb = c.getBoundingClientRect(); const vb = v.getBoundingClientRect();
       const pose = it => it.querySelector('.cf-pose')?.style.transform || '';
+      const meta = r.querySelector('[data-rail-meta]'); const strong = meta.querySelector('strong');
       return {
         ready: r.classList.contains('is-ready'), hidden: r.hidden, n: items.length,
-        chips: [...r.querySelectorAll('.rail-chip-name')].map(c => c.textContent),
+        chips: [...r.querySelectorAll('.rail-chip')].map(c => c.textContent.trim()),
         checked: r.querySelectorAll('.rail-chip[aria-checked=true]').length,
         vw: v.clientWidth, sw: v.scrollWidth, centerW: Math.round(c.offsetWidth), ci, mid: Math.floor(items.length / 2),
         centered: Math.abs(cb.left + cb.width / 2 - (vb.left + vb.width / 2)) <= 2, front: /rotateY\\(-?0(\\.0+)?deg\\)/.test(pose(c)),
         turned: [items[ci - 1], items[ci + 1]].every(n => n && /rotateY\\(-?[1-9]/.test(pose(n))), both: !!items[ci - 1] && !!items[ci + 1],
         snap: getComputedStyle(v).scrollSnapType, role: v.getAttribute('aria-roledescription'), tab: v.tabIndex, cardTabs: items.filter(i => i.querySelector('.card').tabIndex === 0).map(i => items.indexOf(i)),
-        caption: r.querySelector('[data-rail-title]').textContent, meta: r.querySelector('[data-rail-meta]').textContent, dots: r.querySelectorAll('[data-rail-dots] span').length, dotOn: [...r.querySelectorAll('[data-rail-dots] span')].findIndex(d => d.classList.contains('is-activo')),
+        caption: r.querySelector('[data-rail-title]').textContent, meta: meta.textContent, dots: r.querySelectorAll('[data-rail-dots], .cf-progreso, .rail-all, .rail-trail, .rail-stop').length,
         sk: r.querySelectorAll('.card--sk').length,
-        small: [...r.querySelectorAll('.rail-chip, .rail-btn')].filter(b => b.getBoundingClientRect().width > 0 && (b.getBoundingClientRect().height < 44 || b.getBoundingClientRect().width < 44)).length,
+        small: [...r.querySelectorAll('.rail-chip, .rail-btn, [data-rail-ask], .rail-libre')].filter(b => b.getBoundingClientRect().width > 0 && (b.getBoundingClientRect().height < 44 || b.getBoundingClientRect().width < 44)).length,
         docW: document.documentElement.scrollWidth === document.documentElement.clientWidth
       };
     })()`);
     ck(name + ': carrusel listo, 3 colecciones (Narrativa, Poesía, Ensayo), 12 tarjetas, sin esqueletos', st.ready && !st.hidden && st.chips.join() === 'Narrativa,Poesía,Ensayo' && st.checked === 1 && st.n === 12 && st.sk === 0, JSON.stringify(st));
     const pics = await ev(`(async () => { const r = document.querySelector('[data-rail]'); const imgs = [...r.querySelectorAll('.cover--img img')]; imgs.forEach(i => { i.loading = 'eager'; }); await Promise.all(imgs.map(i => i.decode().catch(() => {})));
-      const covers = [...r.querySelectorAll('.rail-item .cover')].map(c => ({ width: c.offsetWidth, height: c.offsetHeight })); const cards = [...r.querySelectorAll('.rail-item .card')]; // tamaño propio: el giro no cuenta const cards = [...r.querySelectorAll('.rail-item .card')];
+      const covers = [...r.querySelectorAll('.rail-item .cover')].map(c => ({ width: c.offsetWidth, height: c.offsetHeight })); const cards = [...r.querySelectorAll('.rail-item .card')]; // tamaño propio: el giro no cuenta
       return { imgs: imgs.length, broken: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.getAttribute('src')), alt: [...new Set(imgs.map(i => i.getAttribute('alt')))], sizes: [...new Set(covers.map(c => Math.round(c.width) + 'x' + Math.round(c.height)))], named: cards.every(c => c.textContent.trim().length > 3 && c.querySelector('.cover-title')) }; })()`);
     ck(name + ': portadas reales en el carrusel: ninguna rota, sin alt (el título y el autor nombran el botón) y todas del mismo tamaño', pics.imgs >= 8 && !pics.broken.length && JSON.stringify(pics.alt) === '[""]' && pics.sizes.length === 1 && pics.named, JSON.stringify(pics));
     ck(name + ': imán, rol de carrusel y una sola parada de tabulador: la portada del centro', /x mandatory/.test(st.snap) && st.role === 'carrusel' && st.tab === -1 && JSON.stringify(st.cardTabs) === JSON.stringify([st.ci]), JSON.stringify(st));
     const reduced = await ev(`!document.documentElement.classList.contains('motion')`);
     ck(name + ': empieza por el libro del medio, centrado y de frente, con vecinas a los dos lados' + (reduced ? ' (sin movimiento: planas)' : ' giradas hacia el centro'), st.ci === st.mid && st.centered && st.front && st.both && (reduced ? !st.turned : st.turned) && st.sw > st.vw, JSON.stringify(st));
-    ck(name + ': bajo el carrusel, el título, «autor · precio» del libro del centro y un punto por libro', st.caption.length > 2 && / · \$\d+ MXN$/.test(st.meta) && st.dots === st.n && st.dotOn === st.ci, JSON.stringify({ caption: st.caption, meta: st.meta, dots: st.dots, on: st.dotOn }));
+    ck(name + ': bajo el carrusel, el título y «autor · precio» del libro del centro; sin puntos, recorrido ni «Ver todo el catálogo»', st.caption.length > 2 && /\s· \$\d+ MXN$/.test(st.meta) && st.dots === 0, JSON.stringify({ caption: st.caption, meta: st.meta, retirados: st.dots }));
     ck(name + ': sin desborde de la página', st.docW);
     ck(name + ': objetivos de 44px o más', st.small === 0, String(st.small));
-    // ---------- Recorrido ----------
-    await settle(`document.querySelector('[data-rail] .rail-stop.is-seen')`, 4000); // la parada inicial cuenta cuando el carrusel entra en pantalla
-    const t0 = await ev(TRAIL);
-    ck(name + ': recorrido = radiogroup «Colección» con 3 paradas role=radio, una marcada y un solo punto de tabulación', t0.role === 'radiogroup' && t0.label === 'Colección' && t0.stops.length === 3 && t0.stops.every(x => x.role === 'radio') && t0.stops.filter(x => x.checked === 'true').length === 1 && t0.stops.filter(x => x.tab === 0).length === 1 && t0.stops[0].checked === 'true' && t0.stops[0].tab === 0, JSON.stringify(t0.stops.map(x => [x.role, x.checked, x.tab])));
-    ck(name + ': cada parada es un control redondo de 64 px (objetivo ≥ 48) con ≥ 8 px a su vecina, icono propio del sprite y nombre en la letra del sitio (semibold 600, ≥ 12 px) sin cortarse, en 2 renglones como máximo', t0.stops.every(x => x.w === 64 && x.h === 64 && x.sprite && x.name && !x.nameCut && x.nameLines >= 1 && x.nameLines <= 2 && /^-apple-system/.test(x.ff) && x.fw === '600' && parseFloat(x.fs) >= 12) && new Set(t0.stops.map(x => x.icon)).size === 3 && t0.gap.every(g => g >= 8) && t0.namesInside && !t0.overY, JSON.stringify({ gap: t0.gap, stops: t0.stops.map(x => [x.w, x.h, x.icon, x.nameLines, x.nameCut, x.ff, x.fw, x.fs]), inside: t0.namesInside, overY: t0.overY }));
-    if (mobile) ck(name + ': la fila alterna la altura de las paradas (zigzag) y, si no caben, se desplaza', t0.zig >= 16 && (w >= 360 ? !t0.scrolls : t0.scrolls), JSON.stringify({ zig: t0.zig, scrolls: t0.scrolls }));
-    ck(name + ': el esqueleto reserva la fila de paradas (una por colección) y el progreso: la cabecera del carrusel mide lo mismo antes y después de cargar', !sk.ready && sk.n === 3 && sk.headH === t0.headH, JSON.stringify({ sk, headH: t0.headH }));
-    ck(name + ': al llegar, solo la parada inicial está hojeada: insignia, «1 de 3 paradas hojeadas», barra de progreso nativa con nombre y el dato guardado en este dispositivo', t0.stops.map(x => x.seen).join() === 'true,false,false' && t0.stops[0].badge && !t0.stops[1].badge && /, hojeada/.test(t0.stops[0].sr) && t0.text === '1 de 3 paradas hojeadas' && t0.bar.tag === 'PROGRESS' && t0.bar.value === 1 && t0.bar.max === 3 && t0.bar.name && t0.bar.valuetext === t0.text && !t0.allShown && t0.footShown && t0.stored === '["narrativa"]' && !t0.stops.some(x => x.pop), JSON.stringify({ seen: t0.stops.map(x => x.seen), text: t0.text, bar: t0.bar, stored: t0.stored, all: t0.allShown, pop: t0.stops.map(x => x.pop) }));
-    // Teclado: las flechas mueven la selección y el foco juntos; Tab entra por la parada marcada.
+    // «autor · precio» de cada libro de las tres colecciones: nunca cortado y el precio entero en un renglón (defecto de 320 px).
+    const metas = await ev(`(async () => {
+      const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const bad = []; let n = 0;
+      for (const chip of r.querySelectorAll('.rail-chip')) {
+        chip.click(); await (${AFTER_CHIP})(chip);
+        const items = [...r.querySelectorAll('.rail-item')];
+        for (let i = 0; i < items.length; i += 1) {
+          v.scrollTo({ left: items[i].offsetLeft + items[i].offsetWidth / 2 - v.clientWidth / 2, behavior: 'instant' });
+          await __itiQa.until(() => items[i].classList.contains('is-centro'), 2000).catch(() => {});
+          const m = r.querySelector('[data-rail-meta]'); const t = r.querySelector('[data-rail-title]'); const p = m.querySelector('strong'); const rects = p ? p.getClientRects().length : 0;
+          n += 1;
+          if (m.scrollWidth > m.clientWidth + 1 || m.scrollHeight > m.clientHeight + 1 || rects > 1 || t.scrollWidth > t.clientWidth + 1 || t.scrollHeight > t.clientHeight + 1) bad.push(t.textContent + ' / ' + m.textContent + ' [' + m.scrollWidth + '/' + m.clientWidth + ', ' + rects + ']');
+        }
+      }
+      r.querySelector('.rail-chip').click(); await (${AFTER_CHIP})(r.querySelector('.rail-chip'));
+      return { n, bad };
+    })()`);
+    ck(name + ': título y «autor · precio» de los ' + metas.n + ' libros sin cortarse y con el precio entero (si no cabe, baja de renglón)', metas.n >= 25 && !metas.bad.length, JSON.stringify(metas.bad));
+    // ---------- Chips de colección ----------
+    const t0 = await ev(CHIPS);
+    ck(name + ': chips = radiogroup «Colección» con 3 botones role=radio, uno marcado (primario con palomita) y un solo punto de tabulación', t0.role === 'radiogroup' && t0.label === 'Colección' && t0.chips.length === 3 && t0.chips.every(x => x.role === 'radio') && t0.chips.filter(x => x.checked === 'true').length === 1 && t0.chips.filter(x => x.tab === 0).length === 1 && t0.chips[0].checked === 'true' && t0.chips[0].tab === 0 && t0.chips[0].mark !== 'none' && t0.chips[1].mark === 'none', JSON.stringify(t0.chips.map(x => [x.role, x.checked, x.tab, x.mark.slice(0, 6)])));
+    ck(name + ': cada chip mide 48 px de alto, con su nombre entero en 15 px y ≥ 8 px entre vecinos', t0.chips.every(x => x.h === 48 && !x.cut && x.fs === '15px') && t0.gap.every(g => g >= 8), JSON.stringify({ chips: t0.chips.map(x => [x.w, x.h, x.fs, x.cut]), gap: t0.gap }));
+    ck(name + ': el esqueleto reserva la fila de chips (uno por colección): la cabecera del carrusel mide lo mismo antes y después de cargar', !sk.ready && sk.n === 3 && sk.headH === t0.headH, JSON.stringify({ sk, headH: t0.headH }));
+    ck(name + ': bajo el carrusel, «Preguntar por narrativa» (WhatsApp con el mensaje de la colección) y «Pide una recomendación por WhatsApp», con objetivos ≥ 44 px', t0.ask.text === 'Preguntar por narrativa' && /libros de narrativa\. ¿Qué me recomiendan\?$/.test(t0.ask.msg) && t0.ask.h >= 48 && t0.libre.text === 'Pide una recomendación por WhatsApp' && t0.libre.h >= 44 && /no sé por dónde empezar/.test(t0.libre.msg), JSON.stringify({ ask: t0.ask, libre: t0.libre }));
+    ck(name + ': sin recorrido: nada se guarda en este dispositivo al hojear colecciones', !t0.stored.length, JSON.stringify(t0.stored));
+    // Teclado: las flechas mueven la selección y el foco juntos; Tab entra por el chip marcado.
     await run(`document.querySelector('.rail-chip[tabindex="0"]').focus()`);
     await key('ArrowRight', 'ArrowRight', 39);
     await waitFor(`document.activeElement.dataset.id === 'poesia' && document.activeElement.getAttribute('aria-checked') === 'true'`, 'flecha derecha elige Poesía', 5000);
     await run(`(${AFTER_CHIP})(document.activeElement)`);
-    const k1 = await ev(TRAIL);
+    const k1 = await ev(CHIPS);
     await key('ArrowLeft', 'ArrowLeft', 37);
     await waitFor(`document.activeElement.dataset.id === 'narrativa' && document.activeElement.getAttribute('aria-checked') === 'true'`, 'flecha izquierda vuelve a Narrativa', 5000);
     await run(`(${AFTER_CHIP})(document.activeElement)`);
     await key('ArrowLeft', 'ArrowLeft', 37);
     await waitFor(`document.activeElement.dataset.id === 'ensayo'`, 'flecha izquierda desde la primera da la vuelta a la última', 5000);
     await run(`(${AFTER_CHIP})(document.activeElement)`);
-    const k2 = await ev(TRAIL);
-    ck(name + ': teclado: las flechas eligen y enfocan la parada vecina (dan la vuelta), queda un solo tabindex=0 y la región viva dice la colección, su número de libros y el progreso', k1.stops[1].checked === 'true' && k1.stops.filter(x => x.tab === 0).length === 1 && k1.stops[1].tab === 0 && k1.text === '2 de 3 paradas hojeadas' && /^Poesía: 8 libros\. 2 de 3 paradas hojeadas\.$/.test(k1.live) && k2.stops[2].checked === 'true' && k2.stops[2].tab === 0 && k2.stops.filter(x => x.tab === 0).length === 1 && k2.text === 'Ya hojeaste las 3 colecciones.' && /^Ensayo: 9 libros\./.test(k2.live), JSON.stringify({ k1: [k1.text, k1.live, k1.stops.map(x => x.tab)], k2: [k2.text, k2.live, k2.stops.map(x => x.tab)] }));
-    ck(name + ': elegir paradas no mueve la nota ni el carrusel', [k1, k2].every(k => k.vpTop === t0.vpTop && k.noteTop === t0.noteTop && k.headH === t0.headH), JSON.stringify([t0, k1, k2].map(k => [k.noteTop, k.vpTop, k.headH])));
-    await run(`document.querySelector('.rail-chip').click()`); // de vuelta a la primera parada para lo que sigue
+    const k2 = await ev(CHIPS);
+    ck(name + ': teclado: las flechas eligen y enfocan el chip vecino (dan la vuelta), queda un solo tabindex=0 y la región viva dice la colección y su número de libros', k1.chips[1].checked === 'true' && k1.chips.filter(x => x.tab === 0).length === 1 && k1.chips[1].tab === 0 && k1.live === 'Poesía: 8 libros.' && k2.chips[2].checked === 'true' && k2.chips[2].tab === 0 && k2.chips.filter(x => x.tab === 0).length === 1 && k2.live === 'Ensayo: 9 libros.', JSON.stringify({ k1: [k1.live, k1.chips.map(x => x.tab)], k2: [k2.live, k2.chips.map(x => x.tab)] }));
+    ck(name + ': «Preguntar por {colección}» sigue al chip (rótulo y mensaje)', k1.ask.text === 'Preguntar por poesía' && /libros de poesía\./.test(k1.ask.msg) && k2.ask.text === 'Preguntar por ensayo' && /libros de ensayo\./.test(k2.ask.msg), JSON.stringify([k1.ask, k2.ask]));
+    ck(name + ': elegir chips no mueve la nota ni el carrusel', [k1, k2].every(k => k.vpTop === t0.vpTop && k.noteTop === t0.noteTop && k.headH === t0.headH), JSON.stringify([t0, k1, k2].map(k => [k.noteTop, k.vpTop, k.headH, k.askTop])));
+    await run(`document.querySelector('.rail-chip').click()`); // de vuelta al primer chip para lo que sigue
     await run(`(${AFTER_CHIP})(document.querySelector('.rail-chip'))`);
     if (mobile) ck(name + ': la portada del centro mide el 44 % del ancho (148–240 px)', Math.abs(st.centerW - Math.min(240, Math.max(148, w * 0.44))) <= 1, String(st.centerW));
     else ck('escritorio: la portada del centro mide 240 px', st.centerW === 240, String(st.centerW));
@@ -186,40 +199,16 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
       for (const chip of r.querySelectorAll('.rail-chip')) {
         chip.click(); await (${AFTER_CHIP})(chip);
         const n = r.querySelector('[data-rail-note]'); const b = n.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(n);
-        out.push({ col: chip.querySelector('.rail-chip-name').textContent, vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - r.getBoundingClientRect().top), shown: b.width > 0 && b.height > 0 && getComputedStyle(n).visibility === 'visible' && !n.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, seal: !!r.querySelector('[data-rail-seal], .rail-seal') || /Datos de muestra|no es inventario/.test(document.body.innerText), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
+        out.push({ col: chip.textContent.trim(), vpTop: Math.round(r.querySelector('[data-rail-viewport]').getBoundingClientRect().top - r.getBoundingClientRect().top), shown: b.width > 0 && b.height > 0 && getComputedStyle(n).visibility === 'visible' && !n.closest('[hidden]'), lines: range.getClientRects().length, note: n.textContent, seal: !!r.querySelector('[data-rail-seal], .rail-seal') || /Datos de muestra|no es inventario/.test(document.body.innerText), above: b.bottom <= r.querySelector('[data-rail-viewport]').getBoundingClientRect().top + 1 });
       }
       return out;
     })()`);
-    ck(name + ': con las 3 colecciones la nota de la colección se ve, en una línea, antes del carrusel, cambia con cada una y no hay sello de muestra', seal.length === 3 && seal.every(s => s.shown && s.lines === 1 && !s.seal && s.above && s.note && !/inventario|muestra/i.test(s.note)) && new Set(seal.map(s => s.note)).size === 3, JSON.stringify(seal));
-    // Recorrido completo: las tres hojeadas, mensaje sobrio con su salida, y el carrusel en el mismo sitio que al llegar.
-    const t1 = await ev(TRAIL);
-    const exit = await ev(`(() => { const a = document.querySelector('[data-rail-trail-all]'); const b = a.getBoundingClientRect(); const hit = dy => { const e = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2 + dy); return !!e && (e === a || a.contains(e)); }; return { href: a.getAttribute('href'), text: a.textContent, up: hit(-21), down: hit(21), inView: b.top >= 0 && b.bottom <= innerHeight }; })()`);
-    ck(name + ': al hojear las 3, «Ya hojeaste las 3 colecciones.» con la salida «Ver todo el catálogo» (objetivo ≥ 44 px), barra llena y sin premios', t1.stops.every(x => x.seen && x.badge) && t1.text === 'Ya hojeaste las 3 colecciones.' && t1.bar.value === 3 && t1.bar.max === 3 && t1.allShown && !t1.footShown && exit.href === '#catalogo' && exit.text === 'Ver todo el catálogo' && exit.up && exit.down && !/punto|racha|reto|nivel|logro|felicidades|🎉/i.test(document_text(t1)), JSON.stringify({ text: t1.text, bar: t1.bar, all: t1.allShown, foot: t1.footShown, exit, seen: t1.stops.map(x => x.seen) }));
-    ck(name + ': ni cambiar de parada ni completar el recorrido mueven la nota ni el carrusel', seal.every(s => s.vpTop === t0.vpTop) && t1.vpTop === t0.vpTop && t1.noteTop === t0.noteTop && t1.headH === t0.headH, JSON.stringify({ t0: [t0.noteTop, t0.vpTop, t0.headH], t1: [t1.noteTop, t1.vpTop, t1.headH], seal: seal.map(s => s.vpTop) }));
-    // Una sola taxonomía a la vista: elegir un tema de consulta marca la colección equivalente y el estado activo es el mismo.
-    // El tema sin equivalente (Crónica) no debe cambiar nada: se le da un tope corto para «cambiar» y se comprueba que no lo hizo.
-    const link = await ev(`(async () => {
-      const r = document.querySelector('[data-rail]'); const t = document.querySelector('.topic[data-topic="poesia"]');
-      const on = () => r.querySelector('.rail-chip[aria-checked=true] .rail-chip-name').textContent;
-      const chip0 = r.querySelectorAll('.rail-chip')[0]; chip0.click(); await (${AFTER_CHIP})(chip0);
-      t.click(); await __itiQa.until(() => on() === 'Poesía' && document.querySelector('.topic[aria-checked=true]'), 6000, 'Poesía marca Poesía'); await (${AFTER_CHIP})(r.querySelector('.rail-chip[aria-checked=true]'));
-      const bg = e => getComputedStyle(e).backgroundColor;
-      const first = document.querySelector('.topic[aria-checked=true]'); const cta = document.querySelector('main .btn--primario');
-      await __itiQa.settled(first); await __itiQa.settled(r.querySelector('.rail-chip[aria-checked=true]')); // los colores se leen con la transición terminada
-      const out = { chip: on(), topic: first && first.dataset.topic, chipBg: bg(r.querySelector('.rail-chip[aria-checked=true]')), topicBg: bg(first), ctaBg: bg(cta), chipFg: getComputedStyle(r.querySelector('.rail-chip[aria-checked=true]')).color, topicFg: getComputedStyle(first).color };
-      document.querySelector('.topic[data-topic="cronica"]').click(); await __itiQa.until(() => on() !== 'Poesía', 1200).catch(() => {});
-      out.sinEquivalente = on();
-      document.querySelector('.topic[data-topic="narrativa"]').click(); await __itiQa.until(() => on() !== 'Poesía', 6000, 'Narrativa cambia de colección'); await (${AFTER_CHIP})(r.querySelector('.rail-chip[aria-checked=true]'));
-      out.narrativa = on();
-      return out;
-    })()`);
-    ck(name + ': elegir el tema Poesía marca Poesía, Crónica (sin equivalente) la deja y Narrativa vuelve a Narrativa', link.chip === 'Poesía' && link.topic === 'poesia' && link.sinEquivalente === 'Poesía' && link.narrativa === 'Narrativa', JSON.stringify(link));
-    if (mobile) ck('móvil: el chip activo del carrusel y el del tema comparten fondo y tinta (el código de lo elegido del sistema: primario, con su forma)', link.chipBg === link.topicBg && link.chipFg === link.topicFg && link.chipBg === link.ctaBg, JSON.stringify(link));
-    // Deslizar (desplazamiento nativo): el centro, sus puntos y las flechas siguen al desplazamiento.
+    ck(name + ': con las 3 colecciones la nota de la colección se ve, en una línea, antes del carrusel, cambia con cada una, no mueve el carrusel y no hay sello de muestra', seal.length === 3 && seal.every(s => s.shown && s.lines === 1 && !s.seal && s.above && s.note && !/inventario|muestra/i.test(s.note) && s.vpTop === t0.vpTop) && new Set(seal.map(s => s.note)).size === 3, JSON.stringify(seal));
+    // Deslizar (desplazamiento nativo): el centro y las flechas siguen al desplazamiento.
     await run(`(() => { const v = document.querySelector('[data-rail-viewport]'); v.scrollTo({ left: v.scrollLeft + 3 * document.querySelector('.rail-item').offsetWidth, behavior: 'instant' }); })()`);
     await ev(`__itiQa.stable(() => document.querySelector('[data-rail-viewport]').scrollLeft, 3000, 300)`);
-    const sc = await ev(`(() => { const r = document.querySelector('[data-rail]'); const items = [...r.querySelectorAll('.rail-item')]; return { ci: items.findIndex(i => i.classList.contains('is-centro')), dot: [...r.querySelectorAll('[data-rail-dots] span')].findIndex(d => d.classList.contains('is-activo')), prev: r.querySelector('[data-rail-prev]').disabled, next: r.querySelector('[data-rail-next]').disabled, n: items.length }; })()`);
-    ck(name + ': al deslizar, el libro del centro, su punto y las flechas siguen al desplazamiento', sc.ci === Math.floor(sc.n / 2) + 3 && sc.dot === sc.ci && sc.prev === false, JSON.stringify(sc));
+    const sc = await ev(`(() => { const r = document.querySelector('[data-rail]'); const items = [...r.querySelectorAll('.rail-item')]; return { ci: items.findIndex(i => i.classList.contains('is-centro')), prev: r.querySelector('[data-rail-prev]').disabled, next: r.querySelector('[data-rail-next]').disabled, n: items.length }; })()`);
+    ck(name + ': al deslizar, el libro del centro y las flechas siguen al desplazamiento', sc.ci === Math.floor(sc.n / 2) + 3 && sc.prev === false, JSON.stringify(sc));
     // Teclado: Tab entra en la portada del centro; ← → Inicio Fin mueven el centro y el foco.
     const kb = [];
     await run(`document.querySelector('[data-rail] .rail-item.is-centro .card').focus()`);
@@ -246,49 +235,12 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     await settle(`document.activeElement.closest('[data-rail]')`, 2000);
     const back = await ev(`(() => { const a = document.activeElement; return { inRail: !!a.closest('[data-rail]'), cls: a.className, open: !!document.getElementById('cat-drawer')?.open }; })()`);
     ck(name + ': al cerrar la ficha el foco vuelve a la tarjeta', back.inRail, JSON.stringify(back));
-    // Persistencia: al recargar, lo hojeado vuelve pintado (sin rebote: nadie tocó nada) y la primera parada sigue siendo la actual.
-    await send('Page.navigate', { url: URL_ });
-    await waitFor(`document.readyState === 'complete' && document.querySelector('[data-rail]') && document.documentElement.classList.contains('js')`, 'la página recargada', 30000);
-    await ev(HELPERS);
-    await run(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
-    await run(`scrollBy(0, 1)`);
-    await waitFor(READY, 'el carrusel listo tras recargar', 30000);
-    const t2 = await ev(TRAIL);
-    ck(name + ': al recargar, el recorrido guardado vuelve (3 hojeadas, mensaje y salida) sin rebote y con la primera parada como actual', t2.stops.every(x => x.seen && x.badge && !x.pop) && t2.text === 'Ya hojeaste las 3 colecciones.' && t2.allShown && t2.stops[0].checked === 'true' && t2.vpTop === t0.vpTop, JSON.stringify({ text: t2.text, seen: t2.stops.map(x => x.seen), pop: t2.stops.map(x => x.pop), vpTop: [t0.vpTop, t2.vpTop] }));
     ck(name + ': sin errores de consola', !errs.length, errs.join(' | '));
     const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 });
     writeFileSync(join(OUT, `rail-${name}.jpg`), Buffer.from(shot.result.data, 'base64'));
   } catch (e) {
     ck(name + ': la pantalla abortó', false, `${e.message}${errs.length ? ' | consola: ' + errs.join(' | ') : ''}`);
   }
-}
-// ---------- Almacenamiento bloqueado: el recorrido funciona igual, sin persistir ----------
-errs.length = 0;
-try {
-  const blocked = await send('Page.addScriptToEvaluateOnNewDocument', { source: `Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('bloqueado', 'SecurityError'); }, configurable: true });` });
-  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-  await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
-  const visit = async () => {
-    await send('Page.navigate', { url: URL_ });
-    await waitFor(`document.readyState === 'complete' && document.querySelector('[data-rail]') && document.documentElement.classList.contains('js')`, 'la página cargada (sin almacenamiento)', 30000);
-    await ev(HELPERS);
-    await run(`scrollTo(0, document.querySelector('[data-rail]').getBoundingClientRect().top + scrollY - 120)`);
-    await run(`scrollBy(0, 1)`);
-    await waitFor(READY, 'el carrusel listo (sin almacenamiento)', 30000);
-    await settle(`document.querySelector('[data-rail] .rail-stop.is-seen')`, 4000);
-  };
-  await visit();
-  const b0 = await ev(TRAIL);
-  await run(`document.querySelectorAll('.rail-chip')[2].click()`);
-  await run(`(${AFTER_CHIP})(document.querySelectorAll('.rail-chip')[2])`);
-  const b1 = await ev(TRAIL);
-  await visit();
-  const b2 = await ev(TRAIL);
-  ck('sin almacenamiento: el recorrido carga, marca la parada inicial, cuenta la elegida («2 de 3») y cambia el carrusel', b0.stored === 'bloqueado' && b0.text === '1 de 3 paradas hojeadas' && b1.text === '2 de 3 paradas hojeadas' && b1.stops[2].checked === 'true' && b1.stops[2].seen, JSON.stringify({ b0: [b0.stored, b0.text], b1: [b1.text, b1.stops.map(x => x.seen)] }));
-  ck('sin almacenamiento: al recargar empieza de nuevo (no se guardó nada) y no hay errores de consola', b2.text === '1 de 3 paradas hojeadas' && !errs.length, JSON.stringify({ text: b2.text, errs }));
-  await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: blocked.result.identifier });
-} catch (e) {
-  ck('sin almacenamiento: la pantalla abortó', false, `${e.message}${errs.length ? ' | consola: ' + errs.join(' | ') : ''}`);
 }
 for (const l of out) console.log(l.join(' '));
 const bad = out.filter(l => l[0] === '✗').length;

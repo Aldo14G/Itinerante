@@ -1,12 +1,7 @@
-// Eventos y talleres (Cartelera) sin inventar nada: «Me interesa» y «Compartir» son locales (no se envía nada y no hay contadores)
-// y el estado de cada propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Se carga al primer toque o en reposo.
-// Las historias de los destacados se retiraron el 2026-11-11 (decisión de Aldo: sin burbujas de historias).
+// Eventos y talleres (Cartelera) sin inventar nada: «Compartir» es local (no se envía nada y no hay contadores) y el estado de cada
+// propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Se carga al primer toque o en reposo.
+// Las historias de los destacados se retiraron el 2026-11-11 y «Me interesa» el 2026-11-13 (crítica minimalista: no servía a nadie).
 import { notify } from './saved.js';
-import { pickPop } from './motion.js';
-
-const INTEREST_KEY = 'iti-b4-interes-v1';
-
-const store = () => { try { return globalThis.localStorage ?? null; } catch { return null; } };
 
 // ---------- Estado de la propuesta: «Propuesta · sin fecha» o la fecha confirmada ----------
 // Cómo se actualiza: cuando la librería confirma una fecha, se añade `data-fecha="AAAA-MM-DD"` (o `AAAA-MM-DDTHH:MM`, hora de Monterrey)
@@ -42,30 +37,7 @@ function paintWhen(item) {
   el.classList.toggle('badge--quiet', badge.kind === 'propuesta'); // lo confirmado lleva la insignia menta; lo que no, la callada
 }
 
-// ---------- «Me interesa» y «Compartir» ----------
-export const readInterest = () => { try { const r = JSON.parse(store()?.getItem(INTEREST_KEY) || '[]'); return Array.isArray(r) ? r.filter(x => typeof x === 'string') : []; } catch { return []; } };
-const writeInterest = list => { try { store()?.setItem(INTEREST_KEY, JSON.stringify(list)); } catch { /* sin persistencia: dura la sesión */ } };
-let memory = null;
-const interest = () => (memory ??= readInterest());
-
-function paintInterest(btn) {
-  const on = interest().includes(btn.dataset.interest);
-  btn.setAttribute('aria-pressed', String(on));
-  const title = btn.dataset.title || 'esta propuesta';
-  btn.setAttribute('aria-label', on ? `Me interesa «${title}». Quitar` : `Me interesa «${title}»`);
-}
-
-export function toggleInterest(btn) {
-  const id = btn.dataset.interest;
-  const list = interest();
-  const at = list.indexOf(id);
-  if (at >= 0) list.splice(at, 1); else list.push(id);
-  writeInterest(list);
-  paintInterest(btn);
-  if (at < 0) pickPop(btn); // el corazón rebota solo al elegir con un toque, no al restaurar lo guardado
-  notify(at >= 0 ? 'Quitado.' : 'Anotado solo en este dispositivo. No enviamos nada.');
-}
-
+// ---------- «Compartir» ----------
 export async function shareItem(btn) {
   const title = btn.dataset.title || 'Cartelera';
   const url = `${location.origin}${location.pathname}#cartelera`;
@@ -79,17 +51,15 @@ export async function shareItem(btn) {
 }
 
 export function onAct(btn) {
-  if (btn.matches('[data-interest]')) toggleInterest(btn);
-  else if (btn.matches('[data-share]')) return shareItem(btn);
+  if (btn.matches('[data-share]')) return shareItem(btn);
 }
 
-// Nombre accesible de «Compartir»: es un control de icono, así que el nombre lleva la acción y el título de la propuesta, como «Me interesa «título»».
+// Nombre accesible de «Compartir»: es un control de icono, así que el nombre lleva la acción y el título de la propuesta.
 // Sin esto las tres propuestas tendrían el mismo nombre para un lector de pantalla. El marcado ya lo trae; aquí se mantiene al día con data-title.
 export const shareName = title => `Compartir «${title || 'esta propuesta'}»`;
 const paintShare = btn => btn.setAttribute('aria-label', shareName(btn.dataset.title));
 
 export function initFeed() {
-  document.querySelectorAll('[data-interest]').forEach(paintInterest);
   document.querySelectorAll('[data-share]').forEach(paintShare);
   document.querySelectorAll('.bill-item').forEach(paintWhen);
 }

@@ -1,5 +1,7 @@
 // Piso de oficio (Impeccable, craft-floor): titulares dentro de la escala, interletra, medida de lectura, cejas sobre titulares,
 // aire de los titulares, controles nativos y superficies del navegador. Uso: node tools/qa/piso.mjs URL
+// Ceja o antetítulo: texto corto (< 40 caracteres, sin punto final) justo encima de un titular h1–h4, en mayúsculas o con interletra abierta,
+// o en minúsculas de oración con letra de 60 % o menos de la del titular (así eran los .sec-rotulo, retirados el 2026-11-13).
 // Falla (salida 1) con: titular > 6rem fuera del mundo comprometido, interletra < -0.04em, medida > 78ch o una ceja sobre un titular.
 import { spawn } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
@@ -35,7 +37,9 @@ const AUDIT = `(() => {
     const ls = parseFloat(c.letterSpacing); if (!Number.isNaN(ls) && ls / fs < -0.0405) out.tracking.push(sel(el) + ' ' + (ls / fs).toFixed(3) + 'em');
     if (['P', 'LI', 'DD'].includes(el.tagName)) { const probe = document.createElement('span'); probe.textContent = '0'; probe.style.cssText = 'position:absolute;visibility:hidden;font:inherit;letter-spacing:inherit'; el.append(probe); const ch = probe.getBoundingClientRect().width; probe.remove();
       const range = document.createRange(); range.selectNodeContents(el); const rects = [...range.getClientRects()]; const wide = Math.max(0, ...rects.map(x => x.width)); if (rects.length > 1 && ch > 0 && wide / ch > 78) out.medida.push(sel(el) + ' ' + Math.round(wide / ch) + 'ch'); }
-    if (/^H[1-4]$/.test(el.tagName)) { const prev = el.previousElementSibling; if (prev && vis(prev) && !/^H[1-6]$/.test(prev.tagName)) { const pc = getComputedStyle(prev); const pfs = parseFloat(pc.fontSize); if (pfs <= 14 && (pc.textTransform === 'uppercase' || parseFloat(pc.letterSpacing) / pfs > 0.05) && prev.textContent.trim().length < 40) out.cejas.push(sel(prev) + ' «' + prev.textContent.trim() + '» sobre ' + sel(el)); } }
+    if (/^H[1-4]$/.test(el.tagName)) { const prev = el.previousElementSibling; if (prev && vis(prev) && !/^H[1-6]$/.test(prev.tagName)) { const pc = getComputedStyle(prev); const pfs = parseFloat(pc.fontSize); const txt = prev.textContent.trim(); const shout = pfs <= 14 && (pc.textTransform === 'uppercase' || parseFloat(pc.letterSpacing) / pfs > 0.05);
+      const eyebrow = prev.matches('.sec-rotulo') || (/^(P|SPAN|DIV|SMALL)$/.test(prev.tagName) && pfs <= fs * 0.6 && txt.length > 0 && !/[.!?:…]$/.test(txt) && !prev.querySelector('a, button, input, img, svg'));
+      if ((shout || eyebrow) && txt.length < 40) out.cejas.push(sel(prev) + ' «' + txt + '» sobre ' + sel(el)); } }
   }
   for (const h of document.querySelectorAll('main h2')) { if (!vis(h)) continue; const r = h.getBoundingClientRect(); let prev = h.previousElementSibling; while (prev && !vis(prev)) prev = prev.previousElementSibling; let next = h.nextElementSibling; while (next && !vis(next)) next = next.nextElementSibling;
     const box = h.closest('section, .cat'); const above = prev ? r.top - prev.getBoundingClientRect().bottom : (box ? r.top - box.getBoundingClientRect().top : NaN); const below = next ? next.getBoundingClientRect().top - r.bottom : NaN; if (below > above) out.aire.push(sel(h) + ' arriba ' + Math.round(above) + ' < abajo ' + Math.round(below)); }

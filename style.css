@@ -85,10 +85,14 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 /* Titular de capa (una capa dentro de un capítulo): Title 2. */
 .layer-title { margin: 0; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); text-wrap: balance; }
 
+/* Sin antetítulo sobre el titular (los rótulos de sección se retiraron el 2026-11-13): el nombre de la sección va en el titular, «Nombre *frase*». */
 .sec-head { max-width: 40rem; }
-.sec-rotulo { margin: 0 0 var(--space-2); font: var(--t-rotulo); letter-spacing: var(--ls-rotulo); color: var(--turquesa-texto); }
 .sec-texto { margin: var(--space-3) 0 0; max-width: 60ch; font: var(--t-cuerpo); color: var(--tinta-2); }
 .sec-texto strong { font-weight: 600; color: var(--tinta); }
+/* Enlace en línea con 44 px de objetivo, sin engordar el renglón. */
+.sec-texto a { position: relative; white-space: nowrap; color: var(--turquesa-texto); }
+.sec-texto a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-4)) 0; }
+.sec-texto a .ic { width: 16px; height: 16px; margin-inline-start: var(--space-1); vertical-align: -0.125em; }
 
 /* ---------- Botón (Boton): píldora de 48 px; 44 solo en línea y en las barras; 56 en las acciones principales ---------- */
 
@@ -128,9 +132,9 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 }
 .btn:disabled, .btn[aria-disabled="true"] { background: var(--fondo-3); color: var(--tinta-2); box-shadow: none; cursor: not-allowed; transform: none; }
 
-/* Alternado (aria-pressed): el secundario toma el primario y su icono se rellena («Me interesa», «Guardado en mi lista»). */
+/* Alternado (aria-pressed): el secundario toma el primario y su icono se rellena («Guardado en mi lista»). */
 .btn--secundario[aria-pressed="true"], .save--wide[aria-pressed="true"] { background: var(--primario); color: var(--en-primario); }
-:where(.act, .save)[aria-pressed="true"] .ic { fill: currentColor; fill-opacity: 0.25; }
+.save[aria-pressed="true"] .ic { fill: currentColor; fill-opacity: 0.25; }
 
 /* Rebote del icono al elegir, solo por un toque (pickPop en motion.js) y solo con movimiento. */
 @keyframes il-pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
@@ -339,16 +343,16 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .still figure { margin: 0; }
 .still-img { position: relative; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--radio-lg); background: var(--fondo-3); }
 .still-img img { width: 100%; height: 100%; object-fit: cover; }
-.still figcaption { display: grid; gap: var(--space-1); padding-top: var(--space-3); }
+/* Pie de foto: solo el nombre del cuarto (lo demás lo dice la foto y, para lectores de pantalla, su alt). */
+.still figcaption { padding-top: var(--space-3); }
 .still figcaption b { font: var(--t-titular); letter-spacing: var(--ls-titular); }
-.still figcaption span { font: var(--t-subtitulo); color: var(--tinta-2); }
 
 /* ---------- Eventos y talleres (#cartelera): tarjetas, todas abiertas ---------- */
 
 .bill { padding: var(--sec) var(--margen); background: var(--fondo-2); }
 .bill > .sec-head { margin-bottom: var(--space-8); }
 .bill-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); align-items: start; }
-.bill-item { overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
+.bill-item { position: relative; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
 .bill-item summary { display: block; padding: 0; list-style: none; cursor: default; pointer-events: none; }
 .bill-item summary::-webkit-details-marker { display: none; }
 .bill-card-fig { display: block; }
@@ -356,33 +360,19 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Insignias de la propuesta: tipo (Lectura, Juego, Taller) y estado («Propuesta · sin fecha» o la fecha confirmada, ver feed.js). */
 .bill-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4) 0; }
 .bill-title { display: block; margin-top: var(--space-3); padding: 0 var(--space-4); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
-.bill-sub { display: block; margin-top: var(--space-1); padding: 0 var(--space-4); font: var(--t-subtitulo); color: var(--tinta-2); }
 .bill-detail { display: grid; gap: var(--space-3); padding: var(--space-3) var(--space-4) var(--space-4); }
 .bill-detail p { max-width: 54ch; margin: 0; font: var(--t-cuerpo); color: var(--tinta); }
-/* «Me interesa» y «Compartir» comparten renglón; «Preguntar por WhatsApp» (acción en texto) va en el siguiente. */
-.bill-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.bill-acts .act:not(.act--icon) { flex: 1 1 auto; }
-.bill-acts .bill-wa { flex: 1 0 100%; justify-content: flex-start; padding-inline: var(--space-2); }
+/* Acciones: «Preguntar por WhatsApp» (secundario) a todo el ancho, con su rótulo entero, y «Compartir» como botón de icono de vidrio que flota
+   sobre la esquina de la foto (el vidrio va en lo que flota sobre una imagen, con su respaldo opaco). Sin «Me interesa». */
+.bill-acts { display: flex; align-items: center; container-type: inline-size; }
+.bill-acts .bill-wa { flex: 1 1 auto; white-space: nowrap; }
+.bill-acts .act--icon { position: absolute; z-index: 1; top: var(--space-3); right: var(--space-3); }
+/* Tarjeta angosta (320 px): el rótulo entero cabe sin el icono de chat. */
+@container (max-width: 263px) { .bill-acts .bill-wa .ic { display: none; } }
 html:not(.js) .bill-acts .act { display: none; }
 .bill-dots { display: none; }
-.bill-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-8); }
-.bill-foot p { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); }
-/* Enlace en línea con 44 px de objetivo, sin engordar el renglón. */
-.bill-foot a:not(.btn), .rail-trail-all { position: relative; white-space: nowrap; color: var(--turquesa-texto); }
-.bill-foot a:not(.btn)::after, .rail-trail-all::after { content: ""; position: absolute; inset: calc(-1 * var(--space-4)) 0; }
-.bill-foot a:not(.btn) .ic { width: 16px; height: 16px; margin-inline-start: var(--space-1); vertical-align: -0.125em; }
 
-/* ---------- Cita, llamado, Visita y pie ---------- */
-
-.quote { margin: 0; padding: var(--sec) var(--margen) var(--space-6); background: var(--fondo-2); }
-.quote blockquote { max-width: 46rem; margin: 0; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); text-wrap: balance; }
-.quote blockquote p { margin: 0; }
-@media (min-width: 761px) { .quote blockquote { font: var(--t-titulo-1); letter-spacing: var(--ls-titulo-1); } }
-.quote figcaption { max-width: 46rem; margin: var(--space-4) 0 0; font: var(--t-nota-pie); color: var(--tinta-2); }
-.quote cite { font-style: normal; color: var(--tinta); }
-
-.call { padding: var(--space-6) var(--margen) var(--sec); background: var(--fondo-2); }
-.call .h2 em { color: var(--turquesa-texto); }
+/* ---------- Visita y pie ---------- */
 
 .visit { display: grid; gap: var(--space-8); padding: var(--sec) var(--margen); background: var(--fondo); }
 .visit address { margin: var(--space-6) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); font-style: normal; }
@@ -409,29 +399,26 @@ html:not(.js) .bill-acts .act { display: none; }
 @media (min-width: 1024px) { .visit { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-16); } }
 
 .ftr { padding: var(--space-10) var(--margen) var(--space-8); background: var(--fondo-2); }
-.ftr-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-4) var(--space-8); align-items: center; }
-.ftr-id { display: grid; justify-items: start; gap: var(--space-1); }
-.ftr-brand { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); }
-.ftr-brand span { font: var(--t-nota-pie); color: var(--tinta-2); }
-.ftr-route { margin-inline-start: calc(-1 * var(--space-4)); }
-.ftr-links { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+/* Pie: redes, correo y «Pausar el movimiento». Sin marca, dirección ni «Cómo llegar» (Visita, justo encima, ya los trae). */
+.ftr-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4) var(--space-8); align-items: center; }
+.ftr-links { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 0 calc(-1 * var(--space-4)); padding: 0; list-style: none; }
 .ftr-links .btn { color: var(--tinta); }
 .motion-btn { color: var(--tinta-2); }
 .motion-btn[aria-pressed="true"] { color: var(--tinta); }
 .motion-btn:disabled { background: transparent; opacity: 1; cursor: default; }
-@media (max-width: 1023px) { .ftr-row { grid-template-columns: minmax(0, 1fr); justify-items: start; } }
+@media (max-width: 1023px) { .ftr-row { grid-template-columns: minmax(0, 1fr); justify-items: start; } .motion-btn { margin-inline-start: calc(-1 * var(--space-4)); } }
 
 /* ---------- Movimiento de entrada (EncabezadoSeccion y revelado de imagen) ---------- */
 /* app.js marca data-revelar="listo" solo en lo que todavía no se ve y con movimiento: el titular sube línea por línea desde su máscara,
-   60 ms entre una y otra; rótulo y entradilla se funden 8 px hacia arriba; la imagen se abre desde un recorte del 6 % y baja de 1.06 a 1.
+   60 ms entre una y otra; la entradilla se funde 8 px hacia arriba; la imagen se abre desde un recorte del 6 % y baja de 1.06 a 1.
    Sin JavaScript, con movimiento reducido o con la pausa del pie, todo aparece colocado. */
 .linea { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
 .linea-in { display: block; }
 .linea:nth-child(2) { --i: 1; } .linea:nth-child(3) { --i: 2; } .linea:nth-child(4) { --i: 3; } .linea:nth-child(5) { --i: 4; }
 .motion [data-revelar="listo"] .linea-in { transform: translateY(105%); transition: transform var(--dur-lenta) var(--curva-salida); transition-delay: calc(var(--i, 0) * var(--escalon-linea)); }
-.motion [data-revelar="listo"] :is(.sec-rotulo, .sec-texto), .motion .quote[data-revelar="listo"] > * { opacity: 0; transform: translateY(8px); transition: opacity var(--dur-lenta) var(--curva-salida), transform var(--dur-lenta) var(--curva-salida); }
-.motion [data-revelar="listo"] .sec-texto, .motion .quote[data-revelar="listo"] figcaption { transition-delay: calc(2 * var(--escalon-linea) + var(--dur-instantanea)); }
-.motion [data-revelar="listo"].is-visible :is(.linea-in, .sec-rotulo, .sec-texto), .motion .quote[data-revelar="listo"].is-visible > * { transform: none; opacity: 1; }
+.motion [data-revelar="listo"] .sec-texto { opacity: 0; transform: translateY(8px); transition: opacity var(--dur-lenta) var(--curva-salida), transform var(--dur-lenta) var(--curva-salida); }
+.motion [data-revelar="listo"] .sec-texto { transition-delay: calc(2 * var(--escalon-linea) + var(--dur-instantanea)); }
+.motion [data-revelar="listo"].is-visible :is(.linea-in, .sec-texto) { transform: none; opacity: 1; }
 .motion :is(.still-img, .frame-clip)[data-revelar="listo"] { clip-path: inset(6% 6% 6% 6% round var(--radio-lg)); transition: clip-path var(--dur-lenta) var(--curva-salida); }
 .motion :is(.still-img, .frame-clip)[data-revelar="listo"] img { transform: scale(1.06); transition: transform calc(var(--dur-lenta) * 1.6) var(--curva-salida); }
 .motion :is(.still-img, .frame-clip)[data-revelar="listo"].is-visible { clip-path: inset(0 0 0 0 round var(--radio-lg)); }
@@ -446,75 +433,60 @@ html:not(.js) .bill-acts .act { display: none; }
 
 .books { padding: var(--sec) var(--margen) 0; background: var(--fondo); }
 .books > .cat { margin: var(--sec) calc(-1 * var(--margen)) 0; }
-.books-head { display: grid; justify-items: start; gap: var(--space-3); margin-bottom: var(--space-8); }
+/* Cabecera del capítulo: titular y, justo debajo, «Buscar en el catálogo» (la tarea principal del capítulo va primero). */
+.books-head { display: grid; justify-items: start; gap: var(--space-5); margin-bottom: var(--space-6); }
 .books-head .h2 { max-width: 16ch; }
-.books-head p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
-.books-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-12); align-items: start; }
-.ask { margin-top: var(--sec); padding-top: var(--space-8); border-top: 1px solid var(--linea); }
-.ask > .layer-title { margin-bottom: var(--space-6); }
+/* «Buscar en el catálogo»: enlace con cara de campo (la misma caja que el buscador). En el teléfono abre la hoja Explorar; en escritorio baja a
+   la rejilla en línea y deja el foco en su buscador (app.js). */
+.explore-open {
+  display: flex; align-items: center; gap: var(--space-3); width: min(100%, 480px); min-height: var(--alto-md); margin: 0; padding: 0 var(--space-5);
+  border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); color: var(--tinta-2); font: var(--t-campo); text-align: left; text-decoration: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: background-color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida);
+}
+.explore-open .ic { width: 22px; height: 22px; flex: none; }
+.explore-open:active, .explore-open[data-opening] { transform: scale(0.98); }
+@media (hover: hover) { .explore-open:hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
 
 /* Chip (Chip): píldora de 48 px en fondo-3; elegido = primario con la palomita (la forma acompaña al color). */
-.topics { display: flex; flex-wrap: wrap; gap: var(--space-2); align-content: start; }
-.topic, .cat-filters-btn, .cat-chip {
+.chip, .cat-filters-btn, .cat-chip {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
   min-height: var(--alto-md); margin: 0; padding: 0 var(--space-4);
   border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); color: var(--tinta);
   font: var(--t-chip); letter-spacing: var(--ls-chip); white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
   transition: background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida);
 }
-.topic:active, .cat-filters-btn:active, .cat-chip:active { transform: scale(0.96); }
-.topic[aria-checked="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip { background: var(--primario); color: var(--en-primario); }
-.topic[aria-checked="true"]::before {
+.chip:active, .cat-filters-btn:active, .cat-chip:active { transform: scale(0.96); }
+.chip[aria-checked="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip { background: var(--primario); color: var(--en-primario); }
+.chip[aria-checked="true"]::before {
   content: ""; width: 18px; height: 18px; margin-left: calc(-1 * var(--space-1)); background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.3 4.3 8.7-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.3 4.3 8.7-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-:is(.topic, .cat-filters-btn, .cat-chip, .rail-chip, .save, .cat-sort select, .explore-open, .rel, .card):focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
-@media (hover: hover) { :is(.topic:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
+:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { :is(.chip:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
 
-/* La foto del tema va limpia; nombre, frase y rótulo debajo. */
-.topic-stage { position: relative; display: grid; gap: var(--space-3); }
-.topic-layers { position: relative; aspect-ratio: 3 / 2; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); }
-.topic-layer { position: absolute; inset: 0; }
-.topic-layer img { width: 100%; height: 100%; object-fit: cover; }
-.topic-card { display: grid; gap: var(--space-2); }
-.topic-name { margin: 0; overflow: hidden; padding-bottom: 0.08em; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); color: var(--turquesa-texto); white-space: nowrap; }
-.topic-name .ch { display: inline-block; white-space: pre; }
-.topic-line { margin: 0; max-width: 46ch; font: var(--t-cuerpo); }
-.topic-tag { margin: 0; font: var(--t-nota-pie); color: var(--tinta-2); }
 
 /* Campo (CampoBusqueda): píldora de 48 px en fondo-3, letra de 17 px (Safari no acerca la página). Con foco: fondo de página, borde linea-fuerte y anillo. */
-.composer { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto; gap: var(--space-6); align-items: end; margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--linea); }
-.composer-field label { display: block; margin-bottom: var(--space-2); font: var(--t-titular); letter-spacing: var(--ls-titular); }
-.composer input, .cat-bar input[type="search"] {
+.cat-bar input[type="search"] {
   width: 100%; min-height: var(--alto-md); margin: 0; padding: 0 var(--space-5);
   border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); color: var(--tinta);
   font: var(--t-campo); caret-color: var(--primario); -webkit-appearance: none; appearance: none;
   transition: background-color var(--dur-rapida) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida);
 }
-.composer input::placeholder, .cat-bar input[type="search"]::placeholder { color: var(--tinta-2); opacity: 1; }
-.composer input:focus, .cat-bar input[type="search"]:focus { background: var(--fondo); box-shadow: inset 0 0 0 2px var(--linea-fuerte); outline: 2px solid transparent; }
-.composer input:focus-visible, .cat-bar input[type="search"]:focus-visible { box-shadow: inset 0 0 0 2px var(--linea-fuerte), var(--anillo-foco); }
+.cat-bar input[type="search"]::placeholder { color: var(--tinta-2); opacity: 1; }
+.cat-bar input[type="search"]:focus { background: var(--fondo); box-shadow: inset 0 0 0 2px var(--linea-fuerte); outline: 2px solid transparent; }
+.cat-bar input[type="search"]:focus-visible { box-shadow: inset 0 0 0 2px var(--linea-fuerte), var(--anillo-foco); }
 .cat-bar input[type="search"]::-webkit-search-cancel-button { filter: opacity(0.7); }
-.composer-hint { margin: var(--space-2) var(--space-4) 0; font: var(--t-nota-pie); color: var(--tinta-2); }
-.note { margin: 0; padding: var(--space-4); border-radius: var(--radio-md); background: var(--fondo-2); color: var(--tinta); }
-.note figcaption { margin-bottom: var(--space-1); font: var(--t-rotulo); color: var(--tinta-2); }
-.note-text { margin: 0; min-height: 2.6em; font: var(--t-cuerpo); }
 .books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec) 0; }
 .books-foot p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
-@media (max-width: 1100px) {
-  .composer { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .composer > .btn { grid-column: 1 / -1; justify-self: start; }
-}
 
-/* Explorar el catálogo (capa 3). En escritorio el diálogo queda abierto en línea; en móvil es una hoja a pantalla completa (mobile.css). */
+/* Explorar el catálogo (capa 2). En escritorio el diálogo queda abierto en línea; en móvil es una hoja a pantalla completa (mobile.css). */
 .cat { padding: var(--space-12) var(--margen) var(--sec); border-top: 1px solid var(--linea); }
-.cat-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3) var(--space-10); align-items: end; margin-bottom: var(--space-8); }
-.cat-lede { grid-column: 1 / -1; max-width: 60ch; margin: 0; font: var(--t-cuerpo); color: var(--tinta-2); }
-.explore-open, .ex-top { display: none; }
+.cat-head { margin-bottom: var(--space-8); }
+.ex-top { display: none; }
 .explorer { position: static; inset: auto; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; overflow: visible; color: inherit; background: none; border: 0; }
 .explorer:not([open]) { display: none; }
-.cat-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-4) var(--space-6); align-items: end; padding-bottom: var(--space-6); border-bottom: 1px solid var(--linea); }
+.cat-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4) var(--space-6); align-items: end; padding-bottom: var(--space-6); border-bottom: 1px solid var(--linea); }
 .cat-bar label { display: block; margin-bottom: var(--space-2); font: var(--t-rotulo); color: var(--tinta-2); }
 .cat-combo { position: relative; }
 /* Sugerencias: lista que flota sobre la rejilla. */
@@ -525,13 +497,6 @@ html:not(.js) .bill-acts .act { display: none; }
 .cat-suggest .sg-all { justify-content: space-between; margin-top: var(--space-1); font: var(--t-titular); color: var(--turquesa-texto); }
 .sg-k { flex: none; min-width: 5.4em; font: var(--t-rotulo); color: var(--tinta-2); }
 .cat-suggest li[aria-selected="true"] .sg-k, .cat-suggest li:hover .sg-k { color: inherit; }
-.cat-sort select {
-  min-height: var(--alto-md); margin: 0; padding: 0 var(--space-10) 0 var(--space-4);
-  border: 0; border-radius: var(--radio-pildora); background-color: var(--fondo-3); color: var(--tinta); font: var(--t-campo); cursor: pointer;
-  appearance: none; -webkit-appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat;
-}
 .cat-filters-btn { display: none; }
 .cat-filters-foot { display: none; }
 .cat-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: var(--space-12); align-items: start; padding-top: var(--space-8); }
@@ -557,7 +522,7 @@ html:not(.js) .bill-acts .act { display: none; }
 .cat-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
 .cat-chips[hidden] { display: none; }
 .cat-clear { min-height: var(--alto-sm); padding: 0 var(--space-3); border: 0; border-radius: var(--radio-pildora); background: none; color: var(--turquesa-texto); font: var(--t-boton-chico); cursor: pointer; }
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: var(--space-8) var(--space-6); margin: 0; padding: 0; list-style: none; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: var(--space-8) var(--space-6); align-items: start; margin: 0; padding: 0; list-style: none; }
 .cat-grid[hidden] { display: none; }
 .cat-more { margin-top: var(--space-10); }
 .cat-empty { display: grid; gap: var(--space-5); justify-items: start; padding: var(--space-12) 0; }
@@ -567,8 +532,6 @@ html:not(.js) .bill-acts .act { display: none; }
 .cat-error { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: 0 0 var(--space-6); }
 .cat [hidden] { display: none !important; }
 @media (max-width: 1100px) {
-  .cat-bar { grid-template-columns: minmax(0, 1fr) auto; }
-  .cat-search { grid-column: 1 / -1; }
   .cat-filters-btn { display: inline-flex; justify-self: end; }
   .cat-layout { grid-template-columns: 1fr; padding-top: var(--space-6); }
   .cat-filters { position: static; display: none; max-height: none; overflow: visible; padding: 0; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
@@ -584,9 +547,17 @@ html:not(.js) .bill-acts .act { display: none; }
 @media (hover: hover) { .card:hover .cover { box-shadow: var(--sombra-portada); } }
 .card:active .cover, .card[data-opening] .cover { transform: scale(0.98); }
 .card-item, .rail-item { position: relative; container-type: inline-size; }
-/* Una sola regla de alto para la tarjeta y su esqueleto: la portada 2:3 (150 % del ancho del contenedor). */
-.rail-item, .card-item { --card-h: 150cqw; }
+/* Una sola regla de alto para la tarjeta y su esqueleto: la portada 2:3 (150 % del ancho del contenedor); en la rejilla, además, el título
+   (dos renglones reservados) y «autor · precio» (el esqueleto lleva los mismos renglones). */
+.rail-item { --card-h: 150cqw; }
+.card-item { --card-h: calc(150cqw + 80px); }
 :is(.rail-item, .card-item) .card { min-height: var(--card-h); align-content: start; }
+/* Debajo de la portada: el título en Subheadline semibold (dos renglones como máximo) y «autor · $250 MXN» en Footnote. El precio (dato de la
+   hoja, data-fuente="hoja") no se parte ni se corta: si no cabe, baja entero al renglón siguiente. */
+.card-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2lh; margin-top: var(--space-2); overflow: hidden; font: var(--t-subtitulo); font-weight: 600; color: var(--tinta); overflow-wrap: anywhere; }
+.card-m { display: block; margin-top: var(--space-1); font: var(--t-nota-pie); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.card-pr { white-space: nowrap; font-weight: 600; color: var(--tinta); }
+.card--sk :is(.card-t, .card-m) { visibility: hidden; }
 /* Portada real: 2:3 de siempre; si la foto es más alta se recorta abajo. Título y autor van como texto oculto (nombre accesible del botón). */
 .cover--img { background: var(--fondo-3); }
 .cover--img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
@@ -633,48 +604,10 @@ html:not(.js) .bill-acts .act { display: none; }
 }
 .save--wide .ic { width: 20px; height: 20px; }
 
-/* Tarjeta que voltea (TarjetaLibro), en la rejilla de «Explora el catálogo». La portada sigue abriendo la ficha; el botón de vidrio «Voltear»
-   (44 px, arriba a la derecha, aria-pressed) gira la tarjeta 180° en dur-lenta y muestra en el reverso título, autor, editorial, precio de la
-   hoja, «Guardar» y «Ver ficha». La cara oculta es inerte. Sin movimiento no gira: las caras se funden (al instante con «reducir movimiento»). */
-.card-item { perspective: var(--perspectiva-tarjeta); }
-.card-giro { display: grid; transform-style: preserve-3d; transition: transform var(--dur-lenta) var(--curva-salida); }
-.card-cara { grid-area: 1 / 1; min-width: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
-.card-frente { position: relative; }
-.card-reverso {
-  display: flex; flex-direction: column; min-height: 0; padding: var(--space-3); overflow: hidden;
-  border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea);
-  transform: rotateY(180deg); visibility: hidden; transition: visibility var(--dur-lenta);
-}
-/* La cara que no se ve tampoco se pinta ni se toca (además de inerte): visibility se interpola como «visible» hasta el final del giro. */
-.card-item.is-volteada .card-reverso { visibility: visible; }
-.card-item.is-volteada .card-frente { visibility: hidden; transition: visibility var(--dur-lenta); }
-.motion .card-item.is-volteada .card-giro { transform: rotateY(180deg); }
-html:not(.motion) .card-giro { transition: none; }
-html:not(.motion) .card-reverso { transform: none; opacity: 0; transition: opacity var(--dur-rapida) linear, visibility var(--dur-rapida); }
-html:not(.motion) .card-frente { transition: opacity var(--dur-rapida) linear; }
-html:not(.motion) .card-item.is-volteada .card-reverso { opacity: 1; }
-html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: opacity var(--dur-rapida) linear, visibility var(--dur-rapida); }
-.card-voltear { position: absolute; top: var(--space-2); right: var(--space-2); z-index: 3; }
-/* Volteada: el botón pasa a primario opaco (también donde el vidrio cae a superficie: así su icono claro nunca queda sobre blanco). */
-.card-item .card-voltear[aria-pressed="true"] { background: var(--primario) !important; color: var(--en-primario); }
-.rev-cab { display: flex; flex: none; align-items: center; height: var(--alto-sm); margin-bottom: var(--space-1); }
-.save.save--reverso { width: var(--alto-sm); min-height: var(--alto-sm); }
-.save--reverso .ic { width: 22px; height: 22px; }
-.rev-texto { flex: 1; min-height: 0; overflow: hidden; }
-.rev-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin: 0; overflow: hidden; font: var(--t-titular); letter-spacing: var(--ls-titular); overflow-wrap: anywhere; }
-.rev-a, .rev-p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-nota-pie); color: var(--tinta-2); }
-.rev-pr { flex: none; margin: 0; font: var(--t-titular); font-variant-numeric: tabular-nums; }
-.rev-ficha { flex: none; width: 100%; margin-top: var(--space-2); }
-/* Tarjeta angosta (menos de 160 px, p. ej. a 320): relleno de 8 px y título en Subheadline. Nada se recorta ni se desborda. */
-@container (max-width: 159px) {
-  .card-reverso { padding: var(--space-2); }
-  .rev-t { font: var(--t-subtitulo); font-weight: 600; }
-  .rev-pr { font: var(--t-subtitulo); font-weight: 600; }
-  .rev-ficha { margin-top: 0; }
-}
 
 /* Ficha del libro (FichaLibro): hoja de vidrio. En escritorio, diálogo centrado de hasta 680 px; en móvil sube desde abajo (mobile.css).
-   Las acciones van fijas al pie: «Preguntar por WhatsApp» (primaria de la ficha) y «Cómo llegar». */
+   Una sola ficha, venga de donde venga (el «modo redes» se retiró el 2026-11-13). Las acciones van fijas al pie: «Preguntar por WhatsApp»
+   (primaria de la ficha) y, debajo, Guardar y Compartir (iconos de 56 px) y «Cómo llegar». */
 .drawer {
   position: fixed; inset: 0; margin: auto; padding: 0;
   width: min(680px, calc(100% - var(--space-16))); max-width: none; height: min(760px, calc(100dvh - var(--space-16))); max-height: none;
@@ -713,33 +646,14 @@ html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: 
 .rel:active .cover { transform: scale(0.98); }
 @media (hover: hover) { .rel:hover span { text-decoration: underline; } }
 .drawer-foot { flex: none; padding: var(--space-4) var(--space-8) var(--space-6); border-top: 1px solid var(--linea); }
-.drawer-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: var(--space-3); }
+/* «Preguntar por WhatsApp» (primaria) a todo el ancho; debajo Guardar y Compartir (iconos de 56) y «Cómo llegar», que ocupa el resto. El orden visual es el del documento. */
+.drawer-actions { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: var(--space-3); }
+.drawer-actions [data-d-cta] { grid-column: 1 / -1; }
 /* Guardar en la ficha: botón de icono de 56 px junto a las acciones; el rótulo («Guardar en mi lista» / «Guardado en mi lista · Quitar») es su nombre accesible. */
 .save--icono { width: var(--alto-lg); min-height: var(--alto-lg); padding: 0; justify-content: center; }
 .save--icono .ic { width: 24px; height: 24px; }
 .save--icono [data-save-label] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .drawer-note { margin: var(--space-2) 0 0; font: var(--t-nota-pie); color: var(--tinta-2); text-align: center; }
-/* Modo «redes» de la ficha (la abre Novedades): «Preguntar por WhatsApp» a todo el ancho y debajo Guardar · Instagram · Facebook · Compartir,
-   cuatro botones de 48 × 48 (círculo menta; guardado en primario) con su nombre en Caption 1, 8 px entre ellos. Sin «Cómo llegar» en este modo. */
-.redes { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0; list-style: none; }
-.drawer[data-modo="redes"] .redes { display: grid; }
-.drawer[data-modo="redes"] :is([data-d-save], [data-d-visit]) { display: none; }
-.drawer[data-modo="redes"] .drawer-actions { grid-template-columns: minmax(0, 1fr); }
-.redes .red, .redes .red.save {
-  position: static; display: flex; flex-direction: column; align-items: center; gap: var(--space-1); width: 100%; height: auto; min-width: var(--alto-md); min-height: var(--alto-md);
-  margin: 0; padding: 0; border: 0; border-radius: var(--radio-sm); background: none; color: var(--tinta); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
-  font: var(--t-leyenda-1); text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
-}
-.red-ic { display: grid; place-items: center; width: var(--alto-md); height: var(--alto-md); border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida); }
-.red-ic .ic { width: 22px; height: 22px; }
-.red:active .red-ic { transform: scale(0.94); }
-.redes .red.save:active { transform: none; }
-.redes .red.save[aria-pressed="true"] { background: none; color: var(--tinta); }
-.red[aria-pressed="true"] .red-ic { background: var(--primario); color: var(--en-primario); }
-.red[aria-pressed="true"] .ic { fill: currentColor; fill-opacity: 0.25; }
-.red:focus-visible { outline: 2px solid transparent; box-shadow: none; }
-.red:focus-visible .red-ic { box-shadow: var(--anillo-foco); }
-@media (hover: hover) { .red:not([aria-pressed="true"]):hover .red-ic { background: color-mix(in oklab, var(--menta), var(--en-menta) 10%); } }
 
 /* Mi lista: hoja de vidrio (diálogo en escritorio, hoja inferior en móvil) con las acciones fijas al pie. */
 .mylist {
@@ -792,60 +706,11 @@ html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: 
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 
 /* ---------- Carrusel de libros (capa 1 del Catálogo) ---------- */
-.rail { margin-bottom: var(--sec); }
 .rail[hidden], html:not(.js) .rail { display: none; }
 .rail-head { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
-.rail-note { margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
-.rail-info { display: grid; gap: var(--space-1); }
-.rail-info [data-rail-note] { min-height: 1lh; }
-/* Recorrido: cada colección es una parada (disco de 64 px con su icono y el nombre debajo) unida a la siguiente por una línea punteada.
-   La actual va en primario y crece con scale; la hojeada lleva la palomita y su tramo de línea en primario. */
-.rail-chips {
-  --stop: 64px; --pitch: clamp(128px, 14vw, 216px); --zig: 0px; --name-h: 36px;
-  display: flex; align-items: flex-start; gap: calc(var(--pitch) - var(--stop));
-  margin: 0 calc(-1 * var(--margen)); padding: var(--space-3) var(--margen) var(--space-1);
-  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
-}
-.rail-chips::-webkit-scrollbar { display: none; }
-.rail-stop, .sk-chip { flex: 0 0 var(--stop); height: calc(var(--stop) + var(--space-2) + var(--name-h)); }
-.rail-chips > :nth-child(even) { margin-top: var(--zig); }
-.rail-chips > :nth-child(odd) { margin-bottom: var(--zig); }
-.rail-stop { position: relative; display: grid; justify-items: center; align-content: start; }
-.rail-stop:not(:last-child)::after {
-  content: ""; position: absolute; z-index: 0; left: 50%; top: calc(var(--stop) / 2 - 2px); width: var(--pitch); height: 4px; transform-origin: 0 50%;
-  background: radial-gradient(circle closest-side, var(--linea-fuerte) 75%, transparent) 0 0 / var(--space-2) 100% repeat-x;
-}
-.rail-stop.is-seen::after { background: linear-gradient(var(--primario), var(--primario)) 0 50% / 100% 2px no-repeat; }
-@supports (rotate: atan2(1px, 1px)) and (width: hypot(1px, 1px)) {
-  .rail-chips { --zig: var(--space-4); }
-  .rail-stop:not(:last-child)::after { width: hypot(var(--pitch), var(--zig)); rotate: atan2(var(--zig), var(--pitch)); }
-  .rail-stop:nth-child(even):not(:last-child)::after { rotate: atan2(calc(-1 * var(--zig)), var(--pitch)); }
-}
-.rail-chip {
-  position: relative; z-index: 1; display: grid; place-items: center; width: var(--stop); height: var(--stop); margin: 0; padding: 0;
-  border: 0; border-radius: 50%; background: var(--fondo-3); color: var(--tinta); font: var(--t-rotulo); cursor: pointer; -webkit-tap-highlight-color: transparent;
-  transition: scale var(--dur-rapida) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida);
-}
-.rail-chip > .ic { width: 28px; height: 28px; stroke-width: 1.75; }
-.rail-chip-name {
-  position: absolute; top: calc(100% + var(--space-2)); left: 50%; translate: -50% 0; transform-origin: 50% 0;
-  width: min(calc(var(--pitch) - var(--space-2)), calc(var(--stop) + var(--space-4))); color: var(--tinta); background: var(--fondo); text-align: center; text-wrap: balance; overflow-wrap: break-word;
-}
-.rail-chip[aria-checked="true"] { scale: 1.1; background: var(--primario); color: var(--en-primario); }
-.rail-chip[aria-checked="true"] > .ic { fill: currentColor; fill-opacity: 0.18; stroke-width: 2.1; }
-.rail-chip[aria-checked="true"] > .rail-chip-name { scale: calc(1 / 1.1); color: var(--tinta); }
-@media (hover: hover) { .rail-chip:not([aria-checked="true"]):hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
-.rail-chip-done { display: none; position: absolute; top: calc(-1 * var(--space-1)); right: calc(-1 * var(--space-1)); width: 24px; min-height: 24px; padding: 0; justify-content: center; box-shadow: 0 0 0 2px var(--fondo); }
-.rail-chip-done .ic { width: 14px; height: 14px; stroke-width: 2.5; }
-.rail-stop.is-seen .rail-chip-done { display: inline-flex; }
-.rail-trail { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); align-items: center; gap: 0 var(--space-4); min-height: var(--alto-sm); }
-.rail-trail-bar { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 8px; overflow: hidden; border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); }
-.rail-trail-bar::-webkit-progress-bar { background: var(--fondo-3); }
-.rail-trail-bar::-webkit-progress-value { background: var(--primario); border-radius: var(--radio-pildora); }
-.rail-trail-bar::-moz-progress-bar { background: var(--primario); border-radius: var(--radio-pildora); }
-.rail-trail-text { margin: 0; font: var(--t-nota-pie); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
-.rail-trail-all[hidden] { display: none; }
-.rail.is-complete .rail-all { visibility: hidden; }
+/* Fila de chips (una colección por chip, de collections.json) y, debajo, la nota de la colección elegida (su renglón está reservado). */
+.rail-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.rail-note { min-height: 1lh; margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
 /* Carrusel de portadas en 3D (CarruselPortadas): la pista se desplaza con el dedo (imán al centro) y rail.js gira las vecinas según su
    distancia al centro, una vez por fotograma. La portada mide el 44 % del ancho entre 148 y 240 px (172 a 390 px; 240 desde 768).
    La perspectiva va en la ventana del carrusel (su punto de fuga no se mueve al desplazar) y la pista conserva el 3D de sus portadas.
@@ -868,16 +733,20 @@ html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: 
 .rail-item .save { transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
 .rail-item:not(.is-centro) .save { opacity: 0; visibility: hidden; }
 .cf-pie { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); }
-.cf-texto { min-width: 0; text-align: center; }
-.cf-titulo { min-height: 1lh; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); color: var(--tinta); }
-.cf-meta { min-height: 1lh; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
-.cf-meta strong { font-weight: 600; color: var(--tinta); }
-.cf-progreso { display: flex; justify-content: center; align-items: center; gap: var(--space-2); height: var(--space-2); margin: var(--space-4) 0 0; }
-.cf-progreso span { width: 6px; height: 6px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.45; transition: scale var(--dur-base) var(--curva-resorte), opacity var(--dur-rapida) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida); }
-.cf-progreso span.is-activo { scale: 1.5; opacity: 1; background: var(--primario); }
-.rail-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-2); }
-.rail-all { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--alto-sm); margin-inline-start: auto; padding: 0 var(--space-3); border-radius: var(--radio-pildora); color: var(--turquesa-texto); font: var(--t-boton-chico); text-decoration: none; }
-.rail-all .ic { width: 18px; height: 18px; }
+/* Pie del libro del centro: el título (Title 3) y «autor · precio» (Subheadline), enteros y sin cortar: si no caben, bajan de renglón y el precio
+   nunca se parte. En un pie angosto el bloque reserva dos renglones de cada uno (2 × 25 + 2 × 20 px) y se centra entre las flechas, así pasar
+   de un libro a otro casi nunca mueve lo de abajo; con un pie de 600 px o más basta lo que mida. */
+.cf-pie { container-type: inline-size; }
+.cf-texto { display: grid; align-content: center; min-width: 0; min-height: 90px; text-align: center; }
+@container (min-width: 600px) { .cf-texto { min-height: 0; } }
+.cf-titulo { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); color: var(--tinta); text-wrap: balance; overflow-wrap: break-word; }
+.cf-meta { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; text-wrap: balance; }
+.cf-meta strong { font-weight: 600; color: var(--tinta); white-space: nowrap; }
+/* Bajo el carrusel: «Preguntar por {colección}» (secundario) y, en texto, pedir una recomendación sin rumbo fijo. */
+.rail-ask { display: grid; justify-items: center; gap: var(--space-2); margin-top: var(--space-5); }
+.rail-libre { display: inline-flex; align-items: center; min-height: var(--alto-sm); padding: 0 var(--space-3); border-radius: var(--radio-pildora); color: var(--turquesa-texto); font: var(--t-boton-chico); text-decoration: none; }
+.rail-libre:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .rail-libre:hover { background: var(--fondo-3); } }
 @media (min-width: 768px) {
   .rail { --cf-w: 240px; }
   .rail-viewport { perspective: var(--perspectiva-carrusel-ancha); }
@@ -887,7 +756,7 @@ html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: 
 .rail-status:empty { position: absolute; }
 .rail-error { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .rail-error[hidden] { display: none; }
-.rail[data-state="error"] :is(.rail-chips, .rail-trail, .rail-info, .rail-viewport, .rail-foot) { display: none; }
+.rail[data-state="error"] :is(.rail-chips, .rail-note, .rail-viewport, .cf-pie, .rail-ask) { display: none; }
 @media print { .rail { display: none; } }
 /* El foco de «Guardar» sobre una portada se separa con el color de esa portada. */
 :is(.rail-item, .card-item) .save:not(.save--wide):focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
@@ -899,14 +768,11 @@ html:not(.motion) .card-item.is-volteada .card-frente { opacity: 0; transition: 
 .card--sk, .card--sk .card { cursor: default; pointer-events: none; content-visibility: visible; }
 .card--sk .cover { overflow: hidden; }
 .cat-grid[aria-busy="true"] .card--sk .cover { background: var(--fondo-3); }
-.sk-chip {
-  --sk: var(--fondo-3);
-  background: radial-gradient(circle at 50% calc(var(--stop) / 2), var(--sk) calc(var(--stop) / 2 - 1px), transparent calc(var(--stop) / 2)) no-repeat,
-    linear-gradient(var(--sk), var(--sk)) 50% calc(var(--stop) + var(--space-3)) / var(--space-12) var(--space-3) no-repeat;
-}
+/* Esqueleto de un chip de colección: la misma píldora de 48 px (el ancho es el de un nombre corto). */
+.sk-chip { display: inline-block; width: var(--space-20); height: var(--alto-md); border-radius: var(--radio-pildora); background: var(--fondo-3); }
 
-/* ---------- Novedades (CarruselNovedades): una tira por todo el catálogo que «Ver todo» despliega en rejilla ---------- */
-/* Sin JavaScript no existe (la tira la arma news.js): ni sección ni enlaces. Con JavaScript está siempre (boot.js pone has-news). */
+/* ---------- Novedades (CarruselNovedades): las llegadas registradas en una tira que «Ver todo» despliega en rejilla ---------- */
+/* Solo existe con llegadas (has-news, que ponen boot.js y news.js): sin entradas válidas ni sin JavaScript no hay sección ni enlaces. */
 html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link][hidden] { display: none; }
 .news { --nov-w: 120px; padding: var(--sec) 0; background: var(--fondo); }
 .news-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--margen); }
@@ -925,7 +791,7 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
 /* Desplegada: rejilla de columnas de 96 px como mínimo (3 a 390 px, 2 a 320; 152 en escritorio), 12 px entre columnas y 20 entre filas. */
 .news.is-open .news-list { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); row-gap: var(--space-5); overflow: visible; scroll-snap-type: none; }
 .news-list.is-moving { overflow: hidden; }
-/* Cada libro es un solo botón (portada, título y autor) que abre su ficha con las redes. */
+/* Cada libro es un solo botón (portada, título y autor) que abre su ficha. */
 .news-book { display: block; width: 100%; padding: 0; border: 0; border-radius: var(--radio-portada); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-instantanea) var(--curva-salida); }
 .news-book:active, .news-book[data-opening] { transform: scale(0.97); }
 .news-book:focus-visible { outline: 2px solid transparent; }
@@ -945,20 +811,19 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
   .news.is-open .news-list { grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); }
 }
 @media print { .news { display: none; } }
+/* Con Novedades (fondo) entre Eventos (fondo-2) y Visita, Visita y el pie invierten su banda para que los vecinos sigan siendo de fondo distinto;
+   el horario, lista agrupada, pasa a fondo sobre la banda fondo-2. Sin llegadas (hoy) no cambia nada. */
+.has-news .visit { background: var(--fondo-2); }
+.has-news .visit .hours { background: var(--fondo); }
+.has-news .ftr { background: var(--fondo); }
 
 /* ---------- Sin JavaScript ---------- */
-/* Lo que necesita JS no se ofrece: el ☰, Mi lista, los temas, el buscador y «Pausar el movimiento». Las secciones quedan en la barra. */
-html:not(.js) :is(.menu-btn, .hdr-list, .topics, .composer-field, .motion-btn, .cat-bar, .cat-layout) { display: none; }
+/* Lo que necesita JS no se ofrece: el ☰, Mi lista, el buscador y «Pausar el movimiento». Las secciones quedan en la barra. */
+html:not(.js) :is(.menu-btn, .hdr-list, .explore-open, .motion-btn, .cat-bar, .cat-layout) { display: none; }
 html:not(.js) .hdr { flex-wrap: wrap; height: auto; padding-bottom: var(--space-1); }
 html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; overflow-x: auto; }
-html:not(.js) .books-grid { grid-template-columns: minmax(0, 1fr); }
-html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* ---------- Escritorio angosto y tableta ---------- */
-@media (max-width: 1100px) {
-  .books-grid { grid-template-columns: minmax(0, 1fr); }
-  .topic-layers { max-height: 60svh; }
-}
 @media (min-width: 761px) and (max-width: 1023px) { .bill-track { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* ---------- Impresión ---------- */
@@ -971,8 +836,8 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* ---------- Colores forzados (Windows alto contraste) ---------- */
 @media (forced-colors: active) {
-  .btn, .topic, .cat-chip, .cat-filters-btn, .rail-chip, .save, .menu-btn, .hdr-nav a, .menu-row, .tabbar a, .tab-list { border: 1px solid ButtonText; }
-  :is(.topic, .rail-chip)[aria-checked="true"], :is(.act, .save, .motion-btn)[aria-pressed="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip, .hdr-nav a[aria-current="true"], .menu-row[aria-current="true"] { border-color: Highlight; color: Highlight; forced-color-adjust: none; }
+  .btn, .chip, .cat-chip, .cat-filters-btn, .save, .menu-btn, .hdr-nav a, .menu-row, .tabbar a, .tab-list { border: 1px solid ButtonText; }
+  .chip[aria-checked="true"], :is(.save, .motion-btn)[aria-pressed="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip, .hdr-nav a[aria-current="true"], .menu-row[aria-current="true"] { border-color: Highlight; color: Highlight; forced-color-adjust: none; }
   .cover { border: 1px solid CanvasText; }
   .cat-opt input:checked + label::before { background: Highlight; border-color: Highlight; }
 }
@@ -981,5 +846,5 @@ html:not(.js) .composer { grid-template-columns: minmax(0, 1fr) auto; }
 /* Sin desplazamientos, escalas, giros ni rebotes: los cambios de color se conservan y responden al toque sin moverse. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
-  .btn:active, .menu-btn:active, .topic:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover { transform: none; }
+  .btn:active, .menu-btn:active, .chip:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover { transform: none; }
 }

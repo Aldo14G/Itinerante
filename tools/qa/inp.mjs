@@ -1,4 +1,5 @@
-// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar y ficha.
+// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar, ficha,
+// carrusel 3D, «Buscar en el catálogo» (la hoja Explorar con los 41 títulos) y la ficha desde la rejilla.
 // Uso: node tools/qa/inp.mjs URL [corridas=3] [cpu=4] [ancho=390] [alto=844]
 // Cada corrida carga la página en frío. Mide con PerformanceObserver `event` (durationThreshold 16 ms, interacciones con
 // interactionId; el INP de una interacción es la mayor duración de sus eventos) y `long-animation-frame` / `longtask`.
@@ -63,14 +64,11 @@ const steps = [
   // Carrusel 3D: la flecha y el toque en una vecina mueven el centro (el giro se pinta por fotograma).
   ['carrusel flecha', async () => { await sleep(600); await click('[data-rail-next]'); }],
   ['carrusel vecina', async () => { await click('.rail-item.is-centro + .rail-item .card'); }],
-  // Novedades: «Ver todo» despliega las 41 portadas en rejilla (FLIP) y «Ver menos» las regresa; un libro abre su ficha con redes.
-  ['Novedades ver todo', async () => { await ev(`document.getElementById('novedades').scrollIntoView()`); await sleep(2500); await click('[data-news-toggle]'); }],
-  ['Novedades ver menos', async () => { await sleep(600); await click('[data-news-toggle]'); }],
-  ['Novedades ficha', async () => { await sleep(800); await click('.news-book'); }],
-  ['Novedades ficha cerrar', async () => { await sleep(600); await click('[data-d-close]'); }],
-  // Tarjeta que voltea, en la rejilla de Explorar (hoja en el teléfono, en línea en escritorio).
-  ['tarjeta voltear', async () => { if (+W < 761) { await click('[data-ex-open]'); await sleep(2500); } else { await ev(`document.getElementById('catalogo').scrollIntoView()`); await sleep(2500); } await click('[data-card-flip]'); }],
-  ['tarjeta regresar', async () => { await sleep(900); await click('[data-card-flip]'); }],
+  // Explorar con los 41 títulos sin paginar (hoja en el teléfono, en línea en escritorio): abrir la búsqueda y abrir y cerrar la ficha de una tarjeta.
+  ['Explorar abrir', async () => { if (+W < 761) { await ev(`document.getElementById('libros').scrollIntoView()`); await sleep(800); await click('[data-ex-open]'); } else { await ev(`document.getElementById('catalogo').scrollIntoView()`); await sleep(1200); await click('[data-ex-open]'); } }],
+  ['rejilla ficha', async () => { await sleep(2500); await click('#explorer .card-item:nth-child(5) .card'); }],
+  ['rejilla ficha cerrar', async () => { await sleep(600); await click('[data-d-close]'); }],
+  ['Explorar cerrar', async () => { await sleep(600); if (+W < 761) await click('[data-ex-close]'); else throw new Error('omitir'); }],
 ];
 
 const rows = [];
@@ -95,7 +93,7 @@ for (let run = 1; run <= +RUNS; run++) {
     if (+W >= 1101 && name.startsWith('menú')) continue; // desde 1101 px las secciones van en la barra (sin ☰)
     if (+W >= 761 && name.startsWith('Mi lista')) continue; // la barra inferior es solo del teléfono
     try { await fn(); await sleep(1800); const r = await collect(); rows.push({ run, name, ...r }); }
-    catch (e) { rows.push({ run, name, error: String(e.message || e) }); }
+    catch (e) { if (String(e.message) !== 'omitir') rows.push({ run, name, error: String(e.message || e) }); } // «Explorar cerrar» solo existe en el teléfono
   }
 }
 const fails = [];

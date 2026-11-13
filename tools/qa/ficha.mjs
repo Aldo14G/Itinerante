@@ -1,5 +1,6 @@
 // Ficha móvil (FichaLibro del sistema «Itinerante Líquido») y sin JavaScript (QA1-03).
-// La ficha es una hoja inferior con las acciones fijas al pie: «Preguntar por WhatsApp» (primaria de la ficha), Guardar y «Cómo llegar».
+// La ficha (una sola, sin «modo redes») es una hoja inferior con las acciones fijas al pie: «Preguntar por WhatsApp» (primaria de la ficha) y,
+// debajo, Guardar, Compartir y «Cómo llegar».
 // Uso: node tools/qa/ficha.mjs URL [DIR]   (necesita Chrome; DIR recibe capturas). Sale con 1 si algo falla.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
@@ -43,13 +44,13 @@ for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
   await click(...p); await sleep(1800);
   const m = await ev(`(() => {
     const d = document.querySelector('#cat-drawer'); const r = d.querySelector('[data-d-visit]').getBoundingClientRect(); const sc = d.querySelector('[data-d-scroll]');
-    const cta = d.querySelector('[data-d-cta]').getBoundingClientRect(); const save = d.querySelector('[data-d-save]').getBoundingClientRect(); const foot = d.querySelector('.drawer-foot').getBoundingClientRect();
+    const cta = d.querySelector('[data-d-cta]').getBoundingClientRect(); const save = d.querySelector('[data-d-save]').getBoundingClientRect(); const share = d.querySelector('[data-d-share]').getBoundingClientRect(); const foot = d.querySelector('.drawer-foot').getBoundingClientRect();
     const note = d.querySelector('.drawer-note');
-    return { open: d.open, bottom: Math.round(r.bottom), cta: [Math.round(cta.top), Math.round(cta.height)], save: [Math.round(save.width), Math.round(save.height)], inFoot: cta.top >= foot.top && r.bottom <= foot.bottom,
+    return { open: d.open, bottom: Math.round(r.bottom), cta: [Math.round(cta.top), Math.round(cta.height)], save: [Math.round(save.width), Math.round(save.height)], share: [Math.round(share.width), Math.round(share.height)], shareName: d.querySelector('[data-d-share]').getAttribute('aria-label'), redes: !!d.querySelector('.redes, [data-d-red-ig]'), ctaLines: Math.round(cta.height), inFoot: cta.top >= foot.top && r.bottom <= foot.bottom,
       primary: d.querySelector('[data-d-cta]').classList.contains('btn--primario'), scroll: sc.scrollTop, hover: document.documentElement.scrollWidth > innerWidth || sc.scrollWidth > sc.clientWidth,
       note: note.textContent.trim(), seal: !!d.querySelector('.drawer-seal, .drawer-tag, .tag'), focus: document.activeElement.getAttribute('aria-label') };
   })()`);
-  ck(`${w}x${h}: acciones fijas al pie dentro de la ventana («Cómo llegar» ${m.bottom} <= ${h - 8}); WhatsApp primaria de 56, Guardar de 56 × 56; hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.inFoot && m.primary && m.cta[1] === 56 && m.save.join() === '56,56' && m.scroll === 0 && !m.hover, JSON.stringify(m));
+  ck(`${w}x${h}: acciones fijas al pie dentro de la ventana («Cómo llegar» ${m.bottom} <= ${h - 8}); WhatsApp primaria de 56 a todo el ancho, Guardar y Compartir de 56 × 56 (Compartir con el título en su nombre; sin Instagram ni Facebook); hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.inFoot && m.primary && m.cta[1] === 56 && m.save.join() === '56,56' && m.share.join() === '56,56' && /^Compartir «.+»$/.test(m.shareName) && !m.redes && m.scroll === 0 && !m.hover, JSON.stringify(m));
   ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma la existencia y el foco inicial va en Cerrar`, !m.seal && m.note === 'La librería confirma si lo tienen.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
   // Inventario real: la portada real carga, la ficha técnica trae el precio de la hoja y la sinopsis (con su encabezado) va bajo ella.
   const dd = await ev(`(async () => {

@@ -100,8 +100,8 @@ for (const w of [360, 390]) {
   await ev(`document.querySelector('[data-menu-open]').click()`);
   for (let i = 0; i < 20 && !(await ev(`document.getElementById('menu').open`)); i++) await sleep(150);
   await sleep(700);
-  const hrs = (await ev(`(()=>{const d=document.getElementById('menu'); return {status:d.querySelector('[data-status-long]').textContent, week:d.querySelector('.menu-semana').textContent, open:d.querySelector('.menu-horario').dataset.open}})()`)) || {};
-  check(A, 'el menú trae el estado de hoy (hora de Monterrey) y el horario: lunes a sábado 11:00–20:00, domingo cerrado', /Abierto|Cerrado/.test(hrs.status) && /Lun–sáb · 11:00–20:00 · Domingo cerrado/.test(hrs.week) && /true|false/.test(hrs.open), JSON.stringify(hrs));
+  const hrs = (await ev(`(()=>{const d=document.getElementById('menu'); return {status:d.querySelector('.menu-horario [data-status-text]').textContent, week:d.querySelector('.menu-semana').textContent, open:d.querySelector('.menu-horario').dataset.open}})()`)) || {};
+  check(A, 'el menú trae el estado corto de hoy (hora de Monterrey) y debajo la semana, sin repetir la hora de cierre', /^(Abierto ahora · hasta 20:00|Cierra pronto · 20:00|Cerrado · abre .+ 11:00)$/.test(hrs.status) && /Lun–sáb · 11:00–20:00 · Domingo cerrado/.test(hrs.week) && /true|false/.test(hrs.open), JSON.stringify(hrs));
   await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 3, y: 400, button: 'left', clickCount: 1 }); await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 3, y: 400, button: 'left', clickCount: 1 }); await sleep(900);
   check(A, 'clic en el velo (fuera de la hoja) cierra', await ev(`!document.getElementById('menu').open`));
   const ext = await ev(`[...document.querySelectorAll('#menu a[target=_blank]')].map(a=>[a.rel, a.href.slice(0,40)])`);
@@ -116,10 +116,10 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
     await open(w, h, { mobile });
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
-    const t = await ev(`(()=>{${lumFn} const out={}; for (const sel of ['#inicio','#casa','#libros','#cartelera','#novedades','.quote','.call','#visita','.ftr']) { const s=document.querySelector(sel); const cs=getComputedStyle(s); let bg=cs.backgroundColor; if (/, 0\\)$/.test(bg) || bg==='transparent') bg=getComputedStyle(document.body).backgroundColor; out[sel]={bg, fg:cs.color, ratio:+ratio(cs.color,bg).toFixed(1)}; } return out})()`);
+    const t = await ev(`(()=>{${lumFn} const out={}; for (const sel of ['#inicio','#casa','#libros','#cartelera','#novedades','#visita','.ftr']) { const s=document.querySelector(sel); const cs=getComputedStyle(s); let bg=cs.backgroundColor; if (/, 0\\)$/.test(bg) || bg==='transparent') bg=getComputedStyle(document.body).backgroundColor; out[sel]={bg, fg:cs.color, ratio:+ratio(cs.color,bg).toFixed(1)}; } return out})()`);
     for (const [sel, v] of Object.entries(t)) check(`tema ${scheme} ${tag}`, `${sel}: tinta sobre su fondo ≥ 7:1`, v.ratio >= 7, JSON.stringify(v));
     const fills = Object.values(t).map(v => v.bg);
-    check(`tema ${scheme} ${tag}`, 'bandas alternas: La casa → Catálogo → Eventos → Novedades → cita y cierre → Visita → pie, vecinos de fondo distinto', ['#inicio', '#casa', '#libros', '#cartelera', '#novedades', '.quote', '#visita', '.ftr'].map(s => t[s].bg).every((f, i, a) => i === 0 || f !== a[i - 1]), JSON.stringify(fills));
+    check(`tema ${scheme} ${tag}`, 'bandas alternas: La casa → Catálogo → Eventos → Novedades → Visita → pie, vecinos de fondo distinto', ['#inicio', '#casa', '#libros', '#cartelera', '#novedades', '#visita', '.ftr'].map(s => t[s].bg).every((f, i, a) => i === 0 || f !== a[i - 1]), JSON.stringify(fills));
     const dark = await ev(`(()=>{ const m=getComputedStyle(document.body).backgroundColor.match(/[\\d.]+/g).map(Number); return (m[0]+m[1]+m[2])/3 })()`);
     check(`tema ${scheme} ${tag}`, scheme === 'dark' ? 'el tema oscuro pinta la página oscura (prefers-color-scheme)' : 'el tema claro pinta la página blanca', scheme === 'dark' ? dark < 40 : dark > 240, String(dark));
   }
@@ -147,9 +147,9 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
 // ---------- 4. Barra inferior, Eventos, inicio (móvil) ----------
 await open(390, 844);
 // Cada tramo de la página y la casilla que debe marcar: Inicio abarca la entrada y La casa; el Catálogo, su capítulo; en el resto no hay casilla.
-for (const [sel, want] of [['#inicio', '#inicio'], ['#casa', '#inicio'], ['#libros', '#libros'], ['#catalogo', '#libros'], ['#cartelera', ''], ['#novedades', ''], ['.quote', ''], ['.call', ''], ['#visita', ''], ['.ftr', '']]) {
-  // #catalogo es la última capa del Catálogo (en el teléfono, un buscador y el cierre): se mide con su borde arriba, no 120 px más abajo, donde la línea del 40 % ya cae en Eventos.
-  for (let i = 0; i < 4; i++) { await ev(`scrollTo(0, document.querySelector('${sel}').getBoundingClientRect().top + scrollY + ${['#inicio', '#catalogo'].includes(sel) ? 0 : 120})`); await sleep(900); }
+for (const [sel, want] of [['#inicio', '#inicio'], ['#casa', '#inicio'], ['#libros', '#libros'], ['[data-rail]', '#libros'], ['#cartelera', ''], ['#novedades', ''], ['#visita', ''], ['.ftr', '']]) {
+  // En el teléfono #catalogo no ocupa sitio (es la hoja Explorar): el Catálogo se mide en su titular y en el carrusel.
+  for (let i = 0; i < 4; i++) { await ev(`scrollTo(0, document.querySelector('${sel}').getBoundingClientRect().top + scrollY + ${['#inicio'].includes(sel) ? 0 : 120})`); await sleep(900); }
   await ev(`scrollBy(0,1)`); await sleep(600);
   const cur = await ev(`[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>a.getAttribute('aria-current')?a.getAttribute('href')+'='+a.getAttribute('aria-current'):null).filter(Boolean)`);
   const pill = await ev(`getComputedStyle(document.querySelector('.tabbar-pastilla')).opacity`);

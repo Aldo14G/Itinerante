@@ -70,45 +70,29 @@ html:not(.js) .bill-item summary { pointer-events: auto; }
 .bill-dots { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-3); }
 .bill-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--linea-fuerte); opacity: 0.45; transition: opacity var(--dur-rapida) var(--curva-salida), scale var(--dur-base) var(--curva-resorte); }
 .bill-dots i.is-on { opacity: 1; scale: 1.4; background: var(--primario); }
-.bill-foot { margin-top: var(--space-6); }
 
 /* ---------- Visita y pie ---------- */
 .visit-actions .btn { flex: 1 1 auto; }
 
 /* ---------- Catálogo en el teléfono ---------- */
-.topics { gap: var(--space-2); }
-.composer { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); margin-top: var(--space-6); padding-top: var(--space-5); }
-.composer > .btn { justify-self: stretch; }
-.books-head { margin-bottom: var(--space-6); }
-.rail { margin-bottom: var(--space-8); }
-.ask { margin-top: var(--space-8); padding-top: var(--space-6); }
-.ask > .layer-title { margin-bottom: var(--space-5); }
-.books > .cat { margin-top: var(--space-8); }
+/* Titular → «Buscar en el catálogo» (abre la hoja Explorar) → chips → carrusel → preguntar. La capa «Explora el catálogo» no ocupa sitio en la
+   página: es la hoja; su titular queda para lectores de pantalla (la región sigue nombrada). */
+.books-head { margin-bottom: var(--space-5); }
+.explore-open { width: 100%; }
+.rail-ask .btn { width: 100%; }
+/* A 320 px los tres chips caben en un renglón (12 px de relleno en vez de 16). */
+@media (max-width: 359px) { .rail-chips .chip { padding: 0 var(--space-3); } }
+.books > .cat { margin: 0; padding: 0; border: 0; }
+.cat-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .books-foot { padding-block: var(--space-8); }
-.cat { padding-top: var(--space-8); padding-bottom: var(--space-8); }
-.cat-head { grid-template-columns: 1fr; margin-bottom: 0; }
 .cat-filters { grid-template-columns: 1fr; }
 .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); }
 @media (min-width: 520px) { .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 680px) { .cat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .cat-more { width: 100%; }
-/* Botón con cara de campo: la misma caja que el buscador de la hoja. */
-.explore-open {
-  display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: var(--alto-md); margin: 0; padding: 0 var(--space-5);
-  border: 0; border-radius: var(--radio-pildora); background: var(--fondo-3); color: var(--tinta-2); font: var(--t-campo); text-align: left; cursor: pointer;
-}
-.explore-open .ic { width: 22px; height: 22px; flex: none; }
 /* Carrusel 3D: el foco de la portada del centro se dibuja en la portada (el botón no lleva sombra propia). */
 .rail-item .card:focus-visible { box-shadow: none; }
 .rail-item .card:focus-visible .cover { outline: 2px solid var(--foco); outline-offset: 2px; }
-.rail-chips { --per: 4; --pitch: clamp(72px, calc((100vw - var(--margen) - var(--stop) / 2) / var(--per)), 128px); --name-h: var(--space-8); }
-@media (max-width: 359px) { .rail-chips { --per: 3; } }
-@media (min-width: 360px) { .rail-chips:has(> :nth-child(4):last-child) { --pitch: clamp(72px, calc((100vw - 2 * var(--margen) - var(--stop)) / 3), 128px); } }
-.rail-chips:has(> :nth-child(3):last-child) { --pitch: clamp(72px, calc((100vw - 2 * var(--margen) - var(--stop)) / 2), 128px); }
-.rail-chips:has(> :nth-child(2):last-child) { --pitch: 128px; }
-@supports (rotate: atan2(1px, 1px)) and (width: hypot(1px, 1px)) { .rail-chips { --zig: var(--space-5); } }
-.rail-chip { font: var(--t-leyenda-1); font-weight: 600; }
-.rail-trail { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(var(--alto-sm), auto); }
 
 /* ---------- Hojas inferiores (FichaLibro): ficha y Mi lista suben desde abajo hasta 48 px del borde superior ---------- */
 .drawer, .mylist {
@@ -126,8 +110,6 @@ html:not(.js) .bill-item summary { pointer-events: auto; }
 .drawer h3 { font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); overflow-wrap: anywhere; }
 .drawer h3.is-long { font-size: clamp(17px, 12.5cqi, 22px); }
 .drawer-foot { padding: var(--space-3) var(--margen) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); }
-.drawer-actions { grid-template-columns: minmax(0, 1fr) auto; }
-.drawer-actions [data-d-visit] { grid-column: 1 / -1; }
 .ml-actions { padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); }
 .drawer::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
 @starting-style { .motion .drawer[open], .motion .mylist[open] { transform: translateY(100%); opacity: 1; } }
@@ -147,7 +129,6 @@ html:not(.js) .bill-item summary { pointer-events: auto; }
 .ex-id { display: grid; gap: var(--space-1); min-width: 0; }
 .ex-title { margin: 0; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); }
 .explorer .cat-bar { margin-top: var(--space-4); }
-.explorer .cat-sort label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .explorer .cat-filters-foot { position: sticky; bottom: calc(-1 * var(--space-24)); z-index: 2; margin: 0 calc(-1 * var(--margen)); padding: var(--space-3) var(--margen) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); background: var(--fondo); border-top: 1px solid var(--linea); }
 .explorer .cat-layout { padding-top: var(--space-4); }
 .explorer, .explorer::backdrop { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
@@ -161,10 +142,8 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 /* Primer pintado: bajo el inicio nada se maqueta hasta acercarse; el navegador recuerda la altura real (auto). Cifras medidas a 360–414 px. */
 .house { content-visibility: auto; contain-intrinsic-size: auto 520px; }
 .bill { content-visibility: auto; contain-intrinsic-size: auto 1000px; }
-.books { content-visibility: auto; contain-intrinsic-size: auto 2400px; }
+.books { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
-.quote { content-visibility: auto; contain-intrinsic-size: auto 260px; }
-.call { content-visibility: auto; contain-intrinsic-size: auto 140px; }
 .visit { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 320px; }
 
@@ -179,12 +158,11 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-media { aspect-ratio: 4 / 3; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }
   .still { width: min(84vw, calc((100svh - 150px) * 1.333)); }
   .rail { --cf-w: min(44vw, calc((100svh - 150px) / 1.5)); }
-  .topic-layers { aspect-ratio: auto; height: calc(100svh - 150px); max-height: none; }
   .bill-item { flex-basis: min(60vw, 300px); }
   .bill-card-img { aspect-ratio: 16 / 9; }
   .drawer-body { grid-template-columns: 24% minmax(0, 1fr); }
   .drawer { height: calc(100dvh - var(--space-4)); }
-  .drawer-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
-  .drawer-actions [data-d-visit] { grid-column: auto; }
+  .drawer-actions { grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr); }
+  .drawer-actions [data-d-cta] { grid-column: auto; }
 }
 @media (max-height: 420px) { .hdr { position: relative; } }
