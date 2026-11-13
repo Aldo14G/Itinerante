@@ -1,35 +1,50 @@
 // Carrusel3D: un solo motor para los tres carruseles del sitio (2026-11-13). Variantes: «portada» (libros del Catálogo, rail.js),
 // «evento» (Eventos y talleres, feed.js) y «carta» (Café y té, cafe.js). Lo mismo para las tres:
 //   · desplazamiento nativo con imán al centro (scroll-snap en CSS); una pose por fotograma según la distancia al centro (giro hasta
-//     --giro-carrusel, profundidad y encimado); solo la central lleva sombra-portada (CSS: .is-centro);
-//   · flechas de vidrio de 48 a los lados; una sola parada de tabulador (la pieza central), con ← → Inicio Fin;
+//     --giro-carrusel, profundidad y empuje hacia fuera: las vecinas asoman separadas de la central, con hueco, sin encimarse);
+//     solo la central lleva sombra-portada (CSS: .is-centro);
+//   · flechas de vidrio de 48 a los lados con puntero fino (con toque no se muestran: el control es deslizar o tocar la vecina); una sola
+//     parada de tabulador (la pieza central), con ← → Inicio Fin;
 //   · tocar una vecina la trae al centro; tocar la central la abre (onOpen, si la variante tiene qué abrir);
-//   · sin autoplay; con «reducir movimiento» o «Pausar el movimiento», plano (vecinas al 88 % y su imagen atenuada; el texto no pierde contraste);
+//   · sin autoplay; con «reducir movimiento» o «Pausar el movimiento», plano: la misma geometría sin giro (las vecinas en el sitio de su
+//     silueta girada, con su imagen atenuada; el texto no pierde contraste);
 //   · profundidad (A5): con puntero fino y hover, la pieza central se inclina hacia el cursor (hasta --inclinacion-max) y se adelanta
 //     --adelanto-profundidad; al soltar vuelve con el resorte. Una sola escritura por fotograma.
 // Sin dependencias. Las funciones puras (coverflowPose, nearestIndex, tiltPose…) se prueban en tests/site.test.mjs.
 
 // ---------- Parte pura ----------
 // La pieza del centro va de frente; cada vecina gira hacia el centro según su distancia `d` (en anchos de pieza, con signo), se hunde y se
-// encima un poco. `flat` (movimiento reducido o «Pausar el movimiento»): sin giro ni profundidad; las vecinas se achican al 88 % y se atenúan.
-// `giro` es el giro máximo en grados (token --giro-carrusel). Hasta dos piezas del centro todo se ve entero; más allá se desvanece y a 2.6 se oculta.
-export const CF_GIRO = 52;
+// empuja hacia fuera: queda separada de la central por un hueco visible (≥ 12 px en todos los tamaños; skill ux-apple §3, 2026-11-13).
+// Los parámetros de la pose van en anchos de pieza y salen del CSS de cada carrusel (.c3d: --c3d-giro, --c3d-separa, --c3d-hunde,
+// --c3d-separa-lejos, --c3d-hunde-lejos, --c3d-alcance); la perspectiva de la ventana es 4 anchos de pieza (--perspectiva-carrusel-piezas).
+//   giro: giro de la vecina (grados) · separa: empuje hacia fuera de la vecina (d = 1) · hunde: profundidad de la vecina
+//   separaLejos / hundeLejos: lo mismo por cada ancho más allá de la vecina · alcance: piezas por lado a la vista (1 o 2).
+// Hasta `alcance` todo se ve entero; más allá se desvanece y a alcance + 0.5 se oculta (ni se ve ni se toca).
+// `flat` (movimiento reducido o «Pausar el movimiento»): sin giro ni profundidad, con la misma geometría: cada vecina ocupa el sitio de su
+// silueta girada (76 % de ancho, con medio punto de holgura hacia dentro y hacia fuera; la lejana, 70 %) y se atenúa su imagen.
+export const CF_GIRO = 44;
+export const POSE = { giro: CF_GIRO, separa: 0.08, hunde: 0.6, separaLejos: 0.24, hundeLejos: 1.2, alcance: 1 };
 export const ATENUADA = 0.6; // opacidad de la imagen de una vecina en el carrusel plano (style.css: .c3d-item.is-atenuada img)
-const fade = ac => (ac <= 2 ? 1 : +Math.max(0, 1 - (ac - 2) / 0.6).toFixed(3));
-export function coverflowPose(d, { flat = false, giro = CF_GIRO, w = 1 } = {}) {
+const fade = (ac, alcance) => (ac <= alcance ? 1 : +Math.max(0, 1 - (ac - alcance) / 0.5).toFixed(3));
+export function coverflowPose(d, { flat = false, w = 1, ...o } = {}) {
+  const k = { ...POSE, ...o };
   const raw = Number(d) || 0;
   const c = Math.abs(raw) < 0.02 ? 0 : Math.max(-3, Math.min(3, raw)); // el imán deja la del centro a medio píxel: va de frente, sin encogerse
   const ac = Math.abs(c), s = c < 0 ? -1 : 1, near = Math.min(ac, 1), far = Math.max(0, ac - 1);
   const zIndex = 100 - Math.round(ac * 10);
-  const hidden = ac >= 2.6; // lo que ya no se ve no se toca ni se enfoca
-  // Plano: la vecina se achica al 88 % y se atenúa su imagen (`dim`, la foto o la portada al 60 %, CSS .is-atenuada); el texto conserva su contraste.
-  if (flat) return { transform: `scale(${(1 - near * 0.12).toFixed(3)})`, opacity: fade(ac), zIndex, hidden, dim: ac >= 0.5 };
-  const rot = -s * near * giro;
-  const tx = -s * (near * 0.28 + far * 0.42) * w;
-  const tz = -(near * 0.8 + far * 0.4) * w;
+  const hidden = ac >= k.alcance + 0.5; // lo que ya no se ve no se toca ni se enfoca
+  const opacity = fade(ac, k.alcance);
+  if (flat) {
+    const tx = s * (near * (0.825 * k.separa - 0.098) - far * 0.35) * w; // bordes de la vecina donde los de su silueta girada
+    const sc = 1 - near * 0.24 - far * 0.06;
+    return { transform: `translateX(${tx.toFixed(1)}px) scale(${sc.toFixed(3)})`, opacity, zIndex, hidden, dim: ac >= 0.5 };
+  }
+  const rot = -s * near * k.giro;
+  const tx = s * (near * k.separa + far * k.separaLejos) * w;
+  const tz = -(near * k.hunde + far * k.hundeLejos) * w;
   return {
     transform: `translateX(${tx.toFixed(1)}px) translateZ(${tz.toFixed(1)}px) rotateY(${rot.toFixed(2)}deg)`,
-    opacity: fade(ac),
+    opacity,
     zIndex,
     hidden,
     dim: false
@@ -124,7 +139,14 @@ export function initDepth() {
 // pieza central; `liveText(i)` (si hay `live`) se anuncia cuando una flecha o el teclado traen una pieza al centro; `onOpen(i, el)` corre al
 // tocar la central; `onUserMove()` avisa que la persona movió el carrusel (dedo, rueda, flecha o tecla).
 export function createCarousel3D({ viewport, track, prev, next, live = null, isMotion = () => false, focusSel = '.c3d-card', onCenter = () => {}, liveText = null, onOpen = null, onUserMove = () => {} }) {
-  const giro = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--giro-carrusel')) || CF_GIRO;
+  // Parámetros de la pose de este carrusel: los pone su CSS (.c3d, por variante y por ancho) y se releen al medir (cambian con el ancho).
+  const host = viewport.closest('.c3d') || viewport;
+  let cfg = { ...POSE };
+  const readPose = () => {
+    const cs = getComputedStyle(host);
+    const n = (v, f) => { const x = parseFloat(cs.getPropertyValue(v)); return Number.isFinite(x) ? x : f; };
+    cfg = { giro: n('--c3d-giro', POSE.giro), separa: n('--c3d-separa', POSE.separa), hunde: n('--c3d-hunde', POSE.hunde), separaLejos: n('--c3d-separa-lejos', POSE.separaLejos), hundeLejos: n('--c3d-hunde-lejos', POSE.hundeLejos), alcance: n('--c3d-alcance', POSE.alcance) };
+  };
   let items = [];
   let centers = [];
   let width = 1;
@@ -134,6 +156,7 @@ export function createCarousel3D({ viewport, track, prev, next, live = null, isM
   let say = -1; // una flecha o el teclado llevan una pieza al centro: se anuncia cuando llega (deslizar con el dedo no anuncia nada)
   const focusOf = it => it?.querySelector(focusSel);
   const measure = () => {
+    readPose();
     width = items[0]?.offsetWidth || 1;
     centers = items.map(it => it.offsetLeft + it.offsetWidth / 2);
   };
@@ -154,12 +177,14 @@ export function createCarousel3D({ viewport, track, prev, next, live = null, isM
     const mid = viewport.scrollLeft + viewport.clientWidth / 2;
     const flat = !isMotion();
     items.forEach((it, i) => {
-      const p = coverflowPose((centers[i] - mid) / width, { flat, giro, w: width });
+      const d = (centers[i] - mid) / width;
+      const p = coverflowPose(d, { flat, w: width, ...cfg });
       const pose = it.firstElementChild;
       pose.style.transform = p.transform;
       pose.style.opacity = String(p.opacity);
       it.style.zIndex = String(p.zIndex);
       it.classList.toggle('is-atenuada', p.dim);
+      it.classList.toggle('is-lejana', Math.abs(d) >= 1.5); // con dos por lado, la lejana queda medio tapada por la vecina: su texto no se muestra partido
       it.style.visibility = p.hidden && i !== keep ? 'hidden' : ''; // la pieza a la que va el foco no se oculta mientras viaja (perdería el foco)
     });
     const i = nearestIndex(centers, mid);

@@ -91,6 +91,7 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .sec-texto strong { font-weight: 600; color: var(--tinta); }
 /* Enlace en línea con 44 px de objetivo, sin engordar el renglón. */
 .sec-texto a { position: relative; white-space: nowrap; color: var(--turquesa-texto); }
+.sec-texto > a { z-index: 1; } /* su área táctil (::after, 52 px de alto) queda sobre el carrusel, que sube 16 px por debajo de la entradilla */
 .sec-texto a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-4)) 0; }
 .sec-texto a .ic { width: 16px; height: 16px; margin-inline-start: var(--space-1); vertical-align: -0.125em; }
 
@@ -219,6 +220,11 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .hdr-nav { display: flex; }
   .hdr-nav + .hdr-end { margin-inline-start: 0; }
   .hdr-nav + .hdr-end .menu-btn { display: none; }
+  /* Tres columnas (marca | secciones | Mi lista y «Cómo llegar»): las secciones quedan en el eje de la página, como el contenido, y no se
+     mueven cuando «Cómo llegar» cede su sitio. Sin JavaScript la barra sigue en flex (las secciones bajan a su renglón). */
+  html.js .hdr { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  html.js .hdr-brand { justify-self: start; max-width: 100%; }
+  html.js .hdr-end { justify-self: end; }
 }
 
 /* ☰ de 44 px: sus tres líneas giran y se cruzan en × (aria-expanded). */
@@ -353,7 +359,6 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
    Sin JavaScript cada tarjeta muestra su descripción y su consulta (la fila de abajo no existe) y la pista se desliza con el dedo. */
 .bill { padding: var(--sec) var(--margen); background: var(--fondo-2); }
 .bill > .sec-head { margin-bottom: var(--space-4); }
-.c3d--evento { --c3d-w: clamp(240px, 72vw, 320px); --c3d-alcance: 1.15; }
 .bill-item .cf-pose, .bill-card { height: 100%; }
 .bill-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
 .bill-card-fig { display: block; }
@@ -368,8 +373,11 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .bill-detail .bill-wa { width: 100%; white-space: normal; }
 html.js .bill-card .bill-detail { display: none; }
 /* La propuesta del centro: descripción (tres renglones reservados: cambiar de tarjeta no mueve las acciones) y la fila de acciones. */
-.bill-pie { display: grid; justify-items: center; gap: var(--space-4); max-width: 36rem; margin: 0 auto; text-align: center; }
-.bill-desc { min-height: 3lh; margin: 0; font: var(--t-cuerpo); line-height: var(--space-6); color: var(--tinta); text-wrap: pretty; }
+.bill-pie { position: relative; display: grid; justify-items: center; gap: var(--space-6); max-width: 36rem; margin: 0 auto; text-align: center; }
+/* La reserva (--bill-reserva) la mide feed.js: la descripción más larga a este ancho; antes de medir, tres renglones (cuatro hasta 400 px). */
+.bill-desc { min-height: var(--bill-reserva, 3lh); margin: 0; font: var(--t-cuerpo); line-height: var(--space-6); color: var(--tinta); text-wrap: pretty; }
+.bill-medida { position: absolute; inset: 0 0 auto; visibility: hidden; pointer-events: none; } /* copia oculta para medir (feed.js) */
+.bill-medida .bill-desc { min-height: 0; }
 .bill-fila { display: flex; justify-content: center; gap: var(--space-3); width: 100%; container-type: inline-size; }
 .bill-fila .bill-wa { flex: 0 1 auto; min-width: 0; white-space: nowrap; }
 /* Fila angosta (320 px): el rótulo entero cabe sin el icono de chat y con 16 px de relleno. */
@@ -480,7 +488,14 @@ html:not(.js) .bill-pie { display: none; }
 .cat-bar input[type="search"]::placeholder { color: var(--tinta-2); opacity: 1; }
 .cat-bar input[type="search"]:focus { background: var(--fondo); box-shadow: inset 0 0 0 2px var(--linea-fuerte); outline: 2px solid transparent; }
 .cat-bar input[type="search"]:focus-visible { box-shadow: inset 0 0 0 2px var(--linea-fuerte), var(--anillo-foco); }
-.cat-bar input[type="search"]::-webkit-search-cancel-button { filter: opacity(0.7); }
+.cat-bar input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; display: none; }
+/* × propia para borrar la búsqueda (la nativa es pequeña, gris y no existe en todos los navegadores): botón de 48 dentro de la píldora. */
+.cat-bar input[type="search"]:has(+ .cat-clear:not([hidden])) { padding-inline-end: var(--alto-md); }
+.cat-clear { position: absolute; top: 0; right: 0; display: grid; place-items: center; width: var(--alto-md); height: var(--alto-md); margin: 0; padding: 0; border: 0; border-radius: var(--radio-pildora); background: none; color: var(--tinta-2); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cat-clear[hidden] { display: none; }
+.cat-clear .ic { width: 20px; height: 20px; }
+.cat-clear:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .cat-clear:hover { color: var(--tinta); } }
 .books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec) 0; }
 .books-foot p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
 
@@ -490,7 +505,7 @@ html:not(.js) .bill-pie { display: none; }
 .ex-top { display: none; }
 .explorer { position: static; inset: auto; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; overflow: visible; color: inherit; background: none; border: 0; }
 .explorer:not([open]) { display: none; }
-.cat-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4) var(--space-6); align-items: end; padding-bottom: var(--space-6); border-bottom: 1px solid var(--linea); }
+.cat-bar { display: grid; grid-template-columns: minmax(0, 640px) auto; justify-content: start; gap: var(--space-4) var(--space-6); align-items: end; padding-bottom: var(--space-6); border-bottom: 1px solid var(--linea); }
 .cat-bar label { display: block; margin-bottom: var(--space-2); font: var(--t-rotulo); color: var(--tinta-2); }
 .cat-combo { position: relative; }
 /* Sugerencias: lista que flota sobre la rejilla. */
@@ -653,6 +668,8 @@ html:not(.js) .bill-pie { display: none; }
 /* «Preguntar por WhatsApp» (primaria) a todo el ancho; debajo Guardar y Compartir (iconos de 56) y «Cómo llegar», que ocupa el resto. El orden visual es el del documento. */
 .drawer-actions { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: var(--space-3); }
 .drawer-actions [data-d-cta] { grid-column: 1 / -1; }
+.drawer-actions [data-d-visit] { white-space: nowrap; } /* «Cómo llegar» no se parte; a menos de 360 px va sin su flecha y con 16 de relleno */
+@media (max-width: 359px) { .drawer-actions [data-d-visit] { --pad: var(--space-4); } .drawer-actions [data-d-visit] .ic { display: none; } }
 /* Guardar en la ficha: botón de icono de 56 px junto a las acciones; el rótulo («Guardar en mi lista» / «Guardado en mi lista · Quitar») es su nombre accesible. */
 .save--icono { width: var(--alto-lg); min-height: var(--alto-lg); padding: 0; justify-content: center; }
 .save--icono .ic { width: 24px; height: 24px; }
@@ -704,39 +721,77 @@ html:not(.js) .bill-pie { display: none; }
   background: var(--vidrio-hoja); -webkit-backdrop-filter: var(--filtro-vidrio-hoja); backdrop-filter: var(--filtro-vidrio-hoja); box-shadow: var(--luz-vidrio), var(--sombra-flotante);
 }
 .toast:popover-open { display: flex; }
-.toast > :first-child { flex: 1 1 10rem; min-width: 0; }
+.toast > :first-child { flex: 1 1 auto; min-width: 0; } /* el mensaje entero en su renglón; si la acción no cabe al lado, baja y queda a la derecha */
 .toast > :only-child { padding: var(--space-3) var(--space-4) var(--space-3) 0; }
-.toast-action { min-height: var(--alto-md); padding: 0 var(--space-4); border: 0; border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); font: var(--t-boton-chico); white-space: nowrap; cursor: pointer; }
+.toast-action { margin-inline-start: auto; min-height: var(--alto-md); padding: 0 var(--space-4); border: 0; border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); font: var(--t-boton-chico); white-space: nowrap; cursor: pointer; }
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 
 /* ---------- Carrusel3D (carousel3d.js): un solo motor para portada, evento y carta ---------- */
-/* La pista se desplaza con el dedo (imán al centro) y carousel3d.js gira las vecinas según su distancia al centro, una vez por fotograma.
-   La perspectiva va en la ventana (su punto de fuga no se mueve al desplazar) y la pista conserva el 3D de sus piezas. --c3d-w es el ancho de
-   una pieza (lo pone cada variante). Sin movimiento (reducir movimiento o «Pausar el movimiento») las vecinas solo se achican al 88 % y se
-   atenúan: la pose la decide carousel3d.js. Solo la pieza del centro lleva sombra-portada. Flechas de vidrio de 48 a los lados. */
-.c3d { position: relative; margin-inline: calc(-1 * var(--margen)); }
+/* La pista se desplaza con el dedo (imán al centro) y carousel3d.js da a cada pieza su pose según su distancia al centro, una vez por
+   fotograma: las vecinas giran, se hunden y se empujan hacia fuera, de modo que asoman **separadas de la central, con hueco visible**
+   (≥ 12 px; norma del 2026-11-13: ya no se enciman). La pose sale de los parámetros de .c3d (en anchos de pieza; carousel3d.js los lee al
+   medir) y la perspectiva de la ventana es --perspectiva-carrusel-piezas anchos de pieza, así la geometría es la misma en cualquier tamaño.
+   --c3d-w es el ancho de la pieza (lo pone cada variante, con tope contra el alto en el teléfono). Sin movimiento (reducir movimiento o
+   «Pausar el movimiento») la misma geometría, plana y sin giro. Solo la pieza del centro lleva sombra-portada. */
+.c3d {
+  --c3d-giro: var(--giro-carrusel); --c3d-separa: 0.08; --c3d-hunde: 0.6; --c3d-separa-lejos: 0.24; --c3d-hunde-lejos: 1.2;
+  --c3d-alcance: 1;  /* piezas por lado a la vista */
+  --c3d-borde: 1.36; /* borde exterior de la última pieza a la vista, en anchos de pieza: 1.36 con una por lado (Eventos, 1.32 y se reserva 1.33), 1.97 con dos */
+  position: relative; container-type: inline-size;
+  /* La ventana deja 24 px arriba (la inclinación al cursor) y 48 abajo (sombra-portada, 0 14px 32px, sin cortarse); el margen negativo
+     devuelve el ritmo visible: 8 px sobre la pieza y 20 bajo ella. En el teléfono va de borde a borde de la pantalla. */
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--margen)) calc(-1 * (var(--space-6) + var(--space-1)));
+}
 .c3d-viewport {
-  position: relative; padding: var(--space-6) 0 var(--space-8);
+  position: relative; padding: var(--space-6) 0 var(--space-12);
   overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
-  perspective: var(--perspectiva-carrusel); touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  perspective: calc(var(--c3d-w) * var(--perspectiva-carrusel-piezas)); touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .c3d-viewport::-webkit-scrollbar { display: none; }
 .c3d-track { display: flex; width: max-content; margin: 0; padding: 0 calc(50% - var(--c3d-w) / 2); list-style: none; transform-style: preserve-3d; }
 .c3d-track > li { flex: 0 0 var(--c3d-w); scroll-snap-align: center; transform-style: preserve-3d; }
 /* La envoltura lleva la pose; el <li> (blanco del imán) no se transforma ni recibe toques: el toque va a la pieza que se ve. */
 .c3d-track:has(.cf-pose), .c3d-item:has(> .cf-pose) { pointer-events: none; } /* en 3D el plano de la pista queda delante de las vecinas hundidas */
-.cf-pose { position: relative; pointer-events: auto; will-change: transform; }
-/* Flechas: vidrio de 48 que flota a los lados de las piezas a la vista (en el teléfono, sobre el borde de las vecinas). */
-.c3d-flecha { position: absolute; z-index: 2; top: calc(50% - var(--space-1)); translate: 0 -50%; }
-/* --c3d-alcance: hasta dónde llegan las piezas a la vista, en anchos de pieza (1.6 con cinco a la vista; Eventos, con tres, 1.15). */
-.c3d-flecha--prev { left: max(var(--margen), calc(50% - var(--c3d-w) * var(--c3d-alcance, 1.6) - var(--space-16))); }
-.c3d-flecha--next { right: max(var(--margen), calc(50% - var(--c3d-w) * var(--c3d-alcance, 1.6) - var(--space-16))); }
+.cf-pose { position: relative; pointer-events: auto; }
+/* Capa propia solo para lo que se mueve en 3D y se ve (la central y sus vecinas); las lejanas y el carrusel plano no la piden. */
+.motion .c3d-item:not(.is-lejana) > .cf-pose { will-change: transform; }
+/* Flechas: vidrio de 48 a los lados, fuera de la última pieza a la vista (16 px de aire) y centradas en el alto de la pieza; si el escenario
+   no da para tanto, se quedan en su borde (sobre la vecina, nunca sobre la central; en una ventana de teléfono, a 8 px de la pantalla). Con toque no se muestran: el control es deslizar
+   o tocar la vecina (alternativa de un puntero a arrastrar, WCAG 2.5.7), y el teclado (← → Inicio Fin) sigue igual. */
+.c3d-flecha { position: absolute; z-index: 2; top: calc(50% - var(--space-3)); translate: 0 -50%; }
+.c3d-flecha--prev { left: max(var(--space-2), calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
+.c3d-flecha--next { right: max(var(--space-2), calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
 .c3d-flecha:disabled { opacity: 0; visibility: hidden; }
+@media (hover: none) and (pointer: coarse) { .c3d-flecha { display: none; } }
 /* Carrusel plano (sin movimiento): la imagen de las vecinas se atenúa (ATENUADA en carousel3d.js); el texto queda entero (≥ 4.5:1). */
 .c3d-item.is-atenuada img { opacity: 0.6; }
+/* Con dos piezas por lado la lejana queda medio tapada por la vecina (is-lejana, carousel3d.js): su texto no se muestra partido. */
+.c3d-item.is-lejana :is(.cafe-nombre, .cafe-desc, .cafe-precio, .bill-badges, .bill-title) { opacity: 0; visibility: hidden; }
 .c3d-card:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco), var(--sombra-portada); }
 .c3d-item.is-centro :is(.bill-card, .cafe-card) { box-shadow: var(--sombra-portada); }
-@media (min-width: 768px) { .c3d-viewport { perspective: var(--perspectiva-carrusel-ancha); } }
+
+/* Ancho de la pieza. Teléfono: portada 58 % (176–240 px, con tope contra el alto: carrusel, pie y acción caben entre las dos barras),
+   evento 76 % (hasta 340), carta 60 % (184–248). Desde 761 px sale del escenario: caben las piezas a la vista y las dos flechas de 48 con
+   16 de aire (2 × (alto-md + space-4)); portada 240–280, evento 300–440, carta 232–272. Desde 1440, dos por lado en portada y carta. */
+.c3d--portada { --c3d-w: min(clamp(176px, 58vw, 240px), calc((100svh - 320px) / 1.5)); }
+.c3d--evento { --c3d-w: min(76vw, 340px); --c3d-separa: 0.045; --c3d-borde: 1.33; }
+.c3d--carta { --c3d-w: clamp(184px, 60vw, 248px); }
+@media (min-width: 761px) {
+  /* Escenario de hasta 1240 px centrado en la columna de contenido; los bordes se desvanecen (máscara de 48 px), sin cortes duros. */
+  .c3d { width: 100%; max-width: 1240px; margin-inline: auto; }
+  .c3d-flecha--prev { left: max(0px, calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
+  .c3d-flecha--next { right: max(0px, calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
+  .c3d-viewport { -webkit-mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); }
+  .c3d--portada { --c3d-w: clamp(240px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 280px); }
+  .c3d--evento { --c3d-w: clamp(300px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 440px); }
+  .c3d--carta { --c3d-w: clamp(232px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 272px); }
+}
+@media (min-width: 1440px) { .c3d--portada, .c3d--carta { --c3d-alcance: 2; --c3d-borde: 1.97; } }
+/* Hasta 1023 px las vecinas asoman cortadas por el borde: su texto no se lee partido (se reconocen por su forma: foto, icono) y aparece al
+   llegar al centro. Desde 1024 caben enteras y su texto se ve. */
+@media (max-width: 1023px) {
+  .c3d-item:not(.is-centro) :is(.cafe-nombre, .cafe-desc, .cafe-precio, .bill-badges, .bill-title) { opacity: 0; visibility: hidden; transition: opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
+}
 
 /* Profundidad (A5): la pieza central de cada carrusel y, en escritorio, la tarjeta de la rejilla se inclinan hacia el cursor (hasta
    --inclinacion-max) y se adelantan --adelanto-profundidad (carousel3d.js escribe el transform una vez por fotograma; solo con puntero fino,
@@ -764,9 +819,8 @@ html:not(.js) .bill-pie { display: none; }
    renglones están reservados desde el esqueleto: el conteo tiene su ancho aunque llegue vacío. */
 .rail-nota-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); max-width: 480px; } /* el ancho de «Buscar en el catálogo»: el conteo queda cerca de sus paradas */
 .rail-note { flex: 1 1 14rem; min-height: 1lh; margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
+@media (min-width: 390px) { .rail-note { font: var(--t-subtitulo); } } /* Subheadline 15 donde la nota cabe en un renglón; antes, Footnote 13 */
 .rail-progreso { flex: 0 0 auto; min-width: 12.5em; min-height: 1lh; margin: 0 0 0 auto; font: var(--t-nota-pie); font-weight: 600; color: var(--turquesa-texto); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-/* Portadas del 44 % del ancho entre 148 y 240 px (172 a 390 px; 240 desde 768). */
-.rail { --c3d-w: clamp(148px, 44vw, 240px); }
 .rail-item .card { content-visibility: visible; }
 .rail-item.is-centro .cover { box-shadow: var(--sombra-portada); }
 /* Guardar solo sobre la portada del centro: en una vecina girada no se leería ni se tocaría bien. */
@@ -775,21 +829,23 @@ html:not(.js) .bill-pie { display: none; }
 /* Pie del libro del centro: el título (Title 3) y «autor · precio» (Subheadline), enteros y sin cortar: si no caben, bajan de renglón y el precio
    nunca se parte. En un pie angosto el bloque reserva dos renglones de cada uno (2 × 25 + 2 × 20 px), así pasar de un libro a otro casi nunca
    mueve lo de abajo; con un pie de 600 px o más, un renglón de cada uno. */
-.cf-pie { display: grid; justify-items: center; width: 100%; container-type: inline-size; }
-.cf-texto { display: grid; align-content: center; width: 100%; min-width: 0; min-height: 90px; text-align: center; }
-@container (min-width: 600px) { .cf-texto { min-height: 2lh; } } /* un renglón de cada uno: el esqueleto ya los reserva */
+.cf-pie { position: relative; display: grid; justify-items: center; width: 100%; container-type: inline-size; }
+.cf-medida { position: absolute; inset: 0 0 auto; visibility: hidden; pointer-events: none; } /* copia oculta para medir la reserva (rail.js) */
+.cf-medida .cf-texto { min-height: 0; }
+/* El texto va arriba, pegado a su portada (20 px); la reserva (--cf-reserva) la mide rail.js: el pie más alto de la colección a ese ancho,
+   así pasar de un libro a otro no mueve lo de abajo y el aire hasta «Preguntar por…» es de 24 en el pie más alto. Antes de medir, lo que mide
+   la primera colección: dos renglones de título y uno de «autor · precio» (70 px; uno de cada uno desde 600 px): el carrusel no salta al cargar. */
+.cf-texto { display: grid; align-content: start; width: 100%; min-width: 0; min-height: var(--cf-reserva, 70px); text-align: center; }
+@container (min-width: 600px) { .cf-texto { min-height: var(--cf-reserva, 2lh); } }
 .cf-titulo { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); color: var(--tinta); text-wrap: balance; overflow-wrap: break-word; }
 .cf-meta { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; text-wrap: balance; }
 .cf-meta strong { font-weight: 600; color: var(--tinta); white-space: nowrap; }
 /* Bajo el carrusel: «Preguntar por {colección}» (secundario) y, en texto, pedir una recomendación sin rumbo fijo. */
-.rail-ask { display: grid; justify-items: center; gap: var(--space-2); margin-top: var(--space-5); }
+.rail-ask { display: grid; justify-items: center; gap: var(--space-2); margin-top: var(--space-6); }
 .rail-libre { display: inline-flex; align-items: center; min-height: var(--alto-sm); padding: 0 var(--space-3); border-radius: var(--radio-pildora); color: var(--turquesa-texto); font: var(--t-boton-chico); text-decoration: none; }
 .rail-libre:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .rail-libre:hover { background: var(--fondo-3); } }
-@media (min-width: 768px) {
-  .rail { --c3d-w: 240px; }
-  .cf-pie { max-width: 640px; margin-inline: auto; }
-}
+@media (min-width: 761px) { .cf-pie { max-width: 640px; margin-inline: auto; } }
 .rail-status { margin: 0; font: var(--t-titular); }
 .rail-status:empty { position: absolute; }
 .rail-error { display: flex; flex-wrap: wrap; gap: var(--space-3); }
@@ -807,11 +863,11 @@ html:not(.js) .bill-pie { display: none; }
 .cafe-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
 .cafe-foto { margin: 0; }
 .cafe-foto .frame-clip { aspect-ratio: 4 / 3; }
-.cafe-carta { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); min-width: 0; }
-.c3d--carta { --c3d-w: clamp(168px, 46vw, 208px); }
+.cafe-carta { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.cafe-chips { margin-bottom: var(--space-4); } /* 16 + los 8 de la ventana: 24 hasta la tarjeta */
 .cafe-item .cf-pose, .cafe-card { height: 100%; }
 .cafe-card {
-  display: flex; flex-direction: column; gap: var(--space-2); min-height: calc(var(--c3d-w) * 1.15); padding: var(--space-5);
+  display: flex; flex-direction: column; gap: var(--space-2); min-height: var(--c3d-w); padding: var(--space-5);
   border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea);
 }
 .cafe-ic { display: grid; place-items: center; width: var(--alto-md); height: var(--alto-md); border-radius: 50%; background: var(--menta); color: var(--en-menta); }
@@ -820,9 +876,9 @@ html:not(.js) .bill-pie { display: none; }
 .cafe-precio { font: var(--t-titular); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .cafe-item.card--sk .cafe-card { display: block; background: var(--fondo-3); box-shadow: none; }
 .cafe-status:empty { position: absolute; }
-.cafe-ask { display: grid; justify-items: center; }
+.cafe-ask { display: grid; justify-items: center; margin-top: var(--space-1); } /* 20 bajo la tarjeta + 4: 24 */
 html:not(.js) :is(.cafe-chips, .c3d--carta), .cafe-carta[data-state="vacio"] :is(.cafe-chips, .c3d--carta) { display: none; }
-@media print { .cafe-carta { display: none; } }
+@media print { .cafe-carta > :not(.cafe-ask) { display: none; } } /* al imprimir queda «Preguntar por la carta» */
 
 /* Esqueletos: ocupan el lugar exacto del contenido; quietos, con colores de los tokens. */
 .sk-line { position: relative; display: block; height: 12px; overflow: hidden; border-radius: var(--radio-portada); background: var(--fondo-3); }
@@ -887,25 +943,32 @@ html:not(.js) :is(.menu-btn, .hdr-list, .explore-open, .motion-btn, .cat-bar, .c
 html:not(.js) .hdr { flex-wrap: wrap; height: auto; padding-bottom: var(--space-1); }
 html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; overflow-x: auto; }
 
-/* ---------- Composición en escritorio (A6, 2026-11-13) ---------- */
-/* Desde 1024 px los encabezados de Catálogo, Eventos y Café van en dos columnas (titular a la izquierda; búsqueda, chips o entradilla a la
-   derecha) y el carrusel a todo el ancho debajo, centrado. En el Catálogo la cabecera y la pieza del carrusel se funden con la rejilla del
-   capítulo (display: contents) para que la búsqueda y los chips compartan la columna derecha. Café: la foto a la izquierda y la carta a la derecha. */
+/* ---------- Composición en escritorio (A6, 2026-11-13; afinada el mismo día) ---------- */
+/* Desde 1024 px el titular va a la izquierda y la búsqueda o la entradilla a la derecha (5/12 y 7/12); el carrusel va debajo a todo el ancho de
+   la columna de contenido y **su control va sobre su eje**: en el Catálogo, los chips y la nota centrados encima del carrusel (proximidad y
+   simetría; .books-head y .rail son display: contents para compartir la rejilla del capítulo). Café y té: titular y entradilla a la izquierda,
+   la foto a la derecha con el alto acotado, y debajo la carta con «Preguntar por la carta» a todo el ancho, centradas, como Catálogo y Eventos. */
 @media (min-width: 1024px) {
   .books { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: start; }
   .books-head, .rail:not([hidden]) { display: contents; }
-  .books-head .h2 { grid-column: 1; grid-row: 1 / span 2; }
-  .books-head .explore-open { grid-column: 2; grid-row: 1; }
-  .rail-head { grid-column: 2; grid-row: 2; margin: var(--space-4) 0 0; }
+  .books-head .h2 { grid-column: 1; grid-row: 1; }
+  .books-head .explore-open { grid-column: 2; grid-row: 1; align-self: end; }
+  .rail-head { grid-column: 1 / -1; grid-row: 2; justify-items: center; margin: var(--space-6) 0 var(--space-4); }
+  /* La nota y el conteo, en un renglón centrado bajo los chips (el conteo conserva su ancho reservado). */
+  .rail-nota-fila { justify-content: center; width: min(100%, 720px); max-width: none; }
+  .rail-note { flex: 0 1 auto; text-align: center; }
+  .rail-conector { flex: none; width: var(--space-6); } /* la fila de chips se centra con su ancho propio: el conector no se encoge */
+  .rail-progreso { margin: 0; text-align: left; }
   .books > :not(.books-head, .rail), .rail > :not(.rail-head) { grid-column: 1 / -1; }
-  .rail > .c3d { margin-top: var(--space-4); }
-  :is(.bill, .cafe) > .sec-head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: last baseline; max-width: none; }
-  :is(.bill, .cafe) > .sec-head .sec-texto { margin: 0; }
-  .cafe-cuerpo { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "foto carta" "foto ask"; column-gap: var(--space-12); row-gap: var(--space-4); align-items: start; }
-  .cafe-foto { grid-area: foto; }
-  .cafe-carta { grid-area: carta; }
-  .cafe-ask { grid-area: ask; }
-  .cafe .c3d { margin-inline: 0; }
+  .bill > .sec-head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: last baseline; max-width: none; }
+  .bill > .sec-head .sec-texto { margin: 0; }
+  .cafe { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-12); align-items: center; }
+  .cafe > .sec-head { grid-column: 1; margin: 0; }
+  .cafe-cuerpo { display: contents; }
+  .cafe-foto { grid-column: 2; grid-row: 1; }
+  .cafe-foto .frame-clip { aspect-ratio: auto; height: clamp(200px, 30svh, 260px); }
+  .cafe-foto img { width: 100%; height: 100%; object-fit: cover; }
+  .cafe-carta { grid-column: 1 / -1; grid-row: 2; justify-items: center; margin-top: var(--space-8); }
 }
 
 /* ---------- Impresión ---------- */

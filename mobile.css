@@ -56,12 +56,12 @@ html:not(.js) .tabbar { display: none; }
 .entry-actions .btn--secundario { display: none; }
 
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
-.still { width: 84vw; scroll-snap-align: center; }
+.still { width: 78vw; scroll-snap-align: center; } /* la siguiente foto asoma lo bastante para invitar a deslizar */
 
 /* ---------- Eventos y talleres: el Carrusel3D (style.css); en ventanas bajas la foto se acorta para que la tarjeta quepa ---------- */
 @media (max-height: 700px) { .bill-card-img { aspect-ratio: 16 / 9; } }
-/* A 320–400 px la descripción de la propuesta del centro llega a cuatro renglones: se reservan para que la fila de acciones no salte. */
-@media (max-width: 400px) { .bill-desc { min-height: 4lh; } }
+/* A 320–400 px la descripción de la propuesta del centro llega a cuatro renglones: hasta que feed.js mide la más larga (--bill-reserva), se reservan cuatro. */
+@media (max-width: 400px) { .bill-desc { min-height: var(--bill-reserva, 4lh); } }
 
 /* ---------- Visita y pie ---------- */
 .visit-actions .btn { flex: 1 1 auto; }
@@ -154,8 +154,8 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-lede { margin-top: var(--space-2); }
   .entry-actions { grid-template-columns: repeat(2, minmax(0, max-content)); margin-top: var(--space-4); }
   .entry-media { aspect-ratio: 4 / 3; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }
-  .still { width: min(84vw, calc((100svh - 150px) * 1.333)); }
-  .rail { --c3d-w: min(44vw, calc((100svh - 150px) / 1.5)); }
+  .still { width: min(78vw, calc((100svh - 150px) * 1.333)); }
+  .c3d--portada { --c3d-w: min(44vw, calc((100svh - 150px) / 1.5)); }
   .c3d--evento { --c3d-w: min(60vw, 300px); }
   .c3d--carta { --c3d-w: min(40vw, calc((100svh - 150px) / 1.25)); }
   .bill-card-img { aspect-ratio: 16 / 9; }

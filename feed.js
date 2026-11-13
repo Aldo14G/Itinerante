@@ -76,6 +76,21 @@ export function eventOf(item) {
 }
 export const waName = title => `Preguntar por WhatsApp: ${title}`;
 
+// Reserva de la descripción (--bill-reserva): la más larga de las propuestas a este ancho, medida de una vez en una copia oculta. Cambiar de
+// tarjeta no mueve las acciones y el aire de la descripción a la fila es de 24 en la más larga (antes se reservaban 3 o 4 renglones fijos).
+export function measureDescs(pie, texts) {
+  if (!pie?.isConnected || !texts.length) return 0;
+  const probe = document.createElement('div');
+  probe.className = 'bill-medida';
+  probe.setAttribute('aria-hidden', 'true');
+  probe.append(...texts.map(t => { const p = document.createElement('p'); p.className = 'bill-desc'; p.textContent = t; return p; }));
+  pie.append(probe);
+  const max = Math.max(...[...probe.children].map(n => n.getBoundingClientRect().height));
+  probe.remove();
+  if (max > 0) pie.style.setProperty('--bill-reserva', `${Math.ceil(max)}px`);
+  return max;
+}
+
 export function initEventos({ isMotion = () => false } = {}) {
   const region = document.querySelector('[data-bill-c3d]');
   if (!region || region.dataset.ready) return;
@@ -104,5 +119,11 @@ export function initEventos({ isMotion = () => false } = {}) {
       paintShare(share);
     }
   }).setItems(items);
+  const pie = document.querySelector('[data-bill-pie]');
+  measureDescs(pie, events.map(e => e.text));
+  if ('ResizeObserver' in window) { // otro ancho (giro del teléfono, ventana): se vuelve a medir una vez por fotograma
+    let w = 0, raf = 0;
+    new ResizeObserver(([e]) => { const nw = Math.round(e.contentRect.width); if (nw === w) return; w = nw; if (!raf) raf = requestAnimationFrame(() => { raf = 0; measureDescs(pie, events.map(x => x.text)); }); }).observe(pie);
+  }
   region.classList.add('is-ready');
 }

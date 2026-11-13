@@ -48,12 +48,12 @@ Objetivo: **la pieza central se lee como protagonista, centrada al píxel, con a
 
 **Teléfono (≤ 760 px):**
 - Pieza central: portada 54–60 % del ancho útil (≈ 210–230 px a 390; ≥ 168 a 320); carta 56–62 %; evento 76–82 %. Siempre con tope de alto: carrusel + pie + acción caben entre la barra superior y la barra de pestañas (usa `svh`).
-- Las vecinas asoman entre 16 y 28 % de su ancho por lado, con **≥ 12 px de hueco visible** entre la central y cada vecina (la central nunca queda tapada).
+- Las vecinas asoman entre 16 y 32 % de su ancho por lado en portada y carta (en evento, que ocupa el 76 %, lo que queda: ≈ 11 %), con **≥ 12 px de hueco visible** entre la central y cada vecina (la central nunca queda tapada; desde el 2026-11-13 las vecinas no se enciman).
 - Máximo 3 piezas a la vista (1 por lado).
-- Flechas: sin tapar la pieza central (≥ 8 px de hueco); si no caben, se esconden en el teléfono (el gesto de deslizar es el control primario, Jakob) y se conservan teclado y lector.
+- Flechas: con toque (`(hover: none) and (pointer: coarse)`) no se muestran en ningún carrusel: el control es deslizar o tocar la vecina (alternativa de un puntero a arrastrar, WCAG 2.5.7; Jakob) y se conservan teclado y lector (decisión de Aldo, 2026-11-13). Con puntero fino, sin tapar la pieza central (≥ 8 px de hueco).
 
 **Tableta y escritorio (≥ 761 px):**
-- Pieza central: portada 280–320 px; evento 400–460 px; carta 240–280 px.
+- Pieza central: portada 280–320 px; evento 400–460 px; carta 240–280 px. Entre 761 y 1279 px el escenario no da para esa pieza con sus vecinas y las dos flechas: toma la que quepa (`(escenario − 128) / (2 × borde)`), con mínimo portada 240, evento 300 y carta 232.
 - Máximo 5 piezas a la vista (2 por lado); el escenario tiene un ancho máximo (~1100–1240 px) **centrado en la columna de contenido** (no en la ventana con barra de desplazamiento) y los bordes se desvanecen suavemente (máscara), sin cortes duros.
 - Flechas fuera de la última pieza visible, ≥ 16 px de ella, centradas en el alto de la pieza central.
 - Un carrusel no se mete en una columna estrecha: si su sección va en dos columnas, el carrusel ocupa el ancho de la columna de contenido completa debajo del encabezado.
@@ -67,7 +67,7 @@ Objetivo: **la pieza central se lee como protagonista, centrada al píxel, con a
 
 ## 4. Cómo medir (no opines sin cifras)
 
-- Medición de carruseles: `node tools/qa/carrusel.mjs URL [DIR]` (falla si algo sale de la norma de §3). Para cada `.c3d` devuelve: `centroDx` contra `c3d.getBoundingClientRect()` (no contra `innerWidth`), `% del ancho útil`, piezas visibles (> 50 % dentro), hueco mínimo central↔vecina, solape flecha↔central y aire arriba/abajo.
+- Medición de carruseles: `node tools/qa/carrusel.mjs URL [DIR]` (sale con 1 si algo sale de la norma de §3). Mide portada, evento y carta en 320, 360, 390, 430, 768 (con toque), 1024, 1280, 1440 y 1920 (puntero fino), con movimiento y con movimiento reducido. Para cada `.c3d` comprueba: centro de la pieza central contra `c3d.getBoundingClientRect()` y contra la columna de su sección (no contra `innerWidth`; ≤ 1 px), ancho (% del carrusel en el teléfono, px desde 761), piezas a la vista (> 50 % dentro), hueco central↔vecina (≥ 12), flechas (ocultas con toque; con puntero fino ≥ 44, sin tapar la central, centradas en el alto de la pieza y desde 1024 ≥ 16 px fuera de la última pieza), bloque carrusel + pie + acción dentro del alto útil, aire (arriba 24–32, pieza → pie 16–20, pie → acción 24), texto cortado (central, pie y vecinas en el borde) y, con movimiento reducido, que nada quede en 3D. Escribe la tabla, `carrusel.json` y capturas en `DIR`.
 - Arnés del repo: `node tools/qa/controles.mjs URL DIR`, `piso.mjs`, `responsive.mjs` (42 tamaños), `rail.mjs`, `feed.mjs`, `e2e.mjs`, `inp.mjs` (CPU 4×), `motion.mjs`; `npm test`, `npm run test:design`, `npm run critique`, `npm run tokens:check`, `npm run test:browser`.
 - Rúbrica `docs/agentes/rubrica-visual.md`: puntúa mirando capturas (390 claro y oscuro, 320, 1440). Vara: promedio ≥ 8 y nada < 7. Para «lo más fino posible» apunta a ≥ 9 en Composición, Móvil y Pulido.
 

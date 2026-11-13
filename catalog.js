@@ -263,6 +263,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   const books = data.books;
   const byId = new Map(books.map(b => [b.id, b]));
   const input = $('[data-cat-q]', root);
+  const clearBtn = $('[data-cat-clear]', root); // × propia para borrar la búsqueda (la nativa se oculta en CSS)
   const list = $('[data-cat-suggest]', root);
   const filtersEl = $('[data-cat-filters]', root);
   const filtersBtn = $('[data-cat-filters-btn]', root);
@@ -397,6 +398,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   }
 
   function refresh({ keepShown = false, animate = true } = {}) {
+    if (clearBtn) clearBtn.hidden = !input.value;
     if (!keepShown) state.shown = PAGE_SIZE;
     compute();
     renderFilters();
@@ -433,6 +435,13 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     state.q = input.value.trim();
     state.sort = state.q ? 'rel' : 'az';
     refresh({ animate: false }); // al teclear no se repite la entrada de las tarjetas
+  });
+  // Borrar la búsqueda: el campo queda vacío y con el foco, y la rejilla vuelve a la A–Z (lo mismo que borrar con el teclado).
+  clearBtn?.addEventListener('click', () => {
+    input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    closeSuggest();
+    input.focus({ preventScroll: true });
   });
   input.addEventListener('keydown', e => {
     const opts = [...list.children];

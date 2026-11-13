@@ -136,9 +136,8 @@
   --filtro-vidrio-hoja: blur(28px) saturate(1.6);
 
   /* Profundidad (carrusel 3D y tarjeta que voltea) */
-  --perspectiva-carrusel: 900px;
-  --perspectiva-carrusel-ancha: 1200px;
-  --giro-carrusel: 52deg;
+  --perspectiva-carrusel-piezas: 4;
+  --giro-carrusel: 44deg;
   --perspectiva-tarjeta: 1000px;
   --perspectiva-inclinacion: 800px;
   --inclinacion-max: 6deg;

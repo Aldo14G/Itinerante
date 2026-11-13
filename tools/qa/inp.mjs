@@ -37,6 +37,14 @@ const click = async sel => {
   await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: q.x, y: q.y, button: 'left', clickCount: 1 });
   await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: q.x, y: q.y, button: 'left', clickCount: 1 });
 };
+// «Siguiente» de un Carrusel3D: la flecha con puntero fino; con toque no hay flechas (norma del 2026-11-13) y se toca la parte visible de la vecina.
+const siguiente = async (btn, c3d) => {
+  if (await ev(`getComputedStyle(document.querySelector(${JSON.stringify(btn)})).display !== 'none'`)) return click(btn);
+  const p = await ev(`(() => { const c = document.querySelector(${JSON.stringify(c3d)}); c.scrollIntoView({ block: 'center' }); const it = c.querySelector('.c3d-item.is-centro').nextElementSibling; const r = it.querySelector('.cf-pose').getBoundingClientRect(); return { x: Math.min(r.right, innerWidth) - 12, y: r.top + r.height / 2 }; })()`);
+  await sleep(300);
+  await ev('window.__mark = performance.now()');
+  for (const type of ['mouseMoved', 'mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: p.x, y: p.y, button: 'left', clickCount: 1 });
+};
 // Entradas de `event` e `long-*` posteriores a la marca, agrupadas por interacción.
 const collect = async () => ev(`(() => {
   const m = window.__mark; const ev = window.__ev.filter(e => e.startTime >= m - 5 && e.interactionId);
@@ -61,13 +69,13 @@ const steps = [
   ['guardar', async () => { await click('.rail-item.is-centro .save'); }],
   ['ficha abrir', async () => { await click('.rail-item.is-centro .card'); }],
   ['ficha cerrar', async () => { await sleep(600); await click('[data-d-close]'); }],
-  // Carrusel 3D: la flecha y el toque en una vecina mueven el centro (el giro se pinta por fotograma).
-  ['carrusel flecha', async () => { await sleep(600); await click('[data-rail-next]'); }],
+  // Carrusel 3D: la flecha (con toque, la vecina de la derecha) y el toque en una vecina mueven el centro (el giro se pinta por fotograma).
+  ['carrusel flecha', async () => { await sleep(600); await siguiente('[data-rail-next]', '[data-rail-c3d]'); }],
   ['carrusel vecina', async () => { await click('.rail-item.is-centro + .rail-item .card'); }],
   // Eventos y Café (Carrusel3D, variantes evento y carta): la flecha mueve el centro y la fila de acciones lo sigue; el chip «Té» cambia la carta.
-  ['eventos flecha', async () => { await ev(`document.querySelector('[data-bill-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('[data-bill-next]'); }],
+  ['eventos flecha', async () => { await ev(`document.querySelector('[data-bill-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await siguiente('[data-bill-next]', '[data-bill-c3d]'); }],
   ['café chip', async () => { await ev(`document.querySelector('[data-cafe-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('.cafe-chip:not([aria-checked=true])'); }],
-  ['café flecha', async () => { await sleep(600); await click('[data-cafe-next]'); }],
+  ['café flecha', async () => { await sleep(600); await siguiente('[data-cafe-next]', '[data-cafe-c3d]'); }],
   // Explorar con los 41 títulos sin paginar (hoja en el teléfono, en línea en escritorio): abrir la búsqueda y abrir y cerrar la ficha de una tarjeta.
   ['Explorar abrir', async () => { if (+W < 761) { await ev(`document.getElementById('libros').scrollIntoView()`); await sleep(800); await click('[data-ex-open]'); } else { await ev(`document.getElementById('catalogo').scrollIntoView()`); await sleep(1200); await click('[data-ex-open]'); } }],
   ['rejilla ficha', async () => { await sleep(2500); await click('#explorer .card-item:nth-child(5) .card'); }],
@@ -77,7 +85,7 @@ const steps = [
 
 const rows = [];
 await send('Emulation.setDeviceMetricsOverride', { width: +W, height: +H, deviceScaleFactor: 1, mobile: +W < 761 });
-await send('Emulation.setTouchEmulationEnabled', { enabled: +W < 761, maxTouchPoints: +W < 761 ? 5 : 0 });
+await send('Emulation.setTouchEmulationEnabled', +W < 761 ? { enabled: true, maxTouchPoints: 5 } : { enabled: false });
 for (let run = 1; run <= +RUNS; run++) {
   await send('Emulation.setCPUThrottlingRate', { rate: 1 });
   await send('Page.navigate', { url: URL_ });

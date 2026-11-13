@@ -65,6 +65,7 @@ const AUDIT = `(() => {
       if (b.e.closest('.tabbar') && c.e.closest('.tabbar')) continue; // casillas contiguas de una sola barra
       if (b.e.matches('.save') || c.e.matches('.save')) continue; // «Guardar» va sobre su portada: un solo objeto, alto propio
       if ((b.e.matches('.c3d-flecha') && c.e.closest('.c3d-track')) || (c.e.matches('.c3d-flecha') && b.e.closest('.c3d-track'))) continue; // las flechas de vidrio del Carrusel3D flotan sobre el borde de las piezas vecinas (que solo vienen al centro)
+      if (b.e.closest('.c3d-track') && b.e.closest('.c3d-track') === c.e.closest('.c3d-track') && !b.e.closest('.is-centro') && !c.e.closest('.is-centro')) continue; // con dos por lado (≥ 1440) la lejana asoma detrás de la vecina: tocar cualquiera de las dos solo la trae al centro (la central sí guarda su hueco ≥ 12 px)
       const dx = Math.max(0, Math.max(b.x, c.x) - Math.min(b.x + b.w, c.x + c.w)), dy = Math.max(0, Math.max(b.y, c.y) - Math.min(b.y + b.h, c.y + c.h));
       const d = Math.hypot(dx, dy); if (d < best) { best = d; who = name(c.e); }
     }

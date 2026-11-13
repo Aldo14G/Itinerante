@@ -505,7 +505,10 @@ test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimenta
   assert.ok(/aria-live="polite" data-rail-live/.test(rail), 'aviso al cambiar de colección');
   assert.ok(/html:not\(\.js\) \.rail \{?[^}]*display: none|\.rail\[hidden\], html:not\(\.js\) \.rail \{ display: none; \}/.test(css), 'sin JS no se muestra');
   assert.ok(/scroll-snap-type: x mandatory/.test(css) && !/(rail|c3d)[^{]*\{[^}]*animation/.test(css) && !/setInterval/.test(readFileSync_('carousel3d.js')), 'snap y sin animación automática (sin autoplay)');
-  assert.ok(/<button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-rail-prev disabled aria-label="Libro anterior">/.test(rail) && /<button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-rail-next disabled aria-label="Libro siguiente">/.test(rail) && !/\.rail-ctrl|rail-btn/.test(css + html), 'flechas de vidrio de 48 px a los lados del carrusel, en todo ancho (alternativa de un toque al deslizar, WCAG 2.5.7)');
+  assert.ok(/<button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-rail-prev disabled aria-label="Libro anterior">/.test(rail) && /<button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-rail-next disabled aria-label="Libro siguiente">/.test(rail) && !/\.rail-ctrl|rail-btn/.test(css + html), 'flechas de vidrio de 48 px a los lados del carrusel');
+  // Norma cambiada el 2026-11-13 (decisión de Aldo): con toque las flechas se ocultan en los tres carruseles; el control es deslizar o tocar la
+  // vecina (alternativa de un puntero a arrastrar, WCAG 2.5.7) y el teclado sigue igual. Con puntero fino las flechas siguen a los lados.
+  assert.ok(/@media \(hover: none\) and \(pointer: coarse\) \{ \.c3d-flecha \{ display: none; \} \}/.test(css) && /track\.addEventListener\('click'[\s\S]*?if \(!item\.classList\.contains\('is-centro'\)\)/.test(readFileSync_('carousel3d.js')), 'con toque, sin flechas: deslizar o tocar la vecina (WCAG 2.5.7); con puntero fino, flechas');
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
   assert.ok(/import\('\.\/rail\.js'\)/.test(app) && !/^import .*rail\.js/m.test(app), 'se carga bajo demanda');
   const motor = await readFile(new URL('../carousel3d.js', import.meta.url), 'utf8');
@@ -964,37 +967,44 @@ test('Novedades sin entradas no existe; con una entrada aparece sola con su lleg
   assert.equal(newsPlan(data.books, { novedades: { entradas: [{ id: 'no-existe', llegada: '2026-11-09' }] } }, { hoy: HOY }).show, false, 'una entrada que no es un libro del inventario no basta para mostrar la sección');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [entry(7, '2026-12-24')] } }, { hoy: HOY }).show, false, 'una llegada futura espera su día');
 });
-test('Carrusel3D (carousel3d.js): la pieza del centro de frente, las vecinas giran hasta 52°; con movimiento reducido, plano (88 % y atenuadas); un solo motor para portada, evento y carta', async () => {
+test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas giran hasta 44° y asoman separadas, con hueco (sin encimarse); con movimiento reducido, la misma geometría plana; un solo motor para portada, evento y carta', async () => {
   const railJs = await readFile(here('./rail.js'), 'utf8');
   const motor = await readFile(here('./carousel3d.js'), 'utf8');
-  assert.equal(CF_GIRO, 52);
+  assert.equal(CF_GIRO, 44);
   assert.equal(coverflowPose, poseMotor, 'rail.js reexporta la pose del motor (las funciones puras de siempre siguen ahí)');
-  assert.equal(tokensJson.scales.profundidad['giro-carrusel'], '52deg', 'el giro máximo es un token');
-  assert.ok(tokensCss.includes('--perspectiva-carrusel: 900px;') && tokensCss.includes('--perspectiva-carrusel-ancha: 1200px;') && tokensCss.includes('--perspectiva-tarjeta: 1000px;'), 'perspectivas en tokens.css');
+  assert.equal(tokensJson.scales.profundidad['giro-carrusel'], '44deg', 'el giro de las vecinas es un token');
+  assert.ok(tokensCss.includes('--perspectiva-carrusel-piezas: 4;') && tokensCss.includes('--perspectiva-tarjeta: 1000px;'), 'perspectivas en tokens.css (la del carrusel, en anchos de pieza)');
   const c = coverflowPose(0, { w: 172 });
   assert.ok(/rotateY\(0\.00deg\)/.test(c.transform) && c.opacity === 1 && c.zIndex === 100 && !c.hidden, 'la del centro, de frente y encima');
   const r = coverflowPose(1, { w: 172 }), l = coverflowPose(-1, { w: 172 });
-  assert.ok(/rotateY\(-52\.00deg\)/.test(r.transform) && /rotateY\(52\.00deg\)/.test(l.transform), 'cada vecina gira hacia el centro');
-  assert.ok(/translateZ\(-/.test(r.transform) && r.zIndex < 100 && /translateX\(-/.test(r.transform) && /translateX\(\d/.test(l.transform), 'se hunden y se enciman hacia el centro');
-  assert.ok(Math.abs(parseFloat(/rotateY\((-?[\d.]+)deg\)/.exec(coverflowPose(0.5, { w: 172 }).transform)[1])) === 26, 'el giro sigue a la distancia: a media pieza, la mitad');
+  assert.ok(/rotateY\(-44\.00deg\)/.test(r.transform) && /rotateY\(44\.00deg\)/.test(l.transform), 'cada vecina gira hacia el centro');
+  assert.ok(/translateZ\(-/.test(r.transform) && r.zIndex < 100 && /translateX\(\d/.test(r.transform) && /translateX\(-/.test(l.transform), 'se hunden y se empujan hacia fuera (ya no se enciman hacia el centro)');
+  assert.ok(Math.abs(parseFloat(/rotateY\((-?[\d.]+)deg\)/.exec(coverflowPose(0.5, { w: 172 }).transform)[1])) === 22, 'el giro sigue a la distancia: a media pieza, la mitad');
+  // Hueco visible central↔vecina (skill ux-apple §3): el borde de la vecina girada, proyectado con la perspectiva de 4 anchos de pieza.
+  const borde = (separa, near = true) => { const a = 44 * Math.PI / 180, X = 1 + separa + (near ? -0.5 : 0.5) * Math.cos(a), Z = -0.6 + (near ? -0.5 : 0.5) * Math.sin(a); return X * 4 / (4 - Z); };
+  assert.ok((borde(0.08) - 0.5) * 176 >= 12 && (borde(0.045) - 0.5) * 243 >= 12, 'hueco ≥ 12 px con la portada más chica (176) y el evento más chico (243)');
+  assert.ok(Math.abs(borde(0.08, false) - 1.36) < 0.01 && Math.abs(borde(0.045, false) - 1.32) < 0.01, 'el borde exterior de la vecina es el --c3d-borde de cada variante (1.36; Eventos, 1.32)');
   assert.ok(coverflowPose(3).hidden && coverflowPose(-7).hidden && coverflowPose(10).transform === coverflowPose(3).transform, 'lo lejano ni se ve ni se toca');
   for (const d of [-2.4, -1, -0.5, 0, 0.5, 1, 2]) {
     const f = coverflowPose(d, { flat: true, w: 172 });
-    assert.ok(/^scale\(0?\.?\d/.test(f.transform) && !/rotate|translate/.test(f.transform), `movimiento reducido (d = ${d}): sin giro ni profundidad (${f.transform})`);
+    assert.ok(/^translateX\(-?[\d.]+px\) scale\(0?\.?\d/.test(f.transform) && !/rotate|translateZ/.test(f.transform), `movimiento reducido (d = ${d}): sin giro ni profundidad (${f.transform})`);
   }
-  assert.equal(coverflowPose(1, { flat: true }).transform, 'scale(0.880)', 'plano: las vecinas al 88 %');
-  assert.ok([0, 1, 2, -2].every(d => coverflowPose(d).opacity === 1) && coverflowPose(2.3).opacity < 1, 'en 3D, hasta dos piezas del centro enteras; más allá se desvanecen');
-  assert.ok([0, 1, -2].every(d => coverflowPose(d, { flat: true }).opacity === 1) && !coverflowPose(0, { flat: true }).dim && coverflowPose(1, { flat: true }).dim && coverflowPose(-2, { flat: true }).dim && !coverflowPose(1).dim, 'plano: la del centro entera y las vecinas atenuadas (solo su imagen: el texto conserva su contraste)');
+  assert.equal(coverflowPose(1, { flat: true, w: 226 }).transform, 'translateX(-7.2px) scale(0.760)', 'plano: la vecina en el sitio de su silueta girada (76 %)');
+  assert.ok(Math.abs((1 - 0.032 - 0.38) - borde(0.08)) < 0.01, 'plano: el borde interior de la vecina queda donde en 3D (el mismo hueco)');
+  assert.ok([0, 1, -1].every(d => coverflowPose(d).opacity === 1) && coverflowPose(1.3).opacity < 1 && coverflowPose(1.5).hidden, 'una por lado: la vecina entera; más allá se desvanece y se oculta');
+  assert.ok([0, 1, 2, -2].every(d => coverflowPose(d, { alcance: 2 }).opacity === 1) && coverflowPose(2.3, { alcance: 2 }).opacity < 1, 'con dos por lado (escritorio ancho), hasta dos piezas del centro enteras');
+  assert.ok([0, 1, -1].every(d => coverflowPose(d, { flat: true }).opacity === 1) && !coverflowPose(0, { flat: true }).dim && coverflowPose(1, { flat: true }).dim && coverflowPose(-2, { flat: true }).dim && !coverflowPose(1).dim, 'plano: la del centro entera y las vecinas atenuadas (solo su imagen: el texto conserva su contraste)');
   assert.ok(css.includes(`.c3d-item.is-atenuada img { opacity: ${ATENUADA}; }`) && /it\.classList\.toggle\('is-atenuada', p\.dim\);/.test(motor), 'la atenuación es la de ATENUADA y la pone el motor');
-  assert.ok(/const flat = !isMotion\(\);/.test(motor) && /coverflowPose\(\(centers\[i\] - mid\) \/ width, \{ flat, giro, w: width \}\)/.test(motor), 'la pose sale del desplazamiento y de la preferencia de movimiento (también «Pausar el movimiento»)');
-  assert.ok(/viewport\.addEventListener\('scroll', request, \{ passive: true \}\)/.test(motor) && /requestAnimationFrame\(paint\)/.test(motor) && /getPropertyValue\('--giro-carrusel'\)/.test(motor), 'una pose por fotograma, con el giro del token');
+  assert.ok(/const flat = !isMotion\(\);/.test(motor) && /const d = \(centers\[i\] - mid\) \/ width;/.test(motor) && /coverflowPose\(d, \{ flat, w: width, \.\.\.cfg \}\)/.test(motor), 'la pose sale del desplazamiento, de la preferencia de movimiento (también «Pausar el movimiento») y de los parámetros del carrusel');
+  assert.ok(/viewport\.addEventListener\('scroll', request, \{ passive: true \}\)/.test(motor) && /requestAnimationFrame\(paint\)/.test(motor) && /n\('--c3d-giro', POSE\.giro\)/.test(motor) && /\.c3d \{\s*--c3d-giro: var\(--giro-carrusel\);/.test(css), 'una pose por fotograma, con el giro del token (leído de --c3d-giro al medir)');
   assert.equal(nearestIndex([86, 258, 430], 300), 1, 'el centro es la pieza más cercana');
   assert.deepEqual([keyTarget('ArrowRight', 1, 5), keyTarget('ArrowLeft', 0, 5), keyTarget('Home', 3, 5), keyTarget('End', 0, 5), keyTarget('Enter', 2, 5)], [2, 0, 0, 4, undefined], 'teclado: ← → Inicio Fin, sin salirse de la pista');
   assert.deepEqual(captionOf({ t: 'Hipercódex: Ensayo poético hiperbólico', a: 'Emmanuel Vizcaya' }, '$250 MXN'), { title: 'Hipercódex', author: 'Emmanuel Vizcaya', price: '$250 MXN' }, 'bajo el carrusel: título (sin subtítulo), autor y precio de la hoja');
   // Desliz nativo con imán al centro; perspectiva en la ventana (punto de fuga fijo) y 3D conservado en la pista.
-  assert.ok(/\.c3d-viewport \{[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*perspective: var\(--perspectiva-carrusel\); touch-action: manipulation;/.test(cssFlat), 'ventana: imán, sin arrastrar la página y con su perspectiva');
-  assert.ok(/\.c3d-track \{[^}]*padding: 0 calc\(50% - var\(--c3d-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.c3d-track > li \{ flex: 0 0 var\(--c3d-w\); scroll-snap-align: center;/.test(css) && /\.rail \{ --c3d-w: clamp\(148px, 44vw, 240px\); \}/.test(css), 'portadas del 44 % del ancho (148–240 px) centradas por el imán');
-  assert.ok(/\.c3d--evento \{ --c3d-w: clamp\(240px, 72vw, 320px\);/.test(css) && /\.c3d--carta \{ --c3d-w: clamp\(168px, 46vw, 208px\); \}/.test(css), 'cada variante pone el ancho de su pieza');
+  assert.ok(/\.c3d-viewport \{[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*perspective: calc\(var\(--c3d-w\) \* var\(--perspectiva-carrusel-piezas\)\); touch-action: manipulation;/.test(cssFlat), 'ventana: imán, sin arrastrar la página y con su perspectiva (en anchos de pieza)');
+  assert.ok(/\.c3d-track \{[^}]*padding: 0 calc\(50% - var\(--c3d-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.c3d-track > li \{ flex: 0 0 var\(--c3d-w\); scroll-snap-align: center;/.test(css) && /\.c3d--portada \{ --c3d-w: min\(clamp\(176px, 58vw, 240px\), calc\(\(100svh - 320px\) \/ 1\.5\)\); \}/.test(css), 'portadas del 58 % del ancho (176–240 px, con tope contra el alto) centradas por el imán');
+  assert.ok(/\.c3d--evento \{ --c3d-w: min\(76vw, 340px\);/.test(css) && /\.c3d--carta \{ --c3d-w: clamp\(184px, 60vw, 248px\); \}/.test(css), 'cada variante pone el ancho de su pieza');
+  assert.ok(/@media \(min-width: 761px\) \{[\s\S]*?\.c3d \{ width: 100%; max-width: 1240px; margin-inline: auto; \}[\s\S]*?mask-image: linear-gradient/.test(css) && /\.c3d--portada \{ --c3d-w: clamp\(240px, calc\(\(100cqi - 2 \* \(var\(--alto-md\) \+ var\(--space-4\)\)\) \/ \(2 \* var\(--c3d-borde\)\)\), 280px\); \}/.test(css), 'desde 761: escenario de hasta 1240 px centrado, bordes que se desvanecen y la pieza que cabe con sus vecinas y las flechas');
   // Toque y teclado: una vecina viene al centro; la del centro se abre. Una sola parada de tabulador; ← → Inicio Fin.
   assert.ok(/if \(!item\.classList\.contains\('is-centro'\)\) \{\s*e\.stopImmediatePropagation\(\);/.test(motor) && /onOpen\?\.\(items\.indexOf\(item\), item, e\)/.test(motor) && /wireBookOpen\(track, ensureCatalog\)/.test(railJs), 'tocar una vecina la trae al centro; tocar la del centro la abre (en la portada, la ficha: iti:open-book)');
   assert.ok(/const k0 = keyTarget\(e\.key, actual, items\.length\);/.test(motor), 'teclado: ← → Inicio y Fin en la pieza central');
@@ -1112,7 +1122,7 @@ test('Eventos (A2 + A7): Carrusel3D variante evento; debajo, la descripción de 
     assert.ok(/class="btn btn--secundario bill-wa"[^>]*href="https:\/\/wa\.me\/528180875940\?text=Hola%2C%20me%20interesa/.test(block), `${id}: su consulta va en el marcado (sin JavaScript se lee y funciona)`);
   }
   assert.ok(/\.bill-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && !/\.bill-card \{[^}]*vidrio/.test(cssFlat), 'tarjeta en superficie con radio 20, no de vidrio');
-  assert.ok(/\.bill-desc \{ min-height: 3lh;/.test(cssFlat) && /@media \(max-width: 400px\) \{ \.bill-desc \{ min-height: 4lh; \} \}/.test(mobileFlat), 'la descripción reserva sus renglones: cambiar de tarjeta no mueve las acciones');
+  assert.ok(/\.bill-desc \{ min-height: var\(--bill-reserva, 3lh\);/.test(cssFlat) && /@media \(max-width: 400px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 4lh\); \} \}/.test(mobileFlat) && /measureDescs\(pie, events\.map\(e => e\.text\)\)/.test(readFileSync_('feed.js')), 'la descripción reserva la más larga (medida en feed.js; antes de medir, 3 o 4 renglones): cambiar de tarjeta no mueve las acciones');
   // La fila sigue a la del centro: título en el nombre accesible, mensaje y «Compartir» de esa propuesta.
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/wa\.href = ev\.wa;/.test(feed) && /wa\.setAttribute\('aria-label', waName\(ev\.title\)\);/.test(feed) && /share\.dataset\.share = ev\.id;/.test(feed) && /paintShare\(share\);/.test(feed), 'al cambiar la del centro cambian el enlace, su nombre accesible y «Compartir»');
@@ -1669,7 +1679,8 @@ test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té, C
   const app = readFileSync_('app.js');
   assert.ok(/nearby\(\$\('\[data-cafe\]'\), \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app), 'se carga al acercarse');
   assert.ok(/<a href="#cafe">Café<\/a>/.test(html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0]) && /<a class="menu-row" href="#cafe"><span>Café y té<\/span>/.test(html) && !/#cafe/.test(html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0]), 'en la barra de escritorio y el menú; la barra inferior no cambia');
-  assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.cafe-cuerpo \{ grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\); grid-template-areas: "foto carta" "foto ask";/.test(css) && /:is\(\.bill, \.cafe\) > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'escritorio (A6): encabezados en dos columnas; Café con la foto a la izquierda y la carta a la derecha');
+  assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.cafe \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-carta \{ grid-column: 1 \/ -1; grid-row: 2; justify-items: center;/.test(css) && /\.bill > \.sec-head \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat) && /\.books \{ display: grid; grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\);/.test(cssFlat), 'escritorio (A6, afinada el 2026-11-13): encabezados en dos columnas; en Café, titular y foto arriba y la carta a todo el ancho debajo, centrada como los otros carruseles');
+  assert.ok(/data-cafe-status><\/p>\s*<div class="cafe-ask">/.test(sec), '«Preguntar por la carta» va dentro de la carta, bajo su carrusel (mismo bloque en el teléfono y en escritorio)');
   const [prep, prev] = [readFileSync_('scripts/prepare-public.mjs'), readFileSync_('tools/preview-site.mjs')];
   assert.ok(/"carousel3d\.js"/.test(prep) && /"cafe\.js"/.test(prep) && /"assets\/data\/menu\.json"/.test(prep) && /'\/carousel3d\.js', '\/cafe\.js'/.test(prev), 'se publican el motor, la carta y su JSON');
 });

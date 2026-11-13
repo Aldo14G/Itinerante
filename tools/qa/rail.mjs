@@ -139,7 +139,8 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     const reduced = await ev(`!document.documentElement.classList.contains('motion')`);
     ck(name + ': empieza por el libro del medio, centrado y de frente, con vecinas a los dos lados' + (reduced ? ' (sin movimiento: planas)' : ' giradas hacia el centro'), st.ci === st.mid && st.centered && st.front && st.both && (reduced ? !st.turned : st.turned) && st.sw > st.vw, JSON.stringify(st));
     ck(name + ': bajo el carrusel, el título y «autor · precio» del libro del centro; sin puntos, recorrido ni «Ver todo el catálogo»', st.caption.length > 2 && /\s· \$\d+ MXN$/.test(st.meta) && st.dots === 0, JSON.stringify({ caption: st.caption, meta: st.meta, retirados: st.dots }));
-    ck(name + ': flechas de vidrio de 48 px a los lados; el recorrido empieza en «0 de 3 paradas hojeadas»', st.flechas.length === 2 && st.flechas.every(f => f[0] && f[2] === 48) && st.progreso === '0 de 3 paradas hojeadas', JSON.stringify([st.flechas, st.progreso]));
+    // Con toque (teléfono) las flechas no se muestran: el control es deslizar o tocar la vecina (norma del 2026-11-13); con puntero fino, vidrio de 48.
+    ck(name + (mobile ? ': con toque, sin flechas a la vista' : ': flechas de vidrio de 48 px a los lados') + '; el recorrido empieza en «0 de 3 paradas hojeadas»', st.flechas.length === 2 && st.flechas.every(f => f[0] && (mobile ? f[2] === 0 : f[2] === 48)) && st.progreso === '0 de 3 paradas hojeadas', JSON.stringify([st.flechas, st.progreso]));
     ck(name + ': sin desborde de la página', st.docW);
     ck(name + ': objetivos de 44px o más', st.small === 0, String(st.small));
     // «autor · precio» de cada libro de las tres colecciones: nunca cortado y el precio entero en un renglón (defecto de 320 px).
@@ -186,8 +187,10 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     ck(name + ': elegir chips no mueve la nota ni el carrusel', [k1, k2].every(k => k.vpTop === t0.vpTop && k.noteTop === t0.noteTop && k.headH === t0.headH), JSON.stringify([t0, k1, k2].map(k => [k.noteTop, k.vpTop, k.headH, k.askTop])));
     await run(`document.querySelector('.rail-chip').click()`); // de vuelta al primer chip para lo que sigue
     await run(`(${AFTER_CHIP})(document.querySelector('.rail-chip'))`);
-    if (mobile) ck(name + ': la portada del centro mide el 44 % del ancho (148–240 px)', Math.abs(st.centerW - Math.min(240, Math.max(148, w * 0.44))) <= 1, String(st.centerW));
-    else ck('escritorio: la portada del centro mide 240 px', st.centerW === 240, String(st.centerW));
+    // Norma del 2026-11-13 (skill ux-apple §3; tools/qa/carrusel.mjs la mide entera): 58 % del ancho en el teléfono (176–240 px, con tope contra el
+    // alto); en escritorio la que cabe con sus vecinas y las flechas, 240–280 px (280 desde 1024).
+    if (mobile) ck(name + ': la portada del centro mide el 58 % del ancho (176–240 px)', Math.abs(st.centerW - Math.min(240, Math.max(176, w * 0.58))) <= 1, String(st.centerW));
+    else ck('escritorio: la portada del centro mide 280 px', st.centerW === 280, String(st.centerW));
     const btn = await ev(`(async () => {
       const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const at = () => [...r.querySelectorAll('.rail-item')].findIndex(i => i.classList.contains('is-centro'));
       const before = at(); r.querySelector('[data-rail-next]').click(); await __itiQa.until(() => at() === before + 1, 4000, 'siguiente al centro').catch(() => {}); await __itiQa.stable(() => v.scrollLeft, 4000);

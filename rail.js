@@ -125,6 +125,29 @@ export function captionOf(b, price = null) {
   return { title, author: b?.a || '', price };
 }
 
+// Pinta el pie de un libro: el título y «autor · precio» (el precio de la hoja, que no se parte ni se corta: CSS).
+function fillCaption(titleEl, metaEl, b) {
+  const cap = captionOf(b, priceLabel(b.pr));
+  titleEl.textContent = cap.title;
+  metaEl.replaceChildren(cap.author);
+  if (cap.price) { const strong = document.createElement('strong'); strong.textContent = cap.price; strong.dataset.fuente = 'hoja'; metaEl.append(cap.author ? '\u00a0· ' : '', strong); }
+}
+
+// Reserva del pie (--cf-reserva): el pie más alto de la colección a este ancho. Se miden todos de una vez en una copia oculta del pie
+// (una sola maquetación); así el pie no reserva de más (el aire hasta «Preguntar por…» es de 24 en el más alto) y cambiar de libro no mueve
+// lo de abajo. `pie` es .cf-pie; `books`, los libros de la colección pintada.
+export function measureCaptions(pie, books) {
+  if (!pie?.isConnected || !books.length) return 0;
+  const probe = make('div', 'cf-medida');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.append(...books.map(b => { const box = make('div', 'cf-texto'); const t = make('p', 'cf-titulo'), m = make('p', 'cf-meta'); fillCaption(t, m, b); box.append(t, m); return box; }));
+  pie.append(probe);
+  const max = Math.max(...[...probe.children].map(n => n.getBoundingClientRect().height));
+  probe.remove();
+  if (max > 0) pie.style.setProperty('--cf-reserva', `${Math.ceil(max)}px`);
+  return max;
+}
+
 export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const root = document.querySelector('[data-rail]');
   if (!root || root.dataset.ready) return;
@@ -139,6 +162,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   const next = $('[data-rail-next]');
   const capTitle = $('[data-rail-title]');
   const capMeta = $('[data-rail-meta]');
+  const pie = $('.cf-pie');
   const live = $('[data-rail-live]');
   const region = $('[data-rail-c3d]');
   const progreso = $('[data-rail-progreso]');
@@ -201,13 +225,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   let current = null;
   const c3d = createCarousel3D({
     viewport, track, prev, next, live, isMotion, focusSel: '.card',
-    onCenter: i => {
-      const b = list[i];
-      const cap = captionOf(b, priceLabel(b.pr));
-      capTitle.textContent = cap.title;
-      capMeta.replaceChildren(cap.author);
-      if (cap.price) { const strong = document.createElement('strong'); strong.textContent = cap.price; strong.dataset.fuente = 'hoja'; capMeta.append(cap.author ? '\u00a0· ' : '', strong); } // el precio no se parte ni se corta (CSS)
-    },
+    onCenter: i => fillCaption(capTitle, capMeta, list[i]),
     liveText: i => { const b = list[i]; const price = priceLabel(b.pr); return `${b.t}, ${b.a}${price ? `, ${price}` : ''}. ${i + 1} de ${list.length}.`; },
     onUserMove: () => mark(current) // mover el carrusel en una parada la cuenta como hojeada
   });
@@ -233,6 +251,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     region.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
     noteEl.textContent = col.nota || ''; // la nota de la colección
     c3d.setItems(items);
+    measureCaptions(pie, list);
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`; // la región viva del carrusel: la colección elegida
   }
 
@@ -245,6 +264,17 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     choose: chip => { mark(chip.dataset.id); if (chip.dataset.id !== current) show(chip.dataset.id, true); }
   });
   paintTrail();
+
+  // Si cambia el ancho del pie (giro del teléfono, ventana), la reserva se vuelve a medir una vez por fotograma.
+  if ('ResizeObserver' in window) {
+    let w = 0, raf = 0;
+    new ResizeObserver(([e]) => {
+      const nw = Math.round(e.contentRect.width);
+      if (nw === w) return;
+      w = nw;
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; measureCaptions(pie, list); });
+    }).observe(pie);
+  }
 
   // Tocar la portada del centro abre la ficha (wireBookOpen); las vecinas vienen al centro (carousel3d.js).
   wireBookOpen(track, ensureCatalog);
