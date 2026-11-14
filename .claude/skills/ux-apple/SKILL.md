@@ -10,7 +10,14 @@ Aldo pide esto con frecuencia: no hace falta que lo repita. Si vas a tocar la in
 ## 0. Antes de empezar (obligatorio)
 
 1. Lee `AGENTS.md`, `DESIGN.md` (sistema «Itinerante Líquido»), `PRODUCT.md` (límites de verdad) y, en `docs/agentes/00-contexto-compartido.md`, la tabla `<como_evitarlo>` y el bloque `<piso_de_oficio>`. Esta skill no los sustituye: los aterriza.
-2. Mira el sitio **renderizado** antes de opinar: `PORT=XXXX nohup node tools/preview-site.mjs > /dev/null 2>&1 &` y capturas con Playwright (`import pw from '/opt/node-tools/node_modules/playwright/index.js'`) en **320×640, 390×844, 768×1024, 1024×768, 1440×900 y 1920×1080**, claro y oscuro. Nadie juzga lo que no ha visto.
+2. Mira el sitio **renderizado** antes de opinar: `PORT=XXXX nohup node tools/preview-site.mjs > /dev/null 2>&1 &` y capturas con Playwright (`import pw from '/opt/node-tools/node_modules/playwright/index.js'`), claro y oscuro. Nadie juzga lo que no ha visto.
+   - **Teléfono = iPhone reales** (desde el 2026-11-14; 390×844 ya no se usa: ningún iPhone ofrece 743 px de franja útil). El alto es la zona visible de Safari con sus barras; usa `pw.devices[...]` (UA, dpr, toque, `isMobile`) y fija las áreas seguras con `Emulation.setSafeAreaInsetsOverride` por CDP:
+     - **iPhone 16 393×659** (dpr 3): la referencia principal (franja útil 558).
+     - **iPhone 13 mini 375×629** (dpr 3): el peor alto (franja 528): lo que debe caber entre las barras se comprueba aquí.
+     - **iPhone SE (3.ª gen.) 375×667** (dpr 2) e **iPhone 16 Pro Max 440×763** (dpr 3).
+     - **iPhone 16 Pro a pantalla completa 402×874 con áreas seguras 62/34** (app en la pantalla de inicio o barras de Safari ocultas): cabecera, barra inferior y hojas respetan la Dynamic Island.
+     - **320×640** (Zoom de pantalla en los iPhone de 375).
+   - Tableta y escritorio: **768×1024, 1024×768, 1440×900 y 1920×1080**.
 3. Refinar conserva: identidad, copy, datos y estructura aprobados se quedan. Si algo exige cambiar dirección (quitar una sección, cambiar la paleta, copy nuevo con afirmaciones), propónlo; no lo cueles.
 
 ## 1. Principios de Apple que mandan aquí
@@ -21,7 +28,8 @@ Aldo pide esto con frecuencia: no hace falta que lo repita. Si vas a tocar la in
 - **Consistencia y convenciones (Jakob):** barra de pestañas, hojas, diálogos y controles se comportan como en iOS.
 - **Escala tipográfica de Apple (Dynamic Type, tamaño grande por omisión, en px CSS = pt):** Large Title 34/41 · Title 1 28/34 · Title 2 22/28 · Title 3 20/25 · Headline 17/22 semibold · Body 17/22 · Callout 16/21 · Subheadline 15/20 · Footnote 13/18 · Caption 1 12/16 · Caption 2 11/13. Tokens `--t-*`. Lectura nunca bajo 15; máximo 6 tamaños por pantalla.
 - **Objetivos táctiles:** mínimo 44×44 pt (HIG). Aquí: escala 44/48/56 (`--alto-sm/md/lg`), ≥ 8 px entre vecinos, 12 dentro de un grupo.
-- **Márgenes de contenido estilo iOS:** 16 (≤ 389 px) / 20 (≥ 390) / 32 (≥ 1024), nunca menos que el área segura. Barra de navegación 44 + área segura; barra de pestañas 49.
+- **Márgenes de contenido estilo iOS:** 16 (≤ 375 px) / 20 (≥ 376) / 32 (≥ 1024), nunca menos que el área segura. Desde 1024 el contenido y la cabecera viven en un contenedor centrado de 1152 px (12 columnas, `--ancho-contenido`; 2026-11-14). Barra de navegación 44 + área segura; barra de pestañas 49.
+- **Ritmo de landing (Uber/Pinterest, 2026-11-14):** del fin de una sección al titular de la siguiente, 64 en el teléfono y 112 en escritorio (`--sec`, la mitad a cada lado del borde de la banda); titular → texto 8–16; texto → botón 24–32. Posiciones fijas en el inicio del teléfono: entre modelos solo cambia el ancho.
 - **Movimiento:** respuesta, no espectáculo; duraciones de tokens (`motion.js`); con «reducir movimiento» todo queda plano.
 
 ## 2. Leyes de UX y su regla comprobable aquí
@@ -47,7 +55,8 @@ Aldo pide esto con frecuencia: no hace falta que lo repita. Si vas a tocar la in
 Objetivo: **la pieza central se lee como protagonista, centrada al píxel, con aire alrededor; las vecinas asoman para invitar a deslizar, sin amontonarse.** Valores de la casa, derivados de los principios de arriba (no son cifras de Apple):
 
 **Teléfono (≤ 760 px):**
-- Pieza central: portada 54–60 % del ancho útil (≈ 210–230 px a 390; ≥ 168 a 320); carta 56–62 %; evento 76–82 %. Siempre con tope de alto: carrusel + pie + acción caben entre la barra superior y la barra de pestañas (usa `svh`).
+- Pieza central: portada 54–60 % del ancho útil (≈ 206–248 px en los iPhone; ≥ 168 a 320); carta 56–62 %; evento 76–82 %. Siempre con tope de alto: carrusel + pie caben entre la barra superior y la barra de pestañas (usa `svh`) **en el 13 mini (375×629)**.
+- **Llegar por su enlace** (2026-11-14): cada sección aterriza con su titular a 24 px bajo la cabecera (`scroll-margin-top`); «Catálogo» de la barra inferior aterriza en los chips (`#colecciones`) y chips → portada → «título · autor · precio» quedan enteros entre las barras; en Eventos, la tarjeta central con su «Compartir» (en la fila de insignias); en Café, chips y carta (la carta va antes que la foto).
 - Las vecinas asoman entre 16 y 32 % de su ancho por lado en portada y carta (en evento, que ocupa el 76 %, lo que queda: ≈ 11 %), con **≥ 12 px de hueco visible** entre la central y cada vecina (la central nunca queda tapada; desde el 2026-11-13 las vecinas no se enciman).
 - Máximo 3 piezas a la vista (1 por lado).
 - Flechas: con toque (`(hover: none) and (pointer: coarse)`) no se muestran en ningún carrusel: el control es deslizar o tocar la vecina (alternativa de un puntero a arrastrar, WCAG 2.5.7; Jakob) y se conservan teclado y lector (decisión de Aldo, 2026-11-13). Con puntero fino, sin tapar la pieza central (≥ 8 px de hueco).
@@ -67,9 +76,10 @@ Objetivo: **la pieza central se lee como protagonista, centrada al píxel, con a
 
 ## 4. Cómo medir (no opines sin cifras)
 
-- Medición de carruseles: `node tools/qa/carrusel.mjs URL [DIR]` (sale con 1 si algo sale de la norma de §3). Mide portada, evento y carta en 320, 360, 390, 430, 768 (con toque), 1024, 1280, 1440 y 1920 (puntero fino), con movimiento y con movimiento reducido. Para cada `.c3d` comprueba: centro de la pieza central contra `c3d.getBoundingClientRect()` y contra la columna de su sección (no contra `innerWidth`; ≤ 1 px), ancho (% del carrusel en el teléfono, px desde 761), piezas a la vista (> 50 % dentro), hueco central↔vecina (≥ 12), flechas (ocultas con toque; con puntero fino ≥ 44, sin tapar la central, centradas en el alto de la pieza y desde 1024 ≥ 16 px fuera de la última pieza), bloque carrusel + pie + acción dentro del alto útil, aire (arriba 24–32, pieza → pie 16–20, pie → acción 24), texto cortado (central, pie y vecinas en el borde) y, con movimiento reducido, que nada quede en 3D. Escribe la tabla, `carrusel.json` y capturas en `DIR`.
+- **Llegar a cada sección en iPhone**: `node tools/qa/iphone.mjs URL [DIR]` (2026-11-14). En los perfiles de §0 toca de verdad la barra inferior o el menú ☰ y comprueba que titular, acción y pieza central quedan enteros entre la cabecera y la barra inferior (≥ 8 px), el titular a 24 px de la cabecera, el inicio en sus posiciones fijas (titular y 68–150 y «Cómo llegar» 256–312 con la barra de 44; foto 3:2 entera sobre la barra), el menú sin desbordar y la ficha bajo el área segura. Sale con 1 si algo falla.
+- Medición de carruseles: `node tools/qa/carrusel.mjs URL [DIR]` (sale con 1 si algo sale de la norma de §3). Mide portada, evento y carta en 320×640, los iPhone de §0 (375×629, 375×667, 393×659, 440×763 y 402×874 con áreas seguras), 768 (con toque), 1024, 1280, 1440 y 1920 (puntero fino), con movimiento y con movimiento reducido. Para cada `.c3d` comprueba: centro de la pieza central contra `c3d.getBoundingClientRect()` y contra la columna de su sección (no contra `innerWidth`; ≤ 1 px), ancho (% del carrusel en el teléfono, px desde 761), piezas a la vista (> 50 % dentro), hueco central↔vecina (≥ 12), flechas (ocultas con toque; con puntero fino ≥ 44, sin tapar la central, centradas en el alto de la pieza y desde 1024 ≥ 16 px fuera de la última pieza), bloque carrusel + pie + acción dentro del alto útil, aire (arriba 24–32, pieza → pie 16–20, pie → acción 24), texto cortado (central, pie y vecinas en el borde) y, con movimiento reducido, que nada quede en 3D. Escribe la tabla, `carrusel.json` y capturas en `DIR`.
 - Arnés del repo: `node tools/qa/controles.mjs URL DIR`, `piso.mjs`, `responsive.mjs` (42 tamaños), `rail.mjs`, `feed.mjs`, `e2e.mjs`, `inp.mjs` (CPU 4×), `motion.mjs`; `npm test`, `npm run test:design`, `npm run critique`, `npm run tokens:check`, `npm run test:browser`.
-- Rúbrica `docs/agentes/rubrica-visual.md`: puntúa mirando capturas (390 claro y oscuro, 320, 1440). Vara: promedio ≥ 8 y nada < 7. Para «lo más fino posible» apunta a ≥ 9 en Composición, Móvil y Pulido.
+- Rúbrica `docs/agentes/rubrica-visual.md`: puntúa mirando capturas (iPhone 16 393×659 claro y oscuro, 13 mini 375×629, 16 Pro Max 440×763, 320 y 1440). Vara: promedio ≥ 8 y nada < 7. Para «lo más fino posible» apunta a ≥ 9 en Composición, Móvil y Pulido.
 
 ## 5. Procedimiento
 

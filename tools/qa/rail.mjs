@@ -1,7 +1,7 @@
 // Carrusel de libros (capa 1 de Libros): fila de chips de colección (radiogroup, 48 px, teclado, región viva, «Preguntar por {colección}» que
 // sigue al chip, sin salto de alto), carrusel 3D de portadas (la del centro de frente, las vecinas giradas; flechas, ← → Inicio Fin, toque en
 // una vecina la trae al centro y en la del centro abre la ficha; plano con movimiento reducido), «autor · precio» sin cortar en ningún libro,
-// ficha y foco, a 390, 360, 320 y 1280. El carrusel es la variante «portada» del Carrusel3D (carousel3d.js): flechas de vidrio a los lados, región
+// ficha y foco, a 393×659 (iPhone 16), 375×629 (13 mini), 320 y 1280 (desde el 2026-11-14; antes 390×844 y 360×740). El carrusel es la variante «portada» del Carrusel3D (carousel3d.js): flechas de vidrio a los lados, región
 // con rol de carrusel (la palomita del chip es un trazo SVG, .chip-chk, desde el 2026-11-14). Recorrido ligero (A4, 2026-11-13): los chips son las paradas (conector, palomita en las hojeadas, «N de 3 paradas
 // hojeadas» y su dato en localStorage) y caben en un renglón a 320 px. En escritorio (≥ 1024) .rail es display: contents (dos columnas,
 // A6): las medidas toman como referencia la cabecera del carrusel (.rail-head), que sí tiene caja.
@@ -95,7 +95,7 @@ const READY = `document.querySelector('[data-rail]').classList.contains('is-read
 const out = [];
 const ck = (n, ok, d = '') => out.push([ok ? '✓' : '✗', n, ok ? '' : d]);
 
-for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 360, 740, true], ['móvil 320', 320, 640, true], ['escritorio', 1280, 800, false]]) {
+for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['móvil 375', 375, 629, true], ['móvil 320', 320, 640, true], ['escritorio', 1280, 800, false]]) {
   errs.length = 0;
   try {
     await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
@@ -187,9 +187,9 @@ for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['móvil 360', 3
     ck(name + ': elegir chips no mueve la nota ni el carrusel', [k1, k2].every(k => k.vpTop === t0.vpTop && k.noteTop === t0.noteTop && k.headH === t0.headH), JSON.stringify([t0, k1, k2].map(k => [k.noteTop, k.vpTop, k.headH, k.pieTop])));
     await run(`document.querySelector('.rail-chip').click()`); // de vuelta al primer chip para lo que sigue
     await run(`(${AFTER_CHIP})(document.querySelector('.rail-chip'))`);
-    // Norma del 2026-11-13 (skill ux-apple §3; tools/qa/carrusel.mjs la mide entera): 58 % del ancho en el teléfono (176–240 px, con tope contra el
+    // Norma del 2026-11-13 (skill ux-apple §3; tools/qa/carrusel.mjs la mide entera): 58 % del ancho en el teléfono (176–248 px desde el 2026-11-14, con tope contra el
     // alto); en escritorio la que cabe con sus vecinas y las flechas, 240–280 px (280 desde 1024).
-    if (mobile) ck(name + ': la portada del centro mide el 58 % del ancho (176–240 px)', Math.abs(st.centerW - Math.min(240, Math.max(176, w * 0.58))) <= 1, String(st.centerW));
+    if (mobile) ck(name + ': la portada del centro mide el 58 % del ancho (176–248 px, con tope contra el alto: (100svh − 320) / 1.5)', Math.abs(st.centerW - Math.min(248, Math.max(176, w * 0.58), (h - 320) / 1.5)) <= 1, String(st.centerW));
     else ck('escritorio: la portada del centro mide 280 px', st.centerW === 280, String(st.centerW));
     const btn = await ev(`(async () => {
       const r = document.querySelector('[data-rail]'); const v = r.querySelector('[data-rail-viewport]'); const at = () => [...r.querySelectorAll('.rail-item')].findIndex(i => i.classList.contains('is-centro'));

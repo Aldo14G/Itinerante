@@ -18,7 +18,7 @@ const send = (method, params = {}) => new Promise(r => { const i = ++id; pend.se
 const ev = async x => (await send('Runtime.evaluate', { expression: x, awaitPromise: true, returnByValue: true })).result?.result?.value;
 await send('Page.enable'); await send('Runtime.enable');
 
-for (const [name, w, h, mobile] of [['MÓVIL 390×844', 390, 844, true], ['ESCRITORIO 1280×800', 1280, 800, false]]) {
+for (const [name, w, h, mobile] of [['MÓVIL 393×659 (iPhone 16)', 393, 659, true], ['ESCRITORIO 1280×800', 1280, 800, false]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Page.navigate', { url: URL_ });
   await sleep(4500);

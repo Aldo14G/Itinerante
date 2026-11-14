@@ -6,8 +6,8 @@ Adaptada de la revisión «look-and-fix» del skill MotionSites Web Builder (`re
 
 Después de cada cambio visual, antes de pedir commit. Nadie juzga una página que no ha visto.
 
-1. `node tools/qa/controles.mjs URL DIR`. Guarda tres capturas (`primer-cuadro.png` a 350 ms, `escritorio.png` 1440×900 y `movil.png` 390×844) y revisa los controles y la carga. Si falla, se corrige antes de puntuar.
-2. Abre las capturas **como imágenes** y puntúa los diez criterios de abajo en **390×844 claro y oscuro, 320×640 y 1440×900** (el tema oscuro se captura con `prefers-color-scheme: dark`).
+1. `node tools/qa/controles.mjs URL DIR` y `node tools/qa/iphone.mjs URL DIR`. Guardan las capturas (`primer-cuadro.png` a 350 ms, `escritorio.png` 1440×900, `movil.png` 393×659 y, de `iphone.mjs`, cada sección al llegar en cada iPhone) y revisan los controles, la carga y las posiciones. Si fallan, se corrige antes de puntuar.
+2. Abre las capturas **como imágenes** y puntúa los diez criterios de abajo en **iPhone 16 393×659 claro y oscuro, iPhone 13 mini 375×629, iPhone 16 Pro Max 440×763, 320×640 y 1440×900** (el tema oscuro se captura con `prefers-color-scheme: dark`). Desde el 2026-11-14 los teléfonos son iPhone reales con el alto visible de Safari: 390×844 no existe en ningún iPhone y aprobaba lo que el 13 mini tapa.
 3. Anota los tres más bajos, cada uno con el cambio concreto en valores, no en adjetivos. Ejemplo: «"Ver las N" de 30 a 44 px (`--alto-sm`) y 8 px sobre la lista», no «botón más grande».
 4. Corrige, vuelve a capturar y vuelve a puntuar. Se repite hasta 3 rondas o hasta pasar la vara.
 

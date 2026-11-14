@@ -31,7 +31,9 @@ await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-m
 // Anchos a 800 px de alto (cada quiebre del CSS y sus vecinos), teléfonos en horizontal y tabletas en ambas orientaciones.
 const SIZES = [
   ...[320, 344, 360, 375, 390, 412, 430, 480, 540, 600, 700, 760, 761, 768, 820, 900, 1024, 1100, 1101, 1180, 1280, 1366, 1440, 1600, 1727, 1728, 1920, 2560].map(w => [w, 800]),
-  [320, 640], [360, 740], [390, 844], [430, 932], [667, 375], [740, 360], [844, 390], [932, 430], [768, 1024], [820, 1180], [1024, 768], [1180, 820], [1920, 1080], [2560, 1440],
+  // Teléfonos en vertical: iPhone reales en Safari (13 mini, SE, 16, 16 Pro Max) y el 16 Pro a pantalla completa (2026-11-14; antes 360×740,
+  // 390×844 y 430×932).
+  [320, 640], [375, 629], [375, 667], [393, 659], [440, 763], [402, 874], [667, 375], [740, 360], [844, 390], [932, 430], [768, 1024], [820, 1180], [1024, 768], [1180, 820], [1920, 1080], [2560, 1440],
 ];
 
 const FIRST = `(() => {

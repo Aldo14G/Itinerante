@@ -264,22 +264,23 @@
       "nombre": "CarruselEventos",
       "tipo": "bloque",
       "variante_de": "carrusel3d",
-      "descripcion": "Variante evento: tarjetas en superficie con radio 20, foto real 4:3, insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) y el título; debajo, la descripción de la central (región viva con su reserva) y «Compartir».",
+      "descripcion": "Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva).",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".c3d--evento", ".bill-card", ".bill-card-img", ".bill-badges", ".bill-title", ".bill-pie", ".bill-desc", ".bill-fila"] },
-        { "ruta": "index.html", "selectores": ["[data-bill-track]", "[data-bill-desc]", "[data-bill-pie]", ".bill-item", ".bill-card"] },
+        { "ruta": "style.css", "selectores": [".c3d--evento", ".bill-card", ".bill-card-img", ".bill-badges", ".bill-title", ".bill-pie", ".bill-desc", ".bill-share"] },
+        { "ruta": "index.html", "selectores": ["[data-bill-track]", "[data-bill-desc]", "[data-bill-pie]", ".bill-item", ".bill-card", ".bill-share"] },
         { "ruta": "feed.js", "exporta": ["initEventos", "initFeed", "eventBadge", "eventOf", "measureDescs", "shareItem", "NO_DATE"] }
       ],
       "tokens": ["superficie", "fondo-2", "tinta", "radio-md", "t-titulo-3", "t-cuerpo", "sombra-portada", "space-3", "space-4", "space-6"],
       "estados": {
         "actual": { "css": [".c3d-item.is-centro :is(.bill-card, .cafe-card)"] },
-        "foco": { "css": [".c3d-card:focus-visible"] }
+        "foco": { "css": [".c3d-card:focus-visible"] },
+        "oculto": { "css": [".c3d-item:not(.is-centro) .bill-share"], "nota": "«Compartir» solo se ve y se toca en la tarjeta del centro (y sin JavaScript no se ofrece)." }
       },
       "no_aplica": { "vacio": "Las propuestas están en el HTML; sin JavaScript cada tarjeta muestra su descripción." },
-      "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["aria-labelledby (cada article)", "aria-live=polite (descripción)"], "teclado": "El del Carrusel3D." },
-      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs"],
+      "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["aria-labelledby (cada article)", "aria-live=polite (descripción)", "aria-label «Compartir «título»» (cada «Compartir»)"], "teclado": "El del Carrusel3D." },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs", "tools/qa/iphone.mjs"],
       "desde": "2026-11-13",
-      "decision": "DESIGN.md, «Componentes» (Tarjeta de evento)."
+      "decision": "DESIGN.md, «Componentes» (Tarjeta de evento) y «Posiciones de iPhone y contenedor de 1152» (2026-11-14: «Compartir» en la fila de insignias)."
     },
     {
       "id": "carrusel-carta",

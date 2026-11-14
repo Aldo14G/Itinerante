@@ -106,6 +106,7 @@
   --space-16: 64px;
   --space-20: 80px;
   --space-24: 96px;
+  --space-28: 112px;
 
   /* Radios */
   --radio-sm: 12px;
@@ -137,6 +138,9 @@
   --margen-movil: 16px;
   --margen-movil-amplio: 20px;
   --margen-escritorio: 32px;
+  --ancho-contenido: 1152px;
+  --sec-movil: 64px;
+  --sec-escritorio: 112px;
 
   /* Vidrio */
   --filtro-vidrio: blur(18px) saturate(1.6);

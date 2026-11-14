@@ -1,12 +1,12 @@
 // Auditoría de controles (WCAG 2.2 · 2.5.8 y 2.5.5) y revisión «mira y corrige» adaptada de la rúbrica de MotionSites (ver docs/agentes/rubrica-visual.md).
 // Uso: node tools/qa/controles.mjs URL [DIR]   Sale con código 1 si algo falla. Con DIR guarda capturas: primer cuadro (350 ms), escritorio y móvil.
-// En 320×640, 390×844, 900×800 y 1440×900 comprueba, para cada control visible que no sea un enlace dentro de un párrafo:
+// En 320×640, iPhone 16 393×659, 13 mini 375×629, 16 Pro Max 440×763 (iPhone reales en Safari desde el 2026-11-14; antes 390×844), 900×800 y 1440×900 comprueba, para cada control visible que no sea un enlace dentro de un párrafo:
 //   · tamaño ≥ 44×44 px (AAA 2.5.5; el mínimo AA de 24 px queda muy por debajo);
 //   · alto de la escala del sistema «Itinerante Líquido»: 44 (--alto-sm: en línea y en las barras), 48 (--alto-md: estándar) o 56 (--alto-lg:
 //     acciones principales y filas del menú); excepciones con nombre: casillas de la barra inferior (49, la tab bar de iOS), tarjetas de libro
 //     (portada, título y «autor · precio»), opciones de filtro y sugerencias y el resumen de las tarjetas de evento;
-//   · ≥ 8 px hasta el control vecino (las casillas contiguas de la barra inferior, «Guardar» sobre su portada y «Compartir» sobre la foto de
-//     su evento son una sola pieza y se excluyen);
+//   · ≥ 8 px hasta el control vecino (las casillas contiguas de la barra inferior y «Guardar» sobre su portada son una sola pieza y se
+//     excluyen);
 //   · rótulo a 17 px (Headline: botones de 48 y 56) o 15 px (Subheadline: botones de 44 y chips).
 // Y, como la revisión de MotionSites: sin errores de consola ni peticiones fallidas, sin imágenes rotas, sin desborde horizontal,
 // Inter cargada (respaldo de la letra de Apple: en Linux y Android es la que se pinta) y el primer cuadro ya con el fondo claro del inicio (sin destello oscuro).
@@ -77,7 +77,7 @@ const AUDIT = `(() => {
     fonts: [...new Set([...document.fonts].filter(f => f.status === 'loaded').map(f => f.family.replace(/"/g, '')))] };
 })()`;
 
-const SIZES = [[320, 640, true], [390, 844, true], [900, 800, false], [1440, 900, false]];
+const SIZES = [[320, 640, true], [393, 659, true], [375, 629, true], [440, 763, true], [900, 800, false], [1440, 900, false]];
 const report = []; const check = (area, name, ok, detail = '') => report.push({ area, name, ok: !!ok, detail });
 for (const [w, h, mobile] of SIZES) {
   tag = `${w}×${h}`;
@@ -89,7 +89,7 @@ for (const [w, h, mobile] of SIZES) {
   const H = await ev('document.documentElement.scrollHeight');
   for (let y = 0; y < H; y += h * 0.7) { await ev(`scrollTo(0, ${y})`); await sleep(60); } // pinta cada sección (content-visibility) y carga lo diferido
   await ev('scrollTo(0, 0)'); await sleep(400);
-  if (w === 1440) await shot('escritorio.png'); if (w === 390) await shot('movil.png');
+  if (w === 1440) await shot('escritorio.png'); if (w === 393) await shot('movil.png');
   const r = await ev(AUDIT);
   check(tag, `${r.n} controles: todos ≥ 44×44 px`, !r.small.length, r.small.join(' | '));
   check(tag, 'altos de la escala 44 / 48 / 56 (salvo piezas con alto propio)', !r.offScale.length, r.offScale.join(' | '));

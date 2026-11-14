@@ -33,7 +33,7 @@ const realClick = async sel => {
 const waitFor = async (expr, tries = 40) => { for (let i = 0; i < tries; i++) { if (await ev(expr)) return true; await sleep(200); } return false; };
 
 // ---------- MÓVIL ----------
-await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+await send('Emulation.setDeviceMetricsOverride', { width: 393, height: 659, deviceScaleFactor: 1, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 await send('Page.navigate', { url: URL_ });
 await sleep(4500);
@@ -51,18 +51,18 @@ await ev(`document.querySelector('[data-ex-open]').click()`);
 await waitFor(`document.getElementById('explorer').open`);
 await sleep(1200);
 const op = await ev(`(() => { const ex = document.getElementById('explorer'); const r = ex.getBoundingClientRect(); return { open: ex.open, modal: ex.matches(':modal'), full: [Math.round(r.width), Math.round(r.height)], lock: document.documentElement.classList.contains('explorer-open'), hash: location.hash, focus: document.activeElement.getAttribute('data-ex-close') !== null, cards: ex.querySelectorAll('button.card').length, input: !!ex.querySelector('[data-cat-q]') }; })()`);
-ck('móvil: abre a pantalla completa como diálogo modal con foco en cerrar y el scroll bloqueado', op.open && op.modal && op.full[0] === 390 && op.full[1] === 844 && op.lock && op.focus && op.input && op.cards > 0, JSON.stringify(op));
+ck('móvil: abre a pantalla completa como diálogo modal con foco en cerrar y el scroll bloqueado', op.open && op.modal && op.full[0] === 393 && op.full[1] === 659 && op.lock && op.focus && op.input && op.cards > 0, JSON.stringify(op));
 ck('móvil: la URL refleja la hoja (#explorar) para que «atrás» la cierre', op.hash === '#explorar');
 
-// Plantilla: la cabecera fija de Explorar lleva solo el titular (sin sellos), en una sola línea a 390, 360 y 320 px.
-for (const w of [390, 360, 320]) {
+// Plantilla: la cabecera fija de Explorar lleva solo el titular (sin sellos), en una sola línea a 393, 375 y 320 px.
+for (const w of [393, 375, 320]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: 800, deviceScaleFactor: 1, mobile: true }); await sleep(500);
   const sl = await ev(`(() => { const ex = document.getElementById('explorer'); const s = ex.querySelector('.ex-top .ex-title'); const top = ex.querySelector('.ex-top').getBoundingClientRect(); const b = s.getBoundingClientRect(); const range = document.createRange(); range.selectNodeContents(s); const close = ex.querySelector('[data-ex-close]').getBoundingClientRect(); return { text: s.textContent.trim(), seal: !!ex.querySelector('[data-cat-seal], .ex-seal'), lines: range.getClientRects().length, inTop: b.top >= top.top && b.bottom <= top.bottom + 1, right: Math.round(b.right), closeLeft: Math.round(close.left), vis: getComputedStyle(s).visibility, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, topH: Math.round(top.height) }; })()`);
   ck(`móvil ${w}: la cabecera de Explorar lleva solo «Explorar el catálogo» en una línea, sin sello, sin cortarse ni chocar con cerrar`, sl.text === 'Explorar el catálogo' && !sl.seal && sl.lines === 1 && sl.inTop && sl.right <= sl.closeLeft && sl.vis === 'visible' && sl.sw === sl.cw, JSON.stringify(sl));
-  if (w === 390) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-390.jpg', Buffer.from(shot.result.data, 'base64')); }
-  if (w === 360) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-360.jpg', Buffer.from(shot.result.data, 'base64')); }
+  if (w === 393) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-393.jpg', Buffer.from(shot.result.data, 'base64')); }
+  if (w === 375) { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-movil-sello-375.jpg', Buffer.from(shot.result.data, 'base64')); }
 }
-await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true }); await sleep(500);
+await send('Emulation.setDeviceMetricsOverride', { width: 393, height: 659, deviceScaleFactor: 1, mobile: true }); await sleep(500);
 
 // «Filtros» no promete el total del catálogo: sin filtros activos va a secas; con filtros, el número de activos. Géneros en español (CR-07).
 // Inventario real: Género (6, todos a la vista: un grupo solo se pliega desde 8) y Editorial (4). Sin «Categoría» (sale del género), sin
@@ -188,7 +188,7 @@ const pc = await ev(`(async () => { const ex = document.getElementById('explorer
 ck('escritorio: las 41 tarjetas (32 con portada real, 9 tipográficas), ninguna imagen rota, todas con la misma forma y la foto llenando la portada (object-fit: cover); debajo título y «autor · precio» sin cortar y sin «Voltear»', pc.cards === 41 && pc.imgs === 32 && pc.blank === 9 && !pc.broken.length && pc.ratios.length === 1 && JSON.stringify(pc.fit) === '["cover"]' && pc.fills && pc.named && pc.cards2 && pc.more === true, JSON.stringify(pc));
 { const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 }); writeFileSync('explorer-escritorio.jpg', Buffer.from(shot.result.data, 'base64')); }
 // cambiar de escritorio a móvil sin recargar
-await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+await send('Emulation.setDeviceMetricsOverride', { width: 393, height: 659, deviceScaleFactor: 1, mobile: true });
 await sleep(1500);
 const rs = await ev(`({ open: document.getElementById('explorer').open, lock: document.documentElement.classList.contains('explorer-open') })`);
 ck('escritorio→móvil sin recargar: el explorador se cierra y no deja bloqueo', rs.open === false && rs.lock === false, JSON.stringify(rs));

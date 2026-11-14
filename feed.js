@@ -1,7 +1,8 @@
 // Eventos y talleres (Cartelera) sin inventar nada: «Compartir» es local (no se envía nada y no hay contadores) y el estado de cada
 // propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Las propuestas van en un Carrusel3D, variante «evento»
-// (carousel3d.js, 2026-11-13): tarjeta con foto, insignias y título; debajo, la descripción de la del centro (región viva) y «Compartir»
-// (la consulta por WhatsApp vive en el pie desde el 2026-11-13). Se carga al acercarse a la sección o al primer toque.
+// (carousel3d.js, 2026-11-13): tarjeta con foto, insignias (tipo, estado y, al final de la fila, «Compartir», desde el 2026-11-14: solo se ve en
+// la del centro) y título; debajo, la descripción de la del centro (región viva). La consulta por WhatsApp vive en el pie desde el 2026-11-13.
+// Se carga al acercarse a la sección o al primer toque.
 // Las historias de los destacados se retiraron el 2026-11-11, «Me interesa» el 2026-11-13 y los puntos bajo el carrusel también el 2026-11-13.
 import { notify } from './saved.js';
 import { createCarousel3D } from './carousel3d.js';
@@ -44,7 +45,7 @@ function paintWhen(item) {
 export async function shareItem(btn) {
   const title = btn.dataset.title || 'Cartelera';
   const url = `${location.origin}${location.pathname}#cartelera`;
-  const item = btn.closest?.('.bill-item') ?? (typeof document !== 'undefined' ? document.querySelector?.(`.bill-item[data-id="${btn.dataset.share}"]`) : null); // «Compartir» va en la fila de acciones, no dentro de la tarjeta
+  const item = btn.closest?.('.bill-item') ?? (typeof document !== 'undefined' ? document.querySelector?.(`.bill-item[data-id="${btn.dataset.share}"]`) : null); // «Compartir» va en la fila de insignias de su tarjeta
   const when = eventBadge(item?.dataset.fecha);
   const state = when.kind === 'propuesta' ? 'una propuesta de la Cartelera de Librería Itinerante y Más (sin fecha confirmada todavía)' : `${when.text} en Librería Itinerante y Más`;
   const data = { title: `${title} · Librería Itinerante y Más`, text: `${title}: ${state}.`, url };
@@ -68,15 +69,15 @@ export function initFeed() {
   document.querySelectorAll('.bill-item').forEach(paintWhen);
 }
 
-// ---------- La propuesta del centro: su descripción y «Compartir» ----------
-// Lo que la fila necesita de cada tarjeta: id, título y descripción (todo sale del marcado).
+// ---------- La propuesta del centro: su descripción ----------
+// Lo que el pie necesita de cada tarjeta: id, título y descripción (todo sale del marcado).
 export function eventOf(item) {
   const q = s => item.querySelector(s);
   return { id: item.dataset.id, title: q('.bill-title')?.textContent.trim() ?? '', text: q('.bill-detail > p')?.textContent.trim() ?? '' };
 }
 
 // Reserva de la descripción (--bill-reserva): la más larga de las propuestas a este ancho, medida de una vez en una copia oculta. Cambiar de
-// tarjeta no mueve las acciones y el aire de la descripción a la fila es de 24 en la más larga (antes se reservaban 3 o 4 renglones fijos).
+// tarjeta no mueve lo de abajo (antes se reservaban 3 o 4 renglones fijos).
 export function measureDescs(pie, texts) {
   if (!pie?.isConnected || !texts.length) return 0;
   const probe = document.createElement('div');
@@ -99,7 +100,6 @@ export function initEventos({ isMotion = () => false } = {}) {
   const events = items.map(eventOf);
   const descTitle = document.querySelector('[data-bill-desc-title]');
   const descText = document.querySelector('[data-bill-desc-text]');
-  const share = document.querySelector('.bill-fila [data-share]');
   createCarousel3D({
     viewport: region.querySelector('[data-bill-viewport]'),
     track: region.querySelector('[data-bill-track]'),
@@ -110,9 +110,6 @@ export function initEventos({ isMotion = () => false } = {}) {
     onCenter: i => {
       const ev = events[i];
       if (descText.textContent !== ev.text) { descTitle.textContent = `${ev.title}. `; descText.textContent = ev.text; } // la región viva dice la propuesta del centro
-      share.dataset.share = ev.id;
-      share.dataset.title = ev.title;
-      paintShare(share);
     }
   }).setItems(items);
   const pie = document.querySelector('[data-bill-pie]');

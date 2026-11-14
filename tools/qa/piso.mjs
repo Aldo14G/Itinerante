@@ -49,7 +49,7 @@ const AUDIT = `(() => {
   return out; })()`;
 
 let fails = 0;
-for (const [name, w, h, mobile] of [['ESCRITORIO 1280×800', 1280, 800, false], ['MÓVIL 390×844', 390, 844, true]]) {
+for (const [name, w, h, mobile] of [['ESCRITORIO 1280×800', 1280, 800, false], ['MÓVIL 393×659 (iPhone 16)', 393, 659, true]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   await send('Page.navigate', { url: URL_ }); await sleep(4000);

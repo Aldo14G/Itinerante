@@ -26,7 +26,7 @@ await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'
 const out = [];
 const ck = (n, ok, d = '') => out.push([ok ? '✓' : '✗', n, ok ? '' : d]);
 
-for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1280, 800, false]]) {
+for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['escritorio', 1280, 800, false]]) {
   errs.length = 0;
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Page.navigate', { url: URL_ });

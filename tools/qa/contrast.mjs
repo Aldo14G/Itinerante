@@ -64,7 +64,7 @@ const wait = (expr, n = 40) => (async () => { for (let i = 0; i < n; i++) { if (
 const sweep = async label => { const r = await ev(`window.__sweep(${JSON.stringify(label)})`); fails.push(...(r || [])); };
 
 // Los dos temas del sistema «Itinerante Líquido»: claro y oscuro (prefers-color-scheme).
-for (const [name, w, h, mobile, scheme] of [['móvil claro', 390, 844, true, 'light'], ['escritorio claro', 1280, 800, false, 'light'], ['móvil oscuro', 390, 844, true, 'dark'], ['escritorio oscuro', 1280, 800, false, 'dark']]) {
+for (const [name, w, h, mobile, scheme] of [['móvil claro', 393, 659, true, 'light'], ['escritorio claro', 1280, 800, false, 'light'], ['móvil oscuro', 393, 659, true, 'dark'], ['escritorio oscuro', 1280, 800, false, 'dark']]) {
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 0 });

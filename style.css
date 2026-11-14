@@ -4,14 +4,17 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Márgenes como los de iOS (Apple HIG): 16 hasta 375 px (iPhone SE y mini), 20 desde 376 y 32 desde 1024. El contenido se queda en 1376 px en
-   pantallas muy anchas. Con el teléfono en horizontal el margen nunca es menor que el área segura (la muesca): --seguro-x.
-   --sec: aire entre secciones (48 en móvil, 64 en escritorio). --hdr-h: la barra de navegación más el área segura. */
-:root { --seguro-x: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)); --margen: max(var(--margen-movil), var(--seguro-x)); --sec: var(--space-12); --hdr-h: calc(var(--alto-barra-nav) + env(safe-area-inset-top, 0px)); }
+/* Márgenes como los de iOS (Apple HIG): 16 hasta 375 px (iPhone SE y mini), 20 desde 376 y 32 desde 1024. Desde 1024 el contenido vive en un
+   contenedor centrado de 1152 px (--ancho-contenido, 12 columnas, como Uber; 2026-11-14): el margen crece lo que sobra y la cabecera usa el
+   mismo, así marca y «Mi lista» quedan en los bordes del contenido. Con el teléfono en horizontal el margen nunca es menor que el área segura
+   (la muesca): --seguro-x.
+   --sec: aire entre el fin de una sección y el titular de la siguiente (64 en el teléfono, 112 en escritorio; ritmo de Pinterest y Uber,
+   2026-11-14): cada sección pone la mitad arriba y la mitad abajo, así el borde de la banda queda en medio. --hdr-h: la barra de navegación más
+   el área segura. */
+:root { --seguro-x: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)); --margen: max(var(--margen-movil), var(--seguro-x)); --sec: var(--sec-movil); --hdr-h: calc(var(--alto-barra-nav) + env(safe-area-inset-top, 0px)); }
 @media (min-width: 376px) { :root { --margen: max(var(--margen-movil-amplio), var(--seguro-x)); } }
 @media (min-width: 761px) { :root { --hdr-h: calc(var(--space-16) + env(safe-area-inset-top, 0px)); } }
-@media (min-width: 1024px) { :root { --margen: max(var(--margen-escritorio), var(--seguro-x)); --sec: var(--space-16); } }
-@media (min-width: 1440px) { :root { --margen: max(var(--margen-escritorio), calc((100vw - 1376px) / 2)); } }
+@media (min-width: 1024px) { :root { --margen: max(var(--margen-escritorio), var(--seguro-x), calc((100vw - var(--ancho-contenido)) / 2)); --sec: var(--sec-escritorio); } }
 
 html {
   background: var(--fondo);
@@ -24,6 +27,9 @@ html {
   text-size-adjust: 100%;
 }
 html.sheet-open, html.explorer-open { overflow: hidden; }
+/* Al llegar por un ancla (barra, menú, barra inferior) el titular de la sección queda 24 px bajo la cabecera, como el título grande de iOS
+   (2026-11-14; antes 56 px: los 8 de scroll-padding y la mitad del aire entre secciones encima del titular). */
+main > section[id] { scroll-margin-top: calc(var(--space-6) - var(--space-2) - var(--sec) / 2); }
 
 body {
   margin: 0;
@@ -310,7 +316,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 
 /* ---------- Inicio ---------- */
 
-.entry { display: grid; gap: var(--space-8); padding: var(--space-4) var(--margen) var(--sec); }
+.entry { display: grid; gap: var(--space-8); padding: var(--space-4) var(--margen) calc(var(--sec) / 2); }
 .entry-copy { display: grid; justify-items: start; align-content: start; }
 .entry-title { margin: 0; font: var(--t-titulo-grande); letter-spacing: var(--ls-titulo-grande); text-wrap: balance; }
 .entry-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); font-variant-numeric: tabular-nums; }
@@ -324,7 +330,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .news-hint .entry-news:not([hidden]) { visibility: visible; }
 .entry-news-dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--primario); }
 /* La foto real de la sala, limpia y con radio-lg: nada de texto encima. */
-.entry-media { position: relative; margin: 0; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); aspect-ratio: 3 / 4; }
+.entry-media { position: relative; margin: 0; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); aspect-ratio: 3 / 2; }
 .entry-media picture { height: 100%; }
 .entry-poster { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 @media (min-width: 761px) {
@@ -334,17 +340,20 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .entry-title { font-size: clamp(34px, 3.2vw + 2px, 56px); line-height: 1.08; letter-spacing: var(--ls-display); }
 }
 @media (min-width: 1024px) {
-  /* Inicio en dos columnas (2026-11-13, pedido de Aldo: «centrarlo y posicionarlo correctamente»): el bloque de texto se centra en el alto
-     de la foto y sube 16 px a su centro óptico (el relleno inferior de 32 px de .entry-copy): el titular pesa arriba y la dirección, ligera,
-     abajo. Antes arrancaba al ras del borde superior de la foto y dejaba ~250 px vacíos bajo la dirección a 1440 × 900. La foto no se estira. */
-  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; gap: var(--space-12); padding-block: var(--space-12) var(--space-16); }
-  .entry-copy { padding-bottom: var(--space-8); }
-  .entry-media { aspect-ratio: 3 / 2; }
+  /* Inicio en dos columnas sobre la rejilla de 12 del contenedor de 1152 px (2026-11-14, como Uber): el texto en las columnas 1 a 5 y la foto
+     en las 7 a 12 (5:4, unos 560 × 448 a 1440), con 32 px de canal. El bloque de texto se centra en el alto de la foto y sube 16 px a su centro
+     óptico (el relleno inferior de 32 px de .entry-copy): el titular pesa arriba y la dirección, ligera, abajo. Titular display 56/60. La
+     portada mide 560–620 px de alto y el titular de La casa asoma en la primera vista (≤ 760 px a 1440 × 900). */
+  .entry { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: center; gap: 0 var(--space-8); padding-top: var(--space-20); }
+  .entry-copy { grid-column: 1 / span 5; padding-bottom: var(--space-8); }
+  .entry-media { grid-column: 7 / -1; aspect-ratio: 5 / 4; }
+  .entry-title { font: var(--t-display); font-size: clamp(44px, 2.5vw + 20px, 56px); line-height: 1.07; letter-spacing: var(--ls-display); }
+  .entry-lede { font: var(--t-titulo-3); font-weight: 400; letter-spacing: 0; } /* entradilla 20/25 (Pinterest 20/28) */
 }
 
 /* ---------- La casa ---------- */
 
-.house { padding: var(--sec) 0; background: var(--fondo-2); }
+.house { padding: calc(var(--sec) / 2) 0; background: var(--fondo-2); }
 .house > .sec-head { max-width: calc(40rem + 2 * var(--margen)); padding: 0 var(--margen); margin-bottom: var(--space-8); } /* 40rem de texto más el margen: desde 1728 px el margen crece y antes dejaba 96 px al titular */
 .house-track {
   display: flex; gap: var(--space-4); margin: 0; padding: 0 var(--margen) var(--space-2); list-style: none;
@@ -369,35 +378,39 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 }
 
 /* ---------- Eventos y talleres (#cartelera): Carrusel3D, variante evento ---------- */
-/* Tarjeta en superficie con radio-md (no es vidrio: no flota), foto real 4:3 arriba, insignias de tipo y estado y el título. Debajo del carrusel,
-   la descripción de la propuesta del centro (región viva) y una sola fila de acciones: «Preguntar por WhatsApp» y «Compartir» (icono menta).
-   Sin JavaScript cada tarjeta muestra su descripción y su consulta (la fila de abajo no existe) y la pista se desliza con el dedo. */
-.bill { padding: var(--sec) var(--margen); background: var(--fondo-2); }
+/* Tarjeta en superficie con radio-md (no es vidrio: no flota), foto real 4:3 arriba, insignias de tipo y estado con «Compartir» en su fila y el
+   título. Debajo del carrusel, la descripción de la propuesta del centro (región viva). Sin JavaScript cada tarjeta muestra su descripción y la
+   pista se desliza con el dedo. */
+.bill { padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo-2); }
 .bill > .sec-head { margin-bottom: var(--space-4); }
 .bill-item .cf-pose, .bill-card { height: 100%; }
 .bill-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
 .bill-card-fig { display: block; }
 .bill-card-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-/* Insignias de la propuesta: tipo (Lectura, Juego, Taller) y estado («Propuesta · sin fecha» o la fecha confirmada, ver feed.js). */
-.bill-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4) 0; }
+/* Insignias de la propuesta: tipo (Lectura, Juego, Taller) y estado («Propuesta · sin fecha» o la fecha confirmada, ver feed.js) y, al final de la
+   misma fila, «Compartir» (icono menta de 44; desde el 2026-11-14: antes iba bajo la descripción y, al llegar a Eventos, quedaba bajo la barra
+   inferior en los siete iPhone). Solo existe en la tarjeta del centro (en las vecinas no se ve ni se toca) y necesita JavaScript. */
+.bill-badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-2) 0 var(--space-4); }
+.bill-badges .badge { margin-block: var(--space-2); } /* sin «Compartir» (sin JS) la fila mide lo mismo: 8 + 24 + 8 */
+.bill-share { margin-inline-start: auto; }
+.c3d-item:not(.is-centro) .bill-share, html:not(.js) .bill-share { visibility: hidden; }
 .bill-title { margin: 0; padding: var(--space-3) var(--space-4) var(--space-4); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
 .bill-detail { display: grid; gap: var(--space-3); padding: 0 var(--space-4) var(--space-4); }
 .bill-detail p { max-width: 54ch; margin: 0; font: var(--t-cuerpo); line-height: var(--space-6); color: var(--tinta); }
 /* Párrafos de varias líneas (descripción de la propuesta): Body con interlínea de 24 px, más cómoda para un texto centrado. */
 .bill-track { line-height: var(--space-6); }
 html.js .bill-card .bill-detail { display: none; }
-/* La propuesta del centro: descripción (su alto reservado: cambiar de tarjeta no mueve «Compartir») y «Compartir». */
-.bill-pie { position: relative; display: grid; justify-items: center; gap: var(--space-6); max-width: 36rem; margin: 0 auto; text-align: center; }
+/* La propuesta del centro: su descripción (alto reservado: cambiar de tarjeta no mueve lo de abajo). */
+.bill-pie { position: relative; display: grid; justify-items: center; max-width: 36rem; margin: 0 auto; text-align: center; }
 /* La reserva (--bill-reserva) la mide feed.js: la descripción más larga a este ancho; antes de medir, tres renglones (cuatro hasta 400 px). */
 .bill-desc { min-height: var(--bill-reserva, 3lh); margin: 0; font: var(--t-cuerpo); line-height: var(--space-6); color: var(--tinta); text-wrap: pretty; }
 .bill-medida { position: absolute; inset: 0 0 auto; visibility: hidden; pointer-events: none; } /* copia oculta para medir (feed.js) */
 .bill-medida .bill-desc { min-height: 0; }
-.bill-fila { display: flex; justify-content: center; width: 100%; }
 html:not(.js) .bill-pie { display: none; }
 
 /* ---------- Visita y pie ---------- */
 
-.visit { display: grid; gap: var(--space-8); padding: var(--sec) var(--margen); background: var(--fondo-2); }
+.visit { display: grid; gap: var(--space-8); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo-2); }
 .visit address { margin: var(--space-6) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); font-style: normal; }
 .visit address span { display: inline-block; margin-top: var(--space-2); font: var(--t-subtitulo); color: var(--tinta-2); }
 .visit-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-4) 0 0; font: var(--t-titular); }
@@ -442,7 +455,7 @@ html:not(.js) .bill-pie { display: none; }
 .mapa-pin circle { fill: var(--en-primario); }
 .visit-map figcaption { margin-top: var(--space-2); font: var(--t-nota-pie); color: var(--tinta-2); }
 .visit-map figcaption a { position: relative; color: var(--turquesa-texto); }
-.visit-map figcaption a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-3)) 0; } /* objetivo de 42 px sin engordar el renglón */
+.visit-map figcaption a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-3) - 2px) 0; } /* objetivo de 44 px (16 + 2 × 14) sin engordar el renglón (2026-11-14; antes 40) */
 /* La ruta se dibuja una vez al entrar el mapa en la vista (data-revelar, app.js: con el 60 % del mapa a la vista), en dur-lenta con
    curva-salida tras dur-rapida. Lo que ya se veía al cargar, sin JavaScript o sin movimiento: la ruta entera. */
 .motion .visit-map[data-revelar="listo"] .mapa-ruta { stroke-dashoffset: 1; transition: stroke-dashoffset var(--dur-lenta) var(--curva-salida) var(--dur-rapida); }
@@ -458,7 +471,7 @@ html:not(.js) .bill-pie { display: none; }
 /* Pie (2026-11-13): el único lugar de la página con el contacto, como bloque «Contacto»: titular, para qué escribir y WhatsApp, Instagram,
    Facebook y Correo en una lista agrupada (fondo-2, radio-md, filas de 56 con su icono, como el horario de Visita); debajo, «Pausar el
    movimiento». Sin marca, dirección ni «Cómo llegar» (Visita, justo encima, ya los trae). Las secciones no repiten llamados a WhatsApp. */
-.ftr { padding: var(--sec) var(--margen) var(--space-8); background: var(--fondo); }
+.ftr { padding: calc(var(--sec) / 2) var(--margen) var(--space-8); background: var(--fondo); }
 .ftr-contacto { display: grid; gap: var(--space-6); }
 .ftr-title { margin: 0; font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); }
 .ftr-lede { max-width: 46ch; margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; } /* nota del pie: Subheadline 15/20, un paso bajo el cuerpo de las secciones */
@@ -535,8 +548,8 @@ html:not(.js) .bill-pie { display: none; }
 
 /* ---------- Catálogo (#libros): la piel nueva sobre la estructura de siempre ---------- */
 
-.books { padding: var(--sec) var(--margen) 0; background: var(--fondo); }
-.books > .cat { margin: var(--sec) calc(-1 * var(--margen)) 0; }
+.books { padding: calc(var(--sec) / 2) var(--margen) 0; background: var(--fondo); }
+.books > .cat { margin: calc(var(--sec) / 2) calc(-1 * var(--margen)) 0; }
 /* Cabecera del capítulo: titular y, justo debajo, «Buscar en el catálogo» (la tarea principal del capítulo va primero). */
 .books-head { display: grid; justify-items: start; gap: var(--space-5); margin-bottom: var(--space-6); }
 .books-head .h2 { max-width: 16ch; }
@@ -591,11 +604,11 @@ html:not(.js) .bill-pie { display: none; }
 .cat-clear .ic { width: 20px; height: 20px; }
 .cat-clear:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .cat-clear:hover { color: var(--tinta); } }
-.books-foot { display: grid; justify-items: start; gap: var(--space-4); padding: var(--sec) 0; }
+.books-foot { display: grid; justify-items: start; gap: var(--space-6); padding: var(--space-8) 0 calc(var(--sec) / 2); } /* texto → botón 24 (2026-11-14; antes 16) */
 .books-foot p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
 
 /* Explorar el catálogo (capa 2). En escritorio el diálogo queda abierto en línea; en móvil es una hoja a pantalla completa (mobile.css). */
-.cat { padding: var(--space-12) var(--margen) var(--sec); border-top: 1px solid var(--linea); }
+.cat { padding: var(--space-12) var(--margen) var(--space-8); border-top: 1px solid var(--linea); }
 .cat-head { margin-bottom: var(--space-8); }
 .ex-top { display: none; }
 .explorer { position: static; inset: auto; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; overflow: visible; color: inherit; background: none; border: 0; }
@@ -878,15 +891,17 @@ html:not(.js) .bill-pie { display: none; }
 .c3d-card:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco), var(--sombra-portada); }
 .c3d-item.is-centro :is(.bill-card, .cafe-card) { box-shadow: var(--sombra-portada); }
 
-/* Ancho de la pieza. Teléfono: portada 58 % (176–240 px, con tope contra el alto: carrusel, pie y acción caben entre las dos barras),
+/* Ancho de la pieza. Teléfono: portada 58 % (176–248 px, con tope contra el alto: carrusel, pie y acción caben entre las dos barras),
    evento 76 % (hasta 340), carta 60 % (184–248). Desde 761 px sale del escenario: caben las piezas a la vista y las dos flechas de 48 con
    16 de aire (2 × (alto-md + space-4)); portada 240–280, evento 300–440, carta 232–272. Desde 1440, dos por lado en portada y carta. */
-.c3d--portada { --c3d-w: min(clamp(176px, 58vw, 240px), calc((100svh - 320px) / 1.5)); }
+.c3d--portada { --c3d-w: min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5)); } /* tope 248 (2026-11-14; antes 240: en el 16 Pro Max la vecina asomaba 33 %) */
 .c3d--evento { --c3d-w: min(76vw, 340px); --c3d-separa: 0.045; --c3d-borde: 1.33; }
 .c3d--carta { --c3d-w: clamp(184px, 60vw, 248px); }
 @media (min-width: 761px) {
-  /* Escenario de hasta 1240 px centrado en la columna de contenido; los bordes se desvanecen (máscara de 48 px), sin cortes duros. */
-  .c3d { width: 100%; max-width: 1240px; margin-inline: auto; }
+  /* Escenario de hasta 1240 px centrado en la columna de contenido; los bordes se desvanecen (máscara de 48 px), sin cortes duros. Desde que el
+     contenido vive en 1152 px (2026-11-14) el escenario puede salir del contenedor hasta 1240 (44 px por lado a 1440), simétrico y nunca más
+     allá del margen de escritorio (32): así la portada sigue en 280 con dos vecinas por lado y las flechas. */
+  .c3d { --c3d-escenario: min(1240px, max(100%, 100% + 2 * (var(--margen) - var(--margen-escritorio)))); width: var(--c3d-escenario); max-width: none; margin-inline: calc((100% - var(--c3d-escenario)) / 2); }
   .c3d-flecha--prev { left: max(0px, calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
   .c3d-flecha--next { right: max(0px, calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
   .c3d-viewport { -webkit-mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); }
@@ -949,7 +964,7 @@ html:not(.js) .bill-pie { display: none; }
    renglones están reservados desde el esqueleto: el conteo tiene su ancho aunque llegue vacío. */
 .rail-nota-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); max-width: 480px; } /* el ancho de «Buscar en el catálogo»: el conteo queda cerca de sus paradas */
 .rail-note { flex: 1 1 14rem; min-height: 1lh; margin: 0; max-width: 56ch; font: var(--t-nota-pie); color: var(--tinta-2); }
-@media (min-width: 390px) { .rail-note { font: var(--t-subtitulo); } } /* Subheadline 15 donde la nota cabe en un renglón; antes, Footnote 13 */
+@media (min-width: 375px) { .rail-note { font: var(--t-subtitulo); } } /* Subheadline 15 desde 375 (iPhone SE y mini, 2026-11-14; antes desde 390); a 320–374, Footnote 13 */
 .rail-progreso { flex: 0 0 auto; min-width: 12.5em; min-height: 1lh; margin: 0 0 0 auto; font: var(--t-nota-pie); font-weight: 600; color: var(--turquesa-texto); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rail-item .card { content-visibility: visible; }
 .rail-item.is-centro .cover { box-shadow: var(--sombra-portada); }
@@ -983,7 +998,7 @@ html:not(.js) .bill-pie { display: none; }
 /* ---------- Café y té (#cafe): Carrusel3D, variante carta ---------- */
 /* Titular, entradilla, foto real de la casa, chips Café · Té (radiogroup) y la carta: tarjetas tipográficas en superficie con un icono de
    trazo (taza, tetera), el nombre, la descripción y, solo si la librería lo da, el precio. La consulta por WhatsApp vive en el pie. */
-.cafe { padding: var(--sec) var(--margen); background: var(--fondo); }
+.cafe { padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
 .cafe > .sec-head { margin-bottom: var(--space-8); }
 .cafe-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
 .cafe-foto { margin: 0; }
@@ -1017,7 +1032,7 @@ html:not(.js) :is(.cafe-chips, .c3d--carta), .cafe-carta[data-state="vacio"] :is
 /* ---------- Novedades (CarruselNovedades): las llegadas registradas en una tira que «Ver todo» despliega en rejilla ---------- */
 /* Solo existe con llegadas (has-news, que ponen boot.js y news.js): sin entradas válidas ni sin JavaScript no hay sección ni enlaces. */
 html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link][hidden] { display: none; }
-.news { --nov-w: 120px; padding: var(--sec) 0; background: var(--fondo); }
+.news { --nov-w: 120px; padding: calc(var(--sec) / 2) 0; background: var(--fondo); }
 .news-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--margen); }
 .news-toggle { flex: none; margin-inline-end: calc(-1 * var(--space-3)); }
 .news-toggle:disabled { background: transparent; color: var(--tinta-2); }
@@ -1097,7 +1112,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 
 /* ---------- Impresión ---------- */
 @media print {
-  .hdr, .tabbar, .menu, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer, .save, .toast, .mylist, .card--sk, .sk-group, .bill-fila, .c3d-flecha { display: none !important; }
+  .hdr, .tabbar, .menu, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer, .save, .toast, .mylist, .card--sk, .sk-group, .bill-share, .c3d-flecha { display: none !important; }
   *, *::before, *::after { opacity: 1 !important; transform: none !important; clip-path: none !important; visibility: visible !important; color: var(--tinta) !important; background: transparent !important; box-shadow: none !important; }
   img { filter: grayscale(1); }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.7em; word-break: break-all; }

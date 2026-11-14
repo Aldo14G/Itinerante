@@ -263,18 +263,19 @@ Variante portada (capa 1 del Catálogo): empieza por el libro del medio; bajo é
 
 ### CarruselEventos
 
-Variante evento: tarjetas en superficie con radio 20, foto real 4:3, insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) y el título; debajo, la descripción de la central (región viva con su reserva) y «Compartir».
+Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva).
 
-- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Tarjeta de evento).
-- **style.css:** `.c3d--evento` `.bill-card` `.bill-card-img` `.bill-badges` `.bill-title` `.bill-pie` `.bill-desc` `.bill-fila`
-- **index.html:** `[data-bill-track]` `[data-bill-desc]` `[data-bill-pie]` `.bill-item` `.bill-card`
+- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Tarjeta de evento) y «Posiciones de iPhone y contenedor de 1152» (2026-11-14: «Compartir» en la fila de insignias).
+- **style.css:** `.c3d--evento` `.bill-card` `.bill-card-img` `.bill-badges` `.bill-title` `.bill-pie` `.bill-desc` `.bill-share`
+- **index.html:** `[data-bill-track]` `[data-bill-desc]` `[data-bill-pie]` `.bill-item` `.bill-card` `.bill-share`
 - **feed.js:** exporta `initEventos` `initFeed` `eventBadge` `eventOf` `measureDescs` `shareItem` `NO_DATE`
 - **Tokens:** `superficie` `fondo-2` `tinta` `radio-md` `t-titulo-3` `t-cuerpo` `sombra-portada` `space-3` `space-4` `space-6`
 - **Estado actual:** `.c3d-item.is-centro :is(.bill-card, .cafe-card)`
 - **Estado foco:** `.c3d-card:focus-visible`
+- **Estado oculto:** `.c3d-item:not(.is-centro) .bill-share` — «Compartir» solo se ve y se toca en la tarjeta del centro (y sin JavaScript no se ofrece).
 - **vacio: no aplica.** Las propuestas están en el HTML; sin JavaScript cada tarjeta muestra su descripción.
-- **ARIA:** Carousel (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-labelledby (cada article)` `aria-live=polite (descripción)` · **Teclado:** El del Carrusel3D.
-- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs`
+- **ARIA:** Carousel (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-labelledby (cada article)` `aria-live=polite (descripción)` `aria-label «Compartir «título»» (cada «Compartir»)` · **Teclado:** El del Carrusel3D.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/iphone.mjs`
 
 ### CarruselCarta
 

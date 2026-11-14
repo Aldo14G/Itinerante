@@ -40,19 +40,19 @@ async function open(w, h, mobile) {
 }
 const waitFor = async (expr, tries = 40) => { for (let i = 0; i < tries; i++) { if (await ev(expr)) return true; await sleep(200); } return false; };
 
-await open(390, 844, true);
-await audit('móvil 390: inicio');
+await open(393, 659, true);
+await audit('móvil 393: inicio');
 await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('menu').open`); await sleep(900);
-await audit('móvil 390: menú (secciones, horario de hoy, «Cómo llegar», WhatsApp y redes)');
+await audit('móvil 393: menú (secciones, horario de hoy, «Cómo llegar», WhatsApp y redes)');
 await ev(`document.getElementById('menu').close()`); await sleep(500);
 await ev(`document.querySelector('[data-ex-open]').scrollIntoView()`); await sleep(1200);
 await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`document.getElementById('explorer').open`); await waitFor(`document.querySelector('#explorer [data-cat-grid]').getAttribute('aria-busy') === null`, 60); await sleep(600);
-await audit('móvil 390: hoja Explorar con el catálogo');
+await audit('móvil 393: hoja Explorar con el catálogo');
 await ev(`document.querySelector('#explorer button.card').click()`); await waitFor(`document.getElementById('cat-drawer') && document.getElementById('cat-drawer').open`); await sleep(800);
-await audit('móvil 390: ficha sobre Explorar');
+await audit('móvil 393: ficha sobre Explorar');
 await ev(`document.getElementById('cat-drawer').close(); document.getElementById('explorer').close()`); await sleep(600);
 await ev(`document.querySelector('.tabbar [data-open-mylist]').click()`); await waitFor(`document.getElementById('mylist').open`, 30); await sleep(800);
-await audit('móvil 390: Mi lista (vacía)');
+await audit('móvil 393: Mi lista (vacía)');
 
 await open(1280, 800, false);
 await audit('escritorio 1280: inicio');
@@ -63,10 +63,10 @@ await audit('escritorio 1280: ficha');
 
 // Tema oscuro (prefers-color-scheme): mismas comprobaciones de contraste y nombres en el inicio y el menú.
 await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
-await open(390, 844, true);
-await audit('móvil 390 oscuro: inicio');
+await open(393, 659, true);
+await audit('móvil 393 oscuro: inicio');
 await ev(`document.querySelector('[data-menu-open]').click()`); await waitFor(`document.getElementById('menu').open`); await sleep(900);
-await audit('móvil 390 oscuro: menú');
+await audit('móvil 393 oscuro: menú');
 
 let serious = 0;
 for (const s of states) {

@@ -29,7 +29,7 @@ const ratio = (a, b) => { const [hi, lo] = a > b ? [a, b] : [b, a]; return (hi +
 
 let fail = 0;
 const rows = [];
-for (const [w, h] of [[375, 667], [360, 640], [320, 640], [390, 844]]) {
+for (const [w, h] of [[375, 667], [375, 629], [320, 640], [393, 659]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: true });
   await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   await send('Page.navigate', { url: URL_ });

@@ -43,6 +43,8 @@ const check = (area, name, ok, detail = '') => report.push({ area, name, ok: !!o
 async function open(width, height, { mobile = true, reduced = false } = {}) {
   problems = [];
   await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile });
+  // 402×874 es el iPhone 16 Pro a pantalla completa: lleva sus áreas seguras (62 arriba, 34 abajo); el resto, ninguna.
+  await send('Emulation.setSafeAreaInsetsOverride', { insets: width === 402 && height === 874 ? { top: 62, bottom: 34, left: 0, right: 0 } : { top: 0, bottom: 0, left: 0, right: 0 } });
   if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 }); else await send('Emulation.setTouchEmulationEnabled', { enabled: false });
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: reduced ? 'reduce' : 'no-preference' }] });
   await send('Page.navigate', { url: URL_ });
@@ -53,7 +55,8 @@ async function open(width, height, { mobile = true, reduced = false } = {}) {
 const overflow = () => ev(`(()=>{const d=document.documentElement; const clipped=e=>{for(let p=e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX; if((o==='hidden'||o==='clip')&&p.getBoundingClientRect().right<=d.clientWidth+1) return true;} return false;}; return {sw:d.scrollWidth, cw:d.clientWidth, wide:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(); return r.width>0 && r.right>d.clientWidth+1 && getComputedStyle(e).position!=='absolute' && !clipped(e) && !e.closest('.c3d-viewport, .rail-chips, .house-track, .news-list, dialog, .tabbar')}).slice(0,4).map(e=>(e.className||e.tagName)+' <'+(e.parentElement&&e.parentElement.className)+'>')}})()`);
 
 // ---------- 1. Desbordes en varios anchos ----------
-for (const [w, h, mobile] of [[360, 740, true], [390, 844, true], [414, 896, true], [768, 1024, true], [1280, 800, false], [1920, 1080, false]]) {
+// Teléfonos: iPhone reales en Safari (2026-11-14; antes 360×740, 390×844 y 414×896) y el 16 Pro a pantalla completa.
+for (const [w, h, mobile] of [[375, 629, true], [393, 659, true], [440, 763, true], [402, 874, true], [768, 1024, true], [1280, 800, false], [1920, 1080, false]]) {
   await open(w, h, { mobile });
   const o = await overflow();
   check('layout', `sin desborde horizontal a ${w}px`, o.sw <= o.cw && !o.wide.length, JSON.stringify(o));
@@ -61,9 +64,9 @@ for (const [w, h, mobile] of [[360, 740, true], [390, 844, true], [414, 896, tru
 }
 
 // ---------- 2. Menú ☰ (MenuHamburguesa) ----------
-for (const w of [360, 390]) {
-  await open(w, 800);
-  const A = 'menú ' + w;
+for (const [w, h] of [[375, 629], [440, 763]]) {
+  await open(w, h);
+  const A = `menú ${w}×${h}`;
   const btn = await ev(`(()=>{const b=document.querySelector('[data-menu-open]'); const r=b.getBoundingClientRect(); return {shown:getComputedStyle(b).display!=='none', w:Math.round(r.width), h:Math.round(r.height), exp:b.getAttribute('aria-expanded'), ctl:b.getAttribute('aria-controls'), target:!!document.getElementById(b.getAttribute('aria-controls')), label:b.getAttribute('aria-label'), inBar:!!b.closest('.hdr')}})()`);
   check(A, '☰ en la barra de navegación, 44 × 44, con nombre, aria-expanded y aria-controls a un elemento real', btn.shown && btn.w === 44 && btn.h === 44 && btn.exp === 'false' && btn.ctl === 'menu' && btn.target && btn.label === 'Abrir menú' && btn.inBar, JSON.stringify(btn));
   await ev(`document.querySelector('[data-menu-open]').click()`);
@@ -73,7 +76,7 @@ for (const w of [360, 390]) {
   check(A, 'abre como modal titulado «Menú», el foco entra a la primera sección, el × queda en el sitio del ☰, scroll bloqueado y la barra inferior se oculta', s1.open && s1.modal && s1.active === 'Inicio' && s1.xOnTop && s1.sheet && s1.lock === 'hidden' && s1.exp === 'true' && s1.label === 'Cerrar menú' && s1.tabbarHidden && s1.title === 'Menú', JSON.stringify(s1));
   check(A, 'hoja de vidrio con 8 px de margen, bajo la barra de navegación', s1.left === 8 && s1.right === 8 && s1.top >= 44, JSON.stringify(s1));
   const rows = await ev(`[...document.querySelectorAll('#menu .menu-row')].filter(r=>r.getClientRects().length).map(r=>[r.querySelector('span').firstChild.textContent.trim(), Math.round(r.getBoundingClientRect().height)])`);
-  check(A, 'filas de 56 px con todas las secciones y Mi lista', rows.every(r => r[1] === 56) && rows.map(r => r[0]).join('|') === 'Inicio|Catálogo|Eventos y talleres|Novedades|Café y té|La casa|Visita|Mi lista', JSON.stringify(rows));
+  check(A, `filas de ${h <= 700 ? 48 : 56} px (48 en ventanas de hasta 700 de alto: todo cabe sin desplazar) con todas las secciones y Mi lista`, rows.every(r => r[1] === (h <= 700 ? 48 : 56)) && rows.map(r => r[0]).join('|') === 'Inicio|Catálogo|Eventos y talleres|Novedades|Café y té|La casa|Visita|Mi lista', JSON.stringify(rows));
   const redes = await ev(`[...document.querySelectorAll('#menu .menu-redes a')].map(r=>[r.textContent.trim(), Math.round(r.getBoundingClientRect().height), Math.round(r.getBoundingClientRect().width)])`);
   check(A, 'Instagram y Facebook como botones de 44 px', redes.length === 2 && redes.every(c => c[1] === 44 && c[2] >= 44) && redes.map(c => c[0]).join() === 'Instagram,Facebook', JSON.stringify(redes));
   const flatSheet = await ev(`(()=>{const d=document.getElementById('menu'); return {collapsed:d.querySelectorAll('[aria-expanded="false"], details').length, inert:d.querySelectorAll('[inert]').length, dead:[...d.querySelectorAll('a[href^="#"]')].filter(a=>a.getClientRects().length).filter(a=>{const t=document.querySelector(a.getAttribute('href')); return !t || !t.getClientRects().length}).map(a=>a.getAttribute('href'))}})()`);
@@ -111,7 +114,7 @@ for (const w of [360, 390]) {
 
 // ---------- 3. Temas claro y oscuro ----------
 const lumFn = `const lum=c=>{const [r,g,b]=c.match(/[\\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=0.03928?v/12.92:((v+0.055)/1.055)**2.4); return 0.2126*r+0.7152*g+0.0722*b}; const ratio=(a,b)=>{const x=lum(a),y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)};`;
-for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false, 'escritorio']]) {
+for (const [w, h, mobile, tag] of [[393, 659, true, 'móvil'], [1280, 800, false, 'escritorio']]) {
   for (const scheme of ['light', 'dark']) {
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
     await open(w, h, { mobile });
@@ -145,13 +148,13 @@ for (const [w, h, mobile, tag] of [[390, 844, true, 'móvil'], [1280, 800, false
 }
 
 // ---------- 4. Barra inferior, Eventos, inicio (móvil) ----------
-await open(390, 844);
+await open(393, 659);
 // Cada tramo de la página y la casilla que debe marcar: Inicio abarca la entrada y La casa; el Catálogo, su capítulo; en el resto no hay casilla.
 for (const [sel, want] of [['#inicio', '#inicio'], ['#casa', '#inicio'], ['#libros', '#libros'], ['[data-rail]', '#libros'], ['#cartelera', ''], ['#novedades', ''], ['#cafe', ''], ['#visita', ''], ['.ftr', '']]) {
   // En el teléfono #catalogo no ocupa sitio (es la hoja Explorar): el Catálogo se mide en su titular y en el carrusel.
   for (let i = 0; i < 4; i++) { await ev(`scrollTo(0, document.querySelector('${sel}').getBoundingClientRect().top + scrollY + ${['#inicio'].includes(sel) ? 0 : 120})`); await sleep(900); }
   await ev(`scrollBy(0,1)`); await sleep(600);
-  const cur = await ev(`[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>a.getAttribute('aria-current')?a.getAttribute('href')+'='+a.getAttribute('aria-current'):null).filter(Boolean)`);
+  const cur = await ev(`[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>a.getAttribute('aria-current')?(a.dataset.zona||a.getAttribute('href'))+'='+a.getAttribute('aria-current'):null).filter(Boolean)`); // «Catálogo» aterriza en #colecciones; su zona es #libros
   const pill = await ev(`getComputedStyle(document.querySelector('.tabbar-pastilla')).opacity`);
   check('barra inferior', want ? `en ${sel} marca ${want} (con la pastilla)` : `en ${sel} no marca ninguna casilla (sin pastilla)`, want ? cur.length === 1 && cur[0] === want + '=location' && pill === '1' : cur.length === 0 && pill === '0', JSON.stringify([cur, pill]));
 }
@@ -161,20 +164,20 @@ const steady = await ev(`(async()=>{const box=()=>[...document.querySelectorAll(
 check('barra inferior', 'las casillas no cambian de tamaño ni de sitio al cambiar la activa (solo se desliza la pastilla)', steady === true, String(steady));
 const secs = await ev(`Object.fromEntries([...document.querySelectorAll('main > section')].map(s=>[s.id||s.className.split(' ')[0], Math.round(s.getBoundingClientRect().top+scrollY)]))`);
 await ev(`scrollTo(0,${secs.cartelera + 150})`); await sleep(1500);
-const car = await ev(`(()=>{const items=[...document.querySelectorAll('.bill-item')]; const v=document.querySelector('[data-bill-viewport]'); return {n:items.length, snap:getComputedStyle(v).scrollSnapType, img:items.every(d=>d.querySelector('img').naturalWidth>0||!d.querySelector('img').complete), dots:document.querySelectorAll('.bill-dots').length, centro:items.findIndex(d=>d.classList.contains('is-centro')), rows:document.querySelectorAll('.bill-fila').length}})()`);
-check('eventos', 'Carrusel3D (variante evento) con 3 tarjetas, imán y la del medio al centro; sin puntos; una sola fila («Compartir»)', car.n === 3 && /x mandatory/.test(car.snap) && car.dots === 0 && car.centro === 1 && car.rows === 1, JSON.stringify(car));
+const car = await ev(`(()=>{const items=[...document.querySelectorAll('.bill-item')]; const v=document.querySelector('[data-bill-viewport]'); return {n:items.length, snap:getComputedStyle(v).scrollSnapType, img:items.every(d=>d.querySelector('img').naturalWidth>0||!d.querySelector('img').complete), dots:document.querySelectorAll('.bill-dots').length, centro:items.findIndex(d=>d.classList.contains('is-centro')), rows:document.querySelectorAll('.bill-fila').length, share:document.querySelectorAll('.bill-badges [data-share]').length}})()`);
+check('eventos', 'Carrusel3D (variante evento) con 3 tarjetas, imán y la del medio al centro; sin puntos; «Compartir» en la fila de insignias de cada tarjeta (sin fila aparte, 2026-11-14)', car.n === 3 && /x mandatory/.test(car.snap) && car.dots === 0 && car.centro === 1 && car.rows === 0 && car.share === 3, JSON.stringify(car));
 await ev(`(() => { const v = document.querySelector('[data-bill-viewport]'); v.scrollTo({ left: v.scrollWidth, behavior: 'instant' }); })()`); await sleep(900);
-const ev2 = await ev(`({ centro: document.querySelector('.bill-item.is-centro')?.dataset.id, share: document.querySelector('.bill-fila [data-share]').getAttribute('aria-label') })`);
-check('eventos', 'al deslizar, la del centro y «Compartir» siguen al desplazamiento', ev2.centro === 'taller' && ev2.share === 'Compartir «Taller de escritura»', JSON.stringify(ev2));
+const ev2 = await ev(`({ centro: document.querySelector('.bill-item.is-centro')?.dataset.id, share: [...document.querySelectorAll('#cartelera [data-share]')].filter(b=>getComputedStyle(b).visibility==='visible').map(b=>b.getAttribute('aria-label')).join() })`);
+check('eventos', 'al deslizar, la del centro lleva el único «Compartir» a la vista', ev2.centro === 'taller' && ev2.share === 'Compartir «Taller de escritura»', JSON.stringify(ev2));
 await shot('m-cartelera.jpg');
 // inicio (como primera visita: sin lo que dejó el recorrido anterior, para que el control de novedades tenga su sitio reservado)
 await ev(`localStorage.removeItem('iti-news-visto'); localStorage.removeItem('iti-news-estado')`);
-await open(390, 844);
+await open(393, 659);
 await ev(`scrollTo(0,0)`); await sleep(1200); await ev(`scrollTo(0,1)`); await sleep(300); await ev(`scrollTo(0,0)`); await sleep(800);
-const hero = await ev(`(()=>{const q=s=>document.querySelector(s); const r=q('.entry-lede').getBoundingClientRect(); const cta=[...document.querySelectorAll('.entry-actions a')].map(a=>{const b=a.getBoundingClientRect(); return [Math.round(b.height), Math.round(b.top), Math.round(b.bottom), a.classList.contains('btn--primario')]}); const tb=q('.tabbar').getBoundingClientRect(); const n=q('[data-news-cta]'); const nb=n.getBoundingClientRect(); const ad=q('.entry-address').getBoundingClientRect(); return {lede:[Math.round(r.top),Math.round(r.bottom)], cta, news:{shown:getComputedStyle(n).visibility==='visible'&&nb.height>0, h:Math.round(nb.height), top:Math.round(nb.top), bottom:Math.round(nb.bottom), primary:n.classList.contains('btn--primario')}, tabTop:Math.round(tb.top), address:Math.round(ad.bottom), photo:!!q('.entry-poster').currentSrc.match(/inicio-sala-m/)}})()`);
+const hero = await ev(`(()=>{const q=s=>document.querySelector(s); const r=q('.entry-lede').getBoundingClientRect(); const cta=[...document.querySelectorAll('.entry-actions a')].map(a=>{const b=a.getBoundingClientRect(); return [Math.round(b.height), Math.round(b.top), Math.round(b.bottom), a.classList.contains('btn--primario')]}); const tb=q('.tabbar').getBoundingClientRect(); const n=q('[data-news-cta]'); const nb=n.getBoundingClientRect(); const ad=q('.entry-address').getBoundingClientRect(); return {lede:[Math.round(r.top),Math.round(r.bottom)], cta, news:{shown:getComputedStyle(n).visibility==='visible'&&nb.height>0, h:Math.round(nb.height), top:Math.round(nb.top), bottom:Math.round(nb.bottom), primary:n.classList.contains('btn--primario')}, tabTop:Math.round(tb.top), address:Math.round(ad.bottom), photo:!!q('.entry-poster').currentSrc.match(/inicio-sala-3x2/), ratio:+(q('.entry-media').offsetWidth/q('.entry-media').offsetHeight).toFixed(2), photoBottom:Math.round(q('.entry-media').getBoundingClientRect().bottom)}})()`);
 check('inicio móvil', 'una sola acción visible («Cómo llegar», primario de 56 px; el contacto vive en el pie y el menú), sobre la barra inferior', hero.cta.filter(c => c[0] > 0).length === 1 && hero.cta.filter(c => c[0] > 0).every(c => c[0] === 56 && c[3] && c[2] <= hero.tabTop), JSON.stringify(hero));
 check('inicio móvil', 'el control de novedades (si hay llegadas sin ver) va bajo «Cómo llegar», es secundario, ≥ 48 px y queda sobre la barra inferior', !hero.news.shown || (!hero.news.primary && hero.news.h >= 48 && hero.news.top >= Math.max(...hero.cta.map(c => c[2])) && hero.news.bottom <= hero.tabTop), JSON.stringify(hero.news));
-check('inicio móvil', 'la dirección queda sobre la barra inferior y la foto es la vertical de la sala', hero.address <= hero.tabTop - 8 && hero.photo, JSON.stringify(hero));
+check('inicio móvil', 'la dirección y la foto de la sala (3:2, recorte del 2026-11-14) quedan sobre la barra inferior', hero.address <= hero.tabTop - 8 && hero.photo && hero.ratio >= 1.49 && hero.photoBottom <= hero.tabTop - 8, JSON.stringify(hero));
 await shot('m-hero.jpg');
 
 // ---------- 4b. Portadas, aterrizaje de anclas, gama media, crédito ----------
@@ -183,7 +186,7 @@ for (let i = 0; i < 12 && !(await ev(`document.querySelectorAll('.cover--blank')
 const cov = await ev(`(()=>{const num=c=>c.match(/[0-9.]+/g).slice(0,3).map(Number); const lum=c=>{const [r,g,b]=num(c).map(v=>v/255).map(v=>v<=0.03928?v/12.92:((v+0.055)/1.055)**2.4); return 0.2126*r+0.7152*g+0.0722*b}; const ratio=(a,b)=>{const x=lum(a),y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)}; return [...document.querySelectorAll('.cover--blank')].slice(0,24).map(c=>{ const cs=getComputedStyle(c); const stops=cs.backgroundImage.match(/rgba?\\([^)]*\\)/g)||(cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'?[cs.backgroundColor]:[]); const worst=sel=>Math.min(...stops.map(s=>ratio(getComputedStyle(c.querySelector(sel)).color,s))); return stops.length?[worst('.cover-title'), worst('.cover-author')]:[0,0]})})()`);
 const covCount = await ev(`document.querySelectorAll('.cover--blank').length`);
 check('portadas', 'título y autor se leen sobre el campo plano de su portada tipográfica (≥ 4.5:1), si hay alguna sin imagen', !covCount || (cov?.length > 0 && cov.every(r => r[0] >= 4.5 && r[1] >= 4.5)), JSON.stringify((cov || []).slice(0, 3)));
-for (const [id, how] of [['libros', 'tab'], ['cartelera', 'menu'], ['novedades', 'menu'], ['cafe', 'menu'], ['inicio', 'tab']]) {
+for (const [id, how] of [['colecciones', 'tab'], ['libros', 'menu'], ['cartelera', 'menu'], ['novedades', 'menu'], ['cafe', 'menu'], ['inicio', 'tab']]) {
   await ev(`scrollTo(0, ${id === 'inicio' ? 3000 : 0})`); await sleep(600);
   if (how === 'tab') await ev(`document.querySelector('.tabbar a[href="#${id}"]').click()`);
   else { await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(900); await ev(`document.querySelector('#menu a[href="#${id}"]').click()`); }
@@ -208,7 +211,7 @@ await key('Escape', 'Escape', 27); await sleep(800);
 check('catálogo', 'Escape cierra la ficha y libera el scroll', await ev(`!document.querySelector('dialog.drawer').open && !document.documentElement.classList.contains('sheet-open')`));
 
 // ---------- 6. Movimiento reducido ----------
-await open(390, 844, { reduced: true });
+await open(393, 659, { reduced: true });
 const rm = await ev(`({motion:document.documentElement.classList.contains('motion'), anims:document.getAnimations().filter(a=>a.playState==='running'&&a.effect?.getTiming().iterations===Infinity).length, listo:document.querySelectorAll('[data-revelar="listo"]').length})`);
 check('movimiento reducido', 'sin clase motion, sin animaciones infinitas y ningún titular o imagen preparado para entrar', !rm.motion && rm.anims === 0 && rm.listo === 0, JSON.stringify(rm));
 await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(700);
@@ -230,7 +233,7 @@ check('escritorio', 'todas las anclas internas existen', !anchors.length, JSON.s
 await shot('d-hero.jpg');
 
 // ---------- 8. Accesibilidad básica ----------
-await open(390, 844);
+await open(393, 659);
 const a11y = await ev(`(()=>{const bad=[]; document.querySelectorAll('button, a[href], input, select, summary').forEach(e=>{ if(e.closest('[inert],[hidden]')) return; const cs=getComputedStyle(e); if(cs.display==='none'||cs.visibility==='hidden') return; const name=(e.getAttribute('aria-label')||e.textContent||e.getAttribute('title')||e.getAttribute('placeholder')||'').trim() || (e.labels&&e.labels[0]&&e.labels[0].textContent.trim()) || e.getAttribute('aria-labelledby'); if(!name) bad.push(e.outerHTML.slice(0,80)); }); const imgs=[...document.images].filter(i=>!i.hasAttribute('alt')).map(i=>i.src.slice(-30)); return {unnamed:bad.slice(0,6), noAlt:imgs, lang:document.documentElement.lang, h1:document.querySelectorAll('h1').length, dupIds:(()=>{const s={}, d=[]; document.querySelectorAll('[id]').forEach(e=>{s[e.id]?d.push(e.id):s[e.id]=1}); return d})()}})()`);
 check('accesibilidad', 'controles con nombre, imágenes con alt, un h1, idioma, sin ids duplicados', !a11y.unnamed.length && !a11y.noAlt.length && a11y.lang === 'es-MX' || a11y.lang?.startsWith('es') && a11y.h1 === 1 && !a11y.dupIds.length, JSON.stringify(a11y));
 
@@ -239,7 +242,7 @@ await send('Emulation.setCPUThrottlingRate', { rate: 4 });
 await send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1.6 * 1024 * 1024 / 8, uploadThroughput: 750 * 1024 / 8 });
 await ev(`localStorage.removeItem('iti-news-visto'); localStorage.removeItem('iti-news-estado')`); // se mide la primera visita: el conteo de novedades llega y pinta el punto y el control del inicio
 await send('Page.addScriptToEvaluateOnNewDocument', { source: `window.__m={lcp:0,cls:0,lt:0};new PerformanceObserver(l=>{for(const e of l.getEntries())__m.lcp=e.startTime}).observe({type:'largest-contentful-paint',buffered:true});new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)__m.cls+=e.value}).observe({type:'layout-shift',buffered:true});new PerformanceObserver(l=>{for(const e of l.getEntries())__m.lt+=Math.max(0,e.duration-50)}).observe({type:'longtask',buffered:true});` });
-await open(390, 844);
+await open(393, 659);
 const perf = await ev(`(()=>{const f=performance.getEntriesByName('first-contentful-paint')[0]; return {fcp:Math.round(f?.startTime||0), lcp:Math.round(__m.lcp), cls:+__m.cls.toFixed(3), tbt:Math.round(__m.lt), kb:Math.round(performance.getEntriesByType('resource').reduce((s,r)=>s+(r.encodedBodySize||0),0)/1024)}})()`);
 check('rendimiento (4× CPU, 4G lenta)', 'LCP ≤ 2500 ms', perf.lcp <= 2500, JSON.stringify(perf));
 check('rendimiento (4× CPU, 4G lenta)', 'CLS ≤ 0.1', perf.cls <= 0.1, JSON.stringify(perf));

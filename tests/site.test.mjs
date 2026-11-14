@@ -245,7 +245,7 @@ test('procedencia: todo raster de assets/img y la secuencia tiene origen registr
   assert.ok(!('sampleData' in prov) && /inventario-itinerante\.json/.test(prov.catalogData.origin), 'el origen del catálogo es la hoja de la librería');
   assert.equal(prov.aiRecreation.length, 0, 'no quedan recreaciones: todas las imágenes son fotografías de la casa');
   assert.ok(![...kind.keys()].some(k => k.startsWith('seq')) && !existsSync(here('./assets/seq')) && !existsSync(here('./assets/seq-m')), 'la secuencia de fotogramas generada se retiró');
-  assert.ok(/<img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp"/.test(html) && /srcset="assets\/img\/inicio-sala-m\.webp"/.test(html) && !/<section id="inicio"[^>]*data-seq/.test(html), 'el inicio es una fotografía fija (sin data-seq no hay recorrido por fotogramas)');
+  assert.ok(/<img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp"/.test(html) && /srcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w"/.test(html) && !/<section id="inicio"[^>]*data-seq/.test(html), 'el inicio es una fotografía fija (sin data-seq no hay recorrido por fotogramas)');
   assert.ok(!/data-kind="ai"/.test(html) && !/TOPICS|topic-layer/.test(html + readFileSync_('app.js')), 'el marcado declara solo fotografías (los temas de «Pregúntanos» se retiraron el 2026-11-13)');
   const stills = [...html.matchAll(/<li class="still">([\s\S]*?)<\/li>/g)].map(m => m[1]);
   assert.equal(stills.length, 6);
@@ -504,7 +504,7 @@ test('servidor de vista previa: lista de permitidos del sitio, sin código, prue
   } finally { server.closeAllConnections(); await new Promise(r => server.close(r)); }
 });
 test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimentado por colecciones', async () => {
-  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  const rail = html.match(/<div class="rail" id="colecciones" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.ok(/<div class="c3d c3d--portada" role="region" aria-roledescription="carrusel" aria-label="[^"]+" data-rail-c3d>\s*<div class="rail-viewport c3d-viewport" data-rail-viewport>/.test(rail), 'región con rol de carrusel (el Carrusel3D, variante portada) que abarca la ventana y las flechas');
   assert.ok(/aria-label="Libro anterior"/.test(rail) && /aria-label="Libro siguiente"/.test(rail) && !/data-rail-viewport[^>]*tabindex|tabindex[^>]*data-rail-viewport/.test(rail), 'flechas con nombre; la parada de tabulador es la portada del centro (no la ventana del carrusel)');
   assert.ok(/aria-live="polite" data-rail-live/.test(rail), 'aviso al cambiar de colección');
@@ -560,7 +560,7 @@ test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poes
   // Lo retirado no vuelve: iconos de parada, <progress>, «Pregúntanos», puntos y «Ver todo el catálogo».
   for (const gone of ['iti-recorrido-v1', 'stopNode', 'rail-stop', 'iti:topic', 'cf-progreso', 'dotsEl', '<progress']) assert.ok(!railJs.includes(gone) && !html.includes(gone), `retirado: ${gone}`);
   assert.ok(!/rail-stop|rail-trail|--stop|--zig|\.topic\b|topic-layer|composer|cf-progreso|rail-all/.test(css + mobileCss), 'sin CSS del recorrido de antes, de «Pregúntanos», de los puntos ni de «Ver todo el catálogo»');
-  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  const rail = html.match(/<div class="rail" id="colecciones" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.equal((rail.match(/aria-live=/g) || []).length, 2, 'dos regiones vivas: el progreso del recorrido y la del carrusel');
   assert.ok(rail.indexOf('data-rail-chips') < rail.indexOf('data-rail-note') && rail.indexOf('data-rail-note') < rail.indexOf('data-rail-progreso') && rail.indexOf('data-rail-progreso') < rail.indexOf('data-rail-viewport') && rail.indexOf('data-rail-viewport') < rail.indexOf('cf-pie') && !rail.includes('data-rail-ask'), 'orden: chips, nota y progreso, carrusel, pie del libro (el contacto vive en el pie de la página)');
   assert.ok(/live\.textContent = `\$\{col\.titulo\}: \$\{list\.length\} libros\.`/.test(railJs), 'al elegir un chip la región viva dice la colección y cuántos libros trae');
@@ -596,8 +596,9 @@ test('recorrido (A4): conteo, tramos y persistencia en localStorage, con el alma
 test('eventos: insignias de tipo y de estado; la fecha solo sale de data-fecha, en español y con el día de Monterrey', () => {
   const items = [...html.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
   const tipo = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
+  const title = { circulo: 'Círculo de lectura', ajedrez: 'Ajedrez en la casa', taller: 'Taller de escritura' };
   for (const [block, id] of items) {
-    assert.ok(block.includes(`<span class="bill-badges"><span class="badge" data-bill-type>${tipo[id]}</span><span class="badge badge--quiet" data-bill-when>${NO_DATE}</span></span>`), `${id}: insignia de tipo «${tipo[id]}» e insignia de estado «${NO_DATE}»`);
+    assert.ok(block.includes(`<span class="bill-badges"><span class="badge" data-bill-type>${tipo[id]}</span><span class="badge badge--quiet" data-bill-when>${NO_DATE}</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="${id}" data-title="${title[id]}" aria-label="Compartir «${title[id]}»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>`), `${id}: insignia de tipo «${tipo[id]}», insignia de estado «${NO_DATE}» y, al final de la fila, «Compartir» con el título en su nombre (2026-11-14)`);
     assert.equal((block.match(/class="badge/g) || []).length, 2, `${id}: dos insignias, no más`);
     assert.ok(!/data-fecha=/.test(block.match(/^<li[^>]*>/)[0]), `${id}: hoy ninguna propuesta tiene fecha confirmada`);
   }
@@ -1011,9 +1012,9 @@ test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas gir
   assert.deepEqual(captionOf({ t: 'Hipercódex: Ensayo poético hiperbólico', a: 'Emmanuel Vizcaya' }, '$250 MXN'), { title: 'Hipercódex', author: 'Emmanuel Vizcaya', price: '$250 MXN' }, 'bajo el carrusel: título (sin subtítulo), autor y precio de la hoja');
   // Desliz nativo con imán al centro; perspectiva en la ventana (punto de fuga fijo) y 3D conservado en la pista.
   assert.ok(/\.c3d-viewport \{[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*perspective: calc\(var\(--c3d-w\) \* var\(--perspectiva-carrusel-piezas\)\); touch-action: manipulation;/.test(cssFlat), 'ventana: imán, sin arrastrar la página y con su perspectiva (en anchos de pieza)');
-  assert.ok(/\.c3d-track \{[^}]*padding: 0 calc\(50% - var\(--c3d-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.c3d-track > li \{ flex: 0 0 var\(--c3d-w\); scroll-snap-align: center;/.test(css) && /\.c3d--portada \{ --c3d-w: min\(clamp\(176px, 58vw, 240px\), calc\(\(100svh - 320px\) \/ 1\.5\)\); \}/.test(css), 'portadas del 58 % del ancho (176–240 px, con tope contra el alto) centradas por el imán');
+  assert.ok(/\.c3d-track \{[^}]*padding: 0 calc\(50% - var\(--c3d-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.c3d-track > li \{ flex: 0 0 var\(--c3d-w\); scroll-snap-align: center;/.test(css) && /\.c3d--portada \{ --c3d-w: min\(clamp\(176px, 58vw, 248px\), calc\(\(100svh - 320px\) \/ 1\.5\)\); \}/.test(css), 'portadas del 58 % del ancho (176–248 px, con tope contra el alto) centradas por el imán');
   assert.ok(/\.c3d--evento \{ --c3d-w: min\(76vw, 340px\);/.test(css) && /\.c3d--carta \{ --c3d-w: clamp\(184px, 60vw, 248px\); \}/.test(css), 'cada variante pone el ancho de su pieza');
-  assert.ok(/@media \(min-width: 761px\) \{[\s\S]*?\.c3d \{ width: 100%; max-width: 1240px; margin-inline: auto; \}[\s\S]*?mask-image: linear-gradient/.test(css) && /\.c3d--portada \{ --c3d-w: clamp\(240px, calc\(\(100cqi - 2 \* \(var\(--alto-md\) \+ var\(--space-4\)\)\) \/ \(2 \* var\(--c3d-borde\)\)\), 280px\); \}/.test(css), 'desde 761: escenario de hasta 1240 px centrado, bordes que se desvanecen y la pieza que cabe con sus vecinas y las flechas');
+  assert.ok(/@media \(min-width: 761px\) \{[\s\S]*?\.c3d \{ --c3d-escenario: min\(1240px, max\(100%, 100% \+ 2 \* \(var\(--margen\) - var\(--margen-escritorio\)\)\)\); width: var\(--c3d-escenario\); max-width: none; margin-inline: calc\(\(100% - var\(--c3d-escenario\)\) \/ 2\); \}[\s\S]*?mask-image: linear-gradient/.test(css) && /\.c3d--portada \{ --c3d-w: clamp\(240px, calc\(\(100cqi - 2 \* \(var\(--alto-md\) \+ var\(--space-4\)\)\) \/ \(2 \* var\(--c3d-borde\)\)\), 280px\); \}/.test(css), 'desde 761: escenario de hasta 1240 px centrado, bordes que se desvanecen y la pieza que cabe con sus vecinas y las flechas');
   // Toque y teclado: una vecina viene al centro; la del centro se abre. Una sola parada de tabulador; ← → Inicio Fin.
   assert.ok(/if \(!item\.classList\.contains\('is-centro'\)\) \{\s*e\.stopImmediatePropagation\(\);/.test(motor) && /onOpen\?\.\(items\.indexOf\(item\), item, e\)/.test(motor) && /wireBookOpen\(track, ensureCatalog\)/.test(railJs), 'tocar una vecina la trae al centro; tocar la del centro la abre (en la portada, la ficha: iti:open-book)');
   assert.ok(/const k0 = keyTarget\(e\.key, actual, items\.length\);/.test(motor), 'teclado: ← → Inicio y Fin en la pieza central');
@@ -1021,7 +1022,7 @@ test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas gir
   assert.ok(/\.rail-item\.is-centro \.cover \{ box-shadow: var\(--sombra-portada\); \}/.test(css) && /\.c3d-item\.is-centro :is\(\.bill-card, \.cafe-card\) \{ box-shadow: var\(--sombra-portada\); \}/.test(css), 'solo la pieza del centro lleva sombra-portada');
   const flechas = [...html.matchAll(/<button class="([^"]*c3d-flecha[^"]*)"/g)].map(m => m[1]);
   assert.ok(/\.c3d-flecha \{ position: absolute;/.test(css) && flechas.length === 6 && flechas.every(c => /btn btn--vidrio btn--icono c3d-flecha c3d-flecha--(prev|next)/.test(c)), 'flechas de vidrio de 48 a los lados, dos por carrusel');
-  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  const rail = html.match(/<div class="rail" id="colecciones" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.ok(/<div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title><\/p><p class="cf-meta" data-rail-meta><\/p><\/div>/.test(rail), 'título y «autor · precio» del libro del centro');
   assert.ok(/if \(say === i\) \{ say = -1; if \(live && liveText\) live\.textContent = liveText\(i\); \}/.test(motor), 'con flechas o teclado, la pieza que llega al centro se anuncia en la región viva');
   for (const [file, variante] of [['rail.js', 'portada'], ['feed.js', 'evento'], ['cafe.js', 'carta']]) assert.ok(/createCarousel3D\(/.test(readFileSync_(file)) && html.includes(`c3d c3d--${variante}" role="region" aria-roledescription="carrusel"`), `${file}: variante ${variante} del mismo motor, con role="region" y aria-roledescription="carrusel"`);
@@ -1104,26 +1105,26 @@ test('Eventos y talleres: foto y «Compartir» local (el contacto vive en el pie
   assert.equal(items.length, 3);
   for (const [block, id] of items) {
     assert.ok(/<img class="bill-card-img"[^>]* alt="[^"]+"/.test(block), `${id}: foto con texto alternativo`);
-    assert.ok(!/data-interest|Me interesa|i-heart|data-share/.test(block), `${id}: sin «Me interesa» y sin «Compartir» dentro de la tarjeta (va en la fila de abajo)`);
+    assert.ok(!/data-interest|Me interesa|i-heart/.test(block) && (block.match(/data-share=/g) || []).length === 1, `${id}: sin «Me interesa»; un «Compartir» en la fila de insignias de la tarjeta (2026-11-14)`);
+    assert.ok(new RegExp(`<button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="${id}" data-title="([^"]+)" aria-label="Compartir «\\1»">`).test(block), `${id}: «Compartir» es un botón de icono menta (secundario, 44) cuyo nombre lleva el título`);
     assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
   }
-  const fila = html.match(/<div class="bill-fila">[\s\S]*?<\/div>/)[0];
-  assert.ok(/<button class="btn btn--secundario btn--icono act act--icon" type="button" data-share="([a-z]+)" data-title="([^"]+)" aria-label="Compartir «\2»">/.test(fila), '«Compartir» es un botón de icono menta (secundario) cuyo nombre lleva el título');
   assert.ok(html.includes('<symbol id="i-share"') && !html.includes('<symbol id="i-heart"'), 'el corazón salió del sprite con «Me interesa»');
-  assert.ok(/html:not\(\.js\) \.bill-pie \{ display: none; \}/.test(css) && /html\.js \.bill-card \.bill-detail \{ display: none; \}/.test(css), 'sin JavaScript cada tarjeta muestra su descripción (la fila de abajo no existe); con JavaScript, la de la del centro');
+  assert.ok(/html:not\(\.js\) \.bill-pie \{ display: none; \}/.test(css) && /html\.js \.bill-card \.bill-detail \{ display: none; \}/.test(css), 'sin JavaScript cada tarjeta muestra su descripción (el pie de abajo no existe); con JavaScript, la de la del centro');
+  assert.ok(/\.c3d-item:not\(\.is-centro\) \.bill-share, html:not\(\.js\) \.bill-share \{ visibility: hidden; \}/.test(cssFlat), '«Compartir» solo se ve y se toca en la tarjeta del centro; sin JavaScript no se ofrece');
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/navigator\.share/.test(feed) && /AbortError/.test(feed) && /clipboard\.writeText/.test(feed), 'Web Share con respaldo de copiar enlace; cancelar no copia');
   assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage|toggleInterest|readInterest|iti-b4-interes/.test(feed), 'Eventos no guarda ni envía nada');
-  assert.ok(/document\.querySelector\?\.\(`\.bill-item\[data-id="\$\{btn\.dataset\.share\}"\]`\)/.test(feed), '«Compartir» lee la fecha de la propuesta del centro (ya no está dentro de la tarjeta)');
+  assert.ok(/btn\.closest\?\.\('\.bill-item'\)/.test(feed), '«Compartir» lee la fecha de su propuesta (va dentro de su tarjeta desde el 2026-11-14)');
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/e\.target\.closest\('\[data-share\]'\)/.test(app) && !/data-interest/.test(app), 'el único control que carga feed.js al tocar es Compartir');
 });
-test('Eventos (A2 + A7): Carrusel3D variante evento; debajo, la descripción de la del centro (región viva) y «Compartir», que la siguen', async () => {
+test('Eventos (A2 + A7): Carrusel3D variante evento; «Compartir» en la tarjeta del centro y, debajo, su descripción (región viva)', async () => {
   const bill = html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0];
   assert.ok(/<div class="c3d c3d--evento" role="region" aria-roledescription="carrusel" aria-label="Eventos y talleres" data-bill-c3d>/.test(bill), 'carrusel con rol y nombre');
   assert.ok(!/bill-dots|<details|<summary/.test(bill), 'sin puntos ni acordeón');
-  assert.equal((bill.match(/class="bill-fila"/g) || []).length, 1, 'una sola fila: «Compartir»');
-  assert.equal((bill.match(/data-share=/g) || []).length, 1, 'un solo «Compartir»');
+  assert.equal((bill.match(/class="bill-fila"/g) || []).length, 0, 'sin fila de acciones bajo el carrusel (2026-11-14: «Compartir» va en la tarjeta)');
+  assert.equal((bill.match(/data-share=/g) || []).length, 3, 'un «Compartir» por tarjeta (solo se ve el de la del centro)');
   const pie = bill.slice(bill.indexOf('data-bill-pie'));
   assert.ok(/<p class="bill-desc" aria-live="polite" data-bill-desc>/.test(pie) && !/wa\.me/.test(bill), 'la descripción es región viva; sin consulta por WhatsApp en la sección (vive en el pie)');
   for (const [block, id] of bill.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)) {
@@ -1131,10 +1132,10 @@ test('Eventos (A2 + A7): Carrusel3D variante evento; debajo, la descripción de 
     assert.ok(/<div class="bill-detail">\s*<p>[^<]+<\/p>\s*<\/div>/.test(block), `${id}: su descripción va en el marcado (sin JavaScript se lee)`);
   }
   assert.ok(/\.bill-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && !/\.bill-card \{[^}]*vidrio/.test(cssFlat), 'tarjeta en superficie con radio 20, no de vidrio');
-  assert.ok(/\.bill-desc \{ min-height: var\(--bill-reserva, 3lh\);/.test(cssFlat) && /@media \(max-width: 400px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 4lh\); \} \}/.test(mobileFlat) && /measureDescs\(pie, events\.map\(e => e\.text\)\)/.test(readFileSync_('feed.js')), 'la descripción reserva la más larga (medida en feed.js; antes de medir, 3 o 4 renglones): cambiar de tarjeta no mueve «Compartir»');
-  // «Compartir» sigue a la del centro: su id y su título en el nombre accesible.
+  assert.ok(/\.bill-desc \{ min-height: var\(--bill-reserva, 3lh\);/.test(cssFlat) && /@media \(max-width: 400px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 4lh\); \} \}/.test(mobileFlat) && /measureDescs\(pie, events\.map\(e => e\.text\)\)/.test(readFileSync_('feed.js')), 'la descripción reserva la más larga (medida en feed.js; antes de medir, 3 o 4 renglones): cambiar de tarjeta no mueve lo de abajo');
+  // Cada «Compartir» lleva el título de su propuesta en el nombre accesible (initFeed los pinta todos).
   const feed = await readFile(here('./feed.js'), 'utf8');
-  assert.ok(/share\.dataset\.share = ev\.id;/.test(feed) && /paintShare\(share\);/.test(feed) && !/waName|ev\.wa/.test(feed), 'al cambiar la del centro cambia «Compartir» (sin consulta por WhatsApp)');
+  assert.ok(/document\.querySelectorAll\('\[data-share\]'\)\.forEach\(paintShare\)/.test(feed) && !/waName|ev\.wa|\.bill-fila/.test(feed), 'cada «Compartir» se nombra con su propuesta (sin consulta por WhatsApp)');
   const q = { '.bill-title': { textContent: ' Taller ' }, '.bill-detail > p': { textContent: 'Leer y escribir.' } };
   assert.deepEqual(eventOf({ dataset: { id: 'taller' }, querySelector: s => q[s] }), { id: 'taller', title: 'Taller', text: 'Leer y escribir.' }, 'cada propuesta sale de su marcado');
   const app = await readFile(here('./app.js'), 'utf8');
@@ -1163,7 +1164,7 @@ test('tarjeta de evento: foto → insignias → título (→ descripción solo s
   assert.equal(shareName(''), 'Compartir «esta propuesta»');
   assert.ok(/\.bill-card-fig \{ display: block; \}/.test(cssFlat) && !/bill-dots/.test(css + mobileCss), 'la foto va en la tarjeta en todo ancho; sin puntos');
   assert.ok(!/\.bill-(title|sub)[^{]*\{[^}]*display: none/.test(css + mobileCss), 'el título no se oculta en ningún tamaño');
-  assert.ok(/\.bill-fila \{ display: flex; justify-content: center; width: 100%; \}/.test(cssFlat) && !/bill-wa/.test(css + mobileCss), 'una fila centrada con «Compartir» (48); sin CSS de la consulta retirada');
+  assert.ok(/\.bill-share \{ margin-inline-start: auto; \}/.test(cssFlat) && /\.bill-badges \{ display: flex; flex-wrap: wrap; align-items: center;/.test(cssFlat) && !/bill-wa|\.bill-fila/.test(css + mobileCss), '«Compartir» (44) al final de la fila de insignias; sin CSS de la fila retirada ni de la consulta');
   assert.ok(/@media \(max-height: 700px\) \{ \.bill-card-img \{ aspect-ratio: 16 \/ 9; \} \}/.test(mobileCss), 'tope contra el alto: en ventanas bajas la foto se acorta');
   assert.ok(/\.sec-texto a \{ position: relative; white-space: nowrap; color: var\(--turquesa-texto\); \}/.test(css) && /\.sec-texto a::after \{ content: ""; position: absolute; inset: calc\(-1 \* var\(--space-4\)\) 0; \}/.test(css), 'el enlace a Instagram de la entradilla es texto en línea con 44 px de objetivo');
   assert.ok(/<p class="sec-texto">Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/"[^>]*>Instagram<svg/.test(bill) && !/bill-foot|propuestas para la agenda/.test(bill), 'entradilla «Aún sin fecha. Las fechas se anuncian en Instagram.»');
@@ -1242,7 +1243,7 @@ test('cierre de Libros: una frase y «Cómo llegar» en el mismo bloque, sin vac
   }
 });
 test('plantilla: sin sellos de muestra ni rótulos de procedencia a la vista; la nota de la colección sigue aparte', async () => {
-  const rail = html.match(/<div class="rail" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
+  const rail = html.match(/<div class="rail" id="colecciones" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.ok(/<p class="rail-note" data-rail-note><\/p>/.test(rail), 'la nota nace vacía (la llena la colección)');
   const railJs = await readFile(here('./rail.js'), 'utf8');
   assert.ok(/noteEl\.textContent = col\.nota/.test(railJs), 'al cambiar de colección solo se reescribe la nota');
@@ -1324,7 +1325,7 @@ test('tokens Líquido: claro por omisión y oscuro con prefers-color-scheme, mis
   assert.equal(tokensJson.scales.medidas['alto-barra-nav'], '44px');
   assert.equal(tokensJson.scales.medidas['alto-barra-inferior'], '49px');
   assert.deepEqual(['margen-movil', 'margen-movil-amplio', 'margen-escritorio'].map(k => tokensJson.scales.medidas[k]), ['16px', '20px', '32px']);
-  assert.ok(/:root \{ --seguro-x: max\(env\(safe-area-inset-left, 0px\), env\(safe-area-inset-right, 0px\)\); --margen: max\(var\(--margen-movil\), var\(--seguro-x\)\);/.test(css) && /@media \(min-width: 376px\) \{ :root \{ --margen: max\(var\(--margen-movil-amplio\), var\(--seguro-x\)\); \} \}/.test(css) && /@media \(min-width: 1024px\) \{ :root \{ --margen: max\(var\(--margen-escritorio\), var\(--seguro-x\)\);/.test(css), 'márgenes de Apple HIG: 16 hasta 375 px → 20 (376 px) → 32 (1024 px), nunca menos que el área segura (muesca en horizontal)');
+  assert.ok(/:root \{ --seguro-x: max\(env\(safe-area-inset-left, 0px\), env\(safe-area-inset-right, 0px\)\); --margen: max\(var\(--margen-movil\), var\(--seguro-x\)\);/.test(css) && /@media \(min-width: 376px\) \{ :root \{ --margen: max\(var\(--margen-movil-amplio\), var\(--seguro-x\)\); \} \}/.test(css) && /@media \(min-width: 1024px\) \{ :root \{ --margen: max\(var\(--margen-escritorio\), var\(--seguro-x\), calc\(\(100vw - var\(--ancho-contenido\)\) \/ 2\)\);/.test(css), 'márgenes de Apple HIG: 16 hasta 375 px → 20 (376 px) → 32 (1024 px), nunca menos que el área segura (muesca en horizontal); desde 1024 el contenido vive en 1152 px centrados (2026-11-14)');
   assert.ok(/-webkit-text-size-adjust: 100%;\s*text-size-adjust: 100%;/.test(css) && /a, button, summary, label, select, input \{ -webkit-tap-highlight-color: transparent; touch-action: manipulation; \}/.test(css), 'Safari y Chromium: sin agrandar el texto al girar, sin destello gris al tocar y sin espera de doble toque (el zoom con dos dedos sigue)');
   assert.ok(/\.explore-open \{[^}]*font: var\(--t-campo\)/.test(cssFlat), '«Buscar en el catálogo» usa la letra de campo (17 px), como el buscador');
   // Movimiento: duraciones y curvas del sistema.
@@ -1493,7 +1494,8 @@ test('menú: abre después de pintar, atrapa el foco, Escape y «atrás» lo cie
 test('barra inferior (BarraInferior): cápsula de vidrio de 49 px con Inicio, Catálogo y Mi lista; la pastilla menta marca el destino actual', () => {
   const nav = html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0];
   assert.ok(/aria-label="Accesos"/.test(nav) && !/role="tablist"/.test(nav), 'navegación con nombre, no tablist');
-  assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)"/g)].map(m => m[1]), ['inicio', 'libros'], 'dos destinos de la página');
+  assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)"/g)].map(m => m[1]), ['inicio', 'colecciones'], 'dos destinos de la página: «Catálogo» aterriza en las colecciones (2026-11-14)');
+  assert.ok(/<a href="#colecciones" data-zona="#libros">/.test(nav) && /<div class="rail" id="colecciones" data-rail/.test(html) && /\.rail \{ scroll-margin-top: var\(--space-2\); \}/.test(mobileFlat) && /a\.dataset\.zona \|\| a\.getAttribute\('href'\)/.test(readFileSync_('app.js')), '«Catálogo» lleva a los chips (16 px bajo la cabecera) y su zona del scroll-spy es el capítulo');
   assert.deepEqual([...nav.matchAll(/<span class="tab-lb">([^<]+)/g)].map(m => m[1]), ['Inicio', 'Catálogo', 'Mi lista'], 'tres casillas con nombre siempre visible');
   assert.ok(/<button class="tab-list" type="button" data-open-mylist><span class="tab-ic-box"><svg class="tab-ic" aria-hidden="true"><use href="#i-mark"\/><\/svg><span class="count-badge" data-saved-dot hidden aria-hidden="true"><\/span><\/span><span class="tab-lb">Mi lista<span class="sr-only">, <span data-saved-count>Vacía<\/span><\/span><\/span><\/button>/.test(nav), 'Mi lista abre su hoja y lleva el conteo (en texto para lectores de pantalla)');
   assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)" aria-current="location"/g)].map(m => m[1]), ['inicio'], 'la página carga en Inicio; el scroll-spy corrige');
@@ -1535,7 +1537,7 @@ test('hojas (FichaLibro): ficha y Mi lista suben desde abajo en el teléfono y s
   assert.ok(/<p class="drawer-note">La librería confirma si lo tienen\.<\/p>/.test(foot) && !/y el precio|existencia y precio/.test(html), 'la nota dice quién confirma la existencia (el precio ya es de la hoja de la librería)');
   assert.ok(/<button type="button" class="btn btn--vidrio btn--icono drawer-close" data-d-close aria-label="Cerrar ficha">/.test(drawer), 'cerrar: botón de vidrio de 48 px');
   assert.ok(/\.drawer \{[^}]*width: min\(680px, calc\(100% - var\(--space-16\)\)\);[^}]*border-radius: var\(--radio-lg\);[^}]*background: var\(--vidrio-hoja\);[^}]*box-shadow: var\(--luz-vidrio\), var\(--sombra-hoja\);/.test(cssFlat), 'escritorio: diálogo de hasta 680 px, vidrio de hoja');
-  assert.ok(/\.drawer, \.mylist \{ inset: auto 0 0 0; width: 100%; margin: 0; border-radius: var\(--radio-lg\) var\(--radio-lg\) 0 0; \}/.test(mobileFlat) && /\.drawer \{ height: calc\(100dvh - var\(--space-12\)\); \}/.test(mobileFlat), 'teléfono: hoja inferior hasta 48 px del borde de arriba');
+  assert.ok(/\.drawer, \.mylist \{ inset: auto 0 0 0; width: 100%; margin: 0; border-radius: var\(--radio-lg\) var\(--radio-lg\) 0 0; \}/.test(mobileFlat) && /\.drawer \{ height: calc\(100dvh - max\(var\(--space-12\), env\(safe-area-inset-top, 0px\) \+ var\(--space-3\)\)\); \}/.test(mobileFlat), 'teléfono: hoja inferior hasta 48 px del borde de arriba o, a pantalla completa, 12 px bajo el área segura (2026-11-14)');
   assert.ok(/\.drawer-body \{ grid-template-columns: 38% minmax\(0, 1fr\);/.test(mobileFlat) && /\.drawer-head \{ grid-column: 2;/.test(cssFlat), 'portada al 38 % y datos a su lado');
   assert.ok(/\.drawer-foot \{ padding: var\(--space-3\) var\(--margen\) calc\(var\(--space-3\) \+ env\(safe-area-inset-bottom, 0px\)\); \}/.test(mobileFlat), 'el pie respeta el área segura');
   assert.ok(/\.drawer::backdrop, \.mylist::backdrop \{ background: var\(--velo\); \}/.test(cssFlat), 'detrás, el velo (medido con INP, ver DESIGN.md)');
@@ -1551,16 +1553,17 @@ test('Inicio: foto real de la sala, nombre, estado de hoy y «Cómo llegar» de 
   assert.ok(/<p class="entry-status" data-status><span class="status-dot" aria-hidden="true"><\/span><span data-status-text>/.test(sec), 'estado de hoy con su punto y la palabra');
   assert.ok(/<div class="entry-actions">\s*<a class="btn btn--primario btn--lg" href="https:\/\/www\.google\.com\/maps\/dir\/[^"]*"[^>]*><span>Cómo llegar<\/span>/.test(sec), '«Cómo llegar» primario de 56 px');
   assert.ok(!/wa\.me/.test(sec) && (sec.match(/<div class="entry-actions">[\s\S]*?<\/div>/)[0].match(/class="btn /g) || []).length === 1, 'una sola acción: «Cómo llegar» (el contacto vive en el pie desde el 2026-11-13)');
-  assert.ok(/@media \(min-width: 1024px\) \{[^}]*\.entry \{ grid-template-columns: minmax\(0, 5fr\) minmax\(0, 7fr\); align-items: center;[^}]*\}\s*\.entry-copy \{ padding-bottom: var\(--space-8\); \}/.test(css.replace(/\/\*[\s\S]*?\*\//g, '')), 'en escritorio el texto se centra en el alto de la foto, 16 px arriba (centro óptico)');
-  assert.ok(/<figure class="entry-media">\s*<picture><source media="\(max-width: 760px\)" srcset="assets\/img\/inicio-sala-m\.webp" width="648" height="864"><img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp" width="1080" height="608" alt="[^"]+" fetchpriority="high"/.test(sec), 'foto real: vertical en el teléfono y la sala central en escritorio, con alt y prioridad alta');
+  assert.ok(/@media \(min-width: 1024px\) \{[^}]*\.entry \{ grid-template-columns: repeat\(12, minmax\(0, 1fr\)\); align-items: center;[^}]*\}\s*\.entry-copy \{ grid-column: 1 \/ span 5; padding-bottom: var\(--space-8\); \}\s*\.entry-media \{ grid-column: 7 \/ -1;/.test(css.replace(/\/\*[\s\S]*?\*\//g, '')), 'en escritorio, rejilla de 12: texto en 1–5 y foto en 7–12; el texto se centra en el alto de la foto, 16 px arriba (centro óptico)');
+  assert.ok(/<figure class="entry-media">\s*<picture><source media="\(max-width: 760px\)" srcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w" sizes="\(max-width: 375px\) calc\(100vw - 32px\), calc\(100vw - 40px\)" width="912" height="608"><img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp" width="1080" height="608" alt="[^"]+" fetchpriority="high"/.test(sec), 'foto real: la sala en 3:2 en el teléfono (recorte del 2026-11-14, con srcset y medidas reales) y la sala central en escritorio, con alt y prioridad alta');
+  assert.ok(/\.entry-title-mas \{ display: block; \}/.test(mobileFlat) && /\.entry-media \{ aspect-ratio: auto; height: clamp\(160px, calc\(100svh - var\(--hdr-h\) - var\(--entrada-arriba\) - var\(--reserva-inferior\)\), calc\(\(100vw - 2 \* var\(--margen\)\) \/ 1\.5\)\); \}/.test(mobileFlat), 'teléfono (variante A): titular en dos renglones fijos y la foto 3:2 con alto mín(ancho / 1.5, lo que queda sobre la barra inferior), nunca menos de 160');
   assert.ok(sec.indexOf('entry-copy') < sec.indexOf('entry-media'), 'el texto va antes que la foto: nada se escribe encima de la foto');
   assert.ok(/\.entry-media \{[^}]*overflow: hidden; border-radius: var\(--radio-lg\);/.test(cssFlat) && !/entry-shade|entry-canvas|entry-beat|wordmark|profile-av/.test(html + css + mobileCss), 'foto limpia con radio-lg, sin velos, lienzo de fotogramas ni rótulo gigante');
-  assert.ok(/\.entry-title \{ margin: 0; font: var\(--t-titulo-grande\); letter-spacing: var\(--ls-titulo-grande\); text-wrap: balance; \}/.test(cssFlat) && /\.entry-title \{ font-size: clamp\(34px, 3\.2vw \+ 2px, 56px\);/.test(cssFlat), 'Large Title en el teléfono; en escritorio crece hasta display (56)');
-  assert.ok(/<link rel="preload" href="assets\/img\/inicio-sala-m\.webp" as="image" type="image\/webp" fetchpriority="high" media="\(max-width: 760px\)">/.test(html) && /<link rel="preload" href="assets\/img\/03-home-sala-central\.webp" as="image" type="image\/webp" fetchpriority="high" media="\(min-width: 761px\)">/.test(html), 'la foto del inicio se precarga, una por tamaño');
+  assert.ok(/\.entry-title \{ margin: 0; font: var\(--t-titulo-grande\); letter-spacing: var\(--ls-titulo-grande\); text-wrap: balance; \}/.test(cssFlat) && /\.entry-title \{ font-size: clamp\(34px, 3\.2vw \+ 2px, 56px\);/.test(cssFlat) && /\.entry-title \{ font: var\(--t-display\); font-size: clamp\(44px, 2\.5vw \+ 20px, 56px\); line-height: 1\.07;/.test(cssFlat), 'Large Title en el teléfono; en escritorio crece hasta display (56/60 a 1440)');
+  assert.ok(/<link rel="preload" as="image" type="image\/webp" imagesrcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w" imagesizes="[^"]+" fetchpriority="high" media="\(max-width: 760px\)">/.test(html) && /<link rel="preload" href="assets\/img\/03-home-sala-central\.webp" as="image" type="image\/webp" fetchpriority="high" media="\(min-width: 761px\)">/.test(html), 'la foto del inicio se precarga, una por tamaño');
   assert.ok(/<a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden>/.test(sec) && sec.indexOf('entry-news') > sec.indexOf('btn--primario'), 'el control de novedades es secundario y va después de «Cómo llegar»');
 });
 
-test('secciones: encabezado (EncabezadoSeccion) sin antetítulo, «Nombre *frase*» y entradilla; bandas fondo / fondo-2 alternas; ritmo 48 / 64', () => {
+test('secciones: encabezado (EncabezadoSeccion) sin antetítulo, «Nombre *frase*» y entradilla; bandas fondo / fondo-2 alternas; ritmo 64 / 112 (2026-11-14)', () => {
   const heads = { casa: 'La casa <em>no es una tienda de paso</em>', cartelera: 'Eventos y talleres <em>en la casa</em>', cafe: 'Café y té <em>en la sala</em>', visita: 'Visita <em>los libros se eligen mejor en persona</em>' };
   for (const [id, h] of Object.entries(heads)) {
     const sec = html.match(new RegExp(`<section id="${id}"[\\s\\S]*?</section>`))[0];
@@ -1572,7 +1575,7 @@ test('secciones: encabezado (EncabezadoSeccion) sin antetítulo, «Nombre *frase
   const fills = ['.house', '.books', '.bill', '.news', '.cafe', '.visit', '.ftr'].map(s => rule(cssFlat, s).match(/background: var\(--(fondo(?:-2)?)\)/)?.[1]);
   assert.deepEqual(fills, ['fondo-2', 'fondo', 'fondo-2', 'fondo', 'fondo', 'fondo-2', 'fondo'], 'La casa → Catálogo → Eventos → (Novedades, si hay llegadas) → Café → Visita → pie: sin Novedades, todos los vecinos son de fondo distinto');
   assert.ok(/\.has-news \.cafe \{ background: var\(--fondo-2\); \}/.test(cssFlat) && /\.has-news \.visit \{ background: var\(--fondo\); \}/.test(cssFlat) && /\.has-news \.ftr \{ background: var\(--fondo-2\); \}/.test(cssFlat), 'con Novedades (fondo), Café, Visita y el pie invierten su banda');
-  assert.ok(/--margen: max\(var\(--margen-movil\), var\(--seguro-x\)\); --sec: var\(--space-12\);/.test(css) && /--sec: var\(--space-16\);/.test(css), 'aire entre secciones: 48 en móvil, 64 en escritorio');
+  assert.ok(/--margen: max\(var\(--margen-movil\), var\(--seguro-x\)\); --sec: var\(--sec-movil\);/.test(css) && /--sec: var\(--sec-escritorio\);/.test(css) && /main > section\[id\] \{ scroll-margin-top: calc\(var\(--space-6\) - var\(--space-2\) - var\(--sec\) \/ 2\); \}/.test(css), 'aire entre secciones (fin de una → titular de la siguiente): 64 en el teléfono, 112 en escritorio, la mitad a cada lado del borde de la banda; al llegar por un ancla el titular queda a 24 px bajo la cabecera (2026-11-14)');
   for (const sel of ['.house', '.bill', '.books', '.news', '.cafe', '.visit']) assert.ok(/var\(--sec\)/.test(rule(cssFlat, sel)) && !/vh/.test(rule(cssFlat, sel)), `${sel}: ritmo de la escala, no del alto de la pantalla`);
   assert.ok(!/\.(marquee|wipe|progress|manifesto|house-meter|stories|ftr-mark|wordmark)\b/.test(css + mobileCss) && !/class="(marquee|wipe|progress|manifesto|house-meter|stories|ftr-mark)/.test(html), 'se retiraron la marquesina, la cortinilla, la barra de progreso, el manifiesto suelto, el medidor de La casa y el rótulo gigante del pie');
 });

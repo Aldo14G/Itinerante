@@ -61,6 +61,29 @@
       "sha256": "b4006bb31747dad0ccbd2c9753db5eaae21a1ffdefeee1d239e4c17cfa060222"
     },
     {
+      "file": "img/inicio-sala-3x2.webp",
+      "origin": "recorte 3:2 de 912x608 (x84 y0) de img/03-home-sala-central.webp (1080x608, la versión de mayor resolución de la sala en assets/img), Pillow, WebP calidad 80",
+      "derivedFrom": "img/03-home-sala-central.webp",
+      "source": "Instagram oficial, diapositiva 1 (docs/cuaderno-de-margen/fotos/ig-01.jpg en la rama agent/atenea/casa-editorial-base)",
+      "post": "https://www.instagram.com/p/DVmde4oEVzw/",
+      "author": "@sharonmirelesgong",
+      "account": "@libreriaitineranteymasmty",
+      "date": "2026-11-14",
+      "note": "inicio del teléfono (variante A, aprobada por Aldo el 2026-11-14): la ventana y la mesa al centro, sin texto encima",
+      "sha256": "2750f7907b88b59e77ce956492834b2139f04511bdfba10c0f42c40e97f6bab0"
+    },
+    {
+      "file": "img/inicio-sala-3x2-640.webp",
+      "origin": "el mismo recorte reducido a 640x427 (Pillow, LANCZOS, WebP calidad 80)",
+      "derivedFrom": "img/inicio-sala-3x2.webp",
+      "source": "Instagram oficial, diapositiva 1 (docs/cuaderno-de-margen/fotos/ig-01.jpg en la rama agent/atenea/casa-editorial-base)",
+      "post": "https://www.instagram.com/p/DVmde4oEVzw/",
+      "author": "@sharonmirelesgong",
+      "account": "@libreriaitineranteymasmty",
+      "date": "2026-11-14",
+      "sha256": "2922dc88f01ee5049b37e597e978d89f507772331586a1e9760e44f874c1efab"
+    },
+    {
       "file": "img/01-entrada-pasillo.webp",
       "origin": "recorte 1212x682 (x300 y330) de la foto del pasillo",
       "author": "Aldo G. Pineda",

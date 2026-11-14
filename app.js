@@ -83,7 +83,8 @@ async function boot() {
     current = hash;
     navLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
     // La entrada «#inicio» abarca La casa: su fila del menú «La casa» no se marca por separado.
-    tabLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    // «Catálogo» de la barra inferior aterriza en las colecciones (#colecciones) pero su zona es la del capítulo (data-zona="#libros").
+    tabLinks.forEach(a => { if ((a.dataset.zona || a.getAttribute('href')) === hash) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
   }
   const kick = () => { if (!raf) raf = requestAnimationFrame(spy); };
   addEventListener('scroll', kick, { passive: true });

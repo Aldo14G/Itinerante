@@ -1,5 +1,7 @@
 // Norma del Carrusel3D (skill ux-apple §3): mide los tres carruseles (portada, evento y carta) en nueve tamaños, con movimiento y con
-// movimiento reducido, y sale con código 1 si algo se sale de la norma.
+// movimiento reducido, y sale con código 1 si algo se sale de la norma. Desde el 2026-11-14 los teléfonos son iPhone reales (alto = la zona
+// visible de Safari): 16 393×659, 13 mini 375×629, SE 375×667, 16 Pro Max 440×763 y 16 Pro a pantalla completa 402×874 con áreas seguras
+// 62/34 (Emulation.setSafeAreaInsetsOverride), más 320×640 (Zoom de pantalla); antes 360×740, 390×844 y 430×932, que ningún iPhone tiene.
 // node tools/qa/carrusel.mjs URL [DIR]   (DIR: capturas y carrusel.json; por omisión, el directorio actual)
 // Cambia el navegador con CHROME_PATH. Teléfonos y tableta (≤ 768 px) con toque (puntero grueso); 1024 px o más con puntero fino.
 //
@@ -12,8 +14,8 @@
 //  · hueco visible entre la central y cada vecina ≥ 12 px (no se enciman);
 //  · flechas: con toque no se muestran (el control es deslizar o tocar la vecina); con puntero fino se ven, miden ≥ 44, no tapan la central
 //    (≥ 8 px de hueco), van centradas en el alto de la pieza (± 2 px) y, desde 1024 px, quedan ≥ 16 px fuera de la última pieza a la vista;
-//  · el bloque carrusel + pie + acción cabe en el alto útil (entre la barra de navegación y la barra inferior); desde el 2026-11-13 solo
-//    Eventos lleva acción («Compartir»): el contacto de Catálogo y Café vive en el pie de la página;
+//  · el bloque carrusel + pie cabe en el alto útil (entre la barra de navegación y la barra inferior); desde el 2026-11-14 ningún carrusel
+//    lleva acción debajo («Compartir» de Eventos va en la fila de insignias de la tarjeta; el contacto vive en el pie de la página);
 //  · aire: lo de arriba → pieza 24–32 (± 2), pieza → pie 16–20 (± 2), pie → acción 24 (± 4; en la carta, pieza → acción);
 //  · texto: nada cortado en la pieza central ni en el pie; en las vecinas ningún texto visible cruza el borde de la ventana (el texto de
 //    una portada tipográfica es parte de la imagen y no cuenta);
@@ -27,15 +29,20 @@ import { tmpdir } from 'node:os';
 const URL_ = process.argv[2] || 'http://127.0.0.1:8094/';
 const out = process.argv[3] || '.';
 mkdirSync(out, { recursive: true });
-const SIZES = [[320, 640], [360, 740], [390, 844], [430, 932], [768, 1024], [1024, 768], [1280, 800], [1440, 900], [1920, 1080]];
+// [ancho, alto, área segura arriba, abajo]
+const SIZES = [[320, 640], [375, 629], [375, 667], [393, 659], [440, 763], [402, 874, 62, 34], [768, 1024], [1024, 768], [1280, 800], [1440, 900], [1920, 1080]];
 const MODOS = ['claro', 'reducido'];
 const port = 9700 + Math.floor(Math.random() * 90);
 // Chromium sin cabeza no declara (hover: hover) ni (pointer: fine): se fijan como en e2e.mjs; el toque emulado los cambia a grueso.
-const chrome = spawn(process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--disable-extensions', '--hide-scrollbars', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'iti-c3d-'))}`, 'about:blank'], { stdio: 'ignore' });
+// Como root (contenedores) Chrome no abre su puerto de depuración sin --no-sandbox: la auditoría del 2026-11-14 lo encontró sin arrancar.
+const sandbox = process.getuid?.() === 0 ? ['--no-sandbox'] : [];
+const chrome = spawn(process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', ['--headless=new', ...sandbox, `--remote-debugging-port=${port}`, '--no-first-run', '--disable-extensions', '--hide-scrollbars', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'iti-c3d-'))}`, 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-let targets;
-for (let i = 0; i < 40; i++) { try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); if (targets.length) break; } catch {} await sleep(250); }
-const ws = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl);
+let targets = [];
+for (let i = 0; i < 80 && !targets.some(t => t.type === 'page'); i++) { try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); } catch {} await sleep(250); }
+const pageT = targets.find(t => t.type === 'page');
+if (!pageT) { chrome.kill(); console.error(`carrusel.mjs: Chrome no respondió en el puerto ${port} (CHROME_PATH=${process.env.CHROME_PATH || 'por defecto'})`); process.exit(2); }
+const ws = new WebSocket(pageT.webSocketDebuggerUrl);
 await new Promise(r => ws.addEventListener('open', r, { once: true }));
 let id = 0; const pending = new Map(); let problems = [];
 ws.addEventListener('message', e => {
@@ -103,7 +110,7 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   const q = s => sec.querySelector(s);
   let arriba, pie = null, accion = null;
   if (name === 'portada') { arriba = q('.rail-nota-fila'); pie = q('.cf-texto'); }
-  else if (name === 'evento') { arriba = q('.sec-head'); pie = q('.bill-desc'); accion = q('.bill-fila'); }
+  else if (name === 'evento') { arriba = q('.sec-head'); pie = q('.bill-desc'); } // «Compartir» va en la tarjeta desde el 2026-11-14
   else { arriba = q('.cafe-chips'); }
   const pieTxt = pie ? [...pie.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.sr-only')).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim().slice(0, 30)) : [];
   const hdr = document.querySelector('.hdr'), tab = document.querySelector('.tabbar');
@@ -123,10 +130,11 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
 })`;
 
 for (const modo of MODOS) {
-  for (const [w, h] of SIZES) {
+  for (const [w, h, sTop = 0, sBottom = 0] of SIZES) {
     const mobile = w <= 768;
     problems = [];
     await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
+    await send('Emulation.setSafeAreaInsetsOverride', { insets: { top: sTop, bottom: sBottom, left: 0, right: 0 } });
     await send('Emulation.setTouchEmulationEnabled', mobile ? { enabled: true, maxTouchPoints: 5 } : { enabled: false });
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: modo === 'reducido' ? 'reduce' : 'no-preference' }, { name: 'prefers-color-scheme', value: 'light' }] });
     await send('Page.navigate', { url: 'about:blank' });

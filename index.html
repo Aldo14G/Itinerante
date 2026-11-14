@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="Logo.png">
   <link rel="preload" href="assets/fonts/inter-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/img/03-home-sala-central.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 761px)">
-  <link rel="preload" href="assets/img/inicio-sala-m.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 760px)">
+  <link rel="preload" as="image" type="image/webp" imagesrcset="assets/img/inicio-sala-3x2-640.webp 640w, assets/img/inicio-sala-3x2.webp 912w" imagesizes="(max-width: 375px) calc(100vw - 32px), calc(100vw - 40px)" fetchpriority="high" media="(max-width: 760px)">
   <meta property="og:title" content="Librería Itinerante y Más · Centro de Monterrey">
   <meta property="og:description" content="Libros, café y talleres en una casa de piedra del centro de Monterrey.">
   <meta property="og:type" content="website">
@@ -54,7 +54,8 @@
 
   <a class="skip" href="#contenido">Saltar al contenido</a>
 
-  <!-- Barra de navegación (MenuHamburguesa): vidrio de 44 px más el área segura. Móvil: marca y ☰. 761–1100 px: además Mi lista y «Cómo llegar». Desde 1101 px: las secciones en lugar del ☰. -->
+  <!-- Barra de navegación (MenuHamburguesa): vidrio de 44 px más el área segura. Móvil: marca y ☰. 761–1100 px: además «Cómo llegar» y Mi lista. Desde 1101 px: las secciones en lugar del ☰.
+       «Mi lista» va al final (2026-11-14): termina en el borde del contenido aunque «Cómo llegar» ceda su sitio. -->
   <header class="hdr" data-hdr>
     <a class="hdr-brand" href="#inicio" aria-label="Librería Itinerante y Más, inicio">
       <img src="assets/img/logo-96.webp" width="40" height="40" alt="">
@@ -68,8 +69,8 @@
       <a href="#visita">Visita</a>
     </nav>
     <div class="hdr-end">
-      <button class="btn btn--plano btn--sm hdr-list" type="button" data-open-mylist><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span>Mi lista</span><span class="count-badge" data-saved-dot hidden aria-hidden="true"></span><span class="sr-only">, <span data-saved-count>Vacía</span></span></button>
       <a class="btn btn--primario hdr-cta" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+      <button class="btn btn--plano btn--sm hdr-list" type="button" data-open-mylist><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span>Mi lista</span><span class="count-badge" data-saved-dot hidden aria-hidden="true"></span><span class="sr-only">, <span data-saved-count>Vacía</span></span></button>
       <button class="menu-btn" type="button" data-menu-open aria-expanded="false" aria-controls="menu" aria-label="Abrir menú"><span class="menu-lines" aria-hidden="true"><span></span><span></span><span></span></span></button>
     </div>
   </header>
@@ -122,11 +123,12 @@
     </div>
   </dialog>
 
-  <!-- Barra inferior (BarraInferior, solo móvil): cápsula de vidrio de 49 px con tres destinos. La pastilla menta se desliza a la casilla actual (aria-current, scroll-spy de app.js). -->
+  <!-- Barra inferior (BarraInferior, solo móvil): cápsula de vidrio de 49 px con tres destinos. La pastilla menta se desliza a la casilla actual (aria-current, scroll-spy de app.js).
+       «Catálogo» aterriza en las colecciones (#colecciones, 2026-11-14): chips, carrusel y pie del libro caben entre las dos barras; su zona del scroll-spy es #libros (data-zona). -->
   <nav class="tabbar" aria-label="Accesos">
     <span class="tabbar-pastilla" aria-hidden="true"></span>
     <a href="#inicio" aria-current="location"><svg class="tab-ic" aria-hidden="true"><use href="#t-casa"/></svg><span class="tab-lb">Inicio</span></a>
-    <a href="#libros"><svg class="tab-ic" aria-hidden="true"><use href="#t-libros"/></svg><span class="tab-lb">Catálogo</span></a>
+    <a href="#colecciones" data-zona="#libros"><svg class="tab-ic" aria-hidden="true"><use href="#t-libros"/></svg><span class="tab-lb">Catálogo</span></a>
     <button class="tab-list" type="button" data-open-mylist><span class="tab-ic-box"><svg class="tab-ic" aria-hidden="true"><use href="#i-mark"/></svg><span class="count-badge" data-saved-dot hidden aria-hidden="true"></span></span><span class="tab-lb">Mi lista<span class="sr-only">, <span data-saved-count>Vacía</span></span></span></button>
   </nav>
 
@@ -144,7 +146,7 @@
         <a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"></span><span data-news-cta-text></span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
       </div>
       <figure class="entry-media">
-        <picture><source media="(max-width: 760px)" srcset="assets/img/inicio-sala-m.webp" width="648" height="864"><img class="entry-poster" src="assets/img/03-home-sala-central.webp" width="1080" height="608" alt="La sala de la librería: mesas, sillas turquesa, libreros y la ventana verde" fetchpriority="high" decoding="async"></picture>
+        <picture><source media="(max-width: 760px)" srcset="assets/img/inicio-sala-3x2-640.webp 640w, assets/img/inicio-sala-3x2.webp 912w" sizes="(max-width: 375px) calc(100vw - 32px), calc(100vw - 40px)" width="912" height="608"><img class="entry-poster" src="assets/img/03-home-sala-central.webp" width="1080" height="608" alt="La sala de la librería: mesas, sillas turquesa, libreros y la ventana verde" fetchpriority="high" decoding="async"></picture>
       </figure>
     </section>
 
@@ -172,7 +174,7 @@
         <a class="explore-open" href="#catalogo" data-ex-open><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span>Buscar en el catálogo</span></a>
       </div>
       <!-- Capa 1 de Libros: una colección a la vista (chips y carrusel). Sin JS no se muestra; el catálogo completo sigue más abajo. -->
-      <div class="rail" data-rail aria-labelledby="rail-title">
+      <div class="rail" id="colecciones" data-rail aria-labelledby="rail-title">
         <div class="rail-head">
           <h3 id="rail-title" class="sr-only">Libros por colección</h3>
           <div class="rail-chips" role="radiogroup" aria-label="Colección" data-rail-chips><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></div>
@@ -326,8 +328,8 @@
 
 
     <!-- Eventos y talleres (el id sigue siendo #cartelera): Carrusel3D, variante evento (feed.js). Cada propuesta es una tarjeta (foto, insignias de tipo y
-         estado, título); debajo, la descripción de la del centro y «Compartir». Sin JavaScript, cada tarjeta muestra su descripción y la fila se
-         desliza con el dedo. La consulta por WhatsApp vive en el pie (Contacto). -->
+         estado con «Compartir» al final de su fila —desde el 2026-11-14; solo en la del centro—, título); debajo, la descripción de la del centro.
+         Sin JavaScript, cada tarjeta muestra su descripción (sin «Compartir») y la fila se desliza con el dedo. La consulta por WhatsApp vive en el pie (Contacto). -->
     <section id="cartelera" class="bill" aria-labelledby="bill-title">
       <header class="sec-head" data-revelar>
         <h2 id="bill-title" class="h2">Eventos y talleres <em>en la casa</em></h2>
@@ -340,7 +342,7 @@
           <li class="bill-item" data-item="0" data-id="circulo" data-caption="La sala central" data-kind="real">
             <article class="bill-card c3d-card" aria-labelledby="bill-t-circulo" data-inclina>
               <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async"></span>
-              <span class="bill-badges"><span class="badge" data-bill-type>Lectura</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span>
+              <span class="bill-badges"><span class="badge" data-bill-type>Lectura</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="circulo" data-title="Círculo de lectura" aria-label="Compartir «Círculo de lectura»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>
               <h3 class="bill-title" id="bill-t-circulo">Círculo de lectura</h3>
               <div class="bill-detail">
                 <p>Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
@@ -350,7 +352,7 @@
           <li class="bill-item" data-item="1" data-id="ajedrez" data-caption="La mesa de ajedrez" data-kind="real">
             <article class="bill-card c3d-card" aria-labelledby="bill-t-ajedrez" data-inclina tabindex="0">
               <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async"></span>
-              <span class="bill-badges"><span class="badge" data-bill-type>Juego</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span>
+              <span class="bill-badges"><span class="badge" data-bill-type>Juego</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="ajedrez" data-title="Ajedrez en la casa" aria-label="Compartir «Ajedrez en la casa»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>
               <h3 class="bill-title" id="bill-t-ajedrez">Ajedrez en la casa</h3>
               <div class="bill-detail">
                 <p>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
@@ -360,7 +362,7 @@
           <li class="bill-item" data-item="2" data-id="taller" data-caption="El rincón de lectura" data-kind="real">
             <article class="bill-card c3d-card" aria-labelledby="bill-t-taller" data-inclina>
               <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async"></span>
-              <span class="bill-badges"><span class="badge" data-bill-type>Taller</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span></span>
+              <span class="bill-badges"><span class="badge" data-bill-type>Taller</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="taller" data-title="Taller de escritura" aria-label="Compartir «Taller de escritura»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>
               <h3 class="bill-title" id="bill-t-taller">Taller de escritura</h3>
               <div class="bill-detail">
                 <p>Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
@@ -372,12 +374,9 @@
         <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-bill-prev disabled aria-label="Evento anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
         <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-bill-next disabled aria-label="Evento siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
       </div>
-      <!-- La propuesta del centro: su descripción (región viva) y «Compartir». feed.js los cambia con el carrusel. -->
+      <!-- La propuesta del centro: su descripción (región viva). feed.js la cambia con el carrusel. -->
       <div class="bill-pie" data-bill-pie>
         <p class="bill-desc" aria-live="polite" data-bill-desc><span class="sr-only" data-bill-desc-title>Ajedrez en la casa. </span><span data-bill-desc-text>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</span></p>
-        <div class="bill-fila">
-          <button class="btn btn--secundario btn--icono act act--icon" type="button" data-share="ajedrez" data-title="Ajedrez en la casa" aria-label="Compartir «Ajedrez en la casa»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button>
-        </div>
       </div>
     </section>
 

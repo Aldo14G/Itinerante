@@ -16,13 +16,14 @@ ws.addEventListener('message', e => { const m = JSON.parse(e.data); if (m.id && 
 const send = (method, params = {}) => new Promise(r => { const i = ++id; pend.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 const ev = async x => (await send('Runtime.evaluate', { expression: x, awaitPromise: true, returnByValue: true })).result?.result?.value;
 await send('Page.enable'); await send('Runtime.enable');
-await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+await send('Emulation.setDeviceMetricsOverride', { width: 393, height: 659, deviceScaleFactor: 1, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 await send('Page.navigate', { url: URL_ });
 await sleep(4500);
 const H = await ev(`document.documentElement.scrollHeight`);
 for (let y = 0; y < H; y += 600) { await ev(`scrollTo(0, ${y})`); await sleep(200); }
-const marks = await ev(`(() => { const top = s => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY); return [['inicio', 0], ['casa', top('#casa')], ['catalogo', top('#libros')], ['catalogo-explorar', top('#catalogo') + 380], ['eventos', top('#cartelera')], ['novedades', top('#novedades')], ['cita', top('.quote') - 40], ['llamado', top('.call') - 40], ['visita', top('#visita')], ['pie', top('.ftr') - 100]]; })()`);
+// La cita y el llamado se retiraron el 2026-11-13 (sus selectores dejaban el script sin marcas); Café y té ocupa su sitio (2026-11-14).
+const marks = await ev(`(() => { const top = s => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY); return [['inicio', 0], ['casa', top('#casa')], ['catalogo', top('#libros')], ['catalogo-explorar', top('#catalogo') + 380], ['eventos', top('#cartelera')], ['novedades', top('#novedades')], ['cafe', top('#cafe')], ['visita', top('#visita')], ['pie', top('.ftr') - 100]]; })()`);
 let i = 0;
 for (const [name, y] of marks) {
   await ev(`scrollTo(0, ${y})`); await sleep(1400); await ev(`scrollBy(0, 1)`); await sleep(500);

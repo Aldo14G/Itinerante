@@ -82,9 +82,9 @@ async function pass(name, w, h, mobile, reduced) {
 }
 
 const results = [];
-results.push(await pass('móvil · movimiento normal', 390, 844, true, false));
+results.push(await pass('móvil · movimiento normal', 393, 659, true, false));
 results.push(await pass('escritorio · movimiento normal', 1280, 800, false, false));
-results.push(await pass('móvil · movimiento reducido', 390, 844, true, true));
+results.push(await pass('móvil · movimiento reducido', 393, 659, true, true));
 
 let offTotal = 0;
 for (const r of results) {

@@ -1,6 +1,6 @@
 // INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar, ficha, flecha de Eventos, chip y flecha de Café,
 // carrusel 3D, «Buscar en el catálogo» (la hoja Explorar con los 41 títulos) y la ficha desde la rejilla.
-// Uso: node tools/qa/inp.mjs URL [corridas=3] [cpu=4] [ancho=390] [alto=844]
+// Uso: node tools/qa/inp.mjs URL [corridas=3] [cpu=4] [ancho=393] [alto=659]   (por omisión, el iPhone 16 en Safari desde el 2026-11-14; antes 390×844)
 // Cada corrida carga la página en frío. Mide con PerformanceObserver `event` (durationThreshold 16 ms, interacciones con
 // interactionId; el INP de una interacción es la mayor duración de sus eventos) y `long-animation-frame` / `longtask`.
 // Sale con código 1 si alguna interacción pasa de 200 ms o hay una tarea larga > 200 ms provocada por un clic.
@@ -9,7 +9,7 @@ import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-const [URL_, RUNS = '3', CPU = '4', W = '390', H = '844'] = process.argv.slice(2);
+const [URL_, RUNS = '3', CPU = '4', W = '393', H = '659'] = process.argv.slice(2);
 const port = 9750 + Math.floor(Math.random() * 40);
 const chrome = spawn(process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'iti-inp-'))}`, 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));

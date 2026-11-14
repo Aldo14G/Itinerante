@@ -48,17 +48,42 @@ html.sheet-open .tabbar { translate: -50% calc(100% + var(--space-6)); opacity: 
 html:not(.js) .tabbar { display: none; }
 @media (forced-colors: active) { .tabbar a[aria-current] { outline: 2px solid Highlight; outline-offset: -4px; } }
 
-/* ---------- Inicio en el teléfono ---------- */
-.entry { gap: var(--space-6); padding-top: var(--space-3); }
-.entry-media { max-height: 70svh; }
+/* ---------- Inicio en el teléfono (variante A, patrón Uber; aprobada por Aldo el 2026-11-14) ---------- */
+/* Posiciones fijas, iguales en todos los iPhone (solo cambia el ancho): titular de dos renglones fijos («Librería Itinerante» / «y Más») a 24 px
+   bajo la barra (y 68–150 con la barra de 44), estado, entradilla, «Cómo llegar» de 56 (y 256–312) y la dirección; debajo, la foto real de la
+   sala en 3:2, con alto = mín(ancho / 1.5, lo que queda hasta 16 px sobre la barra inferior) y nunca menos de 160: termina antes de la barra.
+   --entrada-arriba es lo que hay de la barra a la foto: 24 + titular 2 × 41 + 8 + estado 22 + 8 + entradilla 2 × 22 + 24 + botón 56 + 12 +
+   dirección 20 + 24 = 324 px. --reserva-inferior: la barra inferior (49), su aire al borde (8), 16 de respiro y el área segura (73 + área). */
+.entry {
+  --entrada-arriba: calc(var(--space-6) + 82px + var(--space-2) + 22px + var(--space-2) + 44px + var(--space-6) + var(--alto-lg) + var(--space-3) + 20px + var(--space-6));
+  --reserva-inferior: calc(var(--alto-barra-inferior) + var(--space-2) + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  gap: var(--space-6); padding-top: var(--space-6);
+}
+.entry-title-mas { display: block; } /* dos renglones fijos en todo teléfono: el bloque no salta de 2 a 1 renglón entre modelos */
+.entry-status, .entry-lede { margin-top: var(--space-2); }
+.entry-address { margin-top: var(--space-3); }
+.entry-media { aspect-ratio: auto; height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); }
+.news-hint .entry-media { height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--space-4) - var(--alto-md) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); } /* con el control de novedades reservado */
+.entry-poster { object-position: 50% 62%; } /* si la foto queda más baja que 3:2, se recorta arriba: la ventana y la mesa siguen al centro */
 .entry-news { width: 100%; }
 /* Una sola acción en la primera vista («Cómo llegar»); el contacto vive en el pie (bloque Contacto) y en el menú ☰. */
 
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
 .still { width: 78vw; scroll-snap-align: center; } /* la siguiente foto asoma lo bastante para invitar a deslizar */
 
+/* ---------- Café y té: la carta (chips y carrusel) antes que la foto (2026-11-14): al llegar se ve la carta, no la foto ---------- */
+/* Solo el orden visual: la foto no es un control (lleva alt), así que el orden de lectura no cambia ninguna acción. */
+.cafe-carta { order: -1; }
+.cafe > .sec-head { margin-bottom: var(--space-6); }
+
 /* ---------- Eventos y talleres: el Carrusel3D (style.css); en ventanas bajas la foto se acorta para que la tarjeta quepa ---------- */
 @media (max-height: 700px) { .bill-card-img { aspect-ratio: 16 / 9; } }
+/* Hasta 359 px (Zoom de pantalla) las dos insignias y «Compartir» no caben en un renglón de la tarjeta (233 + 16 de canal + 24 de relleno > 243):
+   «Compartir» baja al renglón del título, a su derecha, en lugar de quedarse solo en una fila vacía. */
+@media (max-width: 359px) {
+  .bill-share { position: absolute; right: var(--space-2); bottom: var(--space-2); }
+  .bill-title { padding-right: calc(var(--alto-sm) + var(--space-3)); }
+}
 /* A 320–400 px la descripción de la propuesta del centro llega a cuatro renglones: hasta que feed.js mide la más larga (--bill-reserva), se reservan cuatro. */
 @media (max-width: 400px) { .bill-desc { min-height: var(--bill-reserva, 4lh); } }
 
@@ -69,6 +94,9 @@ html:not(.js) .tabbar { display: none; }
 /* Titular → «Buscar en el catálogo» (abre la hoja Explorar) → chips → carrusel → cierre con «Cómo llegar». La capa «Explora el catálogo» no ocupa sitio en la
    página: es la hoja; su titular queda para lectores de pantalla (la región sigue nombrada). */
 .books-head { margin-bottom: var(--space-5); }
+/* «Catálogo» de la barra inferior aterriza aquí (#colecciones, 2026-11-14): los chips a 16 px bajo la cabecera y, debajo, carrusel y pie del
+   libro entre las dos barras en todos los iPhone (antes el titular arriba y la portada tapada por la barra). El menú ☰ sigue yendo al titular. */
+.rail { scroll-margin-top: var(--space-2); }
 .explore-open { width: 100%; }
 /* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón: 12 px de relleno y, con palomita, 8 y la
    palomita más junta. Nunca se parten. */
@@ -93,12 +121,14 @@ html:not(.js) .tabbar { display: none; }
   inset: auto 0 0 0; width: 100%; margin: 0;
   border-radius: var(--radio-lg) var(--radio-lg) 0 0;
 }
-.drawer { height: calc(100dvh - var(--space-12)); }
-.mylist { max-height: calc(100dvh - var(--space-12)); }
+/* El borde de la hoja queda a 48 px del borde o, a pantalla completa (app en la pantalla de inicio), 12 px bajo el área segura: nunca bajo la
+   Dynamic Island (2026-11-14; antes empezaba en y 48 con un área segura de 59–62). */
+.drawer { height: calc(100dvh - max(var(--space-12), env(safe-area-inset-top, 0px) + var(--space-3))); }
+.mylist { max-height: calc(100dvh - max(var(--space-12), env(safe-area-inset-top, 0px) + var(--space-3))); }
 .drawer-grabber { display: block; position: absolute; top: var(--space-2); left: 50%; translate: -50% 0; width: 36px; height: 5px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.5; touch-action: none; }
 .drawer-body { grid-template-columns: 38% minmax(0, 1fr); gap: var(--space-4); padding: var(--space-6) var(--margen) var(--space-5); touch-action: pan-y; }
 .drawer-close { top: var(--space-3); right: var(--space-3); }
-.drawer-head { align-content: end; padding-right: 0; }
+.drawer-head { align-content: center; padding-right: 0; } /* centrado en el alto de la portada (2026-11-14; al pie dejaba 127–160 px vacíos bajo el ×) */
 .drawer-head h3 { padding-right: 0; }
 .drawer-cover { padding-top: var(--space-6); }
 .drawer h3 { font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); overflow-wrap: anywhere; }
@@ -129,6 +159,13 @@ html:not(.js) .tabbar { display: none; }
 @starting-style { .explorer[open] { opacity: 0; } .motion .explorer[open] { transform: translateY(100%); opacity: 1; } }
 .explorer.is-closing { opacity: 0; transition-duration: var(--dur-rapida); }
 
+/* Menú ☰ en ventanas bajas (13 mini, 16e, 16, SE, 16 Pro en Safari): filas de 48 (la escala estándar) y 16 de aire sobre el pie, así Instagram y
+   Facebook caben sin desplazar la hoja desde 629 px de alto (2026-11-14; antes desbordaba 11–63 px). */
+@media (max-height: 700px) {
+  .menu-row { min-height: var(--alto-md); }
+  .menu-pie { padding-top: var(--space-4); }
+}
+
 /* Aviso: sobre la barra inferior. */
 .toast { bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-5)); }
 html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-5)); }
@@ -150,7 +187,8 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-status { margin-top: var(--space-2); }
   .entry-lede { margin-top: var(--space-2); }
   .entry-actions { grid-template-columns: repeat(2, minmax(0, max-content)); margin-top: var(--space-4); }
-  .entry-media { aspect-ratio: 4 / 3; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }
+  .entry-media { aspect-ratio: 4 / 3; height: auto; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }
+  .entry-title-mas { display: inline; }
   .still { width: min(78vw, calc((100svh - 150px) * 1.333)); }
   .c3d--portada { --c3d-w: min(44vw, calc((100svh - 150px) / 1.5)); }
   .c3d--evento { --c3d-w: min(60vw, 300px); }

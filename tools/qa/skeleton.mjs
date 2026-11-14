@@ -24,7 +24,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', { source: `window.__cls = 0;
 const out = [];
 const ck = (n, ok, d = '') => { out.push(ok); console.log(ok ? '✓' : '✗', n, ok ? '' : String(d).slice(0, 320)); };
 
-for (const [name, w, h, mobile] of [['móvil', 390, 844, true], ['escritorio', 1280, 800, false]]) {
+for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['escritorio', 1280, 800, false]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 0 });
   await send('Page.navigate', { url: URL_ });

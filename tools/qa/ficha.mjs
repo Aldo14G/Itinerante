@@ -33,7 +33,7 @@ const out = [];
 const ck = (n, ok, d = '') => out.push([ok ? '✓' : '✗', n, ok ? '' : d]);
 
 // Con un clic real en la tarjeta 2 del carrusel: las acciones del pie quedan dentro de la ventana (sobre el área segura) y la hoja no se desplaza.
-for (const [w, h] of [[360, 740], [375, 667], [320, 640], [390, 844]]) {
+for (const [w, h] of [[375, 629], [375, 667], [320, 640], [393, 659], [440, 763]]) { // iPhone reales en Safari (2026-11-14; antes 360×740 y 390×844)
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
   await send('Page.navigate', { url: URL_ }); await sleep(1500);
   await ev(`localStorage.clear()`);
@@ -104,7 +104,7 @@ const nj = await ev(`(() => ({ js: document.documentElement.classList.contains('
   links: [...document.querySelectorAll('.hdr-nav a')].map(a => { const r = a.getBoundingClientRect(); return [a.getAttribute('href'), r.width > 0 && r.right > 0 && r.left < innerWidth, Math.round(r.height)]; }) }))()`);
 ck('sin JavaScript: ni la barra inferior ni el ☰ (que necesitan JS) se muestran', nj.js === false && nj.more === 'none' && nj.menu === 'none', JSON.stringify(nj));
 ck('sin JavaScript: Catálogo, Eventos, Café y Visita son alcanzables (>= 44 px de alto) y Novedades, que necesita JavaScript, no se ofrece', nj.links.filter(l => l[1]).map(l => l[0]).join() === '#libros,#cartelera,#cafe,#visita' && nj.links.filter(l => l[1]).every(l => l[2] >= 44) && nj.links.some(l => l[0] === '#novedades' && !l[1]), JSON.stringify(nj));
-await shot('nojs-390-top.png');
+await shot('nojs-393-top.png');
 
 ck('sin errores de consola', errs.length === 0, errs.join(' | '));
 for (const r of out) console.log(r.join(' '));
