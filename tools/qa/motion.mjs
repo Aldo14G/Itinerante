@@ -76,7 +76,9 @@ async function pass(name, w, h, mobile, reduced) {
     });
     return [...seen].sort((a, b) => a[0] - b[0]).map(([d, e]) => [Math.round(d * 100) / 100, e.n, e.ex]);
   })()`);
-  return { name, rows, dur };
+  // Animaciones infinitas vivas (bucles): con movimiento reducido deben ser 0 (WCAG 2.2.2; nada se mueve sin que la persona lo pida).
+  const infinitas = await ev(`document.getAnimations().filter(a => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity).map(a => (a.animationName || a.id || 'waapi') + '@' + ((a.effect.target?.className && String(a.effect.target.className).split(' ')[0]) || a.effect.target?.tagName)).slice(0, 8)`);
+  return { name, rows, dur, infinitas };
 }
 
 const results = [];
@@ -90,6 +92,8 @@ for (const r of results) {
   console.log('eventos disparados (' + r.rows.length + ' tipos):', r.rows.slice(0, 14).map(([k, n]) => `${k}×${n}`).join(' · '));
   const off = r.dur.filter(([d]) => !TOKENS.has(d) && d > 1 && !(r.name.includes('reducido') && d <= 1));
   offTotal += off.length;
+  console.log(`animaciones infinitas vivas: ${r.infinitas.length}${r.infinitas.length ? ' (' + r.infinitas.join(', ') + ')' : ''}`);
+  if (r.name.includes('reducido') && r.infinitas.length) { offTotal += r.infinitas.length; console.log('  FALLA: con movimiento reducido no puede quedar ningún bucle'); }
   console.log('duraciones calculadas en el DOM (ms):', r.dur.map(([d, n]) => `${d}×${n}`).join(' '));
   console.log(off.length ? '  FUERA DE TOKENS: ' + off.map(([d, n, ex]) => `${d}ms (${n}) ej. ${ex.join(', ')}`).join(' | ') : '  todas las duraciones salen de los tokens');
 }

@@ -2,7 +2,7 @@
 // sigue al chip, sin salto de alto), carrusel 3D de portadas (la del centro de frente, las vecinas giradas; flechas, ← → Inicio Fin, toque en
 // una vecina la trae al centro y en la del centro abre la ficha; plano con movimiento reducido), «autor · precio» sin cortar en ningún libro,
 // ficha y foco, a 390, 360, 320 y 1280. El carrusel es la variante «portada» del Carrusel3D (carousel3d.js): flechas de vidrio a los lados, región
-// con rol de carrusel. Recorrido ligero (A4, 2026-11-13): los chips son las paradas (conector, palomita en las hojeadas, «N de 3 paradas
+// con rol de carrusel (la palomita del chip es un trazo SVG, .chip-chk, desde el 2026-11-14). Recorrido ligero (A4, 2026-11-13): los chips son las paradas (conector, palomita en las hojeadas, «N de 3 paradas
 // hojeadas» y su dato en localStorage) y caben en un renglón a 320 px. En escritorio (≥ 1024) .rail es display: contents (dos columnas,
 // A6): las medidas toman como referencia la cabecera del carrusel (.rail-head), que sí tiene caja.
 // node tools/qa/rail.mjs URL [DIR]   Las capturas van a DIR (por defecto, el directorio actual).
@@ -82,7 +82,7 @@ const AFTER_CHIP = `async chip => { const r = document.querySelector('[data-rail
 // Estado de la fila de chips, de lo que hay bajo el carrusel (desde el 2026-11-13, ningún llamado a WhatsApp) y posición del carrusel dentro de la pieza (para vigilar que nada salte de alto).
 const CHIPS = `(() => { const r = document.querySelector('[data-rail]'); const g = r.querySelector('[data-rail-chips]'); const top = r.querySelector('.rail-head').getBoundingClientRect().top;
   const chips = [...g.querySelectorAll('.rail-chip')].map(c => { const b = c.getBoundingClientRect(); const cs = getComputedStyle(c);
-    return { id: c.dataset.id, name: c.textContent.trim(), role: c.getAttribute('role'), checked: c.getAttribute('aria-checked'), tab: c.tabIndex, w: Math.round(b.width), h: Math.round(b.height), left: b.left, right: b.right, top: Math.round(b.top), cut: c.scrollWidth > c.clientWidth + 1, fs: cs.fontSize, bg: cs.backgroundColor, mark: getComputedStyle(c, '::before').content }; });
+    return { id: c.dataset.id, name: c.textContent.trim(), role: c.getAttribute('role'), checked: c.getAttribute('aria-checked'), tab: c.tabIndex, w: Math.round(b.width), h: Math.round(b.height), left: b.left, right: b.right, top: Math.round(b.top), cut: c.scrollWidth > c.clientWidth + 1, fs: cs.fontSize, bg: cs.backgroundColor, mark: (() => { const k = c.querySelector('.chip-chk'); return k && getComputedStyle(k).display !== 'none' && k.getBoundingClientRect().width >= 16 ? 'palomita' : 'none'; })() }; });
   const pieTop = r.querySelector('.cf-pie').getBoundingClientRect().top;
   return { role: g.getAttribute('role'), label: g.getAttribute('aria-label'), chips, gap: chips.slice(1).map((c, i) => c.top === chips[i].top ? Math.round(c.left - chips[i].right) : 99),
     wa: [...r.querySelectorAll('a[href*="wa.me"]')].filter(a => a.getBoundingClientRect().height > 0).length,

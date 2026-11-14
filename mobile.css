@@ -139,7 +139,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 .books { content-visibility: auto; contain-intrinsic-size: auto 1076px; }
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
 .cafe { content-visibility: auto; contain-intrinsic-size: auto 828px; }
-.visit { content-visibility: auto; contain-intrinsic-size: auto 832px; }
+.visit { content-visibility: auto; contain-intrinsic-size: auto 1122px; } /* 2026-11-14: + el mapa de llegada (+290 px: 266 del mapa y su atribución y 24 de aire; Visita mide 1 165–1 190 de 360 a 414) */
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 567px; } /* 2026-11-13, contacto en el pie: el Catálogo −124, Café −52, Visita −68 y el pie +247 px (medido de 360 a 414) */
 
 /* ---------- Ventanas bajas: teléfono en horizontal (≤ 500 px de alto) ---------- */

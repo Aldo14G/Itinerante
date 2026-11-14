@@ -2,8 +2,8 @@
 // editan sin tocar HTML ni JS: cada categoría es un chip (Café · Té) y añadir otra (p. ej. «Para comer») es añadir un objeto a «categorias».
 // Carta genérica indicada por Aldo el 2026-11-13 (cafés y tés habituales): sin precios hasta que la librería los dé. Con `precio: null` no se
 // imprime nada de precio; con un número, «$NN MXN» marcado como dato de la carta (data-fuente="carta"). Se carga al acercarse a la sección.
-import { createCarousel3D, wireRadioChips, checkChip } from './carousel3d.js';
-import { afterPaint } from './motion.js';
+import { createCarousel3D, wireRadioChips, checkChip, checkMark } from './carousel3d.js';
+import { afterPaint, drawCheck } from './motion.js';
 
 export const MENU_URL = 'assets/data/menu.json';
 
@@ -103,13 +103,14 @@ export async function initCafe({ isMotion = () => false } = {}) {
   }
   chipsEl.replaceChildren(...cats.map(c => {
     const b = make('button', 'chip cafe-chip', c.nombre);
+    b.prepend(checkMark()); // la palomita (decorativa) del elegido; se dibuja al elegir
     b.type = 'button';
     b.setAttribute('role', 'radio');
     b.setAttribute('aria-checked', 'false');
     b.dataset.id = c.id;
     return b;
   }));
-  wireRadioChips(chipsEl, { selector: '.cafe-chip', current: () => current, choose: chip => { if (chip.dataset.id !== current) show(chip.dataset.id, true); } });
+  wireRadioChips(chipsEl, { selector: '.cafe-chip', current: () => current, choose: chip => { if (chip.dataset.id !== current) { drawCheck(chip); show(chip.dataset.id, true); } } });
   await show(cats[0].id, false, true);
   root.classList.add('is-ready');
 }

@@ -309,7 +309,7 @@
         <div class="drawer-foot">
           <div class="drawer-actions">
             <a class="btn btn--primario btn--lg" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
-            <button type="button" class="save save--wide save--icono" data-d-save aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-mark"/></svg><span data-save-label>Guardar en mi lista</span></button>
+            <button type="button" class="save save--wide save--icono" data-d-save aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mark"/><path class="save-chk" pathLength="1" d="m9 10.3 2.2 2.2 4-4.4"/></svg><span data-save-label>Guardar en mi lista</span></button>
             <button type="button" class="btn btn--secundario btn--lg btn--icono" data-d-share aria-label="Compartir este libro"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button>
             <a class="btn btn--secundario btn--lg" data-d-visit href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
           </div>
@@ -443,6 +443,28 @@
         <div class="visit-actions">
           <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
         </div>
+        <!-- Mapa de llegada (2026-11-14, idea de mapcn; sin JS ni servicios externos): calles de OpenStreetMap proyectadas a SVG (consulta y
+             fecha en assets/provenance.json, «visitMap»), colores de los tokens en claro y oscuro. La ruta es el tramo de Matamoros desde la
+             esquina con Juan Aldama hasta el 421, en el sentido de la calle; se dibuja una vez al entrar en vista (data-revelar) y queda
+             entera sin movimiento. El pin está en la acera norte de la cuadra, interpolado entre el 409 que registra OSM y la esquina con
+             Aldama (OSM no trae el 421). Todo el mapa enlaza a «Cómo llegar». -->
+        <figure class="visit-map" data-revelar>
+          <a class="visit-map-link" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer">
+          <svg class="mapa" viewBox="-425 -150 722 300" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="mapa-t">
+            <title id="mapa-t">Mapa: Mariano Matamoros Pte. 421, entre Juan Aldama e Ignacio Rayón</title>
+            <rect class="mapa-tierra" x="-425" y="-150" width="722" height="300"/>
+            <path class="mapa-borde mapa-borde--av" d="M260 180 270 119 279 67 286 32 288 20 293 -8 305 -70 307 -81 308 -90 318 -176 318 -180M227 -180 227 -179 226 -171 214 -87 213 -77 211 -64 203 13 198 44 198 50 195 67 194 81 192 93 191 105 190 113 189 117 185 155 184 159 182 175 182 180"/>
+            <path class="mapa-borde" d="M104 -91 117 -89 155 -85 213 -77M327 -2 310 -5 293 -8M-386 45 -390 72 -392 80 -404 145 -410 180M-455 -178 -354 -162 -230 -143 -217 -141 -161 -132 -62 -115 -23 -108 -10 -106 -2 -105 104 -91M-122 180 -106 95 -95 42 -89 14 -77 -40 -62 -115 -49 -180M-273 166 -274 159 -273 146 -272 130 -266 80 -266 76 -267 73 -271 64M111 -180 107 -141 105 -114 104 -91 98 -6 95 28 94 39 86 136 82 180M-455 -113 -364 -96 -303 -84 -173 -59 -133 -51 -97 -44 -87 -42 -77 -40 -19 -28 -16 -28 10 -23 98 -6 141 1 203 13 257 25 286 32 327 41M-273 180 -273 180 -273 166M327 -178 318 -176 311 -173 306 -172 302 -172M-230 -143 -224 -177 -224 -180M302 -172 297 -172 267 -176 227 -179 218 -180M327 -82 324 -81M324 -81 327 -81M-392 80 -455 69M-273 166 -256 166 -229 167 -220 167 -210 169 -197 170 -184 173 -155 180M184 159 176 157 174 156 122 144 118 143 100 139 86 136 65 131 24 121 5 118 -42 108 -78 101 -106 95 -132 90 -147 87 -200 77 -271 64 -386 45 -455 33M-155 -180 -161 -132 -173 -59M256 180 184 159M213 -77 248 -79M248 -79 275 -80 295 -81 307 -81 324 -81M-351 -180 -354 -162 -364 -96 -380 2 -386 45M-455 134 -408 144 -404 145 -388 148 -361 153 -284 165 -273 166"/>
+            <path class="mapa-via mapa-via--av" d="M260 180 270 119 279 67 286 32 288 20 293 -8 305 -70 307 -81 308 -90 318 -176 318 -180M227 -180 227 -179 226 -171 214 -87 213 -77 211 -64 203 13 198 44 198 50 195 67 194 81 192 93 191 105 190 113 189 117 185 155 184 159 182 175 182 180"/>
+            <path class="mapa-via" d="M104 -91 117 -89 155 -85 213 -77M327 -2 310 -5 293 -8M-386 45 -390 72 -392 80 -404 145 -410 180M-455 -178 -354 -162 -230 -143 -217 -141 -161 -132 -62 -115 -23 -108 -10 -106 -2 -105 104 -91M-122 180 -106 95 -95 42 -89 14 -77 -40 -62 -115 -49 -180M-273 166 -274 159 -273 146 -272 130 -266 80 -266 76 -267 73 -271 64M111 -180 107 -141 105 -114 104 -91 98 -6 95 28 94 39 86 136 82 180M-455 -113 -364 -96 -303 -84 -173 -59 -133 -51 -97 -44 -87 -42 -77 -40 -19 -28 -16 -28 10 -23 98 -6 141 1 203 13 257 25 286 32 327 41M-273 180 -273 180 -273 166M327 -178 318 -176 311 -173 306 -172 302 -172M-230 -143 -224 -177 -224 -180M302 -172 297 -172 267 -176 227 -179 218 -180M327 -82 324 -81M324 -81 327 -81M-392 80 -455 69M-273 166 -256 166 -229 167 -220 167 -210 169 -197 170 -184 173 -155 180M184 159 176 157 174 156 122 144 118 143 100 139 86 136 65 131 24 121 5 118 -42 108 -78 101 -106 95 -132 90 -147 87 -200 77 -271 64 -386 45 -455 33M-155 -180 -161 -132 -173 -59M256 180 184 159M213 -77 248 -79M248 -79 275 -80 295 -81 307 -81 324 -81M-351 -180 -354 -162 -364 -96 -380 2 -386 45M-455 134 -408 144 -404 145 -388 148 -361 153 -284 165 -273 166"/>
+            <path class="mapa-ruta" pathLength="1" d="M-77 -40 -77 -40 -19 -28 -16 -28 10 -23 38 -17"/>
+            <circle class="mapa-inicio" cx="-77" cy="-40" r="6"/>
+            <text class="mapa-nombre mapa-nombre--calle" transform="translate(-167 -58) rotate(11.3)">Mariano Matamoros</text><text class="mapa-nombre mapa-nombre--calle" transform="translate(-93 34) rotate(-77.8)">Juan Aldama</text><text class="mapa-nombre mapa-nombre--calle" transform="translate(91 66) rotate(-85.5)">Ignacio Rayón</text><text class="mapa-nombre mapa-nombre--menor" transform="translate(-200 77) rotate(10.0)">Padre Mier</text><text class="mapa-nombre mapa-nombre--menor" transform="translate(20 -102) rotate(7.7)">Juan Ignacio Ramón</text><text class="mapa-nombre mapa-nombre--menor" transform="translate(195 70) rotate(-83.0)">Pino Suárez</text>
+            <g class="mapa-pin" transform="translate(40 -24)"><path d="M0 0s-17-14.6-17-28.6a17 17 0 0 1 34 0C17-14.6 0 0 0 0Z"/><circle cx="0" cy="-28.6" r="6.5"/></g><text class="mapa-nombre mapa-num" x="64" y="-46">421</text>
+          </svg>
+          <span class="sr-only">. Abre «Cómo llegar» en Google Maps</span></a>
+          <figcaption>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Colaboradores de OpenStreetMap</a></figcaption>
+        </figure>
       </div>
       <div class="visit-side">
         <table class="hours">
@@ -476,8 +498,11 @@
         <li><a class="ftr-link" href="mailto:libreriaitineranteymasmty@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span>Correo</span><svg class="ic ftr-ne" aria-hidden="true"><use href="#i-ne"/></svg></a></li>
       </ul>
     </div>
+    <!-- «Pausar el movimiento» es un interruptor al modo de iOS (2026-11-14): role="switch" con su rótulo visible; encendido = movimiento
+         pausado. Con «reducir movimiento» o ahorro de datos queda encendido, no se puede apagar y la nota dice por qué (app.js). -->
     <div class="ftr-row">
-      <button class="btn btn--plano btn--sm motion-btn" type="button" data-motion-toggle aria-pressed="false">Pausar el movimiento</button>
+      <button class="motion-btn interruptor" type="button" role="switch" aria-checked="false" aria-describedby="motion-nota" data-motion-toggle><span class="interruptor-rotulo">Pausar el movimiento</span><span class="interruptor-pista" aria-hidden="true"><span class="interruptor-pulgar"></span></span></button>
+      <p class="interruptor-nota" id="motion-nota" data-motion-nota hidden></p>
     </div>
   </footer>
 </body>

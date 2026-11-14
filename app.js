@@ -112,13 +112,15 @@ async function boot() {
 
   await yieldNow();
   // ---------- Movimiento (preferencia del sistema, ahorro de datos y la pausa del pie) ----------
+  // «Pausar el movimiento» es un interruptor (role="switch", 2026-11-14): encendido = pausado. Si el sistema ya lo pausa (reducir movimiento o
+  // ahorro de datos) queda encendido y no se puede apagar (aria-disabled, así sigue enfocable) y la nota de debajo dice por qué.
   const toggle = $('[data-motion-toggle]');
+  const note = $('[data-motion-nota]');
   function syncToggle() {
-    if (reduceMq.matches) { toggle.disabled = true; toggle.textContent = 'Movimiento reducido por el sistema'; return; }
-    if (saveData) { toggle.disabled = true; toggle.textContent = 'Ahorro de datos: movimiento pausado'; return; }
-    toggle.disabled = false;
-    toggle.textContent = 'Pausar el movimiento';
-    toggle.setAttribute('aria-pressed', String(userOff));
+    const why = reduceMq.matches ? 'Movimiento reducido por el sistema' : saveData ? 'Ahorro de datos: movimiento pausado' : '';
+    toggle.setAttribute('aria-checked', String(Boolean(why) || userOff));
+    if (why) toggle.setAttribute('aria-disabled', 'true'); else toggle.removeAttribute('aria-disabled');
+    if (note) { note.textContent = why; note.hidden = !why; }
   }
   function applyMode() {
     const on = motionOn();
@@ -127,6 +129,7 @@ async function boot() {
     syncToggle();
   }
   toggle.addEventListener('click', () => {
+    if (toggle.getAttribute('aria-disabled') === 'true') return; // lo pausa el sistema: la nota lo explica
     userOff = !userOff;
     try { localStorage.setItem('iti-b4-motion', userOff ? 'off' : 'on'); } catch { /* sin persistencia */ }
     applyMode();
@@ -185,12 +188,19 @@ async function boot() {
       pending.delete(e.target);
       revealIo.unobserve(e.target);
     }), { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    // El mapa de Visita dibuja su ruta cuando se ve buena parte de él (60 %), no al asomar: si no, terminaría de dibujarse fuera de la vista.
+    const mapIo = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-visible');
+      pending.delete(e.target);
+      mapIo.unobserve(e.target);
+    }), { threshold: 0.6 });
     $$('[data-revelar]').forEach(el => {
       if (el.getBoundingClientRect().top < innerHeight) return; // ya a la vista: se queda como está
       if (el.matches('.sec-head')) { const h = $('.h2', el); if (h) splitHeading(h); }
       el.dataset.revelar = 'listo';
       pending.add(el);
-      revealIo.observe(el);
+      (el.matches('.visit-map') ? mapIo : revealIo).observe(el);
     });
   }
   let lastW = innerWidth;

@@ -6,8 +6,8 @@
 import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover, priceLabel } from './catalog.js';
 import { loadSample, loadCollections } from './sample.js';
 import { saveButton, initSaved } from './saved.js';
-import { afterPaint, confirmThen } from './motion.js';
-import { createCarousel3D, wireRadioChips, checkChip } from './carousel3d.js';
+import { afterPaint, confirmThen, drawCheck } from './motion.js';
+import { createCarousel3D, wireRadioChips, checkChip, checkMark } from './carousel3d.js';
 
 export const RAIL_SIZE = 12;
 
@@ -31,6 +31,7 @@ const make = (tag, cls, text) => {
 // Un chip de colección (role="radio" dentro del radiogroup): su texto es su nombre accesible; elegido, primario con la palomita (CSS).
 export function chipNode(col) {
   const btn = make('button', 'chip rail-chip', col.titulo);
+  btn.prepend(checkMark()); // la palomita (decorativa): se ve elegida u hojeada y se dibuja al elegir
   btn.type = 'button';
   btn.setAttribute('role', 'radio');
   btn.dataset.id = col.id;
@@ -192,10 +193,16 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
 
   // ---------- Recorrido: los chips son las paradas, unidos por un conector ----------
   const seen = readTrail();
-  function paintTrail() {
+  // `nueva` es la parada que la persona acaba de hojear (índice): el conector que se completa con ella se llena una sola vez, desde la parada
+  // que ya estaba hojeada hacia la nueva (2026-11-14; idea de Animated Beam, sin bucle). Al pintar lo guardado, nada se anima.
+  function paintTrail(nueva = -1) {
     const st = trailState(cols, seen);
     chipsEl.querySelectorAll('.rail-chip').forEach((c, i) => c.classList.toggle('is-hojeada', st.done[i]));
-    chipsEl.querySelectorAll('.rail-conector').forEach((l, i) => l.classList.toggle('is-hecho', st.links[i]));
+    chipsEl.querySelectorAll('.rail-conector').forEach((l, i) => {
+      const was = l.classList.contains('is-hecho');
+      l.classList.toggle('is-hecho', st.links[i]);
+      if (!was && st.links[i] && nueva >= 0) fillLink(l, nueva === i ? 'izq' : 'der');
+    });
     const line = trailLine(st.count, st.total);
     if (progreso.textContent !== line) progreso.textContent = line;
   }
@@ -203,7 +210,14 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     if (!id || seen.has(id)) return;
     seen.add(id);
     writeTrail(seen);
-    paintTrail();
+    paintTrail(cols.findIndex(c => c.id === id));
+  }
+  // El conector crece de la parada hojeada antes (`der`: viene de la izquierda) a la nueva; solo con movimiento (el color cambia igual).
+  function fillLink(l, haciaIzq) {
+    if (!isMotion()) return;
+    l.classList.toggle('desde-der', haciaIzq === 'izq');
+    l.classList.add('is-llena');
+    l.addEventListener('animationend', () => l.classList.remove('is-llena'), { once: true });
   }
 
   // ---------- Carrusel3D, variante portada ----------
@@ -245,7 +259,12 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
   wireRadioChips(chipsEl, {
     selector: '.rail-chip',
     current: () => current,
-    choose: chip => { mark(chip.dataset.id); if (chip.dataset.id !== current) show(chip.dataset.id, true); }
+    choose: chip => {
+      const nueva = chip.dataset.id !== current;
+      if (nueva && !chip.classList.contains('is-hojeada')) drawCheck(chip); // la palomita se dibuja si aún no estaba (una hojeada ya la trae)
+      mark(chip.dataset.id);
+      if (nueva) show(chip.dataset.id, true);
+    }
   });
   paintTrail();
 

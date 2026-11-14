@@ -10,7 +10,9 @@
 //     silueta girada, con su imagen atenuada; el texto no pierde contraste);
 //   · profundidad (A5): con puntero fino y hover, la pieza central se inclina hacia el cursor (hasta --inclinacion-max) y se adelanta
 //     --adelanto-profundidad; al soltar vuelve con el resorte. Una sola escritura por fotograma.
-// Sin dependencias. Las funciones puras (coverflowPose, nearestIndex, tiltPose…) se prueban en tests/site.test.mjs.
+// Solo depende de motion.js (duraciones de los tokens). Las funciones puras (coverflowPose, nearestIndex, tiltPose…) se prueban en tests/site.test.mjs.
+
+import { DUR } from './motion.js';
 
 // ---------- Parte pura ----------
 // La pieza del centro va de frente; cada vecina gira hacia el centro según su distancia `d` (en anchos de pieza, con signo), se hunde y se
@@ -89,6 +91,20 @@ export function wireRadioChips(group, { selector = '.chip', current, choose }) {
   group.addEventListener('focusin', e => { all().forEach(c => { c.tabIndex = c === e.target ? 0 : -1; }); }); // un solo punto de tabulación: el elegido
   all().forEach((c, i) => { c.tabIndex = i ? -1 : 0; });
 }
+// La palomita del chip (2026-11-14): un trazo SVG de verdad, para que se dibuje (stroke-dashoffset, drawCheck en motion.js) al elegir.
+// Decorativa (aria-hidden): el estado lo dice aria-checked. El CSS solo la muestra en el chip elegido (y en la parada hojeada).
+export function checkMark(cls = 'chip-chk') {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', cls);
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('d', 'm5.5 12.5 4.3 4.3 8.7-9.3');
+  path.setAttribute('pathLength', '1');
+  svg.append(path);
+  return svg;
+}
 // Marca el chip elegido (aria-checked y su palomita en CSS) y lo deja como punto de tabulación.
 export function checkChip(group, id, selector = '.chip') {
   group.querySelectorAll(selector).forEach(c => {
@@ -112,19 +128,26 @@ export function initDepth() {
   const max = parseFloat(css.getPropertyValue('--inclinacion-max')) || 6;
   const adelanto = parseFloat(css.getPropertyValue('--adelanto-profundidad')) || 12;
   const perspectiva = parseFloat(css.getPropertyValue('--perspectiva-inclinacion')) || 800;
-  let el = null, px = 0.5, py = 0.5, frame = 0;
-  const release = () => { if (!el) return; el.style.transform = ''; el.classList.remove('is-inclinada'); el = null; };
+  let el = null, px = 0.5, py = 0.5, frame = 0, entra = 0;
+  // Brillo de lámina (2026-11-14; idea de Glare Card y Magic Card): la portada que se inclina lleva un gradiente radial (style.css,
+  // .cover::after) centrado en el cursor. Solo se escriben --brillo-x y --brillo-y por CSSOM, en el mismo fotograma que la inclinación:
+  // cambia la pintura de la portada, no el layout. Sin puntero fino o sin movimiento no hay brillo (ni inclinación).
+  const release = () => { if (!el) return; el.style.transform = ''; el.style.removeProperty('--brillo-x'); el.style.removeProperty('--brillo-y'); el.classList.remove('is-inclinada', 'is-entrando'); clearTimeout(entra); el = null; };
   const paint = () => {
     frame = 0;
     if (!el) return;
     el.style.transform = tiltTransform(tiltPose(px, py, max), { adelanto, perspectiva });
+    el.style.setProperty('--brillo-x', `${(Math.max(0, Math.min(1, px)) * 100).toFixed(1)}%`);
+    el.style.setProperty('--brillo-y', `${(Math.max(0, Math.min(1, py)) * 100).toFixed(1)}%`);
   };
   document.addEventListener('pointermove', e => {
     if (e.pointerType !== 'mouse' || !fine.matches || !root.classList.contains('motion')) { release(); return; }
     const target = e.target.closest?.('[data-inclina]');
     const ok = target && (!target.closest('.c3d-item') || target.closest('.c3d-item.is-centro'));
     if (!ok) { release(); return; }
-    if (target !== el) { release(); el = target; el.classList.add('is-inclinada'); }
+    // Al llegar el cursor la pieza entra a su primera pose con transición (dur-rapida, .is-entrando) en lugar de saltar a ella; pasado ese
+    // tiempo sigue al cursor sin retraso (idea medida en Glare Card: 300 ms de entrada y luego sin transición). Antes saltaba en un fotograma.
+    if (target !== el) { release(); el = target; el.classList.add('is-inclinada', 'is-entrando'); const mine = el; entra = setTimeout(() => mine.classList.remove('is-entrando'), DUR('rapida')); }
     const r = el.getBoundingClientRect();
     px = (e.clientX - r.left) / r.width; py = (e.clientY - r.top) / r.height;
     if (!frame) frame = requestAnimationFrame(paint);

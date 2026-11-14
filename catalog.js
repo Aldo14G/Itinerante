@@ -425,10 +425,24 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     foldBtn.textContent = v.label;
     return v.folded;
   }
+  // Al desplegar, las tarjetas nuevas que caen en la vista entran escalonadas (2026-11-14; idea de Blur Fade, sin desenfoque): opacidad y
+  // 8 px, dur-rapida con curva-salida, escalon-linea entre una y otra y todo dentro de dur-lenta (el retraso se topa en dur-lenta − dur-rapida).
+  // Arranca en el fotograma siguiente al cambio (el clic solo pliega o despliega) y solo con movimiento; el foco se queda en el botón.
+  function staggerIn(items) {
+    if (!isMotion() || !items.length) return;
+    requestAnimationFrame(() => {
+      const vh = innerHeight;
+      const inView = items.filter(li => { const r = li.getBoundingClientRect(); return r.bottom > 0 && r.top < vh; });
+      const dur = DUR('rapida'), step = ms('escalon-linea'), tope = DUR('lenta') - dur;
+      inView.forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: dur, delay: Math.min(i * step, tope), easing: EASE(), fill: 'backwards' }));
+    });
+  }
   foldBtn.addEventListener('click', () => {
     const y = foldBtn.getBoundingClientRect().top;
+    const before = [...grid.children].filter(li => !li.hidden).length;
     state.expanded = !state.expanded;
     applyFold();
+    if (state.expanded) staggerIn([...grid.children].slice(before).filter(li => !li.hidden));
     moreBtn.hidden = moreBtn.hidden || foldBtn.getAttribute('aria-expanded') === 'false';
     // Al plegar, el botón se queda bajo el dedo o el cursor: la página sube lo que la rejilla encogió.
     if (!state.expanded) window.scrollBy(0, foldBtn.getBoundingClientRect().top - y);

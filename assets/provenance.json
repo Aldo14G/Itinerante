@@ -484,5 +484,15 @@
     "file": "data/menu.json",
     "origin": "Carta genérica indicada por Aldo el 2026-11-13: cafés y tés habituales; sin precios hasta que la librería los dé",
     "rule": "precio: null mientras la librería no dé el precio; con un número se muestra «$NN MXN» (data-fuente=\"carta\"). Sin fotos de producto: tarjeta tipográfica con icono."
+  },
+  "visitMap": {
+    "file": "index.html (#visita, figure.visit-map: SVG en línea)",
+    "source": "OpenStreetMap: calles (highway trunk, tertiary y residential) de la API de OSM, GET https://www.openstreetmap.org/api/0.6/map?bbox=-100.3262,25.6688,-100.3178,25.6740",
+    "retrieved": "2026-11-14T03:09:26Z",
+    "license": "ODbL 1.0 (© Colaboradores de OpenStreetMap; atribución visible bajo el mapa con enlace a https://www.openstreetmap.org/copyright)",
+    "method": "Proyección equirectangular local centrada en 25.6707, -100.3220 (1 unidad = 1 m, norte arriba), recorte a la caja del mapa y coordenadas redondeadas al metro. Nombres de calle de OSM (Ignacio López Rayón se rotula «Ignacio Rayón», como la dirección del sitio). Ways usados: Calle Mariano Matamoros 155342199, Juan Aldama 30984146, Calle Ignacio López Rayón 121917915 y las vecinas del recorte.",
+    "pin": "OSM no registra el 421. El pin va en la acera norte (impares: el 409, Qualitas, way 1136750391, está al norte) de la cuadra de Matamoros entre Juan Aldama y Ignacio Rayón, a 0.66 del tramo desde Aldama, interpolado entre el 409 (0.81) y la esquina con Aldama (~499): posición aproximada dentro de la cuadra; la cuadra y las entre calles son las de la dirección.",
+    "route": "Tramo de Matamoros desde la esquina con Juan Aldama hasta el pin (≈117 m, vértices reales del way 155342199), en el sentido de la calle (oneway=yes, de poniente a oriente).",
+    "geocode": "Nominatim (búsqueda por calle de Mariano Matamoros, Juan Aldama e Ignacio Rayón en Monterrey) solo para ubicar la cuadra; Overpass no respondió desde la red de la sesión (conexión cortada)."
   }
 }

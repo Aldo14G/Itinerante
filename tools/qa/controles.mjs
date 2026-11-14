@@ -43,7 +43,7 @@ await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-m
 
 const SCALE = [44, 48, 56];
 // Piezas con alto propio, cada una con su razón: no son botones de la escala.
-const OWN = '.tabbar a, .tab-list, .card, .rel, .menu-row, .c3d-viewport, .cat-opt input, .cat-suggest li, summary, .news-book'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card
+const OWN = '.tabbar a, .tab-list, .card, .rel, .menu-row, .c3d-viewport, .cat-opt input, .cat-suggest li, summary, .news-book, .visit-map-link'; // .news-book: un libro de Novedades (portada, título y autor) es una pieza con alto propio, como .card; .visit-map-link: el mapa de llegada de Visita (240/260 px) es un enlace-imagen, no un botón de la escala (2026-11-14)
 const AUDIT = `(() => {
   const SCALE = ${JSON.stringify(SCALE)};
   const sel = 'a[href], button, input:not([type=hidden]), select, summary, [role=radio]';

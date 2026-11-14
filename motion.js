@@ -61,3 +61,15 @@ export function pickPop(el) {
   el.classList.add('is-pop');
   el.addEventListener('animationend', () => el.classList.remove('is-pop'), { once: true });
 }
+
+/**
+ * La palomita que se dibuja (2026-11-14; idea de los checkboxes de Uiverse, reescrita): al elegir un chip, el trazo de su palomita entra con
+ * stroke-dashoffset (`chk-dibuja` en el CSS). Solo cuando la persona elige y solo con movimiento; sin movimiento aparece completa. Pone
+ * `.is-dibuja` en el control y la retira al terminar ese trazo, así repintar un estado ya elegido no lo vuelve a dibujar.
+ */
+export function drawCheck(el) {
+  if (!el || typeof document === 'undefined' || !document.documentElement.classList.contains('motion')) return;
+  el.classList.add('is-dibuja');
+  const done = e => { if (e.animationName !== 'chk-dibuja') return; el.classList.remove('is-dibuja'); el.removeEventListener('animationend', done); };
+  el.addEventListener('animationend', done);
+}

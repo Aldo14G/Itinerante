@@ -58,14 +58,25 @@ export function listWaUrl(books) {
 
 // ---------------------------------------------------------------------------------------------
 // Interfaz (solo navegador)
+// El marcador de «Guardar» lleva dentro una palomita (2026-11-14): guardado = marcador relleno y palomita; al guardar con un toque, la
+// palomita se dibuja (stroke-dashoffset, con el rebote de pickPop). Es la misma que el botón de la ficha trae en el HTML.
+const CHK = 'm9 10.3 2.2 2.2 4-4.4';
 function icon(id) {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'ic');
+  svg.setAttribute('viewBox', '0 0 24 24');
   svg.setAttribute('aria-hidden', 'true');
   const use = document.createElementNS(NS, 'use');
   use.setAttribute('href', `#${id}`);
   svg.append(use);
+  if (id === 'i-mark') {
+    const chk = document.createElementNS(NS, 'path');
+    chk.setAttribute('class', 'save-chk');
+    chk.setAttribute('pathLength', '1');
+    chk.setAttribute('d', CHK);
+    svg.append(chk);
+  }
   return svg;
 }
 

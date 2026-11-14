@@ -136,6 +136,10 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 /* Alternado (aria-pressed): el secundario toma el primario y su icono se rellena («Guardado en mi lista»). */
 .btn--secundario[aria-pressed="true"], .save--wide[aria-pressed="true"] { background: var(--primario); color: var(--en-primario); }
 .save[aria-pressed="true"] .ic { fill: currentColor; fill-opacity: 0.25; }
+/* Guardado = marcador relleno y su palomita (2026-11-14): la forma acompaña al color. Al guardar con un toque se dibuja (.is-pop, pickPop). */
+.save-chk { fill: none; stroke-width: 2; stroke-dashoffset: 1; opacity: 0; }
+.save[aria-pressed="true"] .save-chk { stroke-dashoffset: 0; opacity: 1; }
+.motion .save.is-pop .save-chk { animation: chk-dibuja var(--dur-base) var(--curva-salida) backwards; }
 
 /* Rebote del icono al elegir, solo por un toque (pickPop en motion.js) y solo con movimiento. */
 @keyframes il-pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
@@ -355,6 +359,14 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Pie de foto: solo el nombre del cuarto (lo demás lo dice la foto y, para lectores de pantalla, su alt). */
 .still figcaption { padding-top: var(--space-3); }
 .still figcaption b { font: var(--t-titular); letter-spacing: var(--ls-titular); }
+/* Enfoque al deslizar (2026-11-14; idea de Focus Cards de Aceternity, solo inspiración): la foto que se ve entera queda plena y la que asoma
+   por un borde se atenúa según lo que asoma (0.6 fuera, como la vecina del carrusel plano), con la línea de tiempo de su propia vista en la
+   tira (view(inline 0px): cuenta lo que se ve, no el scroll-padding, que a 2560 px mide 592): corre en el compositor, sin JavaScript. Solo la imagen: el nombre del cuarto conserva su contraste. Sin soporte, con
+   «reducir movimiento» o con la pausa del pie, todas plenas. */
+@keyframes casa-enfoque { entry 0% { opacity: 0.6; } entry 100% { opacity: 1; } exit 0% { opacity: 1; } exit 100% { opacity: 0.6; } }
+@supports (animation-timeline: view()) {
+  .motion .still-img { animation: casa-enfoque linear both; animation-timeline: view(inline 0px); animation-range: cover; }
+}
 
 /* ---------- Eventos y talleres (#cartelera): Carrusel3D, variante evento ---------- */
 /* Tarjeta en superficie con radio-md (no es vidrio: no flota), foto real 4:3 arriba, insignias de tipo y estado y el título. Debajo del carrusel,
@@ -406,8 +418,42 @@ html:not(.js) .bill-pie { display: none; }
 .visit-arrival .frame-clip { aspect-ratio: 16 / 9; }
 .visit-arrival figcaption { margin-top: var(--space-2); font: var(--t-nota-pie); color: var(--tinta-2); }
 .frame-clip { position: relative; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); }
+/* Mapa de llegada (2026-11-14; idea de mapcn, reescrita sin MapLibre ni teselas): SVG propio con las calles de OpenStreetMap (1 unidad = 1 m,
+   norte arriba), recortado a su caja (slice: los anchos grandes ven más calles, los chicos la cuadra). Colores de los tokens en los dos temas:
+   manzana mapa-tierra, calle mapa-calle con su filete linea, nombres en tinta (los menores en tinta-2) con halo, la ruta en primario y el pin
+   en primario con su centro en-primario. Radio de las fotos de sección (radio-lg). Todo el mapa enlaza a «Cómo llegar». */
+.visit-map { margin: var(--space-6) 0 0; }
+.visit-map-link { display: block; overflow: hidden; border-radius: var(--radio-lg); background: var(--mapa-tierra); color: inherit; -webkit-tap-highlight-color: transparent; }
+.visit-map-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+.mapa { display: block; width: 100%; height: 240px; }
+@media (min-width: 761px) { .mapa { height: 260px; } }
+.mapa-tierra { fill: var(--mapa-tierra); }
+.mapa-borde, .mapa-via, .mapa-ruta { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.mapa-borde { stroke: var(--linea); stroke-width: 14; }
+.mapa-borde--av { stroke-width: 20; }
+.mapa-via { stroke: var(--mapa-calle); stroke-width: 11; }
+.mapa-via--av { stroke-width: 17; }
+.mapa-ruta { stroke: var(--primario); stroke-width: 7; stroke-dasharray: 1; }
+.mapa-inicio { fill: var(--mapa-calle); stroke: var(--primario); stroke-width: 4; }
+.mapa-nombre { font: var(--t-subtitulo); font-weight: 600; fill: var(--tinta); text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--mapa-calle); stroke-width: 4; stroke-linejoin: round; }
+.mapa-nombre--menor { font-weight: 400; fill: var(--tinta-2); }
+.mapa-num { text-anchor: start; stroke: var(--mapa-tierra); }
+.mapa-pin path { fill: var(--primario); stroke: var(--en-primario); stroke-width: 2.5; }
+.mapa-pin circle { fill: var(--en-primario); }
+.visit-map figcaption { margin-top: var(--space-2); font: var(--t-nota-pie); color: var(--tinta-2); }
+.visit-map figcaption a { position: relative; color: var(--turquesa-texto); }
+.visit-map figcaption a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-3)) 0; } /* objetivo de 42 px sin engordar el renglón */
+/* La ruta se dibuja una vez al entrar el mapa en la vista (data-revelar, app.js: con el 60 % del mapa a la vista), en dur-lenta con
+   curva-salida tras dur-rapida. Lo que ya se veía al cargar, sin JavaScript o sin movimiento: la ruta entera. */
+.motion .visit-map[data-revelar="listo"] .mapa-ruta { stroke-dashoffset: 1; transition: stroke-dashoffset var(--dur-lenta) var(--curva-salida) var(--dur-rapida); }
+.motion .visit-map[data-revelar="listo"].is-visible .mapa-ruta { stroke-dashoffset: 0; }
 .frame-clip img { width: 100%; height: 100%; object-fit: cover; }
-@media (min-width: 1024px) { .visit { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-16); } }
+@media (min-width: 1024px) {
+  .visit { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-16); }
+  /* Con el mapa (2026-11-14) la columna izquierda queda más alta: la derecha (horario, nota y foto) baja a su pie, así el mapa y la foto de la
+     llegada comparten la línea de abajo (y sus pies de foto, el mismo renglón) y el aire queda junto al titular, no como hueco bajo la foto. */
+  .visit-side { align-self: end; }
+}
 
 /* Pie (2026-11-13): el único lugar de la página con el contacto, como bloque «Contacto»: titular, para qué escribir y WhatsApp, Instagram,
    Facebook y Correo en una lista agrupada (fondo-2, radio-md, filas de 56 con su icono, como el horario de Visita); debajo, «Pausar el
@@ -425,10 +471,36 @@ html:not(.js) .bill-pie { display: none; }
 .ftr-link .ftr-ne { width: 20px; height: 20px; color: var(--tinta-2); }
 .ftr-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .ftr-link:hover span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; } }
-.ftr-row { display: flex; margin-top: var(--space-6); }
-.motion-btn { margin-inline-start: calc(-1 * var(--space-4)); color: var(--tinta-2); }
-.motion-btn[aria-pressed="true"] { color: var(--tinta); }
-.motion-btn:disabled { background: transparent; opacity: 1; cursor: default; }
+/* «Pausar el movimiento» (2026-11-14): interruptor al modo de iOS (Apple HIG «Toggles»; idea de los toggles de Uiverse, reescrita). Botón
+   role="switch" con su rótulo visible y la pista de 51 × 31 a la derecha, dentro de un objetivo de 44 de alto; encendido (aria-checked) =
+   movimiento pausado: pista primario y el pulgar a la derecha, que se desliza con el resorte (solo con movimiento: al pausar, salta). Apagado,
+   la pista lleva el borde linea-fuerte (≥ 3:1). Si el sistema ya lo pausa queda encendido, atenuado y la nota de debajo dice por qué. */
+.ftr-row { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); margin-top: var(--space-6); }
+.interruptor {
+  display: inline-flex; align-items: center; gap: var(--space-3); min-height: var(--alto-sm); margin: 0 0 0 calc(-1 * var(--space-2)); padding: 0 var(--space-2);
+  border: 0; border-radius: var(--radio-pildora); background: none; color: var(--tinta); font: var(--t-subtitulo); text-align: left; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.interruptor:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+.interruptor-pista {
+  position: relative; flex: none; width: var(--interruptor-ancho); height: var(--interruptor-alto); border-radius: var(--radio-pildora);
+  background: var(--fondo-3); box-shadow: inset 0 0 0 2px var(--linea-fuerte);
+  transition: background-color var(--dur-rapida) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida);
+}
+.interruptor-pulgar {
+  position: absolute; top: calc((var(--interruptor-alto) - var(--interruptor-pulgar)) / 2); left: calc((var(--interruptor-alto) - var(--interruptor-pulgar)) / 2);
+  width: var(--interruptor-pulgar); height: var(--interruptor-pulgar); border-radius: 50%; background: var(--superficie); box-shadow: var(--sombra-pulgar);
+}
+.motion .interruptor-pulgar { transition: transform var(--dur-rapida) var(--curva-resorte); }
+.interruptor[aria-checked="true"] .interruptor-pista { background: var(--primario); box-shadow: none; }
+.interruptor[aria-checked="true"] .interruptor-pulgar { transform: translateX(calc(var(--interruptor-ancho) - var(--interruptor-alto))); }
+.interruptor[aria-disabled="true"] { cursor: default; }
+.interruptor[aria-disabled="true"] .interruptor-pista { opacity: 0.5; }
+@media (hover: hover) {
+  .interruptor:not([aria-disabled="true"]):hover .interruptor-pista { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); }
+  .interruptor[aria-checked="true"]:not([aria-disabled="true"]):hover .interruptor-pista { background: var(--primario-presionado); }
+}
+.interruptor-nota { margin: 0; font: var(--t-nota-pie); color: var(--tinta-2); }
 @media (min-width: 761px) {
   /* Dos por fila: WhatsApp e Instagram arriba, Facebook y Correo abajo; el filete separa solo las filas. */
   .ftr-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -479,7 +551,8 @@ html:not(.js) .bill-pie { display: none; }
 .explore-open:active, .explore-open[data-opening] { transform: scale(0.98); }
 @media (hover: hover) { .explore-open:hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
 
-/* Chip (Chip): píldora de 48 px en fondo-3; elegido = primario con la palomita (la forma acompaña al color). */
+/* Chip (Chip): píldora de 48 px en fondo-3; elegido = primario con la palomita (la forma acompaña al color). La palomita es un trazo SVG
+   (.chip-chk, checkMark en carousel3d.js) para que se dibuje al elegir (2026-11-14); antes era una máscara en ::before. */
 .chip, .cat-filters-btn, .cat-chip {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
   min-height: var(--alto-md); min-width: var(--alto-md); margin: 0; padding: 0 var(--space-4);
@@ -489,11 +562,13 @@ html:not(.js) .bill-pie { display: none; }
 }
 .chip:active, .cat-filters-btn:active, .cat-chip:active { transform: scale(0.96); }
 .chip[aria-checked="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip { background: var(--primario); color: var(--en-primario); }
-.chip[aria-checked="true"]::before, .rail-chip.is-hojeada::before {
-  content: ""; flex: none; width: 18px; height: 18px; margin-left: calc(-1 * var(--space-1)); background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.3 4.3 8.7-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.3 4.3 8.7-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
-}
+.chip-chk { display: none; flex: none; width: 18px; height: 18px; margin-left: calc(-1 * var(--space-1)); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.chip[aria-checked="true"] > .chip-chk, .rail-chip.is-hojeada > .chip-chk { display: block; }
+/* Palomita que se dibuja (chips y «Guardar», 2026-11-14; idea de los checkboxes de Uiverse, reescrita): el trazo mide 1 (pathLength) y entra
+   con stroke-dashoffset solo cuando la persona elige (.is-dibuja, drawCheck en motion.js; .is-pop al guardar) y solo con movimiento. */
+:is(.chip-chk, .save-chk) path, .save-chk { stroke-dasharray: 1; }
+@keyframes chk-dibuja { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.motion .is-dibuja > .chip-chk path { animation: chk-dibuja var(--dur-rapida) var(--curva-salida) backwards; }
 :is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { :is(.chip:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
 
@@ -826,9 +901,24 @@ html:not(.js) .bill-pie { display: none; }
    hover y movimiento). Al salir vuelven con el resorte; al presionar bajan a 0.97 en dur-instantanea y la sombra baja a sombra-flotante. */
 .motion [data-inclina] { transition: transform var(--dur-base) var(--curva-resorte), scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
 .motion [data-inclina].is-inclinada { transition: scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
+/* Entrada del cursor (2026-11-14): la primera pose llega en dur-rapida con curva-salida (antes saltaba en un fotograma: 100 % de la pose de
+   golpe, medido); luego la pieza sigue al cursor sin transición. */
+.motion [data-inclina].is-inclinada.is-entrando { transition: transform var(--dur-rapida) var(--curva-salida), scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
 .motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active { scale: 0.97; }
 .motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active .cover { transform: none; }
 .c3d-item.is-centro :is(.bill-card, .cafe-card):active, .rail-item.is-centro .card:active .cover, .card-item:active .cover { box-shadow: var(--sombra-flotante); }
+/* Brillo de lámina (2026-11-14; idea de Glare Card de Aceternity —solo inspiración— y de Magic Card de Magic UI, MIT): la portada que se
+   inclina (la central del carrusel de libros y la tarjeta de la rejilla) lleva una luz radial que sigue al cursor (--brillo-x/-y, escritas por
+   initDepth en el mismo fotograma que la inclinación; solo pintura). Sin texto encima de la luz, sin neón. Solo con puntero fino, hover y
+   movimiento: con toque, «reducir movimiento» o la pausa, no hay brillo. Al salir se apaga en dur-rapida. */
+@media (hover: hover) and (pointer: fine) {
+  .motion :is(.card, .card-item)[data-inclina] .cover::after {
+    content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(circle at var(--brillo-x, 50%) var(--brillo-y, 50%), var(--brillo-lamina), transparent 60%);
+    opacity: 0; transition: opacity var(--dur-rapida) var(--curva-salida);
+  }
+  .motion :is(.card, .card-item)[data-inclina].is-inclinada .cover::after { opacity: 1; }
+}
 
 /* ---------- Carrusel de libros (capa 1 del Catálogo): Carrusel3D, variante portada ---------- */
 .rail[hidden], html:not(.js) .rail { display: none; }
@@ -839,10 +929,17 @@ html:not(.js) .bill-pie { display: none; }
 .rail-chips .chip { flex: none; } /* un chip nunca se encoge ni se parte: cede el conector */
 /* En el recorrido el conector es la separación: va de chip a chip (≥ 8 px), sin hueco aparte. */
 .rail-chips:has(.rail-conector) { gap: 0; }
-.rail-conector { flex: 0 1 var(--space-6); min-width: var(--space-2); height: 2px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.45; transition: background-color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida); }
-.rail-conector.is-hecho { background: var(--primario); opacity: 1; }
+/* El tramo hecho es una capa primario encima (::after) que, cuando la persona hojea la segunda parada, crece una sola vez desde la parada que
+   ya estaba hojeada (.is-llena; .desde-der si viene de la derecha), en dur-base con curva-salida: idea de Animated Beam (Magic UI, MIT), sin
+   bucle. Al pintar lo guardado o sin movimiento, el tramo aparece hecho. */
+.rail-conector { position: relative; overflow: hidden; flex: 0 1 var(--space-6); min-width: var(--space-2); height: 2px; border-radius: var(--radio-pildora); background: color-mix(in oklab, var(--linea-fuerte) 45%, transparent); }
+.rail-conector::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--primario); transform: scaleX(0); transform-origin: left center; }
+.rail-conector.is-hecho::after { transform: none; }
+.rail-conector.desde-der::after { transform-origin: right center; }
+@keyframes conector-llena { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.motion .rail-conector.is-llena::after { animation: conector-llena var(--dur-base) var(--curva-salida); }
 .rail-chip.is-hojeada:not([aria-checked="true"]) { box-shadow: inset 0 0 0 2px var(--primario); }
-.rail-chip.is-hojeada:not([aria-checked="true"])::before { background: var(--primario); }
+.rail-chip.is-hojeada:not([aria-checked="true"]) > .chip-chk { color: var(--primario); }
 /* Debajo, la nota de la colección y, a su derecha, «N de 3 paradas hojeadas» (si no caben, el conteo baja y queda a la derecha). Los dos
    renglones están reservados desde el esqueleto: el conteo tiene su ancho aunque llegue vacío. */
 .rail-nota-fila { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-4); max-width: 480px; } /* el ancho de «Buscar en el catálogo»: el conteo queda cerca de sus paradas */
@@ -1004,8 +1101,13 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 /* ---------- Colores forzados (Windows alto contraste) ---------- */
 @media (forced-colors: active) {
   .btn, .chip, .cat-chip, .cat-filters-btn, .save, .menu-btn, .hdr-nav a, .menu-row, .tabbar a, .tab-list { border: 1px solid ButtonText; }
-  .chip[aria-checked="true"], :is(.save, .motion-btn)[aria-pressed="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip, .hdr-nav a[aria-current="true"], .menu-row[aria-current="true"] { border-color: Highlight; color: Highlight; forced-color-adjust: none; }
+  .chip[aria-checked="true"], .save[aria-pressed="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip, .hdr-nav a[aria-current="true"], .menu-row[aria-current="true"] { border-color: Highlight; color: Highlight; forced-color-adjust: none; }
   .cover { border: 1px solid CanvasText; }
+  .interruptor-pista { forced-color-adjust: none; background: Canvas; box-shadow: inset 0 0 0 2px ButtonText; }
+  .interruptor-pulgar { forced-color-adjust: none; background: ButtonText; box-shadow: none; }
+  .interruptor[aria-checked="true"] .interruptor-pista { background: Highlight; box-shadow: none; }
+  .interruptor[aria-checked="true"] .interruptor-pulgar { background: HighlightText; }
+  .mapa-ruta { stroke: Highlight; }
   .cat-opt input:checked + label::before { background: Highlight; border-color: Highlight; }
 }
 

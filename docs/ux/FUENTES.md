@@ -108,3 +108,17 @@ La skill de este repositorio es `/autocorregir` (`npm run critique`): mide token
 
 ## MotionSites Web Builder (skill de Claude; instrucciones, referencias y scripts bajo licencia MIT)
 https://github.com/Motionsites-AI/claude-skill · Revisado el 12 nov 2026 a pedido de Aldo. Se adoptó: la revisión «mira y corrige» (capturar, puntuar diez criterios, corregir los tres más bajos con valores y repetir; vara: promedio ≥ 8 y nada < 7), los bloqueantes (destello al cargar, fuentes sin cargar, imágenes rotas, desborde) y la regla de que el fondo del lienzo sea el del borde de la imagen. Vive en `docs/agentes/rubrica-visual.md` y `tools/qa/controles.mjs`. No se adoptó: los ejemplos y la repisa de medios (licencia aparte), librerías por CDN, vidrio, video de fondo, tipografías de su catálogo ni su bloque promocional, porque chocan con la CSP, los tokens o `PRODUCT.md`.
+
+## Ronda de animaciones (2026-11-14): origen de cada idea portada
+Insumo: la investigación de `docs/ux/investigacion-2026-11/` (Aceternity UI, Magic UI, mapcn, shadcn/ui, Uiverse). Nada se instaló ni se copió código: cada idea se reescribió en CSS y JavaScript nativos con nuestros tokens, plana con «reducir movimiento» o «Pausar el movimiento».
+
+| Idea | Fuente | Licencia | Qué se tomó | Dónde |
+|---|---|---|---|---|
+| Enfoque por posición | Aceternity UI, Focus Cards (https://ui.aceternity.com/components/focus-cards) | Sin licencia abierta verificable: **solo inspiración** | La idea de atenuar lo que no está en foco; el disparador pasa del hover a la posición (`animation-timeline: view(inline 0px)`) | La casa (`.still-img`) |
+| Recorrido que se llena | Magic UI, Animated Beam (https://github.com/magicuidesign/magicui) | MIT (verificada en el repositorio) | La idea del trazo que viaja entre dos nodos, **sin bucle**: un `scaleX` de una sola vez | Conector de las paradas del Catálogo |
+| Escalonado al aparecer | Magic UI, Blur Fade | MIT | El escalón entre piezas; **sin desenfoque** (41 portadas desenfocadas repintan demasiado) | «Ver los 41 títulos» |
+| Brillo de lámina | Aceternity UI, Glare Card (solo inspiración; su entrada de 300 ms medida en Chromium por el coordinador) y Magic UI, Magic Card (MIT) | Aceternity: solo idea; Magic UI: MIT | Gradiente radial que sigue al cursor por variables CSS y la entrada suave a la primera pose | Portada central del carrusel y tarjeta de la rejilla |
+| Palomita que se dibuja | Uiverse, checkboxes (https://uiverse.io) | MIT por elemento; solo la idea (sus estilos en línea violan la CSP) | `stroke-dasharray`/`stroke-dashoffset` sobre un trazo de largo 1 | Chips (Catálogo y carta) y «Guardar» |
+| Mapa de llegada y ruta que avanza | mapcn (https://github.com/AnmolSaini16/mapcn), `RouteProgress` | MIT (código; no se usó); datos de OpenStreetMap | La idea de un mapa propio con la ruta que se dibuja; sin MapLibre, teselas ni servicios | Visita |
+| Datos del mapa | OpenStreetMap, API 0.6 `map?bbox=-100.3262,25.6688,-100.3178,25.6740` (consulta del 2026-11-14 03:09 UTC) | ODbL 1.0: atribución «© Colaboradores de OpenStreetMap» con enlace a https://www.openstreetmap.org/copyright | Geometría de las calles, nombres y números de casa vecinos (para el pin) | `assets/provenance.json` (`visitMap`) |
+| Interruptor | Apple HIG, Toggles (https://developer.apple.com/design/human-interface-guidelines/toggles) y toggles de Uiverse (idea) | HIG: cita; Uiverse: MIT, solo idea | Pista de 51 × 31, pulgar que se desliza, `role="switch"` (WAI-ARIA APG, Switch) | «Pausar el movimiento» del pie |
