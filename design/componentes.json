@@ -1,0 +1,689 @@
+{
+  "$comment": "Catálogo de componentes del sitio (sistema «Itinerante Líquido»). Formato plano inspirado en registry.json / registry-item.json de shadcn/ui (MIT; ver docs/ux/FUENTES.md), sin su CLI. Aprobado por Aldo el 2026-11-14. Se escribe a mano con los datos del código: cada archivo, selector, función, token y herramienta que nombra existe (tests/componentes.test.mjs lo comprueba) y cada estado declarado se busca en el CSS o el JS. La tabla legible es design/COMPONENTES.md. Regla de atributos: clase = parte o variante, aria-* = estado, data-* = gancho de JavaScript (DESIGN.md).",
+  "nombre": "itinerante-liquido",
+  "version": "2026-11-14",
+  "convenciones": {
+    "estados": {
+      "hover": "Solo con puntero que flota: la regla vive dentro de @media (hover: hover). Con toque no hay hover pegado.",
+      "foco": ":focus-visible con anillo-foco (2 px de fondo y 2 de foco) o, dentro de una lista, un filete interior de 2 px en foco. Siempre ≥ 3:1.",
+      "presionado": ":active (o data-opening mientras abre): escala 0.94–0.98 o el color presionado.",
+      "deshabilitado": ":disabled o aria-disabled=\"true\" (aria-disabled sigue enfocable y anunciado).",
+      "seleccionado": "aria-checked, aria-pressed, aria-selected o :checked; la forma acompaña al color (palomita, icono relleno).",
+      "actual": "aria-current (destino actual) o la pieza central del carrusel (.is-centro, estado solo visual: la región viva lo anuncia).",
+      "expandido": "aria-expanded (y la clase de la parte que se abre).",
+      "ocupado": "aria-busy=\"true\" y esqueletos quietos del tamaño final.",
+      "vacio": "Una frase y una salida (reintentar, WhatsApp, limpiar filtros).",
+      "error": "Lo que falló y la salida, en una región con role=status o alert.",
+      "movimiento_reducido": "Todo movimiento vive bajo .motion (la pone boot.js/app.js solo sin «reducir movimiento», sin ahorro de datos y sin «Pausar el movimiento») o se neutraliza en @media (prefers-reduced-motion: reduce).",
+      "tactil": "Con toque, @media (hover: none) and (pointer: coarse)."
+    },
+    "contraste": "Pares de la lista «contraste» calculados desde design/tokens.json en claro y oscuro: texto ≥ 4.5:1 (WCAG 1.4.3); borde de control, icono, gráfico y foco ≥ 3:1 (WCAG 1.4.11). «vidrio@peor» es el vidrio compuesto sobre lo peor que puede haber detrás (negro en claro, blanco en oscuro); «mezcla:a+b@p» es color-mix(in oklab, a, b p%)."
+  },
+  "componentes": [
+    {
+      "id": "boton",
+      "nombre": "Boton",
+      "tipo": "control",
+      "descripcion": "Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y en las barras, 56 (--lg) en las acciones principales y el pie de las hojas. Una sola primaria por vista.",
+      "variantes": [
+        { "nombre": "primario", "selector": ".btn--primario", "uso": "La acción primaria de la vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»)." },
+        { "nombre": "secundario", "selector": ".btn--secundario", "uso": "Secundaria «tinted» en menta; alternado con aria-pressed toma el primario." },
+        { "nombre": "plano", "selector": ".btn--plano", "uso": "Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»)." },
+        { "nombre": "vidrio", "selector": ".btn--vidrio", "uso": "Solo lo que flota: cerrar una hoja, flechas del Carrusel3D." },
+        { "nombre": "icono", "selector": ".btn--icono", "uso": "Cuadrado del alto del botón, nombre en aria-label." },
+        { "nombre": "chico", "selector": ".btn--sm", "uso": "44 px." },
+        { "nombre": "grande", "selector": ".btn--lg", "uso": "56 px." },
+        { "nombre": "ancho", "selector": ".btn--ancho", "uso": "A todo el ancho." }
+      ],
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg", ".btn--ancho"] },
+        { "ruta": "index.html", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg"] },
+        { "ruta": "motion.js", "exporta": ["pickPop", "afterPaint", "confirmThen"] }
+      ],
+      "tokens": ["alto-sm", "alto-md", "alto-lg", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte"],
+      "estados": {
+        "hover": { "css": [".btn--primario:hover", ".btn--secundario:hover", ".btn--vidrio:hover", ".btn--plano:hover"] },
+        "foco": { "css": [".btn:focus-visible", ".btn--vidrio:focus-visible"] },
+        "presionado": { "css": [".btn:active", ".btn--primario:active"] },
+        "deshabilitado": { "css": [".btn:disabled", ".btn[aria-disabled=\"true\"]"] },
+        "seleccionado": { "css": [".btn--secundario[aria-pressed=\"true\"]"] },
+        "movimiento_reducido": { "css": [".btn:active"], "nota": "En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo." }
+      },
+      "aria": { "patron": "Button", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "atributos": ["aria-pressed", "aria-disabled", "aria-label"], "teclado": "Enter y Espacio (nativo de <button>); los enlaces con cara de botón, Enter." },
+      "qa": ["tools/qa/controles.mjs", "tools/qa/contrast.mjs", "tools/qa/axe.mjs", "tests/critique.test.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Botón) y «Escala de controles»."
+    },
+    {
+      "id": "guardar",
+      "nombre": "BotonGuardar",
+      "tipo": "control",
+      "descripcion": "«Guardar en Mi lista»: vidrio de 44 sobre la portada (.save), secundario ancho (.save--wide) o icono de 56 en la ficha (.save--icono). Guardado = primario con el marcador relleno y su palomita.",
+      "variantes": [
+        { "nombre": "sobre-portada", "selector": ".save", "uso": "Vidrio de 44 en la esquina de la portada (rejilla y carrusel; en el carrusel solo la central)." },
+        { "nombre": "ancho", "selector": ".save--wide", "uso": "Botón menta con rótulo." },
+        { "nombre": "icono", "selector": ".save--icono", "uso": "Icono de 56 en las acciones de la ficha; el rótulo es su nombre accesible." }
+      ],
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".save", ".save--wide", ".save--icono", ".save-chk"] },
+        { "ruta": "index.html", "selectores": ["[data-d-save]", ".save--icono"] },
+        { "ruta": "saved.js", "exporta": ["saveButton", "bindSaveButton", "toggleSaved", "isSaved", "savedIds", "MAX_SAVED"] },
+        { "ruta": "motion.js", "exporta": ["pickPop"] }
+      ],
+      "tokens": ["alto-sm", "alto-md", "alto-lg", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "primario", "en-primario", "menta", "en-menta", "tinta", "fondo", "foco", "anillo-foco", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida"],
+      "estados": {
+        "foco": { "css": [":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible", ":is(.rail-item, .card-item) .save:not(.save--wide):focus-visible"] },
+        "presionado": { "css": [".save:active"] },
+        "seleccionado": { "css": [".save[aria-pressed=\"true\"]:not(.save--wide)", ".save[aria-pressed=\"true\"] .ic", ".save[aria-pressed=\"true\"] .save-chk", ".save--wide[aria-pressed=\"true\"]"], "js": [{ "ruta": "saved.js", "texto": "btn.setAttribute('aria-pressed', String(on))" }] },
+        "movimiento_reducido": { "css": [".motion .save.is-pop .save-chk", ".save:active"] }
+      },
+      "no_aplica": { "hover": "Sin cambio al pasar el cursor: el vidrio sobre la portada ya se lee como botón; el cursor cambia (cursor: pointer)." },
+      "aria": { "patron": "Button (alternado)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "atributos": ["aria-pressed", "aria-label"], "teclado": "Enter y Espacio alternan; el nombre dice el libro y la acción («Guardar «…» en mi lista» / «Quitar…»)." },
+      "qa": ["tools/qa/saved.mjs", "tools/qa/ficha.mjs", "tools/qa/inp.mjs", "tools/qa/controles.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Ronda de animaciones» (palomita de Guardar, 2026-11-14)."
+    },
+    {
+      "id": "chip",
+      "nombre": "Chip",
+      "tipo": "control",
+      "descripcion": "Píldora de 48 en fondo-3; elegido = primario con la palomita (trazo SVG que se dibuja al elegir). En fila es un radiogroup (colecciones del Catálogo, Café · Té); en Explorar, el filtro activo (.cat-chip) y el botón «Filtros».",
+      "variantes": [
+        { "nombre": "radio", "selector": ".chip", "uso": "role=radio dentro de role=radiogroup (rail.js chipNode, cafe.js)." },
+        { "nombre": "filtro-activo", "selector": ".cat-chip", "uso": "Filtro aplicado en Explorar, con su × para quitarlo." },
+        { "nombre": "filtros", "selector": ".cat-filters-btn", "uso": "Abre los filtros hasta 1100 px (aria-expanded)." }
+      ],
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".chip", ".chip-chk", ".cat-chip", ".cat-filters-btn", ".rail-chips"] },
+        { "ruta": "index.html", "selectores": ["[data-rail-chips]", "[data-cafe-chips]", "[data-cat-filters-btn]", ".rail-chips"] },
+        { "ruta": "carousel3d.js", "exporta": ["wireRadioChips", "checkMark", "checkChip"] },
+        { "ruta": "rail.js", "exporta": ["chipNode"] },
+        { "ruta": "motion.js", "exporta": ["drawCheck"] }
+      ],
+      "tokens": ["alto-md", "radio-pildora", "space-2", "space-4", "fondo-3", "tinta", "primario", "en-primario", "t-chip", "ls-chip", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida"],
+      "estados": {
+        "hover": { "css": [":is(.chip:not([aria-checked=\"true\"]), .cat-filters-btn:not([aria-expanded=\"true\"])):hover"] },
+        "foco": { "css": [":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
+        "presionado": { "css": [".chip:active", ".cat-filters-btn:active", ".cat-chip:active"] },
+        "seleccionado": { "css": [".chip[aria-checked=\"true\"]", ".chip[aria-checked=\"true\"] > .chip-chk"], "js": [{ "ruta": "carousel3d.js", "texto": "c.setAttribute('aria-checked', String(on))" }] },
+        "expandido": { "css": [".cat-filters-btn[aria-expanded=\"true\"]"] },
+        "ocupado": { "css": [".sk-chip"], "html": [".sk-chip"] },
+        "movimiento_reducido": { "css": [".motion .is-dibuja > .chip-chk path", ".chip:active"] }
+      },
+      "aria": { "patron": "Radio Group", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/", "atributos": ["role=radiogroup", "role=radio", "aria-checked", "aria-label"], "teclado": "Un solo punto de tabulación (el elegido); ← → ↑ ↓ mueven el foco y eligen (wireRadioChips)." },
+      "qa": ["tools/qa/rail.mjs", "tools/qa/controles.mjs", "tools/qa/inp.mjs", "tools/qa/feed.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Chip) y «Ronda de animaciones» (palomita que se dibuja)."
+    },
+    {
+      "id": "recorrido",
+      "nombre": "Recorrido",
+      "tipo": "bloque",
+      "descripcion": "Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva. Se guarda en localStorage (iti-recorrido-v2).",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".rail-conector", ".rail-conector::after", ".rail-conector.is-hecho::after", ".rail-progreso", ".rail-nota-fila", ".rail-note"] },
+        { "ruta": "index.html", "selectores": ["[data-rail-progreso]", "[data-rail-note]"] },
+        { "ruta": "rail.js", "exporta": ["conector", "readTrail", "writeTrail", "trailState", "trailLine", "TRAIL_KEY"], "internas": ["fillLink", "paintTrail"], "ganchos": ["iti-recorrido-v2"] }
+      ],
+      "tokens": ["linea-fuerte", "primario", "turquesa-texto", "tinta-2", "space-2", "space-6", "radio-pildora", "t-nota-pie", "t-subtitulo", "dur-base", "curva-salida"],
+      "estados": {
+        "seleccionado": { "css": [".rail-chip.is-hojeada:not([aria-checked=\"true\"])", ".rail-chip.is-hojeada > .chip-chk"], "nota": "Hojeada = estado solo visual (clase); el conteo en la región viva lo anuncia." },
+        "movimiento_reducido": { "css": [".motion .rail-conector.is-llena::after"] }
+      },
+      "no_aplica": { "hover": "No es un control: los chips llevan su propio hover.", "foco": "No es enfocable; el foco es el de los chips." },
+      "aria": { "patron": "Región viva (status)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-live=polite"], "teclado": "El de los chips (radiogroup)." },
+      "qa": ["tools/qa/rail.mjs", "tools/qa/motion.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Carrusel3D, Eventos, Café y té, recorrido y profundidad» y «Recorrido que se llena» (2026-11-14)."
+    },
+    {
+      "id": "barra-navegacion",
+      "nombre": "BarraNavegacion",
+      "tipo": "bloque",
+      "descripcion": "Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): marca y ☰ en el teléfono; Mi lista y «Cómo llegar» desde 761; las secciones con la pastilla menta en la actual desde 1101. Al desplazar flota; «Cómo llegar» cede su sitio si otra primaria está a la vista.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".hdr", ".hdr.is-solid", ".hdr-brand", ".hdr-nav", ".hdr-nav a", ".hdr-end", ".hdr-list", ".hdr-cta", ".hdr.has-primary .hdr-cta"] },
+        { "ruta": "index.html", "selectores": [".hdr", "[data-hdr]", ".hdr-brand", ".hdr-nav", ".hdr-cta", ".hdr-list", "[data-open-mylist]"] },
+        { "ruta": "app.js", "internas": ["spy", "updateStatus"], "ganchos": ["navLinks.forEach(a =>"] }
+      ],
+      "tokens": ["alto-barra-nav", "alto-sm", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "fondo-3", "tinta", "radio-pildora", "radio-sm", "t-titular", "t-boton-chico", "anillo-foco", "dur-rapida", "curva-salida", "space-16"],
+      "estados": {
+        "hover": { "css": [".hdr-nav a:not([aria-current=\"true\"]):hover"] },
+        "foco": { "css": [".hdr-brand:focus-visible", ".hdr-nav a:focus-visible"] },
+        "actual": { "css": [".hdr-nav a[aria-current=\"true\"]"], "js": [{ "ruta": "app.js", "texto": "a.setAttribute('aria-current', 'true')" }] }
+      },
+      "no_aplica": { "deshabilitado": "Nada se deshabilita en la barra." },
+      "aria": { "patron": "Landmark navigation + aria-current", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html", "atributos": ["aria-label=Secciones", "aria-current"], "teclado": "Tab entre enlaces; Enter sigue el enlace." },
+      "qa": ["tools/qa/e2e.mjs", "tools/qa/responsive.mjs", "tools/qa/controles.mjs", "tools/qa/axe.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Barra de navegación) y «Barra de navegación desde 1101 px»."
+    },
+    {
+      "id": "menu-hamburguesa",
+      "nombre": "MenuHamburguesa",
+      "tipo": "bloque",
+      "descripcion": "☰ de 44 cuyas líneas se cruzan en ×, y el diálogo modal con la hoja de vidrio: secciones en filas de 56 (la actual en menta), Mi lista, el horario de hoy, «Cómo llegar», WhatsApp e Instagram/Facebook. Detrás, el velo.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".menu-btn", ".menu-lines", ".menu", ".menu::backdrop", ".menu-hoja", ".menu-row", ".menu-close", ".menu-pie", ".menu-acciones", ".menu-redes"] },
+        { "ruta": "index.html", "selectores": ["#menu", "[data-menu-open]", "[data-menu-close]", ".menu-row", ".menu-hoja"] },
+        { "ruta": "sheets.js", "exporta": ["openDialog", "closeDialog", "pushSheet", "navigateFromSheet"] },
+        { "ruta": "app.js", "ganchos": ["opener.setAttribute('aria-expanded', 'true')"] }
+      ],
+      "tokens": ["alto-sm", "alto-lg", "vidrio", "vidrio-hoja", "filtro-vidrio", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-flotante", "velo", "menta", "en-menta", "fondo-3", "tinta", "tinta-2", "linea", "foco", "anillo-foco", "radio-lg", "radio-sm", "t-titulo-2", "dur-instantanea", "dur-rapida", "dur-base", "escalon-linea", "curva-salida", "curva-resorte"],
+      "estados": {
+        "hover": { "css": [".menu-btn:hover", ".menu-row:not([aria-current=\"true\"]):hover"] },
+        "foco": { "css": [".menu-btn:focus-visible", ".menu-row:focus-visible", ".menu-close:focus-visible"] },
+        "presionado": { "css": [".menu-btn:active", ".menu-row:active"] },
+        "actual": { "css": [".menu-row[aria-current=\"true\"]"] },
+        "expandido": { "css": ["[aria-expanded=\"true\"] > .menu-lines span:nth-child(1)"], "html": ["[aria-expanded=\"false\"]"] },
+        "movimiento_reducido": { "css": [".motion .menu.is-closing .menu-hoja", ".menu-btn:active"] }
+      },
+      "aria": { "patron": "Dialog (Modal) + Disclosure", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "atributos": ["aria-expanded", "aria-controls", "aria-labelledby", "aria-current"], "teclado": "Enter/Espacio abre; foco a la primera sección; Tab atrapado (showModal); Escape, el velo y «atrás» cierran; elegir una sección lleva el foco a su titular." },
+      "qa": ["tools/qa/e2e.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/motion.mjs", "tools/qa/contrast.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Menú ☰)."
+    },
+    {
+      "id": "barra-inferior",
+      "nombre": "BarraInferior",
+      "tipo": "bloque",
+      "descripcion": "Solo ≤ 760 px: cápsula de vidrio de 49 × 228 con Inicio, Catálogo y Mi lista (botón con el conteo). La pastilla menta se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta.",
+      "archivos": [
+        { "ruta": "mobile.css", "selectores": [".tabbar", ".tabbar-pastilla", ".tabbar a", ".tab-list", ".tab-ic", ".tab-lb", ".tab-ic-box"] },
+        { "ruta": "index.html", "selectores": [".tabbar", ".tabbar-pastilla", ".tab-list", ".tab-lb"] },
+        { "ruta": "app.js", "ganchos": ["a.setAttribute('aria-current', 'location')"] }
+      ],
+      "tokens": ["alto-barra-inferior", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "tinta", "foco", "radio-pildora", "t-pestana", "space-1", "space-2", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "curva-resorte"],
+      "estados": {
+        "foco": { "css": [".tabbar a:focus-visible", ".tab-list:focus-visible"] },
+        "presionado": { "css": [".tabbar a:active", ".tab-list:active"] },
+        "actual": { "css": [".tabbar a[aria-current]", ".tabbar a[aria-current] .tab-ic"] },
+        "oculto": { "css": ["html.sheet-open .tabbar"], "nota": "Con una hoja abierta (estado de la página, no del control)." }
+      },
+      "no_aplica": { "hover": "Solo existe en el teléfono (mobile.css, ≤ 760 px)." },
+      "aria": { "patron": "Landmark navigation + aria-current", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html", "atributos": ["aria-label=Accesos", "aria-current=location"], "teclado": "Tab entre las tres casillas; Mi lista es un botón (Enter/Espacio)." },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/controles.mjs", "tools/qa/responsive.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Barra inferior)."
+    },
+    {
+      "id": "carrusel3d",
+      "nombre": "Carrusel3D",
+      "tipo": "control",
+      "descripcion": "Un solo motor para los tres carruseles: desplazamiento nativo con imán al centro y una pose por fotograma según la distancia al centro (giro hasta 44°, hueco ≥ 12 px con la vecina). Solo la central con sombra-portada; flechas de vidrio de 48 solo con puntero fino; plano y con la imagen de las vecinas atenuada sin movimiento.",
+      "variantes": [
+        { "nombre": "portada", "selector": ".c3d--portada", "uso": "Catálogo (rail.js): CarruselPortadas." },
+        { "nombre": "evento", "selector": ".c3d--evento", "uso": "Eventos y talleres (feed.js)." },
+        { "nombre": "carta", "selector": ".c3d--carta", "uso": "Café y té (cafe.js)." }
+      ],
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".c3d", ".c3d-viewport", ".c3d-track", ".cf-pose", ".c3d-flecha", ".c3d-flecha--prev", ".c3d-flecha--next", ".c3d-card", ".c3d--portada", ".c3d--evento", ".c3d--carta"] },
+        { "ruta": "index.html", "selectores": [".c3d", ".c3d-viewport", ".c3d-track", ".c3d-flecha", "[data-rail-c3d]", "[data-bill-c3d]", "[data-cafe-c3d]"] },
+        { "ruta": "carousel3d.js", "exporta": ["createCarousel3D", "coverflowPose", "nearestIndex", "keyTarget", "CF_GIRO", "POSE", "ATENUADA", "initDepth", "tiltPose", "tiltTransform"] }
+      ],
+      "tokens": ["giro-carrusel", "perspectiva-carrusel-piezas", "inclinacion-max", "adelanto-profundidad", "perspectiva-inclinacion", "sombra-portada", "sombra-flotante", "alto-md", "space-2", "space-3", "space-4", "space-6", "space-12", "margen-movil", "anillo-foco", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "curva-resorte"],
+      "estados": {
+        "foco": { "css": [".c3d-card:focus-visible", ".btn:focus-visible"], "nota": "Una sola parada de tabulador: la pieza central (o su botón)." },
+        "deshabilitado": { "css": [".c3d-flecha:disabled"] },
+        "actual": { "css": [".c3d-item.is-centro :is(.bill-card, .cafe-card)", ".rail-item.is-centro .cover"], "nota": "La central: estado solo visual; la región viva anuncia la pieza que llega." },
+        "presionado": { "css": [".motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active"] },
+        "tactil": { "css": [".c3d-flecha"], "media": "(hover: none) and (pointer: coarse)", "nota": "Con toque no hay flechas: deslizar o tocar la vecina (WCAG 2.5.7)." },
+        "plano": { "css": [".c3d-item.is-atenuada img"], "nota": "Sin movimiento (reducir movimiento o «Pausar el movimiento») el motor pinta la misma geometría sin giro y atenúa la imagen de las vecinas al 60 % (ATENUADA); el texto conserva su contraste." },
+        "movimiento_reducido": { "css": ["[data-inclina]:active"], "js": [{ "ruta": "carousel3d.js", "texto": "const flat = !isMotion();" }] }
+      },
+      "no_aplica": { "hover": "La pieza central se inclina hacia el cursor (initDepth, solo con pointer: fine y hover: hover, en JS); las flechas usan el hover de .btn--vidrio." },
+      "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["role=region", "aria-roledescription=carrusel", "aria-label", "aria-live=polite (región viva)", "aria-busy"], "teclado": "Una parada de tabulador (la central); ← → Inicio Fin mueven (keyTarget); Enter abre la central; sin autoplay." },
+      "qa": ["tools/qa/carrusel.mjs", "tools/qa/rail.mjs", "tools/qa/feed.mjs", "tools/qa/motion.mjs", "tools/qa/inp.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Carrusel3D, Eventos, Café y té…» y «Norma del Carrusel3D afinada»; skill ux-apple §3."
+    },
+    {
+      "id": "carrusel-portadas",
+      "nombre": "CarruselPortadas",
+      "tipo": "bloque",
+      "variante_de": "carrusel3d",
+      "descripcion": "Variante portada (capa 1 del Catálogo): empieza por el libro del medio; bajo él, título y «autor · precio» enteros con la reserva del pie más alto (--cf-reserva); tocar la central abre la ficha.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".c3d--portada", ".rail", ".rail-head", ".rail-item", ".cf-pie", ".cf-texto", ".cf-titulo", ".cf-meta", ".rail-status", ".rail-error"] },
+        { "ruta": "index.html", "selectores": ["[data-rail]", "[data-rail-track]", "[data-rail-caption]", "[data-rail-live]", "[data-rail-error]", "[data-rail-retry]", "[data-rail-prev]", "[data-rail-next]"] },
+        { "ruta": "rail.js", "exporta": ["initRail", "measureCaptions", "pickBooks", "bookCard", "wireBookOpen", "captionOf", "RAIL_SIZE"] }
+      ],
+      "tokens": ["sombra-portada", "t-titulo-3", "t-subtitulo", "tinta", "tinta-2", "space-3", "space-4"],
+      "estados": {
+        "ocupado": { "html": ["[data-rail-track][aria-busy=\"true\"]"], "js": [{ "ruta": "rail.js", "texto": "track.setAttribute('aria-busy', 'true')" }] },
+        "error": { "css": [".rail[data-state=\"error\"] :is(.rail-chips, .rail-nota-fila, .c3d, .cf-pie)", ".rail-error"], "html": ["[data-rail-error]"] },
+        "actual": { "css": [".rail-item.is-centro .cover", ".rail-item:not(.is-centro) .save"] }
+      },
+      "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["aria-label=Libros de la colección …", "aria-haspopup=dialog"], "teclado": "El del Carrusel3D; Enter en la central abre la ficha." },
+      "qa": ["tools/qa/rail.mjs", "tools/qa/carrusel.mjs", "tools/qa/skeleton.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Catálogo y Novedades» (Carrusel de portadas en 3D)."
+    },
+    {
+      "id": "carrusel-eventos",
+      "nombre": "CarruselEventos",
+      "tipo": "bloque",
+      "variante_de": "carrusel3d",
+      "descripcion": "Variante evento: tarjetas en superficie con radio 20, foto real 4:3, insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) y el título; debajo, la descripción de la central (región viva con su reserva) y «Compartir».",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".c3d--evento", ".bill-card", ".bill-card-img", ".bill-badges", ".bill-title", ".bill-pie", ".bill-desc", ".bill-fila"] },
+        { "ruta": "index.html", "selectores": ["[data-bill-track]", "[data-bill-desc]", "[data-bill-pie]", ".bill-item", ".bill-card"] },
+        { "ruta": "feed.js", "exporta": ["initEventos", "initFeed", "eventBadge", "eventOf", "measureDescs", "shareItem", "NO_DATE"] }
+      ],
+      "tokens": ["superficie", "fondo-2", "tinta", "radio-md", "t-titulo-3", "t-cuerpo", "sombra-portada", "space-3", "space-4", "space-6"],
+      "estados": {
+        "actual": { "css": [".c3d-item.is-centro :is(.bill-card, .cafe-card)"] },
+        "foco": { "css": [".c3d-card:focus-visible"] }
+      },
+      "no_aplica": { "vacio": "Las propuestas están en el HTML; sin JavaScript cada tarjeta muestra su descripción." },
+      "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["aria-labelledby (cada article)", "aria-live=polite (descripción)"], "teclado": "El del Carrusel3D." },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Tarjeta de evento)."
+    },
+    {
+      "id": "carrusel-carta",
+      "nombre": "CarruselCarta",
+      "tipo": "bloque",
+      "variante_de": "carrusel3d",
+      "descripcion": "Variante carta (Café y té): chips Café · Té y tarjetas tipográficas en superficie con un icono en disco menta, nombre, descripción y, solo si la librería lo da, el precio. Datos en assets/data/menu.json.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".c3d--carta", ".cafe-carta", ".cafe-chips", ".cafe-card", ".cafe-ic", ".cafe-nombre", ".cafe-desc", ".cafe-precio"] },
+        { "ruta": "index.html", "selectores": ["[data-cafe]", "[data-cafe-chips]", "[data-cafe-track]", "[data-cafe-status]", "[data-cafe-live]"] },
+        { "ruta": "cafe.js", "exporta": ["initCafe", "validMenu", "precioCarta", "cartaCard", "MENU_URL"] },
+        { "ruta": "assets/data/menu.json" }
+      ],
+      "tokens": ["superficie", "menta", "en-menta", "tinta", "tinta-2", "linea", "radio-md", "alto-md", "t-titulo-2", "t-subtitulo", "t-titular", "space-2", "space-5"],
+      "estados": {
+        "seleccionado": { "css": [".chip[aria-checked=\"true\"]"] },
+        "ocupado": { "css": [".cafe-item.card--sk .cafe-card"], "html": ["[data-cafe-track][aria-busy=\"true\"]"] },
+        "vacio": { "css": [".cafe-carta[data-state=\"vacio\"] :is(.cafe-chips, .c3d--carta)"] }
+      },
+      "aria": { "patron": "Carousel + Radio Group", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["role=group", "aria-roledescription=bebida", "aria-checked"], "teclado": "Chips con flechas; carrusel con ← → Inicio Fin." },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Carrusel3D, Eventos, Café y té…» (carta)."
+    },
+    {
+      "id": "tarjeta-libro",
+      "nombre": "TarjetaLibro",
+      "tipo": "control",
+      "descripcion": "Un solo botón con la portada 2:3 (real o tipográfica), el título (Subheadline semibold, dos renglones) y «autor · $250 MXN» (Footnote, el precio de la hoja no se parte). «Guardar» flota sobre la portada. En escritorio se inclina al cursor con brillo de lámina.",
+      "variantes": [
+        { "nombre": "portada-real", "selector": ".cover--img", "uso": "Imagen sin alt (el nombre va en el botón)." },
+        { "nombre": "portada-tipografica", "selector": ".cover--blank", "uso": "Sin imagen o si falla: campo de color con título y autor." }
+      ],
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".card", ".cover", ".cover--img", ".cover--blank", ".card-item", ".card-t", ".card-m", ".card-pr", ".cover-title", ".cover-author"] },
+        { "ruta": "catalog.js", "exporta": ["imageCover", "coverFallback", "coverTone", "priceLabel", "splitTitle", "titleSize", "COVER_LAYOUTS"], "internas": ["card", "cover", "blankCover"] },
+        { "ruta": "rail.js", "exporta": ["bookCard", "wireBookOpen"] },
+        { "ruta": "carousel3d.js", "exporta": ["initDepth", "tiltPose", "tiltTransform"] }
+      ],
+      "tokens": ["radio-portada", "fondo-3", "linea", "sombra-portada", "sombra-flotante", "brillo-lamina", "t-subtitulo", "t-nota-pie", "t-titular", "t-titulo-3", "t-leyenda-1", "tinta", "tinta-2", "space-1", "space-2", "anillo-foco", "inclinacion-max", "adelanto-profundidad", "dur-instantanea", "dur-rapida", "curva-salida"],
+      "estados": {
+        "hover": { "css": [".card:hover .cover"], "nota": "Con puntero fino, además, inclinación y brillo de lámina (initDepth, solo con movimiento)." },
+        "foco": { "css": [":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
+        "presionado": { "css": [".card:active .cover", ".card[data-opening] .cover"] },
+        "ocupado": { "css": [".card--sk", ".card--sk :is(.card-t, .card-m)"], "html": [".card--sk"] },
+        "movimiento_reducido": { "css": [".card:active .cover", ".motion :is(.card, .card-item)[data-inclina].is-inclinada .cover::after"] }
+      },
+      "aria": { "patron": "Button (abre un diálogo)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "atributos": ["aria-haspopup=dialog"], "teclado": "Enter y Espacio abren la ficha; el foco vuelve a la tarjeta al cerrar." },
+      "qa": ["tools/qa/explorer.mjs", "tools/qa/skeleton.mjs", "tools/qa/contrast.mjs", "tools/qa/inp.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Catálogo y Novedades» (Tarjeta de la rejilla) y «Brillo de lámina» (2026-11-14)."
+    },
+    {
+      "id": "ficha-libro",
+      "nombre": "FichaLibro",
+      "tipo": "bloque",
+      "descripcion": "Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el teléfono): portada, título, autor, ficha técnica, sinopsis, «Tu mensaje por WhatsApp», relacionados y, fijas al pie, «Preguntar por WhatsApp» (primaria a todo el ancho), Guardar, Compartir y «Cómo llegar».",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".drawer", ".drawer::backdrop", ".drawer-body", ".drawer-close", ".drawer-head", ".drawer-facts", ".drawer-synopsis", ".drawer-foot", ".drawer-actions", ".drawer-note", ".rel"] },
+        { "ruta": "mobile.css", "selectores": [".drawer"] },
+        { "ruta": "index.html", "selectores": ["#cat-drawer", "[data-d-close]", "[data-d-cta]", "[data-d-save]", "[data-d-share]", "[data-d-visit]", "[data-d-scroll]"] },
+        { "ruta": "catalog.js", "exporta": ["shareBook", "bookShareData", "bookMessage", "bookWaUrl", "relatedBooks"], "internas": ["openBook"] },
+        { "ruta": "sheets.js", "exporta": ["openDialog", "closeDialog"] }
+      ],
+      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-portada", "velo", "radio-lg", "tinta", "tinta-2", "linea", "alto-lg", "t-titulo-2", "t-cuerpo", "t-subtitulo", "t-nota-pie", "dur-base", "dur-rapida", "curva-salida", "curva-resorte", "curva-entrada-salida"],
+      "estados": {
+        "foco": { "css": [".btn:focus-visible", ".btn--vidrio:focus-visible"] },
+        "presionado": { "css": [".rel:active .cover"] },
+        "hover": { "css": [".rel:hover span"] },
+        "abriendo": { "css": [".is-filling > *"], "nota": "El contenido espera un fotograma (openDialog con defer)." },
+        "movimiento_reducido": { "css": [".motion .drawer.is-closing", ".rel:active .cover"] }
+      },
+      "aria": { "patron": "Dialog (Modal)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "atributos": ["aria-labelledby=d-title"], "teclado": "<dialog> con showModal: Tab atrapado, Escape y «atrás» cierran; el foco vuelve a quien la abrió." },
+      "qa": ["tools/qa/ficha.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/contrast.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Hojas, FichaLibro)."
+    },
+    {
+      "id": "mi-lista",
+      "nombre": "MiLista",
+      "tipo": "bloque",
+      "descripcion": "«Mi lista para la visita»: libros guardados en localStorage, sin cuenta. Hoja con la lista, «Quitar» por renglón y, fijas al pie, «Cómo llegar» y «Enviar mi lista por WhatsApp». Conteo en la barra inferior, la cabecera y el menú.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".mylist", ".mylist::backdrop", ".ml-head", ".ml-body", ".ml-items", ".ml-item", ".ml-remove", ".ml-empty", ".ml-error", ".ml-actions", ".count-badge"] },
+        { "ruta": "mobile.css", "selectores": [".mylist"] },
+        { "ruta": "index.html", "selectores": ["#mylist", "[data-ml-close]", "[data-ml-items]", "[data-ml-empty]", "[data-ml-error]", "[data-ml-retry]", "[data-ml-status]", "[data-ml-wa]", "[data-saved-dot]"] },
+        { "ruta": "saved.js", "exporta": ["initSaved", "listMessage", "listWaUrl", "clearSaved", "savedIds", "MAX_SAVED"] }
+      ],
+      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "velo", "radio-lg", "fondo-3", "tinta", "tinta-2", "linea", "primario", "en-primario", "alto-md", "alto-lg", "anillo-foco", "t-titulo-2", "t-titular", "t-subtitulo", "t-nota-pie"],
+      "estados": {
+        "foco": { "css": [".ml-remove:focus-visible"] },
+        "vacio": { "css": [".ml-empty"], "html": ["[data-ml-empty]"] },
+        "error": { "css": [".ml-error"], "html": ["[data-ml-error]", "[data-ml-retry]"] },
+        "movimiento_reducido": { "css": [".motion .mylist.is-closing"] }
+      },
+      "no_aplica": { "hover": "Las filas no son enlaces; «Quitar» y las acciones del pie llevan el estado de su botón." },
+      "aria": { "patron": "Dialog (Modal)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "atributos": ["aria-labelledby=mylist-title", "role=status (data-ml-status)"], "teclado": "Igual que la ficha; «Quitar «…» de mi lista» con su título en el nombre." },
+      "qa": ["tools/qa/saved.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Hojas) y AGENTS.md (saved.js)."
+    },
+    {
+      "id": "campo-busqueda",
+      "nombre": "CampoBusqueda",
+      "tipo": "control",
+      "descripcion": "Píldora de 48 en fondo-3 con letra de 17 (iOS no acerca la página); con foco, fondo de página, borde linea-fuerte y anillo. Su × propia de 48 borra (la nativa se oculta). Sugerencias en lista (combobox).",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".cat-bar input[type=\"search\"]", ".cat-clear", ".cat-suggest", ".cat-suggest li", ".cat-combo", ".sg-k"] },
+        { "ruta": "index.html", "selectores": ["#cat-q", "[data-cat-q]", "[data-cat-clear]", "[data-cat-suggest]", "#cat-suggest"] },
+        { "ruta": "catalog.js", "exporta": ["suggest", "score", "norm"], "internas": ["renderSuggest", "closeSuggest", "pick"] }
+      ],
+      "tokens": ["alto-md", "radio-pildora", "radio-md", "radio-sm", "fondo-3", "fondo", "superficie", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "menta", "en-menta", "turquesa-texto", "anillo-foco", "sombra-flotante", "t-campo", "t-subtitulo", "t-rotulo", "dur-rapida", "curva-salida"],
+      "estados": {
+        "hover": { "css": [".cat-clear:hover", ".cat-suggest li:hover"] },
+        "foco": { "css": [".cat-bar input[type=\"search\"]:focus-visible", ".cat-clear:focus-visible"] },
+        "seleccionado": { "css": [".cat-suggest li[aria-selected=\"true\"]"] },
+        "expandido": { "html": ["[aria-expanded=\"false\"][data-cat-q]"], "js": [{ "ruta": "catalog.js", "texto": "input.setAttribute('aria-expanded', 'false')" }] }
+      },
+      "aria": { "patron": "Combobox (lista)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/", "atributos": ["role=combobox", "aria-expanded", "aria-controls", "aria-autocomplete=list", "aria-activedescendant", "role=listbox", "aria-selected"], "teclado": "↓ ↑ recorren las sugerencias; Enter elige; Escape cierra la lista." },
+      "qa": ["tools/qa/explorer.mjs", "tools/qa/axe.mjs", "tools/qa/controles.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Campo de búsqueda)."
+    },
+    {
+      "id": "explorar",
+      "nombre": "Explorar",
+      "tipo": "bloque",
+      "descripcion": "«Explora el catálogo»: los 41 títulos en una página con búsqueda y filtros (Género, Editorial; casillas de 24 con palomita; un grupo se pliega desde 8 opciones). Hoja a pantalla completa en el teléfono; en línea desde 761, donde sin búsqueda ni filtros la rejilla se pliega a dos filas con «Ver los 41 títulos» / «Ver menos». Filtros activos como chips y «Limpiar todo».",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".explore-open", ".explorer", ".cat", ".cat-bar", ".cat-filters", ".cat-group", ".cat-opt", ".cat-more-facets", ".cat-status", ".cat-chips", ".cat-clear-all", ".cat-grid", ".cat-fold", ".cat-empty", ".cat-error"] },
+        { "ruta": "mobile.css", "selectores": [".explorer"] },
+        { "ruta": "index.html", "selectores": ["#catalogo", "#explorer", "[data-ex-open]", "[data-ex-close]", "[data-cat-form]", "[data-cat-filters]", "[data-cat-status]", "[data-cat-chips]", "[data-cat-grid]", "[data-cat-fold]", "[data-cat-empty]", "[data-cat-reset]"] },
+        { "ruta": "catalog.js", "exporta": ["initCatalog", "filterBooks", "sortBooks", "facetCounts", "foldView", "facetView", "FOLD_ROWS", "FACET_FOLD_AT", "FACET_LIMIT", "PAGE_SIZE", "GENRE_ES", "genreLabel"], "internas": ["renderFilters", "renderChips", "renderGrid", "applyFold", "staggerIn", "clearAll"], "ganchos": ["data-clear", "cat-clear-all"] }
+      ],
+      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida"],
+      "estados": {
+        "hover": { "css": [".explore-open:hover", ".cat-opt label:hover"] },
+        "foco": { "css": [".cat-opt input:focus-visible + label", ".cat-clear-all:focus-visible", ":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
+        "presionado": { "css": [".explore-open:active", ".explore-open[data-opening]"] },
+        "seleccionado": { "css": [".cat-opt input:checked + label::before", ".cat-opt input:checked + label::after"] },
+        "expandido": { "js": [{ "ruta": "catalog.js", "texto": "foldBtn.setAttribute('aria-expanded', String(!v.folded))" }], "html": ["[data-cat-fold][aria-expanded=\"false\"]"] },
+        "ocupado": { "css": [".cat-grid[aria-busy=\"true\"]", ".cat-grid[aria-busy=\"true\"] .card--sk .cover"], "html": ["[data-cat-grid][aria-busy=\"true\"]"] },
+        "vacio": { "css": [".cat-empty"], "html": ["[data-cat-empty]", "[data-cat-reset]"] },
+        "error": { "css": [".cat-error"] },
+        "movimiento_reducido": { "js": [{ "ruta": "catalog.js", "texto": "if (!isMotion() || !items.length) return;" }] }
+      },
+      "aria": { "patron": "Dialog (teléfono) + Checkbox + Disclosure", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/", "atributos": ["role=region", "role=search", "role=group", "role=status", "aria-busy", "aria-expanded", "aria-controls"], "teclado": "Casillas nativas (Espacio); «Ver los 41 títulos» despliega en su sitio y el foco se queda en el botón; Escape cierra la hoja del teléfono." },
+      "qa": ["tools/qa/explorer.mjs", "tools/qa/skeleton.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Rejilla en línea plegada» y AGENTS.md (catalog.js)."
+    },
+    {
+      "id": "aviso",
+      "nombre": "Aviso",
+      "tipo": "bloque",
+      "descripcion": "Cápsula de vidrio (popover manual, por encima de las hojas) con el mensaje («Guardado en Mi lista.») y una acción menta; en la ficha flota justo encima de las acciones del pie.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".toast", ".toast:popover-open", ".toast-action"] },
+        { "ruta": "saved.js", "exporta": ["notify"], "internas": ["toast", "hideToast"], "ganchos": ["toastEl.setAttribute('role', 'status')", "toastEl.popover = 'manual'"] }
+      ],
+      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-flotante", "radio-md", "radio-pildora", "tinta", "menta", "en-menta", "alto-md", "t-subtitulo", "t-boton-chico", "anillo-foco"],
+      "estados": {
+        "foco": { "css": [".toast-action:focus-visible"] },
+        "abierto": { "css": [".toast:popover-open"] }
+      },
+      "no_aplica": { "hover": "La acción es menta fija; el aviso dura poco y no invita a explorar con el cursor." },
+      "aria": { "patron": "Status message (WCAG 4.1.3)", "apg": "https://www.w3.org/TR/WCAG22/#status-messages", "atributos": ["role=status", "popover=manual"], "teclado": "La acción es un botón (Enter/Espacio)." },
+      "qa": ["tools/qa/saved.mjs", "tools/qa/ficha.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Hojas: aviso)."
+    },
+    {
+      "id": "encabezado-seccion",
+      "nombre": "EncabezadoSeccion",
+      "tipo": "bloque",
+      "descripcion": "Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*» (el em en tinta-2, en su renglón) y la entradilla; sin antetítulo. Entra por líneas con su máscara una sola vez.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".sec-head", ".h2", ".sec-texto", ".linea", ".linea-in"] },
+        { "ruta": "index.html", "selectores": [".sec-head", ".sec-texto", "[data-revelar]"] },
+        { "ruta": "app.js", "internas": ["splitHeading", "prepareReveals", "revealAll"] }
+      ],
+      "tokens": ["t-titulo-1", "ls-titulo-1", "t-cuerpo", "tinta", "tinta-2", "turquesa-texto", "dur-lenta", "dur-instantanea", "escalon-linea", "curva-salida"],
+      "estados": {
+        "movimiento_reducido": { "css": [".motion [data-revelar=\"listo\"] .linea-in", ".motion [data-revelar=\"listo\"] .sec-texto"] }
+      },
+      "no_aplica": { "hover": "No es un control.", "foco": "No es un control (los enlaces de su entradilla llevan el foco global)." },
+      "aria": { "patron": "Encabezado de sección (h2 + aria-labelledby)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/headings/", "atributos": ["aria-labelledby (en la sección)"], "teclado": "—" },
+      "qa": ["tools/qa/piso.mjs", "tools/qa/motion.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Componentes» (Encabezado de sección)."
+    },
+    {
+      "id": "tira-casa",
+      "nombre": "TiraCasa",
+      "tipo": "bloque",
+      "descripcion": "La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve entera queda plena y la que asoma se atenúa hasta 0.6 (CSS con animation-timeline: view()).",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".house", ".house-track", ".still", ".still-img"] },
+        { "ruta": "mobile.css", "selectores": [".still"] },
+        { "ruta": "index.html", "selectores": ["#casa", ".still-img"] }
+      ],
+      "tokens": ["fondo-2", "fondo-3", "radio-lg", "t-titular", "space-3", "space-4"],
+      "estados": {
+        "foco": { "css": [".house-track:focus-visible"] },
+        "movimiento_reducido": { "css": [".motion .still-img"] }
+      },
+      "aria": { "patron": "Lista desplazable con foco", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-labelledby"], "teclado": "La tira recibe foco y se desplaza con las flechas (nativo)." },
+      "qa": ["tools/qa/responsive.mjs", "tools/qa/motion.mjs"],
+      "desde": "2026-11-14",
+      "decision": "DESIGN.md, «Enfoque en La casa» (2026-11-14)."
+    },
+    {
+      "id": "mapa-llegada",
+      "nombre": "MapaLlegada",
+      "tipo": "bloque",
+      "descripcion": "SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de Matamoros, el pin aproximado y la ruta en primario, que se dibuja una vez al verse el 60 % del mapa. Todo el mapa enlaza a «Cómo llegar».",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".visit-map", ".visit-map-link", ".mapa", ".mapa-tierra", ".mapa-via", ".mapa-ruta", ".mapa-nombre", ".mapa-pin path"] },
+        { "ruta": "index.html", "selectores": [".visit-map", ".visit-map-link", ".mapa", ".mapa-ruta"] },
+        { "ruta": "app.js", "ganchos": ["mapIo"] }
+      ],
+      "tokens": ["mapa-tierra", "mapa-calle", "linea", "primario", "en-primario", "tinta", "tinta-2", "radio-lg", "anillo-foco", "t-subtitulo", "t-nota-pie", "dur-lenta", "dur-rapida", "curva-salida"],
+      "estados": {
+        "foco": { "css": [".visit-map-link:focus-visible"] },
+        "movimiento_reducido": { "css": [".motion .visit-map[data-revelar=\"listo\"] .mapa-ruta", ".motion .visit-map[data-revelar=\"listo\"].is-visible .mapa-ruta"] },
+        "colores_forzados": { "css": [".mapa-ruta"], "media": "(forced-colors: active)" }
+      },
+      "no_aplica": { "hover": "Es un enlace grande; el cursor cambia (enlace nativo)." },
+      "aria": { "patron": "Imagen con nombre dentro de un enlace", "apg": "https://www.w3.org/WAI/tutorials/images/functional/", "atributos": ["role=img", "aria-labelledby=mapa-t"], "teclado": "Enter sigue el enlace." },
+      "qa": ["tools/qa/responsive.mjs", "tools/qa/motion.mjs", "tools/qa/axe.mjs"],
+      "desde": "2026-11-14",
+      "decision": "DESIGN.md, «Mapa de llegada en Visita» (2026-11-14)."
+    },
+    {
+      "id": "interruptor-movimiento",
+      "nombre": "InterruptorMovimiento",
+      "tipo": "control",
+      "descripcion": "«Pausar el movimiento» del pie: <button role=\"switch\" aria-checked> con su rótulo visible y la pista de 51 × 31 (geometría de iOS) en un objetivo de 44. Encendido = pausado (pista primario, pulgar a la derecha). Con «reducir movimiento» o ahorro de datos: encendido, aria-disabled y la nota dice por qué.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".interruptor", ".interruptor-pista", ".interruptor-pulgar", ".interruptor-nota", ".ftr-row"] },
+        { "ruta": "index.html", "selectores": ["[data-motion-toggle]", "[data-motion-nota]", "#motion-nota", ".interruptor"] },
+        { "ruta": "app.js", "internas": ["syncToggle", "applyMode"], "ganchos": ["iti-b4-motion"] },
+        { "ruta": "assets/js/boot.js", "ganchos": ["r.classList.add('motion')"] }
+      ],
+      "tokens": ["interruptor-ancho", "interruptor-alto", "interruptor-pulgar", "alto-sm", "fondo-3", "linea-fuerte", "primario", "primario-presionado", "superficie", "sombra-pulgar", "tinta", "tinta-2", "anillo-foco", "radio-pildora", "t-subtitulo", "t-nota-pie", "dur-rapida", "curva-salida", "curva-resorte"],
+      "estados": {
+        "hover": { "css": [".interruptor:not([aria-disabled=\"true\"]):hover .interruptor-pista", ".interruptor[aria-checked=\"true\"]:not([aria-disabled=\"true\"]):hover .interruptor-pista"] },
+        "foco": { "css": [".interruptor:focus-visible"] },
+        "seleccionado": { "css": [".interruptor[aria-checked=\"true\"] .interruptor-pista", ".interruptor[aria-checked=\"true\"] .interruptor-pulgar"] },
+        "deshabilitado": { "css": [".interruptor[aria-disabled=\"true\"]", ".interruptor[aria-disabled=\"true\"] .interruptor-pista"] },
+        "movimiento_reducido": { "css": [".motion .interruptor-pulgar"] },
+        "colores_forzados": { "css": [".interruptor-pista", ".interruptor[aria-checked=\"true\"] .interruptor-pista"], "media": "(forced-colors: active)" }
+      },
+      "no_aplica": { "presionado": "El cambio de estado es la respuesta (el pulgar se desliza); sin escala." },
+      "aria": { "patron": "Switch", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/", "atributos": ["role=switch", "aria-checked", "aria-disabled", "aria-describedby=motion-nota"], "teclado": "Espacio y Enter alternan; el foco se queda en el interruptor." },
+      "qa": ["tools/qa/motion.mjs", "tools/qa/controles.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs"],
+      "desde": "2026-11-14",
+      "decision": "DESIGN.md, «Interruptor «Pausar el movimiento»» (2026-11-14)."
+    },
+    {
+      "id": "contacto-pie",
+      "nombre": "ContactoPie",
+      "tipo": "bloque",
+      "descripcion": "El pie es el único lugar con el contacto: titular «Contacto», para qué escribir y WhatsApp · Instagram · Facebook · Correo en una lista agrupada de filas de 56 con su icono; debajo, «Pausar el movimiento».",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".ftr", ".ftr-contacto", ".ftr-title", ".ftr-lede", ".ftr-links", ".ftr-link", ".ftr-ne"] },
+        { "ruta": "mobile.css", "selectores": [".ftr"] },
+        { "ruta": "index.html", "selectores": [".ftr", ".ftr-links", ".ftr-link", "#ftr-title"] }
+      ],
+      "tokens": ["fondo", "fondo-2", "tinta", "tinta-2", "turquesa-texto", "linea", "radio-md", "radio-sm", "alto-md", "t-titulo-2", "t-subtitulo", "t-cuerpo", "anillo-foco", "space-1", "space-3", "space-4", "space-6", "space-8"],
+      "estados": {
+        "hover": { "css": [".ftr-link:hover span"] },
+        "foco": { "css": [".ftr-link:focus-visible"] }
+      },
+      "no_aplica": { "presionado": "Enlaces de una lista agrupada: responde el subrayado y el foco (convención de lista de iOS)." },
+      "aria": { "patron": "Landmark contentinfo + lista de enlaces", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/contentinfo.html", "atributos": ["aria-labelledby=ftr-title"], "teclado": "Tab entre enlaces." },
+      "qa": ["tests/site.test.mjs", "tools/qa/controles.mjs", "tools/qa/contrast.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Contacto en un solo lugar» (2026-11-13)."
+    },
+    {
+      "id": "insignia",
+      "nombre": "Insignia",
+      "tipo": "bloque",
+      "descripcion": "Píldora de 24 en Caption 1: tipo de propuesta (menta), estado callado (fondo-3), «Hoy», «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).",
+      "variantes": [
+        { "nombre": "tipo", "selector": ".badge", "uso": "Menta con en-menta." },
+        { "nombre": "callada", "selector": ".badge--quiet", "uso": "fondo-3 con tinta-2." },
+        { "nombre": "conteo", "selector": ".count-badge", "uso": "Disco primario; el número también en texto." },
+        { "nombre": "estado", "selector": ".status-dot", "uso": "Abierto / Cerrado, siempre con la palabra." }
+      ],
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".badge", ".badge--quiet", ".badge-new", ".count-badge", ".status-dot", ".news-dot"] },
+        { "ruta": "index.html", "selectores": [".count-badge", ".status-dot", "[data-status]"] },
+        { "ruta": "app.js", "exporta": ["openingStatus", "monterreyNow"] },
+        { "ruta": "feed.js", "exporta": ["eventBadge"] }
+      ],
+      "tokens": ["menta", "en-menta", "fondo-3", "tinta-2", "primario", "en-primario", "abierto", "cerrado", "radio-pildora", "space-1", "space-2", "font-texto"],
+      "estados": {
+        "abierto": { "css": ["[data-open=\"true\"] .status-dot"] },
+        "cerrado": { "css": ["[data-open=\"false\"] .status-dot"] },
+        "oculto": { "css": [".count-badge[hidden]"] }
+      },
+      "no_aplica": { "hover": "No es un control.", "foco": "No es un control." },
+      "aria": { "patron": "Texto (sin rol)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-hidden en el disco (el número va en .sr-only)"], "teclado": "—" },
+      "qa": ["tools/qa/contrast.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Tokens» (abierto, cerrado) y «Accesibilidad» (estados con forma además del color)."
+    },
+    {
+      "id": "esqueletos",
+      "nombre": "Esqueletos",
+      "tipo": "bloque",
+      "descripcion": "Esqueletos quietos del tamaño final (sin animación de pulso): tarjetas de la rejilla y del carrusel, chips de colección, grupos de filtros, tarjetas de la carta y la tira de Novedades. Reservan el alto exacto: al llegar el contenido nada se mueve.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".sk-line", ".sk-line--s", ".sk-group", ".card--sk", ".sk-chip"] },
+        { "ruta": "index.html", "selectores": [".card--sk", ".sk-chip", ".sk-group", ".sk-line"] }
+      ],
+      "tokens": ["fondo-3", "radio-portada", "radio-pildora", "alto-md", "space-3", "space-4", "space-6", "space-20"],
+      "estados": {
+        "ocupado": { "css": [".cat-grid[aria-busy=\"true\"]", ".card--sk", ".card--sk .card"], "html": ["[aria-busy=\"true\"]"] }
+      },
+      "no_aplica": { "movimiento_reducido": "No se mueven nunca (quietos por diseño)." },
+      "aria": { "patron": "aria-busy en la región que carga", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-busy", "aria-hidden (cada esqueleto)"], "teclado": "No enfocables (pointer-events: none)." },
+      "qa": ["tools/qa/skeleton.mjs", "tools/qa/e2e.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Esqueletos»."
+    },
+    {
+      "id": "novedades",
+      "nombre": "CarruselNovedades",
+      "tipo": "bloque",
+      "descripcion": "Solo existe con llegadas registradas en assets/data/collections.json (hoy la lista está vacía: no hay sección, enlace ni control). Tira de portadas de 120 (152 desde 768) que «Ver todo» / «Ver menos» despliega en rejilla; «Nuevo» marca lo no visto.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".news", ".news-head", ".news-toggle", ".news-list", ".news-item", ".news-book", ".badge-new", ".news-status"] },
+        { "ruta": "index.html", "selectores": ["#novedades", "[data-news]", "[data-news-toggle]", "[data-news-track]", "[data-news-status]", "[data-news-link]"] },
+        { "ruta": "news.js", "exporta": ["initNews", "initNewsCount", "newsPlan", "newsEntries", "isNew", "validDay", "statusLine", "hintLine", "wireToggle", "NEWS_SIZE", "NEW_DAYS"] },
+        { "ruta": "assets/js/boot.js", "ganchos": ["iti-news-estado", "has-news", "news-hint"] }
+      ],
+      "tokens": ["fondo", "fondo-2", "fondo-3", "primario", "en-primario", "tinta", "tinta-2", "radio-portada", "sombra-portada", "anillo-foco", "t-subtitulo", "t-nota-pie", "space-2", "space-3", "space-5", "dur-instantanea", "dur-base", "curva-resorte"],
+      "estados": {
+        "hover": { "css": [".news-book:hover .cover"] },
+        "foco": { "css": [".news-book:focus-visible .cover"] },
+        "presionado": { "css": [".news-book:active", ".news-book[data-opening]"] },
+        "deshabilitado": { "css": [".news-toggle:disabled"] },
+        "expandido": { "css": [".news.is-open .news-list"], "js": [{ "ruta": "news.js", "texto": "toggle.setAttribute('aria-expanded', String(open))" }] },
+        "ocupado": { "css": [".news-item.card--sk .cover"], "html": ["[data-news-track][aria-busy=\"true\"]"] },
+        "vacio": { "css": ["html:not(.has-news) :is(.news, [data-news-link])"], "nota": "Sin llegadas la sección no existe (por diseño)." },
+        "movimiento_reducido": { "css": [".motion .news.is-in .badge-new"] }
+      },
+      "aria": { "patron": "Disclosure", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/", "atributos": ["aria-expanded", "aria-controls=news-list", "aria-haspopup=dialog"], "teclado": "«Ver todo» con Enter/Espacio; el foco se queda en el botón." },
+      "qa": ["tests/site.test.mjs", "tools/qa/skeleton.mjs"],
+      "desde": "2026-11-13",
+      "decision": "DESIGN.md, «Catálogo y Novedades» (Novedades)."
+    }
+  ],
+  "contraste": [
+    { "frente": "en-primario", "fondo": "primario", "tipo": "texto", "donde": "Boton primario, chip elegido, guardado, Insignia de conteo, «Nuevo»" },
+    { "frente": "en-primario", "fondo": "primario-presionado", "tipo": "texto", "donde": "Boton primario presionado y con el cursor" },
+    { "frente": "en-menta", "fondo": "menta", "tipo": "texto", "donde": "Boton secundario, actual de la barra y del menú, pastilla de la barra inferior, Insignia de tipo, acción del Aviso, selección de texto" },
+    { "frente": "en-menta", "fondo": "mezcla:menta+en-menta@10", "tipo": "texto", "donde": "Boton secundario con el cursor" },
+    { "frente": "turquesa-texto", "fondo": "fondo", "tipo": "texto", "donde": "Boton plano, Recorrido («N de 3 paradas hojeadas»), enlaces" },
+    { "frente": "turquesa-texto", "fondo": "fondo-2", "tipo": "texto", "donde": "Boton plano sobre banda, «Limpiar todo» en la hoja" },
+    { "frente": "turquesa-texto", "fondo": "fondo-3", "tipo": "texto", "donde": "Boton plano con el cursor" },
+    { "frente": "turquesa-texto", "fondo": "superficie", "tipo": "texto", "donde": "«Ver todos los resultados» de las sugerencias" },
+    { "frente": "tinta", "fondo": "fondo", "tipo": "texto", "donde": "Texto de lectura, TarjetaLibro, campo con foco" },
+    { "frente": "tinta-2", "fondo": "fondo", "tipo": "texto", "donde": "Entradilla, autor y precio de la tarjeta, nota del interruptor" },
+    { "frente": "tinta", "fondo": "fondo-2", "tipo": "texto", "donde": "Bandas, ContactoPie" },
+    { "frente": "tinta-2", "fondo": "fondo-2", "tipo": "texto", "donde": "Bandas, rótulos de filtros" },
+    { "frente": "tinta", "fondo": "fondo-3", "tipo": "texto", "donde": "Chip en reposo, CampoBusqueda, «Quitar» de Mi lista" },
+    { "frente": "tinta-2", "fondo": "fondo-3", "tipo": "texto", "donde": "Boton deshabilitado, Insignia callada, marcador del campo, «Buscar en el catálogo»" },
+    { "frente": "tinta", "fondo": "mezcla:fondo-3+tinta@6", "tipo": "texto", "donde": "Chip y «Buscar en el catálogo» con el cursor" },
+    { "frente": "tinta-2", "fondo": "mezcla:fondo-3+tinta@6", "tipo": "texto", "donde": "«Buscar en el catálogo» con el cursor" },
+    { "frente": "tinta", "fondo": "superficie", "tipo": "texto", "donde": "CarruselEventos y CarruselCarta (tarjeta), sugerencias" },
+    { "frente": "tinta-2", "fondo": "superficie", "tipo": "texto", "donde": "Descripción de la carta, clave de la sugerencia" },
+    { "frente": "tinta", "fondo": "vidrio@peor", "tipo": "texto", "donde": "BarraNavegacion, BarraInferior, Boton vidrio, Guardar sobre la portada" },
+    { "frente": "tinta", "fondo": "vidrio-hoja@peor", "tipo": "texto", "donde": "MenuHamburguesa, FichaLibro, MiLista, Aviso" },
+    { "frente": "tinta-2", "fondo": "vidrio-hoja@peor", "tipo": "texto", "donde": "Semana del menú, autor de la ficha, nota de la ficha" },
+    { "frente": "tinta", "fondo": "mapa-calle", "tipo": "texto", "donde": "MapaLlegada: nombres de calle con halo" },
+    { "frente": "tinta-2", "fondo": "mapa-calle", "tipo": "texto", "donde": "MapaLlegada: nombres menores con halo" },
+    { "frente": "foco", "fondo": "fondo", "tipo": "foco", "donde": "anillo-foco: 2 px de fondo y 2 de foco (todo control)" },
+    { "frente": "foco", "fondo": "fondo-2", "tipo": "foco", "donde": "Anillo en una banda" },
+    { "frente": "foco", "fondo": "fondo-3", "tipo": "foco", "donde": "Filete interior de las casillas con el cursor" },
+    { "frente": "foco", "fondo": "superficie", "tipo": "foco", "donde": "Anillo junto a una tarjeta" },
+    { "frente": "foco", "fondo": "menta", "tipo": "foco", "donde": "Filete interior en la fila actual del menú y la pastilla de la barra inferior" },
+    { "frente": "foco", "fondo": "vidrio@peor", "tipo": "foco", "donde": "Filete interior de la barra inferior" },
+    { "frente": "foco", "fondo": "vidrio-hoja@peor", "tipo": "foco", "donde": "Filete interior de las filas del menú" },
+    { "frente": "linea-fuerte", "fondo": "fondo", "tipo": "borde", "donde": "Casilla de filtro (interior), campo con foco, pista del interruptor apagada" },
+    { "frente": "linea-fuerte", "fondo": "fondo-2", "tipo": "borde", "donde": "Casilla de filtro sobre su grupo, pista del interruptor con Novedades" },
+    { "frente": "linea-fuerte", "fondo": "fondo-3", "tipo": "borde", "donde": "Pista del interruptor apagada (filete interior)" },
+    { "frente": "primario", "fondo": "fondo", "tipo": "borde", "donde": "Pista del interruptor encendida, conector hecho del Recorrido" },
+    { "frente": "primario", "fondo": "fondo-2", "tipo": "borde", "donde": "Casilla marcada sobre su grupo" },
+    { "frente": "primario", "fondo": "fondo-3", "tipo": "borde", "donde": "Borde de la parada hojeada y su palomita (Recorrido)" },
+    { "frente": "en-primario", "fondo": "primario", "tipo": "borde", "donde": "Palomita de la casilla marcada, centro del pin del mapa" },
+    { "frente": "superficie", "fondo": "primario", "tipo": "borde", "donde": "Pulgar del interruptor encendido" },
+    { "frente": "primario", "fondo": "mapa-calle", "tipo": "borde", "donde": "Ruta del MapaLlegada sobre la calle" },
+    { "frente": "primario", "fondo": "mapa-tierra", "tipo": "borde", "donde": "Pin del MapaLlegada sobre la manzana" },
+    { "frente": "turquesa-texto", "fondo": "fondo-2", "tipo": "icono", "donde": "Iconos de ContactoPie" },
+    { "frente": "tinta-2", "fondo": "vidrio-hoja@peor", "tipo": "icono", "donde": "Chevrón de las filas del menú" },
+    { "frente": "abierto", "fondo": "fondo", "tipo": "icono", "donde": "Punto «Abierto ahora» (Inicio)" },
+    { "frente": "abierto", "fondo": "fondo-2", "tipo": "icono", "donde": "Punto «Abierto ahora» (Visita)" },
+    { "frente": "abierto", "fondo": "vidrio-hoja@peor", "tipo": "icono", "donde": "Punto «Abierto ahora» (menú)" },
+    { "frente": "cerrado", "fondo": "fondo", "tipo": "icono", "donde": "Aro «Cerrado» (Inicio)" },
+    { "frente": "cerrado", "fondo": "fondo-2", "tipo": "icono", "donde": "Aro «Cerrado» (Visita)" },
+    { "frente": "cerrado", "fondo": "vidrio-hoja@peor", "tipo": "icono", "donde": "Aro «Cerrado» (menú)" }
+  ]
+}

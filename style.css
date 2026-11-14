@@ -607,10 +607,12 @@ html:not(.js) .bill-pie { display: none; }
 .cat-suggest { position: absolute; z-index: 20; inset: 100% 0 auto 0; margin: var(--space-2) 0 0; padding: var(--space-2); list-style: none; border-radius: var(--radio-md); background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea), var(--sombra-flotante); }
 .cat-suggest[hidden] { display: none; }
 .cat-suggest li { display: flex; align-items: baseline; gap: var(--space-3); min-height: var(--alto-sm); padding: var(--space-3); border-radius: var(--radio-sm); cursor: pointer; font: var(--t-subtitulo); }
-.cat-suggest li[aria-selected="true"], .cat-suggest li:hover { background: var(--menta); color: var(--en-menta); }
+.cat-suggest li[aria-selected="true"] { background: var(--menta); color: var(--en-menta); }
 .cat-suggest .sg-all { justify-content: space-between; margin-top: var(--space-1); font: var(--t-titular); color: var(--turquesa-texto); }
 .sg-k { flex: none; min-width: 5.4em; font: var(--t-rotulo); color: var(--tinta-2); }
-.cat-suggest li[aria-selected="true"] .sg-k, .cat-suggest li:hover .sg-k { color: inherit; }
+.cat-suggest li[aria-selected="true"] .sg-k { color: inherit; }
+/* Con el cursor, la sugerencia toma la misma cara que la elegida con las flechas; solo con puntero que flota (con toque no queda pegada). */
+@media (hover: hover) { .cat-suggest li:hover { background: var(--menta); color: var(--en-menta); } .cat-suggest li:hover .sg-k { color: inherit; } }
 .cat-filters-btn { display: none; }
 .cat-filters-foot { display: none; }
 .cat-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: var(--space-12); align-items: start; padding-top: var(--space-8); }
@@ -635,7 +637,10 @@ html:not(.js) .bill-pie { display: none; }
 .cat-status { margin: 0 0 var(--space-4); font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
 .cat-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
 .cat-chips[hidden] { display: none; }
-.cat-clear { min-height: var(--alto-sm); padding: 0 var(--space-3); border: 0; border-radius: var(--radio-pildora); background: none; color: var(--turquesa-texto); font: var(--t-boton-chico); cursor: pointer; }
+/* «Limpiar todo» (catalog.js) tiene su propia clase: hasta el 2026-11-14 compartía .cat-clear con la × del buscador y heredaba su posición
+   absoluta (salía de la fila de chips, 48 px de ancho para 66 de texto) y la × heredaba este color. */
+.cat-clear-all { min-height: var(--alto-sm); padding: 0 var(--space-3); border: 0; border-radius: var(--radio-pildora); background: none; color: var(--turquesa-texto); font: var(--t-boton-chico); cursor: pointer; }
+.cat-clear-all:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: var(--space-8) var(--space-6); align-items: start; margin: 0; padding: 0; list-style: none; }
 .cat-grid[hidden] { display: none; }
 .cat-more { margin-top: var(--space-10); }
@@ -1118,3 +1123,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .btn:active, .menu-btn:active, .chip:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover { transform: none; }
   [data-inclina]:active { scale: none; }
 }
+/* La pausa del pie («Pausar el movimiento», html.js sin .motion) vale lo mismo que reducir movimiento (DESIGN.md, Movimiento). */
+html.js:not(.motion) *, html.js:not(.motion) *::before, html.js:not(.motion) *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+html.js:not(.motion) :is(.btn:active, .menu-btn:active, .chip:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover) { transform: none; }
+html.js:not(.motion) [data-inclina]:active { scale: none; }

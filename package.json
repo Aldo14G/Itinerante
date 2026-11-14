@@ -12,7 +12,7 @@
     "backend:dev:emulator": "node tools/dev-with-dataconnect.mjs",
     "backend:build": "next build",
     "backend:start": "next start",
-    "test": "node --test tests/site.test.mjs tests/sheets.test.mjs tests/publish.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs && node --test tests/critique.test.mjs",
+    "test": "node --test tests/site.test.mjs tests/componentes.test.mjs tests/sheets.test.mjs tests/publish.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs && node --test tests/critique.test.mjs",
     "harness": "npm run test",
     "reference:check": "node --test tests/reference-search.test.mjs",
     "filters:test": "node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs",
@@ -40,10 +40,12 @@
     "cf:deploy": "node scripts/prepare-public.mjs && wrangler deploy",
     "tokens": "node scripts/build-tokens.mjs",
     "tokens:check": "node scripts/build-tokens.mjs --check",
+    "componentes": "node scripts/build-componentes.mjs",
+    "componentes:check": "node scripts/build-componentes.mjs --check",
     "critique": "node scripts/critique.mjs",
     "critique:static": "node scripts/critique.mjs --static-only",
     "test:site": "node --test tests/site.test.mjs",
-    "test:design": "node --test tests/critique.test.mjs tests/site.test.mjs",
+    "test:design": "node --test tests/critique.test.mjs tests/site.test.mjs tests/componentes.test.mjs",
     "test:browser": "node tools/qa/run.mjs"
   },
   "dependencies": {

@@ -348,7 +348,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     for (const dim of ['k', 'g', 'f', 'p']) for (const v of state[dim]) chips.push([dim, v, names[dim](v)]);
     chipsEl.replaceChildren(...chips.map(([dim, v, label]) =>
       el('li', {}, el('button', { type: 'button', class: 'cat-chip', 'data-chip-dim': dim, 'data-chip-value': v, 'aria-label': `Quitar filtro ${label}` }, label, el('span', { 'aria-hidden': 'true' }, '×')))));
-    if (chips.length > 1) chipsEl.append(el('li', {}, el('button', { type: 'button', class: 'cat-clear', 'data-clear': '' }, 'Limpiar todo')));
+    if (chips.length > 1) chipsEl.append(el('li', {}, el('button', { type: 'button', class: 'cat-clear-all', 'data-clear': '' }, 'Limpiar todo')));
     chipsEl.hidden = !chips.length;
     const n = state.k.size + state.g.size + state.f.size + state.p.size;
     // «Filtros» a secas hasta que haya filtros puestos; entonces, cuántos (nunca el total de la muestra: «Filtros 500» se leía como 500 filtros).

@@ -122,3 +122,13 @@ Insumo: la investigación de `docs/ux/investigacion-2026-11/` (Aceternity UI, Ma
 | Mapa de llegada y ruta que avanza | mapcn (https://github.com/AnmolSaini16/mapcn), `RouteProgress` | MIT (código; no se usó); datos de OpenStreetMap | La idea de un mapa propio con la ruta que se dibuja; sin MapLibre, teselas ni servicios | Visita |
 | Datos del mapa | OpenStreetMap, API 0.6 `map?bbox=-100.3262,25.6688,-100.3178,25.6740` (consulta del 2026-11-14 03:09 UTC) | ODbL 1.0: atribución «© Colaboradores de OpenStreetMap» con enlace a https://www.openstreetmap.org/copyright | Geometría de las calles, nombres y números de casa vecinos (para el pin) | `assets/provenance.json` (`visitMap`) |
 | Interruptor | Apple HIG, Toggles (https://developer.apple.com/design/human-interface-guidelines/toggles) y toggles de Uiverse (idea) | HIG: cita; Uiverse: MIT, solo idea | Pista de 51 × 31, pulgar que se desliza, `role="switch"` (WAI-ARIA APG, Switch) | «Pausar el movimiento» del pie |
+
+## Catálogo de componentes (2026-11-14): formato del registro de shadcn/ui
+
+| Idea | Fuente | Licencia | Qué se tomó | Dónde |
+|---|---|---|---|---|
+| Catálogo de componentes como datos | shadcn/ui, `registry.json` y `registry-item.json` (https://ui.shadcn.com/docs/registry, https://github.com/shadcn-ui/ui) | MIT (verificada en el repositorio) | Solo el formato plano por componente (nombre, descripción, archivos, dependencias): aquí `archivos` con selectores y funciones reales, `tokens`, `estados`, `aria` y `qa`. Sin su CLI ni código | `design/componentes.json`, `design/COMPONENTES.md` |
+| Pares fondo↔texto | Convención `primary`/`primary-foreground` de shadcn/ui | MIT | Que cada relleno de control declare su tinta y se compruebe su contraste (≥ 4.5:1 texto, ≥ 3:1 borde, icono y foco) | `contraste` en `design/componentes.json`, `tests/componentes.test.mjs` |
+| Matriz de estados | Variantes de `cva` en los componentes de shadcn/ui (hover, foco, deshabilitado, inválido) | MIT | La tabla control × estado, comprobada contra el CSS y el JS | `design/COMPONENTES.md` |
+
+Investigación de origen: `docs/ux/investigacion-2026-11/shadcn-21st-uiverse.md` §4.2 y §5.
