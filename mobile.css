@@ -82,8 +82,9 @@ html:not(.js) .tabbar { display: none; }
   .bill-share { position: absolute; right: var(--space-2); bottom: var(--space-2); }
   .bill-title { padding-right: calc(var(--alto-sm) + var(--space-3)); }
 }
-/* A 320–400 px la descripción de la propuesta del centro llega a cuatro renglones: hasta que feed.js mide la más larga (--bill-reserva), se reservan cuatro. */
-@media (max-width: 400px) { .bill-desc { min-height: var(--bill-reserva, 4lh); } }
+/* A 320–374 px la descripción de la propuesta del centro llega a cinco renglones (el bloque mide lo que la tarjeta, 243–284 px): hasta que
+   feed.js mide la más larga (--bill-reserva), se reservan cinco (2026-11-15; antes cuatro hasta 400 px, con el texto centrado en 36rem). */
+@media (max-width: 374px) { .bill-desc { min-height: var(--bill-reserva, 5lh); } }
 
 /* ---------- Visita y pie ---------- */
 .visit-actions .btn { flex: 1 1 auto; }

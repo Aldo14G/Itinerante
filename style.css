@@ -417,8 +417,10 @@ html.js .bill-card .bill-detail { display: none; }
    central (--bill-w, que escribe feed.js al medir; antes de medir, el ancho de la tarjeta del teléfono), centrado en el eje del carrusel, con
    el texto a la izquierda en la sangría de la tarjeta (16), bajo su título. Letra `lectura` 17/24 (antes 17/24 escrita a mano sobre `cuerpo`). */
 .bill-pie { position: relative; display: grid; width: var(--bill-w, min(76vw, 340px)); max-width: 100%; margin: 0 auto; padding-inline: var(--space-4); }
-/* La reserva (--bill-reserva) la mide feed.js: la descripción más larga a este ancho; antes de medir, tres renglones (cuatro hasta 400 px). */
-.bill-desc { min-height: var(--bill-reserva, 3lh); margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: pretty; }
+/* La reserva (--bill-reserva) la mide feed.js: la descripción más larga a este ancho. Antes de medir, lo que mide a ese ancho con el bloque
+   del ancho de la tarjeta (2026-11-15): cuatro renglones (cinco hasta 374 px, mobile.css; tres desde 1280 px, con la tarjeta de 400 o más). */
+.bill-desc { min-height: var(--bill-reserva, 4lh); margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: pretty; }
+@media (min-width: 1280px) { .bill-desc { min-height: var(--bill-reserva, 3lh); } }
 .bill-medida { position: absolute; inset: 0 0 auto; visibility: hidden; pointer-events: none; } /* copia oculta para medir (feed.js) */
 .bill-medida .bill-desc { min-height: 0; }
 html:not(.js) .bill-pie { display: none; }

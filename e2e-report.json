@@ -1,0 +1,776 @@
+[
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 375px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 375px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 393px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 393px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 440px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 440px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 402px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 402px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 768px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 768px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 1280px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 1280px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "layout",
+  "name": "sin desborde horizontal a 1920px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "consola",
+  "name": "sin errores de consola a 1920px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "☰ en la barra de navegación, 44 × 44, con nombre, aria-expanded y aria-controls a un elemento real",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "abre como modal titulado «Menú», el foco entra a la primera sección, el × queda en el sitio del ☰, scroll bloqueado y la barra inferior se oculta",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "hoja de vidrio con 8 px de margen, bajo la barra de navegación",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "filas de 48 px (48 en ventanas de hasta 700 de alto: todo cabe sin desplazar) con todas las secciones y Mi lista",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "Instagram y Facebook como botones de 44 px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "sin acordeones ni contenido plegado; los destinos internos existen",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "si la hoja no cabe, se desplaza y el último destino se alcanza",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "el foco no escapa con Tab (trampa modal)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "Escape cierra y devuelve el foco al ☰ (y el × vuelve a ☰)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "tras navegar el foco va al título de la sección destino",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "La casa cierra la hoja, navega (título a la vista) y la barra marca Inicio",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "Visita cierra la hoja, navega (foco en su titular); la barra inferior no marca casilla y el menú marca Visita",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "el menú trae el estado corto de hoy (hora de Monterrey) y debajo la semana, sin repetir la hora de cierre",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "clic en el velo (fuera de la hoja) cierra",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "enlaces externos con noopener noreferrer («Cómo llegar», WhatsApp, Instagram y Facebook)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 375×629",
+  "name": "sin errores de consola durante el menú",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "☰ en la barra de navegación, 44 × 44, con nombre, aria-expanded y aria-controls a un elemento real",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "abre como modal titulado «Menú», el foco entra a la primera sección, el × queda en el sitio del ☰, scroll bloqueado y la barra inferior se oculta",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "hoja de vidrio con 8 px de margen, bajo la barra de navegación",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "filas de 56 px (48 en ventanas de hasta 700 de alto: todo cabe sin desplazar) con todas las secciones y Mi lista",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "Instagram y Facebook como botones de 44 px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "sin acordeones ni contenido plegado; los destinos internos existen",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "si la hoja no cabe, se desplaza y el último destino se alcanza",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "el foco no escapa con Tab (trampa modal)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "Escape cierra y devuelve el foco al ☰ (y el × vuelve a ☰)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "tras navegar el foco va al título de la sección destino",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "La casa cierra la hoja, navega (título a la vista) y la barra marca Inicio",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "Visita cierra la hoja, navega (foco en su titular); la barra inferior no marca casilla y el menú marca Visita",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "el menú trae el estado corto de hoy (hora de Monterrey) y debajo la semana, sin repetir la hora de cierre",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "clic en el velo (fuera de la hoja) cierra",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "enlaces externos con noopener noreferrer («Cómo llegar», WhatsApp, Instagram y Facebook)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "menú 440×763",
+  "name": "sin errores de consola durante el menú",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#inicio: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#casa: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#libros: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#cartelera: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#novedades: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#cafe: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "#visita: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": ".ftr: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "bandas alternas: La casa → Catálogo → Eventos → Novedades → Café → Visita → pie, vecinos de fondo distinto",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light móvil",
+  "name": "el tema claro pinta la página blanca",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#inicio: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#casa: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#libros: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#cartelera: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#novedades: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#cafe: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "#visita: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": ".ftr: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "bandas alternas: La casa → Catálogo → Eventos → Novedades → Café → Visita → pie, vecinos de fondo distinto",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark móvil",
+  "name": "el tema oscuro pinta la página oscura (prefers-color-scheme)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#inicio: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#casa: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#libros: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#cartelera: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#novedades: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#cafe: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "#visita: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": ".ftr: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "bandas alternas: La casa → Catálogo → Eventos → Novedades → Café → Visita → pie, vecinos de fondo distinto",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema light escritorio",
+  "name": "el tema claro pinta la página blanca",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#inicio: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#casa: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#libros: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#cartelera: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#novedades: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#cafe: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "#visita: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": ".ftr: tinta sobre su fondo ≥ 7:1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "bandas alternas: La casa → Catálogo → Eventos → Novedades → Café → Visita → pie, vecinos de fondo distinto",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "tema dark escritorio",
+  "name": "el tema oscuro pinta la página oscura (prefers-color-scheme)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra escritorio",
+  "name": "enlaces de 44 px; con el cursor ni el enlace ni la barra cambian de tamaño",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra escritorio",
+  "name": "en Eventos la barra marca «Eventos» con la pastilla menta",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #inicio marca #inicio (con la pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #casa marca #inicio (con la pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #libros marca #libros (con la pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en [data-rail] marca #libros (con la pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #cartelera no marca ninguna casilla (sin pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #novedades no marca ninguna casilla (sin pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #cafe no marca ninguna casilla (sin pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en #visita no marca ninguna casilla (sin pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "en .ftr no marca ninguna casilla (sin pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "tres casillas iguales de 76 × 49 px con nombre a la vista (Inicio, Catálogo, Mi lista)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "barra inferior",
+  "name": "las casillas no cambian de tamaño ni de sitio al cambiar la activa (solo se desliza la pastilla)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "eventos",
+  "name": "Carrusel3D (variante evento) con 3 tarjetas, imán y la del medio al centro; sin puntos; «Compartir» en la fila de insignias de cada tarjeta (sin fila aparte, 2026-11-14)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "eventos",
+  "name": "al deslizar, la del centro lleva el único «Compartir» a la vista",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "inicio móvil",
+  "name": "una sola acción visible («Cómo llegar», primario de 56 px; el contacto vive en el pie y el menú), sobre la barra inferior",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "inicio móvil",
+  "name": "el control de novedades (si hay llegadas sin ver) va bajo «Cómo llegar», es secundario, ≥ 48 px y queda sobre la barra inferior",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "inicio móvil",
+  "name": "la dirección y la foto de la sala (3:2, recorte del 2026-11-14) quedan sobre la barra inferior",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "portadas",
+  "name": "título y autor se leen sobre el campo plano de su portada tipográfica (≥ 4.5:1), si hay alguna sin imagen",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "anclas",
+  "name": "la casilla colecciones aterriza con el título a la vista (|top| ≤ 100 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "anclas",
+  "name": "la fila del menú libros aterriza con el título a la vista (|top| ≤ 100 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "anclas",
+  "name": "la fila del menú cartelera aterriza con el título a la vista (|top| ≤ 100 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "anclas",
+  "name": "la fila del menú novedades aterriza con el título a la vista (|top| ≤ 100 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "anclas",
+  "name": "la fila del menú cafe aterriza con el título a la vista (|top| ≤ 100 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "anclas",
+  "name": "la casilla inicio aterriza con el título a la vista (|top| ≤ 100 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "inicio móvil",
+  "name": "la foto del inicio va sin crédito ni rótulos encima",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "gama media",
+  "name": "lite activo: barra de navegación y barra inferior opacas (superficie), sin desenfoque",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "catálogo",
+  "name": "buscar «lomeli» (sin acento) encuentra «Perorata» de Luis Felipe Lomelí: resultado y sugerencia, sin errores",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "catálogo",
+  "name": "sin errores de consola",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "catálogo",
+  "name": "la ficha abre como hoja con «Preguntar por WhatsApp» al pie, asa de arrastre y velo detrás",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "catálogo",
+  "name": "Escape cierra la ficha y libera el scroll",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "movimiento reducido",
+  "name": "sin clase motion, sin animaciones infinitas y ningún titular o imagen preparado para entrar",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "movimiento reducido",
+  "name": "el menú abre en su sitio, sin escala ni desplazamiento",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "movimiento reducido",
+  "name": "sin errores de consola",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "escritorio",
+  "name": "sin ☰ ni barra inferior; la barra lleva Catálogo, Eventos, Novedades, Café y Visita en el orden de la página, Mi lista y «Cómo llegar»; el inicio es una foto fija (sin lienzo)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "escritorio",
+  "name": "761–1100 px: Mi lista, «Cómo llegar» y el ☰ (las secciones en el menú)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "escritorio",
+  "name": "todas las anclas internas existen",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "accesibilidad",
+  "name": "controles con nombre, imágenes con alt, un h1, idioma, sin ids duplicados",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "rendimiento (4× CPU, 4G lenta)",
+  "name": "LCP ≤ 2500 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "rendimiento (4× CPU, 4G lenta)",
+  "name": "CLS ≤ 0.1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "rendimiento (4× CPU, 4G lenta)",
+  "name": "TBT ≤ 3000 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "rendimiento (4× CPU, 4G lenta)",
+  "name": "transferido ≤ 700 KB en la carga inicial",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "area": "info",
+  "name": "métricas",
+  "ok": true,
+  "detail": "{\"fcp\":1276,\"lcp\":1408,\"cls\":0,\"tbt\":29,\"kb\":322}"
+ }
+]

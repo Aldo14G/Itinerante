@@ -1,0 +1,7104 @@
+{
+ "rows": [
+  {
+   "modo": "claro",
+   "size": "320×640",
+   "name": "portada",
+   "w": 186,
+   "pct": 58.1,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": -0.5,
+   "dxCol": -0.5,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    15.2,
+    15.2
+   ],
+   "asoma": [
+    28,
+    28
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 368,
+   "altoUtil": 539,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "320×640",
+   "name": "evento",
+   "w": 243,
+   "pct": 75.9,
+   "cw": "min(76vw, 340px)",
+   "dx": 0.2,
+   "dxCol": 0.2,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    13.3,
+    13.2
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 403,
+   "altoUtil": 539,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "320×640",
+   "name": "carta",
+   "w": 192,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    15.9,
+    15.9
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 539,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "375×629",
+   "name": "portada",
+   "w": 206,
+   "pct": 54.9,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    17,
+    16.9
+   ],
+   "asoma": [
+    33,
+    33
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 399,
+   "altoUtil": 528,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "375×629",
+   "name": "evento",
+   "w": 285,
+   "pct": 76,
+   "cw": "min(76vw, 340px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    15.4,
+    15.4
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 381,
+   "altoUtil": 528,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "375×629",
+   "name": "carta",
+   "w": 225,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    18.5,
+    18.5
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 528,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "375×667",
+   "name": "portada",
+   "w": 218,
+   "pct": 58.1,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    17.8,
+    17.8
+   ],
+   "asoma": [
+    28,
+    28
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 416,
+   "altoUtil": 566,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "375×667",
+   "name": "evento",
+   "w": 285,
+   "pct": 76,
+   "cw": "min(76vw, 340px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    15.4,
+    15.4
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 381,
+   "altoUtil": 566,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "375×667",
+   "name": "carta",
+   "w": 225,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    18.5,
+    18.5
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 566,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "393×659",
+   "name": "portada",
+   "w": 226,
+   "pct": 57.5,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    18.6,
+    18.5
+   ],
+   "asoma": [
+    29,
+    29
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 429,
+   "altoUtil": 558,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "393×659",
+   "name": "evento",
+   "w": 299,
+   "pct": 76.1,
+   "cw": "min(76vw, 340px)",
+   "dx": -0.3,
+   "dxCol": -0.3,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    16.1,
+    16.2
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 389,
+   "altoUtil": 558,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "393×659",
+   "name": "carta",
+   "w": 236,
+   "pct": 60.1,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0.2,
+   "dxCol": 0.2,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.3,
+    19.4
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 177,
+   "altoUtil": 558,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "440×763",
+   "name": "portada",
+   "w": 248,
+   "pct": 56.4,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    20.4,
+    20.4
+   ],
+   "asoma": [
+    30,
+    30
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 462,
+   "altoUtil": 662,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "440×763",
+   "name": "evento",
+   "w": 334,
+   "pct": 75.9,
+   "cw": "min(76vw, 340px)",
+   "dx": 0.4,
+   "dxCol": 0.4,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    18.2,
+    18.1
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 472,
+   "altoUtil": 662,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "440×763",
+   "name": "carta",
+   "w": 248,
+   "pct": 56.4,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    20.4,
+    20.4
+   ],
+   "asoma": [
+    30,
+    30
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 186,
+   "altoUtil": 662,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "402×874",
+   "name": "portada",
+   "w": 233,
+   "pct": 58,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": -0.1,
+   "dxCol": -0.1,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.3,
+    19.3
+   ],
+   "asoma": [
+    28,
+    28
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 440,
+   "altoUtil": 677,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "402×874",
+   "name": "evento",
+   "w": 306,
+   "pct": 76.1,
+   "cw": "min(76vw, 340px)",
+   "dx": -0.5,
+   "dxCol": -0.5,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    16.4,
+    16.4
+   ],
+   "asoma": [
+    10,
+    11
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 450,
+   "altoUtil": 677,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "402×874",
+   "name": "carta",
+   "w": 241,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": -0.3,
+   "dxCol": -0.3,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.9,
+    19.8
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 181,
+   "altoUtil": 677,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "768×1024",
+   "name": "portada",
+   "w": 240,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    19.8,
+    19.8
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 425,
+   "altoUtil": 960,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "768×1024",
+   "name": "evento",
+   "w": 300,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    16.2,
+    16.2
+   ],
+   "asoma": [
+    66,
+    66
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 446,
+   "altoUtil": 960,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "768×1024",
+   "name": "carta",
+   "w": 232,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    19.1,
+    19.1
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 960,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1024×768",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    23,
+    23.1
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 256.8,
+     "fuera": 17.5,
+     "dy": 0
+    },
+    {
+     "hueco": 256.8,
+     "fuera": 17.8,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 704,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1024×768",
+   "name": "evento",
+   "w": 307,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0.1,
+   "dxCol": 0.1,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    16.6,
+    16.6
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 271.1,
+     "fuera": 18.8,
+     "dy": 0
+    },
+    {
+     "hueco": 270.8,
+     "fuera": 18.6,
+     "dy": 0
+    }
+   ],
+   "bloque": 451,
+   "altoUtil": 704,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1024×768",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    22.3,
+    22.5
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 249.9,
+     "fuera": 17.5,
+     "dy": 0
+    },
+    {
+     "hueco": 249.9,
+     "fuera": 17.7,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 704,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1280×800",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    23,
+    23.1
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 256.8,
+     "fuera": 17.5,
+     "dy": 0
+    },
+    {
+     "hueco": 256.8,
+     "fuera": 17.8,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 736,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1280×800",
+   "name": "evento",
+   "w": 403,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0.4,
+   "dxCol": 0.4,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    21.9,
+    21.8
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 351.2,
+     "fuera": 19.9,
+     "dy": 0
+    },
+    {
+     "hueco": 350.5,
+     "fuera": 19.3,
+     "dy": 0
+    }
+   ],
+   "bloque": 500,
+   "altoUtil": 736,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1280×800",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    22.3,
+    22.5
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 249.9,
+     "fuera": 17.5,
+     "dy": 0
+    },
+    {
+     "hueco": 249.9,
+     "fuera": 17.7,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 736,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1440×900",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    23.1,
+    23.1
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 427.6,
+     "fuera": 17.2,
+     "dy": 0
+    },
+    {
+     "hueco": 427.6,
+     "fuera": 17.2,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 836,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1440×900",
+   "name": "evento",
+   "w": 418,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    22.6,
+    22.6
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 363,
+     "fuera": 19.7,
+     "dy": 0
+    },
+    {
+     "hueco": 363,
+     "fuera": 19.7,
+     "dy": 0
+    }
+   ],
+   "bloque": 511,
+   "altoUtil": 836,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1440×900",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    22.4,
+    22.4
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 415.8,
+     "fuera": 17.2,
+     "dy": 0
+    },
+    {
+     "hueco": 415.8,
+     "fuera": 17.2,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 836,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1920×1080",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    23.1,
+    23.1
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 427.6,
+     "fuera": 17.2,
+     "dy": 0
+    },
+    {
+     "hueco": 427.6,
+     "fuera": 17.2,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 1016,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1920×1080",
+   "name": "evento",
+   "w": 418,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    22.6,
+    22.6
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 363,
+     "fuera": 19.7,
+     "dy": 0
+    },
+    {
+     "hueco": 363,
+     "fuera": 19.7,
+     "dy": 0
+    }
+   ],
+   "bloque": 511,
+   "altoUtil": 1016,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "claro",
+   "size": "1920×1080",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    22.4,
+    22.4
+   ],
+   "asoma": [
+    77,
+    77
+   ],
+   "flechas": [
+    {
+     "hueco": 415.8,
+     "fuera": 17.2,
+     "dy": 0
+    },
+    {
+     "hueco": 415.8,
+     "fuera": 17.2,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 1016,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "320×640",
+   "name": "portada",
+   "w": 186,
+   "pct": 58.1,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": -0.5,
+   "dxCol": -0.5,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    16.3,
+    16.3
+   ],
+   "asoma": [
+    27,
+    28
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 368,
+   "altoUtil": 539,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "320×640",
+   "name": "evento",
+   "w": 243,
+   "pct": 75.9,
+   "cw": "min(76vw, 340px)",
+   "dx": 0.2,
+   "dxCol": 0.2,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    14.2,
+    14.2
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 403,
+   "altoUtil": 539,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "320×640",
+   "name": "carta",
+   "w": 192,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    16.9,
+    16.9
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 539,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "375×629",
+   "name": "portada",
+   "w": 206,
+   "pct": 54.9,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    17.9,
+    18
+   ],
+   "asoma": [
+    32,
+    32
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 399,
+   "altoUtil": 528,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "375×629",
+   "name": "evento",
+   "w": 285,
+   "pct": 76,
+   "cw": "min(76vw, 340px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    16.9,
+    16.9
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 381,
+   "altoUtil": 528,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "375×629",
+   "name": "carta",
+   "w": 225,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.8,
+    19.8
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 528,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "375×667",
+   "name": "portada",
+   "w": 218,
+   "pct": 58.1,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19,
+    19
+   ],
+   "asoma": [
+    27,
+    27
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 416,
+   "altoUtil": 566,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "375×667",
+   "name": "evento",
+   "w": 285,
+   "pct": 76,
+   "cw": "min(76vw, 340px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    16.9,
+    16.9
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 381,
+   "altoUtil": 566,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "375×667",
+   "name": "carta",
+   "w": 225,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.8,
+    19.8
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 566,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "393×659",
+   "name": "portada",
+   "w": 226,
+   "pct": 57.5,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.7,
+    19.8
+   ],
+   "asoma": [
+    28,
+    28
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 429,
+   "altoUtil": 558,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "393×659",
+   "name": "evento",
+   "w": 299,
+   "pct": 76.1,
+   "cw": "min(76vw, 340px)",
+   "dx": -0.3,
+   "dxCol": -0.3,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    17.6,
+    17.6
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 389,
+   "altoUtil": 558,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "393×659",
+   "name": "carta",
+   "w": 236,
+   "pct": 60.1,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0.2,
+   "dxCol": 0.2,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    20.7,
+    20.6
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 177,
+   "altoUtil": 558,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "440×763",
+   "name": "portada",
+   "w": 248,
+   "pct": 56.4,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    21.9,
+    21.9
+   ],
+   "asoma": [
+    30,
+    30
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 462,
+   "altoUtil": 662,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "440×763",
+   "name": "evento",
+   "w": 334,
+   "pct": 75.9,
+   "cw": "min(76vw, 340px)",
+   "dx": 0.4,
+   "dxCol": 0.4,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    19.8,
+    19.4
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 472,
+   "altoUtil": 662,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "440×763",
+   "name": "carta",
+   "w": 248,
+   "pct": 56.4,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    21.9,
+    21.9
+   ],
+   "asoma": [
+    30,
+    30
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 186,
+   "altoUtil": 662,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "402×874",
+   "name": "portada",
+   "w": 233,
+   "pct": 58,
+   "cw": "min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5))",
+   "dx": -0.1,
+   "dxCol": -0.1,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    20.4,
+    20.4
+   ],
+   "asoma": [
+    27,
+    28
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 440,
+   "altoUtil": 677,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "402×874",
+   "name": "evento",
+   "w": 306,
+   "pct": 76.1,
+   "cw": "min(76vw, 340px)",
+   "dx": -0.5,
+   "dxCol": -0.5,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    18.1,
+    17.9
+   ],
+   "asoma": [
+    10,
+    10
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 450,
+   "altoUtil": 677,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "402×874",
+   "name": "carta",
+   "w": 241,
+   "pct": 60,
+   "cw": "clamp(184px, 60vw, 248px)",
+   "dx": -0.3,
+   "dxCol": -0.3,
+   "visibles": 1,
+   "parciales": 2,
+   "hueco": [
+    21,
+    21.2
+   ],
+   "asoma": [
+    25,
+    25
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 181,
+   "altoUtil": 677,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "768×1024",
+   "name": "portada",
+   "w": 240,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    21.1,
+    21.1
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 425,
+   "altoUtil": 960,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "768×1024",
+   "name": "evento",
+   "w": 300,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    17.7,
+    17.7
+   ],
+   "asoma": [
+    65,
+    65
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 446,
+   "altoUtil": 960,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "768×1024",
+   "name": "carta",
+   "w": 232,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    20.4,
+    20.4
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": "ocultas (toque)",
+   "bloque": 189,
+   "altoUtil": 960,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1024×768",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    24.7,
+    24.5
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 256.8,
+     "fuera": 19.3,
+     "dy": 0
+    },
+    {
+     "hueco": 256.8,
+     "fuera": 19.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 704,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1024×768",
+   "name": "evento",
+   "w": 307,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0.1,
+   "dxCol": 0.1,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    18.2,
+    18.2
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 271.1,
+     "fuera": 19.5,
+     "dy": 0
+    },
+    {
+     "hueco": 270.8,
+     "fuera": 19.2,
+     "dy": 0
+    }
+   ],
+   "bloque": 451,
+   "altoUtil": 704,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1024×768",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    23.9,
+    23.7
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 249.9,
+     "fuera": 19.3,
+     "dy": 0
+    },
+    {
+     "hueco": 249.9,
+     "fuera": 19.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 704,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1280×800",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    24.7,
+    24.5
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 256.8,
+     "fuera": 19.3,
+     "dy": 0
+    },
+    {
+     "hueco": 256.8,
+     "fuera": 19.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 736,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1280×800",
+   "name": "evento",
+   "w": 403,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0.4,
+   "dxCol": 0.4,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    23.9,
+    23.5
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 351.2,
+     "fuera": 20.7,
+     "dy": 0
+    },
+    {
+     "hueco": 350.5,
+     "fuera": 20.4,
+     "dy": 0
+    }
+   ],
+   "bloque": 500,
+   "altoUtil": 736,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1280×800",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.36)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    23.9,
+    23.7
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 249.9,
+     "fuera": 19.3,
+     "dy": 0
+    },
+    {
+     "hueco": 249.9,
+     "fuera": 19.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 736,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1440×900",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    24.6,
+    24.6
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 427.6,
+     "fuera": 16.6,
+     "dy": 0
+    },
+    {
+     "hueco": 427.6,
+     "fuera": 16.6,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 836,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1440×900",
+   "name": "evento",
+   "w": 418,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    24.8,
+    24.8
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 363,
+     "fuera": 20.5,
+     "dy": 0
+    },
+    {
+     "hueco": 363,
+     "fuera": 20.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 511,
+   "altoUtil": 836,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1440×900",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    23.9,
+    23.9
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 415.8,
+     "fuera": 16.5,
+     "dy": 0
+    },
+    {
+     "hueco": 415.8,
+     "fuera": 16.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 836,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1920×1080",
+   "name": "portada",
+   "w": 280,
+   "pct": null,
+   "cw": "clamp(240px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 280px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    24.6,
+    24.6
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 427.6,
+     "fuera": 16.6,
+     "dy": 0
+    },
+    {
+     "hueco": 427.6,
+     "fuera": 16.6,
+     "dy": 0
+    }
+   ],
+   "bloque": 485,
+   "altoUtil": 1016,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1920×1080",
+   "name": "evento",
+   "w": 418,
+   "pct": null,
+   "cw": "clamp(300px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.33)), 440px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 3,
+   "parciales": 0,
+   "hueco": [
+    24.8,
+    24.8
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 363,
+     "fuera": 20.5,
+     "dy": 0
+    },
+    {
+     "hueco": 363,
+     "fuera": 20.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 511,
+   "altoUtil": 1016,
+   "aire": {
+    "arriba": 24,
+    "pie": 20,
+    "accion": null
+   }
+  },
+  {
+   "modo": "reducido",
+   "size": "1920×1080",
+   "name": "carta",
+   "w": 272,
+   "pct": null,
+   "cw": "clamp(232px, calc((100cqi - 2 * (48px + 16px)) / (2 * 1.97)), 272px)",
+   "dx": 0,
+   "dxCol": 0,
+   "visibles": 5,
+   "parciales": 0,
+   "hueco": [
+    23.9,
+    23.9
+   ],
+   "asoma": [
+    76,
+    76
+   ],
+   "flechas": [
+    {
+     "hueco": 415.8,
+     "fuera": 16.5,
+     "dy": 0
+    },
+    {
+     "hueco": 415.8,
+     "fuera": 16.5,
+     "dy": 0
+    }
+   ],
+   "bloque": 204,
+   "altoUtil": 1016,
+   "aire": {
+    "arriba": 24,
+    "pie": null,
+    "accion": null
+   }
+  }
+ ],
+ "report": [
+  {
+   "where": "claro 320×640 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 320×640",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×629",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 375×667",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 393×659",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 440×763",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 402×874",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "ancho 240–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "ancho 300–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "ancho 232–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 768×1024",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "ancho 240–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "ancho 300–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "ancho 232–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1024×768",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "ancho 280–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "ancho 400–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "ancho 240–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1280×800",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "ancho 280–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "ancho 400–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "ancho 240–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1440×900",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "ancho 280–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "ancho 400–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "ancho 240–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "claro 1920×1080",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 320×640",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×629",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 375×667",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 393×659",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 440×763",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "ancho 54–60 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "ancho 76–82 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "ancho 56–62 % del carrusel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "piezas a la vista ≤ 3",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 402×874",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "ancho 240–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "ancho 300–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "ancho 232–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "con toque, sin flechas a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 768×1024",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "ancho 240–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "ancho 300–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "ancho 232–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1024×768",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "ancho 280–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "ancho 400–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "ancho 240–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1280×800",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "ancho 280–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "ancho 400–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "ancho 240–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1440×900",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "ancho 280–320 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 portada",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "ancho 400–460 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "pieza → pie 16–20 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 evento",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "pieza central centrada en el carrusel (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "pieza central centrada en la columna (≤ 1 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "ancho 240–280 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "piezas a la vista ≤ 5",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "hueco central↔vecina ≥ 12 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "con puntero fino, flechas a la vista (≥ 44 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "flechas sin tapar la central (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "flechas centradas en el alto de la pieza (± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "flechas ≥ 16 px fuera de la última pieza a la vista",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "carrusel + pie + acción caben en el alto útil",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "aire arriba 24–32 px",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "sin texto cortado en la central ni en el pie",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "vecinas sin texto partido en el borde",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080 carta",
+   "name": "movimiento reducido: plano, sin giro ni profundidad",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "reducido 1920×1080",
+   "name": "sin errores en la página",
+   "ok": true,
+   "detail": ""
+  }
+ ]
+}

@@ -1,0 +1,1446 @@
+{
+ "rows": [
+  {
+   "perfil": "iPhone 16 (Safari)",
+   "vp": "393×659",
+   "insets": "0/0",
+   "franja": 558,
+   "h1": "68–150",
+   "cta": "256–312",
+   "foto": "353×218 → 586",
+   "fotoAire": 16,
+   "casa": "titular 68–136 · foto 238–468",
+   "catalogo-menu": "titular 68–136 · accion 160–208",
+   "catalogo-barra": "chips 60–108 · pieza 190–529 · pie 574–594",
+   "eventos": "titular 68–138 · pieza 216–489 · accion 392–436",
+   "cafe": "titular 68–138 · chips 194–242 · pieza 266–443",
+   "visita": "titular 68–173 · accion 349–405",
+   "menu": "desborda 0 · filas 48–48",
+   "ficha": "borde 48 · × 60 · acciones → 621"
+  },
+  {
+   "perfil": "iPhone 13 mini (Safari)",
+   "vp": "375×629",
+   "insets": "0/0",
+   "franja": 528,
+   "h1": "68–150",
+   "cta": "256–312",
+   "foto": "343×188 → 556",
+   "fotoAire": 16,
+   "casa": "titular 68–136 · foto 238–457",
+   "catalogo-menu": "titular 68–136 · accion 160–208",
+   "catalogo-barra": "chips 60–108 · pieza 190–499 · pie 544–564",
+   "eventos": "titular 68–139 · pieza 216–482 · accion 385–429",
+   "cafe": "titular 68–138 · chips 194–242 · pieza 266–455",
+   "visita": "titular 68–172 · accion 349–405",
+   "menu": "desborda 0 · filas 48–48",
+   "ficha": "borde 48 · × 60 · acciones → 591"
+  },
+  {
+   "perfil": "iPhone SE 3.ª gen. (Safari)",
+   "vp": "375×667",
+   "insets": "0/0",
+   "franja": 566,
+   "h1": "68–150",
+   "cta": "256–312",
+   "foto": "343×226 → 594",
+   "fotoAire": 16,
+   "casa": "titular 68–136 · foto 238–457",
+   "catalogo-menu": "titular 68–136 · accion 160–208",
+   "catalogo-barra": "chips 60–108 · pieza 190–517 · pie 562–582",
+   "eventos": "titular 68–138 · pieza 216–481 · accion 384–428",
+   "cafe": "titular 68–138 · chips 194–242 · pieza 266–455",
+   "visita": "titular 68–172 · accion 349–405",
+   "menu": "desborda 0 · filas 48–48",
+   "ficha": "borde 48 · × 60 · acciones → 629"
+  },
+  {
+   "perfil": "iPhone 16 Pro Max (Safari)",
+   "vp": "440×763",
+   "insets": "0/0",
+   "franja": 662,
+   "h1": "68–150",
+   "cta": "256–312",
+   "foto": "400×267 → 635",
+   "fotoAire": 71,
+   "casa": "titular 68–136 · foto 238–495",
+   "catalogo-menu": "titular 68–136 · accion 160–208",
+   "catalogo-barra": "chips 60–108 · pieza 190–562 · pie 607–627",
+   "eventos": "titular 68–138 · pieza 216–572 · accion 475–519",
+   "cafe": "titular 68–138 · chips 194–242 · pieza 266–452",
+   "visita": "titular 68–172 · accion 327–383",
+   "menu": "desborda 0 · filas 56–56",
+   "ficha": "borde 48 · × 60 · acciones → 725"
+  },
+  {
+   "perfil": "iPhone 16 Pro (pantalla completa)",
+   "vp": "402×874",
+   "insets": "62/34",
+   "franja": 677,
+   "h1": "130–212",
+   "cta": "318–374",
+   "foto": "362×241 → 671",
+   "fotoAire": 112,
+   "casa": "titular 130–198 · foto 300–535",
+   "catalogo-menu": "titular 130–198 · accion 222–270",
+   "catalogo-barra": "chips 122–170 · pieza 252–602 · pie 647–667",
+   "eventos": "titular 130–200 · pieza 278–612 · accion 515–559",
+   "cafe": "titular 130–201 · chips 256–304 · pieza 328–509",
+   "visita": "titular 130–234 · accion 411–467",
+   "menu": "desborda 0 · filas 56–56",
+   "ficha": "borde 74 · × 86 · acciones → 802"
+  },
+  {
+   "perfil": "Zoom de pantalla 320×640",
+   "vp": "320×640",
+   "insets": "0/0",
+   "franja": 539,
+   "h1": "68–150",
+   "cta": "256–312",
+   "foto": "288×192 → 580",
+   "fotoAire": 3,
+   "casa": "titular 68–172 · foto 272–459",
+   "catalogo-menu": "titular 68–136 · accion 160–208",
+   "catalogo-barra": "chips 60–108 · pieza 188–467 · pie 512–532",
+   "eventos": "titular 68–138 · pieza 216–478 · accion 426–470",
+   "cafe": "titular 68–139 · chips 194–242 · pieza 266–455",
+   "visita": "titular 68–173 · accion 374–430",
+   "menu": "desborda 0 · filas 48–48",
+   "ficha": "borde 48 · × 60 · acciones → 602"
+  }
+ ],
+ "report": [
+  {
+   "where": "16",
+   "name": "inicio: titular a 24 px bajo la cabecera (± 2)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "inicio: titular de dos renglones (82 ± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "inicio: la foto ≥ 160 px de alto y ≤ 3:2",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "inicio: la foto entera sobre la barra inferior (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "casa: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "casa: foto entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "casa: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "casa: la barra inferior marca #inicio",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-menu: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-menu: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-menu: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-menu: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-barra: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-barra: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-barra: pie entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catálogo: la barra inferior marca «Catálogo»",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "catalogo-barra: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "eventos: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "eventos: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "eventos: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "eventos: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "eventos: «Compartir» ≥ 44 con el título en su nombre",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "eventos: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "cafe: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "cafe: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "cafe: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "cafe: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "cafe: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "visita: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "visita: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "visita: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "visita: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "menú: filas ≥ 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "ficha: el borde de la hoja ≥ área segura + 12 (48)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16",
+   "name": "ficha: las acciones del pie dentro de la ventana",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "inicio: titular a 24 px bajo la cabecera (± 2)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "inicio: titular de dos renglones (82 ± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "inicio: la foto ≥ 160 px de alto y ≤ 3:2",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "inicio: la foto entera sobre la barra inferior (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "casa: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "casa: foto entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "casa: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "casa: la barra inferior marca #inicio",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-menu: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-menu: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-menu: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-menu: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-barra: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-barra: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-barra: pie entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catálogo: la barra inferior marca «Catálogo»",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "catalogo-barra: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "eventos: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "eventos: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "eventos: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "eventos: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "eventos: «Compartir» ≥ 44 con el título en su nombre",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "eventos: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "cafe: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "cafe: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "cafe: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "cafe: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "cafe: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "visita: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "visita: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "visita: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "visita: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "menú: filas ≥ 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "ficha: el borde de la hoja ≥ área segura + 12 (48)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "13mini",
+   "name": "ficha: las acciones del pie dentro de la ventana",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "inicio: titular a 24 px bajo la cabecera (± 2)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "inicio: titular de dos renglones (82 ± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "inicio: la foto ≥ 160 px de alto y ≤ 3:2",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "inicio: la foto entera sobre la barra inferior (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "casa: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "casa: foto entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "casa: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "casa: la barra inferior marca #inicio",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-menu: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-menu: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-menu: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-menu: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-barra: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-barra: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-barra: pie entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catálogo: la barra inferior marca «Catálogo»",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "catalogo-barra: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "eventos: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "eventos: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "eventos: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "eventos: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "eventos: «Compartir» ≥ 44 con el título en su nombre",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "eventos: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "cafe: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "cafe: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "cafe: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "cafe: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "cafe: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "visita: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "visita: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "visita: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "visita: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "menú: filas ≥ 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "ficha: el borde de la hoja ≥ área segura + 12 (48)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "se3",
+   "name": "ficha: las acciones del pie dentro de la ventana",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "inicio: titular a 24 px bajo la cabecera (± 2)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "inicio: titular de dos renglones (82 ± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "inicio: la foto ≥ 160 px de alto y ≤ 3:2",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "inicio: la foto entera sobre la barra inferior (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "casa: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "casa: foto entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "casa: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "casa: la barra inferior marca #inicio",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-menu: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-menu: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-menu: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-menu: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-barra: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-barra: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-barra: pie entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catálogo: la barra inferior marca «Catálogo»",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "catalogo-barra: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "eventos: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "eventos: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "eventos: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "eventos: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "eventos: «Compartir» ≥ 44 con el título en su nombre",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "eventos: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "cafe: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "cafe: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "cafe: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "cafe: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "cafe: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "visita: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "visita: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "visita: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "visita: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "menú: filas ≥ 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "ficha: el borde de la hoja ≥ área segura + 12 (48)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16promax",
+   "name": "ficha: las acciones del pie dentro de la ventana",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "inicio: titular a 24 px bajo la cabecera (± 2)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "inicio: titular de dos renglones (82 ± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "inicio: la foto ≥ 160 px de alto y ≤ 3:2",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "inicio: la foto entera sobre la barra inferior (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "casa: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "casa: foto entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "casa: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "casa: la barra inferior marca #inicio",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-menu: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-menu: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-menu: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-menu: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-barra: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-barra: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-barra: pie entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catálogo: la barra inferior marca «Catálogo»",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "catalogo-barra: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "eventos: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "eventos: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "eventos: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "eventos: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "eventos: «Compartir» ≥ 44 con el título en su nombre",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "eventos: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "cafe: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "cafe: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "cafe: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "cafe: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "cafe: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "visita: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "visita: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "visita: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "visita: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "menú: filas ≥ 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "ficha: el borde de la hoja ≥ área segura + 12 (74)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "16pro-completa",
+   "name": "ficha: las acciones del pie dentro de la ventana",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "inicio: titular a 24 px bajo la cabecera (± 2)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "inicio: titular de dos renglones (82 ± 2 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "inicio: la foto ≥ 160 px de alto y ≤ 3:2",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "inicio: la foto entera sobre la barra inferior (≥ 8 px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "casa: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "casa: foto entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "casa: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "casa: la barra inferior marca #inicio",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-menu: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-menu: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-menu: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-menu: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-barra: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-barra: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-barra: pie entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catálogo: la barra inferior marca «Catálogo»",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "catalogo-barra: la barra inferior marca #libros",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "eventos: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "eventos: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "eventos: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "eventos: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "eventos: «Compartir» ≥ 44 con el título en su nombre",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "eventos: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "cafe: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "cafe: chips entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "cafe: pieza entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "cafe: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "cafe: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "visita: titular entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "visita: accion entero entre la cabecera y la barra inferior (≥ 8 px de aire)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "visita: titular a 24 px bajo la cabecera (± 4)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "visita: la barra inferior marca ninguna casilla",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "menú: filas ≥ 44",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "ficha: el borde de la hoja ≥ área segura + 12 (48)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "where": "320",
+   "name": "ficha: las acciones del pie dentro de la ventana",
+   "ok": true,
+   "detail": ""
+  }
+ ]
+}
