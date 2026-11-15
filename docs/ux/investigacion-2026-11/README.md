@@ -7,6 +7,7 @@ Informes completos, con fuentes y lo que no se pudo verificar:
 - [`spline-mapcn.md`](spline-mapcn.md): 3D y mapas.
 - [`shadcn-21st-uiverse.md`](shadcn-21st-uiverse.md): arquitectura de componentes y microinteracciones.
 - [`aceternity-magicui.md`](aceternity-magicui.md): animaciones para landings.
+- [`jitter-lottielab-pryzm-magicui.md`](jitter-lottielab-pryzm-magicui.md) (2026-11-15): Jitter, Lottielab, Pryzm y la landing y documentación de Magic UI; formato Lottie medido contra la CSP del sitio (`lottie-web` ligero 46.5 KB gzip funciona con `script-src 'self'`; dotLottie 523 KB y exige `wasm-unsafe-eval`). Conclusión: nada se instala; convienen fichas de movimiento por componente y microanimaciones en SVG + CSS.
 
 **Cómo se verificó:** la red de la sesión no alcanza los sitios de ninguno de los siete (ui.shadcn.com, 21st.dev, uiverse.io, ui.aceternity.com, magicui.design, spline.design, mapcn.dev). Se leyeron sus repositorios públicos (shadcn/ui, Uiverse, Magic UI, mapcn), sus paquetes de npm (Spline, MapLibre) y búsquedas web. El código de Aceternity no es público: su mecánica sale de Inspira UI (port MIT autorizado) y de extractos. Lo no verificado va marcado en cada informe.
 
