@@ -40,3 +40,7 @@ design/report.json
 .impeccable/live/annotations/
 .impeccable/live/artifacts/
 .impeccable/live/server.json
+
+# Cachés de Python (scripts de skills)
+__pycache__/
+*.pyc
