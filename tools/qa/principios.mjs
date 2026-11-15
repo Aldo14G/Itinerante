@@ -113,7 +113,7 @@ const HERRAMIENTAS = {
   explorer: u => ['tools/qa/explorer.mjs', u], inp: u => ['tools/qa/inp.mjs', u], e2e: u => ['tools/qa/e2e.mjs', u, DIR],
   guias: u => ['tools/qa/guias.mjs', u, join(DIR, 'guias'), ...(COMPLETO ? [] : ['--perfiles=iphone16,d1440']), '--capturas=no'],
   critique: () => ['scripts/critique.mjs'], componentes: () => ['--test', 'tests/componentes.test.mjs'],
-  pruebas: () => ['--test', 'tests/'],
+  pruebas: () => ['--test', 'tests/site.test.mjs', 'tests/sheets.test.mjs'], // las funciones puras del sitio (poses, validadores, fechas)
 };
 const SIN_NAVEGADOR = new Set(['critique', 'componentes', 'pruebas']);
 const SOLO_RAPIDO = new Set(['motion', 'controles', 'critique', 'componentes']);
