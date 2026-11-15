@@ -132,3 +132,11 @@ Insumo: la investigación de `docs/ux/investigacion-2026-11/` (Aceternity UI, Ma
 | Matriz de estados | Variantes de `cva` en los componentes de shadcn/ui (hover, foco, deshabilitado, inválido) | MIT | La tabla control × estado, comprobada contra el CSS y el JS | `design/COMPONENTES.md` |
 
 Investigación de origen: `docs/ux/investigacion-2026-11/shadcn-21st-uiverse.md` §4.2 y §5.
+
+## Los 20 principios de UX y animación (2026-11-15): origen de la skill `auditor-calidad`
+La lista de veinte la dio Aldo («20 Principles of UX & Animation»). Sus doce primeros son los principios de animación de Frank Thomas y Ollie Johnston (*The Illusion of Life: Disney Animation*, 1981), con nombres adaptados a interfaz; los ocho restantes son leyes de UX.
+- **Principios de animación (1–12)**: libro impreso, © de sus autores y editorial; aquí solo se usan los nombres y la idea de cada uno, traducidos a reglas propias de este sitio. **[sin cita textual]**: no se abrió una edición del libro en esta sesión. «Straight ahead action» no está en la lista de Aldo (solo «pose to pose») y no se añadió.
+- **Fitts, Hick, Miller, Doherty, Postel y Jakob (13, 15–19)**: Laws of UX (sección 4 de este archivo). Las páginas de Fitts, Hick, Miller, Doherty y Jakob se verificaron el 4 nov 2026; la de Postel (https://lawsofux.com/postels-law/) **no se abrió en esta sesión** (lawsofux.com no respondió desde la red de la sesión el 2026-11-15) y va **[sin cita textual]**.
+- **Zonas de toque amplias (14)**: WCAG 2.2, 2.5.5 y 2.5.8 (sección 1) y Apple HIG (sección 5).
+- **Frecuencia de uso (20)**: no es una de las «Laws of UX»; es un principio clásico de disposición en ergonomía (lo más usado, en el lugar más accesible). **[sin cita textual]**. El sitio no tiene analítica: la frecuencia se razona desde `PRODUCT.md` y no se presentan cifras de uso.
+- Los umbrales numéricos de la skill (escala 0.9–1.06, rebote ≤ 5 %, respuesta ≤ 700 ms, puntuación ≥ 34 de 40) **son norma de este proyecto**, sacada de sus tokens y de `DESIGN.md`; no vienen de esas fuentes.
