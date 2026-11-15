@@ -60,8 +60,7 @@ html:not(.js) .tabbar { display: none; }
   gap: var(--space-6); padding-top: var(--space-6);
 }
 .entry-title-mas { display: block; } /* dos renglones fijos en todo teléfono: el bloque no salta de 2 a 1 renglón entre modelos */
-.entry-status, .entry-lede { margin-top: var(--space-2); }
-.entry-address { margin-top: var(--space-3); }
+.entry-status { margin-top: var(--space-2); } /* titular → estado 8 (posición fija); entradilla a 8 y dirección a 12 son ya la base de style.css */
 .entry-media { aspect-ratio: auto; height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); }
 .news-hint .entry-media { height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--space-4) - var(--alto-md) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); } /* con el control de novedades reservado */
 .entry-poster { object-position: 50% 62%; } /* si la foto queda más baja que 3:2, se recorta arriba: la ventana y la mesa siguen al centro */
@@ -74,7 +73,6 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- Café y té: la carta (chips y carrusel) antes que la foto (2026-11-14): al llegar se ve la carta, no la foto ---------- */
 /* Solo el orden visual: la foto no es un control (lleva alt), así que el orden de lectura no cambia ninguna acción. */
 .cafe-carta { order: -1; }
-.cafe > .sec-head { margin-bottom: var(--space-6); }
 
 /* ---------- Eventos y talleres: el Carrusel3D (style.css); en ventanas bajas la foto se acorta para que la tarjeta quepa ---------- */
 @media (max-height: 700px) { .bill-card-img { aspect-ratio: 16 / 9; } }
@@ -93,20 +91,19 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- Catálogo en el teléfono ---------- */
 /* Titular → «Buscar en el catálogo» (abre la hoja Explorar) → chips → carrusel → cierre con «Cómo llegar». La capa «Explora el catálogo» no ocupa sitio en la
    página: es la hoja; su titular queda para lectores de pantalla (la región sigue nombrada). */
-.books-head { margin-bottom: var(--space-5); }
 /* «Catálogo» de la barra inferior aterriza aquí (#colecciones, 2026-11-14): los chips a 16 px bajo la cabecera y, debajo, carrusel y pie del
    libro entre las dos barras en todos los iPhone (antes el titular arriba y la portada tapada por la barra). El menú ☰ sigue yendo al titular. */
 .rail { scroll-margin-top: var(--space-2); }
 .explore-open { width: 100%; }
-/* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón: 12 px de relleno y, con palomita, 8 y la
-   palomita más junta. Nunca se parten. */
-@media (max-width: 389px) {
-  .rail-chips .chip { padding: 0 var(--space-3); }
-  .rail-chips .chip:is([aria-checked="true"], .is-hojeada) { gap: var(--space-1); padding: 0 var(--space-2); }
-}
+/* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón con **un solo relleno** por ancho
+   (Sistema de guías, 2026-11-15; antes 12 y, con palomita, 8: dos rellenos en la misma fila): 12 hasta 389 px y, con Zoom de pantalla
+   (hasta 359 px), 8 con la palomita más junta. Nunca se parten. */
+@media (max-width: 389px) { .rail-chips .chip { padding: 0 var(--space-3); } }
+@media (max-width: 359px) { .rail-chips .chip { gap: var(--space-1); padding: 0 var(--space-2); } }
 .books > .cat { margin: 0; padding: 0; border: 0; }
 .cat-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .books-foot { padding-block: var(--space-8); }
+.books-foot .btn { width: 100%; } /* la primaria, a todo el ancho en el teléfono, como en Inicio y Visita (2026-11-15; antes al ancho del rótulo) */
 .cat-filters { grid-template-columns: 1fr; }
 .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); }
 @media (min-width: 520px) { .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

@@ -50,7 +50,7 @@
         "movimiento_reducido": { "css": [".btn:active"], "nota": "En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo." }
       },
       "aria": { "patron": "Button", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "atributos": ["aria-pressed", "aria-disabled", "aria-label"], "teclado": "Enter y Espacio (nativo de <button>); los enlaces con cara de botón, Enter." },
-      "qa": ["tools/qa/controles.mjs", "tools/qa/contrast.mjs", "tools/qa/axe.mjs", "tests/critique.test.mjs"],
+      "qa": ["tools/qa/controles.mjs", "tools/qa/contrast.mjs", "tools/qa/axe.mjs", "tests/critique.test.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Botón) y «Escala de controles»."
     },
@@ -111,7 +111,7 @@
         "movimiento_reducido": { "css": [".motion .is-dibuja > .chip-chk path", ".chip:active"] }
       },
       "aria": { "patron": "Radio Group", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/", "atributos": ["role=radiogroup", "role=radio", "aria-checked", "aria-label"], "teclado": "Un solo punto de tabulación (el elegido); ← → ↑ ↓ mueven el foco y eligen (wireRadioChips)." },
-      "qa": ["tools/qa/rail.mjs", "tools/qa/controles.mjs", "tools/qa/inp.mjs", "tools/qa/feed.mjs"],
+      "qa": ["tools/qa/rail.mjs", "tools/qa/controles.mjs", "tools/qa/inp.mjs", "tools/qa/feed.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Chip) y «Ronda de animaciones» (palomita que se dibuja)."
     },
@@ -119,7 +119,7 @@
       "id": "recorrido",
       "nombre": "Recorrido",
       "tipo": "bloque",
-      "descripcion": "Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva. Se guarda en localStorage (iti-recorrido-v2).",
+      "descripcion": "Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva, junto a la nota de la colección y en el eje izquierdo (2026-11-15: 16 px después en su renglón desde 761 px; debajo a 8 en el teléfono). Se guarda en localStorage (iti-recorrido-v2).",
       "archivos": [
         { "ruta": "style.css", "selectores": [".rail-conector", ".rail-conector::after", ".rail-conector.is-hecho::after", ".rail-progreso", ".rail-nota-fila", ".rail-note"] },
         { "ruta": "index.html", "selectores": ["[data-rail-progreso]", "[data-rail-note]"] },
@@ -132,7 +132,7 @@
       },
       "no_aplica": { "hover": "No es un control: los chips llevan su propio hover.", "foco": "No es enfocable; el foco es el de los chips." },
       "aria": { "patron": "Región viva (status)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-live=polite"], "teclado": "El de los chips (radiogroup)." },
-      "qa": ["tools/qa/rail.mjs", "tools/qa/motion.mjs", "tests/site.test.mjs"],
+      "qa": ["tools/qa/rail.mjs", "tools/qa/motion.mjs", "tests/site.test.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Carrusel3D, Eventos, Café y té, recorrido y profundidad» y «Recorrido que se llena» (2026-11-14)."
     },
@@ -154,7 +154,7 @@
       },
       "no_aplica": { "deshabilitado": "Nada se deshabilita en la barra." },
       "aria": { "patron": "Landmark navigation + aria-current", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html", "atributos": ["aria-label=Secciones", "aria-current"], "teclado": "Tab entre enlaces; Enter sigue el enlace." },
-      "qa": ["tools/qa/e2e.mjs", "tools/qa/responsive.mjs", "tools/qa/controles.mjs", "tools/qa/axe.mjs"],
+      "qa": ["tools/qa/e2e.mjs", "tools/qa/responsive.mjs", "tools/qa/controles.mjs", "tools/qa/axe.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Barra de navegación) y «Barra de navegación desde 1101 px»."
     },
@@ -179,7 +179,7 @@
         "movimiento_reducido": { "css": [".motion .menu.is-closing .menu-hoja", ".menu-btn:active"] }
       },
       "aria": { "patron": "Dialog (Modal) + Disclosure", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "atributos": ["aria-expanded", "aria-controls", "aria-labelledby", "aria-current"], "teclado": "Enter/Espacio abre; foco a la primera sección; Tab atrapado (showModal); Escape, el velo y «atrás» cierran; elegir una sección lleva el foco a su titular." },
-      "qa": ["tools/qa/e2e.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/motion.mjs", "tools/qa/contrast.mjs"],
+      "qa": ["tools/qa/e2e.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/motion.mjs", "tools/qa/contrast.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Menú ☰)."
     },
@@ -264,13 +264,13 @@
       "nombre": "CarruselEventos",
       "tipo": "bloque",
       "variante_de": "carrusel3d",
-      "descripcion": "Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva).",
+      "descripcion": "Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva): un bloque del ancho de la tarjeta (--bill-w, que escribe measureDescs) con el texto a la izquierda en su sangría de 16 (2026-11-15; antes centrada).",
       "archivos": [
         { "ruta": "style.css", "selectores": [".c3d--evento", ".bill-card", ".bill-card-img", ".bill-badges", ".bill-title", ".bill-pie", ".bill-desc", ".bill-share"] },
         { "ruta": "index.html", "selectores": ["[data-bill-track]", "[data-bill-desc]", "[data-bill-pie]", ".bill-item", ".bill-card", ".bill-share"] },
         { "ruta": "feed.js", "exporta": ["initEventos", "initFeed", "eventBadge", "eventOf", "measureDescs", "shareItem", "NO_DATE"] }
       ],
-      "tokens": ["superficie", "fondo-2", "tinta", "radio-md", "t-titulo-3", "t-cuerpo", "sombra-portada", "space-3", "space-4", "space-6"],
+      "tokens": ["superficie", "fondo-2", "tinta", "radio-md", "t-titulo-3", "t-lectura", "sombra-portada", "space-3", "space-4", "space-6"],
       "estados": {
         "actual": { "css": [".c3d-item.is-centro :is(.bill-card, .cafe-card)"] },
         "foco": { "css": [".c3d-card:focus-visible"] },
@@ -278,7 +278,7 @@
       },
       "no_aplica": { "vacio": "Las propuestas están en el HTML; sin JavaScript cada tarjeta muestra su descripción." },
       "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["aria-labelledby (cada article)", "aria-live=polite (descripción)", "aria-label «Compartir «título»» (cada «Compartir»)"], "teclado": "El del Carrusel3D." },
-      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs", "tools/qa/iphone.mjs"],
+      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs", "tools/qa/iphone.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Tarjeta de evento) y «Posiciones de iPhone y contenedor de 1152» (2026-11-14: «Compartir» en la fila de insignias)."
     },
@@ -287,23 +287,23 @@
       "nombre": "CarruselCarta",
       "tipo": "bloque",
       "variante_de": "carrusel3d",
-      "descripcion": "Variante carta (Café y té): chips Café · Té y tarjetas tipográficas en superficie con un icono en disco menta, nombre, descripción y, solo si la librería lo da, el precio. Datos en assets/data/menu.json.",
+      "descripcion": "Variante carta (Café y té): chips Café · Té y tarjetas tipográficas 4:3 (desde el 2026-11-15; antes cuadradas) en superficie con un icono en disco menta, nombre (Title 3), descripción en dos renglones parejos y, solo si la librería lo da, el precio. Datos en assets/data/menu.json.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".c3d--carta", ".cafe-carta", ".cafe-chips", ".cafe-card", ".cafe-ic", ".cafe-nombre", ".cafe-desc", ".cafe-precio"] },
         { "ruta": "index.html", "selectores": ["[data-cafe]", "[data-cafe-chips]", "[data-cafe-track]", "[data-cafe-status]", "[data-cafe-live]"] },
         { "ruta": "cafe.js", "exporta": ["initCafe", "validMenu", "precioCarta", "cartaCard", "MENU_URL"] },
         { "ruta": "assets/data/menu.json" }
       ],
-      "tokens": ["superficie", "menta", "en-menta", "tinta", "tinta-2", "linea", "radio-md", "alto-md", "t-titulo-2", "t-subtitulo", "t-titular", "space-2", "space-5"],
+      "tokens": ["superficie", "menta", "en-menta", "tinta", "tinta-2", "linea", "radio-md", "alto-md", "t-titulo-3", "t-subtitulo", "t-titular", "space-2", "space-5", "space-12"],
       "estados": {
         "seleccionado": { "css": [".chip[aria-checked=\"true\"]"] },
         "ocupado": { "css": [".cafe-item.card--sk .cafe-card"], "html": ["[data-cafe-track][aria-busy=\"true\"]"] },
         "vacio": { "css": [".cafe-carta[data-state=\"vacio\"] :is(.cafe-chips, .c3d--carta)"] }
       },
       "aria": { "patron": "Carousel + Radio Group", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["role=group", "aria-roledescription=bebida", "aria-checked"], "teclado": "Chips con flechas; carrusel con ← → Inicio Fin." },
-      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs"],
+      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
-      "decision": "DESIGN.md, «Carrusel3D, Eventos, Café y té…» (carta)."
+      "decision": "DESIGN.md, «Carrusel3D, Eventos, Café y té…» (carta) y «Sistema de guías» (2026-11-15: tarjeta 4:3, nombre en Title 3, chips en el margen izquierdo)."
     },
     {
       "id": "tarjeta-libro",
@@ -362,7 +362,7 @@
       "id": "mi-lista",
       "nombre": "MiLista",
       "tipo": "bloque",
-      "descripcion": "«Mi lista para la visita»: libros guardados en localStorage, sin cuenta. Hoja con la lista, «Quitar» por renglón y, fijas al pie, «Cómo llegar» y «Enviar mi lista por WhatsApp». Conteo en la barra inferior, la cabecera y el menú.",
+      "descripcion": "«Mi lista para la visita»: libros guardados en localStorage, sin cuenta. Hoja con la lista, «Quitar» por renglón y, fijas al pie, «Cómo llegar» y «Enviar mi lista por WhatsApp». Conteo en la barra inferior, la cabecera y el menú. En escritorio (diálogo de 520) su margen interior es de 32 (2026-11-15: redefine --margen; el de la página crece con la ventana).",
       "archivos": [
         { "ruta": "style.css", "selectores": [".mylist", ".mylist::backdrop", ".ml-head", ".ml-body", ".ml-items", ".ml-item", ".ml-remove", ".ml-empty", ".ml-error", ".ml-actions", ".count-badge"] },
         { "ruta": "mobile.css", "selectores": [".mylist"] },
@@ -378,7 +378,7 @@
       },
       "no_aplica": { "hover": "Las filas no son enlaces; «Quitar» y las acciones del pie llevan el estado de su botón." },
       "aria": { "patron": "Dialog (Modal)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "atributos": ["aria-labelledby=mylist-title", "role=status (data-ml-status)"], "teclado": "Igual que la ficha; «Quitar «…» de mi lista» con su título en el nombre." },
-      "qa": ["tools/qa/saved.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs"],
+      "qa": ["tools/qa/saved.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Hojas) y AGENTS.md (saved.js)."
     },
@@ -428,7 +428,7 @@
         "movimiento_reducido": { "js": [{ "ruta": "catalog.js", "texto": "if (!isMotion() || !items.length) return;" }] }
       },
       "aria": { "patron": "Dialog (teléfono) + Checkbox + Disclosure", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/", "atributos": ["role=region", "role=search", "role=group", "role=status", "aria-busy", "aria-expanded", "aria-controls"], "teclado": "Casillas nativas (Espacio); «Ver los 41 títulos» despliega en su sitio y el foco se queda en el botón; Escape cierra la hoja del teléfono." },
-      "qa": ["tools/qa/explorer.mjs", "tools/qa/skeleton.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs"],
+      "qa": ["tools/qa/explorer.mjs", "tools/qa/skeleton.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Rejilla en línea plegada» y AGENTS.md (catalog.js)."
     },
@@ -456,7 +456,7 @@
       "id": "encabezado-seccion",
       "nombre": "EncabezadoSeccion",
       "tipo": "bloque",
-      "descripcion": "Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*» (el em en tinta-2, en su renglón) y la entradilla; sin antetítulo. Entra por líneas con su máscara una sola vez.",
+      "descripcion": "Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*» (el em en tinta-2, en su renglón) y la entradilla; sin antetítulo. Entra por líneas con su máscara una sola vez. Una forma por nivel (Sistema de guías, 2026-11-15): «Contacto» (.ftr-title, .ftr-lede) comparte la regla; titular → entradilla 12, cabecera → contenido 24; desde 1024 px, en las columnas 1–6 de la rejilla.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".sec-head", ".h2", ".sec-texto", ".linea", ".linea-in"] },
         { "ruta": "index.html", "selectores": [".sec-head", ".sec-texto", "[data-revelar]"] },
@@ -468,7 +468,7 @@
       },
       "no_aplica": { "hover": "No es un control.", "foco": "No es un control (los enlaces de su entradilla llevan el foco global)." },
       "aria": { "patron": "Encabezado de sección (h2 + aria-labelledby)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/headings/", "atributos": ["aria-labelledby (en la sección)"], "teclado": "—" },
-      "qa": ["tools/qa/piso.mjs", "tools/qa/motion.mjs", "tests/site.test.mjs"],
+      "qa": ["tools/qa/piso.mjs", "tools/qa/motion.mjs", "tests/site.test.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Encabezado de sección)."
     },
@@ -510,7 +510,7 @@
       },
       "no_aplica": { "hover": "Es un enlace grande; el cursor cambia (enlace nativo)." },
       "aria": { "patron": "Imagen con nombre dentro de un enlace", "apg": "https://www.w3.org/WAI/tutorials/images/functional/", "atributos": ["role=img", "aria-labelledby=mapa-t"], "teclado": "Enter sigue el enlace." },
-      "qa": ["tools/qa/responsive.mjs", "tools/qa/motion.mjs", "tools/qa/axe.mjs"],
+      "qa": ["tools/qa/responsive.mjs", "tools/qa/motion.mjs", "tools/qa/axe.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-14",
       "decision": "DESIGN.md, «Mapa de llegada en Visita» (2026-11-14)."
     },
@@ -544,22 +544,22 @@
       "id": "contacto-pie",
       "nombre": "ContactoPie",
       "tipo": "bloque",
-      "descripcion": "El pie es el único lugar con el contacto: titular «Contacto», para qué escribir y WhatsApp · Instagram · Facebook · Correo en una lista agrupada de filas de 56 con su icono; debajo, «Pausar el movimiento».",
+      "descripcion": "El pie es el único lugar con el contacto: titular «Contacto» (titular de sección, Title 1, desde el 2026-11-15), para qué escribir (entradilla en Body) y WhatsApp · Instagram · Facebook · Correo en una lista agrupada de filas de 56 con su icono (desde 1024 px, texto en las columnas 1–6 y lista en 7–12, alineados arriba); debajo, «Pausar el movimiento».",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".ftr", ".ftr-contacto", ".ftr-title", ".ftr-lede", ".ftr-links", ".ftr-link", ".ftr-ne"] },
+        { "ruta": "style.css", "selectores": [".ftr", ".ftr-contacto", ".ftr-texto", ".ftr-title", ".ftr-lede", ".ftr-links", ".ftr-link", ".ftr-ne"] },
         { "ruta": "mobile.css", "selectores": [".ftr"] },
         { "ruta": "index.html", "selectores": [".ftr", ".ftr-links", ".ftr-link", "#ftr-title"] }
       ],
-      "tokens": ["fondo", "fondo-2", "tinta", "tinta-2", "turquesa-texto", "linea", "radio-md", "radio-sm", "alto-md", "t-titulo-2", "t-subtitulo", "t-cuerpo", "anillo-foco", "space-1", "space-3", "space-4", "space-6", "space-8"],
+      "tokens": ["fondo", "fondo-2", "tinta", "tinta-2", "turquesa-texto", "linea", "radio-md", "radio-sm", "alto-md", "t-titulo-1", "t-cuerpo", "anillo-foco", "canal-rejilla", "space-1", "space-3", "space-4", "space-6", "space-8", "space-12"],
       "estados": {
         "hover": { "css": [".ftr-link:hover span"] },
         "foco": { "css": [".ftr-link:focus-visible"] }
       },
       "no_aplica": { "presionado": "Enlaces de una lista agrupada: responde el subrayado y el foco (convención de lista de iOS)." },
       "aria": { "patron": "Landmark contentinfo + lista de enlaces", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/contentinfo.html", "atributos": ["aria-labelledby=ftr-title"], "teclado": "Tab entre enlaces." },
-      "qa": ["tests/site.test.mjs", "tools/qa/controles.mjs", "tools/qa/contrast.mjs"],
+      "qa": ["tests/site.test.mjs", "tools/qa/controles.mjs", "tools/qa/contrast.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
-      "decision": "DESIGN.md, «Contacto en un solo lugar» (2026-11-13)."
+      "decision": "DESIGN.md, «Contacto en un solo lugar» (2026-11-13) y «Sistema de guías» (2026-11-15: titular y entradilla de sección, 1–6 | 7–12)."
     },
     {
       "id": "insignia",

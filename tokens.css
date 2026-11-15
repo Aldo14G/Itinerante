@@ -70,6 +70,8 @@
   --ls-titular: -0.01em;
   --t-cuerpo: 400 17px/22px var(--font-texto);
   --ls-cuerpo: -0.005em;
+  --t-lectura: 400 17px/24px var(--font-texto);
+  --ls-lectura: -0.005em;
   --t-llamada: 400 16px/21px var(--font-texto);
   --ls-llamada: 0em;
   --t-subtitulo: 400 15px/20px var(--font-texto);
@@ -141,6 +143,8 @@
   --ancho-contenido: 1152px;
   --sec-movil: 64px;
   --sec-escritorio: 112px;
+  --columnas-rejilla: 12;
+  --canal-rejilla: 32px;
 
   /* Vidrio */
   --filtro-vidrio: blur(18px) saturate(1.6);

@@ -114,7 +114,7 @@ Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y 
 - **Estado seleccionado:** `.btn--secundario[aria-pressed="true"]`
 - **Estado movimiento_reducido:** `.btn:active` — En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo.
 - **ARIA:** Button (https://www.w3.org/WAI/ARIA/apg/patterns/button/) · `aria-pressed` `aria-disabled` `aria-label` · **Teclado:** Enter y Espacio (nativo de <button>); los enlaces con cara de botón, Enter.
-- **QA:** `tools/qa/controles.mjs` `tools/qa/contrast.mjs` `tools/qa/axe.mjs` `tests/critique.test.mjs`
+- **QA:** `tools/qa/controles.mjs` `tools/qa/contrast.mjs` `tools/qa/axe.mjs` `tests/critique.test.mjs` `tools/qa/guias.mjs`
 
 ### BotonGuardar
 
@@ -155,11 +155,11 @@ Píldora de 48 en fondo-3; elegido = primario con la palomita (trazo SVG que se 
 - **Estado ocupado:** `.sk-chip`, HTML `.sk-chip`
 - **Estado movimiento_reducido:** `.motion .is-dibuja > .chip-chk path`, `.chip:active`
 - **ARIA:** Radio Group (https://www.w3.org/WAI/ARIA/apg/patterns/radio/) · `role=radiogroup` `role=radio` `aria-checked` `aria-label` · **Teclado:** Un solo punto de tabulación (el elegido); ← → ↑ ↓ mueven el foco y eligen (wireRadioChips).
-- **QA:** `tools/qa/rail.mjs` `tools/qa/controles.mjs` `tools/qa/inp.mjs` `tools/qa/feed.mjs`
+- **QA:** `tools/qa/rail.mjs` `tools/qa/controles.mjs` `tools/qa/inp.mjs` `tools/qa/feed.mjs` `tools/qa/guias.mjs`
 
 ### Recorrido
 
-Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva. Se guarda en localStorage (iti-recorrido-v2).
+Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva, junto a la nota de la colección y en el eje izquierdo (2026-11-15: 16 px después en su renglón desde 761 px; debajo a 8 en el teléfono). Se guarda en localStorage (iti-recorrido-v2).
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Carrusel3D, Eventos, Café y té, recorrido y profundidad» y «Recorrido que se llena» (2026-11-14).
 - **style.css:** `.rail-conector` `.rail-conector::after` `.rail-conector.is-hecho::after` `.rail-progreso` `.rail-nota-fila` `.rail-note`
@@ -171,7 +171,7 @@ Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre para
 - **hover: no aplica.** No es un control: los chips llevan su propio hover.
 - **foco: no aplica.** No es enfocable; el foco es el de los chips.
 - **ARIA:** Región viva (status) (https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/) · `aria-live=polite` · **Teclado:** El de los chips (radiogroup).
-- **QA:** `tools/qa/rail.mjs` `tools/qa/motion.mjs` `tests/site.test.mjs`
+- **QA:** `tools/qa/rail.mjs` `tools/qa/motion.mjs` `tests/site.test.mjs` `tools/qa/guias.mjs`
 
 ### BarraNavegacion
 
@@ -187,7 +187,7 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 - **Estado actual:** `.hdr-nav a[aria-current="true"]`, app.js `a.setAttribute('aria-current', 'true')`
 - **deshabilitado: no aplica.** Nada se deshabilita en la barra.
 - **ARIA:** Landmark navigation + aria-current (https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html) · `aria-label=Secciones` `aria-current` · **Teclado:** Tab entre enlaces; Enter sigue el enlace.
-- **QA:** `tools/qa/e2e.mjs` `tools/qa/responsive.mjs` `tools/qa/controles.mjs` `tools/qa/axe.mjs`
+- **QA:** `tools/qa/e2e.mjs` `tools/qa/responsive.mjs` `tools/qa/controles.mjs` `tools/qa/axe.mjs` `tools/qa/guias.mjs`
 
 ### MenuHamburguesa
 
@@ -206,7 +206,7 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 - **Estado expandido:** `[aria-expanded="true"] > .menu-lines span:nth-child(1)`, HTML `[aria-expanded="false"]`
 - **Estado movimiento_reducido:** `.motion .menu.is-closing .menu-hoja`, `.menu-btn:active`
 - **ARIA:** Dialog (Modal) + Disclosure (https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) · `aria-expanded` `aria-controls` `aria-labelledby` `aria-current` · **Teclado:** Enter/Espacio abre; foco a la primera sección; Tab atrapado (showModal); Escape, el velo y «atrás» cierran; elegir una sección lleva el foco a su titular.
-- **QA:** `tools/qa/e2e.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs` `tools/qa/motion.mjs` `tools/qa/contrast.mjs`
+- **QA:** `tools/qa/e2e.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs` `tools/qa/motion.mjs` `tools/qa/contrast.mjs` `tools/qa/guias.mjs`
 
 ### BarraInferior
 
@@ -263,35 +263,35 @@ Variante portada (capa 1 del Catálogo): empieza por el libro del medio; bajo é
 
 ### CarruselEventos
 
-Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva).
+Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva): un bloque del ancho de la tarjeta (--bill-w, que escribe measureDescs) con el texto a la izquierda en su sangría de 16 (2026-11-15; antes centrada).
 
 - **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Tarjeta de evento) y «Posiciones de iPhone y contenedor de 1152» (2026-11-14: «Compartir» en la fila de insignias).
 - **style.css:** `.c3d--evento` `.bill-card` `.bill-card-img` `.bill-badges` `.bill-title` `.bill-pie` `.bill-desc` `.bill-share`
 - **index.html:** `[data-bill-track]` `[data-bill-desc]` `[data-bill-pie]` `.bill-item` `.bill-card` `.bill-share`
 - **feed.js:** exporta `initEventos` `initFeed` `eventBadge` `eventOf` `measureDescs` `shareItem` `NO_DATE`
-- **Tokens:** `superficie` `fondo-2` `tinta` `radio-md` `t-titulo-3` `t-cuerpo` `sombra-portada` `space-3` `space-4` `space-6`
+- **Tokens:** `superficie` `fondo-2` `tinta` `radio-md` `t-titulo-3` `t-lectura` `sombra-portada` `space-3` `space-4` `space-6`
 - **Estado actual:** `.c3d-item.is-centro :is(.bill-card, .cafe-card)`
 - **Estado foco:** `.c3d-card:focus-visible`
 - **Estado oculto:** `.c3d-item:not(.is-centro) .bill-share` — «Compartir» solo se ve y se toca en la tarjeta del centro (y sin JavaScript no se ofrece).
 - **vacio: no aplica.** Las propuestas están en el HTML; sin JavaScript cada tarjeta muestra su descripción.
 - **ARIA:** Carousel (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-labelledby (cada article)` `aria-live=polite (descripción)` `aria-label «Compartir «título»» (cada «Compartir»)` · **Teclado:** El del Carrusel3D.
-- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/iphone.mjs`
+- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/iphone.mjs` `tools/qa/guias.mjs`
 
 ### CarruselCarta
 
-Variante carta (Café y té): chips Café · Té y tarjetas tipográficas en superficie con un icono en disco menta, nombre, descripción y, solo si la librería lo da, el precio. Datos en assets/data/menu.json.
+Variante carta (Café y té): chips Café · Té y tarjetas tipográficas 4:3 (desde el 2026-11-15; antes cuadradas) en superficie con un icono en disco menta, nombre (Title 3), descripción en dos renglones parejos y, solo si la librería lo da, el precio. Datos en assets/data/menu.json.
 
-- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Carrusel3D, Eventos, Café y té…» (carta).
+- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Carrusel3D, Eventos, Café y té…» (carta) y «Sistema de guías» (2026-11-15: tarjeta 4:3, nombre en Title 3, chips en el margen izquierdo).
 - **style.css:** `.c3d--carta` `.cafe-carta` `.cafe-chips` `.cafe-card` `.cafe-ic` `.cafe-nombre` `.cafe-desc` `.cafe-precio`
 - **index.html:** `[data-cafe]` `[data-cafe-chips]` `[data-cafe-track]` `[data-cafe-status]` `[data-cafe-live]`
 - **cafe.js:** exporta `initCafe` `validMenu` `precioCarta` `cartaCard` `MENU_URL`
 - **assets/data/menu.json:** datos
-- **Tokens:** `superficie` `menta` `en-menta` `tinta` `tinta-2` `linea` `radio-md` `alto-md` `t-titulo-2` `t-subtitulo` `t-titular` `space-2` `space-5`
+- **Tokens:** `superficie` `menta` `en-menta` `tinta` `tinta-2` `linea` `radio-md` `alto-md` `t-titulo-3` `t-subtitulo` `t-titular` `space-2` `space-5` `space-12`
 - **Estado seleccionado:** `.chip[aria-checked="true"]`
 - **Estado ocupado:** `.cafe-item.card--sk .cafe-card`, HTML `[data-cafe-track][aria-busy="true"]`
 - **Estado vacio:** `.cafe-carta[data-state="vacio"] :is(.cafe-chips, .c3d--carta)`
 - **ARIA:** Carousel + Radio Group (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `role=group` `aria-roledescription=bebida` `aria-checked` · **Teclado:** Chips con flechas; carrusel con ← → Inicio Fin.
-- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs`
+- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/guias.mjs`
 
 ### TarjetaLibro
 
@@ -333,7 +333,7 @@ Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el tel
 
 ### MiLista
 
-«Mi lista para la visita»: libros guardados en localStorage, sin cuenta. Hoja con la lista, «Quitar» por renglón y, fijas al pie, «Cómo llegar» y «Enviar mi lista por WhatsApp». Conteo en la barra inferior, la cabecera y el menú.
+«Mi lista para la visita»: libros guardados en localStorage, sin cuenta. Hoja con la lista, «Quitar» por renglón y, fijas al pie, «Cómo llegar» y «Enviar mi lista por WhatsApp». Conteo en la barra inferior, la cabecera y el menú. En escritorio (diálogo de 520) su margen interior es de 32 (2026-11-15: redefine --margen; el de la página crece con la ventana).
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Hojas) y AGENTS.md (saved.js).
 - **style.css:** `.mylist` `.mylist::backdrop` `.ml-head` `.ml-body` `.ml-items` `.ml-item` `.ml-remove` `.ml-empty` `.ml-error` `.ml-actions` `.count-badge`
@@ -347,7 +347,7 @@ Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el tel
 - **Estado movimiento_reducido:** `.motion .mylist.is-closing`
 - **hover: no aplica.** Las filas no son enlaces; «Quitar» y las acciones del pie llevan el estado de su botón.
 - **ARIA:** Dialog (Modal) (https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) · `aria-labelledby=mylist-title` `role=status (data-ml-status)` · **Teclado:** Igual que la ficha; «Quitar «…» de mi lista» con su título en el nombre.
-- **QA:** `tools/qa/saved.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs`
+- **QA:** `tools/qa/saved.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs` `tools/qa/guias.mjs`
 
 ### CampoBusqueda
 
@@ -385,7 +385,7 @@ Píldora de 48 en fondo-3 con letra de 17 (iOS no acerca la página); con foco, 
 - **Estado error:** `.cat-error`
 - **Estado movimiento_reducido:** catalog.js `if (!isMotion() \|\| !items.length) return;`
 - **ARIA:** Dialog (teléfono) + Checkbox + Disclosure (https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/) · `role=region` `role=search` `role=group` `role=status` `aria-busy` `aria-expanded` `aria-controls` · **Teclado:** Casillas nativas (Espacio); «Ver los 41 títulos» despliega en su sitio y el foco se queda en el botón; Escape cierra la hoja del teléfono.
-- **QA:** `tools/qa/explorer.mjs` `tools/qa/skeleton.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs`
+- **QA:** `tools/qa/explorer.mjs` `tools/qa/skeleton.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs` `tools/qa/guias.mjs`
 
 ### Aviso
 
@@ -403,7 +403,7 @@ Cápsula de vidrio (popover manual, por encima de las hojas) con el mensaje («G
 
 ### EncabezadoSeccion
 
-Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*» (el em en tinta-2, en su renglón) y la entradilla; sin antetítulo. Entra por líneas con su máscara una sola vez.
+Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*» (el em en tinta-2, en su renglón) y la entradilla; sin antetítulo. Entra por líneas con su máscara una sola vez. Una forma por nivel (Sistema de guías, 2026-11-15): «Contacto» (.ftr-title, .ftr-lede) comparte la regla; titular → entradilla 12, cabecera → contenido 24; desde 1024 px, en las columnas 1–6 de la rejilla.
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Encabezado de sección).
 - **style.css:** `.sec-head` `.h2` `.sec-texto` `.linea` `.linea-in`
@@ -414,7 +414,7 @@ Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*�
 - **hover: no aplica.** No es un control.
 - **foco: no aplica.** No es un control (los enlaces de su entradilla llevan el foco global).
 - **ARIA:** Encabezado de sección (h2 + aria-labelledby) (https://www.w3.org/WAI/ARIA/apg/practices/headings/) · `aria-labelledby (en la sección)` · **Teclado:** —
-- **QA:** `tools/qa/piso.mjs` `tools/qa/motion.mjs` `tests/site.test.mjs`
+- **QA:** `tools/qa/piso.mjs` `tools/qa/motion.mjs` `tests/site.test.mjs` `tools/qa/guias.mjs`
 
 ### TiraCasa
 
@@ -444,7 +444,7 @@ SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de
 - **Estado colores_forzados ((forced-colors: active)):** `.mapa-ruta`
 - **hover: no aplica.** Es un enlace grande; el cursor cambia (enlace nativo).
 - **ARIA:** Imagen con nombre dentro de un enlace (https://www.w3.org/WAI/tutorials/images/functional/) · `role=img` `aria-labelledby=mapa-t` · **Teclado:** Enter sigue el enlace.
-- **QA:** `tools/qa/responsive.mjs` `tools/qa/motion.mjs` `tools/qa/axe.mjs`
+- **QA:** `tools/qa/responsive.mjs` `tools/qa/motion.mjs` `tools/qa/axe.mjs` `tools/qa/guias.mjs`
 
 ### InterruptorMovimiento
 
@@ -468,18 +468,18 @@ SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de
 
 ### ContactoPie
 
-El pie es el único lugar con el contacto: titular «Contacto», para qué escribir y WhatsApp · Instagram · Facebook · Correo en una lista agrupada de filas de 56 con su icono; debajo, «Pausar el movimiento».
+El pie es el único lugar con el contacto: titular «Contacto» (titular de sección, Title 1, desde el 2026-11-15), para qué escribir (entradilla en Body) y WhatsApp · Instagram · Facebook · Correo en una lista agrupada de filas de 56 con su icono (desde 1024 px, texto en las columnas 1–6 y lista en 7–12, alineados arriba); debajo, «Pausar el movimiento».
 
-- **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Contacto en un solo lugar» (2026-11-13).
-- **style.css:** `.ftr` `.ftr-contacto` `.ftr-title` `.ftr-lede` `.ftr-links` `.ftr-link` `.ftr-ne`
+- **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Contacto en un solo lugar» (2026-11-13) y «Sistema de guías» (2026-11-15: titular y entradilla de sección, 1–6 | 7–12).
+- **style.css:** `.ftr` `.ftr-contacto` `.ftr-texto` `.ftr-title` `.ftr-lede` `.ftr-links` `.ftr-link` `.ftr-ne`
 - **mobile.css:** `.ftr`
 - **index.html:** `.ftr` `.ftr-links` `.ftr-link` `#ftr-title`
-- **Tokens:** `fondo` `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `radio-md` `radio-sm` `alto-md` `t-titulo-2` `t-subtitulo` `t-cuerpo` `anillo-foco` `space-1` `space-3` `space-4` `space-6` `space-8`
+- **Tokens:** `fondo` `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `radio-md` `radio-sm` `alto-md` `t-titulo-1` `t-cuerpo` `anillo-foco` `canal-rejilla` `space-1` `space-3` `space-4` `space-6` `space-8` `space-12`
 - **Estado hover:** `.ftr-link:hover span`
 - **Estado foco:** `.ftr-link:focus-visible`
 - **presionado: no aplica.** Enlaces de una lista agrupada: responde el subrayado y el foco (convención de lista de iOS).
 - **ARIA:** Landmark contentinfo + lista de enlaces (https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/contentinfo.html) · `aria-labelledby=ftr-title` · **Teclado:** Tab entre enlaces.
-- **QA:** `tests/site.test.mjs` `tools/qa/controles.mjs` `tools/qa/contrast.mjs`
+- **QA:** `tests/site.test.mjs` `tools/qa/controles.mjs` `tools/qa/contrast.mjs` `tools/qa/guias.mjs`
 
 ### Insignia
 

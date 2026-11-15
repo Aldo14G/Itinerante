@@ -77,9 +77,11 @@ export function eventOf(item) {
 }
 
 // Reserva de la descripción (--bill-reserva): la más larga de las propuestas a este ancho, medida de una vez en una copia oculta. Cambiar de
-// tarjeta no mueve lo de abajo (antes se reservaban 3 o 4 renglones fijos).
-export function measureDescs(pie, texts) {
+// tarjeta no mueve lo de abajo (antes se reservaban 3 o 4 renglones fijos). Antes de medir escribe el ancho de la tarjeta central (--bill-w,
+// 2026-11-15, Sistema de guías): la descripción es un bloque de ese ancho bajo su tarjeta, con el texto en la sangría de la tarjeta.
+export function measureDescs(pie, texts, cardWidth = 0) {
   if (!pie?.isConnected || !texts.length) return 0;
+  if (cardWidth > 0) pie.style.setProperty('--bill-w', `${cardWidth}px`);
   const probe = document.createElement('div');
   probe.className = 'bill-medida';
   probe.setAttribute('aria-hidden', 'true');
@@ -113,10 +115,11 @@ export function initEventos({ isMotion = () => false } = {}) {
     }
   }).setItems(items);
   const pie = document.querySelector('[data-bill-pie]');
-  measureDescs(pie, events.map(e => e.text));
-  if ('ResizeObserver' in window) { // otro ancho (giro del teléfono, ventana): se vuelve a medir una vez por fotograma
+  const cardWidth = () => items[0]?.getBoundingClientRect().width ?? 0; // el <li> no se transforma (la pose va en .cf-pose): su ancho es el de la tarjeta
+  measureDescs(pie, events.map(e => e.text), cardWidth());
+  if ('ResizeObserver' in window && items[0]) { // otro ancho de tarjeta (giro del teléfono, ventana): se vuelve a medir una vez por fotograma
     let w = 0, raf = 0;
-    new ResizeObserver(([e]) => { const nw = Math.round(e.contentRect.width); if (nw === w) return; w = nw; if (!raf) raf = requestAnimationFrame(() => { raf = 0; measureDescs(pie, events.map(x => x.text)); }); }).observe(pie);
+    new ResizeObserver(([e]) => { const nw = Math.round(e.contentRect.width * 10); if (nw === w) return; w = nw; if (!raf) raf = requestAnimationFrame(() => { raf = 0; measureDescs(pie, events.map(x => x.text), cardWidth()); }); }).observe(items[0]);
   }
   region.classList.add('is-ready');
 }
