@@ -398,7 +398,7 @@ async function boot() {
   };
   nearby($('[data-ev]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
 
-  // ---------- Café y té: la carta (Carrusel3D, variante carta) se pide al acercarse ----------
+  // ---------- Café y té: la carta (parrilla por categorías, cafe.js) se pide al acercarse ----------
   nearby($('[data-cafe]'), () => import('./cafe.js').then(m => m.initCafe({ isMotion })).catch(() => {}));
 
   await yieldNow();

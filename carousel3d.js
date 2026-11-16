@@ -1,11 +1,12 @@
-// Carrusel3D: un solo motor para los tres carruseles del sitio (2026-11-13). Variantes: «portada» (libros del Catálogo, rail.js),
-// «evento» (Eventos y talleres, feed.js) y «carta» (Café y té, cafe.js). Lo mismo para las tres:
+// Carrusel3D: el motor del carrusel de portadas del Catálogo (rail.js, variante «portada»). Nació el 2026-11-13 como motor único de tres
+// carruseles; el 2026-11-16 Eventos pasó a destacado y lista por fecha (feed.js) y la carta de Café y té a una parrilla (cafe.js), y sus
+// variantes «evento» y «carta» se retiraron. Lo que hace:
 //   · desplazamiento nativo con imán al centro (scroll-snap en CSS); una pose por fotograma según la distancia al centro (giro hasta
 //     --giro-carrusel, profundidad y empuje hacia fuera: las vecinas asoman separadas de la central, con hueco, sin encimarse);
 //     solo la central lleva sombra-portada (CSS: .is-centro);
 //   · flechas de vidrio de 48 a los lados con puntero fino (con toque no se muestran: el control es deslizar o tocar la vecina); una sola
 //     parada de tabulador (la pieza central), con ← → Inicio Fin;
-//   · tocar una vecina la trae al centro; tocar la central la abre (onOpen, si la variante tiene qué abrir);
+//   · tocar una vecina la trae al centro; tocar la central la abre (onOpen: la ficha del libro);
 //   · sin autoplay; con «reducir movimiento» o «Pausar el movimiento», plano: la misma geometría sin giro (las vecinas en el sitio de su
 //     silueta girada, con su imagen atenuada; el texto no pierde contraste);
 //   · profundidad (A5): con puntero fino y hover, la pieza central se inclina hacia el cursor (hasta --inclinacion-max) y se adelanta
@@ -17,7 +18,7 @@ import { DUR } from './motion.js';
 // ---------- Parte pura ----------
 // La pieza del centro va de frente; cada vecina gira hacia el centro según su distancia `d` (en anchos de pieza, con signo), se hunde y se
 // empuja hacia fuera: queda separada de la central por un hueco visible (≥ 12 px en todos los tamaños; skill ux-apple §3, 2026-11-13).
-// Los parámetros de la pose van en anchos de pieza y salen del CSS de cada carrusel (.c3d: --c3d-giro, --c3d-separa, --c3d-hunde,
+// Los parámetros de la pose van en anchos de pieza y salen del CSS del carrusel (.c3d: --c3d-giro, --c3d-separa, --c3d-hunde,
 // --c3d-separa-lejos, --c3d-hunde-lejos, --c3d-alcance); la perspectiva de la ventana es 4 anchos de pieza (--perspectiva-carrusel-piezas).
 //   giro: giro de la vecina (grados) · separa: empuje hacia fuera de la vecina (d = 1) · hunde: profundidad de la vecina
 //   separaLejos / hundeLejos: lo mismo por cada ancho más allá de la vecina · alcance: piezas por lado a la vista (1 o 2).
@@ -73,7 +74,7 @@ export function tiltPose(px, py, max = 6) {
 }
 export const tiltTransform = ({ rx, ry }, { adelanto = 12, perspectiva = 800 } = {}) => `perspective(${perspectiva}px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${adelanto}px)`;
 
-// ---------- Fila de chips (radiogroup): Narrativa · Poesía · Ensayo en el Catálogo, Café · Té en la carta ----------
+// ---------- Fila de chips (radiogroup): Narrativa · Poesía · Ensayo en el Catálogo ----------
 // Un solo punto de tabulación (el elegido), flechas para moverse y elegir. `choose(chip)` decide qué hacer; `current()` dice cuál está elegido.
 export function wireRadioChips(group, { selector = '.chip', current, choose }) {
   const all = () => [...group.querySelectorAll(selector)];
@@ -115,7 +116,7 @@ export function checkChip(group, id, selector = '.chip') {
 }
 
 // ---------- Profundidad (A5) ----------
-// La pieza que se inclina se marca con data-inclina (la central de cada carrusel y, en escritorio, la tarjeta de la rejilla). Solo con puntero
+// La pieza que se inclina se marca con data-inclina (la portada central del carrusel y, en escritorio, la tarjeta de la rejilla). Solo con puntero
 // fino que pasa por encima (pointer: fine y hover: hover) y con movimiento (clase motion de <html>). El transform se escribe una vez por
 // fotograma; al salir se borra y CSS lo devuelve con curva-resorte.
 let depthWired = false;
@@ -161,8 +162,8 @@ export function initDepth() {
 // blanco del imán. `focusSel` es lo que recibe el foco dentro de cada pieza (la parada de tabulador). `onCenter(i)` se llama cuando cambia la
 // pieza central; `liveText(i)` (si hay `live`) se anuncia cuando una flecha o el teclado traen una pieza al centro; `onOpen(i, el)` corre al
 // tocar la central; `onUserMove()` avisa que la persona movió el carrusel (dedo, rueda, flecha o tecla).
-export function createCarousel3D({ viewport, track, prev, next, live = null, isMotion = () => false, focusSel = '.c3d-card', onCenter = () => {}, liveText = null, onOpen = null, onUserMove = () => {} }) {
-  // Parámetros de la pose de este carrusel: los pone su CSS (.c3d, por variante y por ancho) y se releen al medir (cambian con el ancho).
+export function createCarousel3D({ viewport, track, prev, next, live = null, isMotion = () => false, focusSel = '.card', onCenter = () => {}, liveText = null, onOpen = null, onUserMove = () => {} }) {
+  // Parámetros de la pose de este carrusel: los pone su CSS (.c3d, por ancho) y se releen al medir (cambian con el ancho).
   const host = viewport.closest('.c3d') || viewport;
   let cfg = { ...POSE };
   const readPose = () => {

@@ -1,4 +1,5 @@
-// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar, ficha, flecha de Eventos, chip y flecha de Café,
+// INP con CPU limitada: clics reales (Input.dispatchMouseEvent) en el menú ☰ (abrir/cerrar, con velo), Mi lista (abrir/cerrar), chip del carrusel, guardar, ficha, «Añadir al calendario» de Eventos
+// (con un evento de prueba que inyecta esta herramienta: Fetch de CDP sobre eventos.json; no está en el repo), chip y flecha de Café,
 // carrusel 3D, «Buscar en el catálogo» (la hoja Explorar con los 41 títulos) y la ficha desde la rejilla.
 // Uso: node tools/qa/inp.mjs URL [corridas=3] [cpu=4] [ancho=393] [alto=659]   (por omisión, el iPhone 16 en Safari desde el 2026-11-14; antes 390×844)
 // Cada corrida carga la página en frío. Mide con PerformanceObserver `event` (durationThreshold 16 ms, interacciones con
@@ -21,11 +22,17 @@ let id = 0; const pend = new Map(); const errs = [];
 ws.addEventListener('message', e => {
   const m = JSON.parse(e.data);
   if (m.id && pend.has(m.id)) { pend.get(m.id)(m); pend.delete(m.id); }
+  else if (m.method === 'Fetch.requestPaused') send('Fetch.fulfillRequest', { requestId: m.params.requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body: Buffer.from(JSON.stringify(EVENTO_DE_PRUEBA)).toString('base64') });
   else if (m.method === 'Runtime.exceptionThrown') errs.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
 });
 const send = (method, params = {}) => new Promise(r => { const i = ++id; pend.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 const ev = async x => (await send('Runtime.evaluate', { expression: x, awaitPromise: true, returnByValue: true })).result?.result?.value;
 await send('Page.enable'); await send('Runtime.enable');
+// Evento de prueba (dentro de cinco días, hora de Monterrey): da un destacado con «Añadir al calendario». Las descargas van a una carpeta temporal.
+const enDias = n => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + n * 86_400_000));
+const EVENTO_DE_PRUEBA = { eventos: [{ id: 'prueba-inp', tipo: 'Lectura', titulo: 'Evento de prueba', fecha: enDias(5), hora: '18:57', fin: null, con: null, descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null }] };
+await send('Fetch.enable', { patterns: [{ urlPattern: '*eventos.json*' }] });
+await send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath: mkdtempSync(join(tmpdir(), 'iti-inp-ics-')) });
 
 const click = async sel => {
   const p = await ev(`(() => { const e = document.querySelector(${JSON.stringify(sel)}); if (!e) return null; e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
@@ -72,8 +79,9 @@ const steps = [
   // Carrusel 3D: la flecha (con toque, la vecina de la derecha) y el toque en una vecina mueven el centro (el giro se pinta por fotograma).
   ['carrusel flecha', async () => { await sleep(600); await siguiente('[data-rail-next]', '[data-rail-c3d]'); }],
   ['carrusel vecina', async () => { await click('.rail-item.is-centro + .rail-item .card'); }],
-  // Eventos y Café (Carrusel3D, variantes evento y carta): la flecha mueve el centro y la fila de acciones lo sigue; el chip «Té» cambia la carta.
-  ['eventos flecha', async () => { await ev(`document.querySelector('[data-bill-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await siguiente('[data-bill-next]', '[data-bill-c3d]'); }],
+  // Eventos (2026-11-16: destacado y lista por fecha): «Añadir al calendario» arma y descarga el .ics (solo existe con un evento con fecha: lo da
+  // el evento de prueba que inyecta esta herramienta). Café (Carrusel3D, variante carta): el chip «Té» cambia la carta y la flecha mueve el centro.
+  ['eventos calendario', async () => { await ev(`document.querySelector('.ev-prox').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('.ev-prox [data-ev-cal]'); }],
   ['café chip', async () => { await ev(`document.querySelector('[data-cafe-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('.cafe-chip:not([aria-checked=true])'); }],
   ['café flecha', async () => { await sleep(600); await siguiente('[data-cafe-next]', '[data-cafe-c3d]'); }],
   // Explorar con los 41 títulos sin paginar (hoja en el teléfono, en línea en escritorio): abrir la búsqueda y abrir y cerrar la ficha de una tarjeta.

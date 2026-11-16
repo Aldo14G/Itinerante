@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 25 componentes (versión 2026-11-14). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 29 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -21,8 +21,12 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | BarraInferior | — | sí | sí |  |  | sí |  |  |  |  |  |
 | Carrusel3D | — | sí | sí | sí |  | sí |  |  |  |  | sí |
 | CarruselPortadas (variante de Carrusel3D) |  |  |  |  |  | sí |  | sí |  | sí |  |
-| CarruselEventos (variante de Carrusel3D) |  | sí |  |  |  | sí |  |  | — |  |  |
-| CarruselCarta (variante de Carrusel3D) |  |  |  |  | sí |  |  | sí | sí |  |  |
+| EventoDestacado | — | sí |  |  |  |  |  |  | sí | sí | sí |
+| ListaEventos | — | sí |  |  |  |  |  |  | sí | sí | sí |
+| BloqueFecha | — | — |  |  |  |  |  |  |  |  |  |
+| AvisoEvento | sí | sí |  |  |  |  |  |  |  |  |  |
+| BarraCategorias | sí | sí | sí |  |  | sí |  | sí | sí |  | sí |
+| TarjetaProducto | — | — | — |  |  |  |  | sí | sí | sí |  |
 | TarjetaLibro | sí | sí | sí |  |  |  |  | sí |  |  | sí |
 | FichaLibro | sí | sí | sí |  |  |  |  |  |  |  | sí |
 | MiLista | — | sí |  |  |  |  |  |  | sí | sí | sí |
@@ -140,9 +144,9 @@ Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y 
 Píldora de 48 en fondo-3; elegido = primario con la palomita (trazo SVG que se dibuja al elegir). En fila es un radiogroup (colecciones del Catálogo, Café · Té); en Explorar, el filtro activo (.cat-chip) y el botón «Filtros».
 
 - **Tipo:** control · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Chip) y «Ronda de animaciones» (palomita que se dibuja).
-- **Variantes:** `.chip` radio (role=radio dentro de role=radiogroup (rail.js chipNode, cafe.js).); `.cat-chip` filtro-activo (Filtro aplicado en Explorar, con su × para quitarlo.); `.cat-filters-btn` filtros (Abre los filtros hasta 1100 px (aria-expanded).)
+- **Variantes:** `.chip` radio (role=radio dentro de role=radiogroup (rail.js chipNode). En la carta el chip es un enlace de la BarraCategorias (.ct-chip).); `.cat-chip` filtro-activo (Filtro aplicado en Explorar, con su × para quitarlo.); `.cat-filters-btn` filtros (Abre los filtros hasta 1100 px (aria-expanded).)
 - **style.css:** `.chip` `.chip-chk` `.cat-chip` `.cat-filters-btn` `.rail-chips`
-- **index.html:** `[data-rail-chips]` `[data-cafe-chips]` `[data-cat-filters-btn]` `.rail-chips`
+- **index.html:** `[data-rail-chips]` `[data-cat-filters-btn]` `.rail-chips`
 - **carousel3d.js:** exporta `wireRadioChips` `checkMark` `checkChip`
 - **rail.js:** exporta `chipNode`
 - **motion.js:** exporta `drawCheck`
@@ -227,17 +231,17 @@ Solo ≤ 760 px: cápsula de vidrio de 49 × 228 con Inicio, Catálogo y Mi list
 
 ### Carrusel3D
 
-Un solo motor para los tres carruseles: desplazamiento nativo con imán al centro y una pose por fotograma según la distancia al centro (giro hasta 44°, hueco ≥ 12 px con la vecina). Solo la central con sombra-portada; flechas de vidrio de 48 solo con puntero fino; plano y con la imagen de las vecinas atenuada sin movimiento.
+El motor del carrusel de portadas del Catálogo (los de Eventos y de la carta se retiraron el 2026-11-16: ahora son una lista y una parrilla): desplazamiento nativo con imán al centro y una pose por fotograma según la distancia al centro (giro hasta 44°, hueco ≥ 12 px con la vecina). Solo la central con sombra-portada; flechas de vidrio de 48 solo con puntero fino; plano y con la imagen de las vecinas atenuada sin movimiento.
 
 - **Tipo:** control · **desde** 2026-11-13 · DESIGN.md, «Carrusel3D, Eventos, Café y té…» y «Norma del Carrusel3D afinada»; skill ux-apple §3.
-- **Variantes:** `.c3d--portada` portada (Catálogo (rail.js): CarruselPortadas.); `.c3d--evento` evento (Eventos y talleres (feed.js).); `.c3d--carta` carta (Café y té (cafe.js).)
-- **style.css:** `.c3d` `.c3d-viewport` `.c3d-track` `.cf-pose` `.c3d-flecha` `.c3d-flecha--prev` `.c3d-flecha--next` `.c3d-card` `.c3d--portada` `.c3d--evento` `.c3d--carta`
-- **index.html:** `.c3d` `.c3d-viewport` `.c3d-track` `.c3d-flecha` `[data-rail-c3d]` `[data-bill-c3d]` `[data-cafe-c3d]`
+- **Variantes:** `.c3d--portada` portada (Catálogo (rail.js): CarruselPortadas.)
+- **style.css:** `.c3d` `.c3d-viewport` `.c3d-track` `.cf-pose` `.c3d-flecha` `.c3d-flecha--prev` `.c3d-flecha--next` `.c3d--portada`
+- **index.html:** `.c3d` `.c3d-viewport` `.c3d-track` `.c3d-flecha` `[data-rail-c3d]`
 - **carousel3d.js:** exporta `createCarousel3D` `coverflowPose` `nearestIndex` `keyTarget` `CF_GIRO` `POSE` `ATENUADA` `initDepth` `tiltPose` `tiltTransform`
 - **Tokens:** `giro-carrusel` `perspectiva-carrusel-piezas` `inclinacion-max` `adelanto-profundidad` `perspectiva-inclinacion` `sombra-portada` `sombra-flotante` `alto-md` `space-2` `space-3` `space-4` `space-6` `space-12` `margen-movil` `anillo-foco` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte`
-- **Estado foco:** `.c3d-card:focus-visible`, `.btn:focus-visible` — Una sola parada de tabulador: la pieza central (o su botón).
+- **Estado foco:** `.rail-item .card:focus-visible .cover`, `.btn:focus-visible` — Una sola parada de tabulador: la portada central (su anillo se dibuja en la portada).
 - **Estado deshabilitado:** `.c3d-flecha:disabled`
-- **Estado actual:** `.c3d-item.is-centro :is(.bill-card, .cafe-card)`, `.rail-item.is-centro .cover` — La central: estado solo visual; la región viva anuncia la pieza que llega.
+- **Estado actual:** `.rail-item.is-centro .cover` — La central: estado solo visual; la región viva anuncia la pieza que llega.
 - **Estado presionado:** `.motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active`
 - **Estado tactil ((hover: none) and (pointer: coarse)):** `.c3d-flecha` — Con toque no hay flechas: deslizar o tocar la vecina (WCAG 2.5.7).
 - **Estado plano:** `.c3d-item.is-atenuada img` — Sin movimiento (reducir movimiento o «Pausar el movimiento») el motor pinta la misma geometría sin giro y atenúa la imagen de las vecinas al 60 % (ATENUADA); el texto conserva su contraste.
@@ -261,37 +265,111 @@ Variante portada (capa 1 del Catálogo): empieza por el libro del medio; bajo é
 - **ARIA:** Carousel (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-label=Libros de la colección …` `aria-haspopup=dialog` · **Teclado:** El del Carrusel3D; Enter en la central abre la ficha.
 - **QA:** `tools/qa/rail.mjs` `tools/qa/carrusel.mjs` `tools/qa/skeleton.mjs`
 
-### CarruselEventos
+### EventoDestacado
 
-Variante evento: tarjetas en superficie con radio 20, foto real 4:3 (16:9 en ventanas de hasta 700 px de alto), insignias de tipo y estado («Propuesta · sin fecha» o la fecha de data-fecha) con «Compartir» (icono menta de 44, solo en la central) al final de su fila, y el título; debajo, la descripción de la central (región viva con su reserva): un bloque del ancho de la tarjeta (--bill-w, que escribe measureDescs) con el texto a la izquierda en su sangría de 16 (2026-11-15; antes centrada).
+El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): tarjeta en superficie con sombra-flotante, foto 16:9 o cartel entero y cuadrado (encuadre), BloqueFecha, insignias «Próximo» (u «Hoy»), tipo y ciclo, título (Title 3), «Sábado 21 de noviembre · 18:57 · …», descripción, costo tal como lo da la librería y acciones: la reserva del evento como primaria de 56 («Registrarme», enlace a Luma en otra pestaña, o «Reservar por WhatsApp» con el mensaje escrito; sin reserva, «Añadir al calendario») y los iconos de 56 «Añadir al calendario» y «Compartir». Desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. Solo existe con un evento con fecha vigente.
 
-- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Tarjeta de evento) y «Posiciones de iPhone y contenedor de 1152» (2026-11-14: «Compartir» en la fila de insignias).
-- **style.css:** `.c3d--evento` `.bill-card` `.bill-card-img` `.bill-badges` `.bill-title` `.bill-pie` `.bill-desc` `.bill-share`
-- **index.html:** `[data-bill-track]` `[data-bill-desc]` `[data-bill-pie]` `.bill-item` `.bill-card` `.bill-share`
-- **feed.js:** exporta `initEventos` `initFeed` `eventBadge` `eventOf` `measureDescs` `shareItem` `NO_DATE`
-- **Tokens:** `superficie` `fondo-2` `tinta` `radio-md` `t-titulo-3` `t-lectura` `sombra-portada` `space-3` `space-4` `space-6`
-- **Estado actual:** `.c3d-item.is-centro :is(.bill-card, .cafe-card)`
-- **Estado foco:** `.c3d-card:focus-visible`
-- **Estado oculto:** `.c3d-item:not(.is-centro) .bill-share` — «Compartir» solo se ve y se toca en la tarjeta del centro (y sin JavaScript no se ofrece).
-- **vacio: no aplica.** Las propuestas están en el HTML; sin JavaScript cada tarjeta muestra su descripción.
-- **ARIA:** Carousel (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-labelledby (cada article)` `aria-live=polite (descripción)` `aria-label «Compartir «título»» (cada «Compartir»)` · **Teclado:** El del Carrusel3D.
-- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/iphone.mjs` `tools/qa/guias.mjs`
+- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **Variantes:** `.ev-prox` foto (Fotografía 16:9 (teléfono) o a todo el alto de la mitad 7–12 (escritorio), recortada (cover).); `.ev-prox--cartel` cartel (Cartel cuadrado con texto: entero, 1:1, nunca recortado (contain sobre fondo-3).)
+- **style.css:** `.ev-prox` `.ev-prox--cartel` `.ev-prox-fig` `.ev-prox-img` `.ev-prox-cuerpo` `.ev-prox-enc` `.ev-prox-cab` `.ev-prox-tit` `.ev-prox-meta` `.ev-prox-desc` `.ev-costo` `.ev-acc` `.ev-rot`
+- **index.html:** `[data-ev]` `[data-ev-lede]`
+- **feed.js:** exporta `initEventos` `destacadoNode` `eventosNodes` `eventosPlan` `validEventos` `eventosProblems` `validReserva` `validRegistro` `validTelefono` `reservaUrl` `reservaMessage` `metaLine` `quienLine` `icsOf` `downloadIcs` `shareEvento` `shareData` `onAct` `registroName` `reservaName` `calName` `shareName` `EVENTOS_URL` `LUGAR` · internas `reservaLink` `calButton` `shareButton` `costoNode` `enterOnView` · ganchos `dataset.fuente = 'anuncio'` `a.rel = 'noopener noreferrer'` `new CustomEvent('iti:primarias')`
+- **assets/data/eventos.json:** datos
+- **Tokens:** `superficie` `fondo-3` `tinta` `tinta-2` `radio-lg` `sombra-flotante` `t-titulo-3` `t-subtitulo` `t-lectura` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-5` `space-8` `space-20` `dur-rapida` `dur-lenta` `escalon-linea`
+- **Estado foco:** `.btn:focus-visible` — La tarjeta no es un control: el foco va a sus tres acciones.
+- **Estado vacio:** feed.js `if (plan.destacado) out.push(destacadoNode(plan.destacado, now));` — Sin un evento con fecha vigente no hay destacado (por diseño): queda la lista de propuestas.
+- **Estado error:** feed.js `img.addEventListener('error', () => fig.remove())` — Si la imagen no carga, el destacado queda sin figura; si eventos.json no llega, queda lo que trae index.html.
+- **Estado movimiento_reducido:** `.motion .ev-espera`, feed.js `if (!isMotion() \|\| !('IntersectionObserver' in window)) return;` — La entrada (8 px y opacidad, dur-rapida) solo corre con movimiento y solo en lo que aún no se ve; sin movimiento todo está colocado.
+- **hover: no aplica.** La tarjeta no es un control; sus botones usan el hover de Boton.
+- **ARIA:** Article + Link + Button (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `aria-labelledby (el article toma el título)` `aria-label «Registrarme en «título» (abre Luma en otra pestaña)»` `aria-label «Reservar por WhatsApp para «título»»` `aria-label «Añadir «título» al calendario»` `aria-label «Compartir «título»»` `aria-hidden en el bloque de fecha (la fecha va en texto)` `target=_blank + rel=noopener noreferrer` · **Teclado:** Tab recorre la reserva, el calendario y «Compartir»; Enter o Espacio los activan.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/hojas.mjs` `tools/qa/inp.mjs` `tests/site.test.mjs`
 
-### CarruselCarta
+### ListaEventos
 
-Variante carta (Café y té): chips Café · Té y tarjetas tipográficas 4:3 (desde el 2026-11-15; antes cuadradas) en superficie con un icono en disco menta, nombre (Title 3), descripción en dos renglones parejos y, solo si la librería lo da, el precio. Datos en assets/data/menu.json.
+Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un rótulo por día («26 nov jueves» sobre una línea punteada) y, al final, «Propuestas, aún sin fecha». Cada TarjetaEvento es una tarjeta horizontal en superficie con radio 20: hora y tipo (o tipo y «Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 a la derecha; con fecha lleva la reserva (secundaria de 48) y el calendario; una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.
 
-- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-13 · DESIGN.md, «Carrusel3D, Eventos, Café y té…» (carta) y «Sistema de guías» (2026-11-15: tarjeta 4:3, nombre en Title 3, chips en el margen izquierdo).
-- **style.css:** `.c3d--carta` `.cafe-carta` `.cafe-chips` `.cafe-card` `.cafe-ic` `.cafe-nombre` `.cafe-desc` `.cafe-precio`
-- **index.html:** `[data-cafe]` `[data-cafe-chips]` `[data-cafe-track]` `[data-cafe-status]` `[data-cafe-live]`
-- **cafe.js:** exporta `initCafe` `validMenu` `precioCarta` `cartaCard` `MENU_URL`
+- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **style.css:** `.ev` `.ev-despues` `.ev-lista` `.ev-sub` `.ev-dias` `.ev-dia-tit` `.ev-filas` `.ev-card` `.ev-card-txt` `.ev-card-img` `.ev-card-tit` `.ev-card-meta` `.ev-card-desc` `.ev-card-acc` `.ev-hora` `.ev-lado` `.ev-lado-tit` `.ev-lado-txt` `.ev-espera`
+- **index.html:** `#cartelera` `.ev-lista` `.ev-propuestas` `.ev-filas` `.ev-fila` `.ev-card` `.ev-card-img` `.ev-card-desc` `[data-ev-when]`
+- **feed.js:** exporta `cardNode` `eventosNodes` `notaCopy` `diaCorto` `horario` `eventBadge` `NO_DATE` · internas `listNode` `notaNode` `staticSignature` `planSignature`
+- **Tokens:** `superficie` `fondo-2` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `linea-fuerte` `radio-md` `radio-sm` `radio-portada` `portada-evento` `portada-evento-amplia` `t-titulo-3` `t-titular` `t-cuerpo` `t-subtitulo` `t-lectura` `anillo-foco` `canal-rejilla` `space-2` `space-3` `space-4` `space-5` `space-6` `space-8` `space-12`
+- **Estado foco:** `.ev-lado-txt a:focus-visible`, `.btn:focus-visible` — La tarjeta no es un control: el foco va a sus acciones y al enlace de la nota.
+- **Estado vacio:** feed.js `if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }` — Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»); una propuesta no lleva acciones.
+- **Estado error:** feed.js `catch { delete root.dataset.ready; return; }` — Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio.
+- **Estado movimiento_reducido:** `.motion .ev-espera`
+- **hover: no aplica.** Las tarjetas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton.
+- **ARIA:** List + Article (https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/) · `ul / li` `aria-labelledby (cada article y cada día)` `aria-label «Propuestas» (grupo sin rótulo visible)` `aria-label de cada acción con el título del evento` · **Teclado:** Tab recorre las acciones de cada tarjeta en el orden de lectura; nada que deslizar.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/iphone.mjs` `tools/qa/e2e.mjs` `tests/site.test.mjs`
+
+### BloqueFecha
+
+Bloque de 64 × 72 en primario con el día de la semana, el número (Title 1 en 700) y el mes del evento destacado: lo primero que se lee de un anuncio. Es decorativo (aria-hidden): la fecha completa va en texto en el renglón de al lado.
+
+- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **style.css:** `.ev-fecha`
+- **feed.js:** exporta `fechaBloque` `fechaLarga` · internas `fechaNode`
+- **Tokens:** `primario` `en-primario` `radio-md` `space-16` `space-2` `t-titulo-1` `t-leyenda-1`
+- **Estado oculto:** feed.js `box.setAttribute('aria-hidden', 'true');` — Oculto para lectores de pantalla: la fecha se lee en «Sábado 21 de noviembre · 18:57».
+- **hover: no aplica.** No es un control.
+- **foco: no aplica.** No es un control.
+- **ARIA:** Texto decorativo (sin rol) (https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/) · `aria-hidden=true` · **Teclado:** —
+- **QA:** `tools/qa/feed.mjs` `tests/site.test.mjs`
+
+### AvisoEvento
+
+Renglón del inicio «Próximo: Sáb 21 nov · título» (el día del evento, «Hoy · 18:57 · título») que lleva a Eventos, y el punto de «Eventos» en la barra de escritorio y en el menú ☰. Solo con un evento con fecha vigente. Mismo mecanismo que el control de Novedades: boot.js reserva el renglón antes del primer render (ev-hint) si la visita anterior dejó un evento vigente; si no coincide, se corrige con el inicio fuera de la vista. En el teléfono la foto cede sus 28 px y las posiciones fijas no cambian.
+
+- **Tipo:** control · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **style.css:** `.entry-ev` `.entry-ev-txt` `.ev-dot`
+- **mobile.css:** `.ev-hint .entry-media` `.ev-hint.news-hint .entry-news`
+- **index.html:** `[data-ev-cta]` `[data-ev-cta-text]` `[data-ev-dot]` `[data-ev-sr]`
+- **feed.js:** exporta `initEventosAviso` `avisoLine` · internas `applyAviso` `settleHint` · ganchos `iti-ev-hasta`
+- **assets/js/boot.js:** ganchos `iti-ev-hasta` `ev-hint`
+- **Tokens:** `turquesa-texto` `primario` `alto-sm` `radio-sm` `t-subtitulo` `anillo-foco` `space-2` `space-3`
+- **Estado hover:** `.entry-ev:hover .entry-ev-txt`
+- **Estado foco:** `.entry-ev:focus-visible`
+- **Estado oculto:** `.ev-hint .entry-ev`, `.ev-dot[hidden]`, HTML `[data-ev-cta][hidden]` — Sin evento con fecha no existe: ni el renglón ni el punto.
+- **ARIA:** Link (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `href=#cartelera` `el punto es aria-hidden: «, próximo: Sáb 21 nov · título» va en .sr-only` · **Teclado:** Enlace: Enter.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/iphone.mjs` `tools/qa/guias.mjs` `tests/site.test.mjs`
+
+### BarraCategorias
+
+Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría. Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra; sin palomita, para que los chips no cambien de ancho al desplazar). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.
+
+- **Tipo:** control · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **style.css:** `.ct-nav` `.ct-chip` `.ct` `.ct-grupo` `.ct-grupo-tit`
+- **mobile.css:** `.ct-nav .chip`
+- **index.html:** `[data-cafe]` `[data-ct-nav]` `.ct-nav`
+- **cafe.js:** exporta `initCafe` `chipNode` `currentGroup` `groupId` · ganchos `chip.setAttribute('aria-current', 'true')` `new IntersectionObserver(` `behavior: isMotion() ? 'smooth' : 'auto'`
+- **Tokens:** `primario` `en-primario` `fondo-3` `tinta` `linea` `alto-md` `radio-pildora` `radio-portada` `t-chip` `anillo-foco` `space-2` `space-3` `space-4` `space-6` `canal-rejilla`
+- **Estado hover:** `:is(.chip:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover`, `.ct-chip[aria-current="true"]:hover` — El de Chip; el actual conserva el primario.
+- **Estado foco:** `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`, `.ct-grupo-tit:focus-visible` — Al llegar por su chip, el foco pasa al título del grupo.
+- **Estado presionado:** `.chip:active`
+- **Estado actual:** `.ct-chip[aria-current="true"]`, cafe.js `chip.setAttribute('aria-current', 'true')` — El grupo a la vista: color y aria-current (dos canales).
+- **Estado ocupado:** `.sk-chip` — Mientras llega menu.json, dos chips de esqueleto.
+- **Estado vacio:** `.ct[data-state="vacio"]` — Sin carta (o sin JavaScript) no hay barra: quedan la foto y el cierre.
+- **Estado movimiento_reducido:** cafe.js `behavior: isMotion() ? 'smooth' : 'auto'` — Sin movimiento el salto al grupo es inmediato.
+- **ARIA:** Navigation (enlaces dentro de la página) (https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/) · `nav con aria-label «Categorías de la carta»` `aria-current=true en el chip del grupo a la vista` `href=#carta-<id>` · **Teclado:** Tab recorre los chips; Enter lleva al grupo y deja el foco en su título.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/iphone.mjs` `tools/qa/inp.mjs` `tools/qa/controles.mjs` `tests/site.test.mjs`
+
+### TarjetaProducto
+
+Producto de la carta en la parrilla (2 columnas en el teléfono, 3 desde 761 y 4 desde 1024, en las columnas 4–12): recuadro cuadrado con la foto del producto si la trae (campo foto de menu.json, local y registrada) o, sin foto, el icono de su categoría (taza, tetera, plato) sobre fondo-3; debajo el nombre (Headline), la descripción (Subheadline, renglones parejos, sin cortar con «…») y el precio solo si la librería lo dio («$NN MXN», data-fuente="carta"). No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3; la sección cierra con «Pídelo en la barra de la sala.» y «Cómo llegar».
+
+- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **style.css:** `.ct-lista` `.ct-rejilla` `.ct-prod` `.ct-foto` `.ct-ic` `.ct-txt` `.ct-nom` `.ct-desc` `.ct-precio` `.ct-cierre` `.cafe-foto`
+- **index.html:** `[data-ct-lista]` `.ct-rejilla` `.ct-prod` `.ct-cierre` `.cafe-foto`
+- **cafe.js:** exporta `productNode` `groupNode` `validMenu` `menuProblems` `validFoto` `precioCarta` `MENU_URL` · internas `iconNode` · ganchos `s.dataset.fuente = 'carta'`
 - **assets/data/menu.json:** datos
-- **Tokens:** `superficie` `menta` `en-menta` `tinta` `tinta-2` `linea` `radio-md` `alto-md` `t-titulo-3` `t-subtitulo` `t-titular` `space-2` `space-5` `space-12`
-- **Estado seleccionado:** `.chip[aria-checked="true"]`
-- **Estado ocupado:** `.cafe-item.card--sk .cafe-card`, HTML `[data-cafe-track][aria-busy="true"]`
-- **Estado vacio:** `.cafe-carta[data-state="vacio"] :is(.cafe-chips, .c3d--carta)`
-- **ARIA:** Carousel + Radio Group (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `role=group` `aria-roledescription=bebida` `aria-checked` · **Teclado:** Chips con flechas; carrusel con ← → Inicio Fin.
-- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/guias.mjs`
+- **Tokens:** `fondo` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `radio-md` `radio-portada` `icono-producto` `t-titulo-3` `t-titular` `t-subtitulo` `t-cuerpo` `space-1` `space-2` `space-3` `space-6` `space-8` `space-12` `space-20`
+- **Estado ocupado:** `.ct-prod.card--sk :is(.ct-nom, .ct-desc)`, HTML `[data-ct-lista][aria-busy="true"]` — Cuatro tarjetas de esqueleto del tamaño de las reales.
+- **Estado vacio:** `.ct[data-state="vacio"]`, cafe.js `root.dataset.state = 'vacio';` — Sin carta válida no se promete nada: quedan la foto y el cierre.
+- **Estado error:** cafe.js `img.addEventListener('error', () => img.remove());` — Si la foto de un producto falla, queda el icono de su categoría.
+- **hover: no aplica.** No es un control: no abre nada.
+- **foco: no aplica.** No es un control.
+- **presionado: no aplica.** No es un control.
+- **ARIA:** List (grupos con su título) (https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/) · `section con aria-labelledby (el título del grupo)` `ul / li` `h4 por producto` `alt en la foto del producto; el icono es aria-hidden` `aria-busy mientras carga` · **Teclado:** —
+- **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/iphone.mjs` `tools/qa/responsive.mjs` `tests/site.test.mjs`
 
 ### TarjetaLibro
 

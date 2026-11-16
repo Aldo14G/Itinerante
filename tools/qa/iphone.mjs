@@ -1,5 +1,7 @@
 // Llegar a cada sección en iPhone reales (2026-11-14, pedido de Aldo: «no corresponde con las dimensiones correctas de iPhone»).
-// node tools/qa/iphone.mjs URL [DIR]   (DIR: capturas e iphone.json; por omisión, el directorio actual). Cambia el navegador con CHROME_PATH.
+// node tools/qa/iphone.mjs URL [DIR] [--aviso]   (DIR: capturas e iphone.json; por omisión, el directorio actual). Cambia el navegador con CHROME_PATH.
+// --aviso (2026-11-16): inyecta un evento de prueba con fecha (no está en el repo; Fetch de CDP sobre eventos.json) y mide la visita de
+// regreso, con el aviso «Próximo: …» reservado por boot.js bajo la dirección: las posiciones fijas del inicio deben ser las mismas.
 //
 // Perfiles (alto = la zona visible de Safari con sus barras; la pantalla completa lleva sus áreas seguras por
 // Emulation.setSafeAreaInsetsOverride): iPhone 16 393×659 (referencia), 13 mini 375×629 (peor alto), SE (3.ª gen.) 375×667, 16 Pro Max
@@ -11,7 +13,8 @@
 //  · al llegar a cada sección por su enlace (barra inferior: Catálogo; menú ☰: La casa, Catálogo, Eventos, Café y Visita): el titular a 24 px
 //    (± 4) bajo la cabecera y, entre la cabecera y la barra inferior (≥ 8 px de aire con la barra), lo que importa en esa sección:
 //      La casa: titular y la primera foto · Catálogo (menú): titular y «Buscar en el catálogo» · Catálogo (barra inferior): chips, la portada
-//      central y su pie «título · autor · precio» · Eventos: titular, la tarjeta central y su «Compartir» (≥ 44, con el título en su nombre) ·
+//      central y su pie «título · autor · precio» · Eventos: titular, entradilla y la primera tarjeta de la lista (con --aviso, el titular, la
+//      entradilla y el arranque del destacado, que no cabe entero: lleva foto o cartel) ·
 //      Café: titular, chips y la tarjeta central de la carta · Visita: titular y «Cómo llegar»;
 //  · menú ☰: la hoja no se desplaza (todo cabe: Instagram y Facebook a la vista) y sus filas miden ≥ 44;
 //  · ficha (tocar la portada central): el borde de la hoja ≥ área segura + 12 (y ≥ 48 sin área segura) y las acciones del pie dentro de la ventana.
@@ -21,8 +24,10 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-const URL_ = process.argv[2] || 'http://127.0.0.1:8094/';
-const out = process.argv[3] || '.';
+const POS = process.argv.slice(2).filter(a => !a.startsWith('--'));
+const AVISO = process.argv.includes('--aviso');
+const URL_ = POS[0] || 'http://127.0.0.1:8094/';
+const out = POS[1] || '.';
 mkdirSync(out, { recursive: true });
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 // [clave, nombre, ancho, alto, dpr, área segura arriba, abajo]
@@ -49,6 +54,7 @@ let id = 0; const pending = new Map(); const problems = [];
 ws.addEventListener('message', e => {
   const m = JSON.parse(e.data);
   if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); return; }
+  if (m.method === 'Fetch.requestPaused') { send('Fetch.fulfillRequest', { requestId: m.params.requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body: Buffer.from(JSON.stringify(EVENTO_DE_PRUEBA)).toString('base64') }); return; }
   if (m.method === 'Runtime.exceptionThrown') problems.push('EXC ' + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text));
   if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') problems.push('CONSOLA ' + m.params.args.map(a => a.value ?? a.description).join(' '));
 });
@@ -76,6 +82,10 @@ async function shot(name) {
   if (s.result?.data) writeFileSync(join(out, `${name}.png`), Buffer.from(s.result.data, 'base64'));
 }
 await send('Page.enable'); await send('Runtime.enable');
+// Evento de prueba (solo con --aviso): un evento con fecha dentro de cinco días, hora de Monterrey. Título largo a propósito: no debe partir el renglón.
+const enDias = n => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + n * 86_400_000));
+const EVENTO_DE_PRUEBA = { eventos: [{ id: 'prueba-aviso', tipo: 'Lectura', titulo: 'Evento de prueba con un título largo', fecha: enDias(5), hora: '18:57', fin: null, con: null, descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null }] };
+if (AVISO) await send('Fetch.enable', { patterns: [{ urlPattern: '*eventos.json*' }] });
 
 // Medición en la página: la franja útil (de la cabecera a la barra inferior) y la caja de cada selector.
 const MEDIR = String.raw`((sels) => {
@@ -94,7 +104,7 @@ const DESTINOS = [
   ['casa', 'menu', '#casa', { titular: '#house-title', foto: '.house-track .still-img' }, 'titular'],
   ['catalogo-menu', 'menu', '#libros', { titular: '#books-title', accion: '.explore-open' }, 'titular'],
   ['catalogo-barra', 'barra', '#colecciones', { chips: '.rail-chips', pieza: '.c3d--portada .c3d-item.is-centro .cover', pie: '.cf-meta' }, null],
-  ['eventos', 'menu', '#cartelera', { titular: '#bill-title', pieza: '.c3d--evento .c3d-item.is-centro .bill-card', accion: '.c3d--evento .c3d-item.is-centro .bill-share' }, 'titular'],
+  ['eventos', 'menu', '#cartelera', AVISO ? { titular: '#bill-title', entradilla: '.bill .sec-texto' } : { titular: '#bill-title', entradilla: '.bill .sec-texto', pieza: '.ev-fila .ev-card' }, 'titular'],
   ['cafe', 'menu', '#cafe', { titular: '#cafe-title', chips: '.cafe-chips', pieza: '.c3d--carta .c3d-item.is-centro .cafe-card' }, 'titular'],
   ['visita', 'menu', '#visita', { titular: '#visit-title', accion: '.visit-actions .btn' }, 'titular']
 ];
@@ -115,10 +125,17 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
   await until(`document.readyState === 'complete' && document.documentElement.classList.contains('js')`, 10000);
   await until(`document.fonts.status === 'loaded' && document.querySelector('.entry-poster').complete`, 6000);
   await sleep(400);
+  if (AVISO) {   // visita de regreso: la primera carga anotó el evento; en la segunda boot.js reserva el renglón antes del primer render
+    await until(`localStorage.getItem('iti-ev-hasta')`, 6000);
+    await send('Page.navigate', { url: URL_ });
+    await until(`document.readyState === 'complete' && document.documentElement.classList.contains('js')`, 10000);
+    await until(`document.fonts.status === 'loaded' && document.querySelector('.entry-poster').complete && !document.querySelector('[data-ev-cta]').hidden`, 6000);
+    await sleep(400);
+  } else await ev(`localStorage.removeItem('iti-ev-hasta')`);
   const fila = { perfil: nombre, vp: `${w}×${h}`, insets: `${top}/${bottom}` };
 
   // ---------- Inicio ----------
-  const ini = await medir({ titular: '.entry-title', cta: '.entry-actions .btn', foto: '.entry-media', dir: '.entry-address' });
+  const ini = await medir({ titular: '.entry-title', cta: '.entry-actions .btn', foto: '.entry-media', dir: '.entry-address', aviso: '[data-ev-cta]', avisoTxt: '.entry-ev-txt' });
   const { band } = ini; const e = ini.el;
   fila.franja = band.b - band.t;
   fila.h1 = `${e.titular.t}–${e.titular.b}`;
@@ -130,6 +147,11 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
   check(key, 'inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44', w <= 359 || Math.abs(e.cta.t - band.t - 212) <= 2, `${e.cta.t - band.t}`);
   check(key, 'inicio: la foto ≥ 160 px de alto y ≤ 3:2', e.foto.h >= 160 && e.foto.w / e.foto.h >= 1.49, `${e.foto.w}×${e.foto.h}`);
   check(key, `inicio: la foto entera sobre la barra inferior (≥ ${AIRE} px)`, w <= 359 || band.b - e.foto.b >= AIRE, `${band.b - e.foto.b} px`);
+  if (AVISO) {
+    fila.aviso = e.aviso && e.aviso.vis ? `${e.avisoTxt.t}–${e.avisoTxt.b} (objetivo ${e.aviso.h})` : 'no se ve';
+    check(key, 'inicio con aviso: «Próximo: …» a la vista bajo la dirección, a 8 px (± 1), en un renglón de 20', e.aviso && e.aviso.vis && Math.abs(e.avisoTxt.t - e.dir.b - 8) <= 1 && e.avisoTxt.h === 20, e.aviso ? `dirección ${e.dir.b} · aviso ${e.avisoTxt.t}–${e.avisoTxt.b}` : 'no existe');
+    check(key, 'inicio con aviso: objetivo de toque de 44 que no pasa del ancho del contenido ni toca la foto', e.aviso && e.aviso.h >= 44 && e.aviso.r <= ini.W - e.dir.l + 1 && e.avisoTxt.b <= e.foto.t - 23, e.aviso ? `${e.aviso.w}×${e.aviso.h} · tinta hasta ${e.avisoTxt.b} · foto ${e.foto.t}` : 'no existe');
+  } else check(key, 'inicio sin evento: ni aviso ni renglón reservado (dirección → foto 24)', (!e.aviso || !e.aviso.vis) && Math.abs(e.foto.t - e.dir.b - 24) <= 1 && !(await ev(`document.documentElement.classList.contains('ev-hint')`)), `${e.foto.t - e.dir.b} px`);
   await shot(`${key}-inicio`);
 
   // ---------- Llegar a cada sección ----------
@@ -156,7 +178,7 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
       check(key, `${dest}: ${k} entero entre la cabecera y la barra inferior (≥ ${AIRE} px de aire)`, ok, r ? `${r.t}–${r.b} en la franja ${b.t}–${b.b}` : 'no existe');
     }
     if (tit) check(key, `${dest}: titular a 24 px bajo la cabecera (± 4)`, m.el.titular && Math.abs(m.el.titular.t - b.t - 24) <= 4, m.el.titular ? `${m.el.titular.t - b.t}` : '∅');
-    if (dest === 'eventos' && m.el.accion) check(key, 'eventos: «Compartir» ≥ 44 con el título en su nombre', m.el.accion.w >= 44 && m.el.accion.h >= 44 && /^Compartir «.+»$/.test(m.el.accion.name), `${m.el.accion.w}×${m.el.accion.h} «${m.el.accion.name}»`);
+    if (dest === 'eventos' && AVISO) { await until(`!!document.querySelector('.ev-prox:not(.ev-espera)')`, 8000); await sleep(700); const p = await medir({ destacado: '.ev-prox' }); check(key, 'eventos con fecha: el destacado arranca a la vista, bajo la entradilla (24 px)', p.el.destacado && p.el.destacado.vis && m.el.entradilla && Math.abs(p.el.destacado.t - m.el.entradilla.b - 24) <= 2 && p.el.destacado.t < b.b - 120, p.el.destacado ? `${p.el.destacado.t} (entradilla hasta ${m.el.entradilla?.b}; franja hasta ${b.b})` : 'no existe'); }
     if (dest === 'catalogo-barra') check(key, 'catálogo: la barra inferior marca «Catálogo»', await ev(`document.querySelector('.tabbar a:nth-of-type(2)').getAttribute('aria-current') === 'location'`), 'sin aria-current');
     const marca = { casa: '#inicio', 'catalogo-menu': '#libros', 'catalogo-barra': '#libros' }[dest] || '';
     const cur = await ev(`[...document.querySelectorAll('.tabbar a')].filter(a => a.getAttribute('aria-current')).map(a => a.dataset.zona || a.getAttribute('href')).join()`);
@@ -198,10 +220,10 @@ await send('Emulation.setSafeAreaInsetsOverride', { insets: { top: 0, bottom: 0,
 
 for (const p of problems) check('consola', 'sin errores de consola ni excepciones', false, p);
 writeFileSync(join(out, 'iphone.json'), JSON.stringify({ rows, report }, null, 1));
-console.log('\n== Llegar a cada sección en iPhone ==');
+console.log(`\n== Llegar a cada sección en iPhone${AVISO ? ' (con el aviso de un evento de prueba)' : ''} ==`);
 for (const r of rows) {
   console.log(`\n${r.perfil} ${r.vp} (áreas ${r.insets}) · franja ${r.franja} px`);
-  console.log(`  inicio: titular ${r.h1} · «Cómo llegar» ${r.cta} · foto ${r.foto} (aire ${r.fotoAire})`);
+  console.log(`  inicio: titular ${r.h1} · «Cómo llegar» ${r.cta} · foto ${r.foto} (aire ${r.fotoAire})${r.aviso ? ` · aviso ${r.aviso}` : ''}`);
   for (const [dest] of DESTINOS) console.log(`  ${dest}: ${r[dest]}`);
   console.log(`  menú: ${r.menu} · ficha: ${r.ficha}`);
 }

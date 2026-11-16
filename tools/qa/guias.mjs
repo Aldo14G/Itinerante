@@ -56,11 +56,19 @@ const SISTEMA = {
   division: [6, 7],                    // la columna izquierda termina en la 6 y la derecha empieza en la 7, en todas las secciones
   escala: 4,                           // todo hueco es múltiplo de 4
   // Solo el escenario del carrusel y lo que cuelga de él puede ir sobre el eje central.
-  centrables: '.c3d, .cf-pie, .bill-pie',
+  centrables: '.c3d, .cf-pie',
   renglonesCentradosMax: 2,            // un texto centrado no pasa de dos renglones
   // Proximidad: un dato asociado va junto a lo suyo, en el eje izquierdo: en el renglón de su texto, `hueco` px después de su última letra, o
   // debajo de él a `debajo` px. Nunca suelto en el borde derecho (decisión del 2026-11-15: a 1440 quedaba a ~600 px de sus chips).
   asociados: [{ dato: '.rail-progreso', de: '.rail-note', hueco: 16, debajo: 8 }],
+  // Nota lateral (2026-11-16): la única pieza que no sigue la división 1–6 | 7–12. La lista de Eventos va en las columnas 1–8 y su nota en
+  // 9–12 (estructura aprobada por Aldo: lista ancha y panel estrecho, como en Luma). No se le perdona nada más: empieza exactamente en su
+  // columna, termina en el margen derecho y comparte tope con la lista (G3 y G4 la miden aparte).
+  laterales: [{ sel: '.ev-lado', columna: 9 }],
+  // Primaria dentro de una tarjeta (2026-11-16, el evento destacado): se mide contra su tarjeta, no contra la página. Empieza en la sangría
+  // de la tarjeta; en el teléfono su fila de acciones llega al borde interior derecho (la primaria sola a todo el ancho interior, o seguida de
+  // sus iconos); desde 761, al ancho del rótulo.
+  tarjetasConPrimaria: '.ev-prox',
   // Hojas con un solo eje de tinta (texto y controles sin fondo) y uno de cajas (controles con fondo). La ficha tiene su retícula interior
   // (portada + título, tabla de datos) y solo se informa.
   hojasUnEje: ['menu', 'milista', 'explorar'],
@@ -98,12 +106,15 @@ const SISTEMA = {
     'Inicio del teléfono: posiciones fijas aprobadas (variante A, 2026-11-14): sus roles llevan el prefijo «inicio·» y sus propios valores.',
     'Inicio de escritorio: el bloque de texto se centra en el alto de la foto (texto en 1–5, foto en 7–12): no se le exige compartir tope (G4) ni un valor de barra → titular.',
     'Una fila de dos columnas: la más corta absorbe la diferencia al final de su celda; de cada fila cuenta el hueco menor (piezas con `fila`).',
-    'Café en escritorio: los chips son el control de la carta, no del encabezado: de la entradilla a los chips cuenta bloque → bloque (48), no texto → control (pieza con `bloque`); en teléfono y tableta, texto → control (24).',
+    'Café en escritorio: la barra de categorías es el control de la carta, no del encabezado: la carta empieza un bloque nuevo a todo el ancho, así que su aire es bloque → bloque (48) y se mide desde lo más bajo que tiene encima (la foto de 7–12, más alta que el encabezado), no desde la entradilla (pieza con `bloque`); en teléfono y tableta, texto → control (24).',
+    'Barra de categorías de la carta: como una fila de chips de radio, cuenta como un solo control (la unión de sus chips), no chip por chip.',
     'Pie del libro: el aire hacia abajo se cuenta desde la reserva (--cf-reserva), no desde la última letra: con un título de un renglón se ve más.',
     'Tira de La casa y ventana del carrusel: van a sangre; de la tira se mide su primera pieza y del carrusel, la pieza central.',
     'Titular de sección en el teléfono: hasta tres renglones si la frase no cabe en dos; «Contacto» es de un renglón (no lleva frase).',
     'Controles sin fondo (texto, interruptor, «Mi lista»): se alinean por su tinta, no por su caja de toque.',
-    'Descripción de un evento: es un párrafo de lectura (≥ 120 caracteres, tres o cuatro renglones) y lleva la letra `lectura` 17/24, no la de las entradillas (17/22): scripts/critique.mjs (law-lineheight) pide interlínea ≥ 1.35 en esos párrafos. Nivel propio en NIVELES.',
+    'Descripción de un evento (propuesta o destacado): es un párrafo de lectura (≥ 120 caracteres, tres o cuatro renglones) y lleva la letra `lectura` 17/24, no la de las entradillas (17/22): scripts/critique.mjs (law-lineheight) pide interlínea ≥ 1.35 en esos párrafos. Nivel propio en NIVELES.',
+    'Eventos en escritorio: la lista va en las columnas 1–8 y la nota lateral en 9–12 (`laterales`; aprobado por Aldo el 2026-11-16): la nota no cuenta como «columna derecha» de la división única, pero debe empezar en la columna 9, terminar en el margen y compartir tope con la lista.',
+    'Primaria del evento destacado: vive dentro de su tarjeta (`tarjetasConPrimaria`); se le exige la sangría de la tarjeta y, en el teléfono, que su fila llegue al borde interior (no el ancho de la página).',
     'Ficha del libro: tiene retícula interior propia; de ella solo fallan el margen (H1) y los botones aplastados (H2).'
   ]
 };
@@ -127,7 +138,7 @@ const REF = ['iphone16', 'd1440'];
 const SECCIONES = [
   { id: 'inicio', sel: '#inicio', piezas: [
     ['titular', '.entry-title'], ['estado', '.entry-status'], ['entradilla', '.entry-lede'], ['control', '.entry-actions .btn'],
-    ['nota', '.entry-address'], ['contenido', '.entry-media'] ] },
+    ['nota', '.entry-address'], ['dato', '.entry-ev'], ['contenido', '.entry-media'] ] },
   { id: 'casa', sel: '#casa', piezas: [
     ['titular', '#house-title'], ['entradilla', '.house .sec-texto'], ['contenido', '.house-track .still:first-child .still-img'],
     ['pie', '.house-track .still:first-child figcaption'] ] },
@@ -137,10 +148,11 @@ const SECCIONES = [
 ['subtitular', '.layer-title'], ['rotulo', '.cat-search label'], ['control', '.cat-combo'], ['rotulo', '.cat-status'],
 ['contenido', '.cat-grid'], ['accion', '.cat-fold'], ['texto', '.books-foot p'], ['control', '.books-foot .btn'] ] },
   { id: 'eventos', sel: '#cartelera', piezas: [
-    ['titular', '#bill-title'], ['entradilla', '.bill .sec-texto'], ['escenario', '.c3d--evento', { c3d: true }], ['pie-escenario', '.bill-desc'] ] },
+    ['titular', '#bill-title'], ['entradilla', '.bill .sec-texto'], ['contenido', '.ev-prox'], ['rotulo', '.ev-grupo:not(.ev-propuestas) > .ev-sub'], ['contenido', '.ev-dias'],
+    ['rotulo', '.ev-propuestas > .ev-sub'], ['contenido', '.ev-propuestas .ev-filas'], ['bloque', '.ev-lado'] ] },
   { id: 'cafe', sel: '#cafe', piezas: [
-    ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['control', '.cafe-chips', { bloque: true }], ['escenario', '.c3d--carta', { c3d: true }],
-    ['contenido', '.cafe-foto'] ] },
+    ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['control', '.ct-nav', { bloque: true }], ['contenido', '.ct-lista'],
+    ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p'], ['control', '.ct-cierre .btn'] ] },
   { id: 'visita', sel: '#visita', piezas: [
     ['titular', '#visit-title'], ['subtitular', '.visit address'], ['estado', '.visit-status'], ['control', '.visit-actions .btn'],
 ['contenido', '.visit-map-link', { fila: 'figuras' }], ['pie', '.visit-map figcaption'], ['rotulo', '.hours caption'], ['contenido', '.hours tbody'],
@@ -152,15 +164,16 @@ const SECCIONES = [
 const NIVELES = {
   'h1': ['.entry-title'],
   'titular de sección': ['#house-title', '#books-title', '#bill-title', '#cafe-title', '#visit-title', '#ftr-title'],
-  'subtitular': ['.layer-title', '.visit address'],
-  'entradilla y cuerpo': ['.house .sec-texto', '.bill .sec-texto', '.cafe .sec-texto', '.ftr-lede', '.books-foot p'],
-  'párrafo de lectura': ['.bill-desc'],   // tres renglones o más (≥ 120 caracteres): token `lectura` 17/24; la crítica (law-lineheight) pide ≥ 1.35
+  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ct-grupo-tit'],
+  'entradilla y cuerpo': ['.house .sec-texto', '.bill .sec-texto', '.cafe .sec-texto', '.ftr-lede', '.books-foot p', '.ct-cierre p'],
+  'párrafo de lectura': ['.ev-card-desc', '.ev-prox-desc'],   // tres renglones o más (≥ 120 caracteres): token `lectura` 17/24; la crítica (law-lineheight) pide ≥ 1.35
   'estado': ['.entry-status', '.visit-status'],
-  'título de pieza': ['.cf-titulo', '.c3d--evento .is-centro .bill-title', '.c3d--carta .is-centro .cafe-nombre'],
-  'texto de pieza': ['.cf-meta', '.c3d--carta .is-centro .cafe-desc'],
+  'título de pieza': ['.cf-titulo', '.ev-card-tit', '.ev-prox-tit'],
+  'nombre de producto': ['.ct-nom'],      // Headline 17: la tarjeta de la carta es pequeña (2 a 4 por fila) y su nombre no compite con el título del grupo
+  'texto de pieza': ['.cf-meta', '.ct-desc'],
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],
-  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status']
+  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-prox-meta', '.ev-lado-txt']
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -252,7 +265,7 @@ function enPagina(cfg) {
       let centro = null, d = 1e9;
       for (const li of e.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; centro = li; } }
       if (centro) {
-        const cara = centro.querySelector('.cover, .bill-card, .cafe-card') || centro;
+        const cara = centro.querySelector('.cover') || centro;
         const id = empuja(cara, 'pieza-central', sup, { escenario: true, ejeEscenario: rd(cx + sx), piezas: e.querySelectorAll('.c3d-track > li').length });
         camina(cara, id);
       }
@@ -266,8 +279,8 @@ function enPagina(cfg) {
         if (h.tagName === 'DIALOG' && !h.open) continue;
         if (!visible(h)) continue;
         if (h.matches('.c3d')) { c3d(h, sup); continue; }
-        if (h.matches('[role="radiogroup"]')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
-        if (h.matches('.house-track, .news-list, .cat-grid')) {
+        if (h.matches('[role="radiogroup"], .ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
+        if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ct-rejilla')) {
           const id = empuja(h, 'rejilla', sup);
           let i = 0;
           for (const li of h.children) { const r = li.getBoundingClientRect(); if (r.left < -1 || r.right > document.documentElement.clientWidth + 1 || !visible(li)) continue; if (i++ > 5) break; camina(li, id); }
@@ -294,12 +307,12 @@ function enPagina(cfg) {
       if (o && o.c3d) {
         const c = document.querySelector(sel); if (!c || !visible(c)) continue;
         const cr = c.getBoundingClientRect(), cx = cr.left + cr.width / 2; let d = 1e9;
-        for (const li of c.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; e = li.querySelector('.cover, .bill-card, .cafe-card') || li; } }
+        for (const li of c.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; e = li.querySelector('.cover') || li; } }
       } else e = [...document.querySelectorAll(sel)].find(visible) || null;
       if (!e) continue;
-      const p = { rol, sel, fila: (o && o.fila) || null, bloque: !!(o && o.bloque), caja: e.matches('[role="radiogroup"]') ? union(e) : B(e.getBoundingClientRect()), txt: texto(e) };
+      const p = { rol, sel, fila: (o && o.fila) || null, bloque: !!(o && o.bloque), caja: e.matches('[role="radiogroup"], .ct-nav') ? union(e) : B(e.getBoundingClientRect()), txt: texto(e) };
       const ecs = getComputedStyle(e);
-      const sinFondo = rol === 'control' && !(alpha(ecs.backgroundColor) > 0.03 || ecs.boxShadow !== 'none' || parseFloat(ecs.borderTopWidth) > 0) && !e.matches('[role="radiogroup"], .cat-combo');
+      const sinFondo = rol === 'control' && !(alpha(ecs.backgroundColor) > 0.03 || ecs.boxShadow !== 'none' || parseFloat(ecs.borderTopWidth) > 0) && !e.matches('[role="radiogroup"], .ct-nav, .cat-combo');
       if (/titular|entradilla|estado|nota|dato|pie|rotulo|texto|subtitular/.test(rol) || sinFondo) {
         p.letra = letra(e); p.tinta = tinta(e);
         if (p.tinta) {   // de renglón a renglón (lo que se ve): la caja de contenido, salvo que el texto no la llene (objetivo de toque, alto mínimo)
@@ -345,7 +358,11 @@ function enPagina(cfg) {
       const util = padre.width - parseFloat(pcs.paddingLeft) - parseFloat(pcs.paddingRight);
       botones.push({ variante, icono: c.contains('btn--icono'), alto: rd(r.height), ancho: rd(r.width), caja: B(r), relleno: [rd(parseFloat(cs.paddingLeft)), rd(parseFloat(cs.paddingRight))], letra: letra(e), tinta: tinta(e),
         ic: ic ? rd(ic.getBoundingClientRect().width) : null, hueco: cs.columnGap === 'normal' ? 0 : rd(parseFloat(cs.columnGap)), radio: cs.borderTopLeftRadius, txt: texto(e) || e.getAttribute('aria-label') || e.getAttribute('placeholder') || '', zona, sel: nombre(e),
-        completo: r.width >= util - 2, enEscenario: !!e.closest('.c3d') });
+        completo: r.width >= util - 2, enEscenario: !!e.closest('.c3d'),
+        tarjeta: (t => { if (!t) return null; const tr = t.getBoundingClientRect(); const fila = [...e.parentElement.children].filter(visible).filter(x => Math.abs(x.getBoundingClientRect().top - r.top) < r.height / 2).map(x => x.getBoundingClientRect());
+          let c = e; while (c.parentElement && c.parentElement !== t) c = c.parentElement;   // el hijo directo de la tarjeta que contiene el botón: su relleno es la sangría
+          const sang = c.getBoundingClientRect().left - tr.left + parseFloat(getComputedStyle(c).paddingLeft);
+          return { l: rd(tr.left + sx), r: rd(tr.right + sx), sangria: rd(sang), filaR: rd(Math.max(...fila.map(x => x.right)) + sx), interiorR: rd(padre.right - parseFloat(pcs.paddingRight) + sx) }; })(cfg.tarjetasConPrimaria ? e.closest(cfg.tarjetasConPrimaria) : null) });
     }
     const asociados = [];
     for (const a of cfg.asociados || []) { const d = [...document.querySelectorAll(a.dato)].find(visible), n = [...document.querySelectorAll(a.de)].find(visible); if (d && n) asociados.push({ ...a, d: tinta(d), n: tinta(n), txt: texto(d) }); }
@@ -505,7 +522,15 @@ function analizar(clave, m) {
     if (k === 2) {
       const tl = s.atomos.filter(a => a.sup === null && !['escenario', 'flecha', 'pieza-central', 'rejilla'].includes(a.tipo) && !a.escenario);
       const izqX = a => (a.tinta && a.tipo !== 'control' ? a.tinta.ml : a.caja.l);
-      const der = tl.filter(a => izqX(a) > G.C - 100 && !(a.letra && a.letra.alinea !== 'left' && a.tipo !== 'control') && Math.abs((a.caja.l + a.caja.r) / 2 - G.C) > 2 && a.caja.w > 120);
+      const esLateral = a => SISTEMA.laterales.find(l => a.sel.includes(l.sel));
+      for (const a of tl.filter(esLateral)) {   // la nota lateral: su columna, el margen derecho y el tope de la lista que acompaña
+        const lat = esLateral(a), x0 = G.inicios[lat.columna - 1];
+        if (Math.abs(a.caja.l - x0) > tol || Math.abs(a.caja.r - G.R) > tol) F('G3', id, `${a.sel}: la nota lateral va de la columna ${lat.columna} al margen (${r1(x0)}–${r1(G.R)}); está en ${a.caja.l}–${a.caja.r}`);
+        const junto = tl.filter(b => b !== a && !esLateral(b) && Math.abs(izqX(b) - G.L) <= 2 && b.caja.b > a.caja.t && b.caja.t < a.caja.b);
+        if (junto.length) { const t0 = Math.min(...junto.map(b => b.caja.t)); if (Math.abs(t0 - a.caja.t) > tol) F('G4', id, `${a.sel}: la nota lateral no comparte tope con la lista (lista y ${r1(t0 - s.caja.t)}, nota y ${r1(a.caja.t - s.caja.t)}, Δ ${r1(a.caja.t - t0)})`); }
+        res.laterales = [...(res.laterales || []), { seccion: id, sel: a.sel, l: a.caja.l, r: a.caja.r, columna: lat.columna }];
+      }
+      const der = tl.filter(a => !esLateral(a) && izqX(a) > G.C - 100 && !(a.letra && a.letra.alinea !== 'left' && a.tipo !== 'control') && Math.abs((a.caja.l + a.caja.r) / 2 - G.C) > 2 && a.caja.w > 120);
       const izq = tl.filter(a => Math.abs(izqX(a) - G.L) <= 2);
       if (der.length && izq.length) {
         colDer = Math.min(...der.map(izqX));
@@ -549,7 +574,7 @@ function analizar(clave, m) {
     const s = m.secciones[id], ps = s.piezas;
     ps.forEach((p, i) => {
       let ant = null;
-      const ancho = ['escenario', 'bloque'].includes(p.rol);   // ocupan la fila entera aunque su caja sea estrecha
+      const ancho = ['escenario', 'bloque'].includes(p.rol) || (p.bloque && k === 2);   // ocupan la fila entera aunque su caja sea estrecha (también la pieza que abre un bloque nuevo en escritorio)
       if (p.rol === 'dato' && enLinea.includes(p.sel)) return;   // va en el renglón de su nota: su aire es el de la nota (lo juzga G6)
       for (const q of ps) {
         if (q === p) continue;
@@ -602,14 +627,21 @@ function analizar(clave, m) {
     res.botones[g] = { n: bs.length, altos, rellenos: rell, letras, iconos: ics, casos: bs.map(b => ({ zona: b.zona, txt: b.txt.slice(0, 28), alto: b.alto, ancho: b.ancho, l: b.caja.l, r: b.caja.r, relleno: b.relleno.join('/'), letra: `${b.letra.px}/${b.letra.peso}`, ic: b.ic, completo: b.completo })) };
     if (['primario', 'secundario', 'plano', 'chip', 'fila', 'vidrio-icono', 'secundario-icono'].includes(g)) {
       const enPagina = bs.filter(b => !b.zona.startsWith('hoja:') && b.zona !== 'cabecera');
+      const sueltos = enPagina.filter(b => !b.tarjeta);   // el ancho se compara entre las que van sueltas en la página
       const uu = f => [...new Set(enPagina.map(f))];
       if (enPagina.length > 1) {
         if (uu(b => r0(b.alto)).length > 1) F('B1', 'página', `${g}: altos distintos en la página (${enPagina.map(b => `${b.zona} «${b.txt.slice(0, 18)}» ${b.alto}`).join(', ')})`);
         if (uu(b => b.relleno.join('/')).length > 1) F('B1', 'página', `${g}: rellenos distintos (${uu(b => b.relleno.join('/')).join(' · ')})`);
         if (uu(b => `${b.letra.px}/${b.letra.peso}`).length > 1) F('B1', 'página', `${g}: rótulos distintos (${uu(b => `${b.letra.px}/${b.letra.peso}`).join(' · ')})`);
-        if (g === 'primario' && uu(b => b.completo).length > 1) F('B1', 'página', `primario «Cómo llegar»: ancho completo en ${enPagina.filter(b => b.completo).map(b => b.zona).join(', ')} y al ancho del texto en ${enPagina.filter(b => !b.completo).map(b => `${b.zona} (${b.ancho})`).join(', ')}`);
+        if (g === 'primario' && new Set(sueltos.map(b => b.completo)).size > 1) F('B1', 'página', `primario «Cómo llegar»: ancho completo en ${sueltos.filter(b => b.completo).map(b => b.zona).join(', ')} y al ancho del texto en ${sueltos.filter(b => !b.completo).map(b => `${b.zona} (${b.ancho})`).join(', ')}`);
       }
-      if (g === 'primario') for (const b of enPagina) {
+      if (g === 'primario') for (const b of enPagina.filter(x => x.tarjeta)) {   // dentro de una tarjeta: su sangría y, en el teléfono, la fila hasta el borde interior
+        const t = b.tarjeta;
+        if (Math.abs(b.caja.l - (t.l + t.sangria)) > tol) F('B2', b.zona, `primario «${b.txt}» en su tarjeta: empieza en x ${b.caja.l}; la sangría de la tarjeta está en ${r1(t.l + t.sangria)}`);
+        if (k === 0 && Math.abs(t.filaR - t.interiorR) > tol) F('B2', b.zona, `primario «${b.txt}» en su tarjeta: su fila de acciones termina en x ${t.filaR}; el borde interior está en ${t.interiorR}`);
+        if (k > 0 && Math.abs(b.caja.r - t.interiorR) <= tol) F('B2', b.zona, `primario «${b.txt}» en su tarjeta: ocupa todo el ancho interior; desde 761 px va al ancho de su rótulo`);
+      }
+      if (g === 'primario') for (const b of sueltos) {
         const quiere = k === 0 ? SISTEMA.botones['primario-56'].telefono : SISTEMA.botones['primario-56'].ancho;
         if ((quiere === 'completo') !== b.completo) F('B2', b.zona, `primario «${b.txt}»: ${b.completo ? 'ancho completo' : `ancho ${b.ancho}`}; la regla en ${NOMBRE_CLASE[k]} es «${quiere}»`);
         if (Math.abs(b.caja.l - G.L) > tol) F('B2', b.zona, `primario «${b.txt}»: empieza en x ${b.caja.l}; el margen está en ${r1(G.L)}`);
@@ -765,7 +797,7 @@ for (const clave of claves) {
   let ctx = await nuevoCtx();
   let page = await ctx.newPage();
   await cargar(page, toque);
-  const m = await page.evaluate(enPagina, { modo: 'pagina', secciones: SECCIONES, niveles: NIVELES, centrables: SISTEMA.centrables, asociados: SISTEMA.asociados });
+  const m = await page.evaluate(enPagina, { modo: 'pagina', secciones: SECCIONES, niveles: NIVELES, centrables: SISTEMA.centrables, asociados: SISTEMA.asociados, tarjetasConPrimaria: SISTEMA.tarjetasConPrimaria });
   const { res, fallos, G } = analizar(clave, m);
 
   // barras: en el tope y con cada sección bajo la cabecera

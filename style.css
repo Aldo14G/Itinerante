@@ -343,16 +343,25 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .entry-news { display: none; margin-top: var(--space-4); }
 .news-hint .entry-news { display: inline-flex; visibility: hidden; }
 .news-hint .entry-news:not([hidden]) { visibility: visible; }
-.entry-news-dot, .entry-ev-dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--primario); }
+.entry-news-dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--primario); }
 /* Aviso del próximo evento («Próximo: Sáb 21 nov · …», feed.js): solo con un evento con fecha vigente. Un renglón de Subheadline a 8 px de la
    dirección (texto → texto), en un objetivo de 44 que no ocupa más que su renglón (los márgenes negativos lo devuelven: 8 + 20 px en total).
    Su renglón se reserva antes del primer render (ev-hint, boot.js) para que nada se mueva. El título cede con puntos suspensivos si no cabe;
    la fecha nunca se corta. */
-.entry-ev { display: none; align-items: center; gap: var(--space-2); max-width: 100%; min-height: var(--alto-sm); margin: calc(var(--space-2) - var(--space-3)) 0 calc(-1 * var(--space-3)); border-radius: var(--radio-sm); color: var(--turquesa-texto); font: var(--t-subtitulo); font-weight: 600; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.entry-ev { display: none; align-items: center; gap: var(--space-2); min-width: 0; max-width: 100%; min-height: var(--alto-sm); margin: calc(var(--space-2) - var(--space-3)) 0 calc(-1 * var(--space-3)); border-radius: var(--radio-sm); color: var(--turquesa-texto); font: var(--t-subtitulo); font-weight: 600; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .ev-hint .entry-ev { display: flex; visibility: hidden; }
 .ev-hint .entry-ev:not([hidden]) { visibility: visible; }
 .entry-ev-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.entry-ev .ic { flex: none; width: 16px; height: 16px; }
+.entry-ev .ic { flex: none; width: 20px; height: 20px; } /* el calendario, como el pin de la dirección: el texto de los dos renglones empieza en la misma x */
+.entry-ev .ic + .entry-ev-txt + .ic { width: 16px; height: 16px; }
+/* Desde 1024 px el aviso vive en el relleno inferior del bloque de texto (32 px de ajuste óptico: caben los 8 de aire y su renglón de 20),
+   sin ocupar sitio: el bloque, centrado en el alto de la foto, no se mueve cuando el aviso aparece. No necesita reserva y se muestra en
+   cuanto se sabe que hay evento, también en la primera visita. */
+@media (min-width: 1024px) {
+  .entry-copy { position: relative; }
+  .entry-ev, .ev-hint .entry-ev { display: flex; visibility: visible; position: absolute; left: 0; bottom: calc(-1 * var(--space-2)); margin: 0; }
+  .entry-ev[hidden] { display: none; }
+}
 .entry-ev:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .entry-ev:hover .entry-ev-txt { text-decoration: underline; text-underline-offset: 0.2em; } }
 /* La foto real de la sala, limpia y con radio-lg: nada de texto encima. */
@@ -424,13 +433,16 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .ev-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3) var(--space-4); align-items: start; padding: var(--space-4); border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
 .ev-card-txt { min-width: 0; }
 .ev-card-img { grid-column: 2; grid-row: 1; width: var(--portada-evento); height: var(--portada-evento); border-radius: var(--radio-sm); object-fit: cover; }
-.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; }
+.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .ev-hora { font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
 .ev-card-tit, .ev-prox-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
-.ev-card-meta, .ev-prox-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); }
+.ev-card-meta, .ev-prox-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; }
+.ev-prox-enc { display: grid; grid-template-columns: minmax(0, 1fr); } /* bloque de fecha con sus insignias → título 12 → la fecha completa 4 */
+.ev-prox-tit { margin-top: var(--space-3); }
 /* Párrafos de tres renglones o más (la descripción de una propuesta o del destacado): token `lectura`, Body con interlínea de 24 (1.41; la
    crítica pide ≥ 1.35 en párrafos de 120 caracteres o más). */
-.ev-card-desc, .ev-prox-desc { max-width: 54ch; margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: pretty; }
+.ev-card-desc, .ev-prox-desc { max-width: 54ch; margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: balance; } /* renglones parejos: sin palabra viuda al final */
+.ev-fila { line-height: var(--space-6); } /* el <li> hereda la interlínea de lectura: su texto incluye la descripción (law-lineheight) */
 .ev-card-desc, .ev-card-acc { grid-column: 1 / -1; }
 /* Costo tal como lo da la librería (data-fuente="anuncio"): el primer renglón en la tarjeta de la lista y todos en el destacado. */
 .ev-costo { margin: var(--space-1) 0 0; padding: 0; list-style: none; font: var(--t-subtitulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
@@ -443,16 +455,16 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 /* Un cartel (encuadre: "cartel") es una imagen cuadrada con texto: se muestra entero, 1:1, nunca recortado; si no es cuadrado, sobre fondo-3. */
 .ev-prox--cartel .ev-prox-img { aspect-ratio: 1 / 1; object-fit: contain; }
 .ev-prox-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); padding: var(--space-5); }
-.ev-prox-cab { display: flex; align-items: flex-start; gap: var(--space-4); }
-.ev-prox-txt { min-width: 0; }
+.ev-prox-cab { display: flex; align-items: center; gap: var(--space-4); }
+.ev-prox-cab > .ev-rot { min-width: 0; }
 /* Bloque de fecha (BloqueFecha): lo primero que se lee de un anuncio. Decorativo (aria-hidden): la fecha completa va en texto al lado. */
-.ev-fecha { display: grid; flex: none; justify-items: center; align-content: center; width: var(--space-16); height: calc(var(--space-16) + var(--space-2)); border-radius: var(--radio-md); background: var(--primario); color: var(--en-primario); }
-.ev-fecha b { font: var(--t-titulo-1); font-weight: 700; letter-spacing: var(--ls-titulo-1); font-variant-numeric: tabular-nums; }
-.ev-fecha span { font: var(--t-leyenda-1); font-weight: 600; }
+.ev-fecha { display: grid; flex: none; justify-items: center; align-content: center; width: var(--space-16); height: calc(var(--space-16) + var(--space-2)); border-radius: var(--radio-md); background: var(--primario); color: var(--en-primario); font: var(--t-titulo-1); font-weight: 700; letter-spacing: var(--ls-titulo-1); font-variant-numeric: tabular-nums; }
+.ev-fecha span { font: var(--t-leyenda-1); font-weight: 600; letter-spacing: 0; }
 /* Acciones del destacado: la primaria crece; si su rótulo no cabe junto a los dos iconos («Reservar por WhatsApp» en el teléfono), ocupa su
    renglón entero y los iconos bajan al siguiente (como en la ficha del libro). */
 .ev-acc { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2); } /* con el hueco del cuerpo: texto → control 24 */
 .ev-acc > .btn--primario { flex: 1 1 auto; white-space: nowrap; }
+@media (min-width: 761px) { .ev-acc > .btn--primario { flex: none; } } /* desde 761, la primaria al ancho de su rótulo */
 .ev-card-acc > .btn { white-space: nowrap; }
 /* Nota lateral: cómo registrarse o dónde se anuncian las fechas. */
 .ev-lado { padding: var(--space-5); border-radius: var(--radio-md); background: var(--fondo-3); }
@@ -471,7 +483,6 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
   .ev-prox--cartel .ev-prox-img { height: auto; min-height: 0; aspect-ratio: 1 / 1; } /* el cartel entero en su mitad: la tarjeta toma su alto */
   .ev-prox-cuerpo { grid-column: 1 / span 6; grid-row: 1; align-content: center; gap: var(--space-5); padding: var(--space-8) 0 var(--space-8) var(--space-8); }
   .ev-acc { margin-top: var(--space-1); }
-  .ev-acc > .btn--primario { flex: none; }
   .ev-despues { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
   .ev-lista { grid-column: 1 / span 8; }
   .ev-lado { grid-column: 9 / -1; position: sticky; top: calc(var(--hdr-h) + var(--space-6)); }
@@ -953,7 +964,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 .toast-action { margin-inline-start: auto; min-height: var(--alto-md); padding: 0 var(--space-4); border: 0; border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); font: var(--t-boton-chico); white-space: nowrap; cursor: pointer; }
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 
-/* ---------- Carrusel3D (carousel3d.js): el motor del carrusel de portadas y de la carta ---------- */
+/* ---------- Carrusel3D (carousel3d.js): el motor del carrusel de portadas del Catálogo ---------- */
 /* La pista se desplaza con el dedo (imán al centro) y carousel3d.js da a cada pieza su pose según su distancia al centro, una vez por
    fotograma: las vecinas giran, se hunden y se empujan hacia fuera, de modo que asoman **separadas de la central, con hueco visible**
    (≥ 12 px; norma del 2026-11-13: ya no se enciman). La pose sale de los parámetros de .c3d (en anchos de pieza; carousel3d.js los lee al
@@ -992,16 +1003,11 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 @media (hover: none) and (pointer: coarse) { .c3d-flecha { display: none; } }
 /* Carrusel plano (sin movimiento): la imagen de las vecinas se atenúa (ATENUADA en carousel3d.js); el texto queda entero (≥ 4.5:1). */
 .c3d-item.is-atenuada img { opacity: 0.6; }
-/* Con dos piezas por lado la lejana queda medio tapada por la vecina (is-lejana, carousel3d.js): su texto no se muestra partido. */
-.c3d-item.is-lejana :is(.cafe-nombre, .cafe-desc, .cafe-precio) { opacity: 0; visibility: hidden; }
-.c3d-card:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco), var(--sombra-portada); }
-.c3d-item.is-centro .cafe-card { box-shadow: var(--sombra-portada); }
 
-/* Ancho de la pieza. Teléfono: portada 58 % (176–248 px, con tope contra el alto: carrusel, pie y acción caben entre las dos barras),
-   carta 60 % (184–248). Desde 761 px sale del escenario: caben las piezas a la vista y las dos flechas de 48 con
-   16 de aire (2 × (alto-md + space-4)); portada 240–280, carta 232–272. Desde 1440, dos por lado en portada y carta. */
+/* Ancho de la pieza. Teléfono: portada 58 % (176–248 px, con tope contra el alto: carrusel, pie y acción caben entre las dos barras).
+   Desde 761 px sale del escenario: caben las piezas a la vista y las dos flechas de 48 con 16 de aire (2 × (alto-md + space-4)): 240–280.
+   Desde 1440, dos por lado. */
 .c3d--portada { --c3d-w: min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5)); } /* tope 248 (2026-11-14; antes 240: en el 16 Pro Max la vecina asomaba 33 %) */
-.c3d--carta { --c3d-w: clamp(184px, 60vw, 248px); }
 @media (min-width: 761px) {
   /* Escenario de hasta 1240 px centrado en la columna de contenido; los bordes se desvanecen (máscara de 48 px), sin cortes duros. Desde que el
      contenido vive en 1152 px (2026-11-14) el escenario puede salir del contenedor hasta 1240 (44 px por lado a 1440), simétrico y nunca más
@@ -1011,14 +1017,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
   .c3d-flecha--next { right: max(0px, calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
   .c3d-viewport { -webkit-mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); }
   .c3d--portada { --c3d-w: clamp(240px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 280px); }
-  .c3d--carta { --c3d-w: clamp(232px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 272px); }
 }
-@media (min-width: 1440px) { .c3d--portada, .c3d--carta { --c3d-alcance: 2; --c3d-borde: 1.97; } }
-/* Hasta 1023 px las vecinas asoman cortadas por el borde: su texto no se lee partido (se reconocen por su forma: foto, icono) y aparece al
-   llegar al centro. Desde 1024 caben enteras y su texto se ve. */
-@media (max-width: 1023px) {
-  .c3d-item:not(.is-centro) :is(.cafe-nombre, .cafe-desc, .cafe-precio) { opacity: 0; visibility: hidden; transition: opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
-}
+@media (min-width: 1440px) { .c3d--portada { --c3d-alcance: 2; --c3d-borde: 1.97; } }
 
 /* Profundidad (A5): la pieza central de cada carrusel y, en escritorio, la tarjeta de la rejilla se inclinan hacia el cursor (hasta
    --inclinacion-max) y se adelantan --adelanto-profundidad (carousel3d.js escribe el transform una vez por fotograma; solo con puntero fino,
@@ -1030,7 +1030,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 .motion [data-inclina].is-inclinada.is-entrando { transition: transform var(--dur-rapida) var(--curva-salida), scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
 .motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active { scale: 0.97; }
 .motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active .cover { transform: none; }
-.c3d-item.is-centro .cafe-card:active, .rail-item.is-centro .card:active .cover, .card-item:active .cover { box-shadow: var(--sombra-flotante); }
+.rail-item.is-centro .card:active .cover, .card-item:active .cover { box-shadow: var(--sombra-flotante); }
 /* Brillo de lámina (2026-11-14; idea de Glare Card de Aceternity —solo inspiración— y de Magic Card de Magic UI, MIT): la portada que se
    inclina (la central del carrusel de libros y la tarjeta de la rejilla) lleva una luz radial que sigue al cursor (--brillo-x/-y, escritas por
    initDepth en el mismo fotograma que la inclinación; solo pintura). Sin texto encima de la luz, sin neón. Solo con puntero fino, hover y
@@ -1101,32 +1101,59 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 /* El foco de «Guardar» sobre una portada se separa con el color de esa portada. */
 :is(.rail-item, .card-item) .save:not(.save--wide):focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
 
-/* ---------- Café y té (#cafe): Carrusel3D, variante carta ---------- */
-/* Titular, entradilla, foto real de la casa, chips Café · Té (radiogroup) y la carta: tarjetas tipográficas en superficie con un icono de
-   trazo (taza, tetera), el nombre, la descripción y, solo si la librería lo da, el precio. La consulta por WhatsApp vive en el pie. */
-.cafe { padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
-.cafe > .sec-head { margin-bottom: var(--space-6); } /* cabecera → contenido 24 */
-.cafe-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); } /* bloque → bloque 32 entre la carta y la foto */
-.cafe-foto { margin: 0; }
+/* ---------- Café y té (#cafe): la carta en parrilla por categorías (2026-11-16; cafe.js) ---------- */
+/* Sustituye al Carrusel3D, variante carta (2026-11-13). Titular y entradilla; la barra de categorías (BarraCategorias: chips de 48 que
+   llevan a cada grupo y marcan el que está a la vista), fija bajo la cabecera mientras se recorre la carta, con el fondo opaco de la banda
+   (no es vidrio); la parrilla, un grupo por categoría con su título (Title 3) y sus productos (TarjetaProducto: foto cuadrada o el icono de
+   la categoría, nombre, descripción y precio solo si la librería lo dio) a dos columnas (tres desde 761; cuatro desde 1024, con las
+   categorías en una lista vertical fija en las columnas 1–3 y la parrilla en 4–12); la foto real de la casa y el cierre: «Pídelo en la barra
+   de la sala.» y «Cómo llegar». En el teléfono y la tableta la foto va después de la carta (al llegar se ve la carta); el orden de lectura
+   del marcado es titular, foto, carta y cierre. La tarjeta no es un control: sin cursor de mano ni estados.
+   Aire por rol: texto → control 24 (16 + los 8 de relleno de la barra) · cabecera → contenido 24 (los 8 de la barra + 16) · título de grupo →
+   su parrilla 12 · grupo → grupo 32 / 48 · bloque → bloque 32 / 48 · texto → control 24. */
+.cafe { --ct-barra: calc(var(--alto-md) + 2 * var(--space-2)); display: grid; grid-template-columns: minmax(0, 1fr); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
+.cafe > .sec-head { margin-bottom: var(--space-4); }
+.ct { order: 1; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.cafe-foto { order: 2; margin: var(--space-8) 0 0; }
 .cafe-foto .frame-clip { aspect-ratio: 4 / 3; }
-.cafe-carta { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
-.cafe-chips { margin-bottom: var(--space-4); } /* 16 + los 8 de la ventana: 24 hasta la tarjeta */
-/* La carta no lleva pie: los 48 px que la ventana guarda bajo la pieza (20 para el pie y la sombra) no cuentan como aire hacia lo siguiente
-   (2026-11-15; antes Café → Visita medía 132 y carta → foto 44, 20 px de más). La sombra de la tarjeta central sigue sin cortarse. */
-.cafe .c3d { margin-bottom: calc(-1 * var(--space-12)); }
-.cafe-item .cf-pose, .cafe-card { height: 100%; }
-.cafe-card {
-  display: flex; flex-direction: column; gap: var(--space-2); min-height: calc(var(--c3d-w) * 0.75); padding: var(--space-5); /* 4:3 (2026-11-15; cuadrada dejaba 61–108 px vacíos entre el icono y el nombre, 27–40 % de su alto) */
-  border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea);
+.ct-cierre { order: 3; display: grid; justify-items: start; gap: var(--space-6); margin-top: var(--space-8); }
+.ct-cierre p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
+/* Barra de categorías: de borde a borde de la pantalla, con el fondo de la banda y un filete debajo. Si no caben, se desliza (sin imán). */
+.ct-nav {
+  position: sticky; top: var(--hdr-h); z-index: 3;
+  display: flex; gap: var(--space-2); margin: 0 calc(-1 * var(--margen)); padding: var(--space-2) var(--margen);
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  background: var(--fondo); box-shadow: 0 1px 0 var(--linea); /* el fondo de su banda: opaco, no es vidrio */
 }
-.cafe-ic { display: grid; place-items: center; width: var(--alto-md); height: var(--alto-md); border-radius: 50%; background: var(--menta); color: var(--en-menta); }
-.cafe-nombre { margin-top: auto; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; } /* Title 3, como el libro y el evento del centro */
-.cafe-desc { font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* dos renglones parejos: sin palabra viuda («vaporizada.») */
-.cafe-precio { font: var(--t-titular); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.cafe-item.card--sk .cafe-card { display: block; background: var(--fondo-3); box-shadow: none; }
-.cafe-status:empty { position: absolute; }
-html:not(.js) :is(.cafe-chips, .c3d--carta), .cafe-carta[data-state="vacio"] :is(.cafe-chips, .c3d--carta) { display: none; }
-@media print { .cafe-carta { display: none; } }
+.has-news .ct-nav { background: var(--fondo-2); } /* con Novedades, Café va sobre fondo-2 */
+.ct-nav::-webkit-scrollbar { display: none; }
+.ct-chip { flex: none; text-decoration: none; }
+.ct-chip[aria-current="true"] { background: var(--primario); color: var(--en-primario); }
+@media (hover: hover) { .ct-chip[aria-current="true"]:hover { background: var(--primario); } }
+.ct-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); min-width: 0; padding-top: var(--space-4); }
+/* Al llegar por su chip, el título del grupo queda 16 px bajo la barra (html ya aparta la cabecera y 8 px: scroll-padding-top). */
+.ct-grupo { scroll-margin-top: calc(var(--ct-barra) + var(--space-2)); }
+.ct-grupo-tit { margin: 0 0 var(--space-3); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
+.ct-grupo-nota { margin: calc(-1 * var(--space-2)) 0 var(--space-3); font: var(--t-subtitulo); color: var(--tinta-2); }
+.ct-prod--solo { display: flex; flex-direction: column; gap: var(--space-1); min-height: var(--alto-lg); padding: var(--space-4); border-radius: var(--radio-md); background: var(--fondo-3); }
+.ct-prod--solo .ct-txt { display: contents; }
+.ct-prod--solo .ct-precio { margin-top: auto; padding-top: var(--space-2); }
+.ct-grupo-tit:focus-visible { outline: 2px solid transparent; border-radius: var(--radio-portada); box-shadow: var(--anillo-foco); }
+.ct-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); margin: 0; padding: 0; list-style: none; }
+.ct-prod { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-2); }
+.ct-foto { position: relative; display: grid; place-items: center; overflow: hidden; aspect-ratio: 1 / 1; border-radius: var(--radio-md); background: var(--fondo-3); color: var(--turquesa-texto); }
+.ct-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ct-ic { width: var(--icono-producto); height: var(--icono-producto); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ct-txt { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-1); }
+.ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
+.ct-desc { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* renglones parejos, sin palabra viuda; nunca se corta con «…»: si hace falta, tres renglones */
+.ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Esqueleto: los chips y cuatro tarjetas del tamaño de las reales mientras llega menu.json. */
+.ct-grupo-tit--sk { display: block; width: var(--space-20); border-radius: var(--radio-portada); background: var(--fondo-3); }
+.ct-prod.card--sk :is(.ct-nom, .ct-desc) { display: block; visibility: hidden; }
+html:not(.js) .ct, .ct[data-state="vacio"] { display: none; }
+@media (min-width: 761px) { .ct-rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8) var(--space-6); } }
+@media print { .ct-nav { display: none; } }
 
 /* Esqueletos: ocupan el lugar exacto del contenido; quietos, con colores de los tokens. */
 .sk-line { position: relative; display: block; height: 12px; overflow: hidden; border-radius: var(--radio-portada); background: var(--fondo-3); }
@@ -1195,8 +1222,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 /* Desde 1024 px toda sección de dos columnas usa la rejilla de la página (--rejilla, 12 columnas con canal de 32) con la división única 1–6 |
    7–12 y un solo eje izquierdo: titular, entradilla, chips, nota y cierre empiezan en el margen. Solo el escenario del carrusel va sobre el eje
    central (la pieza del centro, su pie de hasta dos renglones y las flechas). Las dos columnas de una fila comparten la línea de arriba.
-   .books-head, .rail y .cafe-cuerpo son display: contents para compartir la rejilla de su sección; .cafe-carta conserva su caja (app.js la
-   observa para cargar cafe.js) y hereda la rejilla con subgrid. */
+   .books-head y .rail son display: contents para compartir la rejilla de su sección; la carta (.ct) repite la rejilla de la página. */
 @media (min-width: 1024px) {
   .books, .cafe { display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
   /* Catálogo: titular 1–6 · «Buscar en el catálogo» 7–12 (termina con el titular) · chips en el margen con su nota y el conteo debajo · carrusel
@@ -1209,26 +1235,18 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .books > .cat { margin-top: var(--space-12); padding-top: var(--space-12); padding-bottom: var(--space-6); }
   .cat-bar { grid-template-columns: minmax(0, calc(50% - var(--canal-rejilla) / 2)) auto; column-gap: var(--canal-rejilla); } /* el buscador, columnas 1–6 */
   .books-foot { padding-top: var(--space-6); } /* con los 24 de la capa: bloque → bloque 48 */
-  /* Café y té: titular y entradilla en 1–6; debajo, a 48 (bloque → bloque: son el control de la carta, no del encabezado), los chips, a 24 de
-     la carta, que va a todo el ancho. La foto, en 7–12, toma el alto de esa columna: empieza con el titular y termina con los chips (203–224 px
-     de 1024 a 1920; antes clamp(200px, 30svh, 260px) centrada, con el titular 70 px más abajo que la foto y los chips centrados). */
+  /* Café y té (2026-11-16): titular y entradilla en 1–6 y la foto en 7–12 (5:2), alineados arriba; debajo, a 48, la carta: las categorías en
+     una lista vertical fija en las columnas 1–3 y la parrilla en 4–12 (cuatro por fila); el cierre vuelve al margen izquierdo, a 48. */
+  .cafe { --ct-barra: 0px; }
   .cafe > .sec-head { grid-column: 1 / span 6; grid-row: 1; margin: 0; }
-  .cafe-cuerpo { display: contents; }
-  .cafe-foto { grid-column: 7 / -1; grid-row: 1; }
-  .cafe-foto .frame-clip { aspect-ratio: auto; height: clamp(200px, 30svh, 260px); }
-  .cafe-foto img { width: 100%; height: 100%; object-fit: cover; }
-  .cafe-carta { grid-column: 1 / -1; grid-row: 2; }
-  .cafe-chips { justify-self: start; margin: var(--space-8) 0 0; }
-  .cafe .c3d { margin-top: 0; } /* la ventana deja 24 sobre la tarjeta: chips → carta 24 */
-  /* Con subgrid la carta presta sus dos filas a la sección (chips | carrusel) y la foto abarca encabezado y chips. Sin subgrid (navegadores de
-     antes de 2023) queda lo de arriba: la foto con su alto acotado junto al encabezado y la carta debajo. */
-  @supports (grid-template-rows: subgrid) {
-    .cafe-foto { position: relative; grid-row: 1 / span 2; align-self: stretch; min-height: 200px; } /* sin carta (sin JavaScript o si falla) la foto no baja de 200 */
-    .cafe-foto .frame-clip { position: absolute; inset: 0; height: auto; }
-    .cafe-carta { grid-row: 2 / span 2; grid-template-columns: subgrid; grid-template-rows: subgrid; }
-    .cafe-chips { grid-column: 1 / span 6; grid-row: 1; margin-top: var(--space-12); }
-    .cafe .c3d, .cafe-status { grid-column: 1 / -1; grid-row: 2; }
-  }
+  .cafe-foto { order: 0; grid-column: 7 / -1; grid-row: 1; margin: 0; }
+  .cafe-foto .frame-clip { aspect-ratio: 5 / 2; }
+  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; margin-top: var(--space-12); }
+  .ct-nav { grid-column: 1 / span 3; top: calc(var(--hdr-h) + var(--space-6)); flex-direction: column; margin: 0; padding: 0; overflow: visible; box-shadow: none; }
+  .ct-chip { justify-content: flex-start; }
+  .ct-lista { grid-column: 4 / -1; gap: var(--space-12); padding-top: 0; }
+  .ct-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .ct-cierre { order: 0; grid-column: 1 / -1; grid-row: 3; margin-top: var(--space-12); }
 }
 
 /* ---------- Impresión ---------- */

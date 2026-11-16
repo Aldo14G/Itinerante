@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { readFile, access, readdir } from 'node:fs/promises';
 import { pickBooks, chipNode, coverflowPose, nearestIndex, captionOf, CF_GIRO, readTrail, writeTrail, trailState, trailLine, TRAIL_KEY } from '../rail.js';
 import { coverflowPose as poseMotor, keyTarget, tiltPose, tiltTransform, ATENUADA } from '../carousel3d.js';
-import { validMenu, precioCarta } from '../cafe.js';
+import { validMenu, menuProblems, validFoto, precioCarta, currentGroup, groupId } from '../cafe.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
@@ -551,13 +551,13 @@ test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poes
   // La palomita es un trazo SVG (checkMark) que se dibuja al elegir (drawCheck: .is-dibuja, solo con movimiento), 2026-11-14.
   assert.ok(/btn\.prepend\(checkMark\(\)\)/.test(railJs) && /export function checkMark\(cls = 'chip-chk'\)/.test(motor) && /path\.setAttribute\('pathLength', '1'\)/.test(motor) && /setAttribute\('aria-hidden', 'true'\)/.test(motor), 'la palomita del chip es un trazo SVG decorativo de largo 1');
   assert.ok(/@keyframes chk-dibuja \{ from \{ stroke-dashoffset: 1; \} to \{ stroke-dashoffset: 0; \} \}/.test(css) && /\.motion \.is-dibuja > \.chip-chk path \{ animation: chk-dibuja var\(--dur-rapida\) var\(--curva-salida\) backwards; \}/.test(css), 'la palomita se dibuja con stroke-dashoffset, en dur-rapida y solo con movimiento');
-  assert.ok(/export function drawCheck\(el\) \{\s*if \(!el \|\| typeof document === 'undefined' \|\| !document\.documentElement\.classList\.contains\('motion'\)\) return;/.test(readFileSync_('motion.js')) && /drawCheck\(chip\)/.test(railJs) && /drawCheck\(chip\)/.test(readFileSync_('cafe.js')), 'se dibuja solo al elegir (chips del Catálogo y de la carta), nunca al pintar');
+  assert.ok(/export function drawCheck\(el\) \{\s*if \(!el \|\| typeof document === 'undefined' \|\| !document\.documentElement\.classList\.contains\('motion'\)\) return;/.test(readFileSync_('motion.js')) && /drawCheck\(chip\)/.test(railJs) && !/drawCheck|checkMark/.test(readFileSync_('cafe.js')), 'se dibuja solo al elegir (chips del Catálogo), nunca al pintar; la barra de categorías de la carta marca el grupo a la vista con el color, sin palomita (no cambia de ancho al desplazar)');
   // Recorrido: conector de 2 px entre paradas (linea-fuerte atenuada; primario entre dos hojeadas), borde primario en la hojeada no elegida.
   assert.ok(/\.rail-conector \{[^}]*min-width: var\(--space-2\); height: 2px;[^}]*background: color-mix\(in oklab, var\(--linea-fuerte\) 45%, transparent\);/.test(cssFlat) && /\.rail-conector::after \{[^}]*background: var\(--primario\); transform: scaleX\(0\);/.test(cssFlat) && /\.rail-conector\.is-hecho::after \{ transform: none; \}/.test(cssFlat), 'conector de 2 px, atenuado; primario entre dos paradas hojeadas; nunca menos de 8 px');
   // El conector se llena una sola vez cuando la segunda parada queda hojeada (2026-11-14; Animated Beam sin bucle), desde la que ya estaba.
   assert.ok(/@keyframes conector-llena \{ from \{ transform: scaleX\(0\); \} to \{ transform: scaleX\(1\); \} \}/.test(css) && /\.motion \.rail-conector\.is-llena::after \{ animation: conector-llena var\(--dur-base\) var\(--curva-salida\); \}/.test(css) && /if \(!was && st\.links\[i\] && nueva >= 0\) fillLink\(l, nueva === i \? 'izq' : 'der'\);/.test(railJs) && /function fillLink\(l, haciaIzq\) \{\s*if \(!isMotion\(\)\) return;/.test(railJs), 'el conector crece una vez, solo por la persona y solo con movimiento');
   assert.ok(/\.rail-chip\.is-hojeada:not\(\[aria-checked="true"\]\) \{ box-shadow: inset 0 0 0 2px var\(--primario\); \}/.test(cssFlat), 'la hojeada que no es la elegida lleva borde primario');
-  assert.ok(/\.rail-chips \{ display: flex; flex-wrap: nowrap;/.test(cssFlat) && /\.rail-chips:has\(\.rail-conector\) \{ gap: 0; \}/.test(cssFlat) && /@media \(max-width: 389px\) \{[^}]*\.rail-chips \.chip \{ padding: 0 var\(--space-3\); \}/.test(mobileFlat), 'un solo renglón (no se parten los chips): hasta 389 px menos relleno y el conector es la separación');
+  assert.ok(/\.rail-chips \{ display: flex; flex-wrap: nowrap;/.test(cssFlat) && /\.rail-chips:has\(\.rail-conector\) \{ gap: 0; \}/.test(cssFlat) && /@media \(max-width: 389px\) \{[^}]*\.rail-chips \.chip, \.ct-nav \.chip \{ padding: 0 var\(--space-3\); \}/.test(mobileFlat), 'un solo renglón (no se parten los chips): hasta 389 px menos relleno y el conector es la separación');
   assert.ok(/<p class="rail-progreso" aria-live="polite" data-rail-progreso><\/p>/.test(html) && /\.rail-progreso \{[^}]*font: var\(--t-nota-pie\); font-weight: 600; color: var\(--turquesa-texto\);/.test(cssFlat), '«N de 3 paradas hojeadas» junto a la nota (tras ella o debajo, en el eje izquierdo; 2026-11-15), Footnote semibold en turquesa-texto, región viva');
   assert.ok(/onUserMove: \(\) => mark\(current\)/.test(railJs) && /choose: chip => \{[^}]*mark\(chip\.dataset\.id\);/.test(railJs) && /for \(const type of \['pointerdown', 'wheel'\]\) viewport\.addEventListener/.test(motor), 'cuenta como hojeada al elegirla o al mover el carrusel en ella (no la que se pinta sola al cargar)');
   // Lo retirado no vuelve: iconos de parada, <progress>, «Pregúntanos», puntos y «Ver todo el catálogo».
@@ -608,7 +608,7 @@ test('eventos: insignias de tipo y de estado; la fecha solo sale de eventos.json
   const tipo = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
   assert.equal(items.length, 3);
   for (const [block, id] of items) {
-    assert.ok(block.includes(`<p class="ev-rot"><span class="badge">${tipo[id]}</span><span class="badge badge--quiet" data-ev-when>${NO_DATE}</span></p>`), `${id}: insignia de tipo «${tipo[id]}» e insignia de estado «${NO_DATE}»`);
+    assert.ok(block.includes(`<div class="ev-rot"><span class="badge">${tipo[id]}</span><span class="badge badge--quiet" data-ev-when>${NO_DATE}</span></div>`), `${id}: insignia de tipo «${tipo[id]}» e insignia de estado «${NO_DATE}»`);
     assert.equal((block.match(/class="badge/g) || []).length, 2, `${id}: dos insignias, no más`);
     assert.ok(!/data-fecha=|<button|<a /.test(block), `${id}: hoy ninguna propuesta tiene fecha confirmada ni acciones (sin reserva ni calendario)`);
   }
@@ -1145,7 +1145,7 @@ test('Novedades sin entradas no existe; con una entrada aparece sola con su lleg
   assert.equal(newsPlan(data.books, { novedades: { entradas: [{ id: 'no-existe', llegada: '2026-11-09' }] } }, { hoy: HOY }).show, false, 'una entrada que no es un libro del inventario no basta para mostrar la sección');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [entry(7, '2026-12-24')] } }, { hoy: HOY }).show, false, 'una llegada futura espera su día');
 });
-test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas giran hasta 44° y asoman separadas, con hueco (sin encimarse); con movimiento reducido, la misma geometría plana; un solo motor para portada y carta', async () => {
+test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas giran hasta 44° y asoman separadas, con hueco (sin encimarse); con movimiento reducido, la misma geometría plana; el motor es solo del carrusel de portadas', async () => {
   const railJs = await readFile(here('./rail.js'), 'utf8');
   const motor = await readFile(here('./carousel3d.js'), 'utf8');
   assert.equal(CF_GIRO, 44);
@@ -1181,20 +1181,22 @@ test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas gir
   // Desliz nativo con imán al centro; perspectiva en la ventana (punto de fuga fijo) y 3D conservado en la pista.
   assert.ok(/\.c3d-viewport \{[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*perspective: calc\(var\(--c3d-w\) \* var\(--perspectiva-carrusel-piezas\)\); touch-action: manipulation;/.test(cssFlat), 'ventana: imán, sin arrastrar la página y con su perspectiva (en anchos de pieza)');
   assert.ok(/\.c3d-track \{[^}]*padding: 0 calc\(50% - var\(--c3d-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.c3d-track > li \{ flex: 0 0 var\(--c3d-w\); scroll-snap-align: center;/.test(css) && /\.c3d--portada \{ --c3d-w: min\(clamp\(176px, 58vw, 248px\), calc\(\(100svh - 320px\) \/ 1\.5\)\); \}/.test(css), 'portadas del 58 % del ancho (176–248 px, con tope contra el alto) centradas por el imán');
-  assert.ok(!/c3d--evento/.test(css + mobileCss + html) && /\.c3d--carta \{ --c3d-w: clamp\(184px, 60vw, 248px\); \}/.test(css), 'cada variante pone el ancho de su pieza; la de evento se retiró con el carrusel de Eventos (2026-11-16)');
+  assert.ok(!/c3d--(evento|carta)|c3d-card|cafe-card|cafe-chip/.test(css + mobileCss + html + readFileSync_('cafe.js') + readFileSync_('feed.js')), 'las variantes evento y carta se retiraron el 2026-11-16 (Eventos y la carta ya no son carruseles): sin reglas ni marcado huérfanos');
   assert.ok(/@media \(min-width: 761px\) \{[\s\S]*?\.c3d \{ --c3d-escenario: min\(1240px, max\(100%, 100% \+ 2 \* \(var\(--margen\) - var\(--margen-escritorio\)\)\)\); width: var\(--c3d-escenario\); max-width: none; margin-inline: calc\(\(100% - var\(--c3d-escenario\)\) \/ 2\); \}[\s\S]*?mask-image: linear-gradient/.test(css) && /\.c3d--portada \{ --c3d-w: clamp\(240px, calc\(\(100cqi - 2 \* \(var\(--alto-md\) \+ var\(--space-4\)\)\) \/ \(2 \* var\(--c3d-borde\)\)\), 280px\); \}/.test(css), 'desde 761: escenario de hasta 1240 px centrado, bordes que se desvanecen y la pieza que cabe con sus vecinas y las flechas');
   // Toque y teclado: una vecina viene al centro; la del centro se abre. Una sola parada de tabulador; ← → Inicio Fin.
   assert.ok(/if \(!item\.classList\.contains\('is-centro'\)\) \{\s*e\.stopImmediatePropagation\(\);/.test(motor) && /onOpen\?\.\(items\.indexOf\(item\), item, e\)/.test(motor) && /wireBookOpen\(track, ensureCatalog\)/.test(railJs), 'tocar una vecina la trae al centro; tocar la del centro la abre (en la portada, la ficha: iti:open-book)');
   assert.ok(/const k0 = keyTarget\(e\.key, actual, items\.length\);/.test(motor), 'teclado: ← → Inicio y Fin en la pieza central');
   assert.ok(/\.rail-item:not\(\.is-centro\) \.save \{ opacity: 0; visibility: hidden; \}/.test(css), 'Guardar solo sobre la portada del centro');
-  assert.ok(/\.rail-item\.is-centro \.cover \{ box-shadow: var\(--sombra-portada\); \}/.test(css) && /\.c3d-item\.is-centro \.cafe-card \{ box-shadow: var\(--sombra-portada\); \}/.test(css), 'solo la pieza del centro lleva sombra-portada');
+  assert.ok(/\.rail-item\.is-centro \.cover \{ box-shadow: var\(--sombra-portada\); \}/.test(css) && !/\.c3d-item\.is-centro [^{]*\{ box-shadow/.test(css), 'solo la portada del centro lleva sombra-portada');
   const flechas = [...html.matchAll(/<button class="([^"]*c3d-flecha[^"]*)"/g)].map(m => m[1]);
-  assert.ok(/\.c3d-flecha \{ position: absolute;/.test(css) && flechas.length === 4 && flechas.every(c => /btn btn--vidrio btn--icono c3d-flecha c3d-flecha--(prev|next)/.test(c)), 'flechas de vidrio de 48 a los lados, dos por carrusel');
+  assert.ok(/\.c3d-flecha \{ position: absolute;/.test(css) && flechas.length === 2 && flechas.every(c => /btn btn--vidrio btn--icono c3d-flecha c3d-flecha--(prev|next)/.test(c)), 'flechas de vidrio de 48 a los lados del carrusel de portadas (el único)');
   const rail = html.match(/<div class="rail" id="colecciones" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.ok(/<div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title><\/p><p class="cf-meta" data-rail-meta><\/p><\/div>/.test(rail), 'título y «autor · precio» del libro del centro');
   assert.ok(/if \(say === i\) \{ say = -1; if \(live && liveText\) live\.textContent = liveText\(i\); \}/.test(motor), 'con flechas o teclado, la pieza que llega al centro se anuncia en la región viva');
   assert.ok(!/createCarousel3D|carousel3d/.test(readFileSync_('feed.js')), 'Eventos ya no usa el motor (destacado y lista por fecha, 2026-11-16)');
-  for (const [file, variante] of [['rail.js', 'portada'], ['cafe.js', 'carta']]) assert.ok(/createCarousel3D\(/.test(readFileSync_(file)) && html.includes(`c3d c3d--${variante}" role="region" aria-roledescription="carrusel"`), `${file}: variante ${variante} del mismo motor, con role="region" y aria-roledescription="carrusel"`);
+  assert.ok(!/createCarousel3D|carousel3d/.test(readFileSync_('cafe.js')), 'la carta ya no usa el motor (parrilla por categorías, 2026-11-16)');
+  assert.equal((html.match(/aria-roledescription="carrusel"/g) || []).length, 1, 'un solo carrusel en la página: el de portadas');
+  for (const [file, variante] of [['rail.js', 'portada']]) assert.ok(/createCarousel3D\(/.test(readFileSync_(file)) && html.includes(`c3d c3d--${variante}" role="region" aria-roledescription="carrusel"`), `${file}: variante ${variante} del mismo motor, con role="region" y aria-roledescription="carrusel"`);
 });
 test('profundidad (A5): la pieza central se inclina hacia el cursor hasta 6° y se adelanta 12 px; al presionar, 0.97 y sombra-flotante; nada sin movimiento', () => {
   const motor = readFileSync_('carousel3d.js');
@@ -1208,9 +1210,9 @@ test('profundidad (A5): la pieza central se inclina hacia el cursor hasta 6° y 
   assert.equal(tiltTransform({ rx: 3, ry: -2 }, { adelanto: 12, perspectiva: 800 }), 'perspective(800px) rotateX(3deg) rotateY(-2deg) translateZ(12px)');
   assert.ok(/matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)/.test(motor) && /e\.pointerType !== 'mouse' \|\| !fine\.matches \|\| !root\.classList\.contains\('motion'\)/.test(motor), 'solo con puntero fino que pasa por encima, y con movimiento («Pausar el movimiento» y reducir movimiento lo apagan)');
   assert.ok(/target\.closest\('\.c3d-item\.is-centro'\)/.test(motor) && /if \(!frame\) frame = requestAnimationFrame\(paint\);/.test(motor), 'solo la pieza central de un carrusel; una escritura por fotograma');
-  assert.ok(/'data-inclina': ''/.test(readFileSync_('catalog.js')) && /dataset\.inclina = ''/.test(readFileSync_('rail.js')) && /dataset\.inclina = ''/.test(readFileSync_('cafe.js')) && !/inclina/.test(readFileSync_('feed.js')) && !/class="ev-[^"]*"[^>]*data-inclina/.test(html), 'portadas, carta y la tarjeta de la rejilla se marcan con data-inclina; las tarjetas de evento no se inclinan (no son la pieza de un carrusel)');
+  assert.ok(/'data-inclina': ''/.test(readFileSync_('catalog.js')) && /dataset\.inclina = ''/.test(readFileSync_('rail.js')) && !/inclina/.test(readFileSync_('cafe.js') + readFileSync_('feed.js')) && !/class="(ev|ct)-[^"]*"[^>]*data-inclina/.test(html), 'la portada central y la tarjeta de la rejilla se marcan con data-inclina; las tarjetas de evento y de producto no se inclinan (no son la pieza de un carrusel ni un control)');
   assert.ok(/\.motion \[data-inclina\] \{ transition: transform var\(--dur-base\) var\(--curva-resorte\), scale var\(--dur-instantanea\)/.test(cssFlat), 'vuelve con curva-resorte; el toque en dur-instantanea');
-  assert.ok(/\.motion :is\(\.c3d-item\.is-centro \[data-inclina\], \.card-item\[data-inclina\]\):active \{ scale: 0\.97; \}/.test(cssFlat) && /:active, \.rail-item\.is-centro \.card:active \.cover, \.card-item:active \.cover \{ box-shadow: var\(--sombra-flotante\); \}/.test(cssFlat), 'al presionar, 0.97 y la sombra baja a sombra-flotante');
+  assert.ok(/\.motion :is\(\.c3d-item\.is-centro \[data-inclina\], \.card-item\[data-inclina\]\):active \{ scale: 0\.97; \}/.test(cssFlat) && /\.rail-item\.is-centro \.card:active \.cover, \.card-item:active \.cover \{ box-shadow: var\(--sombra-flotante\); \}/.test(cssFlat), 'al presionar, 0.97 y la sombra baja a sombra-flotante');
   assert.ok(/\[data-inclina\]:active \{ scale: none; \}/.test(css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))), 'con reducir movimiento no hay escala al tocar');
 });
 test('tarjeta de la rejilla (TarjetaLibro): portada que abre la ficha y «Guardar» encima; debajo el título (2 renglones) y «autor · precio» de la hoja; sin reverso ni giro', async () => {
@@ -1325,9 +1327,10 @@ test('Eventos (2026-11-16): destacado y lista por fecha en lugar del carrusel; s
 });
 test('aviso del próximo evento: renglón del inicio y punto de «Eventos», reservados antes del primer render (como Novedades); hoy, nada', async () => {
   const entry = html.match(/<section id="inicio"[\s\S]*?<\/section>/)[0];
-  assert.ok(/<p class="entry-address">[\s\S]*?<\/p>\s*<a class="entry-ev" href="#cartelera" data-ev-cta hidden><span class="entry-ev-dot" aria-hidden="true"><\/span><span class="entry-ev-txt" data-ev-cta-text><\/span><svg class="ic" aria-hidden="true"><use href="#i-down"\/><\/svg><\/a>/.test(entry), 'el renglón va bajo la dirección, oculto y vacío en el marcado: hoy no hay evento con fecha');
+  assert.ok(/<p class="entry-address">[\s\S]*?<\/p>\s*<a class="entry-ev" href="#cartelera" data-ev-cta hidden><svg class="ic" aria-hidden="true"><use href="#t-cartelera"\/><\/svg><span class="entry-ev-txt" data-ev-cta-text><\/span><svg class="ic" aria-hidden="true"><use href="#i-down"\/><\/svg><\/a>/.test(entry), 'el renglón va bajo la dirección, oculto y vacío en el marcado: hoy no hay evento con fecha');
   assert.ok(/<a href="#cartelera">Eventos<span class="ev-dot" data-ev-dot hidden aria-hidden="true"><\/span><span class="sr-only" data-ev-sr><\/span><\/a>/.test(html) && /<a class="menu-row" href="#cartelera"><span>Eventos y talleres<span class="sr-only" data-ev-sr><\/span><\/span><span class="news-dot" data-ev-dot hidden aria-hidden="true"><\/span>/.test(html), 'punto (oculto) en la barra y en el menú, con su texto para lectores de pantalla');
-  assert.ok(/\.entry-ev \{ display: none;[^}]*min-height: var\(--alto-sm\); margin: calc\(var\(--space-2\) - var\(--space-3\)\) 0 calc\(-1 \* var\(--space-3\)\);/.test(cssFlat) && /\.ev-hint \.entry-ev \{ display: flex; visibility: hidden; \}/.test(cssFlat) && /\.ev-hint \.entry-ev:not\(\[hidden\]\) \{ visibility: visible; \}/.test(cssFlat), 'objetivo de 44 que solo ocupa su renglón (8 + 20); existe solo con ev-hint');
+  assert.ok(/\.entry-ev \{ display: none;[^}]*min-width: 0; max-width: 100%; min-height: var\(--alto-sm\); margin: calc\(var\(--space-2\) - var\(--space-3\)\) 0 calc\(-1 \* var\(--space-3\)\);/.test(cssFlat) && /\.ev-hint \.entry-ev \{ display: flex; visibility: hidden; \}/.test(cssFlat) && /\.ev-hint \.entry-ev:not\(\[hidden\]\) \{ visibility: visible; \}/.test(cssFlat), 'objetivo de 44 que solo ocupa su renglón (8 + 20); existe solo con ev-hint');
+  assert.ok(/@media \(min-width: 1024px\) \{\s*\.entry-copy \{ position: relative; \}\s*\.entry-ev, \.ev-hint \.entry-ev \{ display: flex; visibility: visible; position: absolute; left: 0; bottom: calc\(-1 \* var\(--space-2\)\); margin: 0; \}\s*\.entry-ev\[hidden\] \{ display: none; \}\s*\}/.test(css), 'escritorio: vive en el relleno inferior del bloque de texto, sin ocupar sitio (el bloque centrado no se mueve): no necesita reserva');
   assert.ok(/\.ev-dot \{ position: absolute;/.test(cssFlat) && /\.hdr-nav a \{\s*position: relative;/.test(css), 'el punto de la barra flota en su enlace: no mueve a sus vecinos');
   assert.ok(/\.ev-hint \.entry-media, \.ev-hint\.news-hint \.entry-media \{ height: clamp\(160px, calc\(100svh - var\(--hdr-h\) - var\(--entrada-arriba\) - var\(--space-2\) - 20px - var\(--reserva-inferior\)\), calc\(\(100vw - 2 \* var\(--margen\)\) \/ 1\.5\)\); \}/.test(mobileCss) && /\.ev-hint\.news-hint \.entry-news \{ display: none; \}/.test(mobileCss), 'teléfono: la foto cede 28 px y sigue sobre la barra inferior; un solo renglón extra en el inicio');
   const boot = readFileSync_('assets/js/boot.js');
@@ -1839,10 +1842,12 @@ test('icono y logotipo: sprite de trazo de 24 px (los del sistema) y el logotipo
   assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(html.replace(/<!--[\s\S]*?-->/g, '')), 'sin emojis');
 });
 
-test('Café y té (#cafe): menu.json válido (categorías con id, nombre y productos; precio null o número), sin precios inventados', async () => {
+test('Café y té (#cafe): menu.json válido (categorías con id, nombre y productos; precio null o número), precios solo los de la carta impresa', async () => {
   const menu = JSON.parse(await readFile(here('./assets/data/menu.json'), 'utf8'));
   assert.ok(Array.isArray(menu.categorias) && menu.categorias.length >= 2, 'al menos Café y Té');
-  assert.deepEqual(menu.categorias.map(c => c.nombre), ['Café', 'Té'], 'los chips, en ese orden');
+  assert.deepEqual(menu.categorias.map(c => c.nombre), ['Cafés', 'Tés y aguas', 'Dulce', 'Salado'], 'los chips, en el orden de la carta impresa');
+  // Los precios son los de la carta impresa (2026-11-16); los de los tés y las aguas frescas estaban tapados en la foto: null, no se inventan.
+  const IMPRESOS = { 'cafe-de-olla': 65, 'cafe-americano': 45, cappuccino: 65, latte: 65, macchiato: 45, chocolate: 65, espresso: 45, affogato: 70, 'empanada-de-cajeta': 35, 'empanada-de-pina': 35, 'tarta-del-dia': 70, sandwich: 80, 'quesadilla-campesina': 55, molletes: 65 };
   const ids = new Set();
   for (const c of menu.categorias) {
     assert.ok(/^[a-z0-9-]+$/.test(c.id) && typeof c.nombre === 'string' && c.nombre && Array.isArray(c.productos) && c.productos.length, `${c.id}: id, nombre y productos`);
@@ -1851,22 +1856,42 @@ test('Café y té (#cafe): menu.json válido (categorías con id, nombre y produ
       assert.ok(/^[a-z0-9-]+$/.test(p.id) && !ids.has(p.id) && typeof p.nombre === 'string' && p.nombre, `${c.id}/${p.id}: id único y nombre`);
       ids.add(p.id);
       assert.ok(p.precio === null || (typeof p.precio === 'number' && p.precio >= 0), `${p.id}: precio null o un número`);
-      assert.equal(p.precio, null, `${p.id}: hoy sin precio (la librería no los ha dado; no se inventan)`);
+      assert.equal(p.precio, IMPRESOS[p.id] ?? null, `${p.id}: el precio de la carta impresa, o null si estaba tapado (no se inventan)`);
     }
   }
-  assert.ok(menu.categorias[0].productos.length >= 7 && menu.categorias[1].productos.length >= 6, 'los cafés y tés habituales de una cafetería');
-  assert.ok(/sin precios/.test(menu.meta.nota) && /añadir una categoría/i.test(menu.meta.nota), 'el archivo dice de dónde sale y cómo se edita');
+  assert.deepEqual(menu.categorias.map(c => c.productos.length), [8, 7, 3, 3], 'los 8 cafés, 6 tés y las aguas frescas, 3 de dulce y 3 de salado de la carta');
+  assert.deepEqual(Object.keys(IMPRESOS).filter(id => !menu.categorias.some(c => c.productos.some(p => p.id === id))), [], 'todos los productos con precio impreso están');
+  assert.ok(/precio null/.test(menu.meta.nota) && /añadir una categoría/i.test(menu.meta.nota) && /foto/.test(menu.meta.nota) && /plato/.test(menu.meta.nota), 'el archivo dice de dónde sale y cómo se edita (categorías, iconos, fotos y precios)');
+  assert.deepEqual(menuProblems(menu), [], 'el archivo pasa la revisión estricta');
+  for (const c of menu.categorias) for (const p of c.productos) {
+    assert.ok(p.foto === undefined || p.foto === null, `${p.id}: hoy sin foto de producto (la librería no las ha entregado; no se usan fotos de otra cosa)`);
+    if (p.foto) { assert.ok(existsSync(here(`./${p.foto.src}`)), `${p.id}: la foto existe`); assert.ok(prov.real.some(f => `assets/${f.file}` === p.foto.src), `${p.id}: la foto está registrada como fotografía real en assets/provenance.json`); }
+  }
+  assert.ok(html.includes('<symbol id="c-plato" viewBox="0 0 24 24">'), 'el icono de «Para comer» ya está en el sprite');
   // validMenu: lo que no cumple no se pinta; añadir una categoría es añadir un objeto.
   const extra = { categorias: [...menu.categorias, { id: 'comer', nombre: 'Para comer', productos: [{ id: 'pan', nombre: 'Pan dulce', precio: 30 }] }, { id: 'rota', nombre: 'Rota', productos: [] }, { nombre: 'Sin id', productos: [{ id: 'x', nombre: 'X' }] }] };
-  assert.deepEqual(validMenu(extra).map(c => c.id), ['cafe', 'te', 'comer'], 'una categoría nueva entra sola; las vacías o sin id no');
+  assert.deepEqual(validMenu(extra).map(c => c.id), ['cafe', 'te', 'dulce', 'salado', 'comer'], 'una categoría nueva entra sola; las vacías o sin id no');
   assert.deepEqual(validMenu({ categorias: [{ id: 'a', nombre: 'A', productos: [{ id: 'p', nombre: 'P', precio: 'gratis' }, { id: 'q', nombre: 'Q', precio: -1 }, { id: 'r', nombre: 'R', precio: null }] }] })[0].productos.map(p => p.id), ['r'], 'un precio que no es número (o negativo) no se publica');
   assert.deepEqual(validMenu(null), []);
+  // «Para comer»: un objeto más en `categorias` da su chip y su grupo, con su icono, sus precios y sus fotos.
+  const comer = validMenu({ categorias: [...menu.categorias, { id: 'comer', nombre: 'Para comer', icono: 'plato', productos: [{ id: 'pan', nombre: 'Pan dulce', descripcion: 'Del día.', precio: 30, foto: { src: 'assets/img/carta/pan.webp', alt: 'Pan dulce en un plato' } }, { id: 'galleta', nombre: 'Galleta', precio: null, foto: { src: 'https://cdn.example/galleta.jpg', alt: 'x' } }] }] }).at(-1);
+  assert.deepEqual([comer.id, comer.nombre, comer.icono, groupId(comer.id)], ['comer', 'Para comer', 'plato', 'carta-comer']);
+  assert.deepEqual(comer.productos.map(p => [p.id, p.foto]), [['pan', { src: 'assets/img/carta/pan.webp', alt: 'Pan dulce en un plato' }], ['galleta', null]], 'la foto solo vale si es local y lleva alt; si no, la tarjeta va con el icono de su categoría');
+  for (const bad of [null, undefined, 'assets/img/pan.webp', { src: 'assets/img/pan.webp' }, { src: 'assets/img/pan.webp', alt: ' ' }, { src: '//cdn.example/pan.webp', alt: 'Pan' }, { src: 'assets/img/../../pan.webp', alt: 'Pan' }, { src: 'data:image/png;base64,AAAA', alt: 'Pan' }]) assert.equal(validFoto(bad), null);
+  const probs = menuProblems({ categorias: [{ id: 'a', nombre: 'A', productos: [{ id: 'p', nombre: 'P', precio: 'gratis' }, { id: 'p', nombre: 'Q', precio: null }, { id: 'r', nombre: 'R', precio: null, foto: { src: 'https://x.example/r.jpg', alt: 'R' } }] }, { id: 'a', nombre: 'B', productos: [] }] }).join('\n');
+  for (const frag of ['producto p: «precio» es null o un número', 'producto p: id repetido', 'producto r: «foto» es', 'categoría a: id repetido', 'categoría a: sin productos']) assert.ok(probs.includes(frag), `la revisión señala: ${frag}`);
+  // El grupo a la vista: el último cuyo borde superior ya pasó la línea bajo la barra; antes del primero, el primero.
+  assert.equal(currentGroup([300, 900, 1500], 120), 0, 'al llegar a la sección');
+  assert.equal(currentGroup([-400, 100, 700], 120), 1);
+  assert.equal(currentGroup([-400, 121, 700], 120), 0, 'el siguiente aún no cruza la línea');
+  assert.equal(currentGroup([-1500, -900, -300], 120), 2, 'más allá del último grupo, se queda el último');
+  assert.equal(currentGroup([], 120), -1);
   assert.equal(precioCarta(null), null, 'sin precio no se imprime nada (ni «por confirmar»)');
   assert.equal(precioCarta(45), '$45 MXN');
   assert.equal(precioCarta('45'), null);
   const cafeJs = readFileSync_('cafe.js');
   assert.ok(/s\.dataset\.fuente = 'carta';/.test(cafeJs) && !/por confirmar/i.test(cafeJs.replace(/\/\/[^\n]*/g, '')), 'un precio de la carta va marcado con data-fuente; sin precio, nada');
-  assert.ok(prov.menuData && /Carta genérica indicada por Aldo el 2026-11-13/.test(prov.menuData.origin) && /sin precios hasta que la librería los dé/.test(prov.menuData.origin), 'el origen de la carta está registrado en provenance.json');
+  assert.ok(prov.menuData && /Carta impresa de Café Itinerante que mandó Aldo el 2026-11-16/.test(prov.menuData.origin) && /sin precios hasta que la librería los dé/.test(prov.menuData.origin) && /foto/.test(prov.menuData.rule), 'el origen de la carta está registrado en provenance.json (con la regla de las fotos de producto)');
 });
 test('Sistema de guías (2026-11-15): una rejilla de 12 con canal 32 y división 1–6 | 7–12, un eje izquierdo, aire por rol y una forma por nivel', () => {
   const tk = readFileSync_('tokens.css');
@@ -1883,36 +1908,47 @@ test('Sistema de guías (2026-11-15): una rejilla de 12 con canal 32 y división
   assert.ok(/@media \(min-width: 761px\) \{ \.mylist \{ --margen: var\(--margen-escritorio\); \} \}/.test(cssFlat), 'Mi lista en escritorio: margen de la escala (32) dentro de la hoja, no el de la página (144 px a 1440, 384 a 1920)');
   assert.ok(/\.rail-nota-fila \{ display: grid; grid-template-columns: minmax\(0, 1fr\); gap: var\(--space-2\) var\(--space-4\); \}/.test(cssFlat) && /@media \(min-width: 761px\) \{ \.rail-nota-fila \{ display: flex; flex-wrap: wrap; align-items: baseline; \} \.rail-progreso \{ flex: none; \} \}/.test(cssFlat), 'el conteo va junto a su nota: debajo a 8 en el teléfono; desde 761, en su renglón, 16 px después (proximidad)');
   assert.ok(/\.books-foot \.btn \{ width: 100%; \}/.test(mobileFlat), 'teléfono: la primaria del Catálogo a todo el ancho, como en Inicio y Visita');
-  assert.ok(/@media \(max-width: 389px\) \{ \.rail-chips \.chip \{ padding: 0 var\(--space-3\); \} \}/.test(mobileFlat) && /@media \(max-width: 359px\) \{ \.rail-chips \.chip \{ gap: var\(--space-1\); padding: 0 var\(--space-2\); \} \}/.test(mobileFlat) && !/\.rail-chips \.chip:is\(/.test(mobileCss), 'chips: un solo relleno por ancho (antes 12 y, con palomita, 8)');
-  assert.ok(/\.layer-title \{ margin: 0; font: var\(--t-titulo-3\);/.test(cssFlat) && /\.cafe-nombre \{ margin-top: auto; font: var\(--t-titulo-3\);/.test(cssFlat) && /\.visit-note \{ margin: var\(--space-2\) 0 0; font: var\(--t-subtitulo\);/.test(cssFlat) && /\.cafe-desc \{[^}]*text-wrap: balance; \}/.test(cssFlat), 'una forma por nivel: subtitular y nombre de pieza en Title 3, nota en Subheadline 15; la descripción de la carta sin palabra viuda');
-  assert.ok(/min-height: calc\(var\(--c3d-w\) \* 0\.75\);/.test(cssFlat) && /\.cafe \.c3d \{ margin-bottom: calc\(-1 \* var\(--space-12\)\); \}/.test(cssFlat), 'tarjeta de la carta 4:3 (sin vacío interior) y sin la reserva del pie bajo la carta');
+  assert.ok(/@media \(max-width: 389px\) \{ \.rail-chips \.chip, \.ct-nav \.chip \{ padding: 0 var\(--space-3\); \} \}/.test(mobileFlat) && /@media \(max-width: 359px\) \{ \.rail-chips \.chip, \.ct-nav \.chip \{ gap: var\(--space-1\); padding: 0 var\(--space-2\); \} \}/.test(mobileFlat) && !/\.rail-chips \.chip:is\(/.test(mobileCss), 'chips: un solo relleno por ancho (antes 12 y, con palomita, 8), el mismo en el Catálogo y en la barra de categorías de la carta');
+  assert.ok(/\.layer-title \{ margin: 0; font: var\(--t-titulo-3\);/.test(cssFlat) && /\.ct-grupo-tit \{ margin: 0 0 var\(--space-3\); font: var\(--t-titulo-3\);/.test(cssFlat) && /\.ev-card-tit, \.ev-prox-tit \{[^}]*font: var\(--t-titulo-3\);/.test(cssFlat) && /\.visit-note \{ margin: var\(--space-2\) 0 0; font: var\(--t-subtitulo\);/.test(cssFlat) && /\.ct-desc \{[^}]*text-wrap: balance; \}/.test(cssFlat), 'una forma por nivel: subtitular, título de grupo y título de evento en Title 3, nota en Subheadline 15; la descripción de la carta sin palabra viuda');
+  assert.ok(/\.ct-foto \{[^}]*aspect-ratio: 1 \/ 1; border-radius: var\(--radio-md\); background: var\(--fondo-3\);/.test(cssFlat) && !/\.ct-(prod|foto) \{[^}]*(cursor: pointer|box-shadow)/.test(cssFlat), 'tarjeta de producto: recuadro cuadrado (foto o icono) sobre fondo-3; no es un control (sin cursor de mano ni sombra)');
   assert.ok(/\.menu-horario \{[^}]*padding-inline: var\(--space-2\);/.test(cssFlat) && /\.menu-semana \{[^}]*padding-inline: var\(--space-2\);/.test(cssFlat) && /\.menu-redes \{[^}]*margin: 0 calc\(-1 \* var\(--space-2\)\);/.test(cssFlat), 'menú ☰: un solo eje de tinta (filas, estado, semana y redes)');
   assert.ok(/\.hdr-nav \+ \.hdr-end \{ margin-inline-end: calc\(-1 \* var\(--space-4\)\); \}/.test(cssFlat), 'cabecera desde 1101: la tinta de «Mi lista» termina en el borde del contenido');
 });
 
-test('Café y té (#cafe): titular, entradilla, foto real, chips Café · Té y Carrusel3D variante carta (el contacto vive en el pie); en la barra, el menú y el scroll-spy', async () => {
+test('Café y té (#cafe): titular, entradilla, foto real y la carta en parrilla por categorías con su barra fija; se pide en la sala; en la barra, el menú y el scroll-spy', async () => {
   const sec = html.match(/<section id="cafe"[\s\S]*?\n {4}<\/section>/)[0];
-  assert.ok(/<header class="sec-head" data-revelar>\s*<h2 id="cafe-title" class="h2">Café y té <em>en la sala<\/em><\/h2>\s*<p class="sec-texto">[^<]{10,60}<\/p>/.test(sec), 'titular «Nombre *frase*» sin antetítulo y una entradilla corta');
+  assert.ok(/<header class="sec-head" data-revelar>\s*<h2 id="cafe-title" class="h2">Café y té <em>en la sala<\/em><\/h2>\s*<p class="sec-texto">Algo de tomar mientras hojeas\.<\/p>/.test(sec), 'titular y entradilla de siempre (el título se decide cuando exista «Para comer»)');
   const img = sec.match(/<img src="assets\/(img\/[^"]+)"[^>]*>/);
-  assert.ok(img && prov.real.some(f => f.file === img[1]) && /alt="[^"]{20,}"/.test(img[0]) && /width="\d+" height="\d+"/.test(img[0]) && /<figure class="cafe-foto" data-kind="real">/.test(sec), 'foto real de la casa, registrada, con alt y medidas');
+  assert.ok(img && img[1] === 'img/oficial-mesa-800.webp' && prov.real.some(f => f.file === img[1]) && /alt="[^"]{20,}"/.test(img[0]) && /width="\d+" height="\d+"/.test(img[0]) && /<figure class="cafe-foto" data-kind="real">/.test(sec), 'la foto real de la sección, la de siempre, registrada, con alt y medidas');
   const page = html.replace(sec, '');
   assert.ok(!page.includes(img[1].replace('img/', 'assets/img/')), 'la foto no se repite en otra sección');
-  assert.ok(/<div class="rail-chips cafe-chips" role="radiogroup" aria-label="Carta" data-cafe-chips>/.test(sec), 'chips en radiogroup');
-  assert.ok(/<div class="c3d c3d--carta" role="region" aria-roledescription="carrusel" aria-label="Carta" data-cafe-c3d>/.test(sec) && /aria-label="Bebida anterior"/.test(sec) && /aria-label="Bebida siguiente"/.test(sec), 'Carrusel3D, variante carta, con flechas');
-  assert.ok(!/wa\.me|data-cafe-ask/.test(sec) && !/btn--primario/.test(sec), 'sin «Preguntar por la carta» (el contacto vive en el pie); ninguna primaria');
+  assert.ok(/<div class="ct" data-cafe>\s*<nav class="ct-nav" aria-label="Categorías de la carta" data-ct-nav>/.test(sec) && /<div class="ct-lista" data-ct-lista aria-busy="true">/.test(sec), 'barra de categorías (nav con nombre) y la parrilla, que nace ocupada con su esqueleto');
+  assert.equal((sec.match(/<li class="ct-prod card--sk">/g) || []).length, 4, 'esqueleto: cuatro tarjetas del tamaño de las reales');
+  assert.ok(!/c3d|carrusel|role="radiogroup"|aria-live|c3d-flecha/.test(sec.replace(/<!--[\s\S]*?-->/g, '')), 'sin carrusel, flechas ni chips de radio: la carta es una parrilla estática');
+  assert.ok(/<div class="ct-cierre">\s*<p>Pídelo en la barra de la sala\.<\/p>\s*<a class="btn btn--primario btn--lg" href="https:\/\/www\.google\.com\/maps\/dir\/[^"]+" target="_blank" rel="noopener noreferrer"><span>Cómo llegar<\/span>/.test(sec), 'cierre: «Pídelo en la barra de la sala.» y «Cómo llegar» (primaria de 56)');
+  assert.ok(!/wa\.me|data-cafe-ask|WhatsApp/.test(sec) && (sec.match(/btn--primario/g) || []).length === 1, 'sin WhatsApp en la sección (se pide en la sala); una sola primaria');
   assert.ok(!/\$\s?\d|MXN|por confirmar/.test(sec), 'sin precios en el marcado');
   const at = s => html.indexOf(s);
   assert.ok(at('<section id="novedades"') < at('<section id="cafe"') && at('<section id="cafe"') < at('<section id="visita"') && at('<section id="cartelera"') < at('<section id="cafe"'), 'entre Eventos/Novedades y Visita');
+  assert.ok(at('<figure class="cafe-foto"') < at('<div class="ct" data-cafe>') && at('<div class="ct" data-cafe>') < at('<div class="ct-cierre">'), 'orden de lectura del marcado: titular, foto, carta y cierre');
   const cafeJs = readFileSync_('cafe.js');
-  assert.ok(/card\.setAttribute\('role', 'group'\);/.test(cafeJs) && /card\.setAttribute\('aria-roledescription', 'bebida'\);/.test(cafeJs) && /document\.getElementById\(`c-\$\{cat\.icono\}`\)/.test(cafeJs) && !/<img|createElement\('img'\)/.test(cafeJs), 'tarjeta tipográfica con icono de trazo de la categoría; sin fotos de producto');
-  assert.ok(/wireRadioChips\(chipsEl, \{ selector: '\.cafe-chip'/.test(cafeJs) && /createCarousel3D\(\{/.test(cafeJs), 'mismos chips y mismo motor que el Catálogo');
-  assert.ok(/\.cafe-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && /\.cafe-ic \{[^}]*background: var\(--menta\); color: var\(--en-menta\); \}/.test(cssFlat), 'tarjeta en superficie, radio 20; icono en menta');
-  assert.ok(/html:not\(\.js\) :is\(\.cafe-chips, \.c3d--carta\)/.test(css), 'sin JavaScript queda la foto');
+  assert.ok(/const li = make\('li', p\.foto \? 'ct-prod' : 'ct-prod ct-prod--solo'\);/.test(cafeJs) && /document\.getElementById\(`c-\$\{cat\.icono\}`\)/.test(cafeJs) && /if \(p\.foto\) \{/.test(cafeJs) && /img\.addEventListener\('error', \(\) => img\.remove\(\)\);/.test(cafeJs), 'tarjeta de producto: con foto si la trae (si falla, el icono de su categoría); sin foto, compacta, solo con texto');
+  assert.ok(!/role', 'button'|tabIndex = 0|addEventListener\('click'[^\n]*ct-prod|cursor/.test(cafeJs) && /nav\.addEventListener\('click'/.test(cafeJs), 'la tarjeta no es un control: el único clic que se escucha es el de la barra de categorías');
+  assert.ok(/const a = make\('a', 'chip ct-chip', cat\.nombre\);\s*a\.href = `#\$\{groupId\(cat\.id\)\}`;/.test(cafeJs) && /chip\.setAttribute\('aria-current', 'true'\); else chip\.removeAttribute\('aria-current'\);/.test(cafeJs), 'barra de categorías: enlaces a cada grupo; el actual lleva aria-current');
+  assert.ok(/new IntersectionObserver\(/.test(cafeJs) && !/addEventListener\('scroll'/.test(cafeJs) && /rootMargin: `-\$\{line\}px 0px -\$\{Math\.max\(0, innerHeight - line - 2\)\}px 0px`/.test(cafeJs), 'scroll-spy con IntersectionObserver sobre una línea bajo la barra (sin trabajo por cada evento de scroll)');
+  assert.ok(/group\.scrollIntoView\(\{ behavior: isMotion\(\) \? 'smooth' : 'auto', block: 'start' \}\);/.test(cafeJs) && /e\.preventDefault\(\);/.test(cafeJs) && /\.focus\(\{ preventScroll: true \}\)/.test(cafeJs), 'tocar un chip lleva al grupo (suave solo con movimiento), sin cambiar la dirección, y deja el foco en su título');
+  assert.ok(!/\d+\s*ms\b|setTimeout|setInterval|iterations|\.animate\(/.test(cafeJs.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '')), 'sin milisegundos a mano, temporizadores, bucles ni animaciones propias');
+  assert.ok(/\.ct-nav \{\s*position: sticky; top: var\(--hdr-h\); z-index: 3;[\s\S]*?background: var\(--fondo\); box-shadow: 0 1px 0 var\(--linea\);/.test(css) && !/\.ct-nav \{[^}]*(--vidrio|backdrop-filter)/.test(cssFlat) && /\.has-news \.ct-nav \{ background: var\(--fondo-2\); \}/.test(cssFlat), 'barra fija bajo la cabecera, con el fondo opaco de su banda (no es vidrio) y un filete');
+  assert.ok(/\.ct-grupo \{ scroll-margin-top: calc\(var\(--ct-barra\) \+ var\(--space-2\)\); \}/.test(cssFlat) && /\.cafe \{ --ct-barra: calc\(var\(--alto-md\) \+ 2 \* var\(--space-2\)\);/.test(cssFlat), 'al llegar por su chip, el título del grupo queda visible bajo la barra (scroll-margin-top)');
+  assert.ok(/\.ct-chip\[aria-current="true"\] \{ background: var\(--primario\); color: var\(--en-primario\); \}/.test(cssFlat) && /\.ct-grupo-tit:focus-visible \{[^}]*box-shadow: var\(--anillo-foco\); \}/.test(cssFlat), 'el chip actual en primario; el título que recibe el foco lleva su anillo');
+  assert.ok(/\.ct-rejilla \{ display: grid; grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/.test(cssFlat) && /@media \(min-width: 761px\) \{ \.ct-rejilla \{ grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/.test(cssFlat) && /\.ct-rejilla \{ grid-template-columns: repeat\(4, minmax\(0, 1fr\)\); \}/.test(cssFlat), 'parrilla: 2 columnas en el teléfono, 3 desde 761 y 4 desde 1024');
+  assert.ok(!/\.ct-desc \{[^}]*(line-clamp|text-overflow|overflow: hidden)/.test(cssFlat), 'la descripción no se corta con «…»');
+  assert.ok(/html:not\(\.js\) \.ct, \.ct\[data-state="vacio"\] \{ display: none; \}/.test(cssFlat), 'sin JavaScript (o sin carta) quedan la foto y el cierre');
   const app = readFileSync_('app.js');
   assert.ok(/nearby\(\$\('\[data-cafe\]'\), \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app), 'se carga al acercarse');
   assert.ok(/<a href="#cafe">Café<\/a>/.test(html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0]) && /<a class="menu-row" href="#cafe"><span>Café y té<\/span>/.test(html) && !/#cafe/.test(html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0]), 'en la barra de escritorio y el menú; la barra inferior no cambia');
-  assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.books, \.cafe \{ display: grid; grid-template-columns: var\(--rejilla\); column-gap: var\(--canal-rejilla\); align-items: start; \}[\s\S]*?\.cafe-cuerpo \{ display: contents; \}[\s\S]*?\.cafe-foto \{ grid-column: 7 \/ -1; grid-row: 1; \}[\s\S]*?@supports \(grid-template-rows: subgrid\) \{[\s\S]*?\.cafe-carta \{ grid-row: 2 \/ span 2; grid-template-columns: subgrid; grid-template-rows: subgrid; \}[\s\S]*?\.cafe-chips \{ grid-column: 1 \/ span 6; grid-row: 1; margin-top: var\(--space-12\); \}/.test(css) && !/\.cafe-carta \{[^}]*display: contents/.test(css) && !/\.bill > \.sec-head \{ display: grid/.test(cssFlat), 'escritorio (Sistema de guías, 2026-11-15): Café sobre la rejilla de la página, titular 1–6, foto 7–12 al alto de la columna y chips a la izquierda; .cafe-carta conserva su caja (app.js la observa) y usa subgrid; en Eventos la entradilla va bajo el titular');
-  assert.ok(/data-cafe-status><\/p>\s*<\/div>/.test(sec), 'la carta termina en su carrusel (mismo bloque en el teléfono y en escritorio)');
+  assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.books, \.cafe \{ display: grid; grid-template-columns: var\(--rejilla\); column-gap: var\(--canal-rejilla\); align-items: start; \}[\s\S]*?\.cafe > \.sec-head \{ grid-column: 1 \/ span 6; grid-row: 1; margin: 0; \}\s*\.cafe-foto \{ order: 0; grid-column: 7 \/ -1; grid-row: 1; margin: 0; \}[\s\S]*?\.ct-nav \{ grid-column: 1 \/ span 3;[\s\S]*?\.ct-lista \{ grid-column: 4 \/ -1;[\s\S]*?\.ct-cierre \{ order: 0; grid-column: 1 \/ -1; grid-row: 3;/.test(css) && !/subgrid|cafe-cuerpo|cafe-carta/.test(css + html), 'escritorio (Sistema de guías): titular 1–6 y foto 7–12; categorías en 1–3 (lista vertical fija) y parrilla en 4–12; el cierre vuelve al margen izquierdo');
+  assert.ok(/\.ct \{ order: 1;/.test(cssFlat) && /\.cafe-foto \{ order: 2;/.test(cssFlat) && /\.ct-cierre \{ order: 3;/.test(cssFlat) && /\.ct-cierre \.btn \{ width: 100%; \}/.test(mobileFlat), 'teléfono y tableta: la carta antes que la foto (al llegar se ve la carta) y el cierre al final; la primaria a todo el ancho en el teléfono');
   const [prep, prev] = [readFileSync_('scripts/prepare-public.mjs'), readFileSync_('tools/preview-site.mjs')];
   assert.ok(/"carousel3d\.js"/.test(prep) && /"cafe\.js"/.test(prep) && /"assets\/data\/menu\.json"/.test(prep) && /'\/carousel3d\.js', '\/cafe\.js'/.test(prev), 'se publican el motor, la carta y su JSON');
 });
@@ -1952,6 +1988,6 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   assert.ok(caps.every(c => /^<b>[^<]+<\/b>$/.test(c)), 'cada pie es solo el nombre del cuarto');
   assert.ok([...html.matchAll(/<li class="still">[\s\S]*?alt="([^"]{20,})"/g)].length === 6, 'el alt de cada foto se queda');
   // P22: el horario del menú no repite la hora; P9 y P10: «Cómo llegar» en Inicio, menú, Mi lista, cierre del Catálogo, ficha y Visita (y la barra).
-  assert.equal((html.match(/<span>Cómo llegar<\/span>/g) || []).length, 7, '7 «Cómo llegar» (antes 8: el del pie se fue)');
+  assert.equal((html.match(/<span>Cómo llegar<\/span>/g) || []).length, 8, '8 «Cómo llegar»: cabecera, menú, Mi lista, inicio, ficha, cierre del Catálogo, cierre de la carta (2026-11-16) y Visita; el del pie se fue el 2026-11-13');
   assert.ok(!/data-ex-open\)\?\.addEventListener\('click'/.test(app), '«Buscar en el catálogo» no lleva un manejador aparte: es un enlace a #catalogo');
 });

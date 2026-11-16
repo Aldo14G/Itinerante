@@ -425,9 +425,9 @@ function shareButton(e, cls) {
 }
 function fechaNode(e) {
   const p = fechaBloque(e.fecha);
-  const box = make('div', 'ev-fecha');
+  const box = make('span', 'ev-fecha');
   box.setAttribute('aria-hidden', 'true'); // la fecha completa va en texto al lado
-  box.append(make('span', '', p.sem), make('b', '', p.num), make('span', '', p.mes));
+  box.append(make('span', '', p.sem), p.num, make('span', '', p.mes));
   return box;
 }
 // Costo tal como lo da la librería (dato del anuncio): en el destacado, todos los renglones; en la lista, el primero. Sin el campo, nada.
@@ -450,16 +450,16 @@ export function destacadoNode(e, now = new Date()) {
   if (img) { const fig = make('figure', 'ev-prox-fig'); img.addEventListener('error', () => fig.remove()); fig.append(img); art.append(fig); }
   const body = make('div', 'ev-prox-cuerpo');
   const cab = make('div', 'ev-prox-cab');
-  const txt = make('div', 'ev-prox-txt');
-  const rot = make('p', 'ev-rot');
+  const rot = make('div', 'ev-rot');
   rot.append(badge(e.fecha === dayKey(now) ? 'Hoy' : 'Próximo'));
   if (e.tipo) rot.append(badge(e.tipo, true));
   if (e.ciclo) rot.append(badge(e.ciclo, true));
   const tit = make('h3', 'ev-prox-tit', e.titulo);
   tit.id = `ev-t-${e.id}`;
-  txt.append(rot, tit, make('p', 'ev-prox-meta', metaLine(e, now)));
-  cab.append(fechaNode(e), txt);
-  body.append(cab);
+  cab.append(fechaNode(e), rot);
+  const enc = make('div', 'ev-prox-enc'); // el bloque de fecha con las insignias al lado; debajo, a todo el ancho, el título y la fecha completa
+  enc.append(cab, tit, make('p', 'ev-prox-meta', metaLine(e, now)));
+  body.append(enc);
   if (e.descripcion) body.append(make('p', 'ev-prox-desc', e.descripcion));
   const costo = costoNode(e, true);
   if (costo) body.append(costo);
@@ -481,7 +481,7 @@ export function cardNode(e, { level = 'h3' } = {}) {
   const art = make('article', 'ev-card');
   art.setAttribute('aria-labelledby', `ev-t-${e.id}`);
   const txt = make('div', 'ev-card-txt');
-  const rot = make('p', 'ev-rot');
+  const rot = make('div', 'ev-rot');
   if (e.fecha) {
     if (e.hora) rot.append(make('span', 'ev-hora', horario(e)));
     if (e.tipo) rot.append(badge(e.tipo, true));

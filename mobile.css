@@ -1,6 +1,6 @@
 /* Librería Itinerante y Más · teléfono (se carga solo con max-width: 760px). Sistema «Itinerante Líquido».
    Aquí vive lo que solo existe en el teléfono: la barra inferior de vidrio (Inicio, Catálogo, Mi lista), las hojas que suben desde abajo
-   (ficha, Mi lista) y Explorar a pantalla completa, y la tira de La casa. Los tres Carrusel3D (portada, evento, carta) son de style.css. La piel de cada pieza es la de style.css. */
+   (ficha, Mi lista) y Explorar a pantalla completa, y la tira de La casa. El Carrusel3D de portadas es de style.css. La piel de cada pieza es la de style.css. */
 
 /* El final de la página deja libre el alto de la barra más el área segura y 16 px. */
 html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-6)); }
@@ -75,9 +75,8 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
 .still { width: 78vw; scroll-snap-align: center; } /* la siguiente foto asoma lo bastante para invitar a deslizar */
 
-/* ---------- Café y té: la carta (chips y carrusel) antes que la foto (2026-11-14): al llegar se ve la carta, no la foto ---------- */
-/* Solo el orden visual: la foto no es un control (lleva alt), así que el orden de lectura no cambia ninguna acción. */
-.cafe-carta { order: -1; }
+/* ---------- Café y té: la primaria del cierre, a todo el ancho (como en Inicio, Catálogo y Visita) ---------- */
+.ct-cierre .btn { width: 100%; }
 
 /* ---------- Visita y pie ---------- */
 .visit-actions .btn { flex: 1 1 auto; }
@@ -92,8 +91,8 @@ html:not(.js) .tabbar { display: none; }
 /* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón con **un solo relleno** por ancho
    (Sistema de guías, 2026-11-15; antes 12 y, con palomita, 8: dos rellenos en la misma fila): 12 hasta 389 px y, con Zoom de pantalla
    (hasta 359 px), 8 con la palomita más junta. Nunca se parten. */
-@media (max-width: 389px) { .rail-chips .chip { padding: 0 var(--space-3); } }
-@media (max-width: 359px) { .rail-chips .chip { gap: var(--space-1); padding: 0 var(--space-2); } }
+@media (max-width: 389px) { .rail-chips .chip, .ct-nav .chip { padding: 0 var(--space-3); } }
+@media (max-width: 359px) { .rail-chips .chip, .ct-nav .chip { gap: var(--space-1); padding: 0 var(--space-2); } }
 .books > .cat { margin: 0; padding: 0; border: 0; }
 .cat-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .books-foot { padding-block: var(--space-8); }
@@ -185,7 +184,6 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-title-mas { display: inline; }
   .still { width: min(78vw, calc((100svh - 150px) * 1.333)); }
   .c3d--portada { --c3d-w: min(44vw, calc((100svh - 150px) / 1.5)); }
-  .c3d--carta { --c3d-w: min(40vw, calc((100svh - 150px) / 1.25)); }
   .drawer-body { grid-template-columns: 24% minmax(0, 1fr); }
   .drawer { height: calc(100dvh - var(--space-4)); }
   .drawer-actions { grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr); }

@@ -50,6 +50,7 @@
     <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M12 12.5v5M9.5 15h5"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7.5 7.5 5.75 7.5-5.75"/></symbol>
     <symbol id="c-taza" viewBox="0 0 24 24"><path d="M4.5 9.5h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 11h1.25a2.25 2.25 0 0 1 0 4.5H15M3.5 21h14M8.5 3.5c-.7.9-.7 1.8 0 2.7M12 3.5c-.7.9-.7 1.8 0 2.7"/></symbol>
+    <symbol id="c-plato" viewBox="0 0 24 24"><circle cx="12.5" cy="12" r="5.5"/><circle cx="12.5" cy="12" r="2.4"/><path d="M4 4v16M2.5 4v3.5a1.5 1.5 0 0 0 3 0V4M21 20V4c-1.6 1.2-2.2 3.4-2.2 6.5H21"/></symbol>
     <symbol id="c-tetera" viewBox="0 0 24 24"><path d="M12 5v2M8.5 8.5h7M6.5 13a5.5 5.5 0 0 0 11 0c0-2.5-1.6-4.5-3.5-4.5h-4c-1.9 0-3.5 2-3.5 4.5zM6.6 12.2 3.5 9.5M17.4 11h.6a2.5 2.5 0 0 1 0 5h-1.3M8 20.5h8"/></symbol>
   </svg>
 
@@ -144,7 +145,7 @@
           <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
         </div>
         <p class="entry-address"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mariano Matamoros Pte.&nbsp;421&nbsp;·&nbsp;Centro</p>
-        <a class="entry-ev" href="#cartelera" data-ev-cta hidden><span class="entry-ev-dot" aria-hidden="true"></span><span class="entry-ev-txt" data-ev-cta-text></span><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
+        <a class="entry-ev" href="#cartelera" data-ev-cta hidden><svg class="ic" aria-hidden="true"><use href="#t-cartelera"/></svg><span class="entry-ev-txt" data-ev-cta-text></span><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
         <a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"></span><span data-news-cta-text></span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
       </div>
       <figure class="entry-media">
@@ -346,7 +347,7 @@
               <li class="ev-fila" data-id="circulo" data-kind="real">
                 <article class="ev-card" aria-labelledby="ev-t-circulo">
                   <div class="ev-card-txt">
-                    <p class="ev-rot"><span class="badge">Lectura</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></p>
+                    <div class="ev-rot"><span class="badge">Lectura</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></div>
                     <h3 class="ev-card-tit" id="ev-t-circulo">Círculo de lectura</h3>
                   </div>
                   <img class="ev-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async">
@@ -356,7 +357,7 @@
               <li class="ev-fila" data-id="ajedrez" data-kind="real">
                 <article class="ev-card" aria-labelledby="ev-t-ajedrez">
                   <div class="ev-card-txt">
-                    <p class="ev-rot"><span class="badge">Juego</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></p>
+                    <div class="ev-rot"><span class="badge">Juego</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></div>
                     <h3 class="ev-card-tit" id="ev-t-ajedrez">Ajedrez en la casa</h3>
                   </div>
                   <img class="ev-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async">
@@ -366,7 +367,7 @@
               <li class="ev-fila" data-id="taller" data-kind="real">
                 <article class="ev-card" aria-labelledby="ev-t-taller">
                   <div class="ev-card-txt">
-                    <p class="ev-rot"><span class="badge">Taller</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></p>
+                    <div class="ev-rot"><span class="badge">Taller</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></div>
                     <h3 class="ev-card-tit" id="ev-t-taller">Taller de escritura</h3>
                   </div>
                   <img class="ev-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async">
@@ -397,33 +398,35 @@
       </ul>
     </section>
 
-    <!-- Café y té (#cafe): la carta de la sala en un Carrusel3D, variante carta (cafe.js, datos en assets/data/menu.json: se edita sin tocar HTML ni JS).
-         Sin precios mientras la librería no los dé. Sin JavaScript queda la foto. -->
+    <!-- Café y té (#cafe; 2026-11-16: parrilla por categorías con barra de categorías fija, cafe.js). Los datos viven en assets/data/menu.json: se
+         editan sin tocar HTML ni JS, y añadir una categoría («Para comer») es añadir un objeto. Cada producto es una tarjeta (foto cuadrada si la trae;
+         si no, el icono de su categoría), con su nombre, su descripción y, solo si la librería lo dio, su precio. Se pide en la sala: el cierre lo dice
+         y lleva a «Cómo llegar». Sin JavaScript (o si la carta no llega) quedan la foto y el cierre. -->
     <section id="cafe" class="cafe" aria-labelledby="cafe-title">
       <header class="sec-head" data-revelar>
         <h2 id="cafe-title" class="h2">Café y té <em>en la sala</em></h2>
         <p class="sec-texto">Algo de tomar mientras hojeas.</p>
       </header>
-      <div class="cafe-cuerpo">
-        <figure class="cafe-foto" data-kind="real">
-          <div class="frame-clip" data-revelar><img src="assets/img/oficial-mesa-800.webp" width="800" height="600" alt="Mesa con novelas de bolsillo frente a un muro de piedra; al fondo, libreros y el piso ajedrezado" loading="lazy" decoding="async"></div>
-        </figure>
-        <div class="cafe-carta" data-cafe>
-          <div class="rail-chips cafe-chips" role="radiogroup" aria-label="Carta" data-cafe-chips><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></div>
-          <div class="c3d c3d--carta" role="region" aria-roledescription="carrusel" aria-label="Carta" data-cafe-c3d>
-            <div class="cafe-viewport c3d-viewport" data-cafe-viewport>
-              <ul class="cafe-track c3d-track" data-cafe-track aria-busy="true">
-                <li class="cafe-item card--sk" aria-hidden="true"><span class="cafe-card"></span></li>
-                <li class="cafe-item card--sk" aria-hidden="true"><span class="cafe-card"></span></li>
-                <li class="cafe-item card--sk" aria-hidden="true"><span class="cafe-card"></span></li>
-              </ul>
-            </div>
-            <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-cafe-prev disabled aria-label="Bebida anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
-            <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-cafe-next disabled aria-label="Bebida siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+      <figure class="cafe-foto" data-kind="real">
+        <div class="frame-clip" data-revelar><img src="assets/img/oficial-mesa-800.webp" width="800" height="600" alt="Mesa con novelas de bolsillo frente a un muro de piedra; al fondo, libreros y el piso ajedrezado" loading="lazy" decoding="async"></div>
+      </figure>
+      <div class="ct" data-cafe>
+        <nav class="ct-nav" aria-label="Categorías de la carta" data-ct-nav><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></nav>
+        <div class="ct-lista" data-ct-lista aria-busy="true">
+          <div class="ct-grupo" aria-hidden="true">
+            <span class="ct-grupo-tit ct-grupo-tit--sk">&nbsp;</span>
+            <ul class="ct-rejilla">
+            <li class="ct-prod card--sk"><span class="ct-foto"></span><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-desc">&nbsp;<br>&nbsp;</span></span></li>
+            <li class="ct-prod card--sk"><span class="ct-foto"></span><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-desc">&nbsp;<br>&nbsp;</span></span></li>
+            <li class="ct-prod card--sk"><span class="ct-foto"></span><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-desc">&nbsp;<br>&nbsp;</span></span></li>
+            <li class="ct-prod card--sk"><span class="ct-foto"></span><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-desc">&nbsp;<br>&nbsp;</span></span></li>
+            </ul>
           </div>
-          <p class="sr-only" aria-live="polite" data-cafe-live></p>
-          <p class="cafe-status" role="status" data-cafe-status></p>
         </div>
+      </div>
+      <div class="ct-cierre">
+        <p>Pídelo en la barra de la sala.</p>
+        <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
       </div>
     </section>
 

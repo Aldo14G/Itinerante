@@ -4,7 +4,9 @@
 //  H1 · una hoja que se cierra no vuelve a verse, por ninguna vía (×, Escape, «atrás»), y desaparece a tiempo:
 //       con × en ≤ dur-base + un cuadro; con Escape o «atrás» en ≤ 300 ms.
 //  H2 · una hoja del teléfono no rebota al abrir (pico sobre su posición final ≤ 1 px) y queda asentada en ≤ dur-base + 60 ms.
-//  A1 · el aviso («Guardado en Mi lista.», «Enlace copiado.») queda dentro de la ventana y, en el teléfono, sobre la barra inferior.
+//  A1 · el aviso («Guardado en Mi lista.», «Enlace copiado.», «Se descargó el evento para tu calendario.») queda dentro de la ventana y, en
+//       el teléfono, sobre la barra inferior. «Compartir» y «Añadir al calendario» de un evento solo existen con un evento con fecha: se miden
+//       con un evento de prueba que inyecta esta herramienta (no está en el repo).
 //  A2 · el marcador guardado sobre la portada se distingue de su disco (≥ 3:1) con vidrio y en gama media (`data-glass="lite"`).
 //  P1 · con `localStorage` bloqueado (leerlo lanza) el carrusel del Catálogo sigue ahí y «Catálogo» de la barra inferior aterriza.
 //  T1 · la rejilla que se repinta al filtrar termina dentro de dur-lenta (+ 50 ms de respuesta).
@@ -32,10 +34,14 @@ const SIN_ALMACEN = `Object.defineProperty(window, 'localStorage', { get() { thr
 const res = [];
 const ok = (regla, cond, texto) => { res.push({ regla, ok: Boolean(cond), texto }); console.log(`${cond ? '✓' : '✗'} ${regla} ${texto}`); };
 
-async function abrir(perfil, init) {
+// Evento de prueba (dentro de cinco días, hora de Monterrey): da un destacado con «Añadir al calendario» y «Compartir».
+const enDias = n => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + n * 86_400_000));
+const EVENTO_DE_PRUEBA = { eventos: [{ id: 'prueba-hojas', tipo: 'Lectura', titulo: 'Evento de prueba', fecha: enDias(5), hora: '18:57', fin: null, con: null, descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null }] };
+async function abrir(perfil, init, { eventos = null } = {}) {
   const browser = await pw.chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--hide-scrollbars'] });
   const context = await browser.newContext({ ...PERFILES[perfil], locale: 'es-MX', timezoneId: 'America/Monterrey', permissions: ['clipboard-read', 'clipboard-write'] });
   if (init) await context.addInitScript(init);
+  if (eventos) await context.route('**/assets/data/eventos.json', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(eventos) }));
   const page = await context.newPage();
   await page.goto(URL_, { waitUntil: 'load' });
   await sleep(1800);
@@ -121,7 +127,7 @@ for (const nucleos of [8, 4]) {
 // ---- Escritorio ----
 {
   const perfil = 'd1440';
-  const { browser, page, dur } = await abrir(perfil, NUCLEOS(8));
+  const { browser, page, dur } = await abrir(perfil, NUCLEOS(8), { eventos: EVENTO_DE_PRUEBA });
   await page.evaluate(() => document.querySelector('#cat-grid').scrollIntoView({ block: 'start', behavior: 'instant' })); await sleep(2800);
   await page.evaluate(() => scrollBy(0, -160)); await sleep(500);
   const p = page.evaluate(() => new Promise(done => { addEventListener('click', () => { const t0 = performance.now(); let fin = 0; const n = new Set(); const tick = () => { const t = performance.now() - t0; const a = document.getAnimations().filter(x => x.constructor.name === 'Animation' && x.playState === 'running'); a.forEach(x => n.add(x)); if (a.length) fin = t; if (t < 1200) requestAnimationFrame(tick); else done({ tarjetas: n.size, fin: Math.round(fin) }); }; requestAnimationFrame(tick); }, { capture: true, once: true }); }));
@@ -129,10 +135,15 @@ for (const nucleos of [8, 4]) {
   await page.mouse.click(f.x + 14, f.y + f.height / 2);
   const g = await p;
   ok('T1', g.tarjetas > 0 && g.fin <= dur.lenta + 50, `1440: la rejilla al filtrar (${g.tarjetas} tarjetas) termina a los ${g.fin} ms (tope ${dur.lenta + 50})`);
-  await centrar(page, '#cartelera .c3d');
-  await tap(page, perfil, '.c3d-item.is-centro .bill-share'); await sleep(700);
+  await centrar(page, '#cartelera .ev-prox');
+  await tap(page, perfil, '.ev-prox [data-share]'); await sleep(700);
   const a = await aviso(page);
-  ok('A1', a?.dentro, `1440: aviso tras «Compartir» un evento en y ${a?.y} (dentro: ${a?.dentro}; «${a?.texto}»)`);
+  ok('A1', a?.dentro && /Enlace copiado/.test(a?.texto || ''), `1440: aviso tras «Compartir» un evento en y ${a?.y} (dentro: ${a?.dentro}; «${a?.texto}»)`);
+  await sleep(4600);
+  const descarga = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
+  await tap(page, perfil, '.ev-prox [data-ev-cal]'); await sleep(700);
+  const d = await descarga, ac = await aviso(page);
+  ok('A1', ac?.dentro && /calendario/.test(ac?.texto || '') && d?.suggestedFilename() === 'prueba-hojas.ics', `1440: aviso tras «Añadir al calendario» en y ${ac?.y} (dentro: ${ac?.dentro}; «${ac?.texto}»); se descargó ${d ? d.suggestedFilename() : 'nada'}`);
   await sleep(4600);
   await centrar(page, '.c3d--portada');
   await tap(page, perfil, '.rail-item.is-centro .card .cover', 0.5, 0.3); await sleep(900);

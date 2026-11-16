@@ -60,13 +60,12 @@ await send('Page.enable'); await send('Runtime.enable');
 
 const VARIANTES = [
   { name: 'portada', sec: '#libros', c3d: '.c3d--portada', top: '.rail-head' },
-  { name: 'evento', sec: '#cartelera', c3d: '.c3d--evento', top: '.sec-head' },
   { name: 'carta', sec: '#cafe', c3d: '.c3d--carta', top: '.cafe-chips' }
 ];
 // Norma (skill ux-apple §3). Teléfono: % del ancho del carrusel. Escritorio: px.
-const TEL = { portada: [54, 60], carta: [56, 62], evento: [76, 82] };
-const ESC = { portada: [280, 320], evento: [400, 460], carta: [240, 280] };
-const TAB = { portada: [240, 320], evento: [300, 460], carta: [232, 280] };
+const TEL = { portada: [54, 60], carta: [56, 62] };
+const ESC = { portada: [280, 320], carta: [240, 280] };
+const TAB = { portada: [240, 320], carta: [232, 280] };
 
 const report = [];
 const rows = [];
@@ -81,7 +80,7 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   const colL = sr.left + parseFloat(ps.paddingLeft), colR = sr.right - parseFloat(ps.paddingRight);
   const items = [...c.querySelectorAll('.c3d-item')];
   const ci = items.findIndex(i => i.classList.contains('is-centro'));
-  const visual = it => it.querySelector('.cover, .bill-card, .cafe-card') || it.querySelector('.cf-pose');
+  const visual = it => it.querySelector('.cover, .cafe-card') || it.querySelector('.cf-pose');
   const op = el => { let o = 1; for (let p = el; p && p !== c; p = p.parentElement) o *= +getComputedStyle(p).opacity; return o; };
   const info = items.map((it, i) => {
     const r = R(visual(it)); const inside = Math.max(0, Math.min(r.right, vr.right) - Math.max(r.left, vr.left));
@@ -110,7 +109,6 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   const q = s => sec.querySelector(s);
   let arriba, pie = null, accion = null;
   if (name === 'portada') { arriba = q('.rail-nota-fila'); pie = q('.cf-texto'); }
-  else if (name === 'evento') { arriba = q('.sec-head'); pie = q('.bill-desc'); } // «Compartir» va en la tarjeta desde el 2026-11-14
   else { arriba = q('.cafe-chips'); }
   const pieTxt = pie ? [...pie.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.sr-only')).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim().slice(0, 30)) : [];
   const hdr = document.querySelector('.hdr'), tab = document.querySelector('.tabbar');

@@ -81,7 +81,7 @@ const isExported = (src, name) => new RegExp(`export\\s+(?:async\\s+)?(?:functio
 const isDeclared = (src, name) => new RegExp(`(?:function\\*?\\s+${esc(name)}\\s*\\(|(?:const|let)\\s+${esc(name)}\\s*=)`).test(src);
 const usesToken = (src, tok) => src.includes(`--${tok}`) || src.includes(`'${tok}'`) || (tok.startsWith('dur-') && src.includes(`DUR('${tok.slice(4)}')`));
 
-const HOY = '2026-11-14';
+const HOY = '2026-11-16';
 const SITE_FILES = ['index.html', ...CSS_FILES];
 
 test('catálogo de componentes: forma y campos (nombre, descripcion, archivos, tokens, estados, aria, qa, desde)', () => {
@@ -103,8 +103,8 @@ test('catálogo de componentes: forma y campos (nombre, descripcion, archivos, t
     if (c.variante_de) assert.ok(ids.includes(c.variante_de), `${c.id}: variante de un componente del catálogo`);
     for (const k of Object.keys(c.no_aplica ?? {})) assert.ok(!c.estados[k], `${c.id}: «${k}» no puede estar declarado y a la vez no aplicar`);
   }
-  // Los componentes que pidió Aldo (2026-11-14) están todos.
-  for (const n of ['Boton', 'Chip', 'BarraNavegacion', 'MenuHamburguesa', 'BarraInferior', 'Carrusel3D', 'CarruselPortadas', 'CarruselEventos', 'CarruselCarta', 'TarjetaLibro', 'FichaLibro', 'MiLista', 'Explorar', 'CampoBusqueda', 'Aviso', 'EncabezadoSeccion', 'Recorrido', 'MapaLlegada', 'InterruptorMovimiento', 'ContactoPie', 'Esqueletos', 'CarruselNovedades']) {
+  // Los componentes que pidió Aldo (2026-11-14) están todos; el 2026-11-16 los de Eventos pasaron del carrusel al destacado y la lista por fecha, y el de la carta a la barra de categorías y la tarjeta de producto.
+  for (const n of ['Boton', 'Chip', 'BarraNavegacion', 'MenuHamburguesa', 'BarraInferior', 'Carrusel3D', 'CarruselPortadas', 'EventoDestacado', 'ListaEventos', 'BloqueFecha', 'AvisoEvento', 'BarraCategorias', 'TarjetaProducto', 'TarjetaLibro', 'FichaLibro', 'MiLista', 'Explorar', 'CampoBusqueda', 'Aviso', 'EncabezadoSeccion', 'Recorrido', 'MapaLlegada', 'InterruptorMovimiento', 'ContactoPie', 'Esqueletos', 'CarruselNovedades']) {
     assert.ok(C.some(c => c.nombre === n), `catalogado: ${n}`);
   }
 });
