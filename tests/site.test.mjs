@@ -591,6 +591,13 @@ test('recorrido (A4): conteo, tramos y persistencia en localStorage, con el alma
   assert.deepEqual([...readTrail(mem)], ['poesia'], 'solo ids de texto');
   const blocked = { getItem() { throw new Error('bloqueado'); }, setItem() { throw new Error('bloqueado'); } };
   assert.equal(readTrail(blocked).size, 0, 'almacenamiento bloqueado: el recorrido vive solo en la visita');
+  // Leer `localStorage` puede lanzar (SecurityError con el almacenamiento bloqueado): el valor por omisión se resuelve dentro del try (2026-11-16; antes ocultaba el carrusel entero).
+  const desc = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { throw new Error('SecurityError'); } });
+  try {
+    assert.equal(readTrail().size, 0, 'leer el almacén lanza: recorrido vacío, sin excepción');
+    assert.equal(writeTrail(new Set(['poesia'])), false, 'escribir tampoco lanza');
+  } finally { if (desc) Object.defineProperty(globalThis, 'localStorage', desc); else delete globalThis.localStorage; }
   assert.equal(writeTrail(new Set(['x']), blocked), false);
 });
 test('eventos: insignias de tipo y de estado; la fecha solo sale de data-fecha, en español y con el día de Monterrey', () => {

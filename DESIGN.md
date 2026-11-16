@@ -245,6 +245,14 @@ Orden (con Café y té desde el 2026-11-13, entre Novedades y Visita): **Inicio*
 
 Los titulares de sección entran **por línea** (las líneas reales, medidas en pantalla, suben desde su máscara con `dur-lenta`, `curva-salida` y 60 ms de escalón; la entradilla se funde 8 px), las imágenes se **revelan** (recorte del 6 % y escala 1.06 → 1, la escala dura 1.6 × `dur-lenta`), los controles responden al toque (0.97 botones, 0.96 chips, 0.94 casillas). `app.js` prepara solo lo que aún no se ve, en reposo, y una sola vez; si cambia el ancho, los titulares vuelven a su texto. Con «reducir movimiento» (o la pausa del pie) no hay desplazamientos, escalas ni rebotes: todo aparece colocado y los colores siguen respondiendo.
 
+**Auditoría de los 20 principios (2026-11-16; skill `auditor-calidad`, primera pasada: 20 de 40 con cuatro fallos bloqueantes que el arnés no veía; se miden desde hoy con `tools/qa/hojas.mjs`).** Normas que salen de ella:
+- **Una hoja que se cierra no vuelve a verse.** La hoja (`.drawer`, `.mylist`, `.explorer`) solo anima opacidad y posición; `overlay` y `display` (`allow-discrete`) van **solo en su `::backdrop`**. Con ellos en la hoja, el estado cerrado no tenía pose: tras salir volvía a entrar (ficha visible hasta 545 ms) y con Escape o «atrás» quedaba 420–440 ms con la maqueta rota. Ahora: × en 235–246 ms, Escape y «atrás» en ≤ 5 ms.
+- **Una hoja no rebota.** `curva-resorte` es de las piezas pequeñas (≤ 64 px o recorrido ≤ 24 px: botón, icono, pastilla de la barra, pulgar, inclinación). En el teléfono las hojas suben con `curva-salida` (rebotaban 16–30 px; hoy pico 0 y asentadas a los 317–347 ms).
+- **El aviso siempre queda en la ventana.** Solo sube sobre el pie de una hoja **abierta**; sin hoja usa su sitio (12 px sobre la barra inferior). Antes tomaba el pie de la ficha cerrada y se pintaba en y −68.
+- **El marcador guardado conserva `primario` en los respaldos opacos del vidrio** (gama media, sin `backdrop-filter`, transparencia reducida, contraste alto): era blanco sobre blanco (1:1), hoy 6.33:1.
+- **Leer `localStorage` puede lanzar**: el acceso va dentro del `try` (`readTrail`, `writeTrail`). Con el almacenamiento bloqueado el carrusel del Catálogo se ocultaba entero.
+- **La rejilla al filtrar termina dentro de `dur-lenta`** (el retraso del escalón se topa en `dur-lenta − dur-base`; 828 → 710 ms).
+
 ### Accesibilidad
 
 Texto ≥ 4.5:1 y bordes, iconos y foco ≥ 3:1 en ambos temas, también sobre el peor vidrio (prueba con tokens en `tests/site.test.mjs`; `tools/qa/contrast.mjs` barre la página en claro y oscuro). Objetivos de 48 × 48 con 8 px de separación; 44 solo en línea y en las barras; nada se desborda a 320 px. Estados con palabra o forma además del color (palomita del chip, icono relleno de la casilla y de «Guardado», punto hueco de «Cerrado»).

@@ -772,7 +772,8 @@ html:not(.js) .bill-pie { display: none; }
 }
 .save:active { transform: scale(0.94); }
 .save .ic { width: 22px; height: 22px; }
-.save[aria-pressed="true"]:not(.save--wide) { background: var(--primario); color: var(--en-primario); }
+/* !important: los respaldos opacos del vidrio (gama media, sin backdrop-filter, transparencia reducida, contraste alto) pintan el disco en `superficie` y dejaban el marcador guardado blanco sobre blanco (1:1; 2026-11-16). */
+.save[aria-pressed="true"]:not(.save--wide) { background: var(--primario) !important; color: var(--en-primario); }
 .save--wide {
   position: static; display: inline-flex; gap: var(--space-2); justify-self: start; width: auto; height: auto; min-height: var(--alto-md);
   padding: 0 var(--space-5); border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta);
@@ -866,7 +867,9 @@ html:not(.js) .bill-pie { display: none; }
 
 /* Hojas: entrada y salida. El contenido espera un fotograma (openDialog con defer) y la salida corre antes del cierre real (closeDialog). */
 .is-filling > * { content-visibility: hidden; }
-.drawer, .mylist, .drawer::backdrop, .mylist::backdrop { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
+/* La hoja solo anima opacidad y posición; `overlay` y `display` van solo en su velo. Con ellos en la hoja, al cerrarse seguía pintada sin pose de «cerrado»: volvía a entrar tras salir y, con Escape o «atrás», se quedaba 420 ms con la maqueta rota (auditoría de los 20 principios, 2026-11-16). */
+.drawer, .mylist { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte); }
+.drawer::backdrop, .mylist::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
 @starting-style { .drawer[open], .mylist[open], .drawer[open]::backdrop, .mylist[open]::backdrop { opacity: 0; } }
 .drawer.is-closing, .mylist.is-closing, .drawer.is-closing::backdrop, .mylist.is-closing::backdrop { opacity: 0; transition-duration: var(--dur-rapida); transition-timing-function: var(--curva-entrada-salida); }
 @starting-style { .motion .drawer[open], .motion .mylist[open] { transform: translateY(4%) scale(0.96); } }

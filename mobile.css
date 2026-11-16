@@ -134,6 +134,8 @@ html:not(.js) .tabbar { display: none; }
 .drawer-foot { padding: var(--space-3) var(--margen) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); }
 .ml-actions { padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); }
 .drawer::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* Una hoja de 400–660 px no rebota: el resorte es de las piezas pequeñas (rebotaba 19–30 px; 2026-11-16). */
+.drawer, .mylist { transition-timing-function: var(--curva-salida); }
 @starting-style { .motion .drawer[open], .motion .mylist[open] { transform: translateY(100%); opacity: 1; } }
 .motion .drawer.is-closing, .motion .mylist.is-closing { transform: translateY(100%); opacity: 1; }
 
@@ -153,7 +155,8 @@ html:not(.js) .tabbar { display: none; }
 .explorer .cat-bar { margin-top: var(--space-4); }
 .explorer .cat-filters-foot { position: sticky; bottom: calc(-1 * var(--space-24)); z-index: 2; margin: 0 calc(-1 * var(--margen)); padding: var(--space-3) var(--margen) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); background: var(--fondo); border-top: 1px solid var(--linea); }
 .explorer .cat-layout { padding-top: var(--space-4); }
-.explorer, .explorer::backdrop { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
+.explorer { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-salida); }
+.explorer::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
 @starting-style { .explorer[open] { opacity: 0; } .motion .explorer[open] { transform: translateY(100%); opacity: 1; } }
 .explorer.is-closing { opacity: 0; transition-duration: var(--dur-rapida); }
 

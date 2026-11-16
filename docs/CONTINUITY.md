@@ -1,3 +1,12 @@
+# Continuidad de Itinerante — 2026-11-16 (primera auditoría de los 20 principios y sus correcciones)
+
+- **Pedido de Aldo:** lanzar la auditoría completa con la skill `auditor-calidad` y, visto el resultado, aplicar los cuatro bloqueantes, el rebote de las hojas y la rejilla al filtrar, corregir la skill y añadir las comprobaciones al script.
+- **Auditoría (commit `04df276`, solo lectura):** 20 de 40, seis principios en 0, cuatro P0; `principios.mjs` estaba entero en verde. Informe y tiras de 43 interacciones fuera del repo (scratchpad de la sesión).
+- **Corregido:** hojas que reaparecían al cerrarse o se quedaban rotas con Escape y «atrás» (`style.css`, `mobile.css`: `overlay` y `display` solo en el `::backdrop`); aviso fuera de la ventana (`saved.js`); carrusel oculto con `localStorage` bloqueado (`rail.js`, con prueba nueva); marcador guardado 1:1 en gama media (`style.css`); hojas del teléfono sin resorte; rejilla al filtrar 828 → 710 ms (`catalog.js`).
+- **Arnés:** `tools/qa/hojas.mjs` nuevo (19 comprobaciones; falla 15 contra el sitio anterior y 0 contra el corregido), conectado a `principios.mjs` (principios 4, 5, 9, 10, 17 y 18), que además lista como aviso las esperas con milisegundos a mano en el JS.
+- **Skill:** corregidas las reglas 1, 5, 8, 9, 15 y 20, que contradecían decisiones aprobadas o eran imprecisas; la 4 y la 10 piden ahora el estado cerrado y el aviso dentro de la ventana; nota sobre la gama media (el arnés corre casi siempre sin vidrio).
+- **Abierto (decide Aldo):** titular sin entrada animada al llegar por enlace; tonos de «presionado» por familia; `#libro-<id>` inexistente con aviso; «Pausar el movimiento» también en el menú ☰; cascada del menú más corta. Sin decidir: velo con movimiento reducido, Eventos sin esqueleto al llegar por enlace, milisegundos a mano en JS (7). No medido: Safari, iPhone físico, tema oscuro en tiras, y cuántos teléfonos reales caen en gama media.
+
 # Continuidad de Itinerante — 2026-11-15 (Sistema de guías: una rejilla, un eje izquierdo, aire por rol, botones y títulos por nivel)
 
 - **Pedido de Aldo (2026-11-15):** «no me convence como está el diseño, sobre todo el acomodo visual de los botones, las guidelines, títulos etc. […] corregir las posiciones, el aire y espacios que no estamos implementando correctamente». Insumo: la curaduría de guías (auditoría con un arnés nuevo, 315 fallos en siete perfiles; causa raíz: tres rejillas distintas en escritorio y doce roles de aire con más de un valor).

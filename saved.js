@@ -146,7 +146,7 @@ function toast(text, withAction = true) {
   const host = topDialog() || document.body;
   if (toastEl.parentElement !== host) host.append(toastEl);
   // En una hoja con acciones fijas al pie (la ficha), el aviso flota justo encima de ellas: no tapa Compartir ni «Cómo llegar».
-  const foot = host.querySelector?.('.drawer-foot');
+  const foot = host === document.body ? null : host.querySelector?.('.drawer-foot'); // sin hoja abierta no hay pie: antes encontraba el de la ficha cerrada y el aviso salía de la ventana
   toastEl.style.bottom = foot ? `${Math.round(innerHeight - foot.getBoundingClientRect().top) + 12}px` : '';
   toastEl.showPopover?.();
   clearTimeout(toastTimer);

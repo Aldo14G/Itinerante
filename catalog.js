@@ -397,7 +397,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (!append) grid.replaceChildren();
     grid.removeAttribute('aria-busy');
     grid.append(frag);
-    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: i * ms('stagger-char'), easing: EASE(), fill: 'backwards' }));
+    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: Math.min(i * ms('stagger-char'), DUR('lenta') - DUR('base')), easing: EASE(), fill: 'backwards' }));
     const left = results.length - slice.length;
     const folded = applyFold();
     moreBtn.hidden = left <= 0 || folded;

@@ -91,14 +91,15 @@ export { coverflowPose, nearestIndex, CF_GIRO } from './carousel3d.js';
 // Se guarda en este dispositivo (localStorage, sin cuenta); si el almacenamiento falla, el recorrido vive solo en la visita. No es un ranking
 // ni un juego: «N de 3 paradas hojeadas» es un dato local y verdadero.
 export const TRAIL_KEY = 'iti-recorrido-v2';
-export function readTrail(storage = globalThis.localStorage) {
+export function readTrail(storage) {
   try {
+    storage ??= globalThis.localStorage; // el acceso mismo puede lanzar (SecurityError): dentro del try
     const v = JSON.parse(storage?.getItem(TRAIL_KEY) ?? '[]');
     return new Set(Array.isArray(v) ? v.filter(x => typeof x === 'string') : []);
   } catch { return new Set(); }
 }
-export function writeTrail(seen, storage = globalThis.localStorage) {
-  try { storage?.setItem(TRAIL_KEY, JSON.stringify([...seen])); return true; } catch { return false; }
+export function writeTrail(seen, storage) {
+  try { storage ??= globalThis.localStorage; storage?.setItem(TRAIL_KEY, JSON.stringify([...seen])); return true; } catch { return false; }
 }
 // Estado del recorrido para las colecciones a la vista: cuántas van hojeadas y qué tramos unen dos paradas hojeadas.
 export function trailState(cols, seen) {
