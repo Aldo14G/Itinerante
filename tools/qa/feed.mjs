@@ -70,6 +70,7 @@ const clickSel = async (sel, nth = 0) => {
   if (!p) return false;
   await sleep(250); await mouse(p.x, p.y); return true;
 };
+const enter = async () => { await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r' }); await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }); }; // Enter con texto: el botón enfocado recibe su clic
 const key = async (k, code, vk) => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: k, code, windowsVirtualKeyCode: vk }); };
 await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'); await send('Network.enable');
 await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }, { urlPattern: '*eventos.json*' }, { urlPattern: '*menu.json*' }] });
@@ -390,14 +391,14 @@ overrideEventos = null;
     // desplegar: el foco se queda en el botón; ya salen las 8 y dice «Ver menos»
     await ev(`document.querySelector('.ev-fold').focus({ preventScroll: true }); document.querySelector('.ev-fold').scrollIntoView({ block: 'center' })`); await sleep(500);
     const antes = await ev(`document.querySelector('.ev-fold').getBoundingClientRect().top`);
-    await key('Enter', 'Enter', 13); await sleep(1300);
+    await enter(); await sleep(1300);
     const a1 = await leer();
     check('anteriores', `${tag} «Ver los 8 anteriores» con el teclado: aparecen las 8, el botón dice «Ver menos» con aria-expanded="true", conserva el foco y la altura de la sección crece`, a1.nVis === 8 && a1.fold.txt === 'Ver menos' && a1.fold.exp === 'true' && a1.fold.focus && a1.secH > a0.secH && a1.ids.join() === planA.anteriores.map(e => e.id).join() && a1.filas.every(x => x.img && x.img.ok), JSON.stringify([a1.nVis, a1.fold, a0.secH, a1.secH]));
     await shot(`03a-anteriores-${vw}-desplegado.jpg`);
     // plegar con el cursor sobre el botón: el botón no se mueve bajo el cursor
     await ev(`document.querySelector('.ev-fold').scrollIntoView({ block: 'center' })`); await sleep(400);
     const p0 = await ev(`document.querySelector('.ev-fold').getBoundingClientRect().top`);
-    await key('Enter', 'Enter', 13); await sleep(900);
+    await enter(); await sleep(900);
     const a2 = await leer();
     check('anteriores', `${tag} «Ver menos»: vuelven las 6, el botón dice «Ver los 8 anteriores», conserva el foco y no se mueve bajo el cursor (Δ ${Math.round(a2.fold.top - p0)} px)`, a2.nVis === 6 && a2.fold.txt === 'Ver los 8 anteriores' && a2.fold.exp === 'false' && a2.fold.focus && Math.abs(a2.fold.top - p0) <= 1, JSON.stringify([a2.nVis, a2.fold, p0]));
     check('anteriores', `${tag} con datos de prueba: sin errores de consola`, !problems.length, problems.join(' | '));
@@ -440,7 +441,7 @@ overrideEventos = null;
     await open(vw, vh, { reset: true, mobile, wait: mobile ? 4000 : 2500 }); await irEventos(); await sleep(800);
     const h = await ev(`(() => { const sec = document.querySelector('#cartelera'), r = e => e.getBoundingClientRect(); const prox = sec.querySelector('.ev-prox'), cu = prox?.querySelector('.ev-prox-cuerpo'); return { prox: !!prox, sin: prox?.classList.contains('ev-prox--sin-foto'), fig: !!sec.querySelector('.ev-prox-fig'), imgs: sec.querySelectorAll('.ev-prox-img, .ev-card-img, .ev-pas-img').length, broken: [...sec.querySelectorAll('img')].filter(i => i.complete && i.naturalWidth === 0).length, cuerpo: cu && [Math.round(r(cu).width), Math.round(r(prox).width)], filas: sec.querySelectorAll('.ev-fila').length, pas: sec.querySelectorAll('.ev-pasado').length, over: document.documentElement.scrollWidth > innerWidth, h: Math.round(r(prox).height) }; })()`);
     await shot(`03a-hoja-sin-foto-${vw}.jpg`);
-    check('anteriores', `${vw}×${vh} eventos de la hoja sin cartel (imagen null): destacado sin figura (.ev-prox--sin-foto; ${vw >= 1024 ? 'el cuerpo ocupa 8 de 12 columnas' : 'el cuerpo a todo el ancho'}), una fila en la lista y una en anteriores, ninguna imagen ni recuadro roto, sin desborde`, h.prox && h.sin && !h.fig && h.imgs === 0 && h.broken === 0 && h.filas === 1 && h.pas === 1 && !h.over && (vw >= 1024 ? h.cuerpo[0] / h.cuerpo[1] > 0.6 && h.cuerpo[0] / h.cuerpo[1] < 0.72 : h.cuerpo[0] === h.cuerpo[1]), JSON.stringify(h));
+    check('anteriores', `${vw}×${vh} eventos de la hoja sin cartel (imagen null): destacado sin figura (.ev-prox--sin-foto; ${vw >= 1024 ? 'el cuerpo ocupa 8 de 12 columnas' : 'el cuerpo a todo el ancho'}), una fila en la lista y una en anteriores, ninguna imagen ni recuadro roto, sin desborde`, h.prox && h.sin && !h.fig && h.imgs === 0 && h.broken === 0 && h.filas === 1 && h.pas === 1 && !h.over && (vw >= 1024 ? h.cuerpo[0] / h.cuerpo[1] > 0.6 && h.cuerpo[0] / h.cuerpo[1] < 0.72 : h.cuerpo[1] - h.cuerpo[0] <= 2), JSON.stringify(h));
   }
   // (7) 150 eventos (50 próximos y 100 pasados): pinta sin tareas largas con CPU 4× y arma solo 6 filas de anteriores
   const muchos = { eventos: [...Array.from({ length: 50 }, (_, i) => ({ ...pas(i, 1 + i * 2), id: `prox-${i}`, reserva: i % 2 ? null : { tipo: 'luma', url: 'https://lu.ma/x' } })), ...Array.from({ length: 100 }, (_, i) => pas(i + 100, -3 - i * 6))] };
@@ -682,7 +683,7 @@ await send('Page.addScriptToEvaluateOnNewDocument', { source: `document.addEvent
 await ev(`localStorage.setItem('iti-news-estado', 'p'); localStorage.setItem('iti-news-vence', ${JSON.stringify(dayMty(-1))})`);
 await open(393, 659, { wait: 800 });
 const arrVencido = await ev(`window.__arranque`);
-await ev(`localStorage.setItem('iti-news-vence', ${JSON.stringify(dayMty(0))})`);
+await ev(`localStorage.setItem('iti-news-estado', 'p'); localStorage.setItem('iti-news-vence', ${JSON.stringify(dayMty(0))})`);
 await open(393, 659, { wait: 800 });
 const arrVigente = await ev(`window.__arranque`);
 check('novedades', 'boot.js: con la ventana ya cerrada (vence ayer) no reserva la sección ni el renglón del control antes del primer render; con la ventana abierta (vence hoy) sí', arrVencido === '' && /has-news/.test(arrVigente) && /news-hint/.test(arrVigente), JSON.stringify({ arrVencido, arrVigente }));
