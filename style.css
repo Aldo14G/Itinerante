@@ -93,8 +93,8 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .h2 em, .layer-title em { display: block; }
 @media (min-width: 761px) { .h2, .ftr-title { font-size: clamp(28px, 1.25vw + 18px, 40px); line-height: 1.18; } }
 
-/* Titular de capa (una capa dentro de un capítulo): Title 3, el mismo nivel que la dirección de Visita y el nombre de la pieza central de los
-   tres carruseles (2026-11-15; antes Title 2: 22 y 20 px juntos no se distinguen y el Catálogo sumaba siete tamaños). */
+/* Titular de capa (una capa dentro de un capítulo): Title 3, el mismo nivel que la dirección de Visita y el nombre de la pieza central del
+   carrusel de portadas (2026-11-15; antes de los tres carruseles; antes Title 2: 22 y 20 px juntos no se distinguen y el Catálogo sumaba siete tamaños). */
 .layer-title { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
 
 /* Sin antetítulo sobre el titular (los rótulos de sección se retiraron el 2026-11-13): el nombre de la sección va en el titular, «Nombre *frase*». */
@@ -132,6 +132,8 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .btn--primario:active { background: var(--primario-presionado); }
 .btn--secundario { background: var(--menta); color: var(--en-menta); }
 .btn--plano { background: transparent; color: var(--turquesa-texto); }
+.btn--contorno { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea-fuerte); } /* de contorno (Eventos, 2026-11-16): sin relleno, para lo que no debe competir con la primaria */
+.btn--contorno:active { background: var(--fondo-3); }
 /* De vidrio: solo lo que flota (cerrar una hoja, botones sobre una foto). */
 .btn--vidrio { background: var(--vidrio); color: var(--tinta); -webkit-backdrop-filter: var(--filtro-vidrio); backdrop-filter: var(--filtro-vidrio); box-shadow: var(--luz-vidrio), var(--sombra-flotante); }
 .btn--vidrio:focus-visible { box-shadow: var(--anillo-foco), var(--luz-vidrio); }
@@ -141,6 +143,7 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
   .btn--secundario:hover { background: color-mix(in oklab, var(--menta), var(--en-menta) 10%); }
   .btn--vidrio:hover { background: var(--vidrio-hoja); }
   .btn--plano:hover { background: var(--fondo-3); }
+  .btn--contorno:hover { background: var(--fondo-3); }
   a.btn:hover .ic:has(use[href="#i-ne"]) { transform: translate(2px, -2px); }
 }
 .btn:disabled, .btn[aria-disabled="true"] { background: var(--fondo-3); color: var(--tinta-2); box-shadow: none; cursor: not-allowed; transform: none; }
@@ -163,7 +166,6 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
   border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta);
   font: 600 12px/16px var(--font-texto); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
-.badge--quiet { background: var(--fondo-3); color: var(--tinta-2); }
 /* Conteo de Mi lista (barra inferior, cabecera y menú): disco primario; el número también va en texto para lectores de pantalla. */
 .count-badge {
   display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 var(--space-1);
@@ -413,90 +415,137 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 }
 
 /* ---------- Eventos y talleres (#cartelera): destacado y lista por fecha (2026-11-16; feed.js) ---------- */
-/* Sustituye al Carrusel3D, variante evento (2026-11-13). Un solo eje izquierdo: el destacado (tarjeta en superficie con sombra-flotante: es lo
-   único con sombra de la sección), la lista por día (rótulo de día sobre una línea punteada y tarjetas horizontales: hora y tipo, título,
-   «Con …», portada cuadrada de 88 / 120 a la derecha) y, al final, las propuestas sin fecha con su descripción. Desde 1024 px la lista va en
-   las columnas 1–8 y la nota lateral en 9–12, fija al desplazar. La estructura de la lista se tomó de Luma (referencia; ver DESIGN.md).
-   Aire por rol: cabecera → contenido 24 · bloque → bloque 32 / 48 · rótulo → grupo 8 · tarjeta → tarjeta 12 · día → día 24. */
+/* Sustituye al Carrusel3D, variante evento (2026-11-13). Lenguaje editorial y sobrio (segunda pasada del 2026-11-16): líneas finas en vez de
+   relleno, la fecha como tipografía (versalitas arriba, el número ligero debajo), un solo acento (turquesa-texto) y un solo relleno suave (la
+   insignia «Próximo»). Un solo eje izquierdo: el destacado (panel en superficie con borde de 1 px, sin sombra; título Title 1; los datos como
+   lista de definición entre líneas finas), la lista por día (cada evento una fila entre líneas finas con su hora y tipo como texto; desde
+   761 px el día va en una columna de dos columnas de la rejilla —96 en tableta— a la izquierda) y, al final, las propuestas sin fecha con el mismo lenguaje y sin columna de fecha.
+   Desde 1024 px la lista va en las columnas 1–8 y la nota lateral en 9–12, fija al desplazar. La estructura se tomó de Luma (referencia; ver
+   DESIGN.md). Aire por rol: cabecera → contenido 24 · bloque → bloque 32 / 48 · rótulo → grupo 8 · día → día 32 · fila: 20 arriba y abajo. */
 .bill { padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo-2); }
 .bill > .sec-head { margin-bottom: var(--space-6); }
 .ev, .ev-despues, .ev-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
 .ev-lista { align-content: start; min-width: 0; }
 .ev-sub { margin: 0 0 var(--space-2); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
-.ev-dias { display: grid; gap: var(--space-6); }
-.ev-dia-tit { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-2); font: var(--t-cuerpo); color: var(--tinta-2); }
-.ev-dia-tit b { font-weight: 600; color: var(--tinta); }
-.ev-dia-tit::after { content: ""; flex: 1 1 auto; margin-inline-start: var(--space-2); border-top: 1px dashed var(--linea-fuerte); }
-.ev-filas { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
-/* Tarjeta de la lista (TarjetaEvento): no es un control; sus acciones van dentro. Texto a la izquierda y portada cuadrada a la derecha; la
-   descripción de una propuesta y las acciones ocupan todo el ancho, en la misma sangría. */
-.ev-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3) var(--space-4); align-items: start; padding: var(--space-4); border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
+.ev-dias { display: grid; gap: var(--space-8); }
+/* Día: en el teléfono, un rótulo en versalitas («SÁB · 28 NOV») con una línea fina que corre hasta el borde; desde 761 px, la columna de la
+   izquierda (el día y el mes arriba, el número ligero debajo) con las filas a su derecha, que empiezan en una línea de la rejilla (la columna 3
+   de su ancho: 96 en tableta, 133 en 1024). */
+.ev-dia { display: grid; grid-template-columns: minmax(0, 1fr); }
+.ev-dia-tit { display: flex; align-items: center; margin: 0; font: var(--t-versalitas); letter-spacing: var(--ls-versalitas); text-transform: uppercase; color: var(--tinta-2); }
+.ev-dia-tit::after { content: ""; flex: 1 1 auto; margin-inline-start: var(--space-3); border-top: 1px solid var(--linea-fuerte); }
+.ev-dia-vis { display: inline-flex; align-items: baseline; gap: var(--space-1); white-space: nowrap; }
+.ev-dia-sem::after { content: "·"; margin-inline-start: var(--space-1); }
+.ev-dia-num { font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; }
+.ev-filas { display: grid; margin: 0; padding: 0; list-style: none; }
+/* Fila (la tarjeta ya no lleva relleno ni radio): una línea fina arriba y, en la última, otra abajo. Hora y tipo como texto, título Title 3,
+   «Con …», el primer renglón del costo y la portada cuadrada de 88 (120 en escritorio) con su anillo fino; abajo, las acciones de 44. */
+.ev-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3) var(--space-4); align-items: start; padding: var(--space-5) 0; border-top: 1px solid var(--linea); color: var(--tinta); }
+.ev-dia:last-child .ev-fila:last-child > .ev-card, .ev-propuestas .ev-fila:last-child > .ev-card { border-bottom: 1px solid var(--linea); } /* la lista se cierra con una sola línea, al final del grupo */
+.ev-dia .ev-fila:first-child > .ev-card { padding-top: var(--space-4); border-top: 0; } /* en el teléfono, la línea del rótulo de día hace de arriba */
 .ev-card-txt { min-width: 0; }
-.ev-card-img { grid-column: 2; grid-row: 1; width: var(--portada-evento); height: var(--portada-evento); border-radius: var(--radio-sm); object-fit: cover; }
-.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.ev-hora { font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
-.ev-card-tit, .ev-prox-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
-.ev-card-meta, .ev-prox-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; }
-.ev-prox-enc { display: grid; grid-template-columns: minmax(0, 1fr); } /* bloque de fecha con sus insignias → título 12 → la fecha completa 4 */
-.ev-prox-tit { margin-top: var(--space-3); }
+.ev-card-img { grid-column: 2; grid-row: 1; width: var(--portada-evento); height: var(--portada-evento); border-radius: var(--radio-sm); object-fit: cover; outline: 1px solid var(--linea); outline-offset: -1px; }
+/* Rótulo de la pieza: «17:00 · Juego», «Lectura · Propuesta · sin fecha» o, en el destacado, la insignia «Próximo» y el tipo. Texto, no píldoras:
+   la insignia «Próximo» es lo único con relleno. El punto medio es decoración: no se lee. */
+.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); font: var(--t-subtitulo); color: var(--tinta-2); }
+.ev-rot > * + *::before { content: "·"; content: "·" / ""; margin-inline-end: var(--space-2); }
+.ev-rot > .badge + *::before { content: none; }
+.ev-rot > .badge { font: var(--t-rotulo); letter-spacing: var(--ls-rotulo); } /* «Próximo» a 13, como los demás rótulos de la sección (≤ 6 tamaños por sección) */
+.ev-hora { font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; }
+.ev-tipo, .ev-estado { min-width: 0; }
+.ev-card-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
+.ev-prox-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-1); letter-spacing: var(--ls-titulo-1); text-wrap: balance; } /* el destacado: Title 1, máximo dos renglones en el teléfono */
+.ev-card-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; }
 /* Párrafos de tres renglones o más (la descripción de una propuesta o del destacado): token `lectura`, Body con interlínea de 24 (1.41; la
    crítica pide ≥ 1.35 en párrafos de 120 caracteres o más). */
 .ev-card-desc, .ev-prox-desc { max-width: 54ch; margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: balance; } /* renglones parejos: sin palabra viuda al final */
 .ev-fila { line-height: var(--space-6); } /* el <li> hereda la interlínea de lectura: su texto incluye la descripción (law-lineheight) */
 .ev-card-desc, .ev-card-acc { grid-column: 1 / -1; }
-/* Costo tal como lo da la librería (data-fuente="anuncio"): el primer renglón en la tarjeta de la lista y todos en el destacado. */
+/* Costo tal como lo da la librería (data-fuente="anuncio"): el primer renglón en la fila de la lista y todos, en el destacado, como un dato más. */
 .ev-costo { margin: var(--space-1) 0 0; padding: 0; list-style: none; font: var(--t-subtitulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
-ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
+ul.ev-costo { display: grid; gap: var(--space-1); }
 .ev-card-acc { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-/* Destacado (EventoDestacado): la foto 16:9 arriba y el cuerpo debajo; desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. */
-.ev-prox { display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; border-radius: var(--radio-lg); background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-flotante); }
+.ev-card-acc > .btn { white-space: nowrap; }
+/* Destacado (EventoDestacado): panel en superficie con un borde de 1 px (sin sombra: sobre fondo-2 se separa por el blanco y la línea). La
+   foto 16:9 arriba y el cuerpo debajo; desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. */
+.ev-prox { display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; border: 1px solid var(--linea); border-radius: var(--radio-lg); background: var(--superficie); color: var(--tinta); }
 .ev-prox-fig { margin: 0; background: var(--fondo-3); }
 .ev-prox-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-/* Un cartel (encuadre: "cartel") es una imagen cuadrada con texto: se muestra entero, 1:1, nunca recortado; si no es cuadrado, sobre fondo-3. */
-.ev-prox--cartel .ev-prox-img { aspect-ratio: 1 / 1; object-fit: contain; }
-.ev-prox-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); padding: var(--space-5); }
-.ev-prox-cab { display: flex; align-items: center; gap: var(--space-4); }
-.ev-prox-cab > .ev-rot { min-width: 0; }
-/* Bloque de fecha (BloqueFecha): lo primero que se lee de un anuncio. Decorativo (aria-hidden): la fecha completa va en texto al lado. */
-.ev-fecha { display: grid; flex: none; justify-items: center; align-content: center; width: var(--space-16); height: calc(var(--space-16) + var(--space-2)); border-radius: var(--radio-md); background: var(--primario); color: var(--en-primario); font: var(--t-titulo-1); font-weight: 700; letter-spacing: var(--ls-titulo-1); font-variant-numeric: tabular-nums; }
-.ev-fecha span { font: var(--t-leyenda-1); font-weight: 600; letter-spacing: 0; }
-/* Acciones del destacado: la primaria crece; si su rótulo no cabe junto a los dos iconos («Reservar por WhatsApp» en el teléfono), ocupa su
-   renglón entero y los iconos bajan al siguiente (como en la ficha del libro). */
-.ev-acc { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2); } /* con el hueco del cuerpo: texto → control 24 */
+/* Un cartel (encuadre: "cartel") es una imagen cuadrada con texto: se muestra entero, como un objeto sobre un fondo suave (fondo-3, con relleno
+   interior), con radio-md, sombra-portada y un anillo de 1 px por dentro; nunca recortado ni a sangre. Una foto va a sangre. */
+.ev-prox--cartel .ev-prox-fig { display: grid; align-content: center; padding: var(--space-5); }
+.ev-prox--cartel .ev-prox-img { aspect-ratio: 1 / 1; object-fit: contain; border-radius: var(--radio-md); box-shadow: var(--sombra-portada); outline: 1px solid var(--linea); outline-offset: -1px; }
+.ev-prox-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); padding: var(--space-5); }
+/* Encabezado: la fecha tipográfica y, separado por una línea fina (horizontal en el teléfono, vertical desde 761 px), el rótulo y el título. */
+.ev-prox-enc { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
+.ev-prox-id { min-width: 0; padding-top: var(--space-4); border-top: 1px solid var(--linea-fuerte); }
+/* Fecha (BloqueFecha): mes y día de la semana en versalitas y, debajo, el número grande y ligero con cifras tabulares. Decorativa (aria-hidden):
+   la fecha completa va en texto, para lectores de pantalla, dentro del encabezado. */
+.ev-fecha { display: grid; justify-items: start; align-content: start; gap: var(--space-1); }
+.ev-fecha-rot { font: var(--t-versalitas); letter-spacing: var(--ls-versalitas); text-transform: uppercase; color: var(--turquesa-texto); white-space: nowrap; }
+.ev-fecha-num { font: var(--t-fecha-grande); letter-spacing: var(--ls-fecha-grande); font-variant-numeric: tabular-nums; color: var(--tinta); }
+/* Datos (lista de definición): un renglón por dato entre líneas finas; rótulo pequeño en tinta-2 y valor a 17/22. Solo los renglones con dato. */
+.ev-datos { margin: 0; }
+.ev-dato { display: grid; grid-template-columns: var(--space-20) minmax(0, 1fr); column-gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-top: 1px solid var(--linea); }
+.ev-dato:last-child { border-bottom: 1px solid var(--linea); }
+.ev-dato dt { font: var(--t-nota-pie); color: var(--tinta-2); }
+.ev-dato dd { margin: 0; font: var(--t-cuerpo); letter-spacing: var(--ls-cuerpo); }
+.ev-dato .ev-costo { margin: 0; font: inherit; }
+@media (max-width: 760px) { .ev-dato--costo { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-1); } } /* en el teléfono el costo va bajo su rótulo: sus renglones caben enteros */
+/* Acciones del destacado: la primaria (56) crece; si su rótulo no cabe junto a los dos iconos («Reservar por WhatsApp» en el teléfono), ocupa su
+   renglón entero y los iconos de contorno (44) bajan al siguiente (como en la ficha del libro). */
+.ev-acc { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
 .ev-acc > .btn--primario { flex: 1 1 auto; white-space: nowrap; }
-@media (min-width: 761px) { .ev-acc > .btn--primario { flex: none; } } /* desde 761, la primaria al ancho de su rótulo */
-.ev-card-acc > .btn { white-space: nowrap; }
-/* Nota lateral: cómo registrarse o dónde se anuncian las fechas. */
-.ev-lado { padding: var(--space-5); border-radius: var(--radio-md); background: var(--fondo-3); }
-.ev-lado-tit { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); }
+@media (min-width: 761px) {
+  .ev-acc > .btn--primario { flex: none; } /* desde 761, la primaria al ancho de su rótulo */
+  .ev-prox-enc { grid-template-columns: auto minmax(0, 1fr); column-gap: var(--space-6); }
+  .ev-prox-id { padding: 0 0 0 var(--space-6); border-top: 0; border-left: 1px solid var(--linea-fuerte); }
+}
+/* Nota lateral: cómo registrarse o dónde se anuncian las fechas. Sin relleno ni línea (comparte tope con «Después», G4): texto en Subheadline. */
+.ev-lado { padding: 0; }
+.ev-lado-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); } /* un subtitular más: igual que «Después», así comparten tope (G4) */
 .ev-lado-txt { margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); }
 .ev-lado-txt a { white-space: nowrap; color: var(--turquesa-texto); }
 .ev-lado-txt a .ic { width: 16px; height: 16px; margin-inline-start: var(--space-1); vertical-align: -0.125em; }
 .ev-lado-txt a:focus-visible { outline: 2px solid transparent; border-radius: var(--radio-portada); box-shadow: var(--anillo-foco); }
 /* Lo que aún no se ve espera oculto y entra al llegar a la vista (feed.js, enterOnView); solo con movimiento. */
 .motion .ev-espera { opacity: 0; }
+@media (min-width: 761px) {
+  .ev-prox--cartel .ev-prox-fig { padding: var(--space-8); }
+  .ev-prox--cartel .ev-prox-img { width: min(100%, 30rem); justify-self: center; } /* en tableta (una columna) el cartel no pasa de 480: entero, pero no de pantalla completa */
+  /* Día en su columna: el rótulo (día y mes) arriba, el número ligero de 32 debajo, a la altura del primer renglón de la primera fila. */
+  .ev-dia { grid-template-columns: calc((100% - 11 * var(--canal-rejilla)) / 12 * 2 + var(--canal-rejilla)) minmax(0, 1fr); column-gap: var(--canal-rejilla); }
+  .ev-dia-tit { display: block; padding-top: var(--space-5); }
+  .ev-dia-tit::after { content: none; }
+  .ev-dia-vis { display: grid; grid-template-areas: "sem mes" "num num"; grid-template-columns: auto 1fr; column-gap: var(--space-1); justify-content: start; }
+  .ev-dia-sem { grid-area: sem; }
+  .ev-dia-mes { grid-area: mes; }
+  .ev-dia-num { grid-area: num; font: var(--t-fecha-lista); letter-spacing: var(--ls-fecha-lista); }
+  .ev-dia .ev-fila:first-child > .ev-card { padding-top: var(--space-5); border-top: 1px solid var(--linea); }
+}
 @media (min-width: 1024px) {
   .ev, .ev-lista { gap: var(--space-12); }
   .ev-prox { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); }
   .ev-prox-fig { grid-column: 7 / -1; grid-row: 1; }
   .ev-prox-img { height: 100%; min-height: calc(var(--space-20) * 4); aspect-ratio: auto; }
-  .ev-prox--cartel .ev-prox-img { height: auto; min-height: 0; aspect-ratio: 1 / 1; } /* el cartel entero en su mitad: la tarjeta toma su alto */
-  .ev-prox-cuerpo { grid-column: 1 / span 6; grid-row: 1; align-content: center; gap: var(--space-5); padding: var(--space-8) 0 var(--space-8) var(--space-8); }
-  .ev-acc { margin-top: var(--space-1); }
+  .ev-prox--cartel .ev-prox-img { width: 100%; height: auto; min-height: 0; aspect-ratio: 1 / 1; } /* el cartel entero en su mitad: la tarjeta toma su alto */
+  .ev-prox-cuerpo { grid-column: 1 / span 6; grid-row: 1; align-content: center; padding: var(--space-8) 0 var(--space-8) var(--space-8); }
   .ev-despues { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
   .ev-lista { grid-column: 1 / span 8; }
-  .ev-lado { grid-column: 9 / -1; position: sticky; top: calc(var(--hdr-h) + var(--space-6)); }
-  /* La portada (120) abarca el alto de la tarjeta y el texto, la descripción y las acciones van seguidos en su columna: sin hueco entre el
-     título y lo que sigue (la fila flexible del final absorbe lo que sobre). */
-  .ev-card { grid-template-rows: auto 1fr; column-gap: var(--space-6); padding: var(--space-5); }
+  .ev-lado { grid-column: 9 / -1; position: sticky; top: calc(var(--hdr-h) + var(--space-6)); } /* a un lado, fija al desplazar */
+  .ev-dia { grid-template-columns: calc((100% - 7 * var(--canal-rejilla)) / 8 * 2 + var(--canal-rejilla)) minmax(0, 1fr); } /* la lista mide 8 columnas: el día ocupa las 2 primeras y las filas empiezan en la 3 */
+  /* La portada (120) abarca el alto de la fila y el texto, la descripción y las acciones van seguidos en su columna: sin hueco entre el título
+     y lo que sigue (la fila flexible del final absorbe lo que sobre). */
+  .ev-card { grid-template-rows: auto 1fr; column-gap: var(--space-6); }
   .ev-card-img { grid-row: 1 / -1; width: var(--portada-evento-amplia); height: var(--portada-evento-amplia); }
   .ev-card-desc, .ev-card-acc { grid-column: 1; }
-  /* Solo propuestas (sin eventos con fecha no hay nota lateral: la lista es hija única): tres por fila en las columnas 1–4, 5–8 y 9–12, con
-     la portada cuadrada arriba. Con fechas, las propuestas van al final de la lista de 1–8, en la tarjeta horizontal. */
+  /* Solo propuestas (sin eventos con fecha no hay nota lateral: la lista es hija única): tres por fila en las columnas 1–4, 5–8 y 9–12, cada
+     una bajo su línea fina y con la portada cuadrada arriba. Con fechas, las propuestas van al final de la lista de 1–8, en filas. */
   .ev-lista:only-child { grid-column: 1 / -1; }
   .ev-lista:only-child .ev-filas { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--canal-rejilla); }
   .ev-lista:only-child .ev-fila { display: grid; }
   .ev-lista:only-child .ev-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .ev-lista:only-child .ev-fila > .ev-card { border-bottom: 0; }
   .ev-lista:only-child .ev-card-img { grid-column: 1; grid-row: 1; width: 100%; height: auto; aspect-ratio: 1 / 1; }
 }
 
@@ -1130,14 +1179,12 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 .ct-chip { flex: none; text-decoration: none; }
 .ct-chip[aria-current="true"] { background: var(--primario); color: var(--en-primario); }
 @media (hover: hover) { .ct-chip[aria-current="true"]:hover { background: var(--primario); } }
-.ct-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); min-width: 0; padding-top: var(--space-4); }
+.ct-nav { margin-bottom: var(--space-4); } /* barra → carta: 8 de la barra + 16 = 24 (cabecera → contenido) */
+.ct-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); min-width: 0; }
 /* Al llegar por su chip, el título del grupo queda 16 px bajo la barra (html ya aparta la cabecera y 8 px: scroll-padding-top). */
 .ct-grupo { scroll-margin-top: calc(var(--ct-barra) + var(--space-2)); }
 .ct-grupo-tit { margin: 0 0 var(--space-3); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
 .ct-grupo-nota { margin: calc(-1 * var(--space-2)) 0 var(--space-3); font: var(--t-subtitulo); color: var(--tinta-2); }
-.ct-prod--solo { display: flex; flex-direction: column; gap: var(--space-1); min-height: var(--alto-lg); padding: var(--space-4); border-radius: var(--radio-md); background: var(--fondo-3); }
-.ct-prod--solo .ct-txt { display: contents; }
-.ct-prod--solo .ct-precio { margin-top: auto; padding-top: var(--space-2); }
 .ct-grupo-tit:focus-visible { outline: 2px solid transparent; border-radius: var(--radio-portada); box-shadow: var(--anillo-foco); }
 .ct-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); margin: 0; padding: 0; list-style: none; }
 .ct-prod { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-2); }
@@ -1147,11 +1194,18 @@ ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
 .ct-txt { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-1); }
 .ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
 .ct-desc { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* renglones parejos, sin palabra viuda; nunca se corta con «…»: si hace falta, tres renglones */
-.ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--turquesa-texto); }
+/* Tarjeta compacta (sin foto, solo texto): superficie sobre el fondo de la sección con un borde fino (linea), no un relleno macizo; el nombre en
+   titular, la descripción en tinta-2 y el precio abajo (turquesa-texto, 600). Una sola línea cuando no hay precio ni descripción (los tés). */
+.ct-prod--solo { display: flex; flex-direction: column; gap: var(--space-1); min-height: var(--alto-lg); padding: var(--space-4); border-radius: var(--radio-md); background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea); }
+.ct-prod--solo .ct-txt { display: contents; }
+.ct-rejilla:has(> .ct-prod:not(.ct-prod--solo)) > .ct-prod--solo { align-self: start; } /* en una parrilla con fotos y compactas mezcladas, la compacta no se estira hasta el alto de la que trae foto */
+.ct-prod--solo .ct-precio { margin-top: auto; padding-top: var(--space-2); }
 /* Esqueleto: los chips y cuatro tarjetas del tamaño de las reales mientras llega menu.json. */
 .ct-grupo-tit--sk { display: block; width: var(--space-20); border-radius: var(--radio-portada); background: var(--fondo-3); }
 .ct-prod.card--sk :is(.ct-nom, .ct-desc) { display: block; visibility: hidden; }
-html:not(.js) .ct, .ct[data-state="vacio"] { display: none; }
+html:not(.js) .ct, .ct[data-state="vacio"], .ct-cierre[hidden] { display: none; }
+@media (max-width: 760px) { .ct-rejilla > .ct-prod--solo:last-child:nth-child(odd) { grid-column: 1 / -1; } } /* una tarjeta sin pareja ocupa el renglón: no queda huérfana */
 @media (min-width: 761px) { .ct-rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8) var(--space-6); } }
 @media print { .ct-nav { display: none; } }
 
@@ -1244,7 +1298,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .ct { order: 0; grid-column: 1 / -1; grid-row: 2; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; margin-top: var(--space-12); }
   .ct-nav { grid-column: 1 / span 3; top: calc(var(--hdr-h) + var(--space-6)); flex-direction: column; margin: 0; padding: 0; overflow: visible; box-shadow: none; }
   .ct-chip { justify-content: flex-start; }
-  .ct-lista { grid-column: 4 / -1; gap: var(--space-12); padding-top: 0; }
+  .ct-lista { grid-column: 4 / -1; gap: var(--space-12); }
   .ct-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ct-cierre { order: 0; grid-column: 1 / -1; grid-row: 3; margin-top: var(--space-12); }
 }

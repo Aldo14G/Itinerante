@@ -161,34 +161,43 @@ export async function initCafe({ isMotion = () => false } = {}) {
   const groupOf = id => document.getElementById(groupId(id));
 
   // El grupo a la vista: su chip lleva aria-current (y el color primario). Si la barra se desliza (teléfono con muchas categorías), el chip
-  // actual se trae a la vista dentro de la barra.
+  // actual se trae al centro de la barra solo si no se ve entero.
   let current = null;
   function mark(id) {
     if (!id || id === current) return;
     current = id;
     for (const chip of nav.querySelectorAll('.ct-chip')) { if (chip.dataset.id === id) chip.setAttribute('aria-current', 'true'); else chip.removeAttribute('aria-current'); }
     const chip = chipOf(id);
-    if (chip && nav.scrollWidth > nav.clientWidth + 1) nav.scrollTo({ left: Math.max(0, chip.offsetLeft - nav.offsetLeft - (nav.clientWidth - chip.offsetWidth) / 2), behavior: isMotion() ? 'smooth' : 'auto' });
+    if (!chip || nav.scrollWidth <= nav.clientWidth + 1) return; // (en escritorio la lista es vertical y no se desliza)
+    const nr = nav.getBoundingClientRect(), cr = chip.getBoundingClientRect();
+    if (cr.left >= nr.left && cr.right <= nr.right) return; // ya se ve entero: la barra no se mueve (el relleno de los bordes no es motivo de desplazarla)
+    nav.scrollTo({ left: Math.max(0, nav.scrollLeft + cr.left - nr.left - (nr.width - cr.width) / 2), behavior: isMotion() ? 'smooth' : 'auto' });
   }
   mark(order[0]);
 
   // Scroll-spy: una línea horizontal justo bajo la barra (donde aterriza el título de un grupo, más 8 px). El observador avisa cada vez que
   // un grupo empieza o deja de cruzarla (no hay trabajo por cada evento de scroll) y entonces el actual es el último grupo cuyo borde superior
   // ya la pasó. `pending` es el grupo al que se va tras tocar su chip: hasta que llega, los que pasan por la línea en el camino no se marcan.
-  let io = null, pending = null;
+  // Un salto (la barra de navegación, un enlace, el final de la página) puede llegar a la carta sin que ningún grupo cruce la línea —todos
+  // estaban arriba o abajo y siguen fuera de ella—: por eso un segundo observador, sobre la ventana, vuelve a calcular cuando la carta entra a
+  // la vista (2026-11-16: llegando desde abajo el chip quedaba en «Salado» y, desde arriba tras recorrerla, también).
+  let io = null, pending = null, groups = [], line = 0;
+  function sync() {
+    if (!groups.length) return;
+    const now = order[currentGroup(groups.map(g => g.getBoundingClientRect().top), line)];
+    if (pending) { if (now !== pending) return; pending = null; }
+    mark(now);
+  }
   function watch() {
     io?.disconnect();
     if (!('IntersectionObserver' in window)) return;
-    const groups = order.map(groupOf);
-    const line = Math.round((parseFloat(getComputedStyle(groups[0]).scrollMarginTop) || 0) + (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0)) + 8;
-    io = new IntersectionObserver(() => {
-      const now = order[currentGroup(groups.map(g => g.getBoundingClientRect().top), line)];
-      if (pending) { if (now !== pending) return; pending = null; }
-      mark(now);
-    }, { rootMargin: `-${line}px 0px -${Math.max(0, innerHeight - line - 2)}px 0px` });
+    groups = order.map(groupOf);
+    line = Math.round((parseFloat(getComputedStyle(groups[0]).scrollMarginTop) || 0) + (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0)) + 8;
+    io = new IntersectionObserver(sync, { rootMargin: `-${line}px 0px -${Math.max(0, innerHeight - line - 2)}px 0px` });
     groups.forEach(g => io.observe(g));
   }
   watch();
+  if ('IntersectionObserver' in window) new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) sync(); }).observe(root);
   let raf = 0, lastH = innerHeight, lastW = innerWidth;
   addEventListener('resize', () => { // otra ventana (giro del teléfono, barra de Safari): la línea se vuelve a calcular, una vez por fotograma
     if (raf || (innerHeight === lastH && innerWidth === lastW)) return;

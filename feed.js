@@ -1,8 +1,8 @@
 // Eventos y talleres (#cartelera) sin inventar nada (2026-11-16; sustituye al Carrusel3D del 2026-11-13). Los datos viven en
 // assets/data/eventos.json y se editan sin tocar HTML ni JS: publicar un evento es añadir un renglón.
-//   · con fecha de hoy en adelante (hora de Monterrey): el más próximo es el **destacado** (foto o cartel, bloque de fecha, la acción de
-//     reserva que el evento traiga, «Añadir al calendario» y «Compartir») y los demás van en la **lista por día**; una fecha que ya pasó deja
-//     de mostrarse;
+//   · con fecha de hoy en adelante (hora de Monterrey): el más próximo es el **destacado** (foto o cartel, fecha tipográfica, datos en lista de
+//     definición, la acción de reserva que el evento traiga, «Añadir al calendario» y «Compartir») y los demás van en la **lista por día**
+//     (filas entre líneas finas); una fecha que ya pasó deja de mostrarse;
 //   · con `fecha: null` es una propuesta: va al final, con su insignia «Propuesta · sin fecha», sin reserva ni calendario;
 //   · sin ningún evento con fecha queda lo que trae index.html (las propuestas y la entradilla «Aún sin fecha…»): es también lo que se lee
 //     sin JavaScript.
@@ -12,7 +12,7 @@
 // «Añadir al calendario» arma un archivo .ics en el navegador (icsOf). El aviso del inicio («Próximo: Sáb 21 nov · …») y el punto de
 // «Eventos» en la barra y el menú usan el mecanismo de Novedades: assets/js/boot.js reserva el renglón antes del primer render si la
 // visita anterior dejó un evento vigente (iti-ev-hasta); si no coincide, se corrige con el inicio fuera de la vista.
-// Estructura de la lista (fecha → tarjeta horizontal con la portada cuadrada a la derecha) tomada de Luma como referencia; ni su código ni
+// Estructura de la lista (día a la izquierda → filas con la portada cuadrada a la derecha) tomada de Luma como referencia; ni su código ni
 // sus imágenes (docs/ux/investigacion-2026-11/luma.md).
 import { DUR, EASE, ms } from './motion.js';
 
@@ -157,10 +157,15 @@ export function eventBadge(fecha, now = new Date()) {
   if (hora) out += ` · ${hora}`;
   return { kind: key === today ? 'hoy' : 'fecha', text: out, date: key };
 }
-/** Bloque de fecha del destacado: «Sáb», «21», «Nov». Decorativo: la fecha completa va en texto al lado (fechaLarga). */
-export function fechaBloque(fecha) {
+/**
+ * Bloque de fecha del destacado y rótulo de día de la lista: «Sáb», «21», «Nov» (y `anio` solo si no es el de hoy). Decorativo: la fecha
+ * completa va en texto al lado (fechaLarga).
+ */
+export function fechaBloque(fecha, now = new Date()) {
   const p = partsOf(fecha, { weekday: 'short', day: 'numeric', month: 'short' });
-  return { sem: cap(p.weekday), num: p.day, mes: cap(p.month) };
+  const out = { sem: cap(p.weekday), num: p.day, mes: cap(p.month) };
+  if (fecha.slice(0, 4) !== dayKey(now).slice(0, 4)) out.anio = fecha.slice(0, 4);
+  return out;
 }
 /** «sábado 21 de noviembre» (con el año si no es el de hoy), en minúsculas: quien la usa al empezar un renglón la pone en mayúscula. */
 export function fechaLarga(fecha, now = new Date()) {
@@ -168,21 +173,13 @@ export function fechaLarga(fecha, now = new Date()) {
   const anio = fecha.slice(0, 4);
   return `${p.weekday} ${p.day} de ${p.month}${anio === dayKey(now).slice(0, 4) ? '' : ` de ${anio}`}`;
 }
-/** Encabezado de un día de la lista: «26 nov» y «jueves» (o «hoy»). */
-export function diaCorto(fecha, now = new Date()) {
-  const p = partsOf(fecha, { weekday: 'long', day: 'numeric', month: 'short' });
-  const hoy = dayKey(now);
-  return { fecha: `${p.day} ${p.month}${fecha.slice(0, 4) === hoy.slice(0, 4) ? '' : ` ${fecha.slice(0, 4)}`}`, dia: fecha === hoy ? 'hoy' : p.weekday };
-}
 /** «18:30» o «18:30–20:00»; vacío sin hora. */
 export const horario = e => (e.hora ? (e.fin ? `${e.hora}–${e.fin}` : e.hora) : '');
 /**
- * Quién: «Con Fulana · Invita a Zutano» con lo que el evento traiga (`con`: quien conduce o imparte; `invitado`). No se escribe «invitada» ni
- * «invitado»: el dato no trae género. `colabora` solo va en el destacado («Colabora Ediciones Tal»).
+ * Quién (renglón de la lista y del calendario): «Con Fulana · Invita a Zutano» con lo que el evento traiga (`con`: quien conduce o imparte;
+ * `invitado`). No se escribe «invitada» ni «invitado»: el dato no trae género. `colabora` solo va donde se pide («Colabora Ediciones Tal»).
  */
 export const quienLine = (e, { colabora = false } = {}) => [e.con ? `Con ${e.con}` : '', e.invitado ? `Invita a ${e.invitado}` : '', colabora && e.colabora ? `Colabora ${e.colabora}` : ''].filter(Boolean).join(' · ');
-/** Renglón del destacado: «Sábado 21 de noviembre · 18:57 · Invita a Fulana · Colabora Ediciones Tal». Solo lo que el evento trae. */
-export const metaLine = (e, now = new Date()) => [cap(fechaLarga(e.fecha, now)), horario(e), quienLine(e, { colabora: true })].filter(Boolean).join(' · ');
 /** Renglón del inicio: «Próximo: Sáb 21 nov · Título» (el día de hoy, «Hoy · 18:30 · Título»). */
 export function avisoLine(e, now = new Date()) {
   const hoy = e.fecha === dayKey(now);
@@ -382,7 +379,7 @@ function icon(id) {
   svg.append(use);
   return svg;
 }
-const badge = (txt, quiet) => make('span', quiet ? 'badge badge--quiet' : 'badge', txt);
+const badge = txt => make('span', 'badge', txt); // la única insignia con relleno: «Próximo» u «Hoy»
 function photo(e, cls) {
   if (!e.imagen) return null;
   const img = make('img', cls);
@@ -423,25 +420,42 @@ function shareButton(e, cls) {
   b.append(icon('i-share'));
   return b;
 }
-function fechaNode(e) {
-  const p = fechaBloque(e.fecha);
+// Fecha tipográfica del destacado: «SÁB · NOV» en versalitas (el CSS pone la mayúscula) y el número grande y ligero debajo. Decorativa: la fecha
+// completa va en texto (para lectores de pantalla) dentro del encabezado.
+function fechaNode(e, now) {
+  const p = fechaBloque(e.fecha, now);
   const box = make('span', 'ev-fecha');
-  box.setAttribute('aria-hidden', 'true'); // la fecha completa va en texto al lado
-  box.append(make('span', '', p.sem), p.num, make('span', '', p.mes));
+  box.setAttribute('aria-hidden', 'true');
+  box.append(make('span', 'ev-fecha-rot', `${p.sem} · ${p.mes}${p.anio ? ` · ${p.anio}` : ''}`), make('b', 'ev-fecha-num', p.num));
   return box;
 }
-// Costo tal como lo da la librería (dato del anuncio): en el destacado, todos los renglones; en la lista, el primero. Sin el campo, nada.
+// Costo tal como lo da la librería (dato del anuncio): en el destacado, todos los renglones (un dato más de la lista de definición); en la
+// lista, el primero. Sin el campo, nada.
 function costoNode(e, all) {
   if (!e.costo.length) return null;
   if (!all) { const p = make('p', 'ev-costo', e.costo[0]); p.dataset.fuente = 'anuncio'; return p; }
   const ul = make('ul', 'ev-costo');
   ul.dataset.fuente = 'anuncio';
-  ul.setAttribute('aria-label', 'Costo');
   ul.append(...e.costo.map(c => make('li', '', c)));
   return ul;
 }
-// El destacado: foto (16:9) o cartel (entero y cuadrado), bloque de fecha, insignias, título, «Sábado 21 de noviembre · 18:57 · …», descripción,
-// costo y acciones. La acción con rótulo (primaria de 56) es la reserva que el evento traiga; si no trae, «Añadir al calendario».
+// Datos del destacado como lista de definición (hora, con, invita, colabora, costo): un renglón por dato, solo los que el evento trae.
+function datosNode(e) {
+  const rows = [['Hora', horario(e)], ['Con', e.con], ['Invita', e.invitado], ['Colabora', e.colabora], ['Costo', costoNode(e, true)]].filter(([, v]) => v);
+  if (!rows.length) return null;
+  const dl = make('dl', 'ev-datos');
+  for (const [k, v] of rows) {
+    const row = make('div', k === 'Costo' ? 'ev-dato ev-dato--costo' : 'ev-dato');
+    const dd = make('dd');
+    dd.append(v);
+    row.append(make('dt', '', k), dd);
+    dl.append(row);
+  }
+  return dl;
+}
+// El destacado: foto (16:9, a sangre) o cartel (entero y cuadrado, como un objeto sobre fondo suave), fecha tipográfica, «Próximo» y tipo, el título
+// (Title 1), la descripción, los datos y las acciones. La acción con rótulo (primaria de 56) es la reserva que el evento traiga; si no trae,
+// «Añadir al calendario». El calendario y «Compartir» son iconos de contorno de 44.
 export function destacadoNode(e, now = new Date()) {
   const art = make('article', e.encuadre === 'cartel' ? 'ev-prox ev-prox--cartel' : 'ev-prox');
   art.dataset.id = e.id;
@@ -449,32 +463,32 @@ export function destacadoNode(e, now = new Date()) {
   const img = photo(e, 'ev-prox-img');
   if (img) { const fig = make('figure', 'ev-prox-fig'); img.addEventListener('error', () => fig.remove()); fig.append(img); art.append(fig); }
   const body = make('div', 'ev-prox-cuerpo');
-  const cab = make('div', 'ev-prox-cab');
   const rot = make('div', 'ev-rot');
   rot.append(badge(e.fecha === dayKey(now) ? 'Hoy' : 'Próximo'));
-  if (e.tipo) rot.append(badge(e.tipo, true));
-  if (e.ciclo) rot.append(badge(e.ciclo, true));
+  if (e.tipo) rot.append(make('span', 'ev-tipo', e.tipo));
+  if (e.ciclo) rot.append(make('span', 'ev-tipo', e.ciclo));
   const tit = make('h3', 'ev-prox-tit', e.titulo);
   tit.id = `ev-t-${e.id}`;
-  cab.append(fechaNode(e), rot);
-  const enc = make('div', 'ev-prox-enc'); // el bloque de fecha con las insignias al lado; debajo, a todo el ancho, el título y la fecha completa
-  enc.append(cab, tit, make('p', 'ev-prox-meta', metaLine(e, now)));
+  const id = make('div', 'ev-prox-id');
+  id.append(rot, tit, make('p', 'sr-only', cap(fechaLarga(e.fecha, now))));
+  const enc = make('header', 'ev-prox-enc'); // la fecha y, separado por una línea fina, el rótulo y el título
+  enc.append(fechaNode(e, now), id);
   body.append(enc);
   if (e.descripcion) body.append(make('p', 'ev-prox-desc', e.descripcion));
-  const costo = costoNode(e, true);
-  if (costo) body.append(costo);
+  const datos = datosNode(e);
+  if (datos) body.append(datos);
   const acc = make('div', 'ev-acc');
   const reserva = reservaLink(e, 'btn btn--primario btn--lg');
-  if (reserva) acc.append(reserva, calButton(e, 'btn btn--secundario btn--lg btn--icono'));
+  if (reserva) acc.append(reserva, calButton(e, 'btn btn--contorno btn--sm btn--icono'));
   else acc.append(calButton(e, 'btn btn--primario btn--lg', true));
-  acc.append(shareButton(e, 'btn btn--secundario btn--lg btn--icono'));
+  acc.append(shareButton(e, 'btn btn--contorno btn--sm btn--icono'));
   body.append(acc);
   art.append(body);
   return art;
 }
-// Tarjeta de la lista: hora, tipo y ciclo (o tipo y «Propuesta · sin fecha»), título, quién, el primer renglón del costo, la portada cuadrada a
-// la derecha y, con fecha, sus acciones (la reserva que traiga; si no, «Añadir al calendario» con rótulo). Una propuesta lleva su descripción
-// y ninguna acción.
+// Fila de la lista: «hora · tipo · ciclo» (o «tipo · Propuesta · sin fecha») como texto, título, quién, el primer renglón del costo, la portada
+// cuadrada a la derecha y, con fecha, sus acciones de 44 (la reserva de contorno que traiga y el calendario plano; si no hay reserva,
+// «Añadir al calendario» con rótulo). Una propuesta lleva su descripción y ninguna acción.
 export function cardNode(e, { level = 'h3' } = {}) {
   const li = make('li', 'ev-fila');
   li.dataset.id = e.id;
@@ -484,14 +498,14 @@ export function cardNode(e, { level = 'h3' } = {}) {
   const rot = make('div', 'ev-rot');
   if (e.fecha) {
     if (e.hora) rot.append(make('span', 'ev-hora', horario(e)));
-    if (e.tipo) rot.append(badge(e.tipo, true));
+    if (e.tipo) rot.append(make('span', 'ev-tipo', e.tipo));
   } else {
-    if (e.tipo) rot.append(badge(e.tipo));
-    const when = badge(NO_DATE, true);
+    if (e.tipo) rot.append(make('span', 'ev-tipo', e.tipo));
+    const when = make('span', 'ev-estado', NO_DATE);
     when.dataset.evWhen = '';
     rot.append(when);
   }
-  if (e.ciclo) rot.append(badge(e.ciclo, true));
+  if (e.ciclo) rot.append(make('span', 'ev-tipo', e.ciclo));
   const tit = make(level, 'ev-card-tit', e.titulo);
   tit.id = `ev-t-${e.id}`;
   txt.append(rot, tit);
@@ -505,9 +519,9 @@ export function cardNode(e, { level = 'h3' } = {}) {
   if (!e.fecha && e.descripcion) art.append(make('p', 'ev-card-desc', e.descripcion));
   if (e.fecha) {
     const acc = make('div', 'ev-card-acc');
-    const reserva = reservaLink(e, 'btn btn--secundario');
-    if (reserva) acc.append(reserva, calButton(e, 'btn btn--plano btn--icono'));
-    else acc.append(calButton(e, 'btn btn--secundario', true));
+    const reserva = reservaLink(e, 'btn btn--contorno btn--sm');
+    if (reserva) acc.append(reserva, calButton(e, 'btn btn--plano btn--sm btn--icono'));
+    else acc.append(calButton(e, 'btn btn--contorno btn--sm', true));
     art.append(acc);
   }
   li.append(art);
@@ -543,10 +557,13 @@ export function eventosNodes(plan, now = new Date()) {
     const dias = make('div', 'ev-dias');
     for (const d of plan.dias) {
       const sec = make('section', 'ev-dia');
-      const c = diaCorto(d.fecha, now);
-      const h = make('h4', 'ev-dia-tit');
+      const p = fechaBloque(d.fecha, now);
+      const h = make('h4', 'ev-dia-tit'); // «SÁB · 28 NOV» (o «HOY · 16 NOV»): decorativo; la fecha completa va en texto para lectores de pantalla
       h.id = `ev-d-${d.fecha}`;
-      h.append(make('b', '', c.fecha), ' ', make('span', '', c.dia));
+      const vis = make('span', 'ev-dia-vis');
+      vis.setAttribute('aria-hidden', 'true');
+      vis.append(make('span', 'ev-dia-sem', d.fecha === plan.hoy ? 'Hoy' : p.sem), make('b', 'ev-dia-num', p.num), make('span', 'ev-dia-mes', `${p.mes}${p.anio ? ` ${p.anio}` : ''}`));
+      h.append(make('span', 'sr-only', cap(fechaLarga(d.fecha, now))), vis);
       sec.setAttribute('aria-labelledby', h.id);
       sec.append(h, listNode(d.eventos, 'h5'));
       dias.append(sec);
@@ -611,6 +628,6 @@ export async function initEventos({ isMotion = () => false } = {}) {
   const lede = document.querySelector('[data-ev-lede]');
   if (lede && plan.conFecha) lede.textContent = 'Lo que viene en la casa.';
   root.classList.add('is-ready');
-  enterOnView([...root.querySelectorAll('.ev-prox, .ev-fila, .ev-lado')], isMotion);
+  enterOnView([...root.querySelectorAll('.ev-prox, .ev-dia-tit, .ev-fila, .ev-lado')], isMotion);
   if (plan.destacado) document.dispatchEvent(new CustomEvent('iti:primarias')); // app.js: la primaria de la barra cede ante la del destacado
 }

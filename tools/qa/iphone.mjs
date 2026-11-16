@@ -15,7 +15,7 @@
 //      La casa: titular y la primera foto · Catálogo (menú): titular y «Buscar en el catálogo» · Catálogo (barra inferior): chips, la portada
 //      central y su pie «título · autor · precio» · Eventos: titular, entradilla y la primera tarjeta de la lista (con --aviso, el titular, la
 //      entradilla y el arranque del destacado, que no cabe entero: lleva foto o cartel) ·
-//      Café: titular, chips y la tarjeta central de la carta · Visita: titular y «Cómo llegar»;
+//      Café: titular, la barra de categorías y la primera tarjeta de la carta · Visita: titular y «Cómo llegar»;
 //  · menú ☰: la hoja no se desplaza (todo cabe: Instagram y Facebook a la vista) y sus filas miden ≥ 44;
 //  · ficha (tocar la portada central): el borde de la hoja ≥ área segura + 12 (y ≥ 48 sin área segura) y las acciones del pie dentro de la ventana.
 // Sale con 1 si algo falla. Escribe una tabla, iphone.json y una captura por perfil y estado en DIR.
@@ -105,7 +105,7 @@ const DESTINOS = [
   ['catalogo-menu', 'menu', '#libros', { titular: '#books-title', accion: '.explore-open' }, 'titular'],
   ['catalogo-barra', 'barra', '#colecciones', { chips: '.rail-chips', pieza: '.c3d--portada .c3d-item.is-centro .cover', pie: '.cf-meta' }, null],
   ['eventos', 'menu', '#cartelera', AVISO ? { titular: '#bill-title', entradilla: '.bill .sec-texto' } : { titular: '#bill-title', entradilla: '.bill .sec-texto', pieza: '.ev-fila .ev-card' }, 'titular'],
-  ['cafe', 'menu', '#cafe', { titular: '#cafe-title', chips: '.cafe-chips', pieza: '.c3d--carta .c3d-item.is-centro .cafe-card' }, 'titular'],
+  ['cafe', 'menu', '#cafe', { titular: '#cafe-title', chips: '.ct-nav', pieza: '.ct-lista .ct-prod' }, 'titular'],
   ['visita', 'menu', '#visita', { titular: '#visit-title', accion: '.visit-actions .btn' }, 'titular']
 ];
 

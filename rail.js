@@ -82,8 +82,8 @@ export function wireBookOpen(track, ensureCatalog) {
 }
 
 // ---------- Carrusel de portadas en 3D (CarruselPortadas): variante «portada» del Carrusel3D ----------
-// El motor (pose por fotograma, imán al centro, flechas, teclado, toque y profundidad) vive en carousel3d.js y lo comparten Eventos y la
-// carta de Café y té. Se reexporta lo puro para quien lo pedía aquí.
+// El motor (pose por fotograma, imán al centro, flechas, teclado, toque y profundidad) vive en carousel3d.js; desde el 2026-11-16 este
+// es su único uso (Eventos y la carta de Café y té ya no son carruseles). Se reexporta lo puro para quien lo pedía aquí.
 export { coverflowPose, nearestIndex, CF_GIRO } from './carousel3d.js';
 
 // ---------- Recorrido ligero (A4, recuperado el 2026-11-13): los chips son las paradas ----------

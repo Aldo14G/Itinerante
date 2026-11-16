@@ -82,8 +82,7 @@ const steps = [
   // Eventos (2026-11-16: destacado y lista por fecha): «Añadir al calendario» arma y descarga el .ics (solo existe con un evento con fecha: lo da
   // el evento de prueba que inyecta esta herramienta). Café (Carrusel3D, variante carta): el chip «Té» cambia la carta y la flecha mueve el centro.
   ['eventos calendario', async () => { await ev(`document.querySelector('.ev-prox').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('.ev-prox [data-ev-cal]'); }],
-  ['café chip', async () => { await ev(`document.querySelector('[data-cafe-c3d]').scrollIntoView({ block: 'center' })`); await sleep(2500); await click('.cafe-chip:not([aria-checked=true])'); }],
-  ['café flecha', async () => { await sleep(600); await siguiente('[data-cafe-next]', '[data-cafe-c3d]'); }],
+  ['café categoría', async () => { await ev(`document.querySelector('[data-cafe]').scrollIntoView({ block: 'start' })`); await sleep(2500); await click('.ct-chip:not([aria-current=true])'); }],
   // Explorar con los 41 títulos sin paginar (hoja en el teléfono, en línea en escritorio): abrir la búsqueda y abrir y cerrar la ficha de una tarjeta.
   ['Explorar abrir', async () => { if (+W < 761) { await ev(`document.getElementById('libros').scrollIntoView()`); await sleep(800); await click('[data-ex-open]'); } else { await ev(`document.getElementById('catalogo').scrollIntoView()`); await sleep(1200); await click('[data-ex-open]'); } }],
   ['rejilla ficha', async () => { await sleep(2500); await click('#explorer .card-item:nth-child(5) .card'); }],

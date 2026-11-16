@@ -80,6 +80,12 @@
   --ls-nota-pie: 0em;
   --t-rotulo: 600 13px/18px var(--font-texto);
   --ls-rotulo: 0.01em;
+  --t-versalitas: 600 13px/18px var(--font-texto);
+  --ls-versalitas: 0.08em;
+  --t-fecha-grande: 300 52px/52px var(--font-display);
+  --ls-fecha-grande: -0.03em;
+  --t-fecha-lista: 300 32px/36px var(--font-display);
+  --ls-fecha-lista: -0.02em;
   --t-leyenda-1: 400 12px/16px var(--font-texto);
   --ls-leyenda-1: 0em;
   --t-leyenda-2: 400 11px/13px var(--font-texto);

@@ -48,8 +48,8 @@ genérico.
   destinos (Eventos y talleres, Novedades si hay llegadas, Café y té, La casa, Visita, el
   horario, WhatsApp y las redes) está en el menú ☰. El orden de la página es
   Inicio (con La casa), Catálogo, Eventos y talleres, Novedades (solo con
-  llegadas), Café y té, Visita y pie. En Eventos y talleres (antes Cartelera), «Compartir» es
-  local: no envía nada ni muestra contadores, reseñas o reacciones. «Me interesa»
+  llegadas), Café y té, Visita y pie. En Eventos y talleres (antes Cartelera), «Compartir» (solo
+  en el destacado) es local: no envía nada ni muestra contadores, reseñas o reacciones. «Me interesa»
   se retiró el 2026-11-13: no servía a la persona ni a la librería.
 - Crítica minimalista aprobada por Aldo el 2026-11-13: cada cosa se dice una vez.
   El Catálogo va titular → «Buscar en el catálogo» → chips Narrativa · Poesía ·
@@ -75,24 +75,40 @@ genérico.
   se muestran con llegadas («3 llegaron en las últimas dos semanas», «3 novedades desde tu
   visita») son conteos reales de esa lista frente a la última vez que la persona vio la
   sección en su dispositivo: no se inventa ninguna.
-- **Café y té** (`#cafe`, 2026-11-13): la carta de la sala en un carrusel (Café ·
-  Té), con los cafés y tés habituales de cualquier cafetería que indicó Aldo. Es
-  una **carta genérica sin precios** hasta que la librería los dé: con
-  `precio: null` no se imprime nada de precio (ni «por confirmar»); cuando haya
-  un precio real se muestra «$NN MXN» marcado como dato de la carta. Se edita en
-  `assets/data/menu.json` sin tocar HTML ni JS (añadir «Para comer» es añadir un
-  objeto); su origen queda en `assets/provenance.json` (`menuData`). Sin fotos de
-  producto; la consulta por la carta se hace desde el bloque Contacto del pie.
-- Eventos y talleres van en el mismo carrusel 3D que el Catálogo (2026-11-13):
-  la propuesta del centro muestra su descripción y «Compartir»; las fechas siguen
-  saliendo solo de `data-fecha` en el marcado.
+- **Café y té** (`#cafe`; parrilla por categorías desde el 2026-11-16, antes un carrusel): la
+  carta de la sala, **transcrita de la carta impresa de Café Itinerante que mandó Aldo**:
+  Cafés (con precio), Tés y aguas (los precios de los tés y de las «Aguas frescas»
+  estaban tapados por una etiqueta en la foto: `precio: null`, no se imprime nada, ni «por
+  confirmar»), Dulce (empanadas a $35 c/u, tarta del día $70) y Salado. Cada precio
+  impreso se muestra «$NN MXN» marcado como dato de la carta; no se inventan platillos,
+  descripciones ni precios. Se edita en `assets/data/menu.json` sin tocar HTML ni JS
+  (añadir «Para comer» es añadir un objeto); su origen queda en `assets/provenance.json`
+  (`menuData`). Sin fotos de producto todavía (cuando las haya, `foto` por producto). **El
+  cierre «Pídelo en la barra de la sala.» + «Cómo llegar» está retirado hasta nuevo aviso:**
+  la carta impresa dice «Padre Mier 836A Pte., Centro de Monterrey», que no es la dirección
+  de la librería (Matamoros 421) y está por confirmar con Aldo; el sitio no afirma dónde se
+  pide. La consulta por la carta se hace desde el bloque Contacto del pie.
+- **Eventos y talleres** (2026-11-16: destacado y lista por día, antes un carrusel; datos en
+  `assets/data/eventos.json`): solo se publica lo que el anuncio de la librería dice (fecha,
+  hora, quién conduce, invitado, colaboración, costo tal como lo da), y lo que falta no se
+  completa. **El registro es por enlace a Luma** («Registrarme», una página de Luma que
+  se abre en otra pestaña) **o por WhatsApp** («Reservar por WhatsApp», con el mensaje ya
+  escrito) cuando el anuncio lo dice; sin dato de reserva, sin botón. Es la excepción a «el
+  contacto vive en el pie», por ser la función del objeto. **El sitio no guarda registros ni
+  muestra cupos, asistentes ni «quedan N lugares»**; no carga nada de Luma (ni marcos ni
+  scripts) y descarta un enlace de registro que no sea de Luma. Una propuesta sin fecha
+  confirmada sigue diciendo «Propuesta · sin fecha» y no lleva reserva ni calendario. Cada
+  evento con fecha ofrece «Añadir al calendario» (un archivo `.ics` armado en el
+  navegador) y, el destacado, «Compartir» (local). El próximo evento vigente se avisa
+  en el inicio («Próximo: Sáb 21 nov · título») y con un punto en «Eventos».
 - **Contacto en un solo lugar** (decisión de Aldo, 2026-11-13: «Los contactos irán
   en un solo lugar específico para no sobresaltar el área»): el pie es el bloque
   «Contacto» (WhatsApp, Instagram, Facebook y Correo, con la línea «Escríbenos para
   preguntar por un libro, la carta o la próxima fecha de un taller.»). Inicio,
   Catálogo, Eventos, Café y Visita no repiten llamados a WhatsApp; «Cómo llegar»
   sigue como la acción primaria. Conservan su WhatsApp, por ser la función de su
-  objeto, la ficha del libro (confirmar existencia), «Enviar mi lista por
+  objeto, la ficha del libro (confirmar existencia), «Reservar por WhatsApp» en el
+  evento que lo trae (2026-11-16), «Enviar mi lista por
   WhatsApp», la salida del estado vacío y del error de Explorar, y la fila de
   contacto del menú ☰; el enlace «Instagram» de la entradilla de Eventos dice dónde
   se anuncian las fechas.

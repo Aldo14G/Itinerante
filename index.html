@@ -331,8 +331,8 @@
 
 
     <!-- Eventos y talleres (el id sigue siendo #cartelera; 2026-11-16: destacado y lista por fecha, feed.js). Los datos viven en
-         assets/data/eventos.json: publicar un evento es añadir un renglón. Con un evento con fecha, feed.js pinta el destacado (foto, bloque de
-         fecha, «Registrarme» —enlace a Luma—, «Añadir al calendario» y «Compartir»), la lista por día y la nota lateral, y la entradilla pasa a
+         assets/data/eventos.json: publicar un evento es añadir un renglón. Con un evento con fecha, feed.js pinta el destacado (foto o cartel, fecha
+         tipográfica, datos, «Registrarme» —enlace a Luma—, «Añadir al calendario» y «Compartir»), la lista por día y la nota lateral, y la entradilla pasa a
          «Lo que viene en la casa.». Sin fechas (hoy) y sin JavaScript queda esto: las propuestas, iguales a las del JSON (npm test lo comprueba). -->
     <section id="cartelera" class="bill" aria-labelledby="bill-title">
       <header class="sec-head" data-revelar>
@@ -347,7 +347,7 @@
               <li class="ev-fila" data-id="circulo" data-kind="real">
                 <article class="ev-card" aria-labelledby="ev-t-circulo">
                   <div class="ev-card-txt">
-                    <div class="ev-rot"><span class="badge">Lectura</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></div>
+                    <div class="ev-rot"><span class="ev-tipo">Lectura</span><span class="ev-estado" data-ev-when>Propuesta · sin fecha</span></div>
                     <h3 class="ev-card-tit" id="ev-t-circulo">Círculo de lectura</h3>
                   </div>
                   <img class="ev-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async">
@@ -357,7 +357,7 @@
               <li class="ev-fila" data-id="ajedrez" data-kind="real">
                 <article class="ev-card" aria-labelledby="ev-t-ajedrez">
                   <div class="ev-card-txt">
-                    <div class="ev-rot"><span class="badge">Juego</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></div>
+                    <div class="ev-rot"><span class="ev-tipo">Juego</span><span class="ev-estado" data-ev-when>Propuesta · sin fecha</span></div>
                     <h3 class="ev-card-tit" id="ev-t-ajedrez">Ajedrez en la casa</h3>
                   </div>
                   <img class="ev-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async">
@@ -367,7 +367,7 @@
               <li class="ev-fila" data-id="taller" data-kind="real">
                 <article class="ev-card" aria-labelledby="ev-t-taller">
                   <div class="ev-card-txt">
-                    <div class="ev-rot"><span class="badge">Taller</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></div>
+                    <div class="ev-rot"><span class="ev-tipo">Taller</span><span class="ev-estado" data-ev-when>Propuesta · sin fecha</span></div>
                     <h3 class="ev-card-tit" id="ev-t-taller">Taller de escritura</h3>
                   </div>
                   <img class="ev-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async">
@@ -401,7 +401,7 @@
     <!-- Café y té (#cafe; 2026-11-16: parrilla por categorías con barra de categorías fija, cafe.js). Los datos viven en assets/data/menu.json: se
          editan sin tocar HTML ni JS, y añadir una categoría («Para comer») es añadir un objeto. Cada producto es una tarjeta (foto cuadrada si la trae;
          si no, el icono de su categoría), con su nombre, su descripción y, solo si la librería lo dio, su precio. Se pide en la sala: el cierre lo dice
-         y lleva a «Cómo llegar». Sin JavaScript (o si la carta no llega) quedan la foto y el cierre. -->
+         y lleva a «Cómo llegar» (retirado hasta nuevo aviso, ver abajo). Sin JavaScript (o si la carta no llega) queda la foto. -->
     <section id="cafe" class="cafe" aria-labelledby="cafe-title">
       <header class="sec-head" data-revelar>
         <h2 id="cafe-title" class="h2">Café y té <em>en la sala</em></h2>
@@ -424,7 +424,10 @@
           </div>
         </div>
       </div>
-      <div class="ct-cierre">
+      <!-- Cierre de la carta, RETIRADO hasta nuevo aviso (2026-11-16, pendiente de Aldo): la carta impresa dice «Padre Mier 836A Pte., Centro de
+           Monterrey», que no es la dirección de la librería (Matamoros 421); mientras se confirma no se afirma dónde se pide. Para restaurarlo,
+           quita `hidden` (el CSS y las pruebas ya lo contemplan). -->
+      <div class="ct-cierre" hidden>
         <p>Pídelo en la barra de la sala.</p>
         <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
       </div>

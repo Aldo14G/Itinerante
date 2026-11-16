@@ -1,5 +1,5 @@
-// Norma del Carrusel3D (skill ux-apple §3): mide los tres carruseles (portada, evento y carta) en nueve tamaños, con movimiento y con
-// movimiento reducido, y sale con código 1 si algo se sale de la norma. Desde el 2026-11-14 los teléfonos son iPhone reales (alto = la zona
+// Norma del Carrusel3D (skill ux-apple §3): mide el carrusel de portadas —el único Carrusel3D desde el 2026-11-16: Eventos y la carta salieron—
+// en nueve tamaños, con movimiento y con movimiento reducido, y sale con código 1 si algo se sale de la norma. Desde el 2026-11-14 los teléfonos son iPhone reales (alto = la zona
 // visible de Safari): 16 393×659, 13 mini 375×629, SE 375×667, 16 Pro Max 440×763 y 16 Pro a pantalla completa 402×874 con áreas seguras
 // 62/34 (Emulation.setSafeAreaInsetsOverride), más 320×640 (Zoom de pantalla); antes 360×740, 390×844 y 430×932, que ningún iPhone tiene.
 // node tools/qa/carrusel.mjs URL [DIR]   (DIR: capturas y carrusel.json; por omisión, el directorio actual)
@@ -7,16 +7,15 @@
 //
 // Por carrusel y tamaño comprueba:
 //  · centro: |centro de la pieza central − centro del .c3d| ≤ 1 px y lo mismo contra la columna de contenido de su sección;
-//  · ancho: en el teléfono, % del ancho del carrusel (portada 54–60 y ≥ 168 px, carta 56–62, evento 76–82); desde 761 px, en px
-//    (portada 280–320, evento 400–460, carta 240–280 desde 1280; entre 761 y 1279, donde el escenario no da para la pieza de escritorio con
-//    sus vecinas y las flechas, la que quepa: portada 240–320, evento 300–460, carta 232–280);
+//  · ancho: en el teléfono, % del ancho del carrusel (portada 54–60 y ≥ 168 px); desde 761 px, en px (portada 280–320; entre 761 y 1279,
+//    donde el escenario no da para la pieza de escritorio con sus vecinas y las flechas, la que quepa: 240–320);
 //  · piezas a la vista (> 50 % dentro de la ventana): ≤ 3 en el teléfono, ≤ 5 desde 761;
 //  · hueco visible entre la central y cada vecina ≥ 12 px (no se enciman);
 //  · flechas: con toque no se muestran (el control es deslizar o tocar la vecina); con puntero fino se ven, miden ≥ 44, no tapan la central
 //    (≥ 8 px de hueco), van centradas en el alto de la pieza (± 2 px) y, desde 1024 px, quedan ≥ 16 px fuera de la última pieza a la vista;
-//  · el bloque carrusel + pie cabe en el alto útil (entre la barra de navegación y la barra inferior); desde el 2026-11-14 ningún carrusel
-//    lleva acción debajo («Compartir» de Eventos va en la fila de insignias de la tarjeta; el contacto vive en el pie de la página);
-//  · aire: lo de arriba → pieza 24–32 (± 2), pieza → pie 16–20 (± 2), pie → acción 24 (± 4; en la carta, pieza → acción);
+//  · el bloque carrusel + pie cabe en el alto útil (entre la barra de navegación y la barra inferior); desde el 2026-11-14 el carrusel no
+//    lleva acción debajo (el contacto vive en el pie de la página);
+//  · aire: lo de arriba → pieza 24–32 (± 2), pieza → pie 16–20 (± 2);
 //  · texto: nada cortado en la pieza central ni en el pie; en las vecinas ningún texto visible cruza el borde de la ventana (el texto de
 //    una portada tipográfica es parte de la imagen y no cuenta);
 //  · con movimiento reducido, ninguna pieza con giro ni profundidad (transformación plana).
@@ -59,13 +58,12 @@ const ev = async expr => {
 await send('Page.enable'); await send('Runtime.enable');
 
 const VARIANTES = [
-  { name: 'portada', sec: '#libros', c3d: '.c3d--portada', top: '.rail-head' },
-  { name: 'carta', sec: '#cafe', c3d: '.c3d--carta', top: '.cafe-chips' }
+  { name: 'portada', sec: '#libros', c3d: '.c3d--portada', top: '.rail-head' }
 ];
 // Norma (skill ux-apple §3). Teléfono: % del ancho del carrusel. Escritorio: px.
-const TEL = { portada: [54, 60], carta: [56, 62] };
-const ESC = { portada: [280, 320], carta: [240, 280] };
-const TAB = { portada: [240, 320], carta: [232, 280] };
+const TEL = { portada: [54, 60] };
+const ESC = { portada: [280, 320] };
+const TAB = { portada: [240, 320] };
 
 const report = [];
 const rows = [];
@@ -80,7 +78,7 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   const colL = sr.left + parseFloat(ps.paddingLeft), colR = sr.right - parseFloat(ps.paddingRight);
   const items = [...c.querySelectorAll('.c3d-item')];
   const ci = items.findIndex(i => i.classList.contains('is-centro'));
-  const visual = it => it.querySelector('.cover, .cafe-card') || it.querySelector('.cf-pose');
+  const visual = it => it.querySelector('.cover') || it.querySelector('.cf-pose');
   const op = el => { let o = 1; for (let p = el; p && p !== c; p = p.parentElement) o *= +getComputedStyle(p).opacity; return o; };
   const info = items.map((it, i) => {
     const r = R(visual(it)); const inside = Math.max(0, Math.min(r.right, vr.right) - Math.max(r.left, vr.left));
@@ -108,8 +106,7 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   // Arriba, pie y acción de cada variante.
   const q = s => sec.querySelector(s);
   let arriba, pie = null, accion = null;
-  if (name === 'portada') { arriba = q('.rail-nota-fila'); pie = q('.cf-texto'); }
-  else { arriba = q('.cafe-chips'); }
+  arriba = q('.rail-nota-fila'); pie = q('.cf-texto');
   const pieTxt = pie ? [...pie.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.sr-only')).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim().slice(0, 30)) : [];
   const hdr = document.querySelector('.hdr'), tab = document.querySelector('.tabbar');
   const top = hdr ? R(hdr).bottom : 0;

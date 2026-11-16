@@ -115,6 +115,7 @@ const SISTEMA = {
     'Descripción de un evento (propuesta o destacado): es un párrafo de lectura (≥ 120 caracteres, tres o cuatro renglones) y lleva la letra `lectura` 17/24, no la de las entradillas (17/22): scripts/critique.mjs (law-lineheight) pide interlínea ≥ 1.35 en esos párrafos. Nivel propio en NIVELES.',
     'Eventos en escritorio: la lista va en las columnas 1–8 y la nota lateral en 9–12 (`laterales`; aprobado por Aldo el 2026-11-16): la nota no cuenta como «columna derecha» de la división única, pero debe empezar en la columna 9, terminar en el margen y compartir tope con la lista.',
     'Primaria del evento destacado: vive dentro de su tarjeta (`tarjetasConPrimaria`); se le exige la sangría de la tarjeta y, en el teléfono, que su fila llegue al borde interior (no el ancho de la página).',
+    'Fecha tipográfica de Eventos (el número de 52 del destacado y el de 32 del día): es una cifra decorativa (aria-hidden; la fecha se lee en texto sr-only), no texto de lectura: no cuenta para el máximo de tamaños por sección (T3).',
     'Ficha del libro: tiene retícula interior propia; de ella solo fallan el margen (H1) y los botones aplastados (H2).'
   ]
 };
@@ -164,16 +165,20 @@ const SECCIONES = [
 const NIVELES = {
   'h1': ['.entry-title'],
   'titular de sección': ['#house-title', '#books-title', '#bill-title', '#cafe-title', '#visit-title', '#ftr-title'],
-  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ct-grupo-tit'],
+  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ev-lado-tit', '.ct-grupo-tit'],
   'entradilla y cuerpo': ['.house .sec-texto', '.bill .sec-texto', '.cafe .sec-texto', '.ftr-lede', '.books-foot p', '.ct-cierre p'],
   'párrafo de lectura': ['.ev-card-desc', '.ev-prox-desc'],   // tres renglones o más (≥ 120 caracteres): token `lectura` 17/24; la crítica (law-lineheight) pide ≥ 1.35
   'estado': ['.entry-status', '.visit-status'],
-  'título de pieza': ['.cf-titulo', '.ev-card-tit', '.ev-prox-tit'],
+  'título de pieza': ['.cf-titulo', '.ev-card-tit'],
+  'título del destacado': ['.ev-prox-tit'],   // Title 1 (2026-11-16): el destacado es lo único de Eventos que compite con el titular de sección; su forma es una sola
+  'versalitas': ['.ev-fecha-rot', '.ev-dia-sem'],   // 13 semibold en mayúsculas con interletra abierta: la fecha del destacado y el día de la lista
+  'rótulo de dato': ['.ev-dato dt'],
+  'valor de dato': ['.ev-dato dd'],
   'nombre de producto': ['.ct-nom'],      // Headline 17: la tarjeta de la carta es pequeña (2 a 4 por fila) y su nombre no compite con el título del grupo
   'texto de pieza': ['.cf-meta', '.ct-desc'],
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],
-  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-prox-meta', '.ev-lado-txt']
+  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-lado-txt']
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -241,7 +246,7 @@ function enPagina(cfg) {
       const cs = getComputedStyle(e);
       const a = { id: atomos.length, tipo, sel: nombre(e), txt: texto(e), caja: B(e.getBoundingClientRect()), sup, escenario: !!e.closest(cfg.centrables),
         relleno: [parseFloat(cs.paddingTop), parseFloat(cs.paddingRight), parseFloat(cs.paddingBottom), parseFloat(cs.paddingLeft)].map(rd), radio: cs.borderTopLeftRadius, ...extra };
-      if (tipo === 'texto' || tipo === 'control' || tipo === 'insignia') { a.letra = letra(e); a.tinta = tinta(e); }
+      if (tipo === 'texto' || tipo === 'control' || tipo === 'insignia') { a.letra = letra(e); a.tinta = tinta(e); if (e.closest('[aria-hidden="true"]')) a.decorativo = true; }
       if (tipo === 'control' && extra.fondo === undefined) a.fondo = alpha(cs.backgroundColor) > 0.03 || cs.boxShadow !== 'none' || parseFloat(cs.borderTopWidth) > 0;
       atomos.push(a); return a.id;
     };
@@ -688,7 +693,7 @@ function analizar(clave, m) {
       if (sangrias.length > 1 && sup.tipo !== 'tarjeta' && !/^fieldset/.test(sup.sel)) F('C2', id, `${t.sel}: ${sangrias.length} sangrías interiores distintas (${sangrias.join(', ')} px desde el borde)`);
     }
     res.secciones[id].tarjetas = tarjetas;
-    const tams = [...new Set(m.secciones[id].atomos.filter(a => a.letra).map(a => a.letra.px))].sort((a, b) => a - b);
+    const tams = [...new Set(m.secciones[id].atomos.filter(a => a.letra && !a.decorativo).map(a => a.letra.px))].sort((a, b) => a - b);
     res.secciones[id].tamanos = tams;
     if (tams.length > SISTEMA.tamanosMax) F('T3', id, `${tams.length} tamaños de letra (${tams.join(', ')}); máximo ${SISTEMA.tamanosMax}`);
   }

@@ -81,8 +81,9 @@ Calculados desde `design/tokens.json`. Texto ≥ 4.5:1 (WCAG 1.4.3); borde de co
 | `foco` | `vidrio@peor` | foco | 3 | 4.36 | 5.81 | Filete interior de la barra inferior |
 | `foco` | `vidrio-hoja@peor` | foco | 3 | 5.07 | 7.70 | Filete interior de las filas del menú |
 | `linea-fuerte` | `fondo` | borde | 3 | 4.80 | 6.72 | Casilla de filtro (interior), campo con foco, pista del interruptor apagada |
-| `linea-fuerte` | `fondo-2` | borde | 3 | 4.49 | 6.06 | Casilla de filtro sobre su grupo, pista del interruptor con Novedades |
+| `linea-fuerte` | `fondo-2` | borde | 3 | 4.49 | 6.06 | Casilla de filtro sobre su grupo, pista del interruptor con Novedades, Boton de contorno y línea de la fecha en la lista de Eventos |
 | `linea-fuerte` | `fondo-3` | borde | 3 | 4.07 | 4.57 | Pista del interruptor apagada (filete interior) |
+| `linea-fuerte` | `superficie` | borde | 3 | 4.80 | 5.17 | Borde de Boton de contorno y línea que separa la fecha del título, sobre el panel del destacado |
 | `primario` | `fondo` | borde | 3 | 6.33 | 8.61 | Pista del interruptor encendida, conector hecho del Recorrido |
 | `primario` | `fondo-2` | borde | 3 | 5.92 | 7.77 | Casilla marcada sobre su grupo |
 | `primario` | `fondo-3` | borde | 3 | 5.37 | 5.86 | Borde de la parada hojeada y su palomita (Recorrido) |
@@ -106,14 +107,14 @@ Calculados desde `design/tokens.json`. Texto ≥ 4.5:1 (WCAG 1.4.3); borde de co
 Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y en las barras, 56 (--lg) en las acciones principales y el pie de las hojas. Una sola primaria por vista.
 
 - **Tipo:** control · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Botón) y «Escala de controles».
-- **Variantes:** `.btn--primario` primario (La acción primaria de la vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»).); `.btn--secundario` secundario (Secundaria «tinted» en menta; alternado con aria-pressed toma el primario.); `.btn--plano` plano (Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»).); `.btn--vidrio` vidrio (Solo lo que flota: cerrar una hoja, flechas del Carrusel3D.); `.btn--icono` icono (Cuadrado del alto del botón, nombre en aria-label.); `.btn--sm` chico (44 px.); `.btn--lg` grande (56 px.); `.btn--ancho` ancho (A todo el ancho.)
-- **style.css:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg` `.btn--ancho`
+- **Variantes:** `.btn--primario` primario (La acción primaria de la vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»).); `.btn--secundario` secundario (Secundaria «tinted» en menta; alternado con aria-pressed toma el primario.); `.btn--plano` plano (Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»).); `.btn--contorno` contorno (Sin relleno, borde de 1 px en linea-fuerte y texto en tinta (Eventos, 2026-11-16: «Registrarme» y «Añadir al calendario» de la lista y los iconos del destacado, para lo que no debe competir con la primaria). Mismas alturas (44) y estados que las demás.); `.btn--vidrio` vidrio (Solo lo que flota: cerrar una hoja, flechas del Carrusel3D.); `.btn--icono` icono (Cuadrado del alto del botón, nombre en aria-label.); `.btn--sm` chico (44 px.); `.btn--lg` grande (56 px.); `.btn--ancho` ancho (A todo el ancho.)
+- **style.css:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--contorno` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg` `.btn--ancho`
 - **index.html:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg`
 - **motion.js:** exporta `pickPop` `afterPaint` `confirmThen`
-- **Tokens:** `alto-sm` `alto-md` `alto-lg` `radio-pildora` `t-boton` `ls-boton` `t-boton-chico` `ls-boton-chico` `space-2` `space-4` `space-5` `space-6` `primario` `en-primario` `primario-presionado` `menta` `en-menta` `turquesa-texto` `fondo-3` `tinta` `tinta-2` `vidrio` `vidrio-hoja` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `curva-resorte`
-- **Estado hover:** `.btn--primario:hover`, `.btn--secundario:hover`, `.btn--vidrio:hover`, `.btn--plano:hover`
+- **Tokens:** `alto-sm` `alto-md` `alto-lg` `linea-fuerte` `radio-pildora` `t-boton` `ls-boton` `t-boton-chico` `ls-boton-chico` `space-2` `space-4` `space-5` `space-6` `primario` `en-primario` `primario-presionado` `menta` `en-menta` `turquesa-texto` `fondo-3` `tinta` `tinta-2` `vidrio` `vidrio-hoja` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `curva-resorte`
+- **Estado hover:** `.btn--primario:hover`, `.btn--secundario:hover`, `.btn--vidrio:hover`, `.btn--plano:hover`, `.btn--contorno:hover`
 - **Estado foco:** `.btn:focus-visible`, `.btn--vidrio:focus-visible`
-- **Estado presionado:** `.btn:active`, `.btn--primario:active`
+- **Estado presionado:** `.btn:active`, `.btn--primario:active`, `.btn--contorno:active`
 - **Estado deshabilitado:** `.btn:disabled`, `.btn[aria-disabled="true"]`
 - **Estado seleccionado:** `.btn--secundario[aria-pressed="true"]`
 - **Estado movimiento_reducido:** `.btn:active` — En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo.
@@ -267,49 +268,49 @@ Variante portada (capa 1 del Catálogo): empieza por el libro del medio; bajo é
 
 ### EventoDestacado
 
-El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): tarjeta en superficie con sombra-flotante, foto 16:9 o cartel entero y cuadrado (encuadre), BloqueFecha, insignias «Próximo» (u «Hoy»), tipo y ciclo, título (Title 3), «Sábado 21 de noviembre · 18:57 · …», descripción, costo tal como lo da la librería y acciones: la reserva del evento como primaria de 56 («Registrarme», enlace a Luma en otra pestaña, o «Reservar por WhatsApp» con el mensaje escrito; sin reserva, «Añadir al calendario») y los iconos de 56 «Añadir al calendario» y «Compartir». Desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. Solo existe con un evento con fecha vigente.
+El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): panel en superficie con borde de 1 px (linea) y sin sombra, foto 16:9 a sangre o cartel entero y cuadrado como objeto sobre fondo-3 (encuadre), BloqueFecha (fecha tipográfica) separado del título por una línea fina, «Próximo» (u «Hoy», la única insignia con relleno), tipo y ciclo como texto, título (Title 1), descripción, los datos como lista de definición entre líneas finas (Hora · Con · Invita · Colabora · Costo, solo los que el evento trae; el costo con sus renglones tal como los da la librería) y acciones: la reserva del evento como primaria de 56 («Registrarme», enlace a Luma en otra pestaña, o «Reservar por WhatsApp» con el mensaje escrito; sin reserva, «Añadir al calendario») y los iconos de contorno de 44 «Añadir al calendario» y «Compartir». Desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. Solo existe con un evento con fecha vigente.
 
 - **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
-- **Variantes:** `.ev-prox` foto (Fotografía 16:9 (teléfono) o a todo el alto de la mitad 7–12 (escritorio), recortada (cover).); `.ev-prox--cartel` cartel (Cartel cuadrado con texto: entero, 1:1, nunca recortado (contain sobre fondo-3).)
-- **style.css:** `.ev-prox` `.ev-prox--cartel` `.ev-prox-fig` `.ev-prox-img` `.ev-prox-cuerpo` `.ev-prox-enc` `.ev-prox-cab` `.ev-prox-tit` `.ev-prox-meta` `.ev-prox-desc` `.ev-costo` `.ev-acc` `.ev-rot`
+- **Variantes:** `.ev-prox` foto (Fotografía 16:9 (teléfono) o a todo el alto de la mitad 7–12 (escritorio), recortada (cover).); `.ev-prox--cartel` cartel (Cartel cuadrado con texto: entero, 1:1, nunca recortado ni a sangre; sobre fondo-3 con relleno interior de la escala, radio-md, sombra-portada y un anillo de 1 px.)
+- **style.css:** `.ev-prox` `.ev-prox--cartel` `.ev-prox-fig` `.ev-prox-img` `.ev-prox-cuerpo` `.ev-prox-enc` `.ev-prox-id` `.ev-prox-tit` `.ev-prox-desc` `.ev-datos` `.ev-dato` `.ev-dato--costo` `.ev-costo` `.ev-acc` `.ev-rot` `.ev-tipo`
 - **index.html:** `[data-ev]` `[data-ev-lede]`
-- **feed.js:** exporta `initEventos` `destacadoNode` `eventosNodes` `eventosPlan` `validEventos` `eventosProblems` `validReserva` `validRegistro` `validTelefono` `reservaUrl` `reservaMessage` `metaLine` `quienLine` `icsOf` `downloadIcs` `shareEvento` `shareData` `onAct` `registroName` `reservaName` `calName` `shareName` `EVENTOS_URL` `LUGAR` · internas `reservaLink` `calButton` `shareButton` `costoNode` `enterOnView` · ganchos `dataset.fuente = 'anuncio'` `a.rel = 'noopener noreferrer'` `new CustomEvent('iti:primarias')`
+- **feed.js:** exporta `initEventos` `destacadoNode` `eventosNodes` `eventosPlan` `validEventos` `eventosProblems` `validReserva` `validRegistro` `validTelefono` `reservaUrl` `reservaMessage` `quienLine` `icsOf` `downloadIcs` `shareEvento` `shareData` `onAct` `registroName` `reservaName` `calName` `shareName` `EVENTOS_URL` `LUGAR` · internas `reservaLink` `calButton` `shareButton` `costoNode` `datosNode` `enterOnView` · ganchos `dataset.fuente = 'anuncio'` `a.rel = 'noopener noreferrer'` `new CustomEvent('iti:primarias')`
 - **assets/data/eventos.json:** datos
-- **Tokens:** `superficie` `fondo-3` `tinta` `tinta-2` `radio-lg` `sombra-flotante` `t-titulo-3` `t-subtitulo` `t-lectura` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-5` `space-8` `space-20` `dur-rapida` `dur-lenta` `escalon-linea`
-- **Estado foco:** `.btn:focus-visible` — La tarjeta no es un control: el foco va a sus tres acciones.
+- **Tokens:** `superficie` `fondo-3` `tinta` `tinta-2` `linea` `linea-fuerte` `radio-lg` `radio-md` `sombra-portada` `t-titulo-1` `t-subtitulo` `t-cuerpo` `t-nota-pie` `t-lectura` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-5` `space-6` `space-8` `space-20` `dur-rapida` `dur-lenta` `escalon-linea`
+- **Estado foco:** `.btn:focus-visible` — El panel no es un control: el foco va a sus tres acciones.
 - **Estado vacio:** feed.js `if (plan.destacado) out.push(destacadoNode(plan.destacado, now));` — Sin un evento con fecha vigente no hay destacado (por diseño): queda la lista de propuestas.
 - **Estado error:** feed.js `img.addEventListener('error', () => fig.remove())` — Si la imagen no carga, el destacado queda sin figura; si eventos.json no llega, queda lo que trae index.html.
 - **Estado movimiento_reducido:** `.motion .ev-espera`, feed.js `if (!isMotion() \|\| !('IntersectionObserver' in window)) return;` — La entrada (8 px y opacidad, dur-rapida) solo corre con movimiento y solo en lo que aún no se ve; sin movimiento todo está colocado.
 - **hover: no aplica.** La tarjeta no es un control; sus botones usan el hover de Boton.
-- **ARIA:** Article + Link + Button (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `aria-labelledby (el article toma el título)` `aria-label «Registrarme en «título» (abre Luma en otra pestaña)»` `aria-label «Reservar por WhatsApp para «título»»` `aria-label «Añadir «título» al calendario»` `aria-label «Compartir «título»»` `aria-hidden en el bloque de fecha (la fecha va en texto)` `target=_blank + rel=noopener noreferrer` · **Teclado:** Tab recorre la reserva, el calendario y «Compartir»; Enter o Espacio los activan.
+- **ARIA:** Article + Link + Button (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `aria-labelledby (el article toma el título)` `aria-label «Registrarme en «título» (abre Luma en otra pestaña)»` `aria-label «Reservar por WhatsApp para «título»»` `aria-label «Añadir «título» al calendario»` `aria-label «Compartir «título»»` `aria-hidden en la fecha tipográfica (la fecha completa va en texto sr-only junto al título)` `dl/dt/dd en los datos` `target=_blank + rel=noopener noreferrer` · **Teclado:** Tab recorre la reserva, el calendario y «Compartir»; Enter o Espacio los activan.
 - **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/hojas.mjs` `tools/qa/inp.mjs` `tests/site.test.mjs`
 
 ### ListaEventos
 
-Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un rótulo por día («26 nov jueves» sobre una línea punteada) y, al final, «Propuestas, aún sin fecha». Cada TarjetaEvento es una tarjeta horizontal en superficie con radio 20: hora y tipo (o tipo y «Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 a la derecha; con fecha lleva la reserva (secundaria de 48) y el calendario; una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.
+Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un día por grupo (en el teléfono, un rótulo en versalitas «SÁB · 28 NOV» con una línea fina; desde 761 px, una columna de 96 a la izquierda con el día y el mes arriba y el número ligero debajo) y, al final, «Propuestas, aún sin fecha». Cada fila (TarjetaEvento) va entre líneas finas, sin relleno: hora y tipo como texto («17:00 · Juego»; o «tipo · Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 con radio-sm y anillo fino a la derecha; con fecha lleva la reserva de contorno (44) y el calendario plano (44); una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.
 
 - **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
-- **style.css:** `.ev` `.ev-despues` `.ev-lista` `.ev-sub` `.ev-dias` `.ev-dia-tit` `.ev-filas` `.ev-card` `.ev-card-txt` `.ev-card-img` `.ev-card-tit` `.ev-card-meta` `.ev-card-desc` `.ev-card-acc` `.ev-hora` `.ev-lado` `.ev-lado-tit` `.ev-lado-txt` `.ev-espera`
+- **style.css:** `.ev` `.ev-despues` `.ev-lista` `.ev-sub` `.ev-dias` `.ev-dia` `.ev-dia-tit` `.ev-dia-vis` `.ev-dia-num` `.ev-filas` `.ev-card` `.ev-card-txt` `.ev-card-img` `.ev-card-tit` `.ev-card-meta` `.ev-card-desc` `.ev-card-acc` `.ev-hora` `.ev-estado` `.ev-lado` `.ev-lado-tit` `.ev-lado-txt` `.ev-espera`
 - **index.html:** `#cartelera` `.ev-lista` `.ev-propuestas` `.ev-filas` `.ev-fila` `.ev-card` `.ev-card-img` `.ev-card-desc` `[data-ev-when]`
-- **feed.js:** exporta `cardNode` `eventosNodes` `notaCopy` `diaCorto` `horario` `eventBadge` `NO_DATE` · internas `listNode` `notaNode` `staticSignature` `planSignature`
-- **Tokens:** `superficie` `fondo-2` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `linea-fuerte` `radio-md` `radio-sm` `radio-portada` `portada-evento` `portada-evento-amplia` `t-titulo-3` `t-titular` `t-cuerpo` `t-subtitulo` `t-lectura` `anillo-foco` `canal-rejilla` `space-2` `space-3` `space-4` `space-5` `space-6` `space-8` `space-12`
-- **Estado foco:** `.ev-lado-txt a:focus-visible`, `.btn:focus-visible` — La tarjeta no es un control: el foco va a sus acciones y al enlace de la nota.
+- **feed.js:** exporta `cardNode` `eventosNodes` `notaCopy` `fechaBloque` `horario` `eventBadge` `NO_DATE` · internas `listNode` `notaNode` `staticSignature` `planSignature`
+- **Tokens:** `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `linea-fuerte` `radio-sm` `portada-evento` `portada-evento-amplia` `t-titulo-3` `t-titular` `t-versalitas` `t-fecha-lista` `t-subtitulo` `t-lectura` `anillo-foco` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-5` `space-6` `space-8` `space-12`
+- **Estado foco:** `.ev-lado-txt a:focus-visible`, `.btn:focus-visible` — La fila no es un control: el foco va a sus acciones y al enlace de la nota.
 - **Estado vacio:** feed.js `if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }` — Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»); una propuesta no lleva acciones.
 - **Estado error:** feed.js `catch { delete root.dataset.ready; return; }` — Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio.
 - **Estado movimiento_reducido:** `.motion .ev-espera`
-- **hover: no aplica.** Las tarjetas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton.
+- **hover: no aplica.** Las filas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton.
 - **ARIA:** List + Article (https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/) · `ul / li` `aria-labelledby (cada article y cada día)` `aria-label «Propuestas» (grupo sin rótulo visible)` `aria-label de cada acción con el título del evento` · **Teclado:** Tab recorre las acciones de cada tarjeta en el orden de lectura; nada que deslizar.
 - **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/iphone.mjs` `tools/qa/e2e.mjs` `tests/site.test.mjs`
 
 ### BloqueFecha
 
-Bloque de 64 × 72 en primario con el día de la semana, el número (Title 1 en 700) y el mes del evento destacado: lo primero que se lee de un anuncio. Es decorativo (aria-hidden): la fecha completa va en texto en el renglón de al lado.
+Fecha tipográfica del evento destacado, sin caja: arriba el día de la semana y el mes en versalitas (13, interletra abierta, turquesa-texto) y debajo el número grande y ligero (52, peso 300, cifras tabulares); una línea fina (linea-fuerte) la separa del título, vertical desde 761 px y horizontal en el teléfono. Es decorativa (aria-hidden): la fecha completa va en texto (sr-only) junto al título. En la lista, el rótulo de cada día usa el mismo bloque (número de 32).
 
 - **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
-- **style.css:** `.ev-fecha`
+- **style.css:** `.ev-fecha` `.ev-fecha-rot` `.ev-fecha-num`
 - **feed.js:** exporta `fechaBloque` `fechaLarga` · internas `fechaNode`
-- **Tokens:** `primario` `en-primario` `radio-md` `space-16` `space-2` `t-titulo-1` `t-leyenda-1`
-- **Estado oculto:** feed.js `box.setAttribute('aria-hidden', 'true');` — Oculto para lectores de pantalla: la fecha se lee en «Sábado 21 de noviembre · 18:57».
+- **Tokens:** `turquesa-texto` `tinta` `linea-fuerte` `space-1` `space-4` `space-6` `t-versalitas` `ls-versalitas` `t-fecha-grande` `ls-fecha-grande`
+- **Estado oculto:** feed.js `box.setAttribute('aria-hidden', 'true');` — Oculto para lectores de pantalla: la fecha se lee en el texto sr-only «Sábado 21 de noviembre» junto al título.
 - **hover: no aplica.** No es un control.
 - **foco: no aplica.** No es un control.
 - **ARIA:** Texto decorativo (sin rol) (https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/) · `aria-hidden=true` · **Teclado:** —
@@ -334,7 +335,7 @@ Renglón del inicio «Próximo: Sáb 21 nov · título» (el día del evento, «
 
 ### BarraCategorias
 
-Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría. Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra; sin palomita, para que los chips no cambien de ancho al desplazar). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.
+Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría. Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista, para que un salto desde abajo no deje marcado el último chip; sin palomita, para que los chips no cambien de ancho al desplazar; la barra solo se desliza si el chip actual no se ve entero). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.
 
 - **Tipo:** control · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
 - **style.css:** `.ct-nav` `.ct-chip` `.ct` `.ct-grupo` `.ct-grupo-tit`
@@ -354,14 +355,14 @@ Barra de categorías de la carta (Café y té): un chip de 48 por categoría de 
 
 ### TarjetaProducto
 
-Producto de la carta en la parrilla (2 columnas en el teléfono, 3 desde 761 y 4 desde 1024, en las columnas 4–12): recuadro cuadrado con la foto del producto si la trae (campo foto de menu.json, local y registrada) o, sin foto, el icono de su categoría (taza, tetera, plato) sobre fondo-3; debajo el nombre (Headline), la descripción (Subheadline, renglones parejos, sin cortar con «…») y el precio solo si la librería lo dio («$NN MXN», data-fuente="carta"). No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3; la sección cierra con «Pídelo en la barra de la sala.» y «Cómo llegar».
+Producto de la carta en la parrilla (2 columnas en el teléfono, 3 desde 761 y 4 desde 1024, en las columnas 4–12), en dos variantes. Con foto (campo foto de menu.json, local y registrada): recuadro cuadrado con la foto (fondo-3, radio 20) y debajo el nombre (Headline), la descripción (Subheadline, renglones parejos, sin cortar con «…») y el precio; si la foto falla, el icono de su categoría. Compacta (.ct-prod--solo, la de hoy: la carta impresa no trae fotos): solo texto en una tarjeta de superficie con un anillo fino de 1 px (linea), radio 20 y mínimo 56 de alto; nombre en Headline, descripción en tinta-2 y el precio al fondo (Subheadline 600 en turquesa-texto, «$NN MXN», con la unidad si la trae, data-fuente="carta"); sin precio ni descripción (los tés), una sola línea; una compacta sin pareja ocupa el renglón en el teléfono. No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3 y su nota (Subheadline) si la trae. El cierre («Pídelo en la barra de la sala.» y «Cómo llegar») está retirado hasta nuevo aviso (hidden; pendiente de Aldo).
 
 - **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
-- **style.css:** `.ct-lista` `.ct-rejilla` `.ct-prod` `.ct-foto` `.ct-ic` `.ct-txt` `.ct-nom` `.ct-desc` `.ct-precio` `.ct-cierre` `.cafe-foto`
+- **style.css:** `.ct-lista` `.ct-rejilla` `.ct-prod` `.ct-foto` `.ct-ic` `.ct-txt` `.ct-nom` `.ct-desc` `.ct-precio` `.ct-prod--solo` `.ct-grupo-nota` `.ct-cierre` `.cafe-foto`
 - **index.html:** `[data-ct-lista]` `.ct-rejilla` `.ct-prod` `.ct-cierre` `.cafe-foto`
 - **cafe.js:** exporta `productNode` `groupNode` `validMenu` `menuProblems` `validFoto` `precioCarta` `MENU_URL` · internas `iconNode` · ganchos `s.dataset.fuente = 'carta'`
 - **assets/data/menu.json:** datos
-- **Tokens:** `fondo` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `radio-md` `radio-portada` `icono-producto` `t-titulo-3` `t-titular` `t-subtitulo` `t-cuerpo` `space-1` `space-2` `space-3` `space-6` `space-8` `space-12` `space-20`
+- **Tokens:** `fondo` `superficie` `linea` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `radio-md` `radio-portada` `icono-producto` `t-titulo-3` `t-titular` `t-subtitulo` `t-cuerpo` `space-1` `space-2` `space-3` `space-6` `space-8` `space-12` `space-20`
 - **Estado ocupado:** `.ct-prod.card--sk :is(.ct-nom, .ct-desc)`, HTML `[data-ct-lista][aria-busy="true"]` — Cuatro tarjetas de esqueleto del tamaño de las reales.
 - **Estado vacio:** `.ct[data-state="vacio"]`, cafe.js `root.dataset.state = 'vacio';` — Sin carta válida no se promete nada: quedan la foto y el cierre.
 - **Estado error:** cafe.js `img.addEventListener('error', () => img.remove());` — Si la foto de un producto falla, queda el icono de su categoría.
@@ -561,11 +562,11 @@ El pie es el único lugar con el contacto: titular «Contacto» (titular de secc
 
 ### Insignia
 
-Píldora de 24 en Caption 1: tipo de propuesta (menta), estado callado (fondo-3), «Hoy», «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).
+Píldora de 24 en Caption 1: «Próximo» u «Hoy» en el destacado de Eventos (menta; el tipo, el ciclo y el estado de una propuesta son texto, no píldoras), «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Tokens» (abierto, cerrado) y «Accesibilidad» (estados con forma además del color).
-- **Variantes:** `.badge` tipo (Menta con en-menta.); `.badge--quiet` callada (fondo-3 con tinta-2.); `.count-badge` conteo (Disco primario; el número también en texto.); `.status-dot` estado (Abierto / Cerrado, siempre con la palabra.)
-- **style.css:** `.badge` `.badge--quiet` `.badge-new` `.count-badge` `.status-dot` `.news-dot`
+- **Variantes:** `.badge` relleno suave (Menta con en-menta («Próximo», «Hoy»).); `.count-badge` conteo (Disco primario; el número también en texto.); `.status-dot` estado (Abierto / Cerrado, siempre con la palabra.)
+- **style.css:** `.badge` `.badge-new` `.count-badge` `.status-dot` `.news-dot`
 - **index.html:** `.count-badge` `.status-dot` `[data-status]`
 - **app.js:** exporta `openingStatus` `monterreyNow`
 - **feed.js:** exporta `eventBadge`

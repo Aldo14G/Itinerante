@@ -140,3 +140,6 @@ La lista de veinte la dio Aldo («20 Principles of UX & Animation»). Sus doce p
 - **Zonas de toque amplias (14)**: WCAG 2.2, 2.5.5 y 2.5.8 (sección 1) y Apple HIG (sección 5).
 - **Frecuencia de uso (20)**: no es una de las «Laws of UX»; es un principio clásico de disposición en ergonomía (lo más usado, en el lugar más accesible). **[sin cita textual]**. El sitio no tiene analítica: la frecuencia se razona desde `PRODUCT.md` y no se presentan cifras de uso.
 - Los umbrales numéricos de la skill (escala 0.9–1.06, rebote ≤ 5 %, respuesta ≤ 700 ms, puntuación ≥ 34 de 40) **son norma de este proyecto**, sacada de sus tokens y de `DESIGN.md`; no vienen de esas fuentes.
+
+## Luma (lu.ma), referencia de estructura para Eventos (2026-11-16)
+Aldo pidió que la lista de Eventos siga el orden de la agenda de Luma (la plataforma de eventos; no es el estilo «Luma» de shadcn/ui). Se abrieron en Chromium sus páginas públicas (lista por ciudad y página de un evento) y se midió la estructura; **no se copió código, imágenes ni textos**, no hay licencia que lo permita y el sitio no carga nada de su dominio. Detalle y medidas en `docs/ux/investigacion-2026-11/luma.md`. No verificado: sesión iniciada, registro con aprobación y cambios posteriores de su hoja de estilos.

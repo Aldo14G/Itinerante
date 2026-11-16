@@ -75,7 +75,7 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
 .still { width: 78vw; scroll-snap-align: center; } /* la siguiente foto asoma lo bastante para invitar a deslizar */
 
-/* ---------- Café y té: la primaria del cierre, a todo el ancho (como en Inicio, Catálogo y Visita) ---------- */
+/* ---------- Café y té: la primaria del cierre (hoy retirado, `hidden`), a todo el ancho (como en Inicio, Catálogo y Visita) ---------- */
 .ct-cierre .btn { width: 100%; }
 
 /* ---------- Visita y pie ---------- */
@@ -88,10 +88,10 @@ html:not(.js) .tabbar { display: none; }
    libro entre las dos barras en todos los iPhone (antes el titular arriba y la portada tapada por la barra). El menú ☰ sigue yendo al titular. */
 .rail { scroll-margin-top: var(--space-2); }
 .explore-open { width: 100%; }
-/* Hasta 389 px (margen de 16) las tres paradas (con su palomita) y sus conectores caben en un renglón con **un solo relleno** por ancho
+/* Hasta 419 px (antes 389; margen de 16 o 20) las tres paradas (con su palomita) y sus conectores caben en un renglón con **un solo relleno** por ancho
    (Sistema de guías, 2026-11-15; antes 12 y, con palomita, 8: dos rellenos en la misma fila): 12 hasta 389 px y, con Zoom de pantalla
    (hasta 359 px), 8 con la palomita más junta. Nunca se parten. */
-@media (max-width: 389px) { .rail-chips .chip, .ct-nav .chip { padding: 0 var(--space-3); } }
+@media (max-width: 419px) { .rail-chips .chip, .ct-nav .chip { padding: 0 var(--space-3); } } /* 12 hasta 419 px (antes 389): a 393 las cuatro categorías de la carta (con 16 sumaban 369 px y salían 16 px del margen) caben en 337 de 353 y la barra no se desliza sin necesidad; un solo relleno por ancho en las dos filas de chips */
 @media (max-width: 359px) { .rail-chips .chip, .ct-nav .chip { gap: var(--space-1); padding: 0 var(--space-2); } }
 .books > .cat { margin: 0; padding: 0; border: 0; }
 .cat-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

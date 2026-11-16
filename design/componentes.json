@@ -29,6 +29,7 @@
         { "nombre": "primario", "selector": ".btn--primario", "uso": "La acción primaria de la vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»)." },
         { "nombre": "secundario", "selector": ".btn--secundario", "uso": "Secundaria «tinted» en menta; alternado con aria-pressed toma el primario." },
         { "nombre": "plano", "selector": ".btn--plano", "uso": "Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»)." },
+        { "nombre": "contorno", "selector": ".btn--contorno", "uso": "Sin relleno, borde de 1 px en linea-fuerte y texto en tinta (Eventos, 2026-11-16: «Registrarme» y «Añadir al calendario» de la lista y los iconos del destacado, para lo que no debe competir con la primaria). Mismas alturas (44) y estados que las demás." },
         { "nombre": "vidrio", "selector": ".btn--vidrio", "uso": "Solo lo que flota: cerrar una hoja, flechas del Carrusel3D." },
         { "nombre": "icono", "selector": ".btn--icono", "uso": "Cuadrado del alto del botón, nombre en aria-label." },
         { "nombre": "chico", "selector": ".btn--sm", "uso": "44 px." },
@@ -36,15 +37,15 @@
         { "nombre": "ancho", "selector": ".btn--ancho", "uso": "A todo el ancho." }
       ],
       "archivos": [
-        { "ruta": "style.css", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg", ".btn--ancho"] },
+        { "ruta": "style.css", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--contorno", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg", ".btn--ancho"] },
         { "ruta": "index.html", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg"] },
         { "ruta": "motion.js", "exporta": ["pickPop", "afterPaint", "confirmThen"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "alto-lg", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte"],
+      "tokens": ["alto-sm", "alto-md", "alto-lg", "linea-fuerte", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte"],
       "estados": {
-        "hover": { "css": [".btn--primario:hover", ".btn--secundario:hover", ".btn--vidrio:hover", ".btn--plano:hover"] },
+        "hover": { "css": [".btn--primario:hover", ".btn--secundario:hover", ".btn--vidrio:hover", ".btn--plano:hover", ".btn--contorno:hover"] },
         "foco": { "css": [".btn:focus-visible", ".btn--vidrio:focus-visible"] },
-        "presionado": { "css": [".btn:active", ".btn--primario:active"] },
+        "presionado": { "css": [".btn:active", ".btn--primario:active", ".btn--contorno:active"] },
         "deshabilitado": { "css": [".btn:disabled", ".btn[aria-disabled=\"true\"]"] },
         "seleccionado": { "css": [".btn--secundario[aria-pressed=\"true\"]"] },
         "movimiento_reducido": { "css": [".btn:active"], "nota": "En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo." }
@@ -261,26 +262,26 @@
       "id": "evento-destacado",
       "nombre": "EventoDestacado",
       "tipo": "bloque",
-      "descripcion": "El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): tarjeta en superficie con sombra-flotante, foto 16:9 o cartel entero y cuadrado (encuadre), BloqueFecha, insignias «Próximo» (u «Hoy»), tipo y ciclo, título (Title 3), «Sábado 21 de noviembre · 18:57 · …», descripción, costo tal como lo da la librería y acciones: la reserva del evento como primaria de 56 («Registrarme», enlace a Luma en otra pestaña, o «Reservar por WhatsApp» con el mensaje escrito; sin reserva, «Añadir al calendario») y los iconos de 56 «Añadir al calendario» y «Compartir». Desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. Solo existe con un evento con fecha vigente.",
+      "descripcion": "El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): panel en superficie con borde de 1 px (linea) y sin sombra, foto 16:9 a sangre o cartel entero y cuadrado como objeto sobre fondo-3 (encuadre), BloqueFecha (fecha tipográfica) separado del título por una línea fina, «Próximo» (u «Hoy», la única insignia con relleno), tipo y ciclo como texto, título (Title 1), descripción, los datos como lista de definición entre líneas finas (Hora · Con · Invita · Colabora · Costo, solo los que el evento trae; el costo con sus renglones tal como los da la librería) y acciones: la reserva del evento como primaria de 56 («Registrarme», enlace a Luma en otra pestaña, o «Reservar por WhatsApp» con el mensaje escrito; sin reserva, «Añadir al calendario») y los iconos de contorno de 44 «Añadir al calendario» y «Compartir». Desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. Solo existe con un evento con fecha vigente.",
       "variantes": [
         { "nombre": "foto", "selector": ".ev-prox", "uso": "Fotografía 16:9 (teléfono) o a todo el alto de la mitad 7–12 (escritorio), recortada (cover)." },
-        { "nombre": "cartel", "selector": ".ev-prox--cartel", "uso": "Cartel cuadrado con texto: entero, 1:1, nunca recortado (contain sobre fondo-3)." }
+        { "nombre": "cartel", "selector": ".ev-prox--cartel", "uso": "Cartel cuadrado con texto: entero, 1:1, nunca recortado ni a sangre; sobre fondo-3 con relleno interior de la escala, radio-md, sombra-portada y un anillo de 1 px." }
       ],
       "archivos": [
-        { "ruta": "style.css", "selectores": [".ev-prox", ".ev-prox--cartel", ".ev-prox-fig", ".ev-prox-img", ".ev-prox-cuerpo", ".ev-prox-enc", ".ev-prox-cab", ".ev-prox-tit", ".ev-prox-meta", ".ev-prox-desc", ".ev-costo", ".ev-acc", ".ev-rot"] },
+        { "ruta": "style.css", "selectores": [".ev-prox", ".ev-prox--cartel", ".ev-prox-fig", ".ev-prox-img", ".ev-prox-cuerpo", ".ev-prox-enc", ".ev-prox-id", ".ev-prox-tit", ".ev-prox-desc", ".ev-datos", ".ev-dato", ".ev-dato--costo", ".ev-costo", ".ev-acc", ".ev-rot", ".ev-tipo"] },
         { "ruta": "index.html", "selectores": ["[data-ev]", "[data-ev-lede]"] },
-        { "ruta": "feed.js", "exporta": ["initEventos", "destacadoNode", "eventosNodes", "eventosPlan", "validEventos", "eventosProblems", "validReserva", "validRegistro", "validTelefono", "reservaUrl", "reservaMessage", "metaLine", "quienLine", "icsOf", "downloadIcs", "shareEvento", "shareData", "onAct", "registroName", "reservaName", "calName", "shareName", "EVENTOS_URL", "LUGAR"], "internas": ["reservaLink", "calButton", "shareButton", "costoNode", "enterOnView"], "ganchos": ["dataset.fuente = 'anuncio'", "a.rel = 'noopener noreferrer'", "new CustomEvent('iti:primarias')"] },
+        { "ruta": "feed.js", "exporta": ["initEventos", "destacadoNode", "eventosNodes", "eventosPlan", "validEventos", "eventosProblems", "validReserva", "validRegistro", "validTelefono", "reservaUrl", "reservaMessage", "quienLine", "icsOf", "downloadIcs", "shareEvento", "shareData", "onAct", "registroName", "reservaName", "calName", "shareName", "EVENTOS_URL", "LUGAR"], "internas": ["reservaLink", "calButton", "shareButton", "costoNode", "datosNode", "enterOnView"], "ganchos": ["dataset.fuente = 'anuncio'", "a.rel = 'noopener noreferrer'", "new CustomEvent('iti:primarias')"] },
         { "ruta": "assets/data/eventos.json" }
       ],
-      "tokens": ["superficie", "fondo-3", "tinta", "tinta-2", "radio-lg", "sombra-flotante", "t-titulo-3", "t-subtitulo", "t-lectura", "canal-rejilla", "space-1", "space-2", "space-3", "space-4", "space-5", "space-8", "space-20", "dur-rapida", "dur-lenta", "escalon-linea"],
+      "tokens": ["superficie", "fondo-3", "tinta", "tinta-2", "linea", "linea-fuerte", "radio-lg", "radio-md", "sombra-portada", "t-titulo-1", "t-subtitulo", "t-cuerpo", "t-nota-pie", "t-lectura", "canal-rejilla", "space-1", "space-2", "space-3", "space-4", "space-5", "space-6", "space-8", "space-20", "dur-rapida", "dur-lenta", "escalon-linea"],
       "estados": {
-        "foco": { "css": [".btn:focus-visible"], "nota": "La tarjeta no es un control: el foco va a sus tres acciones." },
+        "foco": { "css": [".btn:focus-visible"], "nota": "El panel no es un control: el foco va a sus tres acciones." },
         "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (plan.destacado) out.push(destacadoNode(plan.destacado, now));" }], "nota": "Sin un evento con fecha vigente no hay destacado (por diseño): queda la lista de propuestas." },
         "error": { "js": [{ "ruta": "feed.js", "texto": "img.addEventListener('error', () => fig.remove())" }], "nota": "Si la imagen no carga, el destacado queda sin figura; si eventos.json no llega, queda lo que trae index.html." },
         "movimiento_reducido": { "css": [".motion .ev-espera"], "js": [{ "ruta": "feed.js", "texto": "if (!isMotion() || !('IntersectionObserver' in window)) return;" }], "nota": "La entrada (8 px y opacidad, dur-rapida) solo corre con movimiento y solo en lo que aún no se ve; sin movimiento todo está colocado." }
       },
       "no_aplica": { "hover": "La tarjeta no es un control; sus botones usan el hover de Boton." },
-      "aria": { "patron": "Article + Link + Button", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "atributos": ["aria-labelledby (el article toma el título)", "aria-label «Registrarme en «título» (abre Luma en otra pestaña)»", "aria-label «Reservar por WhatsApp para «título»»", "aria-label «Añadir «título» al calendario»", "aria-label «Compartir «título»»", "aria-hidden en el bloque de fecha (la fecha va en texto)", "target=_blank + rel=noopener noreferrer"], "teclado": "Tab recorre la reserva, el calendario y «Compartir»; Enter o Espacio los activan." },
+      "aria": { "patron": "Article + Link + Button", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "atributos": ["aria-labelledby (el article toma el título)", "aria-label «Registrarme en «título» (abre Luma en otra pestaña)»", "aria-label «Reservar por WhatsApp para «título»»", "aria-label «Añadir «título» al calendario»", "aria-label «Compartir «título»»", "aria-hidden en la fecha tipográfica (la fecha completa va en texto sr-only junto al título)", "dl/dt/dd en los datos", "target=_blank + rel=noopener noreferrer"], "teclado": "Tab recorre la reserva, el calendario y «Compartir»; Enter o Espacio los activan." },
       "qa": ["tools/qa/feed.mjs", "tools/qa/guias.mjs", "tools/qa/hojas.mjs", "tools/qa/inp.mjs", "tests/site.test.mjs"],
       "desde": "2026-11-16",
       "decision": "DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16)."
@@ -289,20 +290,20 @@
       "id": "lista-eventos",
       "nombre": "ListaEventos",
       "tipo": "bloque",
-      "descripcion": "Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un rótulo por día («26 nov jueves» sobre una línea punteada) y, al final, «Propuestas, aún sin fecha». Cada TarjetaEvento es una tarjeta horizontal en superficie con radio 20: hora y tipo (o tipo y «Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 a la derecha; con fecha lleva la reserva (secundaria de 48) y el calendario; una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.",
+      "descripcion": "Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un día por grupo (en el teléfono, un rótulo en versalitas «SÁB · 28 NOV» con una línea fina; desde 761 px, una columna de 96 a la izquierda con el día y el mes arriba y el número ligero debajo) y, al final, «Propuestas, aún sin fecha». Cada fila (TarjetaEvento) va entre líneas finas, sin relleno: hora y tipo como texto («17:00 · Juego»; o «tipo · Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 con radio-sm y anillo fino a la derecha; con fecha lleva la reserva de contorno (44) y el calendario plano (44); una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".ev", ".ev-despues", ".ev-lista", ".ev-sub", ".ev-dias", ".ev-dia-tit", ".ev-filas", ".ev-card", ".ev-card-txt", ".ev-card-img", ".ev-card-tit", ".ev-card-meta", ".ev-card-desc", ".ev-card-acc", ".ev-hora", ".ev-lado", ".ev-lado-tit", ".ev-lado-txt", ".ev-espera"] },
+        { "ruta": "style.css", "selectores": [".ev", ".ev-despues", ".ev-lista", ".ev-sub", ".ev-dias", ".ev-dia", ".ev-dia-tit", ".ev-dia-vis", ".ev-dia-num", ".ev-filas", ".ev-card", ".ev-card-txt", ".ev-card-img", ".ev-card-tit", ".ev-card-meta", ".ev-card-desc", ".ev-card-acc", ".ev-hora", ".ev-estado", ".ev-lado", ".ev-lado-tit", ".ev-lado-txt", ".ev-espera"] },
         { "ruta": "index.html", "selectores": ["#cartelera", ".ev-lista", ".ev-propuestas", ".ev-filas", ".ev-fila", ".ev-card", ".ev-card-img", ".ev-card-desc", "[data-ev-when]"] },
-        { "ruta": "feed.js", "exporta": ["cardNode", "eventosNodes", "notaCopy", "diaCorto", "horario", "eventBadge", "NO_DATE"], "internas": ["listNode", "notaNode", "staticSignature", "planSignature"] }
+        { "ruta": "feed.js", "exporta": ["cardNode", "eventosNodes", "notaCopy", "fechaBloque", "horario", "eventBadge", "NO_DATE"], "internas": ["listNode", "notaNode", "staticSignature", "planSignature"] }
       ],
-      "tokens": ["superficie", "fondo-2", "fondo-3", "tinta", "tinta-2", "turquesa-texto", "linea-fuerte", "radio-md", "radio-sm", "radio-portada", "portada-evento", "portada-evento-amplia", "t-titulo-3", "t-titular", "t-cuerpo", "t-subtitulo", "t-lectura", "anillo-foco", "canal-rejilla", "space-2", "space-3", "space-4", "space-5", "space-6", "space-8", "space-12"],
+      "tokens": ["fondo-2", "tinta", "tinta-2", "turquesa-texto", "linea", "linea-fuerte", "radio-sm", "portada-evento", "portada-evento-amplia", "t-titulo-3", "t-titular", "t-versalitas", "t-fecha-lista", "t-subtitulo", "t-lectura", "anillo-foco", "canal-rejilla", "space-1", "space-2", "space-3", "space-4", "space-5", "space-6", "space-8", "space-12"],
       "estados": {
-        "foco": { "css": [".ev-lado-txt a:focus-visible", ".btn:focus-visible"], "nota": "La tarjeta no es un control: el foco va a sus acciones y al enlace de la nota." },
+        "foco": { "css": [".ev-lado-txt a:focus-visible", ".btn:focus-visible"], "nota": "La fila no es un control: el foco va a sus acciones y al enlace de la nota." },
         "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }" }], "nota": "Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»); una propuesta no lleva acciones." },
         "error": { "js": [{ "ruta": "feed.js", "texto": "catch { delete root.dataset.ready; return; }" }], "nota": "Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio." },
         "movimiento_reducido": { "css": [".motion .ev-espera"] }
       },
-      "no_aplica": { "hover": "Las tarjetas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton." },
+      "no_aplica": { "hover": "Las filas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton." },
       "aria": { "patron": "List + Article", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/", "atributos": ["ul / li", "aria-labelledby (cada article y cada día)", "aria-label «Propuestas» (grupo sin rótulo visible)", "aria-label de cada acción con el título del evento"], "teclado": "Tab recorre las acciones de cada tarjeta en el orden de lectura; nada que deslizar." },
       "qa": ["tools/qa/feed.mjs", "tools/qa/guias.mjs", "tools/qa/iphone.mjs", "tools/qa/e2e.mjs", "tests/site.test.mjs"],
       "desde": "2026-11-16",
@@ -312,14 +313,14 @@
       "id": "bloque-fecha",
       "nombre": "BloqueFecha",
       "tipo": "bloque",
-      "descripcion": "Bloque de 64 × 72 en primario con el día de la semana, el número (Title 1 en 700) y el mes del evento destacado: lo primero que se lee de un anuncio. Es decorativo (aria-hidden): la fecha completa va en texto en el renglón de al lado.",
+      "descripcion": "Fecha tipográfica del evento destacado, sin caja: arriba el día de la semana y el mes en versalitas (13, interletra abierta, turquesa-texto) y debajo el número grande y ligero (52, peso 300, cifras tabulares); una línea fina (linea-fuerte) la separa del título, vertical desde 761 px y horizontal en el teléfono. Es decorativa (aria-hidden): la fecha completa va en texto (sr-only) junto al título. En la lista, el rótulo de cada día usa el mismo bloque (número de 32).",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".ev-fecha"] },
+        { "ruta": "style.css", "selectores": [".ev-fecha", ".ev-fecha-rot", ".ev-fecha-num"] },
         { "ruta": "feed.js", "exporta": ["fechaBloque", "fechaLarga"], "internas": ["fechaNode"] }
       ],
-      "tokens": ["primario", "en-primario", "radio-md", "space-16", "space-2", "t-titulo-1", "t-leyenda-1"],
+      "tokens": ["turquesa-texto", "tinta", "linea-fuerte", "space-1", "space-4", "space-6", "t-versalitas", "ls-versalitas", "t-fecha-grande", "ls-fecha-grande"],
       "estados": {
-        "oculto": { "js": [{ "ruta": "feed.js", "texto": "box.setAttribute('aria-hidden', 'true');" }], "nota": "Oculto para lectores de pantalla: la fecha se lee en «Sábado 21 de noviembre · 18:57»." }
+        "oculto": { "js": [{ "ruta": "feed.js", "texto": "box.setAttribute('aria-hidden', 'true');" }], "nota": "Oculto para lectores de pantalla: la fecha se lee en el texto sr-only «Sábado 21 de noviembre» junto al título." }
       },
       "no_aplica": { "hover": "No es un control.", "foco": "No es un control." },
       "aria": { "patron": "Texto decorativo (sin rol)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-hidden=true"], "teclado": "—" },
@@ -354,7 +355,7 @@
       "id": "barra-categorias",
       "nombre": "BarraCategorias",
       "tipo": "control",
-      "descripcion": "Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría. Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra; sin palomita, para que los chips no cambien de ancho al desplazar). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.",
+      "descripcion": "Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría. Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista, para que un salto desde abajo no deje marcado el último chip; sin palomita, para que los chips no cambien de ancho al desplazar; la barra solo se desliza si el chip actual no se ve entero). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".ct-nav", ".ct-chip", ".ct", ".ct-grupo", ".ct-grupo-tit"] },
         { "ruta": "mobile.css", "selectores": [".ct-nav .chip"] },
@@ -380,14 +381,14 @@
       "id": "tarjeta-producto",
       "nombre": "TarjetaProducto",
       "tipo": "bloque",
-      "descripcion": "Producto de la carta en la parrilla (2 columnas en el teléfono, 3 desde 761 y 4 desde 1024, en las columnas 4–12): recuadro cuadrado con la foto del producto si la trae (campo foto de menu.json, local y registrada) o, sin foto, el icono de su categoría (taza, tetera, plato) sobre fondo-3; debajo el nombre (Headline), la descripción (Subheadline, renglones parejos, sin cortar con «…») y el precio solo si la librería lo dio («$NN MXN», data-fuente=\"carta\"). No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3; la sección cierra con «Pídelo en la barra de la sala.» y «Cómo llegar».",
+      "descripcion": "Producto de la carta en la parrilla (2 columnas en el teléfono, 3 desde 761 y 4 desde 1024, en las columnas 4–12), en dos variantes. Con foto (campo foto de menu.json, local y registrada): recuadro cuadrado con la foto (fondo-3, radio 20) y debajo el nombre (Headline), la descripción (Subheadline, renglones parejos, sin cortar con «…») y el precio; si la foto falla, el icono de su categoría. Compacta (.ct-prod--solo, la de hoy: la carta impresa no trae fotos): solo texto en una tarjeta de superficie con un anillo fino de 1 px (linea), radio 20 y mínimo 56 de alto; nombre en Headline, descripción en tinta-2 y el precio al fondo (Subheadline 600 en turquesa-texto, «$NN MXN», con la unidad si la trae, data-fuente=\"carta\"); sin precio ni descripción (los tés), una sola línea; una compacta sin pareja ocupa el renglón en el teléfono. No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3 y su nota (Subheadline) si la trae. El cierre («Pídelo en la barra de la sala.» y «Cómo llegar») está retirado hasta nuevo aviso (hidden; pendiente de Aldo).",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".ct-lista", ".ct-rejilla", ".ct-prod", ".ct-foto", ".ct-ic", ".ct-txt", ".ct-nom", ".ct-desc", ".ct-precio", ".ct-cierre", ".cafe-foto"] },
+        { "ruta": "style.css", "selectores": [".ct-lista", ".ct-rejilla", ".ct-prod", ".ct-foto", ".ct-ic", ".ct-txt", ".ct-nom", ".ct-desc", ".ct-precio", ".ct-prod--solo", ".ct-grupo-nota", ".ct-cierre", ".cafe-foto"] },
         { "ruta": "index.html", "selectores": ["[data-ct-lista]", ".ct-rejilla", ".ct-prod", ".ct-cierre", ".cafe-foto"] },
         { "ruta": "cafe.js", "exporta": ["productNode", "groupNode", "validMenu", "menuProblems", "validFoto", "precioCarta", "MENU_URL"], "internas": ["iconNode"], "ganchos": ["s.dataset.fuente = 'carta'"] },
         { "ruta": "assets/data/menu.json" }
       ],
-      "tokens": ["fondo", "fondo-3", "tinta", "tinta-2", "turquesa-texto", "radio-md", "radio-portada", "icono-producto", "t-titulo-3", "t-titular", "t-subtitulo", "t-cuerpo", "space-1", "space-2", "space-3", "space-6", "space-8", "space-12", "space-20"],
+      "tokens": ["fondo", "superficie", "linea", "fondo-3", "tinta", "tinta-2", "turquesa-texto", "radio-md", "radio-portada", "icono-producto", "t-titulo-3", "t-titular", "t-subtitulo", "t-cuerpo", "space-1", "space-2", "space-3", "space-6", "space-8", "space-12", "space-20"],
       "estados": {
         "ocupado": { "css": [".ct-prod.card--sk :is(.ct-nom, .ct-desc)"], "html": ["[data-ct-lista][aria-busy=\"true\"]"], "nota": "Cuatro tarjetas de esqueleto del tamaño de las reales." },
         "vacio": { "css": [".ct[data-state=\"vacio\"]"], "js": [{ "ruta": "cafe.js", "texto": "root.dataset.state = 'vacio';" }], "nota": "Sin carta válida no se promete nada: quedan la foto y el cierre." },
@@ -659,15 +660,14 @@
       "id": "insignia",
       "nombre": "Insignia",
       "tipo": "bloque",
-      "descripcion": "Píldora de 24 en Caption 1: tipo de propuesta (menta), estado callado (fondo-3), «Hoy», «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).",
+      "descripcion": "Píldora de 24 en Caption 1: «Próximo» u «Hoy» en el destacado de Eventos (menta; el tipo, el ciclo y el estado de una propuesta son texto, no píldoras), «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).",
       "variantes": [
-        { "nombre": "tipo", "selector": ".badge", "uso": "Menta con en-menta." },
-        { "nombre": "callada", "selector": ".badge--quiet", "uso": "fondo-3 con tinta-2." },
+        { "nombre": "relleno suave", "selector": ".badge", "uso": "Menta con en-menta («Próximo», «Hoy»)." },
         { "nombre": "conteo", "selector": ".count-badge", "uso": "Disco primario; el número también en texto." },
         { "nombre": "estado", "selector": ".status-dot", "uso": "Abierto / Cerrado, siempre con la palabra." }
       ],
       "archivos": [
-        { "ruta": "style.css", "selectores": [".badge", ".badge--quiet", ".badge-new", ".count-badge", ".status-dot", ".news-dot"] },
+        { "ruta": "style.css", "selectores": [".badge", ".badge-new", ".count-badge", ".status-dot", ".news-dot"] },
         { "ruta": "index.html", "selectores": [".count-badge", ".status-dot", "[data-status]"] },
         { "ruta": "app.js", "exporta": ["openingStatus", "monterreyNow"] },
         { "ruta": "feed.js", "exporta": ["eventBadge"] }
@@ -763,8 +763,9 @@
     { "frente": "foco", "fondo": "vidrio@peor", "tipo": "foco", "donde": "Filete interior de la barra inferior" },
     { "frente": "foco", "fondo": "vidrio-hoja@peor", "tipo": "foco", "donde": "Filete interior de las filas del menú" },
     { "frente": "linea-fuerte", "fondo": "fondo", "tipo": "borde", "donde": "Casilla de filtro (interior), campo con foco, pista del interruptor apagada" },
-    { "frente": "linea-fuerte", "fondo": "fondo-2", "tipo": "borde", "donde": "Casilla de filtro sobre su grupo, pista del interruptor con Novedades" },
+    { "frente": "linea-fuerte", "fondo": "fondo-2", "tipo": "borde", "donde": "Casilla de filtro sobre su grupo, pista del interruptor con Novedades, Boton de contorno y línea de la fecha en la lista de Eventos" },
     { "frente": "linea-fuerte", "fondo": "fondo-3", "tipo": "borde", "donde": "Pista del interruptor apagada (filete interior)" },
+    { "frente": "linea-fuerte", "fondo": "superficie", "tipo": "borde", "donde": "Borde de Boton de contorno y línea que separa la fecha del título, sobre el panel del destacado" },
     { "frente": "primario", "fondo": "fondo", "tipo": "borde", "donde": "Pista del interruptor encendida, conector hecho del Recorrido" },
     { "frente": "primario", "fondo": "fondo-2", "tipo": "borde", "donde": "Casilla marcada sobre su grupo" },
     { "frente": "primario", "fondo": "fondo-3", "tipo": "borde", "donde": "Borde de la parada hojeada y su palomita (Recorrido)" },
