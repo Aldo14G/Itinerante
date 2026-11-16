@@ -9,7 +9,7 @@ import { validMenu, precioCarta } from '../cafe.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
-import { shareName, initFeed, eventBadge, NO_DATE, eventOf } from '../feed.js';
+import { shareName, calName, registroName, reservaName, eventBadge, NO_DATE, validEventos, eventosProblems, eventosPlan, validRegistro, validTelefono, validReserva, reservaUrl, reservaMessage, notaCopy, quienLine, metaLine, avisoLine, fechaBloque, fechaLarga, diaCorto, horario, icsOf, mtyToUtc, shareData, LUGAR, ICS_BLOQUE_MIN } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
 import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
@@ -74,7 +74,7 @@ test('contacto en un solo lugar (decisión de Aldo, 2026-11-13): el pie; las sec
   assert.ok(!/wa\.me/.test(outside), 'Inicio, Catálogo, Eventos, Café y Visita sin llamados a WhatsApp');
   for (const gone of ['data-rail-ask', 'rail-libre', 'data-bill-wa', 'bill-wa', 'bill-acts', 'data-cafe-ask', 'cafe-ask', 'Pide una recomendación', 'Preguntar por la carta', 'Preguntar por un libro']) assert.ok(!html.includes(gone), `retirado: ${gone}`);
   for (const gone of ['rail-ask', 'rail-libre', 'cafe-ask', 'bill-wa']) assert.ok(!(css + mobileCss).includes(gone), `sin CSS huérfano: ${gone}`);
-  for (const [f, names] of [['rail.js', ['askLabel', 'askMessage', 'askUrl', 'WA_NUMBER', 'data-rail-ask']], ['cafe.js', ['cartaMessage', 'cartaUrl', 'WA_NUMBER', 'data-cafe-ask']], ['feed.js', ['waName', 'data-bill-wa', '.bill-wa']]]) {
+  for (const [f, names] of [['rail.js', ['askLabel', 'askMessage', 'askUrl', 'WA_NUMBER', 'data-rail-ask']], ['cafe.js', ['cartaMessage', 'cartaUrl', 'WA_NUMBER', 'data-cafe-ask']], ['feed.js', ['waName', 'data-bill-wa', '.bill-wa', 'WA_NUMBER']]]) {
     const src = readFileSync_(f);
     for (const n of names) assert.ok(!src.includes(n), `${f}: sin código huérfano (${n})`);
   }
@@ -86,7 +86,10 @@ test('contacto en un solo lugar (decisión de Aldo, 2026-11-13): el pie; las sec
   assert.deepEqual(links, [['wa.me', 'i-chat', 'WhatsApp'], ['www.instagram.com', 'i-ig', 'Instagram'], ['www.facebook.com', 'i-fb', 'Facebook'], ['mailto', 'i-mail', 'Correo']], 'WhatsApp, Instagram, Facebook y Correo, cada uno con su icono');
   // Se quedan los que son la función de su objeto: la ficha, Mi lista, el estado vacío de Explorar, Instagram en Eventos y el menú ☰.
   assert.ok(/data-d-cta href="https:\/\/wa\.me/.test(html) && /data-ml-wa href="https:\/\/wa\.me/.test(html) && /<div class="cat-empty"[\s\S]*?wa\.me[\s\S]*?<\/div>/.test(html), 'ficha, Mi lista y estado vacío conservan su WhatsApp');
-  assert.ok(/class="sec-texto">Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\//.test(html), 'la entradilla de Eventos dice dónde se anuncian las fechas');
+  assert.ok(/class="sec-texto" data-ev-lede>Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\//.test(html), 'la entradilla de Eventos dice dónde se anuncian las fechas');
+  // «Reservar por WhatsApp» de un evento (2026-11-16) es la función de su objeto, como «Preguntar por WhatsApp» en la ficha: solo lo pinta
+  // feed.js para un evento con reserva por WhatsApp; index.html no lo trae.
+  assert.ok(/'Reservar por WhatsApp'/.test(readFileSync_('feed.js')) && !/Reservar por WhatsApp/.test(html), 'la reserva por WhatsApp de un evento solo existe si el evento la trae');
   const menu = html.match(/<dialog class="menu"[\s\S]*?<\/dialog>/)[0];
   assert.ok(/wa\.me/.test(menu) && /instagram\.com/.test(menu), 'el menú ☰ conserva su fila de contacto');
   assert.ok(/\.ftr-link \{[^}]*min-height: var\(--alto-md\);/.test(cssFlat) && /\.ftr-links li \{ padding-block: var\(--space-1\); \}/.test(cssFlat) && /\.ftr-links \{[^}]*border-radius: var\(--radio-md\); background: var\(--fondo-2\);/.test(cssFlat), 'lista agrupada (fondo-2, radio-md) con filas de 56: enlaces de 48 con 9 px entre vecinos');
@@ -459,17 +462,17 @@ test('portadas: la ficha repite el tono de la tarjeta pulsada y la composición 
   for (let i = 1; i < COVER_LAYOUTS; i++) assert.ok(css.includes(`[data-cover-layout="${i}"]`), `falta la composición ${i}`);
   assert.ok(!/data-cover-layout[^{}]*\{[^}]*(color|background)\s*:/.test(css), 'la composición no toca color');
 });
-test('cartelera: cada tarjeta lleva su foto (el pie de antes es su alt) y la procedencia registrada; sin puntos bajo el carrusel', () => {
-  const items = [...html.matchAll(/<li class="bill-item"[\s\S]*?<\/li>/g)].map(m => m[0]);
+test('Eventos: cada propuesta lleva su foto real registrada (con alt y medidas) y la procedencia como dato; sin puntos ni carrusel', async () => {
+  const prov = JSON.parse(await readFile(here('./assets/provenance.json'), 'utf8'));
+  const items = [...html.matchAll(/<li class="ev-fila"[\s\S]*?<\/li>/g)].map(m => m[0]);
   assert.equal(items.length, 3);
   for (const it of items) {
-    assert.match(it, /class="bill-card-fig"/);
-    const caption = it.match(/data-caption="([^"]+)"/)[1];
-    assert.ok(it.includes(`<img class="bill-card-img" src="assets/img/`) && it.includes(` alt="${caption}" `), 'la foto de la tarjeta se describe con el pie del escenario (sin rótulo de procedencia)');
-    assert.ok(!/bill-card-cap/.test(it), 'el pie ya no es una tercera insignia sobre la foto');
-    assert.match(it, /^<li class="bill-item"[^>]*data-kind="(real|ai)"/, 'la procedencia viaja como dato');
+    const img = it.match(/<img class="ev-card-img" src="assets\/(img\/[^"]+)" width="\d+" height="\d+" alt="([^"]+)" loading="lazy" decoding="async">/);
+    assert.ok(img, 'la portada de la tarjeta, con alt y medidas (sin rótulo de procedencia)');
+    assert.ok(prov.real.some(f => f.file === img[1]), `${img[1]}: registrada como fotografía real`);
+    assert.match(it, /^<li class="ev-fila"[^>]*data-kind="(real|ai)"/, 'la procedencia viaja como dato');
   }
-  assert.ok(!/bill-dots/.test(html + css + mobileCss + readFileSync_('app.js')), 'sin puntos .bill-dots (retirados el 2026-11-13 con el Carrusel3D)');
+  assert.ok(!/bill-dots|bill-card|bill-item|c3d--evento|data-bill-/.test(html + css + mobileCss + readFileSync_('app.js') + readFileSync_('feed.js')), 'sin restos del carrusel de Eventos (retirado el 2026-11-16)');
 });
 test('el sitio raíz es el único: no hay otro *.html en la raíz y el sitio anterior no se publica', async () => {
   const pages = (await readdir(repo)).filter(f => /\.html?$/i.test(f));
@@ -600,16 +603,16 @@ test('recorrido (A4): conteo, tramos y persistencia en localStorage, con el alma
   } finally { if (desc) Object.defineProperty(globalThis, 'localStorage', desc); else delete globalThis.localStorage; }
   assert.equal(writeTrail(new Set(['x']), blocked), false);
 });
-test('eventos: insignias de tipo y de estado; la fecha solo sale de data-fecha, en español y con el día de Monterrey', () => {
-  const items = [...html.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
+test('eventos: insignias de tipo y de estado; la fecha solo sale de eventos.json, en español y con el día de Monterrey', () => {
+  const items = [...html.matchAll(/<li class="ev-fila" data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
   const tipo = { circulo: 'Lectura', ajedrez: 'Juego', taller: 'Taller' };
-  const title = { circulo: 'Círculo de lectura', ajedrez: 'Ajedrez en la casa', taller: 'Taller de escritura' };
+  assert.equal(items.length, 3);
   for (const [block, id] of items) {
-    assert.ok(block.includes(`<span class="bill-badges"><span class="badge" data-bill-type>${tipo[id]}</span><span class="badge badge--quiet" data-bill-when>${NO_DATE}</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="${id}" data-title="${title[id]}" aria-label="Compartir «${title[id]}»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>`), `${id}: insignia de tipo «${tipo[id]}», insignia de estado «${NO_DATE}» y, al final de la fila, «Compartir» con el título en su nombre (2026-11-14)`);
+    assert.ok(block.includes(`<p class="ev-rot"><span class="badge">${tipo[id]}</span><span class="badge badge--quiet" data-ev-when>${NO_DATE}</span></p>`), `${id}: insignia de tipo «${tipo[id]}» e insignia de estado «${NO_DATE}»`);
     assert.equal((block.match(/class="badge/g) || []).length, 2, `${id}: dos insignias, no más`);
-    assert.ok(!/data-fecha=/.test(block.match(/^<li[^>]*>/)[0]), `${id}: hoy ninguna propuesta tiene fecha confirmada`);
+    assert.ok(!/data-fecha=|<button|<a /.test(block), `${id}: hoy ninguna propuesta tiene fecha confirmada ni acciones (sin reserva ni calendario)`);
   }
-  assert.ok(/data-fecha="AAAA-MM-DD"/.test(html.match(/<!-- Fecha confirmada:[^>]*-->/)[0]), 'el marcado dice cómo se pone una fecha real');
+  assert.ok(!/data-fecha/.test(html), 'la fecha ya no se escribe en el marcado: sale de assets/data/eventos.json');
   assert.equal(NO_DATE, 'Propuesta · sin fecha');
   const now = new Date('2026-11-11T18:00:00Z'); // mediodía del 11 de noviembre en Monterrey
   for (const bad of [undefined, null, '', 'pronto', '2026-13-01', '2026-02-31', '21/11/2026', '2026-11-21T25:00', '2026-11-21 18:00']) {
@@ -617,6 +620,7 @@ test('eventos: insignias de tipo y de estado; la fecha solo sale de data-fecha, 
   }
   assert.deepEqual(eventBadge('2026-11-21', now), { kind: 'fecha', text: 'Sáb 21 nov', date: '2026-11-21' });
   assert.deepEqual(eventBadge('2026-11-21T18:30', now), { kind: 'fecha', text: 'Sáb 21 nov · 18:30', date: '2026-11-21' });
+  assert.deepEqual(eventBadge('2026-11-21T18:57', now), { kind: 'fecha', text: 'Sáb 21 nov · 18:57', date: '2026-11-21' }, 'la hora se imprime tal cual, sin redondear');
   assert.deepEqual(eventBadge('2027-01-09', now), { kind: 'fecha', text: 'Sáb 9 ene 2027', date: '2027-01-09' }, 'otro año lleva el año');
   assert.deepEqual(eventBadge('2026-11-11', now), { kind: 'hoy', text: 'Hoy', date: '2026-11-11' });
   assert.deepEqual(eventBadge('2026-11-11T19:00', now), { kind: 'hoy', text: 'Hoy · 19:00', date: '2026-11-11' });
@@ -628,14 +632,171 @@ test('eventos: insignias de tipo y de estado; la fecha solo sale de data-fecha, 
   assert.ok(!/\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i.test(html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0]), 'ninguna fecha escrita a mano en el capítulo');
   // La insignia callada es para lo no confirmado; lo confirmado usa la insignia común.
   assert.ok(/\.badge--quiet \{ background: var\(--fondo-3\); color: var\(--tinta-2\); \}/.test(css), 'insignia callada (fondo-3 con tinta-2, ≥ 4.5:1 en ambos temas)');
-  // initFeed pinta el estado desde el atributo.
-  const mk = fecha => { const el = { textContent: '', quiet: null, classList: { toggle(c, on) { el.quiet = on; } } }; return { dataset: { fecha }, querySelector: () => el, el }; };
-  const future = `${new Date().getUTCFullYear() + 1}-06-15`;
-  const cards = [mk(undefined), mk(future), mk('2020-01-01')];
-  globalThis.document = { querySelectorAll: sel => (sel === '.bill-item' ? cards : []) };
-  try { initFeed(); } finally { delete globalThis.document; }
-  assert.deepEqual(cards.map(c => [c.el.textContent === NO_DATE, c.el.quiet]), [[true, true], [false, false], [true, true]], 'sin atributo o con fecha vencida: «Propuesta · sin fecha»; con fecha vigente, la fecha en la insignia común');
-  assert.match(cards[1].el.textContent, /^(Lun|Mar|Mié|Jue|Vie|Sáb|Dom) 15 jun \d{4}$/);
+  // Formatos de fecha del destacado y de la lista: un solo formato por pieza.
+  assert.deepEqual(fechaBloque('2026-11-21'), { sem: 'Sáb', num: '21', mes: 'Nov' });
+  assert.equal(fechaLarga('2026-11-21', now), 'sábado 21 de noviembre');
+  assert.equal(fechaLarga('2027-01-09', now), 'sábado 9 de enero de 2027');
+  assert.deepEqual(diaCorto('2026-11-26', now), { fecha: '26 nov', dia: 'jueves' });
+  assert.deepEqual(diaCorto('2026-11-11', now), { fecha: '11 nov', dia: 'hoy' });
+  assert.equal(horario({ hora: '18:57', fin: null }), '18:57');
+  assert.equal(horario({ hora: '18:30', fin: '20:00' }), '18:30–20:00');
+  assert.equal(horario({ hora: null, fin: null }), '');
+});
+test('eventos.json: tres propuestas reales, sin fechas, ponentes, costos ni enlaces inventados; iguales a las de index.html; fotos registradas', async () => {
+  const data = JSON.parse(await readFile(here('./assets/data/eventos.json'), 'utf8'));
+  const prov = JSON.parse(await readFile(here('./assets/provenance.json'), 'utf8'));
+  assert.deepEqual(eventosProblems(data), [], 'el archivo pasa la revisión estricta');
+  const list = validEventos(data);
+  assert.deepEqual(list.map(e => e.id), ['circulo', 'ajedrez', 'taller']);
+  for (const e of list) {
+    assert.ok(e.fecha === null && e.hora === null && e.fin === null && e.con === null && e.invitado === null && e.colabora === null && e.ciclo === null && e.reserva === null && e.costo.length === 0 && e.encuadre === 'foto', `${e.id}: hoy es una propuesta: sin fecha, hora, ponente, costo ni reserva (no se inventa nada)`);
+    assert.ok(existsSync(here(`./${e.imagen}`)), `${e.id}: la imagen existe (${e.imagen})`);
+    assert.ok(prov.real.some(f => `assets/${f.file}` === e.imagen), `${e.id}: la imagen está registrada como fotografía real en assets/provenance.json`);
+  }
+  // Lo que se lee sin JavaScript (index.html) es lo mismo que dice el JSON.
+  const items = [...html.matchAll(/<li class="ev-fila" data-id="([a-z]+)"[\s\S]*?<\/li>/g)].map(([block, id]) => ({
+    id, tipo: block.match(/<span class="badge">([^<]+)</)[1], titulo: block.match(/<h3 class="ev-card-tit" id="ev-t-[a-z]+">([^<]+)</)[1],
+    descripcion: block.match(/<p class="ev-card-desc">([^<]+)</)[1], imagen: block.match(/src="([^"]+)"/)[1], alt: block.match(/ alt="([^"]+)"/)[1]
+  }));
+  assert.deepEqual(items, list.map(({ id, tipo, titulo, descripcion, imagen, alt }) => ({ id, tipo, titulo, descripcion, imagen, alt })), 'index.html y eventos.json dicen lo mismo');
+  assert.ok(prov.eventosData && /eventos\.json/.test(prov.eventosData.file), 'el origen de los datos de Eventos está en assets/provenance.json');
+  const prep = readFileSync_('scripts/prepare-public.mjs');
+  assert.ok(/"assets\/data\/eventos\.json"/.test(prep), 'eventos.json se publica (obligatorio)');
+});
+test('validEventos y eventosProblems: ids únicos, fecha y hora reales, imagen local y reserva solo por Luma o WhatsApp de 10 dígitos', () => {
+  const base = { tipo: 'Taller', titulo: 'T', fecha: null, hora: null, fin: null, con: null, descripcion: 'd', imagen: 'assets/img/cartelera-1.webp', alt: 'a', reserva: null };
+  const ev = (id, extra = {}) => ({ id, ...base, ...extra });
+  // ids: el repetido y el mal escrito no se pintan
+  assert.deepEqual(validEventos({ eventos: [ev('a'), ev('a', { titulo: 'otra' }), ev('Con Mayúsculas'), ev('b', { titulo: '' }), ev('c')] }).map(e => e.id), ['a', 'c']);
+  assert.deepEqual(validEventos(null), []);
+  assert.deepEqual(validEventos({ eventos: 'no' }), []);
+  // fecha y hora: lo que no es real queda en null (propuesta); una hora sin fecha no vale; fin solo después de hora
+  const [x] = validEventos({ eventos: [ev('x', { fecha: '2026-02-30', hora: '18:00', reserva: { tipo: 'luma', url: 'https://lu.ma/x' } })] });
+  assert.ok(x.fecha === null && x.hora === null && x.reserva === null, 'el 30 de febrero no es una fecha: queda como propuesta, sin hora ni reserva');
+  const [y] = validEventos({ eventos: [ev('y', { fecha: '2026-11-21', hora: '18:57', fin: '18:00' })] });
+  assert.deepEqual([y.fecha, y.hora, y.fin], ['2026-11-21', '18:57', null], 'la hora real, tal cual; un fin anterior a la hora se ignora');
+  assert.equal(validEventos({ eventos: [ev('z', { fecha: '2026-11-21', hora: '25:00' })] })[0].hora, null);
+  // imagen: solo rutas locales bajo assets/img/
+  for (const bad of ['https://lu.ma/x.jpg', '//cdn.example/x.webp', 'assets/img/../../x.webp', 'data:image/png;base64,AAAA', 'assets/data/x.webp', '']) assert.equal(validEventos({ eventos: [ev('i', { imagen: bad })] })[0].imagen, null, `imagen descartada: ${bad}`);
+  assert.equal(validEventos({ eventos: [ev('i', { imagen: 'assets/img/cartel-tarde-xvii.webp', encuadre: 'cartel' })] })[0].encuadre, 'cartel');
+  assert.equal(validEventos({ eventos: [ev('i', { encuadre: 'póster' })] })[0].encuadre, 'foto', 'por omisión, foto');
+  // registro por Luma: solo https y solo lu.ma o luma.com, con ruta
+  assert.equal(validRegistro('https://lu.ma/tarde-de-letras'), 'https://lu.ma/tarde-de-letras');
+  assert.equal(validRegistro(' https://luma.com/abc123 '), 'https://luma.com/abc123');
+  for (const bad of ['http://lu.ma/abc', 'https://lu.ma', 'https://lu.ma/', 'https://lu.ma.evil.example/abc', 'https://evil.example/lu.ma/abc', 'https://www.luma.com/abc', 'https://user:pw@lu.ma/abc', 'https://lu.ma:8443/abc', 'javascript:alert(1)', 'lu.ma/abc', '', null, 42]) assert.equal(validRegistro(bad), null, `registro descartado: ${bad}`);
+  // reserva por WhatsApp: 10 dígitos mexicanos
+  assert.equal(validTelefono('8112345678'), '8112345678');
+  assert.equal(validTelefono('81-1234-5678'), '8112345678');
+  assert.equal(validTelefono('+52 81 1234 5678'), '8112345678');
+  for (const bad of ['811234567', '81123456789', '0112345678', 'ochenta y uno', '8112345678 ext 3', '', null]) assert.equal(validTelefono(bad), null, `teléfono descartado: ${bad}`);
+  assert.deepEqual(validReserva({ tipo: 'luma', url: 'https://lu.ma/x' }), { tipo: 'luma', url: 'https://lu.ma/x' });
+  assert.deepEqual(validReserva({ tipo: 'whatsapp', telefono: '81 1234 5678' }), { tipo: 'whatsapp', telefono: '8112345678' });
+  for (const bad of [null, undefined, 'https://lu.ma/x', { tipo: 'luma', url: 'https://otro.example/x' }, { tipo: 'whatsapp', telefono: '123' }, { tipo: 'telefono', telefono: '8112345678' }, {}]) assert.equal(validReserva(bad), null);
+  assert.equal(validEventos({ eventos: [ev('p', { reserva: { tipo: 'luma', url: 'https://lu.ma/x' } })] })[0].reserva, null, 'una propuesta (sin fecha) no lleva reserva');
+  // costo: solo renglones de texto, tal cual; sin el campo, nada
+  assert.deepEqual(validEventos({ eventos: [ev('c', { costo: ['$90 MXN entrada', '', 7, ' $120 MXN con libro en PDF '] })] })[0].costo, ['$90 MXN entrada', '$120 MXN con libro en PDF']);
+  assert.deepEqual(validEventos({ eventos: [ev('c', { costo: 'gratis' })] })[0].costo, []);
+  assert.deepEqual(validEventos({ eventos: [ev('c')] })[0].costo, []);
+  // La revisión estricta señala lo que el pintado perdona.
+  const probs = eventosProblems({ eventos: [ev('a'), ev('a'), ev('b', { fecha: '2026-02-30' }), ev('c', { hora: '18:00' }), ev('d', { fecha: '2026-11-21', hora: '18:00', fin: '17:00' }), ev('e', { imagen: 'https://x.example/a.webp' }),
+    ev('f', { fecha: '2026-11-21', reserva: { tipo: 'luma', url: 'http://lu.ma/x' } }), ev('g', { fecha: '2026-11-21', reserva: { tipo: 'whatsapp', telefono: '81-1500-6246' } }), ev('h', { reserva: { tipo: 'luma', url: 'https://lu.ma/x' } }),
+    ev('i', { registro: 'https://lu.ma/x' }), ev('j', { costo: [] }), ev('k', { encuadre: 'poster' }), ev('l', { invitado: '' }), ev('m', { fuente: 'instagram' })] }).join('\n');
+  for (const frag of ['(a): id repetido', '(b): «fecha» no es una fecha real', '(c): tiene hora pero no fecha', '(d): «fin» debe ser posterior', '(e): «imagen» debe ser una ruta local', '(f): la reserva por Luma', '(g): la reserva por WhatsApp lleva un «telefono» de 10 dígitos', '(h): tiene reserva pero no fecha', '(i): «registro» ya no se usa', '(j): «costo» es una lista', '(k): «encuadre»', '(l): «invitado» es un texto o null', '(m): «fuente» es el enlace https']) assert.ok(probs.includes(frag), `la revisión señala: ${frag}`);
+  assert.deepEqual(eventosProblems({ eventos: [ev('ok', { fecha: '2026-11-21', hora: '18:57', ciclo: 'Letras en vivo', invitado: 'Fulana', colabora: 'Editorial', encuadre: 'cartel', costo: ['$90 MXN entrada'], reserva: { tipo: 'whatsapp', telefono: '8112345678' } })] }), []);
+  assert.deepEqual(eventosProblems({ eventos: [{ id: 'sin-tipo', titulo: 'T', fecha: '2026-11-21', hora: null, fin: null, con: null, descripcion: 'd', imagen: 'assets/img/eventos/sin-tipo.webp', alt: 'a', fuente: 'https://www.instagram.com/p/abc/', reserva: null }] }), [], 'el tipo es opcional (solo si el anuncio lo dice); la imagen puede vivir en assets/img/eventos/');
+  assert.deepEqual(eventosProblems({}), ['falta la lista «eventos»']);
+});
+test('eventosPlan: próximos por fecha y hora, el primero es el destacado, el resto por día, los pasados fuera y las propuestas al final', () => {
+  const now = new Date('2026-11-16T18:00:00Z'); // mediodía del 16 de noviembre en Monterrey
+  const base = { tipo: 'Taller', titulo: 'T', hora: null, fin: null, con: null, descripcion: 'd', imagen: 'assets/img/cartelera-1.webp', alt: 'a', reserva: null };
+  const list = validEventos({ eventos: [
+    { id: 'propuesta', ...base, fecha: null },
+    { id: 'dic-tarde', ...base, fecha: '2026-12-05', hora: '19:30' },
+    { id: 'pasado', ...base, fecha: '2026-11-15', hora: '18:00', reserva: { tipo: 'luma', url: 'https://lu.ma/pasado' } },
+    { id: 'nov-26', ...base, fecha: '2026-11-26', hora: '19:00', reserva: { tipo: 'luma', url: 'https://lu.ma/x' } },
+    { id: 'dic-temprano', ...base, fecha: '2026-12-05', hora: '17:00' },
+    { id: 'proximo', ...base, titulo: 'Tarde de Letras', fecha: '2026-11-21', hora: '18:57', reserva: { tipo: 'whatsapp', telefono: '8112345678' } },
+    { id: 'dic-sin-hora', ...base, fecha: '2026-12-05' }
+  ] });
+  const plan = eventosPlan(list, now);
+  assert.equal(plan.destacado.id, 'proximo', 'el más próximo es el destacado');
+  assert.deepEqual(plan.dias.map(d => [d.fecha, d.eventos.map(e => e.id)]), [['2026-11-26', ['nov-26']], ['2026-12-05', ['dic-sin-hora', 'dic-temprano', 'dic-tarde']]], 'el resto, agrupado por día y ordenado por hora');
+  assert.deepEqual(plan.propuestas.map(e => e.id), ['propuesta'], 'las propuestas, al final');
+  assert.ok(![plan.destacado, ...plan.dias.flatMap(d => d.eventos), ...plan.propuestas].some(e => e.id === 'pasado'), 'un evento con fecha pasada no se muestra');
+  assert.equal(plan.conFecha, 5);
+  assert.deepEqual(plan.reservas, ['luma', 'whatsapp'], 'solo cuentan las reservas de los eventos vigentes');
+  assert.equal(plan.aviso, 'Próximo: Sáb 21 nov · Tarde de Letras');
+  assert.equal(plan.hasta, '2026-12-05', 'boot.js reserva el renglón del inicio hasta el último evento vigente');
+  // Hoy cuenta como próximo durante todo el día de Monterrey (23:30 del 21 = 05:30 UTC del 22) y el aviso dice «Hoy».
+  const hoy = eventosPlan(list, new Date('2026-11-22T05:30:00Z'));
+  assert.equal(hoy.destacado.id, 'proximo');
+  assert.equal(hoy.aviso, 'Hoy · 18:57 · Tarde de Letras');
+  assert.equal(eventosPlan(list, new Date('2026-11-22T06:30:00Z')).destacado.id, 'nov-26', 'al día siguiente ya no');
+  // Sin eventos con fecha: ni destacado, ni días, ni aviso; solo las propuestas.
+  const solo = eventosPlan(validEventos({ eventos: [{ id: 'p', ...base, fecha: null }, { id: 'viejo', ...base, fecha: '2026-01-10' }] }), now);
+  assert.deepEqual([solo.destacado, solo.dias, solo.conFecha, solo.aviso, solo.hasta, solo.reservas, solo.propuestas.map(e => e.id)], [null, [], 0, null, null, [], ['p']]);
+  assert.equal(avisoLine({ fecha: '2026-11-21', hora: null, titulo: 'X' }, now), 'Próximo: Sáb 21 nov · X');
+});
+test('eventos: quién, costo y reserva se imprimen solo con lo que el evento trae (sin inventar género, «gratis» ni cupos)', () => {
+  const now = new Date('2026-11-16T18:00:00Z');
+  const e = { id: 'tarde', tipo: 'Lectura', ciclo: 'Letras en vivo', titulo: 'Tarde de Letras XVII', fecha: '2026-11-21', hora: '18:57', fin: null, con: null, invitado: 'Fulana de Tal', colabora: 'Ediciones Tal', descripcion: 'd', costo: ['$90 MXN entrada'], reserva: { tipo: 'whatsapp', telefono: '8112345678' } };
+  assert.equal(quienLine(e), 'Invita a Fulana de Tal', 'en la lista: quién, sin «invitada» ni «invitado» (el dato no trae género)');
+  assert.equal(quienLine({ ...e, con: 'Zutano' }), 'Con Zutano · Invita a Fulana de Tal');
+  assert.equal(quienLine({ con: null, invitado: null, colabora: 'X' }), '', 'quien colabora solo va en el destacado');
+  assert.equal(metaLine(e, now), 'Sábado 21 de noviembre · 18:57 · Invita a Fulana de Tal · Colabora Ediciones Tal');
+  assert.equal(metaLine({ fecha: '2026-11-21', hora: null, fin: null, con: null, invitado: null, colabora: null }, now), 'Sábado 21 de noviembre', 'sin hora ni ponente, solo la fecha');
+  assert.equal(reservaMessage(e, now), 'Hola, quiero reservar para «Tarde de Letras XVII» del sábado 21 de noviembre.');
+  assert.equal(reservaUrl(e, now), `https://wa.me/528112345678?text=${encodeURIComponent('Hola, quiero reservar para «Tarde de Letras XVII» del sábado 21 de noviembre.')}`);
+  assert.equal(reservaUrl({ ...e, reserva: { tipo: 'luma', url: 'https://lu.ma/tarde' } }, now), 'https://lu.ma/tarde');
+  assert.equal(reservaUrl({ ...e, reserva: null }, now), null);
+  assert.equal(registroName('Tarde'), 'Registrarme en «Tarde» (abre Luma en otra pestaña)', 'el nombre accesible dice que abre Luma en otra pestaña');
+  assert.equal(reservaName('Tarde'), 'Reservar por WhatsApp para «Tarde»');
+  assert.equal(calName('Tarde'), 'Añadir «Tarde» al calendario');
+  assert.deepEqual(notaCopy(['luma']).titulo, '¿Cómo me registro?');
+  assert.ok(/«Registrarme»/.test(notaCopy(['luma']).texto) && /Luma/.test(notaCopy(['luma']).texto) && !/WhatsApp/.test(notaCopy(['luma']).texto));
+  assert.ok(/«Reservar por WhatsApp»/.test(notaCopy(['whatsapp']).texto) && !/Luma/.test(notaCopy(['whatsapp']).texto));
+  assert.ok(/Luma/.test(notaCopy(['luma', 'whatsapp']).texto) && /WhatsApp/.test(notaCopy(['luma', 'whatsapp']).texto));
+  assert.deepEqual(notaCopy([]), { titulo: 'Fechas nuevas', texto: '' }, 'sin reservas, la nota solo dice dónde se anuncian las fechas');
+  const feed = readFileSync_('feed.js');
+  assert.ok(!/gratis|entrada libre|cupo|lugares disponibles|quedan \d|asistentes|asistir[áa]n/i.test(feed.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '')), 'sin «gratis», cupos ni asistentes: el sitio no los conoce');
+  assert.ok(/a\.target = '_blank';\s*a\.rel = 'noopener noreferrer';/.test(feed), 'la reserva es un enlace normal en otra pestaña');
+  assert.ok(/dataset\.fuente = 'anuncio'/.test(feed), 'el costo va marcado como dato del anuncio');
+  assert.ok(!/lu\.ma|luma\.com|cdn\.lu\.ma/.test(html + readFileSync_('app.js')) && !/<script[^>]+src="https?:/.test(html), 'el sitio no carga nada de Luma');
+});
+test('icsOf: el evento como archivo de calendario (UTC correcto desde la hora de Monterrey, lugar, texto escapado, CRLF y renglones ≤ 75 octetos)', () => {
+  const now = new Date('2026-11-16T18:00:00Z');
+  const e = { id: 'tarde', tipo: 'Lectura', ciclo: null, titulo: 'Leer, escribir; compartir', fecha: '2026-11-21', hora: '18:57', fin: null, con: 'Fulana', invitado: null, colabora: null, descripcion: 'Línea uno.\nLínea dos, con coma.', costo: ['$90 MXN entrada'], reserva: { tipo: 'luma', url: 'https://lu.ma/tarde' } };
+  const ics = icsOf(e, { now });
+  const lines = ics.split('\r\n');
+  assert.ok(ics.endsWith('\r\n') && !/[^\r]\n/.test(ics), 'renglones terminados en CRLF');
+  assert.ok(lines.every(l => Buffer.byteLength(l, 'utf8') <= 75), 'ningún renglón pasa de 75 octetos');
+  const flat = ics.replace(/\r\n /g, '');
+  assert.deepEqual(flat.split('\r\n').slice(0, 2), ['BEGIN:VCALENDAR', 'VERSION:2.0']);
+  assert.ok(flat.includes('\r\nBEGIN:VEVENT\r\n') && flat.includes('\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n'));
+  assert.ok(flat.includes('\r\nDTSTART:20261122T005700Z\r\n'), '18:57 de Monterrey (UTC−6) = 00:57 UTC del día siguiente');
+  assert.ok(flat.includes('\r\nDTEND:20261122T015700Z\r\n'), `sin hora de fin, el calendario aparta ${ICS_BLOQUE_MIN} minutos`);
+  assert.ok(flat.includes('\r\nDTSTAMP:20261116T180000Z\r\n') && flat.includes('\r\nUID:tarde-20261121@'));
+  assert.ok(flat.includes('\r\nSUMMARY:Leer\\, escribir\\; compartir\r\n'), 'comas y puntos y coma escapados');
+  assert.equal(LUGAR, 'Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey');
+  assert.ok(flat.includes('\r\nLOCATION:Librería Itinerante y Más\\, Mariano Matamoros Pte. 421\\, Centro\\, Monterrey\r\n'), 'el lugar');
+  assert.ok(flat.includes('\r\nDESCRIPTION:Lectura · Con Fulana\\nLínea uno.\\nLínea dos\\, con coma.\\n$90 MXN entrada\\nRegistro: https://lu.ma/tarde\r\n'), 'descripción con saltos escapados, costo y registro');
+  assert.ok(flat.includes('\r\nURL:https://lu.ma/tarde\r\n'));
+  // Con hora de fin, esa; sin hora, día completo.
+  assert.ok(icsOf({ ...e, fin: '20:30' }, { now }).includes('DTEND:20261122T023000Z'));
+  const dia = icsOf({ ...e, hora: null }, { now });
+  assert.ok(dia.includes('DTSTART;VALUE=DATE:20261121\r\n') && dia.includes('DTEND;VALUE=DATE:20261122\r\n'), 'sin hora: evento de día completo');
+  assert.ok(icsOf({ ...e, fecha: '2026-12-31', hora: null }, { now }).includes('DTEND;VALUE=DATE:20270101'), 'el día siguiente cruza el año');
+  assert.ok(icsOf({ ...e, reserva: { tipo: 'whatsapp', telefono: '8112345678' } }, { now }).replace(/\r\n /g, '').includes('Reserva por WhatsApp: +52 8112345678') && !/\r\nURL:/.test(icsOf({ ...e, reserva: { tipo: 'whatsapp', telefono: '8112345678' } }, { now })));
+  assert.equal(icsOf({ ...e, fecha: null }), null, 'una propuesta no tiene archivo de calendario');
+  assert.equal(icsOf({ ...e, fecha: '2026-02-30' }), null);
+  // La hora de pared de Monterrey se convierte con la regla de la zona de ese día (UTC−5 en el verano de 2021, UTC−6 desde 2022).
+  assert.equal(mtyToUtc('2026-11-21', '18:30').toISOString(), '2026-11-22T00:30:00.000Z');
+  assert.equal(mtyToUtc('2021-07-10', '18:30').toISOString(), '2021-07-10T23:30:00.000Z');
+  // Un título largo con acentos se pliega sin partir una letra.
+  const largo = icsOf({ ...e, titulo: 'Ñandú '.repeat(30).trim() }, { now });
+  assert.ok(largo.split('\r\n').every(l => Buffer.byteLength(l, 'utf8') <= 75) && largo.replace(/\r\n /g, '').includes(`SUMMARY:${'Ñandú '.repeat(30).trim()}`));
+  const feed = readFileSync_('feed.js');
+  assert.ok(/new Blob\(\[ics\], \{ type: 'text\/calendar;charset=utf-8' \}\)/.test(feed) && /a\.download = `\$\{e\.id\}\.ics`;/.test(feed), 'se descarga como un Blob con nombre .ics (sin servidor)');
 });
 test('filtros de Explorar: Género y Editorial (sin «Categoría»); un grupo solo se pliega desde 8 opciones, a 5, con su «Ver las N» / «Ver menos»', async () => {
   const catalog = await readFile(here('./catalog.js'), 'utf8');
@@ -984,7 +1145,7 @@ test('Novedades sin entradas no existe; con una entrada aparece sola con su lleg
   assert.equal(newsPlan(data.books, { novedades: { entradas: [{ id: 'no-existe', llegada: '2026-11-09' }] } }, { hoy: HOY }).show, false, 'una entrada que no es un libro del inventario no basta para mostrar la sección');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [entry(7, '2026-12-24')] } }, { hoy: HOY }).show, false, 'una llegada futura espera su día');
 });
-test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas giran hasta 44° y asoman separadas, con hueco (sin encimarse); con movimiento reducido, la misma geometría plana; un solo motor para portada, evento y carta', async () => {
+test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas giran hasta 44° y asoman separadas, con hueco (sin encimarse); con movimiento reducido, la misma geometría plana; un solo motor para portada y carta', async () => {
   const railJs = await readFile(here('./rail.js'), 'utf8');
   const motor = await readFile(here('./carousel3d.js'), 'utf8');
   assert.equal(CF_GIRO, 44);
@@ -999,8 +1160,8 @@ test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas gir
   assert.ok(Math.abs(parseFloat(/rotateY\((-?[\d.]+)deg\)/.exec(coverflowPose(0.5, { w: 172 }).transform)[1])) === 22, 'el giro sigue a la distancia: a media pieza, la mitad');
   // Hueco visible central↔vecina (skill ux-apple §3): el borde de la vecina girada, proyectado con la perspectiva de 4 anchos de pieza.
   const borde = (separa, near = true) => { const a = 44 * Math.PI / 180, X = 1 + separa + (near ? -0.5 : 0.5) * Math.cos(a), Z = -0.6 + (near ? -0.5 : 0.5) * Math.sin(a); return X * 4 / (4 - Z); };
-  assert.ok((borde(0.08) - 0.5) * 176 >= 12 && (borde(0.045) - 0.5) * 243 >= 12, 'hueco ≥ 12 px con la portada más chica (176) y el evento más chico (243)');
-  assert.ok(Math.abs(borde(0.08, false) - 1.36) < 0.01 && Math.abs(borde(0.045, false) - 1.32) < 0.01, 'el borde exterior de la vecina es el --c3d-borde de cada variante (1.36; Eventos, 1.32)');
+  assert.ok((borde(0.08) - 0.5) * 176 >= 12, 'hueco ≥ 12 px con la portada más chica (176)');
+  assert.ok(Math.abs(borde(0.08, false) - 1.36) < 0.01, 'el borde exterior de la vecina es el --c3d-borde (1.36)');
   assert.ok(coverflowPose(3).hidden && coverflowPose(-7).hidden && coverflowPose(10).transform === coverflowPose(3).transform, 'lo lejano ni se ve ni se toca');
   for (const d of [-2.4, -1, -0.5, 0, 0.5, 1, 2]) {
     const f = coverflowPose(d, { flat: true, w: 172 });
@@ -1020,19 +1181,20 @@ test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas gir
   // Desliz nativo con imán al centro; perspectiva en la ventana (punto de fuga fijo) y 3D conservado en la pista.
   assert.ok(/\.c3d-viewport \{[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*perspective: calc\(var\(--c3d-w\) \* var\(--perspectiva-carrusel-piezas\)\); touch-action: manipulation;/.test(cssFlat), 'ventana: imán, sin arrastrar la página y con su perspectiva (en anchos de pieza)');
   assert.ok(/\.c3d-track \{[^}]*padding: 0 calc\(50% - var\(--c3d-w\) \/ 2\);[^}]*transform-style: preserve-3d; \}/.test(cssFlat) && /\.c3d-track > li \{ flex: 0 0 var\(--c3d-w\); scroll-snap-align: center;/.test(css) && /\.c3d--portada \{ --c3d-w: min\(clamp\(176px, 58vw, 248px\), calc\(\(100svh - 320px\) \/ 1\.5\)\); \}/.test(css), 'portadas del 58 % del ancho (176–248 px, con tope contra el alto) centradas por el imán');
-  assert.ok(/\.c3d--evento \{ --c3d-w: min\(76vw, 340px\);/.test(css) && /\.c3d--carta \{ --c3d-w: clamp\(184px, 60vw, 248px\); \}/.test(css), 'cada variante pone el ancho de su pieza');
+  assert.ok(!/c3d--evento/.test(css + mobileCss + html) && /\.c3d--carta \{ --c3d-w: clamp\(184px, 60vw, 248px\); \}/.test(css), 'cada variante pone el ancho de su pieza; la de evento se retiró con el carrusel de Eventos (2026-11-16)');
   assert.ok(/@media \(min-width: 761px\) \{[\s\S]*?\.c3d \{ --c3d-escenario: min\(1240px, max\(100%, 100% \+ 2 \* \(var\(--margen\) - var\(--margen-escritorio\)\)\)\); width: var\(--c3d-escenario\); max-width: none; margin-inline: calc\(\(100% - var\(--c3d-escenario\)\) \/ 2\); \}[\s\S]*?mask-image: linear-gradient/.test(css) && /\.c3d--portada \{ --c3d-w: clamp\(240px, calc\(\(100cqi - 2 \* \(var\(--alto-md\) \+ var\(--space-4\)\)\) \/ \(2 \* var\(--c3d-borde\)\)\), 280px\); \}/.test(css), 'desde 761: escenario de hasta 1240 px centrado, bordes que se desvanecen y la pieza que cabe con sus vecinas y las flechas');
   // Toque y teclado: una vecina viene al centro; la del centro se abre. Una sola parada de tabulador; ← → Inicio Fin.
   assert.ok(/if \(!item\.classList\.contains\('is-centro'\)\) \{\s*e\.stopImmediatePropagation\(\);/.test(motor) && /onOpen\?\.\(items\.indexOf\(item\), item, e\)/.test(motor) && /wireBookOpen\(track, ensureCatalog\)/.test(railJs), 'tocar una vecina la trae al centro; tocar la del centro la abre (en la portada, la ficha: iti:open-book)');
   assert.ok(/const k0 = keyTarget\(e\.key, actual, items\.length\);/.test(motor), 'teclado: ← → Inicio y Fin en la pieza central');
   assert.ok(/\.rail-item:not\(\.is-centro\) \.save \{ opacity: 0; visibility: hidden; \}/.test(css), 'Guardar solo sobre la portada del centro');
-  assert.ok(/\.rail-item\.is-centro \.cover \{ box-shadow: var\(--sombra-portada\); \}/.test(css) && /\.c3d-item\.is-centro :is\(\.bill-card, \.cafe-card\) \{ box-shadow: var\(--sombra-portada\); \}/.test(css), 'solo la pieza del centro lleva sombra-portada');
+  assert.ok(/\.rail-item\.is-centro \.cover \{ box-shadow: var\(--sombra-portada\); \}/.test(css) && /\.c3d-item\.is-centro \.cafe-card \{ box-shadow: var\(--sombra-portada\); \}/.test(css), 'solo la pieza del centro lleva sombra-portada');
   const flechas = [...html.matchAll(/<button class="([^"]*c3d-flecha[^"]*)"/g)].map(m => m[1]);
-  assert.ok(/\.c3d-flecha \{ position: absolute;/.test(css) && flechas.length === 6 && flechas.every(c => /btn btn--vidrio btn--icono c3d-flecha c3d-flecha--(prev|next)/.test(c)), 'flechas de vidrio de 48 a los lados, dos por carrusel');
+  assert.ok(/\.c3d-flecha \{ position: absolute;/.test(css) && flechas.length === 4 && flechas.every(c => /btn btn--vidrio btn--icono c3d-flecha c3d-flecha--(prev|next)/.test(c)), 'flechas de vidrio de 48 a los lados, dos por carrusel');
   const rail = html.match(/<div class="rail" id="colecciones" data-rail[\s\S]*?data-rail-live><\/p>\s*<\/div>/)[0];
   assert.ok(/<div class="cf-texto" data-rail-caption><p class="cf-titulo" data-rail-title><\/p><p class="cf-meta" data-rail-meta><\/p><\/div>/.test(rail), 'título y «autor · precio» del libro del centro');
   assert.ok(/if \(say === i\) \{ say = -1; if \(live && liveText\) live\.textContent = liveText\(i\); \}/.test(motor), 'con flechas o teclado, la pieza que llega al centro se anuncia en la región viva');
-  for (const [file, variante] of [['rail.js', 'portada'], ['feed.js', 'evento'], ['cafe.js', 'carta']]) assert.ok(/createCarousel3D\(/.test(readFileSync_(file)) && html.includes(`c3d c3d--${variante}" role="region" aria-roledescription="carrusel"`), `${file}: variante ${variante} del mismo motor, con role="region" y aria-roledescription="carrusel"`);
+  assert.ok(!/createCarousel3D|carousel3d/.test(readFileSync_('feed.js')), 'Eventos ya no usa el motor (destacado y lista por fecha, 2026-11-16)');
+  for (const [file, variante] of [['rail.js', 'portada'], ['cafe.js', 'carta']]) assert.ok(/createCarousel3D\(/.test(readFileSync_(file)) && html.includes(`c3d c3d--${variante}" role="region" aria-roledescription="carrusel"`), `${file}: variante ${variante} del mismo motor, con role="region" y aria-roledescription="carrusel"`);
 });
 test('profundidad (A5): la pieza central se inclina hacia el cursor hasta 6° y se adelanta 12 px; al presionar, 0.97 y sombra-flotante; nada sin movimiento', () => {
   const motor = readFileSync_('carousel3d.js');
@@ -1046,7 +1208,7 @@ test('profundidad (A5): la pieza central se inclina hacia el cursor hasta 6° y 
   assert.equal(tiltTransform({ rx: 3, ry: -2 }, { adelanto: 12, perspectiva: 800 }), 'perspective(800px) rotateX(3deg) rotateY(-2deg) translateZ(12px)');
   assert.ok(/matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)/.test(motor) && /e\.pointerType !== 'mouse' \|\| !fine\.matches \|\| !root\.classList\.contains\('motion'\)/.test(motor), 'solo con puntero fino que pasa por encima, y con movimiento («Pausar el movimiento» y reducir movimiento lo apagan)');
   assert.ok(/target\.closest\('\.c3d-item\.is-centro'\)/.test(motor) && /if \(!frame\) frame = requestAnimationFrame\(paint\);/.test(motor), 'solo la pieza central de un carrusel; una escritura por fotograma');
-  assert.ok(/'data-inclina': ''/.test(readFileSync_('catalog.js')) && /dataset\.inclina = ''/.test(readFileSync_('rail.js')) && /dataset\.inclina = ''/.test(readFileSync_('cafe.js')) && (html.match(/class="bill-card c3d-card"[^>]*data-inclina/g) || []).length === 3, 'portadas, eventos, carta y la tarjeta de la rejilla se marcan con data-inclina');
+  assert.ok(/'data-inclina': ''/.test(readFileSync_('catalog.js')) && /dataset\.inclina = ''/.test(readFileSync_('rail.js')) && /dataset\.inclina = ''/.test(readFileSync_('cafe.js')) && !/inclina/.test(readFileSync_('feed.js')) && !/class="ev-[^"]*"[^>]*data-inclina/.test(html), 'portadas, carta y la tarjeta de la rejilla se marcan con data-inclina; las tarjetas de evento no se inclinan (no son la pieza de un carrusel)');
   assert.ok(/\.motion \[data-inclina\] \{ transition: transform var\(--dur-base\) var\(--curva-resorte\), scale var\(--dur-instantanea\)/.test(cssFlat), 'vuelve con curva-resorte; el toque en dur-instantanea');
   assert.ok(/\.motion :is\(\.c3d-item\.is-centro \[data-inclina\], \.card-item\[data-inclina\]\):active \{ scale: 0\.97; \}/.test(cssFlat) && /:active, \.rail-item\.is-centro \.card:active \.cover, \.card-item:active \.cover \{ box-shadow: var\(--sombra-flotante\); \}/.test(cssFlat), 'al presionar, 0.97 y la sombra baja a sombra-flotante');
   assert.ok(/\[data-inclina\]:active \{ scale: none; \}/.test(css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))), 'con reducir movimiento no hay escala al tocar');
@@ -1107,76 +1269,73 @@ test('Novedades: nada se presenta como ranking ni como inventario', async () => 
   const preview = await readFile(here('./tools/preview-site.mjs'), 'utf8');
   for (const f of ['feed.js', 'news.js']) { assert.ok(prepare.includes(`"${f}"`), `${f} se publica`); assert.ok(preview.includes(`'/${f}'`), `${f} se sirve en la vista previa`); }
 });
-test('Eventos y talleres: foto y «Compartir» local (el contacto vive en el pie); sin «Me interesa», contadores ni fechas inventadas', async () => {
-  const items = [...html.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
-  assert.equal(items.length, 3);
-  for (const [block, id] of items) {
-    assert.ok(/<img class="bill-card-img"[^>]* alt="[^"]+"/.test(block), `${id}: foto con texto alternativo`);
-    assert.ok(!/data-interest|Me interesa|i-heart/.test(block) && (block.match(/data-share=/g) || []).length === 1, `${id}: sin «Me interesa»; un «Compartir» en la fila de insignias de la tarjeta (2026-11-14)`);
-    assert.ok(new RegExp(`<button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="${id}" data-title="([^"]+)" aria-label="Compartir «\\1»">`).test(block), `${id}: «Compartir» es un botón de icono menta (secundario, 44) cuyo nombre lleva el título`);
-    assert.ok(!/\d+\s*(me gusta|likes?|reseñas)|★/i.test(block), `${id}: sin señales sociales inventadas`);
-  }
-  assert.ok(html.includes('<symbol id="i-share"') && !html.includes('<symbol id="i-heart"'), 'el corazón salió del sprite con «Me interesa»');
-  assert.ok(/html:not\(\.js\) \.bill-pie \{ display: none; \}/.test(css) && /html\.js \.bill-card \.bill-detail \{ display: none; \}/.test(css), 'sin JavaScript cada tarjeta muestra su descripción (el pie de abajo no existe); con JavaScript, la de la del centro');
-  assert.ok(/\.c3d-item:not\(\.is-centro\) \.bill-share, html:not\(\.js\) \.bill-share \{ visibility: hidden; \}/.test(cssFlat), '«Compartir» solo se ve y se toca en la tarjeta del centro; sin JavaScript no se ofrece');
+test('Eventos y talleres: «Compartir» y calendario locales; sin «Me interesa», contadores ni fechas inventadas', async () => {
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/navigator\.share/.test(feed) && /AbortError/.test(feed) && /clipboard\.writeText/.test(feed), 'Web Share con respaldo de copiar enlace; cancelar no copia');
-  assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage|toggleInterest|readInterest|iti-b4-interes/.test(feed), 'Eventos no guarda ni envía nada');
-  assert.ok(/btn\.closest\?\.\('\.bill-item'\)/.test(feed), '«Compartir» lee la fecha de su propuesta (va dentro de su tarjeta desde el 2026-11-14)');
+  // No se envía nada: la única petición es leer eventos.json y lo único que se guarda es la fecha del último evento vigente (para el aviso).
+  assert.ok(!/XMLHttpRequest|sendBeacon|method:\s*'POST'|toggleInterest|readInterest|iti-b4-interes/.test(feed), 'Eventos no envía nada');
+  assert.deepEqual(feed.match(/fetch\(([^)]*)\)/g), ['fetch(EVENTOS_URL)'], 'la única petición: leer assets/data/eventos.json');
+  assert.ok(/export const EVENTOS_URL = 'assets\/data\/eventos\.json';/.test(feed));
+  assert.deepEqual([...new Set(feed.match(/(?:setItem|removeItem|getItem)\(([A-Z_a-z']+)/g))].sort(), ['removeItem(HASTA_KEY', 'setItem(HASTA_KEY'], 'lo único guardado: la fecha del último evento vigente (iti-ev-hasta), sin datos de la persona');
+  assert.ok(/const store = \(\) => \{ try \{ return globalThis\.localStorage \?\? null; \} catch \{ return null; \} \};/.test(feed), 'leer localStorage puede lanzar: el acceso va dentro del try');
   const app = await readFile(here('./app.js'), 'utf8');
-  assert.ok(/e\.target\.closest\('\[data-share\]'\)/.test(app) && !/data-interest/.test(app), 'el único control que carga feed.js al tocar es Compartir');
+  assert.ok(/e\.target\.closest\('\[data-share\], \[data-ev-cal\]'\)/.test(app) && !/data-interest/.test(app), 'los controles que cargan feed.js al tocar: «Compartir» y «Añadir al calendario»');
+  const now = new Date('2026-11-16T18:00:00Z');
+  assert.deepEqual(shareData({ titulo: 'Taller', fecha: null, hora: null }, { now, url: 'https://x.example/#cartelera' }), { title: 'Taller · Librería Itinerante y Más', text: 'Taller: una propuesta de Eventos y talleres de Librería Itinerante y Más (sin fecha confirmada todavía).', url: 'https://x.example/#cartelera' });
+  assert.equal(shareData({ titulo: 'Tarde', fecha: '2026-11-21', hora: '18:57' }, { now }).text, 'Tarde: Sáb 21 nov · 18:57 en Librería Itinerante y Más.');
+  assert.equal(shareName('Círculo de lectura'), 'Compartir «Círculo de lectura»', 'el nombre empieza por la acción y lleva el título (WCAG 2.5.3)');
+  assert.equal(shareName(''), 'Compartir «este evento»');
 });
-test('Eventos (A2 + A7): Carrusel3D variante evento; «Compartir» en la tarjeta del centro y, debajo, su descripción (región viva)', async () => {
-  const bill = html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0];
-  assert.ok(/<div class="c3d c3d--evento" role="region" aria-roledescription="carrusel" aria-label="Eventos y talleres" data-bill-c3d>/.test(bill), 'carrusel con rol y nombre');
-  assert.ok(!/bill-dots|<details|<summary/.test(bill), 'sin puntos ni acordeón');
-  assert.equal((bill.match(/class="bill-fila"/g) || []).length, 0, 'sin fila de acciones bajo el carrusel (2026-11-14: «Compartir» va en la tarjeta)');
-  assert.equal((bill.match(/data-share=/g) || []).length, 3, 'un «Compartir» por tarjeta (solo se ve el de la del centro)');
-  const pie = bill.slice(bill.indexOf('data-bill-pie'));
-  assert.ok(/<p class="bill-desc" aria-live="polite" data-bill-desc>/.test(pie) && !/wa\.me/.test(bill), 'la descripción es región viva; sin consulta por WhatsApp en la sección (vive en el pie)');
-  for (const [block, id] of bill.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)) {
-    assert.ok(/<article class="bill-card c3d-card" aria-labelledby="bill-t-[a-z]+" data-inclina( tabindex="0")?>/.test(block) && /<h3 class="bill-title" id="bill-t-[a-z]+">/.test(block), `${id}: tarjeta (superficie) con su título`);
-    assert.ok(/<div class="bill-detail">\s*<p>[^<]+<\/p>\s*<\/div>/.test(block), `${id}: su descripción va en el marcado (sin JavaScript se lee)`);
+test('Eventos (2026-11-16): destacado y lista por fecha en lugar del carrusel; sin JavaScript, las propuestas en HTML estático', async () => {
+  const bill = html.match(/<section id="cartelera"[\s\S]*?\n {4}<\/section>/)[0];
+  assert.ok(/<div class="ev" data-ev>\s*<div class="ev-despues">\s*<div class="ev-lista">\s*<section class="ev-grupo ev-propuestas" aria-label="Propuestas">\s*<ul class="ev-filas">/.test(bill), 'la lista de propuestas va en el marcado (lista simple)');
+  assert.ok(!/c3d|carrusel|aria-live|bill-pie|bill-desc|<details|<summary|<button/.test(bill.replace(/<!--[\s\S]*?-->/g, '')), 'sin carrusel, región viva, acordeón ni botones en el marcado estático');
+  assert.equal((bill.match(/btn--primario/g) || []).length, 0, 'ninguna primaria en el marcado: la del destacado solo existe con un evento con fecha');
+  assert.ok(!/wa\.me|lu\.ma|luma\.com/.test(bill), 'sin enlaces de reserva inventados');
+  for (const [block, id] of bill.matchAll(/<li class="ev-fila" data-id="([a-z]+)"[\s\S]*?<\/li>/g)) {
+    assert.ok(new RegExp(`<article class="ev-card" aria-labelledby="ev-t-${id}">`).test(block) && new RegExp(`<h3 class="ev-card-tit" id="ev-t-${id}">[^<]{4,}</h3>`).test(block), `${id}: tarjeta nombrada por su título`);
+    assert.ok(/<p class="ev-card-desc">[^<]{60,}<\/p>/.test(block), `${id}: su descripción va en el marcado (sin JavaScript se lee)`);
+    const order = [/class="ev-rot"/, /class="ev-card-tit"/, /class="ev-card-img"/, /class="ev-card-desc"/].map(re => block.search(re));
+    assert.deepEqual(order, [...order].sort((a, b) => a - b), `${id}: insignias → título → portada → descripción`);
+    assert.ok(!/\b\d+\s*(me gusta|likes?|reseñas|personas|interesad|lugares|asistentes)/i.test(block.replace(/<[^>]+>/g, ' ')), `${id}: sin contadores ni números de interacción`);
   }
-  assert.ok(/\.bill-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && !/\.bill-card \{[^}]*vidrio/.test(cssFlat), 'tarjeta en superficie con radio 20, no de vidrio');
-  assert.ok(/\.bill-desc \{ min-height: var\(--bill-reserva, 4lh\);/.test(cssFlat) && /@media \(min-width: 1280px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 3lh\); \} \}/.test(cssFlat) && /@media \(max-width: 374px\) \{ \.bill-desc \{ min-height: var\(--bill-reserva, 5lh\); \} \}/.test(mobileFlat) && /measureDescs\(pie, events\.map\(e => e\.text\), cardWidth\(\)\)/.test(readFileSync_('feed.js')), 'la descripción reserva la más larga (medida en feed.js; antes de medir, 5, 4 o 3 renglones según el ancho): cambiar de tarjeta no mueve lo de abajo');
-  assert.ok(/\.bill-pie \{ position: relative; display: grid; width: var\(--bill-w, min\(76vw, 340px\)\); max-width: 100%; margin: 0 auto; padding-inline: var\(--space-4\); \}/.test(cssFlat) && !/\.bill-pie \{[^}]*text-align: center/.test(cssFlat) && /if \(cardWidth > 0\) pie\.style\.setProperty\('--bill-w', `\$\{cardWidth\}px`\);/.test(readFileSync_('feed.js')) && /\.bill-desc \{[^}]*font: var\(--t-lectura\);/.test(cssFlat) && /--t-lectura: 400 17px\/24px/.test(readFileSync_('tokens.css')), 'la descripción no va centrada (tres o cuatro renglones): bloque del ancho de la tarjeta central (--bill-w, feed.js), texto a la izquierda en su sangría (16), en la letra `lectura` 17/24 (Sistema de guías, 2026-11-15)');
-  // Cada «Compartir» lleva el título de su propuesta en el nombre accesible (initFeed los pinta todos).
-  const feed = await readFile(here('./feed.js'), 'utf8');
-  assert.ok(/document\.querySelectorAll\('\[data-share\]'\)\.forEach\(paintShare\)/.test(feed) && !/waName|ev\.wa|\.bill-fila/.test(feed), 'cada «Compartir» se nombra con su propuesta (sin consulta por WhatsApp)');
-  const q = { '.bill-title': { textContent: ' Taller ' }, '.bill-detail > p': { textContent: 'Leer y escribir.' } };
-  assert.deepEqual(eventOf({ dataset: { id: 'taller' }, querySelector: s => q[s] }), { id: 'taller', title: 'Taller', text: 'Leer y escribir.' }, 'cada propuesta sale de su marcado');
-  const app = await readFile(here('./app.js'), 'utf8');
-  assert.ok(/nearby\(\$\('\[data-bill-c3d\]'\), \(\) => loadFeed\(\)\.then\(m => m\.initEventos\(\{ isMotion \}\)\)/.test(app) && !/import .*feed\.js/m.test(app.split('\n').filter(l => l.startsWith('import')).join('\n')), 'se arma al acercarse (import diferido)');
-});
-test('tarjeta de evento: foto → insignias → título (→ descripción solo sin JavaScript), sin números de interacción; «Compartir» nombra la propuesta', async () => {
-  const items = [...html.matchAll(/<li class="bill-item"[^>]*data-id="([a-z]+)"[\s\S]*?<\/li>/g)];
-  assert.equal(items.length, 3);
-  for (const [block, id] of items) {
-    const order = [/class="bill-card-img"/, /class="bill-badges"/, /class="bill-title"/, /<p>/].map(re => block.search(re));
-    assert.ok(order.every((n, i) => n >= 0 && (i === 0 || n > order[i - 1])), `${id}: el DOM va de la foto a las insignias, el título y la descripción (${order})`);
-    assert.ok(!/bill-sub|bill-post-head|bill-post-who|bill-av|bill-cap/.test(block), `${id}: sin subtítulo ni encabezado de red social`);
-    const pick = re => block.match(re)[1];
-    assert.equal((block.match(/class="bill-title"/g) || []).length, 1, `${id}: el título está una sola vez`);
-    assert.ok(!/wa\.me|bill-acts/.test(block) && pick(/class="bill-title"[^>]*>([^<]+)</).length > 3, `${id}: sin consulta por WhatsApp en la tarjeta (vive en el pie)`);
-    assert.ok(!/btn--primario/.test(block), `${id}: ninguna acción de la tarjeta es primaria`);
-    assert.ok(!/\b\d+\s*(me gusta|likes?|reseñas|personas|interesad)/i.test(block.replace(/<[^>]+>/g, ' ')), `${id}: sin contadores ni números de interacción`);
-  }
-  const bill = html.match(/<section id="cartelera"[\s\S]*?<\/section>/)[0];
-  assert.equal((bill.match(/btn--primario/g) || []).length, 0, 'ninguna primaria en Eventos: «Cómo llegar» está en Visita');
-  // initFeed de verdad, sobre un DOM mínimo: «Compartir» queda con un nombre que empieza por la acción (WCAG 2.5.3)
-  const buttons = ['Círculo de lectura', 'Ajedrez en la casa', 'Taller de escritura'].map(title => ({ dataset: { title }, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } }));
-  globalThis.document = { querySelectorAll: sel => (sel === '[data-share]' ? buttons : []) };
-  try { initFeed(); } finally { delete globalThis.document; }
-  assert.deepEqual(buttons.map(b => b.attrs['aria-label']), ['Compartir «Círculo de lectura»', 'Compartir «Ajedrez en la casa»', 'Compartir «Taller de escritura»']);
-  assert.equal(shareName(''), 'Compartir «esta propuesta»');
-  assert.ok(/\.bill-card-fig \{ display: block; \}/.test(cssFlat) && !/bill-dots/.test(css + mobileCss), 'la foto va en la tarjeta en todo ancho; sin puntos');
-  assert.ok(!/\.bill-(title|sub)[^{]*\{[^}]*display: none/.test(css + mobileCss), 'el título no se oculta en ningún tamaño');
-  assert.ok(/\.bill-share \{ margin-inline-start: auto; \}/.test(cssFlat) && /\.bill-badges \{ display: flex; flex-wrap: wrap; align-items: center;/.test(cssFlat) && !/bill-wa|\.bill-fila/.test(css + mobileCss), '«Compartir» (44) al final de la fila de insignias; sin CSS de la fila retirada ni de la consulta');
-  assert.ok(/@media \(max-height: 700px\) \{ \.bill-card-img \{ aspect-ratio: 16 \/ 9; \} \}/.test(mobileCss), 'tope contra el alto: en ventanas bajas la foto se acorta');
+  assert.equal((bill.match(/data-ev-when>Propuesta · sin fecha</g) || []).length, 3, 'la insignia de estado se queda en cada tarjeta');
+  assert.ok(/<p class="sec-texto" data-ev-lede>Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/"[^>]*>Instagram<svg/.test(bill) && !/bill-foot|propuestas para la agenda/.test(bill), 'entradilla «Aún sin fecha. Las fechas se anuncian en Instagram.»');
   assert.ok(/\.sec-texto a \{ position: relative; white-space: nowrap; color: var\(--turquesa-texto\); \}/.test(css) && /\.sec-texto a::after \{ content: ""; position: absolute; inset: calc\(-1 \* var\(--space-4\)\) 0; \}/.test(css), 'el enlace a Instagram de la entradilla es texto en línea con 44 px de objetivo');
-  assert.ok(/<p class="sec-texto">Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/"[^>]*>Instagram<svg/.test(bill) && !/bill-foot|propuestas para la agenda/.test(bill), 'entradilla «Aún sin fecha. Las fechas se anuncian en Instagram.»');
-  assert.equal((bill.match(/data-bill-when>Propuesta · sin fecha</g) || []).length, 3, 'la insignia de estado se queda en cada tarjeta');
+  const feed = await readFile(here('./feed.js'), 'utf8');
+  assert.ok(/if \(lede && plan\.conFecha\) lede\.textContent = 'Lo que viene en la casa\.';/.test(feed), 'con fechas, la entradilla pasa a «Lo que viene en la casa.» (Instagram queda en la nota lateral)');
+  assert.ok(/if \(!plan\.conFecha && staticSignature\(root\) === planSignature\(plan\)\)/.test(feed), 'sin fechas y con el marcado al día, no se vuelve a pintar');
+  assert.ok(/catch \{ delete root\.dataset\.ready; return; \}/.test(feed), 'si el JSON no llega, queda lo que trae index.html');
+  // Piezas: destacado (primaria de 56 = la reserva o, sin ella, el calendario; iconos de 56 con nombre), tarjeta de la lista y nota lateral.
+  assert.ok(/const reserva = reservaLink\(e, 'btn btn--primario btn--lg'\);\s*if \(reserva\) acc\.append\(reserva, calButton\(e, 'btn btn--secundario btn--lg btn--icono'\)\);\s*else acc\.append\(calButton\(e, 'btn btn--primario btn--lg', true\)\);\s*acc\.append\(shareButton\(e, 'btn btn--secundario btn--lg btn--icono'\)\);/.test(feed), 'destacado: la acción con rótulo es la reserva; sin reserva, «Añadir al calendario»');
+  assert.ok(/const reserva = reservaLink\(e, 'btn btn--secundario'\);\s*if \(reserva\) acc\.append\(reserva, calButton\(e, 'btn btn--plano btn--icono'\)\);\s*else acc\.append\(calButton\(e, 'btn btn--secundario', true\)\);/.test(feed), 'lista: la reserva (48) y el calendario; sin reserva, el calendario con rótulo');
+  assert.ok(/box\.setAttribute\('aria-hidden', 'true'\);/.test(feed) && /make\('p', 'ev-prox-meta', metaLine\(e, now\)\)/.test(feed), 'el bloque de fecha es decorativo: la fecha completa va en texto al lado');
+  assert.ok(/if \(!e\.fecha && e\.descripcion\) art\.append\(make\('p', 'ev-card-desc', e\.descripcion\)\);\s*if \(e\.fecha\) \{/.test(feed), 'una propuesta lleva su descripción y ninguna acción');
+  assert.ok(/art = make\('article', e\.encuadre === 'cartel' \? 'ev-prox ev-prox--cartel' : 'ev-prox'\)/.test(feed) && /\.ev-prox--cartel \.ev-prox-img \{ aspect-ratio: 1 \/ 1; object-fit: contain; \}/.test(css), 'un cartel se muestra entero y cuadrado, nunca recortado');
+  // CSS: superficie (no vidrio), sombra solo en el destacado, un solo eje y la rejilla de la página desde 1024.
+  assert.ok(/\.ev-card \{[^}]*border-radius: var\(--radio-md\); background: var\(--superficie\);/.test(cssFlat) && !/\.ev-(card|prox) \{[^}]*(vidrio|cursor: pointer)/.test(cssFlat), 'tarjeta en superficie con radio 20: no es vidrio ni un control');
+  assert.ok(/\.ev-prox \{[^}]*border-radius: var\(--radio-lg\); background: var\(--superficie\);[^}]*box-shadow: var\(--sombra-flotante\); \}/.test(cssFlat) && !/\.ev-card \{[^}]*box-shadow/.test(cssFlat), 'solo el destacado lleva sombra');
+  assert.ok(/\.ev-card-img \{[^}]*width: var\(--portada-evento\); height: var\(--portada-evento\);[^}]*object-fit: cover; \}/.test(cssFlat) && tokensCss.includes('--portada-evento: 88px;') && tokensCss.includes('--portada-evento-amplia: 120px;'), 'portada cuadrada de 88 (120 en escritorio), de los tokens');
+  assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.ev-prox \{ grid-template-columns: var\(--rejilla\); column-gap: var\(--canal-rejilla\); \}\s*\.ev-prox-fig \{ grid-column: 7 \/ -1; grid-row: 1; \}[\s\S]*?\.ev-lista \{ grid-column: 1 \/ span 8; \}\s*\.ev-lado \{ grid-column: 9 \/ -1; position: sticky;/.test(css), 'escritorio: destacado 1–6 | 7–12; lista 1–8 y nota 9–12, fija al desplazar');
+  assert.ok(/\.motion \.ev-espera \{ opacity: 0; \}/.test(cssFlat) && /waiting = nodes\.filter\(n => n\.getBoundingClientRect\(\)\.top >= innerHeight\)/.test(feed) && /delay: Math\.min\(i \* step, tope\)/.test(feed) && /tope = DUR\('lenta'\) - dur/.test(feed), 'entrada escalonada dentro de dur-lenta, solo de lo que aún no se ve y solo con movimiento');
+  assert.ok(!/\d+\s*ms|setTimeout|setInterval|iterations/.test(feed.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '')), 'sin milisegundos a mano, temporizadores ni bucles');
+  const app = await readFile(here('./app.js'), 'utf8');
+  assert.ok(/nearby\(\$\('\[data-ev\]'\), \(\) => loadFeed\(\)\.then\(m => m\.initEventos\(\{ isMotion \}\)\)/.test(app) && !/import .*feed\.js/m.test(app.split('\n').filter(l => l.startsWith('import')).join('\n')), 'se pinta al acercarse (import diferido)');
+  assert.ok(/document\.addEventListener\('iti:primarias', watchPrimaries\)/.test(app) && /dispatchEvent\(new CustomEvent\('iti:primarias'\)\)/.test(feed), 'la primaria de la barra cede ante la del destacado (una sola primaria a la vista)');
+});
+test('aviso del próximo evento: renglón del inicio y punto de «Eventos», reservados antes del primer render (como Novedades); hoy, nada', async () => {
+  const entry = html.match(/<section id="inicio"[\s\S]*?<\/section>/)[0];
+  assert.ok(/<p class="entry-address">[\s\S]*?<\/p>\s*<a class="entry-ev" href="#cartelera" data-ev-cta hidden><span class="entry-ev-dot" aria-hidden="true"><\/span><span class="entry-ev-txt" data-ev-cta-text><\/span><svg class="ic" aria-hidden="true"><use href="#i-down"\/><\/svg><\/a>/.test(entry), 'el renglón va bajo la dirección, oculto y vacío en el marcado: hoy no hay evento con fecha');
+  assert.ok(/<a href="#cartelera">Eventos<span class="ev-dot" data-ev-dot hidden aria-hidden="true"><\/span><span class="sr-only" data-ev-sr><\/span><\/a>/.test(html) && /<a class="menu-row" href="#cartelera"><span>Eventos y talleres<span class="sr-only" data-ev-sr><\/span><\/span><span class="news-dot" data-ev-dot hidden aria-hidden="true"><\/span>/.test(html), 'punto (oculto) en la barra y en el menú, con su texto para lectores de pantalla');
+  assert.ok(/\.entry-ev \{ display: none;[^}]*min-height: var\(--alto-sm\); margin: calc\(var\(--space-2\) - var\(--space-3\)\) 0 calc\(-1 \* var\(--space-3\)\);/.test(cssFlat) && /\.ev-hint \.entry-ev \{ display: flex; visibility: hidden; \}/.test(cssFlat) && /\.ev-hint \.entry-ev:not\(\[hidden\]\) \{ visibility: visible; \}/.test(cssFlat), 'objetivo de 44 que solo ocupa su renglón (8 + 20); existe solo con ev-hint');
+  assert.ok(/\.ev-dot \{ position: absolute;/.test(cssFlat) && /\.hdr-nav a \{\s*position: relative;/.test(css), 'el punto de la barra flota en su enlace: no mueve a sus vecinos');
+  assert.ok(/\.ev-hint \.entry-media, \.ev-hint\.news-hint \.entry-media \{ height: clamp\(160px, calc\(100svh - var\(--hdr-h\) - var\(--entrada-arriba\) - var\(--space-2\) - 20px - var\(--reserva-inferior\)\), calc\(\(100vw - 2 \* var\(--margen\)\) \/ 1\.5\)\); \}/.test(mobileCss) && /\.ev-hint\.news-hint \.entry-news \{ display: none; \}/.test(mobileCss), 'teléfono: la foto cede 28 px y sigue sobre la barra inferior; un solo renglón extra en el inicio');
+  const boot = readFileSync_('assets/js/boot.js');
+  assert.ok(/localStorage\.getItem\('iti-ev-hasta'\)/.test(boot) && /if \(ev >= hoy\) r\.classList\.add\('ev-hint'\);/.test(boot), 'boot.js reserva el renglón si la visita anterior dejó un evento vigente');
+  const feed = await readFile(here('./feed.js'), 'utf8');
+  assert.ok(/const HASTA_KEY = 'iti-ev-hasta';/.test(feed) && /if \(es\.some\(x => x\.isIntersecting\)\) return;\s*io\.disconnect\(\);\s*root\.classList\.toggle\('ev-hint', wanted\);/.test(feed), 'si no coincide, se corrige con el inicio fuera de la vista');
+  const app = await readFile(here('./app.js'), 'utf8');
+  assert.ok(/loadFeed\(\)\.then\(m => m\.initEventosAviso\(\)\)/.test(app) && /root\.classList\.remove\('ev-hint'\);/.test(app), 'el aviso se pide pronto, después de la foto y las fuentes; sin el módulo no se reserva nada');
 });
 test('INP: los botones confirman primero y la hoja se abre o se cierra después de pintar', async () => {
   const [motion, sheets, rail, cat, app] = await Promise.all(['motion.js', 'sheets.js', 'rail.js', 'catalog.js', 'app.js'].map(f => readFile(here(f), 'utf8')));
@@ -1619,12 +1778,12 @@ test('controles: 48 estándar, 44 en línea y en las barras, 56 principales; chi
   assert.ok(/const SCALE = \[44, 48, 56\];/.test(qa) && /best < 8/.test(qa) && /\[15, 17\]/.test(qa), 'el arnés mide la escala 44 / 48 / 56, 8 px entre vecinos y rótulos de 15 o 17 px');
 });
 
-test('Eventos y talleres: tarjetas en un Carrusel3D en todo ancho (sin rejilla ni carrusel aparte del teléfono); sin JavaScript se leen las tres', async () => {
+test('Eventos y talleres: lista estática en todo ancho (sin carrusel ni acordeón); sin JavaScript se leen las tres', async () => {
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(!/function bill\(\)|\.bill-dots|d\.open = true/.test(app), 'se retiraron el carrusel con puntos y el acordeón abierto a la fuerza');
-  assert.equal([...html.matchAll(/<li class="bill-item"/g)].length, 3, 'tres propuestas en el marcado');
-  assert.ok(!/<details class="bill-item"/.test(html), 'sin acordeón');
-  assert.ok(!/\.bill-track \{ display: grid/.test(cssFlat) && !/\.bill-track/.test(mobileCss), 'sin rejilla de escritorio ni carrusel propio del teléfono: el Carrusel3D en todo ancho');
+  assert.equal([...html.matchAll(/<li class="ev-fila"/g)].length, 3, 'tres propuestas en el marcado');
+  assert.ok(!/<details class="(bill|ev)-/.test(html), 'sin acordeón');
+  assert.ok(/\.ev-filas \{ display: grid; gap: var\(--space-3\); margin: 0; padding: 0; list-style: none; \}/.test(cssFlat) && !/\.ev-[a-z-]+ \{[^}]*(overflow-x: auto|scroll-snap)/.test(cssFlat + mobileCss), 'lista estática: nada que deslizar');
   assert.ok(/\.bill \{[^}]*background: var\(--fondo-2\);/.test(cssFlat), 'tarjeta de superficie sobre la banda fondo-2');
   assert.ok(/\.badge, \.badge-new, \.hours tr\.is-today th::after \{[^}]*border-radius: var\(--radio-pildora\); background: var\(--menta\); color: var\(--en-menta\);/.test(cssFlat) && /\.badge--quiet \{ background: var\(--fondo-3\); color: var\(--tinta-2\); \}/.test(cssFlat), 'insignia de tipo en menta y la de estado (no confirmado) callada');
   assert.ok(!/bill-stage|bill-layer|bill-ic|data-bill-stage/.test(html + css + mobileCss + app), 'se retiraron el escenario de fotos y el acordeón de escritorio');

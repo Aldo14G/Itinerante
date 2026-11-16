@@ -16,6 +16,16 @@
   try { news = localStorage.getItem('iti-news-estado'); } catch (e) { /* almacenamiento bloqueado */ }
   if (news === 's' || news === 'p') r.classList.add('has-news');
   if (news === 'p') r.classList.add('news-hint');
+  // Aviso del próximo evento (feed.js): la visita anterior dejó la fecha del último evento vigente (iti-ev-hasta, AAAA-MM-DD). Si aún no
+  // pasa (día del dispositivo, que es barato; el día de Monterrey lo confirma feed.js), se reserva su renglón del inicio (ev-hint) antes
+  // del primer render. Si luego no hay evento, o aparece uno nuevo, se corrige con el inicio fuera de la vista.
+  var ev = null;
+  try { ev = localStorage.getItem('iti-ev-hasta'); } catch (e) { /* almacenamiento bloqueado */ }
+  if (ev && /^\d{4}-\d{2}-\d{2}$/.test(ev)) {
+    var d = new Date();
+    var hoy = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    if (ev >= hoy) r.classList.add('ev-hint');
+  }
   if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   r.classList.add('motion');
   if (!scrollY) {

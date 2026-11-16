@@ -65,6 +65,11 @@ html:not(.js) .tabbar { display: none; }
 .news-hint .entry-media { height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--space-4) - var(--alto-md) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); } /* con el control de novedades reservado */
 .entry-poster { object-position: 50% 62%; } /* si la foto queda más baja que 3:2, se recorta arriba: la ventana y la mesa siguen al centro */
 .entry-news { width: 100%; }
+/* Con el aviso del próximo evento reservado (ev-hint): la foto cede sus 28 px (8 + el renglón de 20) y sigue terminando antes de la barra
+   inferior (160 px en el 13 mini). En el teléfono el aviso tiene preferencia sobre el control de novedades: un solo renglón extra en el inicio
+   (los dos juntos dejaban la foto bajo la barra); Novedades conserva su punto en el menú. */
+.ev-hint .entry-media, .ev-hint.news-hint .entry-media { height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--space-2) - 20px - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); }
+.ev-hint.news-hint .entry-news { display: none; }
 /* Una sola acción en la primera vista («Cómo llegar»); el contacto vive en el pie (bloque Contacto) y en el menú ☰. */
 
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
@@ -73,18 +78,6 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- Café y té: la carta (chips y carrusel) antes que la foto (2026-11-14): al llegar se ve la carta, no la foto ---------- */
 /* Solo el orden visual: la foto no es un control (lleva alt), así que el orden de lectura no cambia ninguna acción. */
 .cafe-carta { order: -1; }
-
-/* ---------- Eventos y talleres: el Carrusel3D (style.css); en ventanas bajas la foto se acorta para que la tarjeta quepa ---------- */
-@media (max-height: 700px) { .bill-card-img { aspect-ratio: 16 / 9; } }
-/* Hasta 359 px (Zoom de pantalla) las dos insignias y «Compartir» no caben en un renglón de la tarjeta (233 + 16 de canal + 24 de relleno > 243):
-   «Compartir» baja al renglón del título, a su derecha, en lugar de quedarse solo en una fila vacía. */
-@media (max-width: 359px) {
-  .bill-share { position: absolute; right: var(--space-2); bottom: var(--space-2); }
-  .bill-title { padding-right: calc(var(--alto-sm) + var(--space-3)); }
-}
-/* A 320–374 px la descripción de la propuesta del centro llega a cinco renglones (el bloque mide lo que la tarjeta, 243–284 px): hasta que
-   feed.js mide la más larga (--bill-reserva), se reservan cinco (2026-11-15; antes cuatro hasta 400 px, con el texto centrado en 36rem). */
-@media (max-width: 374px) { .bill-desc { min-height: var(--bill-reserva, 5lh); } }
 
 /* ---------- Visita y pie ---------- */
 .visit-actions .btn { flex: 1 1 auto; }
@@ -192,9 +185,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .entry-title-mas { display: inline; }
   .still { width: min(78vw, calc((100svh - 150px) * 1.333)); }
   .c3d--portada { --c3d-w: min(44vw, calc((100svh - 150px) / 1.5)); }
-  .c3d--evento { --c3d-w: min(60vw, 300px); }
   .c3d--carta { --c3d-w: min(40vw, calc((100svh - 150px) / 1.25)); }
-  .bill-card-img { aspect-ratio: 16 / 9; }
   .drawer-body { grid-template-columns: 24% minmax(0, 1fr); }
   .drawer { height: calc(100dvh - var(--space-4)); }
   .drawer-actions { grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr); }

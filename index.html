@@ -47,6 +47,7 @@
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15.5V4m-4 4 4-4 4 4M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
     <symbol id="i-prev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
     <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M12 12.5v5M9.5 15h5"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7.5 7.5 5.75 7.5-5.75"/></symbol>
     <symbol id="c-taza" viewBox="0 0 24 24"><path d="M4.5 9.5h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 11h1.25a2.25 2.25 0 0 1 0 4.5H15M3.5 21h14M8.5 3.5c-.7.9-.7 1.8 0 2.7M12 3.5c-.7.9-.7 1.8 0 2.7"/></symbol>
     <symbol id="c-tetera" viewBox="0 0 24 24"><path d="M12 5v2M8.5 8.5h7M6.5 13a5.5 5.5 0 0 0 11 0c0-2.5-1.6-4.5-3.5-4.5h-4c-1.9 0-3.5 2-3.5 4.5zM6.6 12.2 3.5 9.5M17.4 11h.6a2.5 2.5 0 0 1 0 5h-1.3M8 20.5h8"/></symbol>
@@ -63,7 +64,7 @@
     </a>
     <nav class="hdr-nav" aria-label="Secciones">
       <a href="#libros">Catálogo</a>
-      <a href="#cartelera">Eventos</a>
+      <a href="#cartelera">Eventos<span class="ev-dot" data-ev-dot hidden aria-hidden="true"></span><span class="sr-only" data-ev-sr></span></a>
       <a href="#novedades" data-news-link>Novedades<span class="news-dot" data-news-dot hidden aria-hidden="true"></span><span class="sr-only" data-news-sr></span></a>
       <a href="#cafe">Café</a>
       <a href="#visita">Visita</a>
@@ -84,7 +85,7 @@
         <ul class="menu-lista">
           <li><a class="menu-row" href="#inicio"><span>Inicio</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#libros"><span>Catálogo</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
-          <li><a class="menu-row" href="#cartelera"><span>Eventos y talleres</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
+          <li><a class="menu-row" href="#cartelera"><span>Eventos y talleres<span class="sr-only" data-ev-sr></span></span><span class="news-dot" data-ev-dot hidden aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li data-news-link><a class="menu-row" href="#novedades"><span>Novedades<span class="sr-only" data-news-sr></span></span><span class="news-dot" data-news-dot hidden aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#cafe"><span>Café y té</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#casa"><span>La casa</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
@@ -143,6 +144,7 @@
           <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
         </div>
         <p class="entry-address"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mariano Matamoros Pte.&nbsp;421&nbsp;·&nbsp;Centro</p>
+        <a class="entry-ev" href="#cartelera" data-ev-cta hidden><span class="entry-ev-dot" aria-hidden="true"></span><span class="entry-ev-txt" data-ev-cta-text></span><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
         <a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"></span><span data-news-cta-text></span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
       </div>
       <figure class="entry-media">
@@ -327,56 +329,54 @@
     </section>
 
 
-    <!-- Eventos y talleres (el id sigue siendo #cartelera): Carrusel3D, variante evento (feed.js). Cada propuesta es una tarjeta (foto, insignias de tipo y
-         estado con «Compartir» al final de su fila —desde el 2026-11-14; solo en la del centro—, título); debajo, la descripción de la del centro.
-         Sin JavaScript, cada tarjeta muestra su descripción (sin «Compartir») y la fila se desliza con el dedo. La consulta por WhatsApp vive en el pie (Contacto). -->
+    <!-- Eventos y talleres (el id sigue siendo #cartelera; 2026-11-16: destacado y lista por fecha, feed.js). Los datos viven en
+         assets/data/eventos.json: publicar un evento es añadir un renglón. Con un evento con fecha, feed.js pinta el destacado (foto, bloque de
+         fecha, «Registrarme» —enlace a Luma—, «Añadir al calendario» y «Compartir»), la lista por día y la nota lateral, y la entradilla pasa a
+         «Lo que viene en la casa.». Sin fechas (hoy) y sin JavaScript queda esto: las propuestas, iguales a las del JSON (npm test lo comprueba). -->
     <section id="cartelera" class="bill" aria-labelledby="bill-title">
       <header class="sec-head" data-revelar>
         <h2 id="bill-title" class="h2">Eventos y talleres <em>en la casa</em></h2>
-        <p class="sec-texto">Aún sin fecha. Las fechas se anuncian en <a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram<svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>.</p>
+        <p class="sec-texto" data-ev-lede>Aún sin fecha. Las fechas se anuncian en <a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer">Instagram<svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>.</p>
       </header>
-      <!-- Fecha confirmada: añade data-fecha="AAAA-MM-DD" (o AAAA-MM-DDTHH:MM, hora de Monterrey) al elemento li.bill-item de la propuesta; feed.js sustituye «Propuesta · sin fecha». -->
-      <div class="c3d c3d--evento" role="region" aria-roledescription="carrusel" aria-label="Eventos y talleres" data-bill-c3d>
-        <div class="bill-viewport c3d-viewport" data-bill-viewport>
-          <ul class="bill-track c3d-track" data-bill-track>
-          <li class="bill-item" data-item="0" data-id="circulo" data-caption="La sala central" data-kind="real">
-            <article class="bill-card c3d-card" aria-labelledby="bill-t-circulo" data-inclina>
-              <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async"></span>
-              <span class="bill-badges"><span class="badge" data-bill-type>Lectura</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="circulo" data-title="Círculo de lectura" aria-label="Compartir «Círculo de lectura»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>
-              <h3 class="bill-title" id="bill-t-circulo">Círculo de lectura</h3>
-              <div class="bill-detail">
-                <p>Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
-              </div>
-            </article>
-          </li>
-          <li class="bill-item" data-item="1" data-id="ajedrez" data-caption="La mesa de ajedrez" data-kind="real">
-            <article class="bill-card c3d-card" aria-labelledby="bill-t-ajedrez" data-inclina tabindex="0">
-              <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async"></span>
-              <span class="bill-badges"><span class="badge" data-bill-type>Juego</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="ajedrez" data-title="Ajedrez en la casa" aria-label="Compartir «Ajedrez en la casa»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>
-              <h3 class="bill-title" id="bill-t-ajedrez">Ajedrez en la casa</h3>
-              <div class="bill-detail">
-                <p>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
-              </div>
-            </article>
-          </li>
-          <li class="bill-item" data-item="2" data-id="taller" data-caption="El rincón de lectura" data-kind="real">
-            <article class="bill-card c3d-card" aria-labelledby="bill-t-taller" data-inclina>
-              <span class="bill-card-fig"><img class="bill-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async"></span>
-              <span class="bill-badges"><span class="badge" data-bill-type>Taller</span><span class="badge badge--quiet" data-bill-when>Propuesta · sin fecha</span><button class="btn btn--secundario btn--sm btn--icono bill-share" type="button" data-share="taller" data-title="Taller de escritura" aria-label="Compartir «Taller de escritura»"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button></span>
-              <h3 class="bill-title" id="bill-t-taller">Taller de escritura</h3>
-              <div class="bill-detail">
-                <p>Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
-              </div>
-            </article>
-          </li>
-          </ul>
+      <div class="ev" data-ev>
+        <div class="ev-despues">
+          <div class="ev-lista">
+            <section class="ev-grupo ev-propuestas" aria-label="Propuestas">
+              <ul class="ev-filas">
+              <li class="ev-fila" data-id="circulo" data-kind="real">
+                <article class="ev-card" aria-labelledby="ev-t-circulo">
+                  <div class="ev-card-txt">
+                    <p class="ev-rot"><span class="badge">Lectura</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></p>
+                    <h3 class="ev-card-tit" id="ev-t-circulo">Círculo de lectura</h3>
+                  </div>
+                  <img class="ev-card-img" src="assets/img/cartelera-1.webp" width="720" height="900" alt="La sala central" loading="lazy" decoding="async">
+                  <p class="ev-card-desc">Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.</p>
+                </article>
+              </li>
+              <li class="ev-fila" data-id="ajedrez" data-kind="real">
+                <article class="ev-card" aria-labelledby="ev-t-ajedrez">
+                  <div class="ev-card-txt">
+                    <p class="ev-rot"><span class="badge">Juego</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></p>
+                    <h3 class="ev-card-tit" id="ev-t-ajedrez">Ajedrez en la casa</h3>
+                  </div>
+                  <img class="ev-card-img" src="assets/img/cartelera-2.webp" width="540" height="675" alt="La mesa de ajedrez" loading="lazy" decoding="async">
+                  <p class="ev-card-desc">El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</p>
+                </article>
+              </li>
+              <li class="ev-fila" data-id="taller" data-kind="real">
+                <article class="ev-card" aria-labelledby="ev-t-taller">
+                  <div class="ev-card-txt">
+                    <p class="ev-rot"><span class="badge">Taller</span><span class="badge badge--quiet" data-ev-when>Propuesta · sin fecha</span></p>
+                    <h3 class="ev-card-tit" id="ev-t-taller">Taller de escritura</h3>
+                  </div>
+                  <img class="ev-card-img" src="assets/img/cartelera-3.webp" width="960" height="1200" alt="El rincón de lectura" loading="lazy" decoding="async">
+                  <p class="ev-card-desc">Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.</p>
+                </article>
+              </li>
+              </ul>
+            </section>
+          </div>
         </div>
-        <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--prev" type="button" data-bill-prev disabled aria-label="Evento anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
-        <button class="btn btn--vidrio btn--icono c3d-flecha c3d-flecha--next" type="button" data-bill-next disabled aria-label="Evento siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
-      </div>
-      <!-- La propuesta del centro: su descripción (región viva). feed.js la cambia con el carrusel. -->
-      <div class="bill-pie" data-bill-pie>
-        <p class="bill-desc" aria-live="polite" data-bill-desc><span class="sr-only" data-bill-desc-title>Ajedrez en la casa. </span><span data-bill-desc-text>El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.</span></p>
       </div>
     </section>
 

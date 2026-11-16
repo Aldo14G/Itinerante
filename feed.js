@@ -1,125 +1,616 @@
-// Eventos y talleres (Cartelera) sin inventar nada: «Compartir» es local (no se envía nada y no hay contadores) y el estado de cada
-// propuesta es «Propuesta · sin fecha» hasta que la librería confirme una fecha. Las propuestas van en un Carrusel3D, variante «evento»
-// (carousel3d.js, 2026-11-13): tarjeta con foto, insignias (tipo, estado y, al final de la fila, «Compartir», desde el 2026-11-14: solo se ve en
-// la del centro) y título; debajo, la descripción de la del centro (región viva). La consulta por WhatsApp vive en el pie desde el 2026-11-13.
-// Se carga al acercarse a la sección o al primer toque.
-// Las historias de los destacados se retiraron el 2026-11-11, «Me interesa» el 2026-11-13 y los puntos bajo el carrusel también el 2026-11-13.
-import { notify } from './saved.js';
-import { createCarousel3D } from './carousel3d.js';
+// Eventos y talleres (#cartelera) sin inventar nada (2026-11-16; sustituye al Carrusel3D del 2026-11-13). Los datos viven en
+// assets/data/eventos.json y se editan sin tocar HTML ni JS: publicar un evento es añadir un renglón.
+//   · con fecha de hoy en adelante (hora de Monterrey): el más próximo es el **destacado** (foto o cartel, bloque de fecha, la acción de
+//     reserva que el evento traiga, «Añadir al calendario» y «Compartir») y los demás van en la **lista por día**; una fecha que ya pasó deja
+//     de mostrarse;
+//   · con `fecha: null` es una propuesta: va al final, con su insignia «Propuesta · sin fecha», sin reserva ni calendario;
+//   · sin ningún evento con fecha queda lo que trae index.html (las propuestas y la entradilla «Aún sin fecha…»): es también lo que se lee
+//     sin JavaScript.
+// Reserva (`reserva`): { tipo: "luma", url } → «Registrarme», un enlace normal a la página del evento en Luma, en otra pestaña (el sitio no
+// carga nada de Luma ni guarda registros, cupos o asistentes); { tipo: "whatsapp", telefono } → «Reservar por WhatsApp», con el mensaje ya
+// escrito (es la función del objeto, como «Preguntar por WhatsApp» en la ficha del libro); null → sin botón.
+// «Añadir al calendario» arma un archivo .ics en el navegador (icsOf). El aviso del inicio («Próximo: Sáb 21 nov · …») y el punto de
+// «Eventos» en la barra y el menú usan el mecanismo de Novedades: assets/js/boot.js reserva el renglón antes del primer render si la
+// visita anterior dejó un evento vigente (iti-ev-hasta); si no coincide, se corrige con el inicio fuera de la vista.
+// Estructura de la lista (fecha → tarjeta horizontal con la portada cuadrada a la derecha) tomada de Luma como referencia; ni su código ni
+// sus imágenes (docs/ux/investigacion-2026-11/luma.md).
+import { DUR, EASE, ms } from './motion.js';
 
-// ---------- Estado de la propuesta: «Propuesta · sin fecha» o la fecha confirmada ----------
-// Cómo se actualiza: cuando la librería confirma una fecha, se añade `data-fecha="AAAA-MM-DD"` (o `AAAA-MM-DDTHH:MM`, hora de Monterrey)
-// al <details class="bill-item"> de esa propuesta en index.html. Sin atributo, con un valor que no es una fecha real o con una fecha que ya
-// pasó, la insignia dice «Propuesta · sin fecha»: nunca se anuncia una fecha que no esté confirmada y vigente.
 const MTY = 'America/Monterrey';
+export const EVENTOS_URL = 'assets/data/eventos.json';
 export const NO_DATE = 'Propuesta · sin fecha';
-const dayKey = date => new Intl.DateTimeFormat('en-CA', { timeZone: MTY, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); // AAAA-MM-DD en Monterrey
+export const LUGAR = 'Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey';
+export const COSTO_MAX = 4; // renglones de costo que se imprimen (un cartel trae dos o tres)
+const INSTAGRAM = 'https://www.instagram.com/libreriaitineranteymasmty/';
+const HASTA_KEY = 'iti-ev-hasta'; // AAAA-MM-DD del último evento vigente: lo que boot.js lee antes del primer render
 
+// ---------------------------------------------------------------------------------------------
+// Lógica pura (se prueba con fechas en tests/site.test.mjs)
+
+const dayKey = date => new Intl.DateTimeFormat('en-CA', { timeZone: MTY, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); // AAAA-MM-DD en Monterrey
+/** ¿Es una fecha real escrita como AAAA-MM-DD? (2026-02-30 no lo es). */
+export function validDay(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const d = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
+}
+/** ¿Es una hora real escrita como HH:MM (24 horas)? Se imprime tal cual («18:57»), sin redondear. */
+export const validHour = value => typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+/**
+ * La página de registro en Luma: solo https y solo lu.ma o luma.com, con ruta. Cualquier otra cosa (http, otro dominio, usuario o puerto en
+ * la dirección, texto suelto) se descarta.
+ */
+export function validRegistro(value) {
+  if (typeof value !== 'string') return null;
+  let u;
+  try { u = new URL(value.trim()); } catch { return null; }
+  if (u.protocol !== 'https:' || u.username || u.password || u.port) return null;
+  if (u.hostname !== 'lu.ma' && u.hostname !== 'luma.com') return null;
+  return u.pathname.length > 1 ? u.href : null;
+}
+/** Teléfono mexicano de 10 dígitos (se toleran espacios, guiones, paréntesis y el prefijo +52 al pintar); si no lo es, null. */
+export function validTelefono(value) {
+  if (typeof value !== 'string' && typeof value !== 'number') return null;
+  const raw = String(value).trim();
+  if (!/^[\d\s()+-]+$/.test(raw)) return null;
+  let d = raw.replace(/\D/g, '');
+  if (d.length === 12 && d.startsWith('52')) d = d.slice(2);
+  return /^[1-9]\d{9}$/.test(d) ? d : null;
+}
+/**
+ * Cómo se reserva: { tipo: 'luma', url } con una página de Luma válida, { tipo: 'whatsapp', telefono } con 10 dígitos, o null. Un tipo
+ * desconocido, una URL que no es de Luma o un teléfono que no es mexicano de 10 dígitos dejan el evento sin botón de reserva.
+ */
+export function validReserva(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (value.tipo === 'luma') { const url = validRegistro(value.url); return url ? { tipo: 'luma', url } : null; }
+  if (value.tipo === 'whatsapp') { const telefono = validTelefono(value.telefono); return telefono ? { tipo: 'whatsapp', telefono } : null; }
+  return null;
+}
+const text = v => (typeof v === 'string' ? v.trim() : '');
+const localImage = v => (/^assets\/img\/[\w./-]+\.(webp|jpe?g|png|avif)$/.test(text(v)) && !text(v).includes('..') ? text(v) : null);
+
+/**
+ * Lo que se puede pintar de eventos.json: cada evento con id (minúsculas, cifras y guiones; el repetido se descarta) y título. `tipo` es
+ * opcional (solo si el anuncio lo dice) y `fuente` (el enlace de la publicación de origen) no se pinta. Tolerante con lo demás: una fecha que no es real queda en null (propuesta), una hora sin fecha o mal escrita se ignora, `fin` solo vale después de
+ * `hora`, la imagen solo si es una ruta local bajo assets/img/ (`encuadre`: «cartel» o, por omisión, «foto»), `costo` solo sus renglones de
+ * texto y la reserva solo si es válida y el evento tiene fecha.
+ */
+export function validEventos(data) {
+  const raw = Array.isArray(data?.eventos) ? data.eventos : [];
+  const seen = new Set();
+  const list = [];
+  for (const e of raw) {
+    const id = text(e?.id), titulo = text(e?.titulo);
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(id) || !titulo || seen.has(id)) continue;
+    seen.add(id);
+    const fecha = validDay(e.fecha) ? e.fecha : null;
+    const hora = fecha && validHour(e.hora) ? e.hora : null;
+    const fin = hora && validHour(e.fin) && e.fin > hora ? e.fin : null;
+    list.push({
+      id, tipo: text(e.tipo), ciclo: text(e.ciclo) || null, titulo, fecha, hora, fin,
+      con: text(e.con) || null, invitado: text(e.invitado) || null, colabora: text(e.colabora) || null,
+      descripcion: text(e.descripcion), imagen: localImage(e.imagen), alt: text(e.alt), encuadre: e.encuadre === 'cartel' ? 'cartel' : 'foto',
+      costo: (Array.isArray(e.costo) ? e.costo : []).map(text).filter(Boolean).slice(0, COSTO_MAX),
+      reserva: fecha ? validReserva(e.reserva) : null
+    });
+  }
+  return list;
+}
+/**
+ * Revisión estricta del archivo (la corre npm test): lo que validEventos perdona al pintar, aquí se señala para corregirlo antes de publicar.
+ * Devuelve una lista de frases; vacía si todo está bien.
+ */
+export function eventosProblems(data) {
+  const out = [];
+  if (!Array.isArray(data?.eventos)) return ['falta la lista «eventos»'];
+  const seen = new Set();
+  const has = (e, k) => e != null && Object.hasOwn(e, k) && e[k] !== null;
+  data.eventos.forEach((e, i) => {
+    const who = `evento ${i + 1}${e?.id ? ` (${e.id})` : ''}`;
+    const id = text(e?.id);
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) out.push(`${who}: id inválido (minúsculas, cifras y guiones)`);
+    else if (seen.has(id)) out.push(`${who}: id repetido`);
+    seen.add(id);
+    for (const k of ['titulo', 'descripcion', 'alt']) if (!text(e?.[k])) out.push(`${who}: falta «${k}»`);
+    if (!localImage(e?.imagen)) out.push(`${who}: «imagen» debe ser una ruta local bajo assets/img/`);
+    if (has(e, 'encuadre') && e.encuadre !== 'cartel' && e.encuadre !== 'foto') out.push(`${who}: «encuadre» es "cartel" o "foto"`);
+    if (e?.fecha !== null && !validDay(e?.fecha)) out.push(`${who}: «fecha» no es una fecha real (AAAA-MM-DD) ni null`);
+    if (e?.hora !== null && !validHour(e?.hora)) out.push(`${who}: «hora» no es HH:MM ni null`);
+    if (e?.fin !== null && !validHour(e?.fin)) out.push(`${who}: «fin» no es HH:MM ni null`);
+    if (validHour(e?.hora) && !validDay(e?.fecha)) out.push(`${who}: tiene hora pero no fecha`);
+    if (validHour(e?.fin) && (!validHour(e?.hora) || e.fin <= e.hora)) out.push(`${who}: «fin» debe ser posterior a «hora»`);
+    for (const k of ['tipo', 'con', 'invitado', 'colabora', 'ciclo']) if (has(e, k) && !text(e[k])) out.push(`${who}: «${k}» es un texto o null`);
+    if (has(e, 'fuente') && !/^https:\/\/\S+$/.test(text(e.fuente))) out.push(`${who}: «fuente» es el enlace https de la publicación de origen (no se imprime)`);
+    if (has(e, 'costo') && !(Array.isArray(e.costo) && e.costo.length && e.costo.length <= COSTO_MAX && e.costo.every(c => text(c)))) out.push(`${who}: «costo» es una lista de 1 a ${COSTO_MAX} renglones de texto (o no va)`);
+    if (has(e, 'registro')) out.push(`${who}: «registro» ya no se usa: la reserva va en «reserva» ({ "tipo": "luma", "url": … })`);
+    if (e?.reserva !== null) {
+      if (!e?.reserva || typeof e.reserva !== 'object') out.push(`${who}: «reserva» es { "tipo": "luma", "url" }, { "tipo": "whatsapp", "telefono" } o null`);
+      else if (e.reserva.tipo === 'luma') { if (!validRegistro(e.reserva.url)) out.push(`${who}: la reserva por Luma lleva una «url» https://lu.ma/… o https://luma.com/…`); }
+      else if (e.reserva.tipo === 'whatsapp') { if (!/^[1-9]\d{9}$/.test(String(e.reserva.telefono ?? ''))) out.push(`${who}: la reserva por WhatsApp lleva un «telefono» de 10 dígitos (sin 52, espacios ni guiones)`); }
+      else out.push(`${who}: «reserva.tipo» es "luma" o "whatsapp"`);
+      if (!validDay(e?.fecha)) out.push(`${who}: tiene reserva pero no fecha`);
+    }
+  });
+  return out;
+}
+
+// Partes de una fecha en español (México), sin puntos de abreviatura. El mediodía de Monterrey (UTC−6 todo el año) no cambia de día al dar formato.
+const noonOf = fecha => { const [y, m, d] = fecha.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d, 18)); };
+const partsOf = (fecha, opts) => Object.fromEntries(new Intl.DateTimeFormat('es-MX', { timeZone: MTY, ...opts }).formatToParts(noonOf(fecha)).map(p => [p.type, p.value.replace('.', '')]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * Insignia de estado de una propuesta o fecha corta de un evento: «Propuesta · sin fecha», «Sáb 21 nov · 18:30», «Hoy · 19:00».
+ * `fecha` es AAAA-MM-DD o AAAA-MM-DDTHH:MM (hora de Monterrey). Sin fecha real, o con una que ya pasó, es una propuesta: nunca se
+ * anuncia una fecha que no esté confirmada y vigente.
+ */
 export function eventBadge(fecha, now = new Date()) {
   const quiet = { kind: 'propuesta', text: NO_DATE };
-  const m = /^(\d{4})-(\d{2})-(\d{2})(?:T([01]\d|2[0-3]):([0-5]\d))?$/.exec(String(fecha ?? '').trim());
-  if (!m) return quiet;
-  const [, y, mo, d, h, mi] = m;
-  const noon = new Date(Date.UTC(+y, +mo - 1, +d, 18)); // mediodía en Monterrey (UTC−6 todo el año): el día no cambia al dar formato
-  if (noon.getUTCMonth() !== +mo - 1 || noon.getUTCDate() !== +d) return quiet; // 31 de febrero y similares
-  const key = `${y}-${mo}-${d}`;
+  const m = /^(\d{4}-\d{2}-\d{2})(?:T(([01]\d|2[0-3]):[0-5]\d))?$/.exec(String(fecha ?? '').trim());
+  if (!m || !validDay(m[1])) return quiet;
+  const key = m[1], hora = m[2];
   const today = dayKey(now);
   if (key < today) return quiet;
-  const parts = new Intl.DateTimeFormat('es-MX', { timeZone: MTY, weekday: 'short', day: 'numeric', month: 'short' }).formatToParts(noon);
-  const part = type => (parts.find(p => p.type === type)?.value ?? '').replace('.', '');
-  const weekday = part('weekday');
-  let text = key === today ? 'Hoy' : `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${part('day')} ${part('month')}${y === today.slice(0, 4) ? '' : ` ${y}`}`;
-  if (h) text += ` · ${h}:${mi}`;
-  return { kind: key === today ? 'hoy' : 'fecha', text, date: key };
+  const p = partsOf(key, { weekday: 'short', day: 'numeric', month: 'short' });
+  let out = key === today ? 'Hoy' : `${cap(p.weekday)} ${p.day} ${p.month}${key.slice(0, 4) === today.slice(0, 4) ? '' : ` ${key.slice(0, 4)}`}`;
+  if (hora) out += ` · ${hora}`;
+  return { kind: key === today ? 'hoy' : 'fecha', text: out, date: key };
+}
+/** Bloque de fecha del destacado: «Sáb», «21», «Nov». Decorativo: la fecha completa va en texto al lado (fechaLarga). */
+export function fechaBloque(fecha) {
+  const p = partsOf(fecha, { weekday: 'short', day: 'numeric', month: 'short' });
+  return { sem: cap(p.weekday), num: p.day, mes: cap(p.month) };
+}
+/** «sábado 21 de noviembre» (con el año si no es el de hoy), en minúsculas: quien la usa al empezar un renglón la pone en mayúscula. */
+export function fechaLarga(fecha, now = new Date()) {
+  const p = partsOf(fecha, { weekday: 'long', day: 'numeric', month: 'long' });
+  const anio = fecha.slice(0, 4);
+  return `${p.weekday} ${p.day} de ${p.month}${anio === dayKey(now).slice(0, 4) ? '' : ` de ${anio}`}`;
+}
+/** Encabezado de un día de la lista: «26 nov» y «jueves» (o «hoy»). */
+export function diaCorto(fecha, now = new Date()) {
+  const p = partsOf(fecha, { weekday: 'long', day: 'numeric', month: 'short' });
+  const hoy = dayKey(now);
+  return { fecha: `${p.day} ${p.month}${fecha.slice(0, 4) === hoy.slice(0, 4) ? '' : ` ${fecha.slice(0, 4)}`}`, dia: fecha === hoy ? 'hoy' : p.weekday };
+}
+/** «18:30» o «18:30–20:00»; vacío sin hora. */
+export const horario = e => (e.hora ? (e.fin ? `${e.hora}–${e.fin}` : e.hora) : '');
+/**
+ * Quién: «Con Fulana · Invita a Zutano» con lo que el evento traiga (`con`: quien conduce o imparte; `invitado`). No se escribe «invitada» ni
+ * «invitado»: el dato no trae género. `colabora` solo va en el destacado («Colabora Ediciones Tal»).
+ */
+export const quienLine = (e, { colabora = false } = {}) => [e.con ? `Con ${e.con}` : '', e.invitado ? `Invita a ${e.invitado}` : '', colabora && e.colabora ? `Colabora ${e.colabora}` : ''].filter(Boolean).join(' · ');
+/** Renglón del destacado: «Sábado 21 de noviembre · 18:57 · Invita a Fulana · Colabora Ediciones Tal». Solo lo que el evento trae. */
+export const metaLine = (e, now = new Date()) => [cap(fechaLarga(e.fecha, now)), horario(e), quienLine(e, { colabora: true })].filter(Boolean).join(' · ');
+/** Renglón del inicio: «Próximo: Sáb 21 nov · Título» (el día de hoy, «Hoy · 18:30 · Título»). */
+export function avisoLine(e, now = new Date()) {
+  const hoy = e.fecha === dayKey(now);
+  const b = eventBadge(hoy && e.hora ? `${e.fecha}T${e.hora}` : e.fecha, now);
+  return hoy ? `${b.text} · ${e.titulo}` : `Próximo: ${b.text} · ${e.titulo}`;
+}
+/** El mensaje ya escrito de «Reservar por WhatsApp» y su enlace (wa.me/52 + 10 dígitos). */
+export const reservaMessage = (e, now = new Date()) => `Hola, quiero reservar para «${e.titulo}» del ${fechaLarga(e.fecha, now)}.`;
+export const reservaUrl = (e, now = new Date()) => (e.reserva?.tipo === 'whatsapp' ? `https://wa.me/52${e.reserva.telefono}?text=${encodeURIComponent(reservaMessage(e, now))}` : e.reserva?.tipo === 'luma' ? e.reserva.url : null);
+
+/**
+ * Qué se muestra hoy y en qué orden. Próximos = fecha de hoy en adelante, por fecha y hora (a igualdad, el orden del archivo): el primero es
+ * el destacado y los demás se agrupan por día. Los de fecha pasada no se muestran. Los de fecha null son las propuestas, al final.
+ * `aviso` es el renglón del inicio (null sin eventos con fecha), `hasta` la fecha del último evento vigente y `reservas`, los tipos de
+ * reserva presentes entre los próximos (para la nota lateral).
+ */
+export function eventosPlan(list, now = new Date()) {
+  const hoy = dayKey(now);
+  const proximos = list.map((e, i) => ({ e, i })).filter(x => x.e.fecha && x.e.fecha >= hoy)
+    .sort((a, b) => (a.e.fecha < b.e.fecha ? -1 : a.e.fecha > b.e.fecha ? 1 : (a.e.hora ?? '') < (b.e.hora ?? '') ? -1 : (a.e.hora ?? '') > (b.e.hora ?? '') ? 1 : a.i - b.i))
+    .map(x => x.e);
+  const [destacado = null, ...resto] = proximos;
+  const dias = [];
+  for (const e of resto) { const d = dias.at(-1); if (d && d.fecha === e.fecha) d.eventos.push(e); else dias.push({ fecha: e.fecha, eventos: [e] }); }
+  return {
+    hoy, destacado, dias,
+    propuestas: list.filter(e => !e.fecha),
+    conFecha: proximos.length,
+    reservas: ['luma', 'whatsapp'].filter(t => proximos.some(e => e.reserva?.tipo === t)),
+    aviso: destacado ? avisoLine(destacado, now) : null,
+    hasta: proximos.length ? proximos.at(-1).fecha : null
+  };
+}
+/** La nota lateral según cómo se reserva en los eventos a la vista: título y frase (el enlace a Instagram se añade al pintar). */
+export function notaCopy(reservas) {
+  const luma = reservas.includes('luma'), wa = reservas.includes('whatsapp');
+  if (luma && wa) return { titulo: '¿Cómo me registro?', texto: 'Cada evento lo dice: «Registrarme» abre su página en Luma, en otra pestaña; «Reservar por WhatsApp» abre el chat con el mensaje ya escrito.' };
+  if (luma) return { titulo: '¿Cómo me registro?', texto: 'Toca «Registrarme» en el evento que te interese: su página en Luma se abre en otra pestaña.' };
+  if (wa) return { titulo: '¿Cómo reservo?', texto: 'Toca «Reservar por WhatsApp» en el evento que te interese: el mensaje ya va escrito.' };
+  return { titulo: 'Fechas nuevas', texto: '' };
 }
 
-function paintWhen(item) {
-  const el = item.querySelector('[data-bill-when]');
-  if (!el) return;
-  const badge = eventBadge(item.dataset.fecha);
-  el.textContent = badge.text;
-  el.classList.toggle('badge--quiet', badge.kind === 'propuesta'); // lo confirmado lleva la insignia menta; lo que no, la callada
+// ---------- Calendario: un archivo .ics (RFC 5545) armado en el navegador ----------
+const pad = n => String(n).padStart(2, '0');
+const icsText = s => String(s ?? '').replace(/\\/g, '\\\\').replace(/\r\n|\r|\n/g, '\\n').replace(/([,;])/g, '\\$1');
+// Un renglón no pasa de 75 octetos (UTF-8): el resto sigue en renglones que empiezan con un espacio. Nunca se parte una letra.
+function icsFold(line) {
+  const out = [];
+  let cur = '', bytes = 0;
+  for (const ch of line) {
+    const cp = ch.codePointAt(0), n = cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4;
+    if (bytes + n > 75) { out.push(cur); cur = ' '; bytes = 1; }
+    cur += ch; bytes += n;
+  }
+  out.push(cur);
+  return out.join('\r\n');
+}
+/** La hora de pared de Monterrey como instante (UTC). Parte de UTC−6 y deja que Intl corrija si la regla de la zona fuera otra ese día. */
+export function mtyToUtc(fecha, hora) {
+  const [y, m, d] = fecha.split('-').map(Number), [h, mi] = hora.split(':').map(Number);
+  const want = Date.UTC(y, m - 1, d, h, mi);
+  const guess = want + 6 * 3_600_000;
+  const g = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: MTY, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date(guess)).map(p => [p.type, Number(p.value)]));
+  return new Date(guess + (want - Date.UTC(g.year, g.month - 1, g.day, g.hour % 24, g.minute)));
+}
+const utcStamp = d => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+export const ICS_BLOQUE_MIN = 60; // sin hora de fin, el calendario aparta una hora (lo habitual al crear un evento); con `fin`, lo que diga
+/**
+ * El evento como archivo de calendario. Con hora: DTSTART y DTEND en UTC (la hora de Monterrey convertida), que todo calendario entiende
+ * sin tabla de zonas; sin hora, evento de día completo. Título, lugar y descripción con comas, puntos y coma y saltos escapados; renglones
+ * terminados en CRLF y plegados a 75 octetos. Devuelve null si el evento no tiene una fecha real.
+ */
+export function icsOf(e, { now = new Date() } = {}) {
+  if (!e || !validDay(e.fecha)) return null;
+  const ymd = e.fecha.replaceAll('-', '');
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Libreria Itinerante y Mas//Eventos//ES', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+    `UID:${e.id}-${ymd}@libreria-itinerante-y-mas`, `DTSTAMP:${utcStamp(now)}`];
+  if (validHour(e.hora)) {
+    const start = mtyToUtc(e.fecha, e.hora);
+    const end = validHour(e.fin) && e.fin > e.hora ? mtyToUtc(e.fecha, e.fin) : new Date(start.getTime() + ICS_BLOQUE_MIN * 60_000);
+    lines.push(`DTSTART:${utcStamp(start)}`, `DTEND:${utcStamp(end)}`);
+  } else {
+    const next = new Date(Date.UTC(+e.fecha.slice(0, 4), +e.fecha.slice(5, 7) - 1, +e.fecha.slice(8, 10) + 1));
+    lines.push(`DTSTART;VALUE=DATE:${ymd}`, `DTEND;VALUE=DATE:${next.toISOString().slice(0, 10).replaceAll('-', '')}`);
+  }
+  const reserva = e.reserva?.tipo === 'luma' ? `Registro: ${e.reserva.url}` : e.reserva?.tipo === 'whatsapp' ? `Reserva por WhatsApp: +52 ${e.reserva.telefono}` : '';
+  const about = [[e.tipo, e.ciclo, quienLine(e, { colabora: true })].filter(Boolean).join(' · '), e.descripcion, (e.costo ?? []).join('\n'), reserva].filter(Boolean).join('\n');
+  lines.push(`SUMMARY:${icsText(e.titulo)}`, `LOCATION:${icsText(LUGAR)}`);
+  if (about) lines.push(`DESCRIPTION:${icsText(about)}`);
+  if (e.reserva?.tipo === 'luma') lines.push(`URL:${e.reserva.url}`);
+  lines.push('END:VEVENT', 'END:VCALENDAR');
+  return lines.map(icsFold).join('\r\n') + '\r\n';
 }
 
-// ---------- «Compartir» ----------
-export async function shareItem(btn) {
-  const title = btn.dataset.title || 'Cartelera';
-  const url = `${location.origin}${location.pathname}#cartelera`;
-  const item = btn.closest?.('.bill-item') ?? (typeof document !== 'undefined' ? document.querySelector?.(`.bill-item[data-id="${btn.dataset.share}"]`) : null); // «Compartir» va en la fila de insignias de su tarjeta
-  const when = eventBadge(item?.dataset.fecha);
-  const state = when.kind === 'propuesta' ? 'una propuesta de la Cartelera de Librería Itinerante y Más (sin fecha confirmada todavía)' : `${when.text} en Librería Itinerante y Más`;
-  const data = { title: `${title} · Librería Itinerante y Más`, text: `${title}: ${state}.`, url };
+// Nombres accesibles de los controles de un evento: la acción y el título (dos eventos no comparten nombre).
+export const shareName = title => `Compartir «${title || 'este evento'}»`;
+export const calName = title => `Añadir «${title || 'este evento'}» al calendario`;
+export const registroName = title => `Registrarme en «${title || 'este evento'}» (abre Luma en otra pestaña)`;
+export const reservaName = title => `Reservar por WhatsApp para «${title || 'este evento'}»`;
+/** Lo que se comparte de un evento: título, fecha vigente (o que es una propuesta) y el enlace a la sección. */
+export function shareData(e, { now = new Date(), url = '' } = {}) {
+  const when = eventBadge(e.fecha && e.hora ? `${e.fecha}T${e.hora}` : e.fecha, now);
+  const state = when.kind === 'propuesta' ? 'una propuesta de Eventos y talleres de Librería Itinerante y Más (sin fecha confirmada todavía)' : `${when.text} en Librería Itinerante y Más`;
+  return { title: `${e.titulo} · Librería Itinerante y Más`, text: `${e.titulo}: ${state}.`, url };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Interfaz (solo navegador)
+
+const notify = async msg => { try { (await import('./saved.js')).notify(msg); } catch { /* sin el aviso, el archivo o el enlace ya salieron */ } };
+const store = () => { try { return globalThis.localStorage ?? null; } catch { return null; } };
+const writeHasta = day => { try { if (day) store()?.setItem(HASTA_KEY, day); else store()?.removeItem(HASTA_KEY); } catch { /* sin almacenamiento: la próxima visita no reserva el renglón */ } };
+
+let dataLoad;
+const loadEventos = () => (dataLoad ??= fetch(EVENTOS_URL).then(r => { if (!r.ok) throw new Error(String(r.status)); return r.json(); }).then(validEventos).catch(e => { dataLoad = undefined; throw e; }));
+let known = []; // los eventos pintados: «Añadir al calendario» y «Compartir» los buscan por id
+
+export async function shareEvento(e) {
+  const data = shareData(e, { url: `${location.origin}${location.pathname}#cartelera` });
   if (navigator.share) {
-    try { await navigator.share(data); return; } catch (e) { if (e?.name === 'AbortError') return; /* sin hoja de compartir: se copia */ }
+    try { await navigator.share(data); return; } catch (err) { if (err?.name === 'AbortError') return; /* sin hoja de compartir: se copia */ }
   }
-  try { await navigator.clipboard.writeText(url); notify('Enlace copiado.'); } catch { notify('No se pudo copiar. Copia la dirección desde el navegador.'); }
+  try { await navigator.clipboard.writeText(data.url); notify('Enlace copiado.'); } catch { notify('No se pudo copiar. Copia la dirección desde el navegador.'); }
+}
+let lastUrl = '';
+/** Descarga el .ics del evento (un enlace con `download` a un Blob: la CSP del sitio no lo impide) y lo dice en el aviso. */
+export function downloadIcs(e) {
+  const ics = icsOf(e);
+  if (!ics) return false;
+  if (lastUrl) URL.revokeObjectURL(lastUrl); // el anterior ya se descargó
+  lastUrl = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = lastUrl;
+  a.download = `${e.id}.ics`;
+  a.hidden = true;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  notify('Se descargó el evento para tu calendario.');
+  return true;
+}
+// app.js llama aquí al tocar «Compartir» o «Añadir al calendario» (carga este módulo al primer toque si aún no llegó).
+export async function onAct(btn) {
+  if (!known.length) { try { known = await loadEventos(); } catch { return; } }
+  const e = known.find(x => x.id === (btn.dataset.share ?? btn.dataset.evCal));
+  if (!e) return;
+  if (btn.matches('[data-share]')) return shareEvento(e);
+  if (btn.matches('[data-ev-cal]')) return downloadIcs(e);
 }
 
-export function onAct(btn) {
-  if (btn.matches('[data-share]')) return shareItem(btn);
+// ---------- Aviso del inicio y punto de «Eventos» ----------
+// El renglón solo se reserva antes del primer render (boot.js, clase ev-hint) si la visita anterior dejó un evento vigente. Si lo que resultó
+// no coincide, se corrige cuando el inicio está fuera de la vista: nada salta a los ojos de la persona (igual que el control de Novedades).
+function settleHint(wanted) {
+  const root = document.documentElement;
+  const entry = document.getElementById('inicio');
+  if (root.classList.contains('ev-hint') === wanted) return;
+  if (!entry || !('IntersectionObserver' in window)) { root.classList.toggle('ev-hint', wanted); return; }
+  const io = new IntersectionObserver(es => {
+    if (es.some(x => x.isIntersecting)) return;
+    io.disconnect();
+    root.classList.toggle('ev-hint', wanted);
+  });
+  io.observe(entry);
+}
+function applyAviso(plan) {
+  const on = Boolean(plan.aviso);
+  document.querySelectorAll('[data-ev-dot]').forEach(d => { d.hidden = !on; });
+  document.querySelectorAll('[data-ev-sr]').forEach(s => { s.textContent = on ? `, ${plan.aviso.replace(/^Próximo: /, 'próximo: ')}` : ''; });
+  const cta = document.querySelector('[data-ev-cta]');
+  if (cta) {
+    if (on) cta.querySelector('[data-ev-cta-text]').textContent = plan.aviso;
+    cta.hidden = !on;
+  }
+  settleHint(on);
+  writeHasta(plan.hasta);
+}
+let avisoLoad;
+/**
+ * Aviso temprano: solo pide eventos.json (pequeño) para saber si hay un evento con fecha vigente. No pinta la sección ni bloquea el primer
+ * render (app.js lo llama después de la foto y las fuentes). Un fallo de red no borra lo recordado: la próxima visita vuelve a reservar.
+ */
+export function initEventosAviso() {
+  if (typeof document === 'undefined') return Promise.resolve(null);
+  return (avisoLoad ??= loadEventos().then(list => { const plan = eventosPlan(list); applyAviso(plan); return plan; }).catch(() => { avisoLoad = undefined; return null; }));
 }
 
-// Nombre accesible de «Compartir»: es un control de icono, así que el nombre lleva la acción y el título de la propuesta.
-// Sin esto las tres propuestas tendrían el mismo nombre para un lector de pantalla. El marcado ya lo trae; aquí se mantiene al día con data-title.
-export const shareName = title => `Compartir «${title || 'esta propuesta'}»`;
-const paintShare = btn => btn.setAttribute('aria-label', shareName(btn.dataset.title));
-
-export function initFeed() {
-  document.querySelectorAll('[data-share]').forEach(paintShare);
-  document.querySelectorAll('.bill-item').forEach(paintWhen);
+// ---------- Pintar la sección ----------
+const NS = 'http://www.w3.org/2000/svg';
+const make = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+function icon(id) {
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'ic');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(NS, 'use');
+  use.setAttribute('href', `#${id}`);
+  svg.append(use);
+  return svg;
 }
-
-// ---------- La propuesta del centro: su descripción ----------
-// Lo que el pie necesita de cada tarjeta: id, título y descripción (todo sale del marcado).
-export function eventOf(item) {
-  const q = s => item.querySelector(s);
-  return { id: item.dataset.id, title: q('.bill-title')?.textContent.trim() ?? '', text: q('.bill-detail > p')?.textContent.trim() ?? '' };
+const badge = (txt, quiet) => make('span', quiet ? 'badge badge--quiet' : 'badge', txt);
+function photo(e, cls) {
+  if (!e.imagen) return null;
+  const img = make('img', cls);
+  img.src = e.imagen;
+  img.alt = e.alt;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  return img;
 }
-
-// Reserva de la descripción (--bill-reserva): la más larga de las propuestas a este ancho, medida de una vez en una copia oculta. Cambiar de
-// tarjeta no mueve lo de abajo (antes se reservaban 3 o 4 renglones fijos). Antes de medir escribe el ancho de la tarjeta central (--bill-w,
-// 2026-11-15, Sistema de guías): la descripción es un bloque de ese ancho bajo su tarjeta, con el texto en la sangría de la tarjeta.
-export function measureDescs(pie, texts, cardWidth = 0) {
-  if (!pie?.isConnected || !texts.length) return 0;
-  if (cardWidth > 0) pie.style.setProperty('--bill-w', `${cardWidth}px`);
-  const probe = document.createElement('div');
-  probe.className = 'bill-medida';
-  probe.setAttribute('aria-hidden', 'true');
-  probe.append(...texts.map(t => { const p = document.createElement('p'); p.className = 'bill-desc'; p.textContent = t; return p; }));
-  pie.append(probe);
-  const max = Math.max(...[...probe.children].map(n => n.getBoundingClientRect().height));
-  probe.remove();
-  if (max > 0) pie.style.setProperty('--bill-reserva', `${Math.ceil(max)}px`);
-  return max;
+// La acción de reserva del evento (null si no trae): «Registrarme» abre su página en Luma en otra pestaña (el nombre accesible lo dice);
+// «Reservar por WhatsApp» abre el chat con el mensaje ya escrito.
+function reservaLink(e, cls) {
+  if (!e.reserva) return null;
+  const wa = e.reserva.tipo === 'whatsapp';
+  const a = make('a', cls);
+  a.href = reservaUrl(e);
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.setAttribute('aria-label', wa ? reservaName(e.titulo) : registroName(e.titulo));
+  a.dataset.evReserva = e.reserva.tipo;
+  a.append(make('span', '', wa ? 'Reservar por WhatsApp' : 'Registrarme'), ' ', icon(wa ? 'i-chat' : 'i-ne'));
+  return a;
 }
-
-export function initEventos({ isMotion = () => false } = {}) {
-  const region = document.querySelector('[data-bill-c3d]');
-  if (!region || region.dataset.ready) return;
-  region.dataset.ready = '1';
-  initFeed();
-  const items = [...region.querySelectorAll('.bill-item')];
-  const events = items.map(eventOf);
-  const descTitle = document.querySelector('[data-bill-desc-title]');
-  const descText = document.querySelector('[data-bill-desc-text]');
-  createCarousel3D({
-    viewport: region.querySelector('[data-bill-viewport]'),
-    track: region.querySelector('[data-bill-track]'),
-    prev: region.querySelector('[data-bill-prev]'),
-    next: region.querySelector('[data-bill-next]'),
-    isMotion,
-    focusSel: '.bill-card',
-    onCenter: i => {
-      const ev = events[i];
-      if (descText.textContent !== ev.text) { descTitle.textContent = `${ev.title}. `; descText.textContent = ev.text; } // la región viva dice la propuesta del centro
+function calButton(e, cls, rotulo) {
+  const b = make('button', cls);
+  b.type = 'button';
+  b.dataset.evCal = e.id;
+  if (rotulo) b.append(make('span', '', 'Añadir al calendario'), ' ', icon('i-cal'));
+  else { b.setAttribute('aria-label', calName(e.titulo)); b.append(icon('i-cal')); }
+  return b;
+}
+function shareButton(e, cls) {
+  const b = make('button', cls);
+  b.type = 'button';
+  b.dataset.share = e.id;
+  b.dataset.title = e.titulo;
+  b.setAttribute('aria-label', shareName(e.titulo));
+  b.append(icon('i-share'));
+  return b;
+}
+function fechaNode(e) {
+  const p = fechaBloque(e.fecha);
+  const box = make('div', 'ev-fecha');
+  box.setAttribute('aria-hidden', 'true'); // la fecha completa va en texto al lado
+  box.append(make('span', '', p.sem), make('b', '', p.num), make('span', '', p.mes));
+  return box;
+}
+// Costo tal como lo da la librería (dato del anuncio): en el destacado, todos los renglones; en la lista, el primero. Sin el campo, nada.
+function costoNode(e, all) {
+  if (!e.costo.length) return null;
+  if (!all) { const p = make('p', 'ev-costo', e.costo[0]); p.dataset.fuente = 'anuncio'; return p; }
+  const ul = make('ul', 'ev-costo');
+  ul.dataset.fuente = 'anuncio';
+  ul.setAttribute('aria-label', 'Costo');
+  ul.append(...e.costo.map(c => make('li', '', c)));
+  return ul;
+}
+// El destacado: foto (16:9) o cartel (entero y cuadrado), bloque de fecha, insignias, título, «Sábado 21 de noviembre · 18:57 · …», descripción,
+// costo y acciones. La acción con rótulo (primaria de 56) es la reserva que el evento traiga; si no trae, «Añadir al calendario».
+export function destacadoNode(e, now = new Date()) {
+  const art = make('article', e.encuadre === 'cartel' ? 'ev-prox ev-prox--cartel' : 'ev-prox');
+  art.dataset.id = e.id;
+  art.setAttribute('aria-labelledby', `ev-t-${e.id}`);
+  const img = photo(e, 'ev-prox-img');
+  if (img) { const fig = make('figure', 'ev-prox-fig'); img.addEventListener('error', () => fig.remove()); fig.append(img); art.append(fig); }
+  const body = make('div', 'ev-prox-cuerpo');
+  const cab = make('div', 'ev-prox-cab');
+  const txt = make('div', 'ev-prox-txt');
+  const rot = make('p', 'ev-rot');
+  rot.append(badge(e.fecha === dayKey(now) ? 'Hoy' : 'Próximo'));
+  if (e.tipo) rot.append(badge(e.tipo, true));
+  if (e.ciclo) rot.append(badge(e.ciclo, true));
+  const tit = make('h3', 'ev-prox-tit', e.titulo);
+  tit.id = `ev-t-${e.id}`;
+  txt.append(rot, tit, make('p', 'ev-prox-meta', metaLine(e, now)));
+  cab.append(fechaNode(e), txt);
+  body.append(cab);
+  if (e.descripcion) body.append(make('p', 'ev-prox-desc', e.descripcion));
+  const costo = costoNode(e, true);
+  if (costo) body.append(costo);
+  const acc = make('div', 'ev-acc');
+  const reserva = reservaLink(e, 'btn btn--primario btn--lg');
+  if (reserva) acc.append(reserva, calButton(e, 'btn btn--secundario btn--lg btn--icono'));
+  else acc.append(calButton(e, 'btn btn--primario btn--lg', true));
+  acc.append(shareButton(e, 'btn btn--secundario btn--lg btn--icono'));
+  body.append(acc);
+  art.append(body);
+  return art;
+}
+// Tarjeta de la lista: hora, tipo y ciclo (o tipo y «Propuesta · sin fecha»), título, quién, el primer renglón del costo, la portada cuadrada a
+// la derecha y, con fecha, sus acciones (la reserva que traiga; si no, «Añadir al calendario» con rótulo). Una propuesta lleva su descripción
+// y ninguna acción.
+export function cardNode(e, { level = 'h3' } = {}) {
+  const li = make('li', 'ev-fila');
+  li.dataset.id = e.id;
+  const art = make('article', 'ev-card');
+  art.setAttribute('aria-labelledby', `ev-t-${e.id}`);
+  const txt = make('div', 'ev-card-txt');
+  const rot = make('p', 'ev-rot');
+  if (e.fecha) {
+    if (e.hora) rot.append(make('span', 'ev-hora', horario(e)));
+    if (e.tipo) rot.append(badge(e.tipo, true));
+  } else {
+    if (e.tipo) rot.append(badge(e.tipo));
+    const when = badge(NO_DATE, true);
+    when.dataset.evWhen = '';
+    rot.append(when);
+  }
+  if (e.ciclo) rot.append(badge(e.ciclo, true));
+  const tit = make(level, 'ev-card-tit', e.titulo);
+  tit.id = `ev-t-${e.id}`;
+  txt.append(rot, tit);
+  const quien = quienLine(e);
+  if (quien) txt.append(make('p', 'ev-card-meta', quien));
+  const costo = e.fecha ? costoNode(e, false) : null;
+  if (costo) txt.append(costo);
+  art.append(txt);
+  const img = photo(e, 'ev-card-img');
+  if (img) { img.addEventListener('error', () => img.remove()); art.append(img); }
+  if (!e.fecha && e.descripcion) art.append(make('p', 'ev-card-desc', e.descripcion));
+  if (e.fecha) {
+    const acc = make('div', 'ev-card-acc');
+    const reserva = reservaLink(e, 'btn btn--secundario');
+    if (reserva) acc.append(reserva, calButton(e, 'btn btn--plano btn--icono'));
+    else acc.append(calButton(e, 'btn btn--secundario', true));
+    art.append(acc);
+  }
+  li.append(art);
+  return li;
+}
+function listNode(events, level) {
+  const ul = make('ul', 'ev-filas');
+  ul.append(...events.map(e => cardNode(e, { level })));
+  return ul;
+}
+// La nota lateral: cómo reservar según los tipos presentes (notaCopy) y dónde se anuncian las fechas. El enlace a Instagram vive aquí cuando
+// la entradilla pasa a «Lo que viene en la casa.».
+function notaNode(plan) {
+  const copy = notaCopy(plan.reservas);
+  const aside = make('aside', 'ev-lado');
+  const p = make('p', 'ev-lado-txt');
+  const ig = make('a', '', 'Instagram');
+  ig.href = INSTAGRAM;
+  ig.target = '_blank';
+  ig.rel = 'noopener noreferrer';
+  ig.append(icon('i-ne'));
+  if (copy.texto) p.append(`${copy.texto} Las fechas nuevas también se anuncian en `, ig, '.');
+  else p.append('Se anuncian en ', ig, '.');
+  aside.append(make('h3', 'ev-lado-tit', copy.titulo), p);
+  return aside;
+}
+/** El interior de la sección según el plan (nodos sueltos, en orden). Sin nada que mostrar, una lista vacía. */
+export function eventosNodes(plan, now = new Date()) {
+  const out = [];
+  if (plan.destacado) out.push(destacadoNode(plan.destacado, now));
+  const lista = make('div', 'ev-lista');
+  if (plan.dias.length) {
+    const dias = make('div', 'ev-dias');
+    for (const d of plan.dias) {
+      const sec = make('section', 'ev-dia');
+      const c = diaCorto(d.fecha, now);
+      const h = make('h4', 'ev-dia-tit');
+      h.id = `ev-d-${d.fecha}`;
+      h.append(make('b', '', c.fecha), ' ', make('span', '', c.dia));
+      sec.setAttribute('aria-labelledby', h.id);
+      sec.append(h, listNode(d.eventos, 'h5'));
+      dias.append(sec);
     }
-  }).setItems(items);
-  const pie = document.querySelector('[data-bill-pie]');
-  const cardWidth = () => items[0]?.getBoundingClientRect().width ?? 0; // el <li> no se transforma (la pose va en .cf-pose): su ancho es el de la tarjeta
-  measureDescs(pie, events.map(e => e.text), cardWidth());
-  if ('ResizeObserver' in window && items[0]) { // otro ancho de tarjeta (giro del teléfono, ventana): se vuelve a medir una vez por fotograma
-    let w = 0, raf = 0;
-    new ResizeObserver(([e]) => { const nw = Math.round(e.contentRect.width * 10); if (nw === w) return; w = nw; if (!raf) raf = requestAnimationFrame(() => { raf = 0; measureDescs(pie, events.map(x => x.text), cardWidth()); }); }).observe(items[0]);
+    const bloque = make('div', 'ev-grupo');
+    bloque.append(make('h3', 'ev-sub', 'Después'), dias);
+    lista.append(bloque);
   }
-  region.classList.add('is-ready');
+  if (plan.propuestas.length) {
+    const sec = make('section', 'ev-grupo ev-propuestas');
+    if (plan.conFecha) { // junto a eventos con fecha, las propuestas llevan su rótulo; solas, lo dice la entradilla
+      const h = make('h3', 'ev-sub', 'Propuestas, aún sin fecha');
+      h.id = 'ev-propuestas-t';
+      sec.setAttribute('aria-labelledby', h.id);
+      sec.append(h);
+    } else sec.setAttribute('aria-label', 'Propuestas');
+    sec.append(listNode(plan.propuestas, plan.conFecha ? 'h4' : 'h3'));
+    lista.append(sec);
+  }
+  if (lista.children.length || plan.conFecha) {
+    const despues = make('div', 'ev-despues');
+    if (lista.children.length) despues.append(lista);
+    if (plan.conFecha) despues.append(notaNode(plan));
+    out.push(despues);
+  }
+  return out;
+}
+
+// Entrada de las piezas que aún no se ven (solo con movimiento): cada una espera oculta (.ev-espera) y entra al llegar a la vista, 8 px y
+// opacidad en dur-rapida; las que llegan juntas van escalonadas (escalon-linea) y todas dentro de dur-lenta. Lo que ya está a la vista no
+// se oculta nunca. Sin movimiento («reducir movimiento» o la pausa) todo queda colocado: .ev-espera solo vale bajo .motion.
+function enterOnView(nodes, isMotion) {
+  if (!isMotion() || !('IntersectionObserver' in window)) return;
+  const waiting = nodes.filter(n => n.getBoundingClientRect().top >= innerHeight);
+  if (!waiting.length) return;
+  waiting.forEach(n => n.classList.add('ev-espera'));
+  const dur = DUR('rapida'), step = ms('escalon-linea'), tope = DUR('lenta') - dur;
+  const io = new IntersectionObserver(es => {
+    es.filter(x => x.isIntersecting).forEach((x, i) => {
+      io.unobserve(x.target);
+      x.target.classList.remove('ev-espera');
+      if (isMotion()) x.target.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: dur, delay: Math.min(i * step, tope), easing: EASE(), fill: 'backwards' });
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  waiting.forEach(n => io.observe(n));
+}
+
+// Lo que index.html ya trae pintado (las propuestas): si coincide con el plan, no se vuelve a pintar (ni un parpadeo de las fotos).
+const staticSignature = root => [...root.querySelectorAll('.ev-fila')].map(li => `${li.dataset.id}|${li.querySelector('.ev-card-tit')?.textContent.trim()}|${li.querySelector('.ev-card-desc')?.textContent.trim() ?? ''}`).join('\n');
+const planSignature = plan => plan.propuestas.map(e => `${e.id}|${e.titulo}|${e.descripcion}`).join('\n');
+
+/** Pinta Eventos y talleres (al acercarse a la sección): pide eventos.json, arma el plan del día y sustituye lo que trae index.html solo si cambia. */
+export async function initEventos({ isMotion = () => false } = {}) {
+  const root = document.querySelector('[data-ev]');
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = '1';
+  let plan;
+  try { known = await loadEventos(); plan = eventosPlan(known); } catch { delete root.dataset.ready; return; } // sin datos queda lo que trae index.html
+  applyAviso(plan);
+  if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }
+  root.replaceChildren(...eventosNodes(plan));
+  const lede = document.querySelector('[data-ev-lede]');
+  if (lede && plan.conFecha) lede.textContent = 'Lo que viene en la casa.';
+  root.classList.add('is-ready');
+  enterOnView([...root.querySelectorAll('.ev-prox, .ev-fila, .ev-lado')], isMotion);
+  if (plan.destacado) document.dispatchEvent(new CustomEvent('iti:primarias')); // app.js: la primaria de la barra cede ante la del destacado
 }

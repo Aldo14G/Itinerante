@@ -508,6 +508,11 @@
     "origin": "Carta genérica indicada por Aldo el 2026-11-13: cafés y tés habituales; sin precios hasta que la librería los dé",
     "rule": "precio: null mientras la librería no dé el precio; con un número se muestra «$NN MXN» (data-fuente=\"carta\"). Sin fotos de producto: tarjeta tipográfica con icono."
   },
+  "eventosData": {
+    "file": "data/eventos.json",
+    "origin": "Las tres propuestas de Eventos y talleres que ya traía index.html (Círculo de lectura, Ajedrez en la casa, Taller de escritura), pasadas a datos el 2026-11-16; sin fecha, ponente, costo ni reserva hasta que la librería los dé",
+    "rule": "fecha: null = propuesta («Propuesta · sin fecha»). Un evento con fecha lleva solo lo que anuncia la librería (hora tal cual, costo en sus renglones, reserva por Luma o WhatsApp); su imagen se registra en «real» antes de publicarlo (un cartel, con su autor y la publicación de origen)."
+  },
   "visitMap": {
     "file": "index.html (#visita, figure.visit-map: SVG en línea)",
     "source": "OpenStreetMap: calles (highway trunk, tertiary y residential) de la API de OSM, GET https://www.openstreetmap.org/api/0.6/map?bbox=-100.3262,25.6688,-100.3178,25.6740",

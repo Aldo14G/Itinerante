@@ -253,7 +253,9 @@ async function boot() {
       es.forEach(e => { if (e.isIntersecting) onScreen.add(e.target); else onScreen.delete(e.target); });
       hdr.classList.toggle('has-primary', onScreen.size > 0);
     });
-    $$('main .btn--primario').forEach(b => primaryIo.observe(b));
+    const watchPrimaries = () => $$('main .btn--primario').forEach(b => primaryIo.observe(b));
+    watchPrimaries();
+    document.addEventListener('iti:primarias', watchPrimaries); // una primaria que llega después (la del evento destacado, feed.js)
   }
 
   await yieldNow();
@@ -375,12 +377,17 @@ async function boot() {
   (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
 
   await yieldNow();
-  // ---------- Eventos y talleres: Carrusel3D (variante evento), «Compartir» y la fecha de cada propuesta ----------
-  // El carrusel se arma al acercarse (como el del Catálogo); «Compartir» carga el módulo al primer toque si aún no llegó.
+  // ---------- Eventos y talleres: destacado y lista por fecha (feed.js, datos en assets/data/eventos.json) ----------
+  // La sección se pinta al acercarse; «Compartir» y «Añadir al calendario» cargan el módulo al primer toque si aún no llegó. El aviso del
+  // inicio y el punto de «Eventos» se piden pronto (ver «Start»), como el conteo de Novedades.
   let feedLoad;
-  const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => { feedLoad = undefined; throw err; }));
+  const loadFeed = () => (feedLoad ??= import('./feed.js').catch(err => {
+    feedLoad = undefined;
+    root.classList.remove('ev-hint'); // sin el módulo no hay evento que anunciar: el renglón del inicio no se reserva
+    throw err;
+  }));
   document.addEventListener('click', e => {
-    const act = e.target.closest('[data-share]');
+    const act = e.target.closest('[data-share], [data-ev-cal]');
     if (act) loadFeed().then(m => m.onAct(act)).catch(() => {});
   });
   const nearby = (el, boot, margin = '700px 0px') => {
@@ -389,7 +396,7 @@ async function boot() {
     const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); boot(); } }, { rootMargin: margin });
     io.observe(el);
   };
-  nearby($('[data-bill-c3d]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
+  nearby($('[data-ev]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
 
   // ---------- Café y té: la carta (Carrusel3D, variante carta) se pide al acercarse ----------
   nearby($('[data-cafe]'), () => import('./cafe.js').then(m => m.initCafe({ isMotion })).catch(() => {}));
@@ -407,5 +414,7 @@ async function boot() {
     (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(prepareReveals, { timeout: 1500 });
     // Conteo de novedades (control del inicio): después de la foto y las fuentes. Su sitio ya está reservado (boot.js), así que no mueve nada.
     loadNews().then(m => m.initNewsCount()).catch(() => {});
+    // Aviso del próximo evento (renglón del inicio y punto de «Eventos»): mismo momento y mismo mecanismo; su sitio también está reservado.
+    loadFeed().then(m => m.initEventosAviso()).catch(() => {});
   });
 }

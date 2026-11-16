@@ -145,6 +145,9 @@
   --sec-escritorio: 112px;
   --columnas-rejilla: 12;
   --canal-rejilla: 32px;
+  --portada-evento: 88px;
+  --portada-evento-amplia: 120px;
+  --icono-producto: 40px;
 
   /* Vidrio */
   --filtro-vidrio: blur(18px) saturate(1.6);

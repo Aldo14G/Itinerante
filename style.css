@@ -174,6 +174,10 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 /* Novedades sin ver: punto primario junto al nombre (la palabra va en texto para lectores: «, 3 sin ver»). */
 .news-dot { flex: none; width: var(--space-2); height: var(--space-2); margin-inline-start: var(--space-2); border-radius: 50%; background: var(--primario); }
 .news-dot[hidden] { display: none; }
+/* Punto de «Eventos» en la barra (hay un evento con fecha vigente; feed.js): flota en la esquina de su enlace, sin ocupar sitio, así el resto
+   de la barra no se mueve cuando aparece. En el menú ☰ usa .news-dot, que ya va en el renglón de su fila. */
+.ev-dot { position: absolute; top: var(--space-2); right: var(--space-2); width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--primario); }
+.ev-dot[hidden] { display: none; }
 
 /* Punto de estado (Abierto/Cerrado), siempre con la palabra al lado. Cerrado es un aro hueco: se distingue por la forma, no solo por el color. */
 .status-dot { position: relative; width: 10px; height: 10px; border-radius: 50%; background: var(--cerrado); flex: none; }
@@ -217,7 +221,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Secciones en la barra: solo desde 1101 px (antes, el ☰). El destino actual lleva la pastilla menta. */
 .hdr-nav { display: none; gap: var(--space-2); margin-inline: auto; }
 .hdr-nav a {
-  display: inline-flex; align-items: center; min-height: var(--alto-sm); padding: 0 var(--space-4);
+  position: relative; display: inline-flex; align-items: center; min-height: var(--alto-sm); padding: 0 var(--space-4);
   border-radius: var(--radio-pildora); color: var(--tinta); text-decoration: none;
   font: var(--t-boton-chico); letter-spacing: var(--ls-boton-chico);
   transition: background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida);
@@ -339,7 +343,18 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .entry-news { display: none; margin-top: var(--space-4); }
 .news-hint .entry-news { display: inline-flex; visibility: hidden; }
 .news-hint .entry-news:not([hidden]) { visibility: visible; }
-.entry-news-dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--primario); }
+.entry-news-dot, .entry-ev-dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--primario); }
+/* Aviso del próximo evento («Próximo: Sáb 21 nov · …», feed.js): solo con un evento con fecha vigente. Un renglón de Subheadline a 8 px de la
+   dirección (texto → texto), en un objetivo de 44 que no ocupa más que su renglón (los márgenes negativos lo devuelven: 8 + 20 px en total).
+   Su renglón se reserva antes del primer render (ev-hint, boot.js) para que nada se mueva. El título cede con puntos suspensivos si no cabe;
+   la fecha nunca se corta. */
+.entry-ev { display: none; align-items: center; gap: var(--space-2); max-width: 100%; min-height: var(--alto-sm); margin: calc(var(--space-2) - var(--space-3)) 0 calc(-1 * var(--space-3)); border-radius: var(--radio-sm); color: var(--turquesa-texto); font: var(--t-subtitulo); font-weight: 600; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.ev-hint .entry-ev { display: flex; visibility: hidden; }
+.ev-hint .entry-ev:not([hidden]) { visibility: visible; }
+.entry-ev-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry-ev .ic { flex: none; width: 16px; height: 16px; }
+.entry-ev:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .entry-ev:hover .entry-ev-txt { text-decoration: underline; text-underline-offset: 0.2em; } }
 /* La foto real de la sala, limpia y con radio-lg: nada de texto encima. */
 .entry-media { position: relative; margin: 0; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); aspect-ratio: 3 / 2; }
 .entry-media picture { height: 100%; }
@@ -388,42 +403,91 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .motion .still-img { animation: casa-enfoque linear both; animation-timeline: view(inline 0px); animation-range: cover; }
 }
 
-/* ---------- Eventos y talleres (#cartelera): Carrusel3D, variante evento ---------- */
-/* Tarjeta en superficie con radio-md (no es vidrio: no flota), foto real 4:3 arriba, insignias de tipo y estado con «Compartir» en su fila y el
-   título. Debajo del carrusel, la descripción de la propuesta del centro (región viva). Sin JavaScript cada tarjeta muestra su descripción y la
-   pista se desliza con el dedo. */
+/* ---------- Eventos y talleres (#cartelera): destacado y lista por fecha (2026-11-16; feed.js) ---------- */
+/* Sustituye al Carrusel3D, variante evento (2026-11-13). Un solo eje izquierdo: el destacado (tarjeta en superficie con sombra-flotante: es lo
+   único con sombra de la sección), la lista por día (rótulo de día sobre una línea punteada y tarjetas horizontales: hora y tipo, título,
+   «Con …», portada cuadrada de 88 / 120 a la derecha) y, al final, las propuestas sin fecha con su descripción. Desde 1024 px la lista va en
+   las columnas 1–8 y la nota lateral en 9–12, fija al desplazar. La estructura de la lista se tomó de Luma (referencia; ver DESIGN.md).
+   Aire por rol: cabecera → contenido 24 · bloque → bloque 32 / 48 · rótulo → grupo 8 · tarjeta → tarjeta 12 · día → día 24. */
 .bill { padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo-2); }
-.bill > .sec-head { margin-bottom: var(--space-4); }
-.bill-item .cf-pose, .bill-card { height: 100%; }
-.bill-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
-.bill-card-fig { display: block; }
-.bill-card-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-/* Insignias de la propuesta: tipo (Lectura, Juego, Taller) y estado («Propuesta · sin fecha» o la fecha confirmada, ver feed.js) y, al final de la
-   misma fila, «Compartir» (icono menta de 44; desde el 2026-11-14: antes iba bajo la descripción y, al llegar a Eventos, quedaba bajo la barra
-   inferior en los siete iPhone). Solo existe en la tarjeta del centro (en las vecinas no se ve ni se toca) y necesita JavaScript. */
-.bill-badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-2) 0 var(--space-4); }
-.bill-badges .badge { margin-block: var(--space-2); } /* sin «Compartir» (sin JS) la fila mide lo mismo: 8 + 24 + 8 */
-.bill-share { margin-inline-start: auto; }
-.c3d-item:not(.is-centro) .bill-share, html:not(.js) .bill-share { visibility: hidden; }
-.bill-title { margin: 0; padding: var(--space-3) var(--space-4) var(--space-4); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
-.bill-detail { display: grid; gap: var(--space-3); padding: 0 var(--space-4) var(--space-4); }
-.bill-detail p { max-width: 54ch; margin: 0; font: var(--t-lectura); color: var(--tinta); }
-/* Párrafos de tres renglones o más (la descripción de la propuesta): token `lectura`, Body con interlínea de 24 (1.41; la crítica pide ≥ 1.35
-   en párrafos de 120 caracteres o más). El <li> hereda esa interlínea: su texto incluye la descripción. */
-.bill-track { line-height: var(--space-6); }
-html.js .bill-card .bill-detail { display: none; }
-/* La propuesta del centro: su descripción (alto reservado: cambiar de tarjeta no mueve lo de abajo). Es un párrafo de tres o cuatro renglones:
-   no va centrado (lo centrado vale hasta dos renglones; Sistema de guías, 2026-11-15). Cuelga de la tarjeta: un bloque del ancho de la tarjeta
-   central (--bill-w, que escribe feed.js al medir; antes de medir, el ancho de la tarjeta del teléfono), centrado en el eje del carrusel, con
-   el texto a la izquierda en la sangría de la tarjeta (16), bajo su título. Letra `lectura` 17/24 (antes 17/24 escrita a mano sobre `cuerpo`). */
-.bill-pie { position: relative; display: grid; width: var(--bill-w, min(76vw, 340px)); max-width: 100%; margin: 0 auto; padding-inline: var(--space-4); }
-/* La reserva (--bill-reserva) la mide feed.js: la descripción más larga a este ancho. Antes de medir, lo que mide a ese ancho con el bloque
-   del ancho de la tarjeta (2026-11-15): cuatro renglones (cinco hasta 374 px, mobile.css; tres desde 1280 px, con la tarjeta de 400 o más). */
-.bill-desc { min-height: var(--bill-reserva, 4lh); margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: pretty; }
-@media (min-width: 1280px) { .bill-desc { min-height: var(--bill-reserva, 3lh); } }
-.bill-medida { position: absolute; inset: 0 0 auto; visibility: hidden; pointer-events: none; } /* copia oculta para medir (feed.js) */
-.bill-medida .bill-desc { min-height: 0; }
-html:not(.js) .bill-pie { display: none; }
+.bill > .sec-head { margin-bottom: var(--space-6); }
+.ev, .ev-despues, .ev-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
+.ev-lista { align-content: start; min-width: 0; }
+.ev-sub { margin: 0 0 var(--space-2); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
+.ev-dias { display: grid; gap: var(--space-6); }
+.ev-dia-tit { display: flex; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-2); font: var(--t-cuerpo); color: var(--tinta-2); }
+.ev-dia-tit b { font-weight: 600; color: var(--tinta); }
+.ev-dia-tit::after { content: ""; flex: 1 1 auto; margin-inline-start: var(--space-2); border-top: 1px dashed var(--linea-fuerte); }
+.ev-filas { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+/* Tarjeta de la lista (TarjetaEvento): no es un control; sus acciones van dentro. Texto a la izquierda y portada cuadrada a la derecha; la
+   descripción de una propuesta y las acciones ocupan todo el ancho, en la misma sangría. */
+.ev-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3) var(--space-4); align-items: start; padding: var(--space-4); border-radius: var(--radio-md); background: var(--superficie); color: var(--tinta); }
+.ev-card-txt { min-width: 0; }
+.ev-card-img { grid-column: 2; grid-row: 1; width: var(--portada-evento); height: var(--portada-evento); border-radius: var(--radio-sm); object-fit: cover; }
+.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; }
+.ev-hora { font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.ev-card-tit, .ev-prox-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
+.ev-card-meta, .ev-prox-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); }
+/* Párrafos de tres renglones o más (la descripción de una propuesta o del destacado): token `lectura`, Body con interlínea de 24 (1.41; la
+   crítica pide ≥ 1.35 en párrafos de 120 caracteres o más). */
+.ev-card-desc, .ev-prox-desc { max-width: 54ch; margin: 0; font: var(--t-lectura); color: var(--tinta); text-wrap: pretty; }
+.ev-card-desc, .ev-card-acc { grid-column: 1 / -1; }
+/* Costo tal como lo da la librería (data-fuente="anuncio"): el primer renglón en la tarjeta de la lista y todos en el destacado. */
+.ev-costo { margin: var(--space-1) 0 0; padding: 0; list-style: none; font: var(--t-subtitulo); color: var(--tinta); font-variant-numeric: tabular-nums; }
+ul.ev-costo { display: grid; gap: var(--space-1); margin: 0; }
+.ev-card-acc { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+/* Destacado (EventoDestacado): la foto 16:9 arriba y el cuerpo debajo; desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. */
+.ev-prox { display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; border-radius: var(--radio-lg); background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-flotante); }
+.ev-prox-fig { margin: 0; background: var(--fondo-3); }
+.ev-prox-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+/* Un cartel (encuadre: "cartel") es una imagen cuadrada con texto: se muestra entero, 1:1, nunca recortado; si no es cuadrado, sobre fondo-3. */
+.ev-prox--cartel .ev-prox-img { aspect-ratio: 1 / 1; object-fit: contain; }
+.ev-prox-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); padding: var(--space-5); }
+.ev-prox-cab { display: flex; align-items: flex-start; gap: var(--space-4); }
+.ev-prox-txt { min-width: 0; }
+/* Bloque de fecha (BloqueFecha): lo primero que se lee de un anuncio. Decorativo (aria-hidden): la fecha completa va en texto al lado. */
+.ev-fecha { display: grid; flex: none; justify-items: center; align-content: center; width: var(--space-16); height: calc(var(--space-16) + var(--space-2)); border-radius: var(--radio-md); background: var(--primario); color: var(--en-primario); }
+.ev-fecha b { font: var(--t-titulo-1); font-weight: 700; letter-spacing: var(--ls-titulo-1); font-variant-numeric: tabular-nums; }
+.ev-fecha span { font: var(--t-leyenda-1); font-weight: 600; }
+/* Acciones del destacado: la primaria crece; si su rótulo no cabe junto a los dos iconos («Reservar por WhatsApp» en el teléfono), ocupa su
+   renglón entero y los iconos bajan al siguiente (como en la ficha del libro). */
+.ev-acc { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2); } /* con el hueco del cuerpo: texto → control 24 */
+.ev-acc > .btn--primario { flex: 1 1 auto; white-space: nowrap; }
+.ev-card-acc > .btn { white-space: nowrap; }
+/* Nota lateral: cómo registrarse o dónde se anuncian las fechas. */
+.ev-lado { padding: var(--space-5); border-radius: var(--radio-md); background: var(--fondo-3); }
+.ev-lado-tit { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); }
+.ev-lado-txt { margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); }
+.ev-lado-txt a { white-space: nowrap; color: var(--turquesa-texto); }
+.ev-lado-txt a .ic { width: 16px; height: 16px; margin-inline-start: var(--space-1); vertical-align: -0.125em; }
+.ev-lado-txt a:focus-visible { outline: 2px solid transparent; border-radius: var(--radio-portada); box-shadow: var(--anillo-foco); }
+/* Lo que aún no se ve espera oculto y entra al llegar a la vista (feed.js, enterOnView); solo con movimiento. */
+.motion .ev-espera { opacity: 0; }
+@media (min-width: 1024px) {
+  .ev, .ev-lista { gap: var(--space-12); }
+  .ev-prox { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); }
+  .ev-prox-fig { grid-column: 7 / -1; grid-row: 1; }
+  .ev-prox-img { height: 100%; min-height: calc(var(--space-20) * 4); aspect-ratio: auto; }
+  .ev-prox--cartel .ev-prox-img { height: auto; min-height: 0; aspect-ratio: 1 / 1; } /* el cartel entero en su mitad: la tarjeta toma su alto */
+  .ev-prox-cuerpo { grid-column: 1 / span 6; grid-row: 1; align-content: center; gap: var(--space-5); padding: var(--space-8) 0 var(--space-8) var(--space-8); }
+  .ev-acc { margin-top: var(--space-1); }
+  .ev-acc > .btn--primario { flex: none; }
+  .ev-despues { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
+  .ev-lista { grid-column: 1 / span 8; }
+  .ev-lado { grid-column: 9 / -1; position: sticky; top: calc(var(--hdr-h) + var(--space-6)); }
+  /* La portada (120) abarca el alto de la tarjeta y el texto, la descripción y las acciones van seguidos en su columna: sin hueco entre el
+     título y lo que sigue (la fila flexible del final absorbe lo que sobre). */
+  .ev-card { grid-template-rows: auto 1fr; column-gap: var(--space-6); padding: var(--space-5); }
+  .ev-card-img { grid-row: 1 / -1; width: var(--portada-evento-amplia); height: var(--portada-evento-amplia); }
+  .ev-card-desc, .ev-card-acc { grid-column: 1; }
+  /* Solo propuestas (sin eventos con fecha no hay nota lateral: la lista es hija única): tres por fila en las columnas 1–4, 5–8 y 9–12, con
+     la portada cuadrada arriba. Con fechas, las propuestas van al final de la lista de 1–8, en la tarjeta horizontal. */
+  .ev-lista:only-child { grid-column: 1 / -1; }
+  .ev-lista:only-child .ev-filas { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--canal-rejilla); }
+  .ev-lista:only-child .ev-fila { display: grid; }
+  .ev-lista:only-child .ev-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .ev-lista:only-child .ev-card-img { grid-column: 1; grid-row: 1; width: 100%; height: auto; aspect-ratio: 1 / 1; }
+}
 
 /* ---------- Visita y pie ---------- */
 
@@ -889,7 +953,7 @@ html:not(.js) .bill-pie { display: none; }
 .toast-action { margin-inline-start: auto; min-height: var(--alto-md); padding: 0 var(--space-4); border: 0; border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); font: var(--t-boton-chico); white-space: nowrap; cursor: pointer; }
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 
-/* ---------- Carrusel3D (carousel3d.js): un solo motor para portada, evento y carta ---------- */
+/* ---------- Carrusel3D (carousel3d.js): el motor del carrusel de portadas y de la carta ---------- */
 /* La pista se desplaza con el dedo (imán al centro) y carousel3d.js da a cada pieza su pose según su distancia al centro, una vez por
    fotograma: las vecinas giran, se hunden y se empujan hacia fuera, de modo que asoman **separadas de la central, con hueco visible**
    (≥ 12 px; norma del 2026-11-13: ya no se enciman). La pose sale de los parámetros de .c3d (en anchos de pieza; carousel3d.js los lee al
@@ -899,7 +963,7 @@ html:not(.js) .bill-pie { display: none; }
 .c3d {
   --c3d-giro: var(--giro-carrusel); --c3d-separa: 0.08; --c3d-hunde: 0.6; --c3d-separa-lejos: 0.24; --c3d-hunde-lejos: 1.2;
   --c3d-alcance: 1;  /* piezas por lado a la vista */
-  --c3d-borde: 1.36; /* borde exterior de la última pieza a la vista, en anchos de pieza: 1.36 con una por lado (Eventos, 1.32 y se reserva 1.33), 1.97 con dos */
+  --c3d-borde: 1.36; /* borde exterior de la última pieza a la vista, en anchos de pieza: 1.36 con una por lado, 1.97 con dos */
   position: relative; container-type: inline-size;
   /* La ventana deja 24 px arriba (la inclinación al cursor) y 48 abajo (sombra-portada, 0 14px 32px, sin cortarse); el margen negativo
      devuelve el ritmo visible: 8 px sobre la pieza y 20 bajo ella. En el teléfono va de borde a borde de la pantalla. */
@@ -929,15 +993,14 @@ html:not(.js) .bill-pie { display: none; }
 /* Carrusel plano (sin movimiento): la imagen de las vecinas se atenúa (ATENUADA en carousel3d.js); el texto queda entero (≥ 4.5:1). */
 .c3d-item.is-atenuada img { opacity: 0.6; }
 /* Con dos piezas por lado la lejana queda medio tapada por la vecina (is-lejana, carousel3d.js): su texto no se muestra partido. */
-.c3d-item.is-lejana :is(.cafe-nombre, .cafe-desc, .cafe-precio, .bill-badges, .bill-title) { opacity: 0; visibility: hidden; }
+.c3d-item.is-lejana :is(.cafe-nombre, .cafe-desc, .cafe-precio) { opacity: 0; visibility: hidden; }
 .c3d-card:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco), var(--sombra-portada); }
-.c3d-item.is-centro :is(.bill-card, .cafe-card) { box-shadow: var(--sombra-portada); }
+.c3d-item.is-centro .cafe-card { box-shadow: var(--sombra-portada); }
 
 /* Ancho de la pieza. Teléfono: portada 58 % (176–248 px, con tope contra el alto: carrusel, pie y acción caben entre las dos barras),
-   evento 76 % (hasta 340), carta 60 % (184–248). Desde 761 px sale del escenario: caben las piezas a la vista y las dos flechas de 48 con
-   16 de aire (2 × (alto-md + space-4)); portada 240–280, evento 300–440, carta 232–272. Desde 1440, dos por lado en portada y carta. */
+   carta 60 % (184–248). Desde 761 px sale del escenario: caben las piezas a la vista y las dos flechas de 48 con
+   16 de aire (2 × (alto-md + space-4)); portada 240–280, carta 232–272. Desde 1440, dos por lado en portada y carta. */
 .c3d--portada { --c3d-w: min(clamp(176px, 58vw, 248px), calc((100svh - 320px) / 1.5)); } /* tope 248 (2026-11-14; antes 240: en el 16 Pro Max la vecina asomaba 33 %) */
-.c3d--evento { --c3d-w: min(76vw, 340px); --c3d-separa: 0.045; --c3d-borde: 1.33; }
 .c3d--carta { --c3d-w: clamp(184px, 60vw, 248px); }
 @media (min-width: 761px) {
   /* Escenario de hasta 1240 px centrado en la columna de contenido; los bordes se desvanecen (máscara de 48 px), sin cortes duros. Desde que el
@@ -948,14 +1011,13 @@ html:not(.js) .bill-pie { display: none; }
   .c3d-flecha--next { right: max(0px, calc(50% - var(--c3d-w) * var(--c3d-borde) - var(--space-4) - var(--alto-md))); }
   .c3d-viewport { -webkit-mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); mask-image: linear-gradient(90deg, transparent, black var(--space-12), black calc(100% - var(--space-12)), transparent); }
   .c3d--portada { --c3d-w: clamp(240px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 280px); }
-  .c3d--evento { --c3d-w: clamp(300px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 440px); }
   .c3d--carta { --c3d-w: clamp(232px, calc((100cqi - 2 * (var(--alto-md) + var(--space-4))) / (2 * var(--c3d-borde))), 272px); }
 }
 @media (min-width: 1440px) { .c3d--portada, .c3d--carta { --c3d-alcance: 2; --c3d-borde: 1.97; } }
 /* Hasta 1023 px las vecinas asoman cortadas por el borde: su texto no se lee partido (se reconocen por su forma: foto, icono) y aparece al
    llegar al centro. Desde 1024 caben enteras y su texto se ve. */
 @media (max-width: 1023px) {
-  .c3d-item:not(.is-centro) :is(.cafe-nombre, .cafe-desc, .cafe-precio, .bill-badges, .bill-title) { opacity: 0; visibility: hidden; transition: opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
+  .c3d-item:not(.is-centro) :is(.cafe-nombre, .cafe-desc, .cafe-precio) { opacity: 0; visibility: hidden; transition: opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
 }
 
 /* Profundidad (A5): la pieza central de cada carrusel y, en escritorio, la tarjeta de la rejilla se inclinan hacia el cursor (hasta
@@ -968,7 +1030,7 @@ html:not(.js) .bill-pie { display: none; }
 .motion [data-inclina].is-inclinada.is-entrando { transition: transform var(--dur-rapida) var(--curva-salida), scale var(--dur-instantanea) var(--curva-salida), box-shadow var(--dur-rapida) var(--curva-salida); }
 .motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active { scale: 0.97; }
 .motion :is(.c3d-item.is-centro [data-inclina], .card-item[data-inclina]):active .cover { transform: none; }
-.c3d-item.is-centro :is(.bill-card, .cafe-card):active, .rail-item.is-centro .card:active .cover, .card-item:active .cover { box-shadow: var(--sombra-flotante); }
+.c3d-item.is-centro .cafe-card:active, .rail-item.is-centro .card:active .cover, .card-item:active .cover { box-shadow: var(--sombra-flotante); }
 /* Brillo de lámina (2026-11-14; idea de Glare Card de Aceternity —solo inspiración— y de Magic Card de Magic UI, MIT): la portada que se
    inclina (la central del carrusel de libros y la tarjeta de la rejilla) lleva una luz radial que sigue al cursor (--brillo-x/-y, escritas por
    initDepth en el mismo fotograma que la inclinación; solo pintura). Sin texto encima de la luz, sin neón. Solo con puntero fino, hover y
@@ -1147,7 +1209,6 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .books > .cat { margin-top: var(--space-12); padding-top: var(--space-12); padding-bottom: var(--space-6); }
   .cat-bar { grid-template-columns: minmax(0, calc(50% - var(--canal-rejilla) / 2)) auto; column-gap: var(--canal-rejilla); } /* el buscador, columnas 1–6 */
   .books-foot { padding-top: var(--space-6); } /* con los 24 de la capa: bloque → bloque 48 */
-  /* Eventos no necesita nada aquí: la entradilla va bajo el titular (bloque normal), como en La casa y Café (antes, a la derecha en 7/12). */
   /* Café y té: titular y entradilla en 1–6; debajo, a 48 (bloque → bloque: son el control de la carta, no del encabezado), los chips, a 24 de
      la carta, que va a todo el ancho. La foto, en 7–12, toma el alto de esa columna: empieza con el titular y termina con los chips (203–224 px
      de 1024 a 1920; antes clamp(200px, 30svh, 260px) centrada, con el titular 70 px más abajo que la foto y los chips centrados). */
@@ -1172,7 +1233,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 
 /* ---------- Impresión ---------- */
 @media print {
-  .hdr, .tabbar, .menu, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer, .save, .toast, .mylist, .card--sk, .sk-group, .bill-share, .c3d-flecha { display: none !important; }
+  .hdr, .tabbar, .menu, .motion-btn, .cat-bar, .cat-filters, .cat-more, .drawer, .save, .toast, .mylist, .card--sk, .sk-group, .ev-acc, .ev-card-acc, .c3d-flecha { display: none !important; }
   *, *::before, *::after { opacity: 1 !important; transform: none !important; clip-path: none !important; visibility: visible !important; color: var(--tinta) !important; background: transparent !important; box-shadow: none !important; }
   img { filter: grayscale(1); }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.7em; word-break: break-all; }

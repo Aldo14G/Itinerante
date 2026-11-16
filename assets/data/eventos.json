@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "nota": "Eventos y talleres (#cartelera, feed.js). Publicar un evento es añadir un renglón a «eventos»; no se toca HTML ni JS. Campos de siempre: id (minúsculas, cifras y guiones; no se repite), titulo, fecha («AAAA-MM-DD» o null), hora y fin («HH:MM», hora de Monterrey, tal cual la anuncia la librería —«18:57»—, o null), con (quien conduce o imparte, o null; se imprime «Con …»), descripcion, imagen (ruta local bajo assets/img/, registrada en assets/provenance.json), alt (qué se ve; en un cartel, lo que anuncia: título, invitado, fecha y hora) y reserva: { \"tipo\": \"luma\", \"url\": \"https://lu.ma/…\" } («Registrarme», abre Luma en otra pestaña), { \"tipo\": \"whatsapp\", \"telefono\": \"8112345678\" } (10 dígitos; «Reservar por WhatsApp» con el mensaje ya escrito) o null (sin botón). Opcionales: tipo (Lectura, Juego, Taller, Charla…: solo si el anuncio lo dice; es la insignia), fuente (enlace https de la publicación de origen; no se imprime), encuadre («cartel» = imagen cuadrada con texto que se muestra entera; por omisión «foto»), ciclo (p. ej. «Letras en vivo»: insignia junto al tipo), invitado («Invita a …»), colabora («Colabora …», solo en el destacado) y costo (lista de 1 a 4 renglones tal como los da la librería, p. ej. [\"$90 MXN entrada\", \"$120 MXN con libro en PDF\"]; sin el campo no se imprime nada, tampoco «gratis»). Con fecha de hoy en adelante, el más próximo es el destacado y los demás van en la lista por día; un evento con fecha pasada deja de mostrarse; con fecha: null es una propuesta («Propuesta · sin fecha») y va al final, sin reserva ni calendario. Una reserva que no sea de Luma ni un teléfono de 10 dígitos se descarta. No se anotan cupos ni asistentes. Las tres propuestas de hoy se repiten en index.html (lo que se lee sin JavaScript): npm test comprueba que coincidan."
+  },
+  "eventos": [
+    {
+      "id": "circulo",
+      "tipo": "Lectura",
+      "titulo": "Círculo de lectura",
+      "fecha": null,
+      "hora": null,
+      "fin": null,
+      "con": null,
+      "descripcion": "Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.",
+      "imagen": "assets/img/cartelera-1.webp",
+      "alt": "La sala central",
+      "reserva": null
+    },
+    {
+      "id": "ajedrez",
+      "tipo": "Juego",
+      "titulo": "Ajedrez en la casa",
+      "fecha": null,
+      "hora": null,
+      "fin": null,
+      "con": null,
+      "descripcion": "El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.",
+      "imagen": "assets/img/cartelera-2.webp",
+      "alt": "La mesa de ajedrez",
+      "reserva": null
+    },
+    {
+      "id": "taller",
+      "tipo": "Taller",
+      "titulo": "Taller de escritura",
+      "fecha": null,
+      "hora": null,
+      "fin": null,
+      "con": null,
+      "descripcion": "Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.",
+      "imagen": "assets/img/cartelera-3.webp",
+      "alt": "El rincón de lectura",
+      "reserva": null
+    }
+  ]
+}

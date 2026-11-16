@@ -43,6 +43,7 @@ export const REQUIRED_IN_ASSETS = [
   "assets/data/catalog.json",
   "assets/data/collections.json",
   "assets/data/menu.json",
+  "assets/data/eventos.json",
   "assets/img/logo-96.webp",
   "assets/img/03-home-sala-central.webp",
   "assets/img/inicio-sala-m.webp",
