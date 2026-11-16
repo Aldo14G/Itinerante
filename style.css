@@ -545,6 +545,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .ev-prox-img { height: 100%; min-height: calc(var(--space-20) * 4); aspect-ratio: auto; }
   .ev-prox--cartel .ev-prox-img { width: 100%; height: auto; min-height: 0; aspect-ratio: 1 / 1; } /* el cartel entero en su mitad: la tarjeta toma su alto */
   .ev-prox-cuerpo { grid-column: 1 / span 6; grid-row: 1; align-content: center; padding: var(--space-8) 0 var(--space-8) var(--space-8); }
+  .ev-prox--sin-foto .ev-prox-cuerpo { grid-column: 1 / span 8; padding-right: var(--space-8); } /* sin foto (evento de la hoja sin cartel): el cuerpo ocupa 8 columnas, no media tarjeta vacía */
   .ev-despues { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
   .ev-lista { grid-column: 1 / span 8; }
   .ev-lado { grid-column: 9 / -1; position: sticky; top: calc(var(--hdr-h) + var(--space-6)); } /* a un lado, fija al desplazar */

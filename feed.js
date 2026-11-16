@@ -119,8 +119,11 @@ export function eventosProblems(data) {
     if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) out.push(`${who}: id inválido (minúsculas, cifras y guiones)`);
     else if (seen.has(id)) out.push(`${who}: id repetido`);
     seen.add(id);
-    for (const k of ['titulo', 'descripcion', 'alt']) if (!text(e?.[k])) out.push(`${who}: falta «${k}»`);
-    if (!localImage(e?.imagen)) out.push(`${who}: «imagen» debe ser una ruta local bajo assets/img/`);
+    // Un evento que publica la hoja de la librería (`origen: "hoja"`, campo del sincronizador; los demás campos desconocidos se ignoran) puede ir sin
+    // foto (`imagen: null`, cuando la fila no trae cartel): se pinta sin figura. Los eventos del repositorio siguen exigiendo imagen local y su alt.
+    const sinFoto = e?.origen === 'hoja' && (e?.imagen === null || e?.imagen === undefined);
+    for (const k of sinFoto ? ['titulo', 'descripcion'] : ['titulo', 'descripcion', 'alt']) if (!text(e?.[k])) out.push(`${who}: falta «${k}»`);
+    if (!sinFoto && !localImage(e?.imagen)) out.push(`${who}: «imagen» debe ser una ruta local bajo assets/img/`);
     if (has(e, 'encuadre') && e.encuadre !== 'cartel' && e.encuadre !== 'foto') out.push(`${who}: «encuadre» es "cartel" o "foto"`);
     if (e?.fecha !== null && !validDay(e?.fecha)) out.push(`${who}: «fecha» no es una fecha real (AAAA-MM-DD) ni null`);
     if (e?.hora !== null && !validHour(e?.hora)) out.push(`${who}: «hora» no es HH:MM ni null`);
@@ -494,7 +497,8 @@ export function destacadoNode(e, now = new Date()) {
   art.dataset.id = e.id;
   art.setAttribute('aria-labelledby', `ev-t-${e.id}`);
   const img = photo(e, 'ev-prox-img');
-  if (img) { const fig = make('figure', 'ev-prox-fig'); img.addEventListener('error', () => fig.remove()); fig.append(img); art.append(fig); }
+  const sinFoto = () => art.classList.add('ev-prox--sin-foto'); // sin figura, el cuerpo toma todo el ancho del panel
+  if (img) { const fig = make('figure', 'ev-prox-fig'); img.addEventListener('error', () => { fig.remove(); sinFoto(); }); fig.append(img); art.append(fig); } else sinFoto();
   const body = make('div', 'ev-prox-cuerpo');
   const rot = make('div', 'ev-rot');
   rot.append(badge(e.fecha === dayKey(now) ? 'Hoy' : 'Próximo'));
