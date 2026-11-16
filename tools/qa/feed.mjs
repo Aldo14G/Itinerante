@@ -348,14 +348,14 @@ overrideEventos = null;
 {
   const pas = (i, n, extra = {}) => ({ id: `ant-${i}`, tipo: ['Charla', 'Lectura', 'Juego', 'Taller'][i % 4], titulo: ['Tarde de Letras XVI', 'Círculo de otoño', 'Ajedrez en la casa', 'Taller de escritura creativa'][i % 4], fecha: dayMty(n), hora: '18:30', fin: null, con: i % 3 === 0 ? 'Nombre de prueba' : null, descripcion: 'Texto de prueba.', imagen: ['assets/img/cartelera-1.webp', 'assets/img/cartelera-2.webp', 'assets/img/cartelera-3.webp'][i % 3], alt: 'Foto de prueba', reserva: { tipo: 'luma', url: 'https://lu.ma/pasado' }, costo: ['$50 MXN'], ...extra });
   const ANT = [-8, -22, -40, -70, -120, -200, -330, -420].map((n, i) => pas(i, n));
-  const ANTES = { eventos: [...PRUEBA.eventos.filter(e => e.id !== 'prueba-pasado'), ...ANT, pas(90, -730), pas(91, -900, { id: 'ant-viejo' })] }; // dos fuera de la ventana
+  const ANTES = { eventos: [...PRUEBA.eventos.filter(e => e.id !== 'prueba-pasado'), ...ANT, pas(90, -745), pas(91, -900, { id: 'ant-viejo' })] }; // dos fuera de la ventana
   const planA = eventosPlan(validEventos(ANTES));
   const leer = () => ev(`(() => { const sec = document.querySelector('#cartelera'); const q = (s, r = sec) => r.querySelector(s); const all = (s, r = sec) => [...r.querySelectorAll(s)];
     const R = e => { const b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)]; };
     const cs = (e, p) => getComputedStyle(e)[p];
     const ap = q('.ev-anteriores'), ul = q('.ev-pasados'), fold = q('.ev-fold');
     const rows = all('.ev-pasado'), vis = rows.filter(l => !l.hidden && getComputedStyle(l).display !== 'none');
-    const fila = l => { const img = q('.ev-pas-img', l), f = q('.ev-pas-fecha', l), t = q('.ev-pas-tit', l), m = q('.ev-pas-meta', l); return { id: l.dataset.id, box: R(l), bg: cs(l, 'backgroundColor'), bt: cs(l, 'borderTopWidth'), shadow: cs(l, 'boxShadow'), glass: cs(l, 'backdropFilter'), cursor: cs(l, 'cursor'), tag: t.tagName, tit: t.textContent, titFs: cs(t, 'fontSize'), titW: cs(t, 'fontWeight'), fecha: f.querySelector('[aria-hidden]')?.textContent, fechaSr: f.querySelector('.sr-only')?.textContent, fechaFs: cs(f, 'fontSize'), fechaTT: cs(f, 'textTransform'), meta: m?.textContent || '', metaFs: m ? cs(m, 'fontSize') : '', img: img && { box: R(img), alt: img.getAttribute('alt'), radius: cs(img, 'borderTopLeftRadius'), outline: cs(img, 'outlineStyle') + ' ' + cs(img, 'outlineWidth'), fit: cs(img, 'objectFit'), ok: img.naturalWidth > 0 }, acts: all('a, button, input, [tabindex]', l).length, over: [...l.querySelectorAll('*')].filter(e => e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible').length }; };
+    const fila = l => { const img = q('.ev-pas-img', l), f = q('.ev-pas-fecha', l), t = q('.ev-pas-tit', l), m = q('.ev-pas-meta', l); return { id: l.dataset.id, box: R(l), bg: cs(l, 'backgroundColor'), bt: cs(l, 'borderTopWidth'), shadow: cs(l, 'boxShadow'), glass: cs(l, 'backdropFilter'), cursor: cs(l, 'cursor'), tag: t.tagName, tit: t.textContent, titFs: cs(t, 'fontSize'), titW: cs(t, 'fontWeight'), fecha: f.querySelector('[aria-hidden]')?.textContent, fechaSr: f.querySelector('.sr-only')?.textContent, fechaFs: cs(f, 'fontSize'), fechaTT: cs(f, 'textTransform'), meta: m?.textContent || '', metaFs: m ? cs(m, 'fontSize') : '', img: img && { box: R(img), alt: img.getAttribute('alt'), radius: cs(img, 'borderTopLeftRadius'), outline: cs(img, 'outlineStyle') + ' ' + cs(img, 'outlineWidth'), fit: cs(img, 'objectFit'), ok: img.naturalWidth > 0 }, acts: all('a, button, input, [tabindex]', l).length, over: [...l.querySelectorAll('*')].filter(e => !e.closest('.sr-only') && e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible').length }; };
     return { ap: !!ap, labelled: ap && ap.getAttribute('aria-labelledby') === q('.ev-anteriores > .ev-sub')?.id, h: q('.ev-anteriores > .ev-sub')?.tagName, hTxt: q('.ev-anteriores > .ev-sub')?.textContent, ul: ul && { tag: ul.tagName, id: ul.id, bb: cs(ul, 'borderBottomWidth') }, n: rows.length, nVis: vis.length, filas: vis.map(fila), ids: vis.map(l => l.dataset.id),
       fold: fold && { txt: fold.textContent.trim(), exp: fold.getAttribute('aria-expanded'), ctl: fold.getAttribute('aria-controls'), ctlOk: !!document.getElementById(fold.getAttribute('aria-controls')), cls: fold.className, box: R(fold), focus: document.activeElement === fold, top: fold.getBoundingClientRect().top, bg: cs(fold, 'backgroundColor') },
       apBox: ap && R(ap), lista: q('.ev-lista') && R(q('.ev-lista')), lado: q('.ev-lado') && R(q('.ev-lado')), secH: Math.round(sec.getBoundingClientRect().height), over: document.documentElement.scrollWidth > innerWidth, text: ap?.innerText || '',
@@ -432,6 +432,15 @@ overrideEventos = null;
       check('anteriores', `${vw}×${vh} cartel de 4000×6000 (no cuadrado): se muestra entero y cuadrado dentro de su marco, sin desbordar la página`, big.nat[0] === 4000 && Math.abs(big.box[0] - big.box[1]) <= 1 && big.inside && !big.over && big.box[0] < 700, JSON.stringify(big));
     }
     cartelEnorme = null;
+  }
+  // (6b) eventos de la hoja sin cartel (`origen: "hoja"`, imagen null): destacado, lista y anteriores sin foto ni recuadro roto
+  const hoja = (id, n, extra = {}) => ({ id, origen: 'hoja', tipo: 'Charla', titulo: `De la hoja ${id}`, fecha: dayMty(n), hora: '18:00', fin: null, con: 'Nombre de prueba', descripcion: 'Texto de prueba de un evento de la hoja sin cartel.', imagen: null, alt: '', reserva: null, ...extra });
+  overrideEventos = { eventos: [hoja('hoja-a', 4, { reserva: { tipo: 'luma', url: 'https://lu.ma/hoja' } }), hoja('hoja-b', 9), hoja('hoja-c', -9)] };
+  for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
+    await open(vw, vh, { reset: true, mobile, wait: mobile ? 4000 : 2500 }); await irEventos(); await sleep(800);
+    const h = await ev(`(() => { const sec = document.querySelector('#cartelera'), r = e => e.getBoundingClientRect(); const prox = sec.querySelector('.ev-prox'), cu = prox?.querySelector('.ev-prox-cuerpo'); return { prox: !!prox, sin: prox?.classList.contains('ev-prox--sin-foto'), fig: !!sec.querySelector('.ev-prox-fig'), imgs: sec.querySelectorAll('.ev-prox-img, .ev-card-img, .ev-pas-img').length, broken: [...sec.querySelectorAll('img')].filter(i => i.complete && i.naturalWidth === 0).length, cuerpo: cu && [Math.round(r(cu).width), Math.round(r(prox).width)], filas: sec.querySelectorAll('.ev-fila').length, pas: sec.querySelectorAll('.ev-pasado').length, over: document.documentElement.scrollWidth > innerWidth, h: Math.round(r(prox).height) }; })()`);
+    await shot(`03a-hoja-sin-foto-${vw}.jpg`);
+    check('anteriores', `${vw}×${vh} eventos de la hoja sin cartel (imagen null): destacado sin figura (.ev-prox--sin-foto; ${vw >= 1024 ? 'el cuerpo ocupa 8 de 12 columnas' : 'el cuerpo a todo el ancho'}), una fila en la lista y una en anteriores, ninguna imagen ni recuadro roto, sin desborde`, h.prox && h.sin && !h.fig && h.imgs === 0 && h.broken === 0 && h.filas === 1 && h.pas === 1 && !h.over && (vw >= 1024 ? h.cuerpo[0] / h.cuerpo[1] > 0.6 && h.cuerpo[0] / h.cuerpo[1] < 0.72 : h.cuerpo[0] === h.cuerpo[1]), JSON.stringify(h));
   }
   // (7) 150 eventos (50 próximos y 100 pasados): pinta sin tareas largas con CPU 4× y arma solo 6 filas de anteriores
   const muchos = { eventos: [...Array.from({ length: 50 }, (_, i) => ({ ...pas(i, 1 + i * 2), id: `prox-${i}`, reserva: i % 2 ? null : { tipo: 'luma', url: 'https://lu.ma/x' } })), ...Array.from({ length: 100 }, (_, i) => pas(i + 100, -3 - i * 6))] };
@@ -613,10 +622,10 @@ await send('Page.navigate', { url: `${URL_}#libro-${pick.id}` }); await sleep(40
 const deep = await ev(`({ open: document.getElementById('cat-drawer').open, modo: document.getElementById('cat-drawer').dataset.modo, hash: location.hash })`);
 check('ficha', 'un enlace #libro-<id> abre la ficha de ese libro (la única) y deja la dirección limpia', deep.open && !deep.modo && deep.hash === '', JSON.stringify(deep));
 // 4d. Con fechas de llegada reales: la tira son esas llegadas (lo más reciente primero) y solo las recientes son «Nuevo»; nada del resto del catálogo.
-// 3 llegadas en las dos últimas semanas, 3 anteriores y una sin fecha, en desorden: la tira ordena de lo más reciente a lo más antiguo y deja al final la que no trae fecha.
-const ages = [1, 3, 20, 2, 30, null, 40];
-const newsOrder = [0, 3, 1, 2, 4, 6, 5].map(i => ids[i]);
-const NEW7 = JSON.stringify([true, true, true, false, false, false, false]);
+// 3 llegadas en las dos últimas semanas, 3 anteriores dentro de los 45 días y una de hace 50 días (vencida), en desorden: la tira ordena de lo más reciente a lo más antiguo y no pinta la vencida.
+const ages = [1, 3, 20, 2, 30, 50, 40];
+const newsOrder = [0, 3, 1, 2, 4, 6].map(i => ids[i]);
+const NEW7 = JSON.stringify([true, true, true, false, false, false]);
 override = { ...realData, novedades: { titulo: 'Recién llegados', entradas: ids.map((id, i) => (ages[i] === null ? { id } : { id, llegada: dayAgo(ages[i]) })) } };
 await ev(`localStorage.clear()`);
 await open(393, 659, { wait: 2500 });
@@ -625,7 +634,7 @@ check('novedades', 'primera visita con llegadas, antes de acercarse: punto en el
 await approach();
 const withData = await newsState();
 check('novedades', 'con el inicio fuera de la vista, el control «3 novedades recientes» toma su renglón (sin que nadie lo vea saltar)', withData.hint && withData.cta === '3 novedades recientes', JSON.stringify({ hint: withData.hint, cta: withData.cta }));
-check('novedades', 'con entradas, la sección aparece sola con esas siete llegadas (lo más reciente primero, sin fecha al final) y nada más; titular «Novedades» y «3 llegaron en las últimas dos semanas»', withData.cards === 7 && !withData.hidden && withData.hasNews && JSON.stringify(withData.ids) === JSON.stringify(newsOrder) && withData.title === 'Novedades' && withData.status === '3 llegaron en las últimas dos semanas', JSON.stringify(withData).slice(0, 600));
+check('novedades', 'con entradas, la sección aparece sola con esas seis llegadas vigentes (lo más reciente primero; la de hace 50 días no se pinta) y nada más; titular «Novedades» y «3 llegaron en las últimas dos semanas»', withData.cards === 6 && !withData.hidden && withData.hasNews && JSON.stringify(withData.ids) === JSON.stringify(newsOrder) && withData.title === 'Novedades' && withData.status === '3 llegaron en las últimas dos semanas', JSON.stringify(withData).slice(0, 600));
 check('novedades', '«Nuevo» solo en las tres llegadas recientes, dentro del botón del libro y antes de su título (entra en su nombre accesible)', JSON.stringify(withData.badges) === NEW7 && withData.badgeFirst, JSON.stringify(withData.badges.slice(0, 9)));
 check('novedades', 'sin aviso de muestra, sin ranking y sin fechas impresas (la fecha de llegada solo ordena y decide «Nuevo»)', !/Datos de muestra|no es inventario|más leídos|más vendid/i.test(withData.text) && !/\d{4}-\d{2}-\d{2}|\d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)|hace \d+ días/i.test(withData.text), withData.text.slice(0, 300));
 await ev(`document.querySelector('#novedades').scrollIntoView()`); await sleep(600);
@@ -644,14 +653,39 @@ await ev(`localStorage.setItem('iti-news-visto', '${dayAgo(2)}')`);
 await open(393, 659, { wait: 2500 });
 await approach();
 const back = await newsState();
-check('novedades', 'visita de regreso (vista hace 2 días): una sola llegada posterior → «1 llegó desde tu última visita», una insignia y «, 1 sin ver»', back.status === '1 llegó desde tu última visita' && JSON.stringify(back.badges.slice(0, 7)) === JSON.stringify([true, false, false, false, false, false, false]) && back.badges.filter(Boolean).length === 1 && back.dot && back.sr === ', 1 sin ver', JSON.stringify({ status: back.status, sr: back.sr }));
-// Compatibilidad: la clave antigua `ids` (sin fecha) va primero en su orden y nunca lleva «Nuevo».
+check('novedades', 'visita de regreso (vista hace 2 días): una sola llegada posterior → «1 llegó desde tu última visita», una insignia y «, 1 sin ver»', back.status === '1 llegó desde tu última visita' && JSON.stringify(back.badges.slice(0, 6)) === JSON.stringify([true, false, false, false, false, false]) && back.badges.filter(Boolean).length === 1 && back.dot && back.sr === ', 1 sin ver', JSON.stringify({ status: back.status, sr: back.sr }));
+// Sin fecha real, la entrada no se puede juzgar reciente: no se muestra (también la clave antigua `ids`): no hay sección, ni punto, ni control.
 override = { ...realData, novedades: { titulo: 'Recién llegados', ids } };
 await ev(`localStorage.clear()`);
 await open(393, 659, { wait: 2500 });
 await approach();
 const undated = await newsState();
-check('novedades', 'sin fecha de llegada (clave antigua `ids`) la sección muestra esos libros en su orden, sin «Nuevo», ni punto ni control', undated.cards === 7 && JSON.stringify(undated.ids) === JSON.stringify(ids) && undated.badges.every(b => !b) && !undated.dot && undated.cta === null, JSON.stringify({ cards: undated.cards, dot: undated.dot, cta: undated.cta }));
+check('novedades', 'entradas sin fecha de llegada (clave antigua `ids`): no hay sección, ni enlaces, ni punto ni control (no se puede saber si son recientes)', undated.cards === 0 && undated.hidden && !undated.hasNews && !undated.dot && undated.cta === null, JSON.stringify({ cards: undated.cards, hidden: undated.hidden, dot: undated.dot, cta: undated.cta }));
+// Todas vencidas (hace 46 días o más) o de libros que ya no existen: igual que con la lista vacía.
+for (const [nombre, entradas] of [['todas de hace 46 días o más', ids.map((id, i) => ({ id, llegada: dayMty(-(46 + i * 10)) }))], ['de libros que ya no están en el catálogo', [{ id: 'ya-no-existe', llegada: dayMty(-1) }, { id: 'tampoco', llegada: dayMty(-2) }]]]) {
+  override = { ...realData, novedades: { titulo: 'Recién llegados', entradas } };
+  await ev(`localStorage.clear()`);
+  await open(393, 659, { wait: 2500 });
+  await approach();
+  const v = await newsState();
+  const fila = await ev(`[...document.querySelectorAll('[data-news-link]')].map(l => l.hidden || l.getBoundingClientRect().width === 0)`);
+  check('novedades', `${nombre}: no existen la sección, su enlace de la barra y del menú, el punto ni el control del inicio (igual que con la lista vacía)`, v.cards === 0 && v.hidden && !v.hasNews && !v.dot && v.cta === null && fila.every(Boolean), JSON.stringify({ cards: v.cards, hidden: v.hidden, hasNews: v.hasNews, dot: v.dot, cta: v.cta, fila }));
+}
+// Ventana de 45 días y arranque: una llegada de hace 45 días entra; la visita siguiente (iti-news-vence ya pasado) no reserva nada antes del primer render.
+override = { ...realData, novedades: { titulo: 'Recién llegados', entradas: [{ id: ids[0], llegada: dayMty(-45) }, { id: ids[1], llegada: dayMty(-46) }] } };
+await ev(`localStorage.clear()`);
+await open(393, 659, { wait: 2500 }); await approach();
+const v45 = await newsState();
+const guardado = await ev(`({ estado: localStorage.getItem('iti-news-estado'), vence: localStorage.getItem('iti-news-vence') })`);
+check('novedades', 'ventana de 45 días: la llegada de hace 45 días se muestra y la de hace 46 no (1 tarjeta); la visita deja iti-news-vence = llegada + 45 días (hoy, el último día)', v45.cards === 1 && v45.ids[0] === ids[0] && guardado.vence === dayMty(0), JSON.stringify({ cards: v45.cards, guardado, hoy: dayMty(0) }));
+await send('Page.addScriptToEvaluateOnNewDocument', { source: `document.addEventListener('DOMContentLoaded', () => { window.__arranque = [...document.documentElement.classList].filter(c => /has-news|news-hint/.test(c)).join(' '); });` });
+await ev(`localStorage.setItem('iti-news-estado', 'p'); localStorage.setItem('iti-news-vence', ${JSON.stringify(dayMty(-1))})`);
+await open(393, 659, { wait: 800 });
+const arrVencido = await ev(`window.__arranque`);
+await ev(`localStorage.setItem('iti-news-vence', ${JSON.stringify(dayMty(0))})`);
+await open(393, 659, { wait: 800 });
+const arrVigente = await ev(`window.__arranque`);
+check('novedades', 'boot.js: con la ventana ya cerrada (vence ayer) no reserva la sección ni el renglón del control antes del primer render; con la ventana abierta (vence hoy) sí', arrVencido === '' && /has-news/.test(arrVigente) && /news-hint/.test(arrVigente), JSON.stringify({ arrVencido, arrVigente }));
 check('consola', 'sin errores de consola con Novedades', !problems.length, problems.join(' | '));
 override = null;
 await ev(`localStorage.clear()`);

@@ -34,7 +34,11 @@ const HASTA_KEY = 'iti-ev-hasta'; // AAAA-MM-DD del último evento vigente: lo q
 // ---------------------------------------------------------------------------------------------
 // Lógica pura (se prueba con fechas en tests/site.test.mjs)
 
-const dayKey = date => new Intl.DateTimeFormat('en-CA', { timeZone: MTY, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); // AAAA-MM-DD en Monterrey
+// Un Intl.DateTimeFormat cuesta (≈ 0.2 ms al construirlo): se arma una vez por combinación de opciones; con cientos de eventos se llama miles de veces.
+const fmtCache = new Map();
+const fmt = (locale, opts) => { const k = locale + JSON.stringify(opts); let f = fmtCache.get(k); if (!f) fmtCache.set(k, f = new Intl.DateTimeFormat(locale, opts)); return f; };
+const DAY_FMT = { timeZone: MTY, year: 'numeric', month: '2-digit', day: '2-digit' };
+const dayKey = date => fmt('en-CA', DAY_FMT).format(date); // AAAA-MM-DD en Monterrey
 /** ¿Es una fecha real escrita como AAAA-MM-DD? (2026-02-30 no lo es). */
 export function validDay(value) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -147,7 +151,7 @@ export function eventosProblems(data) {
 
 // Partes de una fecha en español (México), sin puntos de abreviatura. El mediodía de Monterrey (UTC−6 todo el año) no cambia de día al dar formato.
 const noonOf = fecha => { const [y, m, d] = fecha.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d, 18)); };
-const partsOf = (fecha, opts) => Object.fromEntries(new Intl.DateTimeFormat('es-MX', { timeZone: MTY, ...opts }).formatToParts(noonOf(fecha)).map(p => [p.type, p.value.replace('.', '')]));
+const partsOf = (fecha, opts) => Object.fromEntries(fmt('es-MX', { timeZone: MTY, ...opts }).formatToParts(noonOf(fecha)).map(p => [p.type, p.value.replace('.', '')]));
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /**

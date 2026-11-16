@@ -642,11 +642,12 @@ test('eventos: insignias de tipo y de estado; la fecha solo sale de eventos.json
   assert.equal(horario({ hora: '18:30', fin: '20:00' }), '18:30–20:00');
   assert.equal(horario({ hora: null, fin: null }), '');
 });
-test('eventos.json: tres propuestas reales, sin fechas, ponentes, costos ni enlaces inventados; iguales a las de index.html; fotos registradas', async () => {
+test('eventos.json: tres propuestas reales, sin fechas, ponentes, costos ni enlaces inventados; iguales a las de index.html; fotos registradas (los eventos de la hoja, `origen: "hoja"`, quedan fuera de esta comparación)', async () => {
   const data = JSON.parse(await readFile(here('./assets/data/eventos.json'), 'utf8'));
   const prov = JSON.parse(await readFile(here('./assets/provenance.json'), 'utf8'));
   assert.deepEqual(eventosProblems(data), [], 'el archivo pasa la revisión estricta');
-  const list = validEventos(data);
+  // Lo que publica el sincronizador con la hoja (`origen: "hoja"`) no se compara con index.html ni exige foto registrada: solo los eventos del repositorio.
+  const list = validEventos({ eventos: data.eventos.filter(e => e?.origen !== 'hoja') });
   assert.deepEqual(list.map(e => e.id), ['circulo', 'ajedrez', 'taller']);
   for (const e of list) {
     assert.ok(e.fecha === null && e.hora === null && e.fin === null && e.con === null && e.invitado === null && e.colabora === null && e.ciclo === null && e.reserva === null && e.costo.length === 0 && e.encuadre === 'foto', `${e.id}: hoy es una propuesta: sin fecha, hora, ponente, costo ni reserva (no se inventa nada)`);
@@ -807,6 +808,19 @@ test('Eventos: lo que el proceso externo puede dejar en los datos no rompe nada 
     const [e] = validEventos({ eventos: [{ id: 'r', ...base, titulo: 'Con reserva rara', fecha: '2026-12-01', reserva }] });
     assert.deepEqual([e.titulo, e.reserva], ['Con reserva rara', null], `reserva inválida: ${JSON.stringify(reserva)}`);
   }
+  // evento de la hoja sin cartel (`origen: "hoja"`, imagen null): válido, se publica sin foto (el campo `origen` y los desconocidos se ignoran)
+  const hoja = { id: 'de-la-hoja', origen: 'hoja', titulo: 'De la hoja', tipo: 'Charla', fecha: '2026-12-01', hora: '18:00', fin: null, con: null, descripcion: 'd', imagen: null, alt: '', reserva: null, campoNuevo: 7 };
+  assert.deepEqual(eventosProblems({ eventos: [hoja] }), [], 'un evento de la hoja puede ir sin imagen ni alt');
+  assert.deepEqual(eventosProblems({ eventos: [{ ...hoja, imagen: undefined }] }), [], 'imagen ausente, igual');
+  assert.ok(eventosProblems({ eventos: [{ ...hoja, origen: undefined }] }).some(p => /imagen/.test(p)), 'uno del repositorio (sin origen) sigue exigiendo imagen válida');
+  assert.ok(eventosProblems({ eventos: [{ ...hoja, imagen: 'https://x.example/a.jpg' }] }).some(p => /imagen/.test(p)), 'una imagen de la hoja, si la trae, debe ser local');
+  assert.ok(eventosProblems({ eventos: [{ ...hoja, titulo: '' }] }).some(p => /titulo/.test(p)), 'lo demás se sigue exigiendo');
+  const sinFoto = validEventos({ eventos: [hoja, { ...hoja, id: 'pasada-sin-foto', fecha: '2026-05-01' }] });
+  assert.deepEqual(sinFoto.map(e => [e.id, e.imagen, e.alt]), [['de-la-hoja', null, ''], ['pasada-sin-foto', null, '']], 'validEventos conserva el evento sin foto');
+  const ps = eventosPlan(sinFoto, now);
+  assert.deepEqual([ps.destacado.id, ps.anteriores.map(e => e.id)], ['de-la-hoja', ['pasada-sin-foto']], 'el sin foto es destacado o fila de anteriores como cualquiera');
+  const feedSrc = readFileSync_('feed.js');
+  assert.ok(/else sinFoto\(\)/.test(feedSrc) && /fig\.remove\(\); sinFoto\(\);/.test(feedSrc) && /\.ev-prox--sin-foto \.ev-prox-cuerpo \{ grid-column: 1 \/ span 8;/.test(readFileSync_('style.css')), 'el destacado sin foto (o con la foto rota) no deja media tarjeta vacía');
   // el resto de los campos mal formados no tira el evento
   const raro = validEventos({ eventos: [{ id: 'raro', titulo: 'Raro', fecha: '2026-05-01', hora: '25:99', fin: 'x', con: 7, costo: 'gratis', encuadre: { a: 1 }, descripcion: null, imagen: null, alt: undefined }, null, 'x', 7, { id: 'sin-titulo' }, { titulo: 'sin id' }] });
   assert.deepEqual(raro.map(e => e.id), ['raro']);

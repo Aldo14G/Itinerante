@@ -265,7 +265,8 @@
       "descripcion": "El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): panel en superficie con borde de 1 px (linea) y sin sombra, foto 16:9 a sangre o cartel entero y cuadrado como objeto sobre fondo-3 (encuadre), BloqueFecha (fecha tipográfica) separado del título por una línea fina, «Próximo» (u «Hoy», la única insignia con relleno), tipo y ciclo como texto, título (Title 1), descripción, los datos como lista de definición entre líneas finas (Hora · Con · Invita · Colabora · Costo, solo los que el evento trae; el costo con sus renglones tal como los da la librería) y acciones: la reserva del evento como primaria de 56 («Registrarme», enlace a Luma en otra pestaña, o «Reservar por WhatsApp» con el mensaje escrito; sin reserva, «Añadir al calendario») y los iconos de contorno de 44 «Añadir al calendario» y «Compartir». Desde 1024 px, cuerpo en las columnas 1–6 y foto en 7–12. Solo existe con un evento con fecha vigente.",
       "variantes": [
         { "nombre": "foto", "selector": ".ev-prox", "uso": "Fotografía 16:9 (teléfono) o a todo el alto de la mitad 7–12 (escritorio), recortada (cover)." },
-        { "nombre": "cartel", "selector": ".ev-prox--cartel", "uso": "Cartel cuadrado con texto: entero, 1:1, nunca recortado ni a sangre; sobre fondo-3 con relleno interior de la escala, radio-md, sombra-portada y un anillo de 1 px." }
+        { "nombre": "cartel", "selector": ".ev-prox--cartel", "uso": "Cartel cuadrado con texto: entero, 1:1, nunca recortado ni a sangre; sobre fondo-3 con relleno interior de la escala, radio-md, sombra-portada y un anillo de 1 px." },
+        { "nombre": "sin foto", "selector": ".ev-prox--sin-foto", "uso": "Evento de la hoja sin cartel (imagen: null) o con una imagen que no carga: sin figura; el cuerpo ocupa 8 columnas en escritorio y todo el ancho en el teléfono." }
       ],
       "archivos": [
         { "ruta": "style.css", "selectores": [".ev-prox", ".ev-prox--cartel", ".ev-prox-fig", ".ev-prox-img", ".ev-prox-cuerpo", ".ev-prox-enc", ".ev-prox-id", ".ev-prox-tit", ".ev-prox-desc", ".ev-datos", ".ev-dato", ".ev-dato--costo", ".ev-costo", ".ev-acc", ".ev-rot", ".ev-tipo"] },
@@ -277,7 +278,7 @@
       "estados": {
         "foco": { "css": [".btn:focus-visible"], "nota": "El panel no es un control: el foco va a sus tres acciones." },
         "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (plan.destacado) out.push(destacadoNode(plan.destacado, now));" }], "nota": "Sin un evento con fecha vigente no hay destacado (por diseño): queda la lista de propuestas." },
-        "error": { "js": [{ "ruta": "feed.js", "texto": "img.addEventListener('error', () => fig.remove())" }], "nota": "Si la imagen no carga, el destacado queda sin figura; si eventos.json no llega, queda lo que trae index.html." },
+        "error": { "js": [{ "ruta": "feed.js", "texto": "img.addEventListener('error', () => { fig.remove(); sinFoto(); })" }], "nota": "Si la imagen no carga (o el evento de la hoja no trae cartel), el destacado queda sin figura y el cuerpo toma el ancho; si eventos.json no llega, queda lo que trae index.html." },
         "movimiento_reducido": { "css": [".motion .ev-espera"], "js": [{ "ruta": "feed.js", "texto": "if (!isMotion() || !('IntersectionObserver' in window)) return;" }], "nota": "La entrada (8 px y opacidad, dur-rapida) solo corre con movimiento y solo en lo que aún no se ve; sin movimiento todo está colocado." }
       },
       "no_aplica": { "hover": "La tarjeta no es un control; sus botones usan el hover de Boton." },
