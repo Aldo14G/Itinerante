@@ -4,13 +4,18 @@
 // del 2026-11-13: una sección llamada «Novedades» que mostraba el catálogo de la A a la Z prometía lo que no tenía).
 // Con entradas, la tira muestra esas llegadas (lo más reciente primero) y «Nuevo» en lo que la persona no ha visto; «Ver todo» la despliega en
 // rejilla. Nunca se simula ni se presenta como ranking. La fecha no se imprime; sirve para ordenar y para saber qué es «Nuevo».
+// Solo lo más reciente (2026-11-16): una llegada de hace más de NEWS_DAYS (45) días no se pinta aunque siga en el JSON, y una entrada sin fecha
+// real tampoco (no se puede saber si es reciente). Con todas vencidas, la sección, su enlace, su fila del menú y el control del inicio no existen,
+// igual que con la lista vacía. Un id que ya no está en catalog.json se ignora (sin hueco, sin conteo).
 // Este módulo es ligero a propósito (el conteo se pide pronto): el catálogo se importa solo al pintar la tira.
 import { loadSample, loadCollections } from './sample.js';
 import { DUR, EASE, confirmThen } from './motion.js';
 
 export const NEWS_SIZE = 12;
 export const NEW_DAYS = 14; // primera visita: cuentan como nuevas las llegadas de las últimas dos semanas
+export const NEWS_DAYS = 45; // ventana de Novedades: una llegada de hace más de 45 días (día de Monterrey) ya no se muestra; la de hace 45 todavía
 const SEEN_KEY = 'iti-news-visto'; // fecha (AAAA-MM-DD) de la última vez que esta persona vio Novedades
+const VENCE_KEY = 'iti-news-vence'; // AAAA-MM-DD hasta el que la llegada más reciente sigue en la ventana: boot.js no reserva la sección pasado ese día
 const STATE_KEY = 'iti-news-estado'; // lo que boot.js lee antes del primer render: n = sin llegadas (no hay sección), s = sin pendientes, p = con llegadas sin ver
 
 // ---------------------------------------------------------------------------------------------
@@ -30,6 +35,8 @@ export function validDay(value) {
 }
 
 const dayNumber = day => Math.round(Date.parse(`${day}T00:00:00Z`) / 86_400_000);
+/** El día (AAAA-MM-DD) `n` días después de `day`. */
+export const addDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 
 /**
  * ¿Esta llegada es nueva para la persona? Con `visto` (la fecha de su última visita a Novedades): llegó después.
@@ -43,26 +50,25 @@ export function isNew(llegada, { visto = null, hoy } = {}) {
 }
 
 /**
- * Entradas válidas de la lista, lo más reciente primero (a igual fecha, el orden del JSON). Una entrada vale si trae `id`;
- * las que aún no llegan (fecha posterior a hoy) esperan su día. Compatibilidad: una entrada sin fecha válida, o la clave
- * antigua `ids`, se muestra al final y nunca lleva «Nuevo».
+ * Entradas válidas de la lista, lo más reciente primero (a igual fecha, el orden del JSON; el primero de un id repetido gana). Una entrada
+ * vale si trae `id` y una `llegada` real que ya ocurrió (las que aún no llegan, con fecha posterior a hoy, esperan su día) y que no es más
+ * vieja de NEWS_DAYS días (la de hace 45 días todavía; la de hace 46, no). Sin fecha real no se puede saber si es reciente: no se muestra.
  */
 export function newsEntries(data, hoy) {
   const col = data?.novedades;
-  const raw = Array.isArray(col?.entradas) ? col.entradas : Array.isArray(col?.ids) ? col.ids.map(id => ({ id })) : [];
+  const raw = Array.isArray(col?.entradas) ? col.entradas : [];
   const seen = new Set();
   const list = [];
   for (const e of raw) {
     const id = typeof e?.id === 'string' ? e.id : '';
-    if (!id || seen.has(id)) continue;
-    const llegada = validDay(e.llegada) ? e.llegada : null;
-    if (llegada && validDay(hoy) && llegada > hoy) continue;
+    if (!id || seen.has(id) || !validDay(e.llegada)) continue;
     seen.add(id);
-    list.push({ id, llegada });
+    if (validDay(hoy) && (e.llegada > hoy || dayNumber(hoy) - dayNumber(e.llegada) > NEWS_DAYS)) continue;
+    list.push({ id, llegada: e.llegada });
   }
   return list
     .map((e, i) => ({ e, i }))
-    .sort((a, b) => (a.e.llegada === b.e.llegada ? a.i - b.i : !a.e.llegada ? 1 : !b.e.llegada ? -1 : a.e.llegada < b.e.llegada ? 1 : -1))
+    .sort((a, b) => (a.e.llegada === b.e.llegada ? a.i - b.i : a.e.llegada < b.e.llegada ? 1 : -1))
     .map(x => x.e);
 }
 
@@ -94,6 +100,7 @@ export function newsPlan(books, data, { visto = null, hoy = isoDay() } = {}) {
   const primera = !validDay(visto);
   return {
     show: kept.length > 0,
+    vence: kept.length ? addDays(kept[0].llegada, NEWS_DAYS) : null, // último día en que la llegada más reciente sigue en la ventana
     books: byId ? kept.map(e => byId.get(e.id)) : [],
     ids: kept.map(e => e.id),
     nuevos,
@@ -111,6 +118,7 @@ const store = () => { try { return globalThis.localStorage ?? null; } catch { re
 const readSeen = () => { try { const v = store()?.getItem(SEEN_KEY); return validDay(v) ? v : null; } catch { return null; } };
 const writeSeen = day => { try { store()?.setItem(SEEN_KEY, day); } catch { /* sin almacenamiento: la próxima visita vuelve a ser la primera */ } };
 const writeState = s => { try { store()?.setItem(STATE_KEY, s); } catch { /* sin almacenamiento */ } };
+const writeVence = day => { try { if (day) store()?.setItem(VENCE_KEY, day); else store()?.removeItem(VENCE_KEY); } catch { /* sin almacenamiento */ } };
 
 let visto; // la fecha con la que se pinta esta visita; no cambia mientras la persona mira la sección
 let shown = null; // último plan de llegadas aplicado (punto, control y línea de estado)
@@ -150,7 +158,7 @@ function apply(plan, { remember = true } = {}) {
   const status = section?.querySelector('[data-news-status]');
   if (status && plan.show && status.textContent !== plan.estado) status.textContent = plan.estado;
   settleHint(n > 0);
-  if (remember) writeState(!plan.show ? 'n' : n ? 'p' : 's');
+  if (remember) { writeState(!plan.show ? 'n' : n ? 'p' : 's'); writeVence(plan.show ? plan.vence : null); }
 }
 
 let counted;
@@ -163,7 +171,13 @@ export function initNewsCount() {
   return (counted ??= (async () => {
     visto = readSeen();
     let plan = { show: false, n: 0 }, ok = true;
-    try { plan = newsPlan(null, await loadCollections(), { visto, hoy: isoDay() }); } catch { ok = false; counted = undefined; } // sin datos no se promete nada
+    try {
+      const data = await loadCollections();
+      plan = newsPlan(null, data, { visto, hoy: isoDay() });
+      // Con llegadas vigentes se comprueba que sus libros sigan en el catálogo (el mismo catalog.json que luego usa el Catálogo: una sola carga):
+      // un id que ya no existe no cuenta ni deja un punto en la barra. Si el catálogo no llega, se confía en los ids del JSON y la tira corrige.
+      if (plan.show) { try { plan = newsPlan((await loadSample()).books, data, { visto, hoy: isoDay() }); } catch { /* se confía en los ids */ } }
+    } catch { ok = false; counted = undefined; } // sin datos no se promete nada
     apply(plan, { remember: ok }); // un fallo de red no se recuerda: la próxima visita vuelve a reservar
     if (plan.show && location.hash === '#novedades') document.getElementById('novedades')?.scrollIntoView(); // el ancla no existía al cargar
     return plan;

@@ -149,8 +149,9 @@ const SECCIONES = [
 ['subtitular', '.layer-title'], ['rotulo', '.cat-search label'], ['control', '.cat-combo'], ['rotulo', '.cat-status'],
 ['contenido', '.cat-grid'], ['accion', '.cat-fold'], ['texto', '.books-foot p'], ['control', '.books-foot .btn'] ] },
   { id: 'eventos', sel: '#cartelera', piezas: [
-    ['titular', '#bill-title'], ['entradilla', '.bill .sec-texto'], ['contenido', '.ev-prox'], ['rotulo', '.ev-grupo:not(.ev-propuestas) > .ev-sub'], ['contenido', '.ev-dias'],
-    ['rotulo', '.ev-propuestas > .ev-sub'], ['contenido', '.ev-propuestas .ev-filas'], ['bloque', '.ev-lado'] ] },
+    ['titular', '#bill-title'], ['entradilla', '.bill .sec-texto'], ['contenido', '.ev-prox'], ['rotulo', '.ev-grupo:not(.ev-propuestas):not(.ev-anteriores) > .ev-sub'], ['contenido', '.ev-dias'],
+    ['rotulo', '.ev-propuestas > .ev-sub'], ['contenido', '.ev-propuestas .ev-filas'], ['bloque', '.ev-lado'],
+    ['rotulo', '.ev-anteriores > .ev-sub'], ['contenido', '.ev-pasados'], ['accion', '.ev-fold'] ] },
   { id: 'cafe', sel: '#cafe', piezas: [
     ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['control', '.ct-nav', { bloque: true }], ['contenido', '.ct-lista'],
     ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p'], ['control', '.ct-cierre .btn'] ] },
@@ -171,14 +172,15 @@ const NIVELES = {
   'estado': ['.entry-status', '.visit-status'],
   'título de pieza': ['.cf-titulo', '.ev-card-tit'],
   'título del destacado': ['.ev-prox-tit'],   // Title 1 (2026-11-16): el destacado es lo único de Eventos que compite con el titular de sección; su forma es una sola
-  'versalitas': ['.ev-fecha-rot', '.ev-dia-sem'],   // 13 semibold en mayúsculas con interletra abierta: la fecha del destacado y el día de la lista
+  'versalitas': ['.ev-fecha-rot', '.ev-dia-sem', '.ev-pas-fecha'],   // 13 semibold en mayúsculas con interletra abierta: la fecha del destacado y el día de la lista
+  'título de fila anterior': ['.ev-pas-tit'],   // Headline 17 (2026-11-16): «Eventos anteriores» es archivo; su título no compite con el de una fila de «Después» (Title 3)
   'rótulo de dato': ['.ev-dato dt'],
   'valor de dato': ['.ev-dato dd'],
   'nombre de producto': ['.ct-nom'],      // Headline 17: la tarjeta de la carta es pequeña (2 a 4 por fila) y su nombre no compite con el título del grupo
   'texto de pieza': ['.cf-meta', '.ct-desc'],
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],
-  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-lado-txt']
+  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-lado-txt', '.ev-pas-meta']
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -285,7 +287,7 @@ function enPagina(cfg) {
         if (!visible(h)) continue;
         if (h.matches('.c3d')) { c3d(h, sup); continue; }
         if (h.matches('[role="radiogroup"], .ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
-        if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ct-rejilla')) {
+        if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ev-pasados, .ct-rejilla')) {
           const id = empuja(h, 'rejilla', sup);
           let i = 0;
           for (const li of h.children) { const r = li.getBoundingClientRect(); if (r.left < -1 || r.right > document.documentElement.clientWidth + 1 || !visible(li)) continue; if (i++ > 5) break; camina(li, id); }

@@ -101,6 +101,12 @@ genérico.
   evento con fecha ofrece «Añadir al calendario» (un archivo `.ics` armado en el
   navegador) y, el destacado, «Compartir» (local). El próximo evento vigente se avisa
   en el inicio («Próximo: Sáb 21 nov · título») y con un punto en «Eventos».
+  **El sitio muestra lo reciente y archiva 24 meses** (2026-11-16): un evento que ya
+  pasó se muestra en «Eventos anteriores» (solo título, fecha, tipo, quién y la
+  portada; sin reserva, calendario ni costo) durante 24 meses y luego deja de
+  mostrarse; Novedades muestra solo las llegadas de los últimos 45 días. Ni lo uno
+  ni lo otro muestra asistentes, cupos ni «quedan N lugares»; no se anuncia nada que
+  no esté en los datos.
 - **Contacto en un solo lugar** (decisión de Aldo, 2026-11-13: «Los contactos irán
   en un solo lugar específico para no sobresaltar el área»): el pie es el bloque
   «Contacto» (WhatsApp, Instagram, Facebook y Correo, con la línea «Escríbenos para

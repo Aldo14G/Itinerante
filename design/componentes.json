@@ -299,7 +299,7 @@
       "tokens": ["fondo-2", "tinta", "tinta-2", "turquesa-texto", "linea", "linea-fuerte", "radio-sm", "portada-evento", "portada-evento-amplia", "t-titulo-3", "t-titular", "t-versalitas", "t-fecha-lista", "t-subtitulo", "t-lectura", "anillo-foco", "canal-rejilla", "space-1", "space-2", "space-3", "space-4", "space-5", "space-6", "space-8", "space-12"],
       "estados": {
         "foco": { "css": [".ev-lado-txt a:focus-visible", ".btn:focus-visible"], "nota": "La fila no es un control: el foco va a sus acciones y al enlace de la nota." },
-        "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }" }], "nota": "Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»); una propuesta no lleva acciones." },
+        "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (!plan.conFecha && staticSignature(root) === planSignature(plan)) {" }], "nota": "Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»), sin repintarla; una propuesta no lleva acciones. Los eventos pasados de los últimos 24 meses van aparte, en EventosAnteriores." },
         "error": { "js": [{ "ruta": "feed.js", "texto": "catch { delete root.dataset.ready; return; }" }], "nota": "Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio." },
         "movimiento_reducido": { "css": [".motion .ev-espera"] }
       },
@@ -327,6 +327,53 @@
       "qa": ["tools/qa/feed.mjs", "tests/site.test.mjs"],
       "desde": "2026-11-16",
       "decision": "DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16)."
+    },
+    {
+      "id": "eventos-anteriores",
+      "nombre": "EventosAnteriores",
+      "tipo": "bloque",
+      "descripcion": "Apartado «Eventos anteriores» (2026-11-16) al final de la lista de Eventos, en su misma columna (1–8 desde 1024 px; ancho completo en el teléfono y la tableta): los eventos con fecha anterior a hoy (día de Monterrey) y de los últimos 24 meses pasan solos aquí, del más reciente al más antiguo; lo más viejo no se pinta aunque siga en eventos.json y las propuestas sin fecha nunca entran. Muestra los 6 más recientes y, si hay más, un botón de contorno «Ver los N anteriores» / «Ver menos» (aria-expanded y aria-controls; el foco se queda en el botón; al plegar la página sube lo que encogió para que el botón no se mueva bajo el cursor; las filas que se suman entran escalonadas solo con movimiento). El resto de las filas se arma en el primer despliegue. Sin ningún evento pasado válido el apartado no existe: ni encabezado, ni hueco, ni cambio de alto. Sin JavaScript no aparece (index.html no lo trae).",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".ev-anteriores", ".ev-pasados", ".ev-fold", ".ev-pasado[hidden]"] },
+        { "ruta": "feed.js", "exporta": ["foldAnteriores", "shiftMonths", "ANTERIORES_MESES", "ANTERIORES_VISIBLES", "PROXIMOS_MESES", "eventosPlan"], "internas": ["anterioresNode", "wireFold", "staggerIn", "reveal", "timing"], "ganchos": ["btn.setAttribute('aria-expanded', String(expanded))", "btn.setAttribute('aria-controls', ul.id)"] }
+      ],
+      "tokens": ["linea", "tinta", "space-4", "space-6", "space-8", "dur-rapida", "dur-lenta", "escalon-linea"],
+      "estados": {
+        "hover": { "css": [".btn--contorno:hover"], "nota": "El botón es un Boton de contorno (44 o 48 según el contexto): sus estados son los de Boton." },
+        "foco": { "css": [".btn:focus-visible"], "nota": "El foco se queda en el botón al desplegar y al plegar." },
+        "presionado": { "css": [".btn--contorno:active"] },
+        "expandido": { "js": [{ "ruta": "feed.js", "texto": "btn.setAttribute('aria-expanded', String(expanded));" }], "nota": "«Ver los N anteriores» → «Ver menos»: además del texto, aria-expanded." },
+        "oculto": { "css": [".ev-pasado[hidden]"], "nota": "Las filas más allá de la sexta se ocultan con hidden mientras el apartado está plegado." },
+        "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (plan.anteriores.length) lista.append(anterioresNode(plan, now));" }], "nota": "Sin eventos pasados de los últimos 24 meses no se crea el apartado (hoy, la lista real no tiene ninguno)." },
+        "movimiento_reducido": { "css": [".motion .ev-espera"], "nota": "Con «reducir movimiento» o la pausa, las filas que se suman aparecen colocadas." }
+      },
+      "aria": { "patron": "Disclosure + List", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/", "atributos": ["section aria-labelledby (el h3 «Eventos anteriores»)", "ul / li", "button aria-expanded y aria-controls (la lista)", "las filas ocultas con hidden"], "teclado": "Tab llega al botón; Enter o Espacio despliega o pliega; el foco no se mueve." },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/guias.mjs", "tools/qa/iphone.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-16",
+      "decision": "DESIGN.md, «Eventos anteriores y ventana de novedades» (2026-11-16)."
+    },
+    {
+      "id": "fila-evento-anterior",
+      "nombre": "FilaEventoAnterior",
+      "tipo": "bloque",
+      "descripcion": "Fila compacta de un evento ya ocurrido dentro de «Eventos anteriores»: entre líneas finas de 1 px y sin relleno, la fecha tipográfica pequeña en versalitas («SÁB · 21 NOV», con el año si no es el año en curso; la fecha completa va en texto sr-only), el título en Headline, «tipo · Con …» en Subheadline (tinta-2) y la portada cuadrada de 64 (88 desde 761 px) con radio-sm y anillo fino; un cartel se recorta a cuadrado en la miniatura. No es un control: sin enlace, sin reserva, sin calendario, sin «Compartir», sin costo ni «Próximo». La miniatura es decorativa (alt vacío) y si no carga se retira: la fila queda sin foto, nunca un recuadro roto.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".ev-pasado", ".ev-pas-txt", ".ev-pas-fecha", ".ev-pas-tit", ".ev-pas-meta", ".ev-pas-img"] },
+        { "ruta": "feed.js", "exporta": ["pasadoNode", "fechaPasada"], "ganchos": ["img.addEventListener('error', () => img.remove())"] }
+      ],
+      "tokens": ["tinta", "tinta-2", "linea", "radio-sm", "portada-evento", "t-versalitas", "t-titular", "t-subtitulo", "space-1", "space-4", "space-16"],
+      "estados": {
+        "error": { "js": [{ "ruta": "feed.js", "texto": "img.addEventListener('error', () => img.remove())" }], "nota": "Una portada que falla se retira y el texto ocupa su sitio." },
+        "oculto": { "css": [".ev-pasado[hidden]"], "nota": "Plegado, solo se ven las 6 más recientes." }
+      },
+      "no_aplica": {
+        "hover": "No es un control: sin cursor de mano ni estados de control.",
+        "foco": "No es un control: nada que enfocar."
+      },
+      "aria": { "patron": "List item (sin rol propio)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/", "atributos": ["li con h4 (el título)", "fecha visible aria-hidden y fecha completa en .sr-only", "miniatura con alt vacío"], "teclado": "—" },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/guias.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-16",
+      "decision": "DESIGN.md, «Eventos anteriores y ventana de novedades» (2026-11-16)."
     },
     {
       "id": "aviso-evento",

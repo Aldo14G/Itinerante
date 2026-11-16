@@ -8,8 +8,8 @@ import { coverflowPose as poseMotor, keyTarget, tiltPose, tiltTransform, ATENUAD
 import { validMenu, menuProblems, validFoto, precioCarta, currentGroup, groupId } from '../cafe.js';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
 import { openingStatus, monterreyNow } from '../app.js';
-import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, NEWS_SIZE, NEW_DAYS } from '../news.js';
-import { shareName, calName, registroName, reservaName, eventBadge, NO_DATE, validEventos, eventosProblems, eventosPlan, validRegistro, validTelefono, validReserva, reservaUrl, reservaMessage, notaCopy, quienLine, avisoLine, fechaBloque, fechaLarga, horario, icsOf, mtyToUtc, shareData, LUGAR, ICS_BLOQUE_MIN } from '../feed.js';
+import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, addDays, NEWS_SIZE, NEW_DAYS, NEWS_DAYS } from '../news.js';
+import { shareName, calName, registroName, reservaName, eventBadge, NO_DATE, validEventos, eventosProblems, eventosPlan, validRegistro, validTelefono, validReserva, reservaUrl, reservaMessage, notaCopy, quienLine, avisoLine, fechaBloque, fechaLarga, horario, icsOf, mtyToUtc, shareData, LUGAR, ICS_BLOQUE_MIN, shiftMonths, fechaPasada, foldAnteriores, ANTERIORES_MESES, ANTERIORES_VISIBLES, PROXIMOS_MESES } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
 import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
@@ -722,7 +722,8 @@ test('eventosPlan: próximos por fecha y hora, el primero es el destacado, el re
   assert.equal(plan.destacado.id, 'proximo', 'el más próximo es el destacado');
   assert.deepEqual(plan.dias.map(d => [d.fecha, d.eventos.map(e => e.id)]), [['2026-11-26', ['nov-26']], ['2026-12-05', ['dic-sin-hora', 'dic-temprano', 'dic-tarde']]], 'el resto, agrupado por día y ordenado por hora');
   assert.deepEqual(plan.propuestas.map(e => e.id), ['propuesta'], 'las propuestas, al final');
-  assert.ok(![plan.destacado, ...plan.dias.flatMap(d => d.eventos), ...plan.propuestas].some(e => e.id === 'pasado'), 'un evento con fecha pasada no se muestra');
+  assert.ok(![plan.destacado, ...plan.dias.flatMap(d => d.eventos), ...plan.propuestas].some(e => e.id === 'pasado'), 'un evento con fecha pasada ya no es próximo ni propuesta');
+  assert.deepEqual(plan.anteriores.map(e => e.id), ['pasado'], 'pasa solo a «Eventos anteriores»');
   assert.equal(plan.conFecha, 5);
   assert.deepEqual(plan.reservas, ['luma', 'whatsapp'], 'solo cuentan las reservas de los eventos vigentes');
   assert.equal(plan.aviso, 'Próximo: Sáb 21 nov · Tarde de Letras');
@@ -734,8 +735,115 @@ test('eventosPlan: próximos por fecha y hora, el primero es el destacado, el re
   assert.equal(eventosPlan(list, new Date('2026-11-22T06:30:00Z')).destacado.id, 'nov-26', 'al día siguiente ya no');
   // Sin eventos con fecha: ni destacado, ni días, ni aviso; solo las propuestas.
   const solo = eventosPlan(validEventos({ eventos: [{ id: 'p', ...base, fecha: null }, { id: 'viejo', ...base, fecha: '2026-01-10' }] }), now);
-  assert.deepEqual([solo.destacado, solo.dias, solo.conFecha, solo.aviso, solo.hasta, solo.reservas, solo.propuestas.map(e => e.id)], [null, [], 0, null, null, [], ['p']]);
+  assert.deepEqual([solo.destacado, solo.dias, solo.conFecha, solo.aviso, solo.hasta, solo.reservas, solo.propuestas.map(e => e.id), solo.anteriores.map(e => e.id)], [null, [], 0, null, null, [], ['p'], ['viejo']], 'un evento de enero, en noviembre, es anterior: no hay destacado, ni aviso, ni nota');
+  const vacio = eventosPlan(validEventos({ eventos: [{ id: 'p', ...base, fecha: null }] }), now);
+  assert.deepEqual(vacio.anteriores, [], 'la lista real de hoy (solo propuestas) no tiene anteriores: el apartado no existe');
   assert.equal(avisoLine({ fecha: '2026-11-21', hora: null, titulo: 'X' }, now), 'Próximo: Sáb 21 nov · X');
+});
+test('Eventos anteriores: partición, ventana de 24 meses, orden, plegado en 6 y casos límite (hoy es próximo, fecha inválida se descarta, mes bisiesto)', () => {
+  const now = new Date('2026-11-16T18:00:00Z'); // mediodía del 16 de noviembre de 2026 en Monterrey
+  const base = { tipo: 'Taller', titulo: 'T', hora: null, fin: null, con: null, descripcion: 'd', imagen: 'assets/img/cartelera-1.webp', alt: 'a', reserva: null };
+  const ids = l => l.map(e => e.id);
+  const plan = list => eventosPlan(validEventos({ eventos: list }), now);
+  assert.equal(ANTERIORES_MESES, 24);
+  assert.equal(ANTERIORES_VISIBLES, 6);
+  assert.equal(PROXIMOS_MESES, 24);
+  // partición: ayer es anterior; hoy (a cualquier hora) y mañana son próximos; la propuesta no es ni lo uno ni lo otro
+  const p = plan([{ id: 'ayer', ...base, fecha: '2026-11-15' }, { id: 'hoy', ...base, fecha: '2026-11-16', hora: '09:00' }, { id: 'manana', ...base, fecha: '2026-11-17' }, { id: 'sin-fecha', ...base, fecha: null }]);
+  assert.deepEqual([ids(p.anteriores), p.destacado.id, ids(p.dias.flatMap(d => d.eventos)), ids(p.propuestas)], [['ayer'], 'hoy', ['manana'], ['sin-fecha']], 'el evento de hoy es próximo (aunque su hora ya pasó), no anterior');
+  assert.equal(eventosPlan(validEventos({ eventos: [{ id: 'hoy', ...base, fecha: '2026-11-16' }] }), new Date('2026-11-17T05:59:00Z')).destacado?.id, 'hoy', 'a las 23:59 de Monterrey sigue siendo hoy');
+  assert.deepEqual(ids(eventosPlan(validEventos({ eventos: [{ id: 'hoy', ...base, fecha: '2026-11-16' }] }), new Date('2026-11-17T06:01:00Z')).anteriores), ['hoy'], 'pasada la medianoche de Monterrey, pasa a anteriores');
+  // ventana de 24 meses: el día exacto (2024-11-16) todavía; el anterior, no
+  const w = plan([{ id: 'dentro', ...base, fecha: '2024-11-16' }, { id: 'fuera', ...base, fecha: '2024-11-15' }, { id: 'muy-viejo', ...base, fecha: '2019-03-02' }, { id: 'reciente', ...base, fecha: '2026-11-01' }]);
+  assert.deepEqual(ids(w.anteriores), ['reciente', 'dentro'], 'solo los últimos 24 meses; lo más viejo no se pinta aunque siga en el JSON');
+  // orden: del más reciente al más antiguo; en el mismo día, la hora más tarde primero y, a igualdad, el orden del archivo
+  const o = plan([{ id: 'a', ...base, fecha: '2026-05-01', hora: '10:00' }, { id: 'b', ...base, fecha: '2026-09-01' }, { id: 'c', ...base, fecha: '2026-05-01', hora: '19:00' }, { id: 'd', ...base, fecha: '2026-05-01' }, { id: 'e', ...base, fecha: '2026-05-01' }, { id: 'f', ...base, fecha: '2025-01-31' }]);
+  assert.deepEqual(ids(o.anteriores), ['b', 'c', 'a', 'd', 'e', 'f']);
+  // fecha inválida: pasa a propuesta (no es anterior) y una fecha imposible no se cuela por la ventana
+  const inv = plan([{ id: 'imposible', ...base, fecha: '2026-02-30' }, { id: 'formato', ...base, fecha: '16/11/2026' }, { id: 'numero', ...base, fecha: 20261116 }, { id: 'ok', ...base, fecha: '2026-06-01' }]);
+  assert.deepEqual([ids(inv.anteriores), ids(inv.propuestas)], [['ok'], ['imposible', 'formato', 'numero']], 'una fecha que no es real queda como propuesta; nunca entra a anteriores');
+  // fechas fuera de rango: un año de más (2062 por 2026) no es destacado ni aviso; el pasado remoto, tampoco
+  const rango = plan([{ id: 'typo', ...base, fecha: '2062-11-21' }, { id: 'lejano', ...base, fecha: '2028-11-16' }, { id: 'limite', ...base, fecha: '2028-11-17' }, { id: 'cero', ...base, fecha: '0001-01-01' }, { id: 'ok', ...base, fecha: '2026-12-01' }]);
+  assert.deepEqual([rango.destacado.id, ids(rango.dias.flatMap(d => d.eventos)), rango.anteriores.length, rango.hasta], ['ok', ['lejano'], 0, '2028-11-16'], 'a más de 24 meses por delante o por detrás no se muestra: ni próximo ni anterior');
+  // mes bisiesto: 24 meses antes del 29 de febrero de 2028 es el 28 de febrero de 2026; el 31 de marzo cae en un mes que sí lo tiene
+  assert.equal(shiftMonths('2028-02-29', -24), '2026-02-28');
+  assert.equal(shiftMonths('2028-02-29', -12), '2027-02-28');
+  assert.equal(shiftMonths('2028-02-29', -48), '2024-02-29');
+  assert.equal(shiftMonths('2026-03-31', -1), '2026-02-28');
+  assert.equal(shiftMonths('2026-01-31', 1), '2026-02-28');
+  assert.equal(shiftMonths('2026-12-15', 1), '2027-01-15');
+  assert.equal(shiftMonths('2026-01-15', -2), '2025-11-15');
+  assert.equal(shiftMonths('2026-11-16', -24), '2024-11-16');
+  const bis = eventosPlan(validEventos({ eventos: [{ id: 'dentro', ...base, fecha: '2026-02-28' }, { id: 'fuera', ...base, fecha: '2026-02-27' }] }), new Date('2028-02-29T18:00:00Z'));
+  assert.deepEqual(ids(bis.anteriores), ['dentro'], 'el 29 de febrero de 2028 la ventana empieza el 28 de febrero de 2026');
+  // plegado: los 6 más recientes y «Ver los N anteriores»
+  assert.deepEqual(foldAnteriores(0), { fold: false, folded: false, limit: 0, label: 'Ver menos' });
+  assert.deepEqual([foldAnteriores(6).fold, foldAnteriores(6).limit], [false, 6], 'seis caben: sin botón');
+  assert.deepEqual(foldAnteriores(7), { fold: true, folded: true, limit: 6, label: 'Ver los 7 anteriores' });
+  assert.deepEqual(foldAnteriores(9, { expanded: true }), { fold: true, folded: false, limit: 9, label: 'Ver menos' });
+  assert.equal(foldAnteriores(40).label, 'Ver los 40 anteriores');
+  // fecha de la fila: el año solo si no es el año en curso
+  assert.equal(fechaPasada('2026-11-14', now), 'Sáb · 14 Nov');
+  assert.equal(fechaPasada('2025-12-06', now), 'Sáb · 6 Dic · 2025');
+  assert.equal(fechaLarga('2025-12-06', now), 'sábado 6 de diciembre de 2025');
+  // el aviso del inicio y «hasta» solo miran lo próximo: un evento pasado no anuncia nada
+  const pas = plan([{ id: 'viejo', ...base, titulo: 'Viejo', fecha: '2026-05-01' }]);
+  assert.deepEqual([pas.aviso, pas.hasta, pas.conFecha, pas.reservas], [null, null, 0, []]);
+});
+test('Eventos: lo que el proceso externo puede dejar en los datos no rompe nada (duplicados, imagen ajena, reserva inválida, cientos de eventos)', () => {
+  const now = new Date('2026-11-16T18:00:00Z');
+  const base = { tipo: 'Taller', titulo: 'T', hora: null, fin: null, con: null, descripcion: 'd', imagen: 'assets/img/cartelera-1.webp', alt: 'a', reserva: null };
+  // duplicados: gana el primero (también si el primero es el pasado)
+  const dup = validEventos({ eventos: [{ id: 'x', ...base, titulo: 'Primero', fecha: '2026-05-01' }, { id: 'x', ...base, titulo: 'Segundo', fecha: '2026-12-01' }, { id: 'y', ...base, fecha: '2026-06-01' }, { id: 'y', ...base, titulo: 'Otro', fecha: null }] });
+  assert.deepEqual(dup.map(e => [e.id, e.titulo]), [['x', 'Primero'], ['y', 'T']]);
+  assert.deepEqual(eventosPlan(dup, now).anteriores.map(e => e.titulo), ['T', 'Primero'], 'un id repetido se pinta una sola vez, con el primer renglón');
+  // imagen: solo rutas locales bajo assets/img/; cualquier otra cosa deja el evento sin foto (nunca un recuadro roto), el evento se conserva
+  for (const imagen of ['https://example.com/a.jpg', '//example.com/a.jpg', 'assets/img/../../secreto.jpg', 'assets/img/a.svg', 'data:image/png;base64,AAAA', '', null, 7, 'javascript:alert(1)']) {
+    const [e] = validEventos({ eventos: [{ id: 'img', ...base, fecha: '2026-05-01', imagen }] });
+    assert.deepEqual([e.id, e.imagen], ['img', null], `imagen no local: ${String(imagen)}`);
+  }
+  // reserva inválida: solo se descarta la reserva (también en un evento que ya pasó)
+  for (const reserva of [{ tipo: 'luma', url: 'http://lu.ma/x' }, { tipo: 'luma', url: 'https://evil.example/x' }, { tipo: 'whatsapp', telefono: '123' }, { tipo: 'correo', direccion: 'a@b.c' }, 'https://lu.ma/x', 42, [], {}]) {
+    const [e] = validEventos({ eventos: [{ id: 'r', ...base, titulo: 'Con reserva rara', fecha: '2026-12-01', reserva }] });
+    assert.deepEqual([e.titulo, e.reserva], ['Con reserva rara', null], `reserva inválida: ${JSON.stringify(reserva)}`);
+  }
+  // el resto de los campos mal formados no tira el evento
+  const raro = validEventos({ eventos: [{ id: 'raro', titulo: 'Raro', fecha: '2026-05-01', hora: '25:99', fin: 'x', con: 7, costo: 'gratis', encuadre: { a: 1 }, descripcion: null, imagen: null, alt: undefined }, null, 'x', 7, { id: 'sin-titulo' }, { titulo: 'sin id' }] });
+  assert.deepEqual(raro.map(e => e.id), ['raro']);
+  assert.deepEqual([raro[0].hora, raro[0].fin, raro[0].con, raro[0].costo, raro[0].encuadre], [null, null, null, [], 'foto']);
+  assert.deepEqual(validEventos(null), [], 'sin archivo: sin eventos'); assert.deepEqual(validEventos({ eventos: 'x' }), []);
+  // más de 100 eventos: el plan sigue siendo lineal y el apartado solo arma 6 filas hasta que se despliega
+  const muchos = validEventos({ eventos: Array.from({ length: 600 }, (_, i) => ({ id: `e${i}`, ...base, titulo: `E${i}`, fecha: new Date(Date.UTC(2025, 0, 1) + i * 86_400_000 * 1.5).toISOString().slice(0, 10), hora: i % 2 ? '18:00' : null })) });
+  const t0 = performance.now();
+  const grande = eventosPlan(muchos, now);
+  assert.ok(performance.now() - t0 < 100, `600 eventos se ordenan en menos de 100 ms (${(performance.now() - t0).toFixed(1)} ms)`);
+  const ventana = shiftMonths('2026-11-16', -24);
+  assert.ok(grande.anteriores.length > 100 && grande.anteriores.every((e, i, a) => e.fecha < '2026-11-16' && e.fecha >= ventana && (i === 0 || a[i - 1].fecha >= e.fecha)), `${grande.anteriores.length} anteriores, todos dentro de la ventana y del más reciente al más viejo`);
+  assert.ok(grande.conFecha > 0 && grande.conFecha === 1 + grande.dias.reduce((n, d) => n + d.eventos.length, 0));
+  assert.equal(foldAnteriores(grande.anteriores.length).limit, 6, 'con cientos de pasados, el inicio pinta 6');
+  // el archivo que se publica hoy no tiene eventos pasados: el apartado no aparece
+  const real = validEventos(JSON.parse(readFileSync_('assets/data/eventos.json')));
+  assert.deepEqual(eventosPlan(real, now).anteriores, [], 'la lista real de hoy no trae anteriores: no se pinta nada');
+});
+test('Eventos anteriores (feed.js, style.css): apartado con encabezado h3, lista, plegado accesible y filas sin acciones; no existe sin eventos pasados', () => {
+  const feed = readFileSync_('feed.js'), css = readFileSync_('style.css').replace(/\s+/g, ' ');
+  const src = feed.replace(/\/\/[^\n]*/g, '');
+  assert.ok(/if \(plan\.anteriores\.length\) lista\.append\(anterioresNode\(plan, now\)\);/.test(feed), 'solo se arma con al menos un evento pasado vigente');
+  assert.ok(/make\('section', 'ev-grupo ev-anteriores'\)/.test(feed) && /make\('h3', 'ev-sub', 'Eventos anteriores'\)/.test(feed) && /sec\.setAttribute\('aria-labelledby', h\.id\)/.test(feed) && /make\('ul', 'ev-pasados'\)/.test(feed), 'section aria-labelledby, h3 y ul');
+  assert.ok(/btn\.setAttribute\('aria-expanded', 'false'\)/.test(feed) && /btn\.setAttribute\('aria-controls', ul\.id\)/.test(feed) && /btn\.setAttribute\('aria-expanded', String\(expanded\)\)/.test(feed), 'el botón declara aria-expanded y aria-controls');
+  assert.ok(/make\('button', 'btn btn--contorno ev-fold', v\.label\)/.test(feed), 'botón de contorno');
+  assert.ok(/else scrollBy\(0, btn\.getBoundingClientRect\(\)\.top - y\)/.test(feed) && !/btn\.focus|\.blur\(/.test(feed.slice(feed.indexOf('function wireFold'), feed.indexOf('function anterioresNode'))), 'al plegar la página sube lo que encogió; el foco no se mueve del botón');
+  const fila = feed.slice(feed.indexOf('export function pasadoNode'), feed.indexOf('// «Ver los N anteriores»'));
+  assert.ok(!/reservaLink|calButton|shareButton|costoNode|badge\(|make\('a'|make\('button'/.test(fila), 'la fila no lleva reserva, calendario, compartir, costo, «Próximo» ni enlaces');
+  assert.ok(/make\(level, 'ev-pas-tit', e\.titulo\)/.test(fila) && /vis\.setAttribute\('aria-hidden', 'true'\)/.test(fila) && /make\('span', 'sr-only', cap\(fechaLarga\(e\.fecha, now\)\)\)/.test(fila) && /photo\(e, 'ev-pas-img', ''\)/.test(fila) && /img\.addEventListener\('error', \(\) => img\.remove\(\)\)/.test(fila), 'título real, fecha visible decorativa y completa en sr-only, miniatura decorativa que se retira si falla');
+  assert.ok(/\.ev-pasado\[hidden\] \{ display: none; \}/.test(css) && /\.ev-pasados \{[^}]*border-bottom: 1px solid var\(--linea\)/.test(css) && /\.ev-pasado \{[^}]*border-top: 1px solid var\(--linea\)/.test(css), 'las ocultas no se pintan; una línea fina entre filas y otra al cierre, sin relleno');
+  assert.ok(/\.ev-pas-img \{[^}]*width: var\(--space-16\); height: var\(--space-16\)/.test(css) && /@media \(min-width: 761px\) \{[^@]*\.ev-pas-img \{ width: var\(--portada-evento\); height: var\(--portada-evento\); \}/.test(css), 'miniatura cuadrada de 64 y de 88 desde 761');
+  assert.ok(/\.ev-pas-fecha \{[^}]*var\(--t-versalitas\)[^}]*color: var\(--tinta-2\)/.test(css) && /\.ev-pas-tit \{[^}]*var\(--t-titular\)/.test(css) && /\.ev-pas-meta \{[^}]*var\(--t-subtitulo\)[^}]*var\(--tinta-2\)/.test(css), 'fecha en versalitas, título Headline y meta Subheadline, sin colores sueltos');
+  assert.ok(!/ev-pas[^{]*\{[^}]*(background|box-shadow|backdrop|#[0-9a-f]{3,6}\b|rgb\()/i.test(css), 'sin relleno, sombra ni colores a mano');
+  assert.ok(/\.ev-lista:only-child > \.ev-anteriores \{ width: calc\(\(100% - 11 \* var\(--canal-rejilla\)\) \/ 12 \* 8 \+ 7 \* var\(--canal-rejilla\)\); \}/.test(css), 'sin nota lateral, los anteriores siguen en las columnas 1–8');
+  assert.ok(!/ev-anteriores|ev-pasado|Eventos anteriores/.test(readFileSync_('index.html')), 'sin JavaScript el apartado no existe: index.html no lo trae');
+  assert.ok(/if \(plan\.anteriores\.length && lista\) \{ lista\.append\(anterioresNode\(plan, now\)\)/.test(feed) && /!plan\.conFecha && staticSignature\(root\) === planSignature\(plan\)/.test(feed), 'con solo propuestas y anteriores, las propuestas de index.html no se repintan');
+  assert.ok(!/gratis|cupo|asistentes|quedan \d/i.test(src), 'sin cupos ni asistentes');
 });
 test('eventos: quién, costo y reserva se imprimen solo con lo que el evento trae (sin inventar género, «gratis» ni cupos)', () => {
   const now = new Date('2026-11-16T18:00:00Z');
@@ -1056,19 +1164,20 @@ test('Novedades: «nuevo» es lo que llegó después de la última visita; en la
   assert.equal(isNew('2026-02-30', { hoy: HOY }), false);
   // orden y limpieza de la lista
   const raw = { novedades: { entradas: [entry(0, '2026-10-20'), entry(1, '2026-11-09'), entry(2, '2026-10-20'), entry(1, '2026-11-01'), entry(3, '2026-11-30'), { id: data.books[4].id }, entry(5, 'pronto'), entry(6, '2026-11-11')] } };
-  assert.deepEqual(newsEntries(raw, HOY), [entry(6, '2026-11-11'), entry(1, '2026-11-09'), entry(0, '2026-10-20'), entry(2, '2026-10-20'), { id: data.books[4].id, llegada: null }, { id: data.books[5].id, llegada: null }],
-    'lo más reciente primero; a igual fecha, el orden del JSON; sin repetidos; lo que aún no llega espera su día; sin fecha válida, al final');
-  assert.deepEqual(newsEntries({ novedades: { ids: [data.books[1].id, data.books[0].id] } }, HOY), [{ id: data.books[1].id, llegada: null }, { id: data.books[0].id, llegada: null }], 'compatibilidad: la clave antigua `ids` se acepta sin fecha, en su orden');
+  assert.deepEqual(newsEntries(raw, HOY), [entry(6, '2026-11-11'), entry(1, '2026-11-09'), entry(0, '2026-10-20'), entry(2, '2026-10-20')],
+    'lo más reciente primero; a igual fecha, el orden del JSON; sin repetidos (gana el primero); lo que aún no llega espera su día; sin fecha real no se puede saber si es reciente: no se muestra');
+  assert.deepEqual(newsEntries({ novedades: { ids: [data.books[1].id, data.books[0].id] } }, HOY), [], 'la clave antigua `ids` (sin fechas) ya no se acepta: no hay forma de saber qué es reciente');
   // plan: libros, nuevos y línea de estado
   const first = newsPlan(data.books, raw, { hoy: HOY });
-  assert.deepEqual(first.books.map(b => b.id), [6, 1, 0, 2, 4, 5].map(i => data.books[i].id), 'los libros salen en el orden de las entradas');
+  assert.deepEqual(first.books.map(b => b.id), [6, 1, 0, 2].map(i => data.books[i].id), 'los libros salen en el orden de las entradas');
   assert.deepEqual(first.nuevos, [data.books[6].id, data.books[1].id]);
+  assert.equal(first.vence, '2026-12-26', 'boot.js recuerda hasta cuándo sigue vigente la llegada más reciente (11 de noviembre + 45 días)');
   assert.ok(first.show && first.n === 2 && first.primera === true && first.estado === '2 llegaron en las últimas dos semanas' && first.titulo === 'Recién llegados');
   const back = newsPlan(data.books, raw, { hoy: HOY, visto: '2026-11-09' });
   assert.ok(back.n === 1 && back.primera === false && back.estado === '1 llegó desde tu última visita', JSON.stringify(back.estado));
   assert.equal(newsPlan(data.books, raw, { hoy: HOY, visto: '2026-10-01' }).estado, '4 llegaron desde tu última visita');
   const seen = newsPlan(data.books, raw, { hoy: HOY, visto: HOY });
-  assert.ok(seen.show && seen.n === 0 && seen.estado === 'Ya viste todo lo que ha llegado' && seen.books.length === 6, 'sin pendientes la sección sigue, sin insignias');
+  assert.ok(seen.show && seen.n === 0 && seen.estado === 'Ya viste todo lo que ha llegado' && seen.books.length === 4, 'sin pendientes la sección sigue, sin insignias');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [entry(0, '2026-10-20'), { id: 'no-existe', llegada: '2026-11-10' }] } }, { hoy: HOY }).n, 0, 'un id que no existe en el catálogo no cuenta ni se muestra');
   assert.equal(newsPlan(data.books, { novedades: { entradas: data.books.slice(0, 40).map((b, i) => ({ id: b.id, llegada: `2026-10-${String(i % 28 + 1).padStart(2, '0')}` })) } }, { hoy: HOY }).books.length, NEWS_SIZE, 'tope de 12');
   assert.ok(!('note' in first) && !('llegadas' in first), 'el plan no trae rótulo de muestra ni fechas para imprimir');
@@ -1107,7 +1216,7 @@ test('Novedades: capítulo propio que solo existe con llegadas registradas; tira
   assert.ok(/root\.classList\.toggle\('news-hint'/.test(news) && /new IntersectionObserver\(es => \{\s*if \(es\.some\(e => e\.isIntersecting\)\) return;/.test(news), 'si la reserva no coincide, se corrige con el inicio fuera de la vista');
   // Carga: módulo ligero para el conteo temprano; el catálogo solo al pintar la tira.
   assert.ok(!/^import [^;]*(rail|catalog|saved)\.js/m.test(news) && /import\('\.\/catalog\.js'\)/.test(news), 'news.js no arrastra el catálogo para contar');
-  assert.ok(/newsPlan\(null, await loadCollections\(\)/.test(news) && /loadNews\(\)\.then\(m => m\.initNewsCount\(\)\)/.test(app) && /loadNews\(\)\.then\(m => m\.initNews\(\{ ensureCatalog: bootCatalog, isMotion \}\)\)/.test(app), 'el conteo se pide pronto (solo collections.json) y la tira al acercarse');
+  assert.ok(/const data = await loadCollections\(\);\s*plan = newsPlan\(null, data, \{ visto, hoy: isoDay\(\) \}\);/.test(news) && /loadNews\(\)\.then\(m => m\.initNewsCount\(\)\)/.test(app) && /loadNews\(\)\.then\(m => m\.initNews\(\{ ensureCatalog: bootCatalog, isMotion \}\)\)/.test(app), 'el conteo se pide pronto (solo collections.json) y la tira al acercarse');
   assert.ok(app.indexOf('m.initNewsCount()') > app.indexOf('const posterReady'), 'el conteo va después de la foto y las fuentes: no compite con el primer render');
   for (const line of news.split('\n').filter(l => /getItem|setItem/.test(l))) assert.ok(/try \{/.test(line) && /catch/.test(line), `localStorage siempre en try/catch: ${line.trim().slice(0, 60)}`);
   const watch = news.slice(news.indexOf('function watchSeen'), news.indexOf('export async function initNews'));
@@ -1143,6 +1252,72 @@ test('Novedades sin entradas no existe; con una entrada aparece sola con su lleg
   assert.equal(newsPlan(data.books, one, { hoy: HOY, visto: HOY }).n, 0, 'de regreso, lo ya visto no es «Nuevo» (la sección sigue)');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [{ id: 'no-existe', llegada: '2026-11-09' }] } }, { hoy: HOY }).show, false, 'una entrada que no es un libro del inventario no basta para mostrar la sección');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [entry(7, '2026-12-24')] } }, { hoy: HOY }).show, false, 'una llegada futura espera su día');
+});
+test('Novedades: solo lo más reciente (ventana de 45 días): hoy, hace 44, 45 y 46 días, futuras, sin fecha, repetidas y libros que ya no existen', () => {
+  assert.equal(NEWS_DAYS, 45);
+  const ago = n => addDays(HOY, -n);
+  assert.equal(addDays('2026-11-11', -45), '2026-09-27');
+  assert.equal(addDays('2026-02-27', 2), '2026-03-01');
+  assert.equal(addDays('2028-02-28', 1), '2028-02-29', 'año bisiesto');
+  const con = lista => ({ novedades: { entradas: lista } });
+  const ids = (lista, hoy = HOY) => newsEntries(con(lista), hoy).map(e => e.id);
+  const e = (i, n) => entry(i, ago(n));
+  assert.deepEqual(ids([e(0, 0), e(1, 44), e(2, 45), e(3, 46), e(4, 400)]), [0, 1, 2].map(i => data.books[i].id), 'hoy, hace 44 y hace 45 días entran; hace 46 y más viejas, no');
+  assert.deepEqual(ids([entry(0, ago(-1)), entry(1, '2026-11-12'), entry(2, '2027-01-01'), entry(3, '9999-12-31')]), [], 'una llegada futura espera su día (no se muestra, no es «reciente»)');
+  assert.deepEqual(ids([entry(0, '2026-02-30'), entry(1, 'ayer'), { id: data.books[2].id }, { id: data.books[3].id, llegada: 20261110 }, { id: data.books[4].id, llegada: '2026-11-10T10:00' }]), [], 'sin una fecha real no se muestra');
+  assert.deepEqual(ids([e(0, 60), e(0, 3)]), [], 'un id repetido: gana el primer renglón, aunque ya esté vencido');
+  assert.deepEqual(ids([e(0, 3), e(0, 60)]), [data.books[0].id]);
+  // con todas vencidas, igual que con la lista vacía: ni sección, ni enlaces, ni punto, ni control
+  const vencidas = con([e(0, 46), e(1, 90), e(2, 400)]);
+  for (const visto of [null, '2026-10-01', HOY]) {
+    const plan = newsPlan(data.books, vencidas, { hoy: HOY, visto });
+    assert.deepEqual([plan.show, plan.books, plan.ids, plan.nuevos, plan.n, plan.vence], [false, [], [], [], 0, null]);
+  }
+  assert.equal(newsPlan(null, vencidas, { hoy: HOY }).show, false, 'el conteo temprano (sin catálogo) aplica la misma ventana');
+  // mezcla: las vigentes, de la más reciente a la más antigua; «Nuevo» sigue siendo lo posterior a la última visita (en la primera, 14 días)
+  const mezcla = con([e(0, 45), e(1, 2), e(2, 46), e(3, 20), e(4, 10)]);
+  const plan = newsPlan(data.books, mezcla, { hoy: HOY });
+  assert.deepEqual(plan.ids, [1, 4, 3, 0].map(i => data.books[i].id));
+  assert.deepEqual(plan.nuevos, [1, 4].map(i => data.books[i].id), 'primera visita: lo de los últimos 14 días');
+  assert.equal(plan.vence, addDays(ago(2), 45), 'la ventana se cierra 45 días después de la llegada más reciente');
+  assert.deepEqual(newsPlan(data.books, mezcla, { hoy: HOY, visto: ago(25) }).nuevos, [1, 4, 3].map(i => data.books[i].id), 'de regreso: lo posterior a la última visita (hace 45 días ya no era «Nuevo» y sigue sin serlo)');
+  assert.equal(newsPlan(data.books, mezcla, { hoy: HOY, visto: HOY }).n, 0);
+  // al día siguiente, la entrada de hace 45 días ya tiene 46: sale sin tocar nada
+  assert.deepEqual(newsPlan(data.books, mezcla, { hoy: addDays(HOY, 1) }).ids, [1, 4, 3].map(i => data.books[i].id));
+  // un libro que ya no está en catalog.json se ignora: no deja hueco, no cuenta, y la sección solo existe si queda alguno
+  const huerfanas = con([{ id: 'ya-no-existe', llegada: ago(1) }, e(5, 3), { id: 'tampoco', llegada: ago(2) }, e(6, 30)]);
+  const ph = newsPlan(data.books, huerfanas, { hoy: HOY });
+  assert.deepEqual([ph.ids, ph.books.map(b => b.id), ph.n, ph.vence], [[5, 6].map(i => data.books[i].id), [5, 6].map(i => data.books[i].id), 1, addDays(ago(3), 45)], 'sin hueco: la tira y el conteo son solo libros que existen');
+  assert.equal(newsPlan(data.books, con([{ id: 'ya-no-existe', llegada: ago(1) }]), { hoy: HOY }).show, false, 'si ninguno existe, no hay sección');
+  assert.ok(ph.books.every(Boolean), 'ninguna posición vacía');
+  // tope de 12 dentro de la ventana
+  const muchas = con(data.books.slice(0, 30).map((b, i) => ({ id: b.id, llegada: ago(i % 40) })));
+  assert.equal(newsPlan(data.books, muchas, { hoy: HOY }).books.length, NEWS_SIZE);
+  assert.ok(newsPlan(data.books, muchas, { hoy: HOY }).ids.every((id, i, a) => i === 0 || newsEntries(muchas, HOY).findIndex(x => x.id === a[i - 1]) < newsEntries(muchas, HOY).findIndex(x => x.id === id)), 'de la más reciente a la más antigua');
+  assert.deepEqual(newsEntries(null, HOY), []);
+  assert.deepEqual(newsEntries({ novedades: { entradas: 'x' } }, HOY), []);
+  // la lista que se publica hoy está vacía: no hay sección
+  assert.deepEqual(newsEntries(JSON.parse(readFileSync_('assets/data/collections.json')), HOY), []);
+});
+test('Novedades: boot.js no reserva la sección cuando la ventana ya se cerró; news.js recuerda hasta cuándo vale (iti-news-vence)', () => {
+  const news = readFileSync_('news.js'), boot = readFileSync_('assets/js/boot.js');
+  assert.ok(/const VENCE_KEY = 'iti-news-vence';/.test(news) && /writeVence\(plan\.show \? plan\.vence : null\)/.test(news), 'news.js guarda el último día vigente (o lo borra sin llegadas)');
+  assert.ok(/localStorage\.getItem\('iti-news-vence'\)/.test(boot) && /if \(vence && \/\^\\d\{4\}-\\d\{2\}-\\d\{2\}\$\/\.test\(vence\) && vence < hoy\) news = null;/.test(boot), 'boot.js lee la misma clave y, pasado ese día, no pone has-news ni news-hint');
+  assert.ok(boot.indexOf("vence < hoy) news = null") < boot.indexOf("r.classList.add('has-news')"), 'la ventana se revisa antes de reservar la sección');
+  // simulación del arranque con el estado de la visita anterior: s o p con la ventana abierta reservan; con la ventana cerrada, nada
+  const arranque = (estado, vence, hoyDia) => {
+    let news = estado; const clases = [];
+    const hoy = hoyDia;
+    if (vence && /^\d{4}-\d{2}-\d{2}$/.test(vence) && vence < hoy) news = null;
+    if (news === 's' || news === 'p') clases.push('has-news');
+    if (news === 'p') clases.push('news-hint');
+    return clases;
+  };
+  assert.deepEqual(arranque('p', '2026-12-26', '2026-12-26'), ['has-news', 'news-hint'], 'el último día aún vale');
+  assert.deepEqual(arranque('p', '2026-12-26', '2026-12-27'), [], 'al día siguiente ya no se reserva nada');
+  assert.deepEqual(arranque('s', '2026-12-26', '2027-03-01'), []);
+  assert.deepEqual(arranque('s', null, '2027-03-01'), ['has-news'], 'sin fecha recordada (visita de una versión anterior) se conserva lo de siempre y news.js corrige');
+  assert.deepEqual(arranque('n', '2026-12-26', '2026-11-20'), []);
 });
 test('Carrusel3D (carousel3d.js): la pieza del centro de frente; las vecinas giran hasta 44° y asoman separadas, con hueco (sin encimarse); con movimiento reducido, la misma geometría plana; el motor es solo del carrusel de portadas', async () => {
   const railJs = await readFile(here('./rail.js'), 'utf8');
@@ -1321,7 +1496,7 @@ test('Eventos (2026-11-16): destacado y lista por fecha en lugar del carrusel; s
   assert.ok(/\.btn--contorno \{ background: transparent; color: var\(--tinta\); box-shadow: inset 0 0 0 1px var\(--linea-fuerte\);/.test(cssFlat) && /\.btn--contorno:active \{ background: var\(--fondo-3\); \}/.test(cssFlat) && /@media \(hover: hover\) \{[\s\S]*?\.btn--contorno:hover \{ background: var\(--fondo-3\); \}/.test(cssFlat), 'botón de contorno: transparente, borde linea-fuerte, presionado y hover solo con puntero fino');
   assert.ok(/\.ev-card-img \{[^}]*width: var\(--portada-evento\); height: var\(--portada-evento\);[^}]*object-fit: cover;[^}]*outline: 1px solid var\(--linea\);[^}]*\}/.test(cssFlat) && tokensCss.includes('--portada-evento: 88px;') && tokensCss.includes('--portada-evento-amplia: 120px;'), 'portada cuadrada de 88 (120 en escritorio), de los tokens');
   assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.ev-prox \{ grid-template-columns: var\(--rejilla\); column-gap: var\(--canal-rejilla\); \}\s*\.ev-prox-fig \{ grid-column: 7 \/ -1; grid-row: 1; \}[\s\S]*?\.ev-lista \{ grid-column: 1 \/ span 8; \}\s*\.ev-lado \{ grid-column: 9 \/ -1; position: sticky;/.test(css), 'escritorio: destacado 1–6 | 7–12; lista 1–8 y nota 9–12, fija al desplazar');
-  assert.ok(/\.motion \.ev-espera \{ opacity: 0; \}/.test(cssFlat) && /waiting = nodes\.filter\(n => n\.getBoundingClientRect\(\)\.top >= innerHeight\)/.test(feed) && /delay: Math\.min\(i \* step, tope\)/.test(feed) && /tope = DUR\('lenta'\) - dur/.test(feed), 'entrada escalonada dentro de dur-lenta, solo de lo que aún no se ve y solo con movimiento');
+  assert.ok(/\.motion \.ev-espera \{ opacity: 0; \}/.test(cssFlat) && /waiting = nodes\.filter\(n => n\.getBoundingClientRect\(\)\.top >= innerHeight\)/.test(feed) && /delay: Math\.min\(i \* step, tope\)/.test(feed) && /tope: DUR\('lenta'\) - DUR\('rapida'\)/.test(feed), 'entrada escalonada dentro de dur-lenta, solo de lo que aún no se ve y solo con movimiento');
   assert.ok(!/\d+\s*ms|setTimeout|setInterval|iterations/.test(feed.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '')), 'sin milisegundos a mano, temporizadores ni bucles');
   const app = await readFile(here('./app.js'), 'utf8');
   assert.ok(/nearby\(\$\('\[data-ev\]'\), \(\) => loadFeed\(\)\.then\(m => m\.initEventos\(\{ isMotion \}\)\)/.test(app) && !/import .*feed\.js/m.test(app.split('\n').filter(l => l.startsWith('import')).join('\n')), 'se pinta al acercarse (import diferido)');

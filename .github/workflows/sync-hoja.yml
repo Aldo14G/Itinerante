@@ -1,0 +1,133 @@
+# Sincroniza el sitio con la hoja de Google de la librería (libros nuevos → Novedades; pestaña «Eventos» → Eventos y talleres).
+# Guía para quien lo mantiene: docs/AUTOMATIZACION.md.
+#
+# · Corre cada 30 minutos y a mano («Run workflow»; con la casilla «seco» no escribe nada y solo muestra qué pasaría).
+# · Todo el trabajo lo hace scripts/sync-hoja.mjs en una carpeta temporal; solo si pasa sus guardas copia a assets/ y data/.
+# · Antes de publicar corre la puerta de calidad (tests del sitio y de la sincronización); si falla, descarta los cambios y avisa por correo.
+# · Si hay cambios, los sube con un commit del «Itinerante Bot» a la rama por defecto; Vercel/Cloudflare republican solos al llegar el commit.
+#
+# AVISO SOBRE EL HORARIO: GitHub desactiva los flujos programados de un repositorio PÚBLICO tras 60 días sin actividad en el repositorio
+# (llega un correo de GitHub antes). Para reactivarlo: pestaña Actions → «Sincronizar hoja» → «Enable workflow» (o cualquier commit nuevo).
+# Los commits que hace este mismo flujo no siempre cuentan como actividad; en un repositorio privado la regla no aplica.
+name: Sincronizar hoja
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      seco:
+        description: 'Simulacro: no escribe nada, solo muestra qué pasaría'
+        type: boolean
+        default: false
+      forzar:
+        description: 'Saltar la guarda del 50 % (solo si la hoja de libros de verdad se redujo a menos de la mitad)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: sync-hoja
+  cancel-in-progress: false
+
+permissions:
+  contents: write # subir el commit con los datos nuevos
+  actions: read # ver si la corrida anterior falló (para no repetir el mismo correo de error)
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SECO: ${{ github.event.inputs.seco }}
+      FORZAR: ${{ github.event.inputs.forzar }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar openpyxl y Pillow
+        run: pip install openpyxl pillow
+
+      - name: Leer la hoja y preparar los cambios
+        id: sync
+        continue-on-error: true
+        env:
+          GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
+          HOJA_ID: ${{ secrets.HOJA_ID }}
+        run: |
+          args=()
+          [ "$SECO" = "true" ] && args+=(--seco)
+          [ "$FORZAR" = "true" ] && args+=(--forzar)
+          node scripts/sync-hoja.mjs "${args[@]}"
+
+      - name: Puerta de calidad (tests del sitio y de la sincronización)
+        id: gate
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.cambios == 'true'
+        continue-on-error: true
+        run: node --test tests/site.test.mjs tests/sync.test.mjs
+
+      - name: Descartar los cambios si la puerta falló
+        if: steps.gate.outcome == 'failure'
+        run: |
+          git checkout -- . && git clean -fd assets data
+          echo "SYNC_FALLO=Las pruebas del sitio no pasaron con los datos nuevos de la hoja, así que no se publicó nada. Los cambios se descartaron." >> "$GITHUB_ENV"
+
+      - name: Subir los cambios
+        id: push
+        if: steps.gate.outcome == 'success'
+        continue-on-error: true
+        env:
+          MENSAJE: ${{ steps.sync.outputs.mensaje }}
+        run: |
+          git config user.name "Itinerante Bot"
+          git config user.email "noreply@users.noreply.github.com"
+          git add assets data
+          git commit -m "$MENSAJE"
+          rama="$(git rev-parse --abbrev-ref HEAD)"
+          for intento in 1 2 3; do
+            git push origin "HEAD:${rama}" && exit 0
+            git pull --rebase origin "${rama}" || git rebase --abort
+          done
+          echo "SYNC_FALLO=No se pudo subir el commit con los datos nuevos (alguien más cambió la rama a la vez). La próxima corrida lo vuelve a intentar." >> "$GITHUB_ENV"
+          exit 1
+
+      - name: Ver si la corrida anterior ya había fallado
+        id: previa
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previa="$(gh run list --workflow sync-hoja.yml --status completed --limit 1 --json conclusion --jq '.[0].conclusion // ""' 2>/dev/null || true)"
+          echo "repetido=$([ "$previa" = "failure" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Avisar por correo
+        if: always()
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          AVISO_A: ${{ secrets.AVISO_A }}
+          SITIO_URL: ${{ secrets.SITIO_URL }}
+          SYNC_URL_CORRIDA: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SYNC_ERROR_REPETIDO: ${{ steps.previa.outputs.repetido }}
+          SYNC_RESULTADO: ${{ steps.sync.outcome }}
+        run: |
+          if [ "$SYNC_RESULTADO" = "failure" ] && [ ! -f sync-informe.json ]; then
+            export SYNC_FALLO="El paso que lee la hoja falló antes de dejar un informe. Revisa la corrida."
+          fi
+          args=()
+          [ "$SECO" = "true" ] && args+=(--seco)
+          python3 scripts/aviso-correo.py "${args[@]}"
+
+      - name: Marcar la corrida como fallida si algo se detuvo
+        if: steps.sync.outcome == 'failure' || steps.gate.outcome == 'failure' || steps.push.outcome == 'failure'
+        run: |
+          echo "La sincronización se detuvo; el detalle está en los pasos anteriores y en el correo de aviso."
+          exit 1

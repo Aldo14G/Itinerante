@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 29 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 31 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -24,6 +24,8 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | EventoDestacado | — | sí |  |  |  |  |  |  | sí | sí | sí |
 | ListaEventos | — | sí |  |  |  |  |  |  | sí | sí | sí |
 | BloqueFecha | — | — |  |  |  |  |  |  |  |  |  |
+| EventosAnteriores | sí | sí | sí |  |  |  | sí |  | sí |  | sí |
+| FilaEventoAnterior | — | — |  |  |  |  |  |  |  | sí |  |
 | AvisoEvento | sí | sí |  |  |  |  |  |  |  |  |  |
 | BarraCategorias | sí | sí | sí |  |  | sí |  | sí | sí |  | sí |
 | TarjetaProducto | — | — | — |  |  |  |  | sí | sí | sí |  |
@@ -295,7 +297,7 @@ Lista estática de Eventos (estructura tomada de Luma como referencia): «Despu�
 - **feed.js:** exporta `cardNode` `eventosNodes` `notaCopy` `fechaBloque` `horario` `eventBadge` `NO_DATE` · internas `listNode` `notaNode` `staticSignature` `planSignature`
 - **Tokens:** `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `linea-fuerte` `radio-sm` `portada-evento` `portada-evento-amplia` `t-titulo-3` `t-titular` `t-versalitas` `t-fecha-lista` `t-subtitulo` `t-lectura` `anillo-foco` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-5` `space-6` `space-8` `space-12`
 - **Estado foco:** `.ev-lado-txt a:focus-visible`, `.btn:focus-visible` — La fila no es un control: el foco va a sus acciones y al enlace de la nota.
-- **Estado vacio:** feed.js `if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }` — Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»); una propuesta no lleva acciones.
+- **Estado vacio:** feed.js `if (!plan.conFecha && staticSignature(root) === planSignature(plan)) {` — Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»), sin repintarla; una propuesta no lleva acciones. Los eventos pasados de los últimos 24 meses van aparte, en EventosAnteriores.
 - **Estado error:** feed.js `catch { delete root.dataset.ready; return; }` — Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio.
 - **Estado movimiento_reducido:** `.motion .ev-espera`
 - **hover: no aplica.** Las filas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton.
@@ -315,6 +317,39 @@ Fecha tipográfica del evento destacado, sin caja: arriba el día de la semana y
 - **foco: no aplica.** No es un control.
 - **ARIA:** Texto decorativo (sin rol) (https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/) · `aria-hidden=true` · **Teclado:** —
 - **QA:** `tools/qa/feed.mjs` `tests/site.test.mjs`
+
+### EventosAnteriores
+
+Apartado «Eventos anteriores» (2026-11-16) al final de la lista de Eventos, en su misma columna (1–8 desde 1024 px; ancho completo en el teléfono y la tableta): los eventos con fecha anterior a hoy (día de Monterrey) y de los últimos 24 meses pasan solos aquí, del más reciente al más antiguo; lo más viejo no se pinta aunque siga en eventos.json y las propuestas sin fecha nunca entran. Muestra los 6 más recientes y, si hay más, un botón de contorno «Ver los N anteriores» / «Ver menos» (aria-expanded y aria-controls; el foco se queda en el botón; al plegar la página sube lo que encogió para que el botón no se mueva bajo el cursor; las filas que se suman entran escalonadas solo con movimiento). El resto de las filas se arma en el primer despliegue. Sin ningún evento pasado válido el apartado no existe: ni encabezado, ni hueco, ni cambio de alto. Sin JavaScript no aparece (index.html no lo trae).
+
+- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos anteriores y ventana de novedades» (2026-11-16).
+- **style.css:** `.ev-anteriores` `.ev-pasados` `.ev-fold` `.ev-pasado[hidden]`
+- **feed.js:** exporta `foldAnteriores` `shiftMonths` `ANTERIORES_MESES` `ANTERIORES_VISIBLES` `PROXIMOS_MESES` `eventosPlan` · internas `anterioresNode` `wireFold` `staggerIn` `reveal` `timing` · ganchos `btn.setAttribute('aria-expanded', String(expanded))` `btn.setAttribute('aria-controls', ul.id)`
+- **Tokens:** `linea` `tinta` `space-4` `space-6` `space-8` `dur-rapida` `dur-lenta` `escalon-linea`
+- **Estado hover:** `.btn--contorno:hover` — El botón es un Boton de contorno (44 o 48 según el contexto): sus estados son los de Boton.
+- **Estado foco:** `.btn:focus-visible` — El foco se queda en el botón al desplegar y al plegar.
+- **Estado presionado:** `.btn--contorno:active`
+- **Estado expandido:** feed.js `btn.setAttribute('aria-expanded', String(expanded));` — «Ver los N anteriores» → «Ver menos»: además del texto, aria-expanded.
+- **Estado oculto:** `.ev-pasado[hidden]` — Las filas más allá de la sexta se ocultan con hidden mientras el apartado está plegado.
+- **Estado vacio:** feed.js `if (plan.anteriores.length) lista.append(anterioresNode(plan, now));` — Sin eventos pasados de los últimos 24 meses no se crea el apartado (hoy, la lista real no tiene ninguno).
+- **Estado movimiento_reducido:** `.motion .ev-espera` — Con «reducir movimiento» o la pausa, las filas que se suman aparecen colocadas.
+- **ARIA:** Disclosure + List (https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/) · `section aria-labelledby (el h3 «Eventos anteriores»)` `ul / li` `button aria-expanded y aria-controls (la lista)` `las filas ocultas con hidden` · **Teclado:** Tab llega al botón; Enter o Espacio despliega o pliega; el foco no se mueve.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/iphone.mjs` `tests/site.test.mjs`
+
+### FilaEventoAnterior
+
+Fila compacta de un evento ya ocurrido dentro de «Eventos anteriores»: entre líneas finas de 1 px y sin relleno, la fecha tipográfica pequeña en versalitas («SÁB · 21 NOV», con el año si no es el año en curso; la fecha completa va en texto sr-only), el título en Headline, «tipo · Con …» en Subheadline (tinta-2) y la portada cuadrada de 64 (88 desde 761 px) con radio-sm y anillo fino; un cartel se recorta a cuadrado en la miniatura. No es un control: sin enlace, sin reserva, sin calendario, sin «Compartir», sin costo ni «Próximo». La miniatura es decorativa (alt vacío) y si no carga se retira: la fila queda sin foto, nunca un recuadro roto.
+
+- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos anteriores y ventana de novedades» (2026-11-16).
+- **style.css:** `.ev-pasado` `.ev-pas-txt` `.ev-pas-fecha` `.ev-pas-tit` `.ev-pas-meta` `.ev-pas-img`
+- **feed.js:** exporta `pasadoNode` `fechaPasada` · ganchos `img.addEventListener('error', () => img.remove())`
+- **Tokens:** `tinta` `tinta-2` `linea` `radio-sm` `portada-evento` `t-versalitas` `t-titular` `t-subtitulo` `space-1` `space-4` `space-16`
+- **Estado error:** feed.js `img.addEventListener('error', () => img.remove())` — Una portada que falla se retira y el texto ocupa su sitio.
+- **Estado oculto:** `.ev-pasado[hidden]` — Plegado, solo se ven las 6 más recientes.
+- **hover: no aplica.** No es un control: sin cursor de mano ni estados de control.
+- **foco: no aplica.** No es un control: nada que enfocar.
+- **ARIA:** List item (sin rol propio) (https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/) · `li con h4 (el título)` `fecha visible aria-hidden y fecha completa en .sr-only` `miniatura con alt vacío` · **Teclado:** —
+- **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tests/site.test.mjs`
 
 ### AvisoEvento
 

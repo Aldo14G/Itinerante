@@ -44,3 +44,6 @@ design/report.json
 # Cachés de Python (scripts de skills)
 __pycache__/
 *.pyc
+
+# Informe de la sincronización con la hoja de Google (scripts/sync-hoja.mjs; lo lee scripts/aviso-correo.py)
+sync-informe.json

@@ -501,6 +501,19 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .ev-prox-enc { grid-template-columns: auto minmax(0, 1fr); column-gap: var(--space-6); }
   .ev-prox-id { padding: 0 0 0 var(--space-6); border-top: 0; border-left: 1px solid var(--linea-fuerte); }
 }
+/* Eventos anteriores (2026-11-16; feed.js, anterioresNode): debajo de «Después» y de las propuestas, en la misma columna. Una fila compacta entre líneas
+   finas, sin relleno ni acciones: fecha en versalitas pequeñas (tinta-2: lo ya ocurrido, no un anuncio), título en Headline, «tipo · Con …» en Subheadline y la
+   portada cuadrada de 64 (88 desde 761) con su anillo fino. El apartado solo existe con al menos un evento pasado de los últimos 24 meses. Aire:
+   rótulo → grupo 8 (el de «Después») · fila 16 arriba y abajo · lista → botón 24 (32 desde 761). */
+.ev-pasados { margin: 0; padding: 0; list-style: none; border-bottom: 1px solid var(--linea); }
+.ev-pasado { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding: var(--space-4) 0; border-top: 1px solid var(--linea); color: var(--tinta); }
+.ev-pasado[hidden] { display: none; }
+.ev-pas-txt { min-width: 0; }
+.ev-pas-fecha { margin: 0; font: var(--t-versalitas); letter-spacing: var(--ls-versalitas); text-transform: uppercase; color: var(--tinta-2); white-space: nowrap; }
+.ev-pas-tit { margin: var(--space-1) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
+.ev-pas-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; }
+.ev-pas-img { display: block; width: var(--space-16); height: var(--space-16); border-radius: var(--radio-sm); object-fit: cover; outline: 1px solid var(--linea); outline-offset: -1px; } /* un cartel se recorta a cuadrado en la miniatura */
+.ev-fold { margin-top: var(--space-6); }
 /* Nota lateral: cómo registrarse o dónde se anuncian las fechas. Sin relleno ni línea (comparte tope con «Después», G4): texto en Subheadline. */
 .ev-lado { padding: 0; }
 .ev-lado-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); } /* un subtitular más: igual que «Después», así comparten tope (G4) */
@@ -522,6 +535,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .ev-dia-mes { grid-area: mes; }
   .ev-dia-num { grid-area: num; font: var(--t-fecha-lista); letter-spacing: var(--ls-fecha-lista); }
   .ev-dia .ev-fila:first-child > .ev-card { padding-top: var(--space-5); border-top: 1px solid var(--linea); }
+  .ev-pas-img { width: var(--portada-evento); height: var(--portada-evento); }
+  .ev-fold { margin-top: var(--space-8); }
 }
 @media (min-width: 1024px) {
   .ev, .ev-lista { gap: var(--space-12); }
@@ -547,6 +562,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .ev-lista:only-child .ev-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
   .ev-lista:only-child .ev-fila > .ev-card { border-bottom: 0; }
   .ev-lista:only-child .ev-card-img { grid-column: 1; grid-row: 1; width: 100%; height: auto; aspect-ratio: 1 / 1; }
+  /* Los anteriores van siempre en la columna de la lista (1–8), también cuando no hay nota lateral y la lista ocupa todo el ancho. */
+  .ev-lista:only-child > .ev-anteriores { width: calc((100% - 11 * var(--canal-rejilla)) / 12 * 8 + 7 * var(--canal-rejilla)); }
 }
 
 /* ---------- Visita y pie ---------- */

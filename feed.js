@@ -2,8 +2,12 @@
 // assets/data/eventos.json y se editan sin tocar HTML ni JS: publicar un evento es añadir un renglón.
 //   · con fecha de hoy en adelante (hora de Monterrey): el más próximo es el **destacado** (foto o cartel, fecha tipográfica, datos en lista de
 //     definición, la acción de reserva que el evento traiga, «Añadir al calendario» y «Compartir») y los demás van en la **lista por día**
-//     (filas entre líneas finas); una fecha que ya pasó deja de mostrarse;
+//     (filas entre líneas finas);
 //   · con `fecha: null` es una propuesta: va al final, con su insignia «Propuesta · sin fecha», sin reserva ni calendario;
+//   · una fecha anterior a hoy (día de Monterrey) y de los últimos 24 meses pasa sola al apartado **«Eventos anteriores»** (2026-11-16): debajo
+//     de «Después» y de las propuestas, una fila compacta por evento (fecha tipográfica pequeña, título, «tipo · Con …» y portada cuadrada),
+//     sin acciones; los 6 más recientes y «Ver los N anteriores» / «Ver menos» para el resto. Lo más viejo no se pinta aunque siga en el JSON;
+//     sin ningún evento pasado válido el apartado no existe (ni hueco, ni encabezado);
 //   · sin ningún evento con fecha queda lo que trae index.html (las propuestas y la entradilla «Aún sin fecha…»): es también lo que se lee
 //     sin JavaScript.
 // Reserva (`reserva`): { tipo: "luma", url } → «Registrarme», un enlace normal a la página del evento en Luma, en otra pestaña (el sitio no
@@ -21,6 +25,9 @@ export const EVENTOS_URL = 'assets/data/eventos.json';
 export const NO_DATE = 'Propuesta · sin fecha';
 export const LUGAR = 'Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey';
 export const COSTO_MAX = 4; // renglones de costo que se imprimen (un cartel trae dos o tres)
+export const ANTERIORES_MESES = 24; // un evento pasado se archiva a la vista durante 24 meses; lo más viejo no se pinta aunque siga en el JSON
+export const PROXIMOS_MESES = 24; // una fecha futura a más de 24 meses es casi seguro un error de captura (2062 por 2026): no se anuncia ni se muestra
+export const ANTERIORES_VISIBLES = 6; // «Eventos anteriores» muestra los 6 más recientes; el resto, tras «Ver los N anteriores»
 const INSTAGRAM = 'https://www.instagram.com/libreriaitineranteymasmty/';
 const HASTA_KEY = 'iti-ev-hasta'; // AAAA-MM-DD del último evento vigente: lo que boot.js lee antes del primer render
 
@@ -173,6 +180,24 @@ export function fechaLarga(fecha, now = new Date()) {
   const anio = fecha.slice(0, 4);
   return `${p.weekday} ${p.day} de ${p.month}${anio === dayKey(now).slice(0, 4) ? '' : ` de ${anio}`}`;
 }
+/** «AAAA-MM-DD» movido `n` meses (negativo = atrás). Si el día no existe en el mes de llegada (31 de marzo − 1 mes, 29 de febrero − 12 meses) cae en el último día de ese mes. */
+export function shiftMonths(day, n) {
+  const [y, m, d] = day.split('-').map(Number);
+  const t = y * 12 + (m - 1) + n, ny = Math.floor(t / 12), nm = t % 12;
+  const last = new Date(Date.UTC(ny, nm + 1, 0)).getUTCDate();
+  return `${String(ny).padStart(4, '0')}-${String(nm + 1).padStart(2, '0')}-${String(Math.min(d, last)).padStart(2, '0')}`;
+}
+/** Fecha de una fila de «Eventos anteriores»: «Sáb · 21 Nov» (con el año si no es el año en curso: «Sáb · 21 Nov · 2025»). El CSS la pone en versalitas. */
+export function fechaPasada(fecha, now = new Date()) {
+  const p = fechaBloque(fecha, now);
+  return `${p.sem} · ${p.num} ${p.mes}${p.anio ? ` · ${p.anio}` : ''}`;
+}
+/** Plegado de «Eventos anteriores»: los `limit` más recientes y, si hay más, el botón «Ver los N anteriores» / «Ver menos» (mismo patrón que foldView del Catálogo). */
+export function foldAnteriores(total, { expanded = false, limit = ANTERIORES_VISIBLES } = {}) {
+  const fold = total > limit;
+  const folded = fold && !expanded;
+  return { fold, folded, limit: folded ? limit : total, label: folded ? `Ver los ${total} anteriores` : 'Ver menos' };
+}
 /** «18:30» o «18:30–20:00»; vacío sin hora. */
 export const horario = e => (e.hora ? (e.fin ? `${e.hora}–${e.fin}` : e.hora) : '');
 /**
@@ -191,21 +216,29 @@ export const reservaMessage = (e, now = new Date()) => `Hola, quiero reservar pa
 export const reservaUrl = (e, now = new Date()) => (e.reserva?.tipo === 'whatsapp' ? `https://wa.me/52${e.reserva.telefono}?text=${encodeURIComponent(reservaMessage(e, now))}` : e.reserva?.tipo === 'luma' ? e.reserva.url : null);
 
 /**
- * Qué se muestra hoy y en qué orden. Próximos = fecha de hoy en adelante, por fecha y hora (a igualdad, el orden del archivo): el primero es
- * el destacado y los demás se agrupan por día. Los de fecha pasada no se muestran. Los de fecha null son las propuestas, al final.
+ * Qué se muestra hoy y en qué orden. Próximos = fecha de hoy en adelante (hasta PROXIMOS_MESES), por fecha y hora (a igualdad, el orden del
+ * archivo): el primero es el destacado y los demás se agrupan por día. Anteriores = fecha anterior a hoy y no más vieja que ANTERIORES_MESES
+ * (el día exacto, inclusive), del más reciente al más antiguo (a igualdad, la hora más tarde primero y luego el orden del archivo); lo más
+ * viejo no se muestra. El evento de hoy es próximo, no anterior. Los de fecha null son las propuestas, al final y nunca anteriores.
  * `aviso` es el renglón del inicio (null sin eventos con fecha), `hasta` la fecha del último evento vigente y `reservas`, los tipos de
  * reserva presentes entre los próximos (para la nota lateral).
  */
 export function eventosPlan(list, now = new Date()) {
   const hoy = dayKey(now);
-  const proximos = list.map((e, i) => ({ e, i })).filter(x => x.e.fecha && x.e.fecha >= hoy)
-    .sort((a, b) => (a.e.fecha < b.e.fecha ? -1 : a.e.fecha > b.e.fecha ? 1 : (a.e.hora ?? '') < (b.e.hora ?? '') ? -1 : (a.e.hora ?? '') > (b.e.hora ?? '') ? 1 : a.i - b.i))
+  const limite = shiftMonths(hoy, PROXIMOS_MESES), desde = shiftMonths(hoy, -ANTERIORES_MESES);
+  const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+  const dated = list.map((e, i) => ({ e, i })).filter(x => x.e.fecha);
+  const proximos = dated.filter(x => x.e.fecha >= hoy && x.e.fecha <= limite)
+    .sort((a, b) => cmp(a.e.fecha, b.e.fecha) || cmp(a.e.hora ?? '', b.e.hora ?? '') || a.i - b.i)
+    .map(x => x.e);
+  const anteriores = dated.filter(x => x.e.fecha < hoy && x.e.fecha >= desde)
+    .sort((a, b) => cmp(b.e.fecha, a.e.fecha) || cmp(b.e.hora ?? '', a.e.hora ?? '') || a.i - b.i)
     .map(x => x.e);
   const [destacado = null, ...resto] = proximos;
   const dias = [];
   for (const e of resto) { const d = dias.at(-1); if (d && d.fecha === e.fecha) d.eventos.push(e); else dias.push({ fecha: e.fecha, eventos: [e] }); }
   return {
-    hoy, destacado, dias,
+    hoy, destacado, dias, anteriores,
     propuestas: list.filter(e => !e.fecha),
     conFecha: proximos.length,
     reservas: ['luma', 'whatsapp'].filter(t => proximos.some(e => e.reserva?.tipo === t)),
@@ -380,11 +413,11 @@ function icon(id) {
   return svg;
 }
 const badge = txt => make('span', 'badge', txt); // la única insignia con relleno: «Próximo» u «Hoy»
-function photo(e, cls) {
+function photo(e, cls, alt = e.alt) {
   if (!e.imagen) return null;
   const img = make('img', cls);
   img.src = e.imagen;
-  img.alt = e.alt;
+  img.alt = alt;
   img.loading = 'lazy';
   img.decoding = 'async';
   return img;
@@ -527,6 +560,64 @@ export function cardNode(e, { level = 'h3' } = {}) {
   li.append(art);
   return li;
 }
+// Fila de «Eventos anteriores»: fecha tipográfica pequeña (versalitas; la fecha completa va en texto para lectores de pantalla), título, «tipo · Con …» y
+// la portada cuadrada a la derecha (un cartel se recorta a cuadrado en la miniatura). La fila no es un control: sin acciones, sin reserva, sin costo.
+// La miniatura es decorativa (alt vacío: el título y la fecha ya están en el texto); si no carga se quita y la fila queda sin foto, nunca un recuadro roto.
+export function pasadoNode(e, now = new Date(), { level = 'h4' } = {}) {
+  const li = make('li', 'ev-pasado');
+  li.dataset.id = e.id;
+  const txt = make('div', 'ev-pas-txt');
+  const fecha = make('p', 'ev-pas-fecha');
+  const vis = make('span', '', fechaPasada(e.fecha, now));
+  vis.setAttribute('aria-hidden', 'true');
+  fecha.append(vis, make('span', 'sr-only', cap(fechaLarga(e.fecha, now))));
+  txt.append(fecha, make(level, 'ev-pas-tit', e.titulo));
+  const meta = [e.tipo, quienLine(e)].filter(Boolean).join(' · ');
+  if (meta) txt.append(make('p', 'ev-pas-meta', meta));
+  li.append(txt);
+  const img = photo(e, 'ev-pas-img', '');
+  if (img) { img.addEventListener('error', () => img.remove()); li.append(img); }
+  return li;
+}
+// «Ver los N anteriores» / «Ver menos»: despliega en su sitio. El resto de las filas se arma en el primer despliegue (con cientos de eventos
+// pasados, el inicio solo pinta 6); el foco se queda en el botón y, al plegar, la página sube lo que la lista encogió para que el botón no se
+// mueva bajo el cursor. Las filas que se suman entran escalonadas solo con movimiento (como «Ver los 41 títulos» del Catálogo).
+let motionOn = () => false;
+function wireFold(btn, ul, rest, now) {
+  const total = ul.children.length + rest.length;
+  btn.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') !== 'true';
+    const y = btn.getBoundingClientRect().top;
+    const before = [...ul.children].filter(li => !li.hidden).length;
+    if (expanded && rest.length) ul.append(...rest.splice(0).map(e => pasadoNode(e, now)));
+    const v = foldAnteriores(total, { expanded });
+    [...ul.children].forEach((li, i) => { li.hidden = i >= v.limit; });
+    btn.setAttribute('aria-expanded', String(expanded));
+    btn.textContent = v.label;
+    if (expanded) staggerIn([...ul.children].slice(before));
+    else scrollBy(0, btn.getBoundingClientRect().top - y);
+  });
+}
+function anterioresNode(plan, now) {
+  const sec = make('section', 'ev-grupo ev-anteriores');
+  const h = make('h3', 'ev-sub', 'Eventos anteriores');
+  h.id = 'ev-anteriores-t';
+  sec.setAttribute('aria-labelledby', h.id);
+  const ul = make('ul', 'ev-pasados');
+  ul.id = 'ev-pasados';
+  const v = foldAnteriores(plan.anteriores.length);
+  ul.append(...plan.anteriores.slice(0, v.limit).map(e => pasadoNode(e, now)));
+  sec.append(h, ul);
+  if (v.fold) {
+    const btn = make('button', 'btn btn--contorno ev-fold', v.label);
+    btn.type = 'button';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', ul.id);
+    wireFold(btn, ul, plan.anteriores.slice(v.limit), now);
+    sec.append(btn);
+  }
+  return sec;
+}
 function listNode(events, level) {
   const ul = make('ul', 'ev-filas');
   ul.append(...events.map(e => cardNode(e, { level })));
@@ -583,6 +674,7 @@ export function eventosNodes(plan, now = new Date()) {
     sec.append(listNode(plan.propuestas, plan.conFecha ? 'h4' : 'h3'));
     lista.append(sec);
   }
+  if (plan.anteriores.length) lista.append(anterioresNode(plan, now)); // solo existe con al menos un evento pasado vigente
   if (lista.children.length || plan.conFecha) {
     const despues = make('div', 'ev-despues');
     if (lista.children.length) despues.append(lista);
@@ -595,20 +687,31 @@ export function eventosNodes(plan, now = new Date()) {
 // Entrada de las piezas que aún no se ven (solo con movimiento): cada una espera oculta (.ev-espera) y entra al llegar a la vista, 8 px y
 // opacidad en dur-rapida; las que llegan juntas van escalonadas (escalon-linea) y todas dentro de dur-lenta. Lo que ya está a la vista no
 // se oculta nunca. Sin movimiento («reducir movimiento» o la pausa) todo queda colocado: .ev-espera solo vale bajo .motion.
+const reveal = (n, i, { dur, step, tope }) => n.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: dur, delay: Math.min(i * step, tope), easing: EASE(), fill: 'backwards' });
+const timing = () => ({ dur: DUR('rapida'), step: ms('escalon-linea'), tope: DUR('lenta') - DUR('rapida') });
 function enterOnView(nodes, isMotion) {
   if (!isMotion() || !('IntersectionObserver' in window)) return;
   const waiting = nodes.filter(n => n.getBoundingClientRect().top >= innerHeight);
   if (!waiting.length) return;
   waiting.forEach(n => n.classList.add('ev-espera'));
-  const dur = DUR('rapida'), step = ms('escalon-linea'), tope = DUR('lenta') - dur;
+  const t = timing();
   const io = new IntersectionObserver(es => {
     es.filter(x => x.isIntersecting).forEach((x, i) => {
       io.unobserve(x.target);
       x.target.classList.remove('ev-espera');
-      if (isMotion()) x.target.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: dur, delay: Math.min(i * step, tope), easing: EASE(), fill: 'backwards' });
+      if (isMotion()) reveal(x.target, i, t);
     });
   }, { rootMargin: '0px 0px -8% 0px' });
   waiting.forEach(n => io.observe(n));
+}
+// Las filas que suma «Ver los N anteriores» y caen en la vista entran escalonadas (mismo gesto, mismos tokens); arrancan en el fotograma siguiente
+// al cambio. Sin movimiento no hacen nada.
+function staggerIn(items) {
+  if (!motionOn() || !items.length) return;
+  requestAnimationFrame(() => {
+    const vh = innerHeight, t = timing();
+    items.filter(n => { const r = n.getBoundingClientRect(); return r.bottom > 0 && r.top < vh; }).forEach((n, i) => reveal(n, i, t));
+  });
 }
 
 // Lo que index.html ya trae pintado (las propuestas): si coincide con el plan, no se vuelve a pintar (ni un parpadeo de las fotos).
@@ -620,14 +723,21 @@ export async function initEventos({ isMotion = () => false } = {}) {
   const root = document.querySelector('[data-ev]');
   if (!root || root.dataset.ready) return;
   root.dataset.ready = '1';
+  motionOn = isMotion;
+  const now = new Date();
   let plan;
-  try { known = await loadEventos(); plan = eventosPlan(known); } catch { delete root.dataset.ready; return; } // sin datos queda lo que trae index.html
+  try { known = await loadEventos(); plan = eventosPlan(known, now); } catch { delete root.dataset.ready; return; } // sin datos queda lo que trae index.html
   applyAviso(plan);
-  if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { root.classList.add('is-ready'); return; }
-  root.replaceChildren(...eventosNodes(plan));
+  if (!plan.conFecha && staticSignature(root) === planSignature(plan)) { // lo de index.html sigue vigente: solo se suman los anteriores, sin repintar las propuestas
+    const lista = root.querySelector('.ev-lista');
+    if (plan.anteriores.length && lista) { lista.append(anterioresNode(plan, now)); enterOnView([...lista.querySelectorAll('.ev-pasado')], isMotion); }
+    root.classList.add('is-ready');
+    return;
+  }
+  root.replaceChildren(...eventosNodes(plan, now));
   const lede = document.querySelector('[data-ev-lede]');
   if (lede && plan.conFecha) lede.textContent = 'Lo que viene en la casa.';
   root.classList.add('is-ready');
-  enterOnView([...root.querySelectorAll('.ev-prox, .ev-dia-tit, .ev-fila, .ev-lado')], isMotion);
+  enterOnView([...root.querySelectorAll('.ev-prox, .ev-dia-tit, .ev-fila, .ev-pasado, .ev-lado')], isMotion);
   if (plan.destacado) document.dispatchEvent(new CustomEvent('iti:primarias')); // app.js: la primaria de la barra cede ante la del destacado
 }

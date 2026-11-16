@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Importa el inventario real de la librería (hoja «Catálogo Itinerante.xlsx») al catálogo del sitio.
 
-Uso:  python3 scripts/import-inventario.py RUTA/Catálogo_Itinerante.xlsx
+Uso:  python3 scripts/import-inventario.py RUTA/Catálogo_Itinerante.xlsx [--hoja TÍTULO_DE_LA_PESTAÑA]
+
+- Sin --hoja lee la primera pestaña; con ella, la que se llame así (la sincronización con la hoja de Google lo usa cuando el libro trae
+  más pestañas, como «Eventos»). La variable ITI_RAIZ cambia la carpeta de trabajo (por omisión, la del repositorio): la sincronización
+  y sus pruebas la apuntan a una copia temporal para no tocar assets/ ni data/ hasta tener todo listo.
 
 - Lee la hoja (columnas: Editorial, Título, Autor, Precio, Sinopsis, Género, ISBN, Foto) desde la fila 3 y salta los renglones vacíos.
 - Escribe data/inventario-itinerante.json (copia fiel de la hoja, con avisos por renglón) y assets/data/catalog.json (lo que lee el sitio).
@@ -14,7 +18,7 @@ import json, os, re, subprocess, sys, unicodedata, io
 import openpyxl
 from PIL import Image
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.environ.get('ITI_RAIZ') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COVERS = os.path.join(ROOT, 'assets', 'img', 'portadas')
 
 GENEROS = {  # género de la hoja → (id, nombre, categoría)
@@ -80,8 +84,9 @@ def provenance(books, portadas):
         json.dump(prov, f, ensure_ascii=False, indent=2); f.write('\n')
 
 
-def main(xlsx):
-    ws = openpyxl.load_workbook(xlsx, data_only=True).worksheets[0]
+def main(xlsx, hoja=None):
+    wb = openpyxl.load_workbook(xlsx, data_only=True)
+    ws = wb[hoja] if hoja else wb.worksheets[0]
     portadas = json.load(open(os.path.join(ROOT, 'data', 'portadas.json'), encoding='utf-8'))
     rows, books, seen = [], [], {}
     for fila, row in enumerate(ws.iter_rows(min_row=3, max_col=8, values_only=True), start=3):
@@ -126,5 +131,8 @@ def main(xlsx):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2: sys.exit(__doc__)
-    main(sys.argv[1])
+    args = sys.argv[1:]
+    hoja = None
+    if len(args) == 3 and args[1] == '--hoja': hoja = args[2]; args = args[:1]
+    if len(args) != 1: sys.exit(__doc__)
+    main(args[0], hoja)

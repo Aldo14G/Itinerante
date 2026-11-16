@@ -9,6 +9,10 @@
 //     tipográfica, datos en lista de definición, costo y «Reservar por WhatsApp»; lista por día con «Registrarme» (solo lu.ma / luma.com, en otra pestaña, de
 //     contorno) y «Añadir al calendario» (el .ics se descarga con la CSP de producción); propuestas al final; nota lateral; «Compartir»; aviso en el inicio
 //     (reservado por boot.js en la visita de regreso, sin mover las posiciones fijas) y punto en «Eventos».
+//  3a. Eventos anteriores (2026-11-16): con la lista real el apartado no existe ni deja hueco (misma altura que el HTML estático); con datos de prueba (8 pasados, uno
+//     de otro año y dos fuera de la ventana de 24 meses): fila compacta entre líneas finas (sin relleno, sin acciones, portada cuadrada de 64 / 88 con radio 12 y anillo),
+//     los 6 más recientes y «Ver los N anteriores» / «Ver menos» (aria-expanded, aria-controls, el foco se queda, al plegar el botón no se mueve bajo el cursor), solo
+//     pasados sin próximos, imagen inexistente (fila sin foto, nunca un recuadro roto), cartel enorme sin desborde y 150 eventos sin tareas largas con CPU 4×.
 //  3b. Café y té (#cafe, 2026-11-16): la carta de menu.json en parrilla por categorías con su barra de categorías fija (enlaces, no un radiogroup): tarjeta compacta
 //     de solo texto (superficie con anillo fino; precio solo de la carta impresa), «Aguas frescas» sin precio ni descripción en una sola línea y sin quedar huérfana,
 //     barra fija bajo la cabecera, scroll-spy (llegando desde arriba, desde abajo y por cada grupo), tocar un chip lleva al grupo y deja el foco en su título, la foto real
@@ -36,6 +40,7 @@ await new Promise(r => ws.addEventListener('open', r, { once: true }));
 let id = 0; const pending = new Map(); let problems = [];
 let override = null; // cuerpo alterno de collections.json
 let overrideMenu = null; // cuerpo alterno de menu.json (carta con fotos de prueba; null = el archivo real)
+let cartelEnorme = null; // cuerpo alterno del cartel enorme de la prueba de robustez (null = el archivo real)
 let overrideEventos = null; // cuerpo alterno de eventos.json (datos de prueba de esta herramienta; null = el archivo real)
 ws.addEventListener('message', e => {
   const m = JSON.parse(e.data);
@@ -45,7 +50,8 @@ ws.addEventListener('message', e => {
   if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') problems.push(`LOG ${m.params.entry.text} ${m.params.entry.url || ''}`);
   if (m.method === 'Fetch.requestPaused') {
     const { requestId, request } = m.params;
-    if (/eventos\.json/.test(request.url)) {
+    if (cartelEnorme && /cartel-enorme/.test(request.url)) send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'image/jpeg' }], body: cartelEnorme.toString('base64') });
+    else if (/eventos\.json/.test(request.url)) {
       if (overrideEventos) send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body: Buffer.from(JSON.stringify(overrideEventos)).toString('base64') });
       else send('Fetch.continueRequest', { requestId });
     } else if (/menu\.json/.test(request.url)) {
@@ -255,7 +261,7 @@ check('eventos', 'destacado: «Reservar por WhatsApp» es la primaria de 56 (enl
 check('eventos', 'destacado en el teléfono: la primaria ocupa su renglón entero y los iconos van debajo (o todo en un renglón si cabe); nada cortado ni fuera de la tarjeta', resv.box[0] === r1.prox.cuerpo[0] + 20 && r1.prox.acc.every(b => b.box[0] + b.box[2] <= r1.prox.box[0] + r1.prox.box[2] - 19) && r1.prox.cut === 0 && !r1.over, JSON.stringify({ acc: r1.prox.acc.map(b => b.box), prox: r1.prox.box }));
 // Lista por día
 const esperado = planPrueba.dias.map(d => { const c = fechaBloque(d.fecha); return { tit: fechaLarga(d.fecha), vis: [c.sem, c.num, c.mes], ids: d.eventos.map(e => e.id) }; });
-check('eventos', 'lista por día: «Después» con un rótulo por día («SÁB · 28 NOV»: decorativo, con la fecha completa en texto sr-only) y los eventos en orden de fecha y hora; el pasado no se muestra; las propuestas, al final con su rótulo', r1.sub.join('|') === 'Después|Propuestas, aún sin fecha' && JSON.stringify(r1.dias.map(d => ({ tit: d.tit.toLowerCase(), vis: d.vis, ids: d.ids }))) === JSON.stringify(esperado) && r1.dias.every(d => d.hidden === 'true') && r1.dias.length === 3 && r1.dias[1].ids.join() === 'ajedrez,prueba-segunda' && !r1.text.includes('Evento pasado') && r1.propuestas.join() === 'taller' && r1.cards.at(-1).id === 'taller', JSON.stringify([r1.sub, r1.dias, esperado, r1.propuestas]));
+check('eventos', 'lista por día: «Después» con un rótulo por día («SÁB · 28 NOV»: decorativo, con la fecha completa en texto sr-only) y los eventos en orden de fecha y hora; el pasado ya no es próximo (va a «Eventos anteriores»); las propuestas, al final con su rótulo', r1.sub.join('|') === 'Después|Propuestas, aún sin fecha|Eventos anteriores' && JSON.stringify(r1.dias.map(d => ({ tit: d.tit.toLowerCase(), vis: d.vis, ids: d.ids }))) === JSON.stringify(esperado) && r1.dias.every(d => d.hidden === 'true') && r1.dias.length === 3 && r1.dias[1].ids.join() === 'ajedrez,prueba-segunda' && r1.cards.every(c => c.id !== 'prueba-pasado') && r1.propuestas.join() === 'taller' && r1.cards.at(-1).id === 'taller', JSON.stringify([r1.sub, r1.dias, esperado, r1.propuestas]));
 check('eventos', 'filas de la lista con fecha: una línea fina arriba (1 px, salvo la primera de cada día en el teléfono, que usa la del rótulo) y cada grupo se cierra con una sola línea abajo (la última fila de los días y la última propuesta); sin relleno, radio ni sombra', r1.cards.every(c => c.bg === 'rgba(0, 0, 0, 0)' && c.radius === '0px' && c.shadow === 'none') && r1.cards.filter(c => c.borderBottom === '1px').map(c => c.id).join() === 'prueba-otro-dominio,taller' && r1.cards.filter(c => c.borderTop === '1px').map(c => c.id).join() === 'prueba-segunda,taller', JSON.stringify(r1.cards.map(c => [c.id, c.borderTop, c.borderBottom])));
 const cById = id => r1.cards.find(c => c.id === id);
 const cir = cById('circulo'), aje = cById('ajedrez'), seg = cById('prueba-segunda'), otro = cById('prueba-otro-dominio'), tal = cById('taller');
@@ -337,6 +343,113 @@ check('eventos', '1280 con fechas: destacado con el cuerpo a la izquierda y el c
 check('eventos', '1280 con fechas: la lista en las columnas 1–8 y la nota lateral en 9–12, alineadas arriba y la nota fija al desplazar; portadas de 120', r1d.lado && r1d.lado.box[0] > r1d.lado.lista[0] + r1d.lado.lista[2] && r1d.lado.box[1] === r1d.lado.lista[1] && r1d.lado.sticky === 'sticky' && Math.abs(r1d.lado.lista[2] / (r1d.lado.box[0] + r1d.lado.box[2] - r1d.lado.lista[0]) - 0.657) < 0.01 && r1d.cards.every(c => c.img.box[2] === 120 && c.img.box[3] === 120 && c.cut === 0) && !r1d.over, JSON.stringify(r1d.lado));
 check('eventos', '1280 con datos de prueba: sin errores de consola', !problems.length, problems.join(' | '));
 overrideEventos = null;
+
+// ---- 3.3 Eventos anteriores (2026-11-16): el sitio se alimenta solo; lo ya ocurrido pasa a un apartado de archivo ----
+{
+  const pas = (i, n, extra = {}) => ({ id: `ant-${i}`, tipo: ['Charla', 'Lectura', 'Juego', 'Taller'][i % 4], titulo: ['Tarde de Letras XVI', 'Círculo de otoño', 'Ajedrez en la casa', 'Taller de escritura creativa'][i % 4], fecha: dayMty(n), hora: '18:30', fin: null, con: i % 3 === 0 ? 'Nombre de prueba' : null, descripcion: 'Texto de prueba.', imagen: ['assets/img/cartelera-1.webp', 'assets/img/cartelera-2.webp', 'assets/img/cartelera-3.webp'][i % 3], alt: 'Foto de prueba', reserva: { tipo: 'luma', url: 'https://lu.ma/pasado' }, costo: ['$50 MXN'], ...extra });
+  const ANT = [-8, -22, -40, -70, -120, -200, -330, -420].map((n, i) => pas(i, n));
+  const ANTES = { eventos: [...PRUEBA.eventos.filter(e => e.id !== 'prueba-pasado'), ...ANT, pas(90, -730), pas(91, -900, { id: 'ant-viejo' })] }; // dos fuera de la ventana
+  const planA = eventosPlan(validEventos(ANTES));
+  const leer = () => ev(`(() => { const sec = document.querySelector('#cartelera'); const q = (s, r = sec) => r.querySelector(s); const all = (s, r = sec) => [...r.querySelectorAll(s)];
+    const R = e => { const b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)]; };
+    const cs = (e, p) => getComputedStyle(e)[p];
+    const ap = q('.ev-anteriores'), ul = q('.ev-pasados'), fold = q('.ev-fold');
+    const rows = all('.ev-pasado'), vis = rows.filter(l => !l.hidden && getComputedStyle(l).display !== 'none');
+    const fila = l => { const img = q('.ev-pas-img', l), f = q('.ev-pas-fecha', l), t = q('.ev-pas-tit', l), m = q('.ev-pas-meta', l); return { id: l.dataset.id, box: R(l), bg: cs(l, 'backgroundColor'), bt: cs(l, 'borderTopWidth'), shadow: cs(l, 'boxShadow'), glass: cs(l, 'backdropFilter'), cursor: cs(l, 'cursor'), tag: t.tagName, tit: t.textContent, titFs: cs(t, 'fontSize'), titW: cs(t, 'fontWeight'), fecha: f.querySelector('[aria-hidden]')?.textContent, fechaSr: f.querySelector('.sr-only')?.textContent, fechaFs: cs(f, 'fontSize'), fechaTT: cs(f, 'textTransform'), meta: m?.textContent || '', metaFs: m ? cs(m, 'fontSize') : '', img: img && { box: R(img), alt: img.getAttribute('alt'), radius: cs(img, 'borderTopLeftRadius'), outline: cs(img, 'outlineStyle') + ' ' + cs(img, 'outlineWidth'), fit: cs(img, 'objectFit'), ok: img.naturalWidth > 0 }, acts: all('a, button, input, [tabindex]', l).length, over: [...l.querySelectorAll('*')].filter(e => e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible').length }; };
+    return { ap: !!ap, labelled: ap && ap.getAttribute('aria-labelledby') === q('.ev-anteriores > .ev-sub')?.id, h: q('.ev-anteriores > .ev-sub')?.tagName, hTxt: q('.ev-anteriores > .ev-sub')?.textContent, ul: ul && { tag: ul.tagName, id: ul.id, bb: cs(ul, 'borderBottomWidth') }, n: rows.length, nVis: vis.length, filas: vis.map(fila), ids: vis.map(l => l.dataset.id),
+      fold: fold && { txt: fold.textContent.trim(), exp: fold.getAttribute('aria-expanded'), ctl: fold.getAttribute('aria-controls'), ctlOk: !!document.getElementById(fold.getAttribute('aria-controls')), cls: fold.className, box: R(fold), focus: document.activeElement === fold, top: fold.getBoundingClientRect().top, bg: cs(fold, 'backgroundColor') },
+      apBox: ap && R(ap), lista: q('.ev-lista') && R(q('.ev-lista')), lado: q('.ev-lado') && R(q('.ev-lado')), secH: Math.round(sec.getBoundingClientRect().height), over: document.documentElement.scrollWidth > innerWidth, text: ap?.innerText || '',
+      broken: all('img').filter(i => i.complete && i.naturalWidth === 0).length, sub: all('.ev-sub').map(h => h.textContent), propuestas: all('.ev-propuestas .ev-fila').length }; })()`);
+  // (1) lista real: sin apartado, sin hueco (misma altura que el HTML estático)
+  overrideEventos = null;
+  await open(393, 659, { reset: true });
+  await irEventos();
+  const real0 = await leer();
+  await send('Emulation.setScriptExecutionDisabled', { value: true });
+  await send('Page.navigate', { url: URL_ }); await sleep(1500);
+  const estatico = await ev(`Math.round(document.querySelector('#cartelera').getBoundingClientRect().height)`);
+  await send('Emulation.setScriptExecutionDisabled', { value: false });
+  check('anteriores', 'lista real (hoy, sin eventos pasados): no existe el apartado ni su botón ni su encabezado, y la sección mide lo mismo que el HTML estático (sin hueco)', !real0.ap && real0.n === 0 && !real0.fold && !real0.sub.includes('Eventos anteriores') && real0.secH === estatico, JSON.stringify([real0.ap, real0.n, real0.secH, estatico]));
+  // (2) datos de prueba en el teléfono y en escritorio
+  for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
+    overrideEventos = ANTES;
+    await open(vw, vh, { reset: true, mobile, wait: mobile ? 4000 : 2500 });
+    await irEventos();
+    const a0 = await leer();
+    const tag = `${vw}×${vh}`;
+    const cover = vw < 761 ? 64 : 88;
+    check('anteriores', `${tag} apartado: section aria-labelledby con h3 «Eventos anteriores» (Title 3), lista ul, 6 de 8 válidos a la vista (los dos de fuera de los 24 meses no están) y «Ver los 8 anteriores» como botón de contorno con aria-expanded="false" y aria-controls`, a0.ap && a0.labelled && a0.h === 'H3' && a0.hTxt === 'Eventos anteriores' && a0.ul.tag === 'UL' && a0.nVis === 6 && a0.n === 6 && planA.anteriores.length === 8 && a0.fold && a0.fold.txt === 'Ver los 8 anteriores' && a0.fold.exp === 'false' && a0.fold.ctl === a0.ul.id && a0.fold.ctlOk && /btn--contorno/.test(a0.fold.cls) && a0.fold.bg === 'rgba(0, 0, 0, 0)', JSON.stringify([a0.ap, a0.labelled, a0.h, a0.nVis, a0.n, a0.fold]));
+    check('anteriores', `${tag} orden: del más reciente al más antiguo (${planA.anteriores.slice(0, 6).map(e => e.id).join(', ')})`, a0.ids.join() === planA.anteriores.slice(0, 6).map(e => e.id).join(), a0.ids.join());
+    const f = a0.filas;
+    check('anteriores', `${tag} fila: entre líneas finas de 1 px, sin relleno, sombra, vidrio ni cursor de mano; título h4 en Headline 17 semibold; fecha en versalitas de 13 en mayúsculas, con la fecha completa en sr-only; «tipo · Con …» de 15; portada cuadrada de ${cover} con radio 12 y anillo de 1 px, decorativa (alt vacío); ningún botón, enlace ni tabindex`, f.length === 6 && f.every(x => x.bt === '1px' && x.bg === 'rgba(0, 0, 0, 0)' && x.shadow === 'none' && (x.glass === 'none' || !x.glass) && x.cursor !== 'pointer' && x.tag === 'H4' && x.titFs === '17px' && x.titW === '600' && x.fechaFs === '13px' && x.fechaTT === 'uppercase' && /[a-záéíóú]+ \d+ de [a-z]+/.test(x.fechaSr) && /^[A-Z][a-zé]+ · \d+ [A-Z][a-z]+/.test(x.fecha) && x.metaFs === '15px' && x.img && x.img.box[2] === cover && x.img.box[3] === cover && x.img.radius === '12px' && /^solid 1px/.test(x.img.outline) && x.img.alt === '' && x.img.ok && x.acts === 0 && x.over === 0) && a0.ul.bb === '1px', JSON.stringify(f[0]));
+    check('anteriores', `${tag} sin acciones: ni «Registrarme», «Reservar», calendario, «Compartir», costo ni «Próximo» dentro del apartado (aunque el JSON los traiga)`, !/Registrarme|Reservar|calendario|Compartir|\$\s?\d|Próximo|Hoy\b/.test(a0.text), a0.text.slice(0, 200));
+    check('anteriores', `${tag} el año solo cuando no es el en curso («DIC · 2025» aparece en las filas de otro año)`, f.every(x => (x.fecha.split(' · ').length === 3) === (x.fechaSr.includes(' de ' + String(new Date().getFullYear() - 1)) || x.fechaSr.includes(' de ' + String(new Date().getFullYear() + 1)))), JSON.stringify(f.map(x => [x.fecha, x.fechaSr])));
+    if (vw >= 1024) check('anteriores', `${tag} está en la columna de la lista (1–8): el apartado empieza y termina con ella y la nota lateral (9–12) queda a su derecha`, a0.apBox[0] === a0.lista[0] && a0.apBox[0] + a0.apBox[2] <= a0.lista[0] + a0.lista[2] + 1 && a0.lado && a0.lado[0] >= a0.apBox[0] + a0.apBox[2] + 16, JSON.stringify([a0.apBox, a0.lista, a0.lado]));
+    else check('anteriores', `${tag} a todo el ancho del contenido, sin desborde`, a0.apBox[0] >= 0 && a0.apBox[0] + a0.apBox[2] <= vw && !a0.over, JSON.stringify([a0.apBox, a0.over]));
+    await shot(`03a-anteriores-${vw}-plegado.jpg`);
+    // desplegar: el foco se queda en el botón; ya salen las 8 y dice «Ver menos»
+    await ev(`document.querySelector('.ev-fold').focus({ preventScroll: true }); document.querySelector('.ev-fold').scrollIntoView({ block: 'center' })`); await sleep(500);
+    const antes = await ev(`document.querySelector('.ev-fold').getBoundingClientRect().top`);
+    await key('Enter', 'Enter', 13); await sleep(1300);
+    const a1 = await leer();
+    check('anteriores', `${tag} «Ver los 8 anteriores» con el teclado: aparecen las 8, el botón dice «Ver menos» con aria-expanded="true", conserva el foco y la altura de la sección crece`, a1.nVis === 8 && a1.fold.txt === 'Ver menos' && a1.fold.exp === 'true' && a1.fold.focus && a1.secH > a0.secH && a1.ids.join() === planA.anteriores.map(e => e.id).join() && a1.filas.every(x => x.img && x.img.ok), JSON.stringify([a1.nVis, a1.fold, a0.secH, a1.secH]));
+    await shot(`03a-anteriores-${vw}-desplegado.jpg`);
+    // plegar con el cursor sobre el botón: el botón no se mueve bajo el cursor
+    await ev(`document.querySelector('.ev-fold').scrollIntoView({ block: 'center' })`); await sleep(400);
+    const p0 = await ev(`document.querySelector('.ev-fold').getBoundingClientRect().top`);
+    await key('Enter', 'Enter', 13); await sleep(900);
+    const a2 = await leer();
+    check('anteriores', `${tag} «Ver menos»: vuelven las 6, el botón dice «Ver los 8 anteriores», conserva el foco y no se mueve bajo el cursor (Δ ${Math.round(a2.fold.top - p0)} px)`, a2.nVis === 6 && a2.fold.txt === 'Ver los 8 anteriores' && a2.fold.exp === 'false' && a2.fold.focus && Math.abs(a2.fold.top - p0) <= 1, JSON.stringify([a2.nVis, a2.fold, p0]));
+    check('anteriores', `${tag} con datos de prueba: sin errores de consola`, !problems.length, problems.join(' | '));
+  }
+  // (3) solo pasados, sin próximos ni propuestas: el apartado va solo, en 1–8 en escritorio, con la entradilla «Aún sin fecha…»
+  overrideEventos = { eventos: ANT };
+  await open(1280, 800, { reset: true, mobile: false, wait: 2500 }); await irEventos();
+  const so = await leer();
+  const lede = await ev(`document.querySelector('[data-ev-lede]').innerText.trim()`);
+  check('anteriores', '1280 solo pasados (sin próximos ni propuestas): el apartado va solo en las columnas 1–8, con su propio encabezado; la entradilla sigue siendo «Aún sin fecha. Las fechas se anuncian en Instagram.»; sin destacado, sin nota lateral', so.ap && so.nVis === 6 && !so.lado && so.propuestas === 0 && so.apBox[2] < 1152 * 0.72 && so.apBox[2] > 1152 * 0.6 && /^Aún sin fecha\./.test(lede) && so.sub.join() === 'Eventos anteriores', JSON.stringify([so.apBox, lede, so.sub]));
+  await shot('03a-solo-pasados-1280.jpg');
+  // (4) propuestas reales + pasados, sin próximos: no se repintan las propuestas de index.html y los anteriores van debajo
+  overrideEventos = { eventos: [realBy('circulo'), realBy('ajedrez'), realBy('taller'), ...ANT.slice(0, 3)] };
+  await open(393, 659, { reset: true }); await irEventos();
+  const mix = await leer();
+  check('anteriores', '393 propuestas sin fecha + 3 pasados: las tres propuestas, el apartado debajo y sin botón (caben en 6)', mix.propuestas === 3 && mix.ap && mix.nVis === 3 && !mix.fold && mix.sub.join() === 'Eventos anteriores', JSON.stringify([mix.propuestas, mix.nVis, mix.fold, mix.sub]));
+  // (5) imagen inexistente: la fila queda sin foto, nunca un recuadro roto
+  overrideEventos = { eventos: [pas(0, -8, { imagen: 'assets/img/no-existe.webp' }), pas(1, -22, { imagen: null }), pas(2, -40)] };
+  await open(393, 659, { reset: true }); await irEventos(); await sleep(800);
+  const sinImg = await leer();
+  check('anteriores', '393 imagen que no existe (404) o ausente: la fila se conserva sin foto y el texto ocupa el ancho; ninguna imagen rota a la vista', sinImg.nVis === 3 && sinImg.filas[0].img === null && sinImg.filas[1].img === null && sinImg.filas[2].img && sinImg.broken === 0 && sinImg.filas.every(x => x.box[2] > 300), JSON.stringify([sinImg.filas.map(x => [x.id, !!x.img, x.box]), sinImg.broken]));
+  // (6) cartel enorme y no cuadrado en el destacado: solo CSS, sin desbordar
+  overrideEventos = { eventos: [{ ...PRUEBA.eventos[1], imagen: 'assets/img/eventos/cartel-enorme.jpg' }, pas(0, -8)] };
+  const enorme = join(tmpdir(), 'cartel-enorme.jpg');
+  if (!existsSync(enorme)) { const { spawnSync } = await import('node:child_process'); spawnSync('python3', ['-c', `from PIL import Image; Image.new('RGB', (4000, 6000), (122, 196, 180)).save(${JSON.stringify(enorme)}, quality=60)`]); }
+  if (existsSync(enorme)) {
+    await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }, { urlPattern: '*eventos.json*' }, { urlPattern: '*menu.json*' }, { urlPattern: '*cartel-enorme*' }] });
+    cartelEnorme = readFileSync(enorme);
+    for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
+      await open(vw, vh, { reset: true, mobile, wait: mobile ? 4000 : 2500 }); await irEventos(); await sleep(1500);
+      const big = await ev(`(() => { const i = document.querySelector('.ev-prox-img'); const f = document.querySelector('.ev-prox-fig'); const r = i.getBoundingClientRect(), fr = f.getBoundingClientRect(); return { nat: [i.naturalWidth, i.naturalHeight], box: [Math.round(r.width), Math.round(r.height)], fig: [Math.round(fr.width), Math.round(fr.height)], over: document.documentElement.scrollWidth > innerWidth, inside: r.left >= fr.left - 1 && r.right <= fr.right + 1 }; })()`);
+      check('anteriores', `${vw}×${vh} cartel de 4000×6000 (no cuadrado): se muestra entero y cuadrado dentro de su marco, sin desbordar la página`, big.nat[0] === 4000 && Math.abs(big.box[0] - big.box[1]) <= 1 && big.inside && !big.over && big.box[0] < 700, JSON.stringify(big));
+    }
+    cartelEnorme = null;
+  }
+  // (7) 150 eventos (50 próximos y 100 pasados): pinta sin tareas largas con CPU 4× y arma solo 6 filas de anteriores
+  const muchos = { eventos: [...Array.from({ length: 50 }, (_, i) => ({ ...pas(i, 1 + i * 2), id: `prox-${i}`, reserva: i % 2 ? null : { tipo: 'luma', url: 'https://lu.ma/x' } })), ...Array.from({ length: 100 }, (_, i) => pas(i + 100, -3 - i * 6))] };
+  overrideEventos = muchos;
+  await open(393, 659, { reset: true, wait: 3500 });
+  await send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await ev(`window.__long = []; new PerformanceObserver(l => l.getEntries().forEach(e => window.__long.push(Math.round(e.duration)))).observe({ type: 'longtask', buffered: false }); document.querySelector('#cartelera').scrollIntoView(); 0`);
+  await sleep(3000);
+  const mm = await leer();
+  const tareas = await ev(`window.__long`);
+  await send('Emulation.setCPUThrottlingRate', { rate: 1 });
+  const antPlan = eventosPlan(validEventos(muchos));
+  check('anteriores', `150 eventos con CPU 4×: la sección se pinta (${antPlan.conFecha} próximos), solo 6 filas de anteriores en el DOM de las ${antPlan.anteriores.length} vigentes, «Ver los ${antPlan.anteriores.length} anteriores», y ninguna tarea larga supera 200 ms (${JSON.stringify(tareas)})`, mm.ap && mm.n === 6 && mm.fold.txt === `Ver los ${antPlan.anteriores.length} anteriores` && (tareas || []).every(d => d <= 200), JSON.stringify([mm.n, mm.fold, tareas]));
+  await ev(`document.querySelector('.ev-fold').click()`); await sleep(1500);
+  const mm2 = await leer();
+  check('anteriores', `150 eventos: «Ver los ${antPlan.anteriores.length} anteriores» arma el resto de las filas (${mm2.nVis} a la vista), todas dentro de la ventana de 24 meses y sin errores de consola`, mm2.nVis === antPlan.anteriores.length && !problems.length, JSON.stringify([mm2.nVis, problems]));
+  overrideEventos = null;
+}
 
 // ---------- 3b. Café y té (#cafe): la carta en parrilla por categorías con su barra de categorías fija (2026-11-16; datos en assets/data/menu.json) ----------
 // Antes era un Carrusel3D con chips Café · Té. Ahora: una barra de enlaces (una por categoría) que marca el grupo a la vista y lleva al grupo; cada grupo
