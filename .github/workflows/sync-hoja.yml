@@ -63,6 +63,12 @@ jobs:
           GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
           HOJA_ID: ${{ secrets.HOJA_ID }}
         run: |
+          # Sin los secretos configurados (antes de seguir docs/AUTOMATIZACION.md) no se hace nada y la corrida termina bien:
+          # así GitHub no manda un correo de error cada 30 minutos.
+          if [ -z "$GOOGLE_SA_KEY" ] || [ -z "$HOJA_ID" ]; then
+            echo "::notice::Sincronización sin configurar: faltan los secretos GOOGLE_SA_KEY y HOJA_ID. No se hace nada. Ver docs/AUTOMATIZACION.md."
+            exit 0
+          fi
           args=()
           [ "$SECO" = "true" ] && args+=(--seco)
           [ "$FORZAR" = "true" ] && args+=(--forzar)
