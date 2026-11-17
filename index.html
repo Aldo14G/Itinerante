@@ -416,18 +416,58 @@
         <div class="frame-clip" data-revelar><img src="assets/img/oficial-mesa-800.webp" width="800" height="600" alt="Mesa con novelas de bolsillo frente a un muro de piedra; al fondo, libreros y el piso ajedrezado" loading="lazy" decoding="async"></div>
       </figure>
       <div class="ct" data-cafe>
-        <nav class="ct-nav" aria-label="Categorías de la carta" data-ct-nav><span class="sk-chip" aria-hidden="true"></span><span class="sk-chip" aria-hidden="true"></span></nav>
-        <div class="ct-lista" data-ct-lista aria-busy="true">
-          <div class="ct-grupo" aria-hidden="true">
-            <span class="ct-grupo-tit ct-grupo-tit--sk">&nbsp;</span>
+        <!-- carta:inicio · generada desde assets/data/menu.json con `npm run carta`; no se edita a mano -->
+        <nav class="ct-nav" aria-label="Categorías de la carta" data-ct-nav>
+          <a class="ct-tab" href="#carta-cafe" data-id="cafe">Cafés</a>
+          <a class="ct-tab" href="#carta-sin-cafe" data-id="sin-cafe" aria-label="Bebidas sin café">Sin café</a>
+          <a class="ct-tab" href="#carta-salado" data-id="salado">Salado</a>
+          <a class="ct-tab" href="#carta-postres" data-id="postres">Postres</a>
+        </nav>
+        <div class="ct-lista" data-ct-lista>
+          <section class="ct-grupo" id="carta-cafe" aria-labelledby="carta-cafe-t">
+            <h3 class="ct-grupo-tit" id="carta-cafe-t" tabindex="-1">Cafés</h3>
             <ul class="ct-rejilla">
-            <li class="ct-prod ct-prod--solo card--sk"><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-precio">&nbsp;</span></span></li>
-            <li class="ct-prod ct-prod--solo card--sk"><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-precio">&nbsp;</span></span></li>
-            <li class="ct-prod ct-prod--solo card--sk"><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-precio">&nbsp;</span></span></li>
-            <li class="ct-prod ct-prod--solo card--sk"><span class="ct-txt"><span class="ct-nom">&nbsp;</span><span class="ct-precio">&nbsp;</span></span></li>
+              <li class="ct-prod ct-prod--solo" data-id="cafe-de-olla"><div class="ct-txt"><h4 class="ct-nom">Café de olla</h4><p class="ct-precio" data-fuente="carta">$65 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="cafe-americano"><div class="ct-txt"><h4 class="ct-nom">Café americano</h4><p class="ct-precio" data-fuente="carta">$45 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="cappuccino"><div class="ct-txt"><h4 class="ct-nom">Cappuccino</h4><p class="ct-precio" data-fuente="carta">$65 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="latte"><div class="ct-txt"><h4 class="ct-nom">Latte</h4><p class="ct-precio" data-fuente="carta">$65 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="macchiato"><div class="ct-txt"><h4 class="ct-nom">Macchiato</h4><p class="ct-precio" data-fuente="carta">$45 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="espresso"><div class="ct-txt"><h4 class="ct-nom">Espresso</h4><p class="ct-precio" data-fuente="carta">$45 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="affogato"><div class="ct-txt"><h4 class="ct-nom">Affogato</h4><p class="ct-precio" data-fuente="carta">$70 MXN</p></div></li>
             </ul>
-          </div>
+          </section>
+          <section class="ct-grupo" id="carta-sin-cafe" aria-labelledby="carta-sin-cafe-t">
+            <h3 class="ct-grupo-tit" id="carta-sin-cafe-t" tabindex="-1">Bebidas sin café</h3>
+            <p class="ct-grupo-nota">Los tés, fríos o calientes.</p>
+            <ul class="ct-rejilla">
+              <li class="ct-prod ct-prod--solo" data-id="chocolate"><div class="ct-txt"><h4 class="ct-nom">Chocolate</h4><p class="ct-precio" data-fuente="carta">$65 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="hierbabuena"><div class="ct-txt"><h4 class="ct-nom">Hierbabuena</h4></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="manzanilla"><div class="ct-txt"><h4 class="ct-nom">Manzanilla</h4></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="7-azahares"><div class="ct-txt"><h4 class="ct-nom">7 azahares</h4></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="limon"><div class="ct-txt"><h4 class="ct-nom">Limón</h4></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="jamaica"><div class="ct-txt"><h4 class="ct-nom">Jamaica</h4></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="te-verde"><div class="ct-txt"><h4 class="ct-nom">Té verde</h4></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="aguas-frescas"><div class="ct-txt"><h4 class="ct-nom">Aguas frescas</h4></div></li>
+            </ul>
+          </section>
+          <section class="ct-grupo" id="carta-salado" aria-labelledby="carta-salado-t">
+            <h3 class="ct-grupo-tit" id="carta-salado-t" tabindex="-1">Salado</h3>
+            <ul class="ct-rejilla">
+              <li class="ct-prod ct-prod--solo" data-id="sandwich"><div class="ct-txt"><h4 class="ct-nom">Sándwich</h4><p class="ct-precio" data-fuente="carta">$80 MXN</p><p class="ct-desc">Queso panela, hummus, espinaca, tomate y aguacate.</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="quesadilla-campesina"><div class="ct-txt"><h4 class="ct-nom">Quesadilla campesina</h4><p class="ct-precio" data-fuente="carta">$55 MXN</p><p class="ct-desc">Queso de rancho y guiso del día.</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="molletes"><div class="ct-txt"><h4 class="ct-nom">Molletes</h4><p class="ct-precio" data-fuente="carta">$65 MXN</p></div></li>
+            </ul>
+          </section>
+          <section class="ct-grupo" id="carta-postres" aria-labelledby="carta-postres-t">
+            <h3 class="ct-grupo-tit" id="carta-postres-t" tabindex="-1">Postres</h3>
+            <ul class="ct-rejilla">
+              <li class="ct-prod ct-prod--solo" data-id="empanada-de-cajeta"><div class="ct-txt"><h4 class="ct-nom">Empanada de cajeta</h4><p class="ct-precio" data-fuente="carta">$35 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="empanada-de-pina"><div class="ct-txt"><h4 class="ct-nom">Empanada de piña</h4><p class="ct-precio" data-fuente="carta">$35 MXN</p></div></li>
+              <li class="ct-prod ct-prod--solo" data-id="tarta-del-dia"><div class="ct-txt"><h4 class="ct-nom">Tarta del día</h4><p class="ct-precio" data-fuente="carta">$70 MXN</p><p class="ct-desc">Rebanada.</p></div></li>
+            </ul>
+          </section>
         </div>
+        <!-- carta:fin -->
       </div>
       <!-- Cierre de la carta: el café se sirve en la librería (Mariano Matamoros 421; lo confirmó Aldo el 2026-11-17 con el enlace de Maps; la carta
            impresa trae una dirección anterior). «Cómo llegar» es secundario: al pie de Café asoma la primaria de Visita (una por pantalla). -->

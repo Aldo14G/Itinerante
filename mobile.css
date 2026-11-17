@@ -76,7 +76,7 @@ html:not(.js) .tabbar { display: none; }
 /* ---------- La casa: tira que se pasa con el dedo ---------- */
 .still { width: 78vw; scroll-snap-align: center; } /* la siguiente foto asoma lo bastante para invitar a deslizar */
 
-/* ---------- Café y té: la primaria del cierre (hoy retirado, `hidden`), a todo el ancho (como en Inicio, Catálogo y Visita) ---------- */
+/* ---------- Café y té: «Cómo llegar» del cierre (secundario de 56), a todo el ancho (como los botones de 56 en Inicio, Catálogo y Visita) ---------- */
 .ct-cierre .btn { width: 100%; }
 
 /* ---------- Visita y pie ---------- */
@@ -92,8 +92,8 @@ html:not(.js) .tabbar { display: none; }
 /* Hasta 419 px (antes 389; margen de 16 o 20) las tres paradas (con su palomita) y sus conectores caben en un renglón con **un solo relleno** por ancho
    (Sistema de guías, 2026-11-15; antes 12 y, con palomita, 8: dos rellenos en la misma fila): 12 hasta 389 px y, con Zoom de pantalla
    (hasta 359 px), 8 con la palomita más junta. Nunca se parten. */
-@media (max-width: 419px) { .rail-chips .chip, .ct-nav .chip { padding: 0 var(--space-3); } } /* 12 hasta 419 px (antes 389): a 393 las cuatro categorías de la carta (con 16 sumaban 369 px y salían 16 px del margen) caben en 337 de 353 y la barra no se desliza sin necesidad; un solo relleno por ancho en las dos filas de chips */
-@media (max-width: 359px) { .rail-chips .chip, .ct-nav .chip { gap: var(--space-1); padding: 0 var(--space-2); } }
+@media (max-width: 419px) { .rail-chips .chip { padding: 0 var(--space-3); } } /* 12 hasta 419 px (antes 389); la barra de categorías de la carta dejó de ser chips el 2026-11-17 (enlaces de sección, .ct-tab) */
+@media (max-width: 359px) { .rail-chips .chip { gap: var(--space-1); padding: 0 var(--space-2); } }
 .books > .cat { margin: 0; padding: 0; border: 0; }
 .cat-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .books-foot { padding-block: var(--space-8); }
@@ -169,7 +169,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 .bill { content-visibility: auto; contain-intrinsic-size: auto 760px; }
 .books { content-visibility: auto; contain-intrinsic-size: auto 1076px; }
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
-.cafe { content-visibility: auto; contain-intrinsic-size: auto 2548px; } /* 2026-11-17, carta en filas con el cierre de vuelta: 2 529–2 564 de 360 a 414 (antes 828, de la parrilla sin cierre) */
+.cafe { content-visibility: auto; contain-intrinsic-size: auto 2312px; } /* 2026-11-17, recomposición (filas de 12, barra de 44 y la carta en el HTML): la sección mide 2 357–2 392 de 360 a 414 (2 376 a 393); la reserva es del contenido, sin los 32 + 32 de la banda: 2 312 (antes 2 548, que con la banda reservaba 2 612) */
 .visit { content-visibility: auto; contain-intrinsic-size: auto 1122px; } /* 2026-11-14: + el mapa de llegada (+290 px: 266 del mapa y su atribución y 24 de aire; Visita mide 1 165–1 190 de 360 a 414) */
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 567px; } /* 2026-11-13, contacto en el pie: el Catálogo −124, Café −52, Visita −68 y el pie +247 px (medido de 360 a 414) */
 

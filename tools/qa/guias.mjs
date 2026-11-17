@@ -65,6 +65,12 @@ const SISTEMA = {
   // 9–12 (estructura aprobada por Aldo: lista ancha y panel estrecho, como en Luma). No se le perdona nada más: empieza exactamente en su
   // columna, termina en el margen derecho y comparte tope con la lista (G3 y G4 la miden aparte).
   laterales: [{ sel: '.ev-lado', columna: 9 }],
+  // Contenedor propio (2026-11-17, recomposición de Café pedida por Aldo: «una sola cuadrícula, contenedor centrado de 1 040–1 120 px»): desde
+  // 1024 px la sección mide sus columnas en su propio contenedor (token ancho-carta, 1120: 12 columnas de 64 con canal de 32), no en el de la
+  // página (1152), y su división es la suya: cabecera en 1–8 y la foto en un tercio, 9–12. Se exige que el contenedor mida lo que dice el token
+  // (o el de la página, si la ventana no da para más), que esté centrado en el eje, que titular, categorías y primer producto compartan su
+  // margen y que la foto empiece en su columna 9; su columna derecha no se compara con la de las demás secciones (G3 de página).
+  contenedores: { cafe: { ancho: 1120, division: [8, 9] } },
   // Primaria dentro de una tarjeta (2026-11-16, el evento destacado): se mide contra su tarjeta, no contra la página. Empieza en la sangría
   // de la tarjeta; en el teléfono su fila de acciones llega al borde interior derecho (la primaria sola a todo el ancho interior, o seguida de
   // sus iconos); desde 761, al ancho del rótulo.
@@ -106,8 +112,8 @@ const SISTEMA = {
     'Inicio del teléfono: posiciones fijas aprobadas (variante A, 2026-11-14): sus roles llevan el prefijo «inicio·» y sus propios valores.',
     'Inicio de escritorio: el bloque de texto se centra en el alto de la foto (texto en 1–5, foto en 7–12): no se le exige compartir tope (G4) ni un valor de barra → titular.',
     'Una fila de dos columnas: la más corta absorbe la diferencia al final de su celda; de cada fila cuenta el hueco menor (piezas con `fila`).',
-    'Café en escritorio: la barra de categorías es el control de la carta, no del encabezado: la carta empieza un bloque nuevo a todo el ancho, así que su aire es bloque → bloque (48) y se mide desde lo más bajo que tiene encima (la foto de 7–12, más alta que el encabezado), no desde la entradilla (pieza con `bloque`); en teléfono y tableta, texto → control (24). Lo mismo el cierre de la carta (de vuelta el 2026-11-17, a todo el ancho bajo la carta): su texto abre un bloque nuevo y su aire es bloque → bloque (48) desde lo más bajo que tiene encima (la carta de 4–12), no desde la barra de categorías de 1–3, que es más corta.',
-    'Barra de categorías de la carta: como una fila de chips de radio, cuenta como un solo control (la unión de sus chips), no chip por chip.',
+    'Café en escritorio: la barra de categorías es el control de la carta, no del encabezado: abre un bloque nuevo a todo el ancho, así que su aire es bloque → bloque (48) y se mide desde lo más bajo que tiene encima (la foto de 9–12, del alto del encabezado o un poco más), no desde la entradilla (pieza con `bloque`); en teléfono y tableta, texto → control (24). Lo mismo el cierre de la carta: su texto abre un bloque nuevo y su aire es bloque → bloque (48) desde la carta.',
+    'Barra de categorías de la carta: cuenta como un solo control (la unión de sus enlaces), no enlace por enlace.',
     'Pie del libro: el aire hacia abajo se cuenta desde la reserva (--cf-reserva), no desde la última letra: con un título de un renglón se ve más.',
     'Tira de La casa y ventana del carrusel: van a sangre; de la tira se mide su primera pieza y del carrusel, la pieza central.',
     'Titular de sección en el teléfono: hasta tres renglones si la frase no cabe en dos; «Contacto» es de un renglón (no lleva frase).',
@@ -116,7 +122,9 @@ const SISTEMA = {
     'Eventos en escritorio: la lista va en las columnas 1–8 y la nota lateral en 9–12 (`laterales`; aprobado por Aldo el 2026-11-16): la nota no cuenta como «columna derecha» de la división única, pero debe empezar en la columna 9, terminar en el margen y compartir tope con la lista.',
     'Primaria del evento destacado: vive dentro de su tarjeta (`tarjetasConPrimaria`); se le exige la sangría de la tarjeta y, en el teléfono, que su fila llegue al borde interior (no el ancho de la página).',
     'Fecha tipográfica de Eventos (el número de 52 del destacado y el de 32 del día): es una cifra decorativa (aria-hidden; la fecha se lee en texto sr-only), no texto de lectura: no cuenta para el máximo de tamaños por sección (T3).',
-    'Ficha del libro: tiene retícula interior propia; de ella solo fallan el margen (H1) y los botones aplastados (H2).'
+    'Ficha del libro: tiene retícula interior propia; de ella solo fallan el margen (H1) y los botones aplastados (H2).',
+    'Café desde 1024 px (2026-11-17, pedido de Aldo): contenedor propio de 1120 (`contenedores.cafe`, token ancho-carta) centrado, 16 px más estrecho por lado que el de la página a partir de 1184 px; sus columnas y su división (1–8 | 9–12: la foto en un tercio) son las de ese contenedor. Su columna derecha no entra en la comparación entre secciones (G3 de página). Titular, categorías y primer producto comparten su margen.',
+    'Barra de categorías de la carta (2026-11-17): enlaces sin fondo (texto con objetivo de 44): se alinea por la tinta de su primer enlace, no por la caja de toque.'
   ]
 };
 
@@ -286,7 +294,8 @@ function enPagina(cfg) {
         if (h.tagName === 'DIALOG' && !h.open) continue;
         if (!visible(h)) continue;
         if (h.matches('.c3d')) { c3d(h, sup); continue; }
-        if (h.matches('[role="radiogroup"], .ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
+        if (h.matches('[role="radiogroup"]')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
+        if (h.matches('.ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // enlaces sin fondo: la tinta del primero
         if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ev-pasados, .ct-rejilla')) {
           const id = empuja(h, 'rejilla', sup);
           let i = 0;
@@ -389,8 +398,8 @@ function enPagina(cfg) {
 // Análisis.
 const clase = W => (W <= 760 ? 0 : W < 1024 ? 1 : 2);
 const NOMBRE_CLASE = ['teléfono', 'tableta', 'escritorio'];
-function rejilla(W, margen, iw = W) {
-  const L = margen, R = W - margen, C = W / 2, g = SISTEMA.canal, n = SISTEMA.columnas;
+function rejilla(W, margen, iw = W, LR = null) {
+  const L = LR ? LR[0] : margen, R = LR ? LR[1] : W - margen, C = (L + R) / 2, g = SISTEMA.canal, n = SISTEMA.columnas;
   if (iw <= 760) return { L, R, C, inicios: [L], finales: [R], col: R - L };
   const col = (R - L - (n - 1) * g) / n;
   const inicios = Array.from({ length: n }, (_, i) => L + i * (col + g));
@@ -521,9 +530,23 @@ function analizar(clave, m) {
   }
 
   // --- G: guías verticales
+  res.rejillas = {};
+  const rejillaDe = id => {   // la de la página o, con contenedor propio (desde 1024), la de su contenedor (borde de contenido de la sección)
+    const ct = SISTEMA.contenedores[id], s = m.secciones[id];
+    if (!ct || k !== 2 || !s) return G;
+    return rejilla(W, m.margen, m.iw, [s.caja.l + s.relleno[3], s.caja.r - s.relleno[1]]);
+  };
   for (const id of ids) {
     const s = m.secciones[id];
-    const { ejes, juicio } = juzgar(s.atomos, G, k, id, F, enLinea);
+    const Gp = G;
+    const G_ = rejillaDe(id);
+    if (G_ !== Gp) {   // contenedor propio: mide lo que dice su token (o el de la página si no cabe) y va centrado en el eje de la página
+      const ct = SISTEMA.contenedores[id], barra = Math.max(0, m.iw - m.W), quiere = Math.min(ct.ancho - barra, Gp.R - Gp.L), mide = G_.R - G_.L;   // con barra de desplazamiento clásica, 100vw la incluye (lo mismo le pasa al contenedor de la página)
+      res.rejillas[id] = { L: r1(G_.L), R: r1(G_.R), col: r1(G_.col), inicios: G_.inicios.map(r1), ancho: r1(mide), objetivo: quiere, desfase: r1(G_.L - Gp.L) };
+      if (Math.abs(mide - quiere) > tol) F('G3', id, `su contenedor mide ${r1(mide)} px; su norma es ${quiere} (contenedores.${id})`);
+      if (Math.abs(G_.C - Gp.C) > tol) F('G5', id, `su contenedor está centrado en x ${r1(G_.C)}; el eje de la página es ${r1(Gp.C)}`);
+    }
+    const { ejes, juicio } = juzgar(s.atomos, G_, k, id, F, enLinea);
     // columnas (desde 1024): dónde empieza la columna derecha y si las dos comparten la línea superior
     let colDer = null, tops = null;
     if (k === 2) {
@@ -531,14 +554,14 @@ function analizar(clave, m) {
       const izqX = a => (a.tinta && a.tipo !== 'control' ? a.tinta.ml : a.caja.l);
       const esLateral = a => SISTEMA.laterales.find(l => a.sel.includes(l.sel));
       for (const a of tl.filter(esLateral)) {   // la nota lateral: su columna, el margen derecho y el tope de la lista que acompaña
-        const lat = esLateral(a), x0 = G.inicios[lat.columna - 1];
-        if (Math.abs(a.caja.l - x0) > tol || Math.abs(a.caja.r - G.R) > tol) F('G3', id, `${a.sel}: la nota lateral va de la columna ${lat.columna} al margen (${r1(x0)}–${r1(G.R)}); está en ${a.caja.l}–${a.caja.r}`);
-        const junto = tl.filter(b => b !== a && !esLateral(b) && Math.abs(izqX(b) - G.L) <= 2 && b.caja.b > a.caja.t && b.caja.t < a.caja.b);
+        const lat = esLateral(a), x0 = G_.inicios[lat.columna - 1];
+        if (Math.abs(a.caja.l - x0) > tol || Math.abs(a.caja.r - G_.R) > tol) F('G3', id, `${a.sel}: la nota lateral va de la columna ${lat.columna} al margen (${r1(x0)}–${r1(G_.R)}); está en ${a.caja.l}–${a.caja.r}`);
+        const junto = tl.filter(b => b !== a && !esLateral(b) && Math.abs(izqX(b) - G_.L) <= 2 && b.caja.b > a.caja.t && b.caja.t < a.caja.b);
         if (junto.length) { const t0 = Math.min(...junto.map(b => b.caja.t)); if (Math.abs(t0 - a.caja.t) > tol) F('G4', id, `${a.sel}: la nota lateral no comparte tope con la lista (lista y ${r1(t0 - s.caja.t)}, nota y ${r1(a.caja.t - s.caja.t)}, Δ ${r1(a.caja.t - t0)})`); }
         res.laterales = [...(res.laterales || []), { seccion: id, sel: a.sel, l: a.caja.l, r: a.caja.r, columna: lat.columna }];
       }
-      const der = tl.filter(a => !esLateral(a) && izqX(a) > G.C - 100 && !(a.letra && a.letra.alinea !== 'left' && a.tipo !== 'control') && Math.abs((a.caja.l + a.caja.r) / 2 - G.C) > 2 && a.caja.w > 120);
-      const izq = tl.filter(a => Math.abs(izqX(a) - G.L) <= 2);
+      const der = tl.filter(a => !esLateral(a) && izqX(a) > G_.C - 100 && !(a.letra && a.letra.alinea !== 'left' && a.tipo !== 'control') && Math.abs((a.caja.l + a.caja.r) / 2 - G_.C) > 2 && a.caja.w > 120);
+      const izq = tl.filter(a => Math.abs(izqX(a) - G_.L) <= 2);
       if (der.length && izq.length) {
         colDer = Math.min(...der.map(izqX));
         const dcol = der.filter(a => Math.abs(izqX(a) - colDer) <= 2);
@@ -547,9 +570,10 @@ function analizar(clave, m) {
         const bDer = Math.max(...dcol.map(a => a.caja.b));
         const fr = izq.filter(a => a.caja.b > tDer && a.caja.t < bDer);
         if (fr.length) { const tIzq = Math.min(...fr.map(a => a.caja.t)); tops = { izq: tIzq, der: tDer, d: r1(tDer - tIzq), bIzq: Math.max(...fr.map(a => a.caja.b)), bDer }; }
-        res.colDer[id] = r1(colDer);
-        const f = cerca(colDer, [G.inicios[SISTEMA.division[1] - 1]]);
-        if (!f.ok) F('G3', id, `la columna derecha empieza en x ${r1(colDer)}; la división única la pone en ${r1(f.v)} (columna ${SISTEMA.division[1]}), Δ ${r1(colDer - f.v)}`);
+        if (G_ === Gp) res.colDer[id] = r1(colDer); else res.rejillas[id].colDer = r1(colDer);   // con contenedor propio no se compara entre secciones
+        const div = (SISTEMA.contenedores[id] && G_ !== Gp ? SISTEMA.contenedores[id].division : SISTEMA.division);
+        const f = cerca(colDer, [G_.inicios[div[1] - 1]]);
+        if (!f.ok) F('G3', id, `la columna derecha empieza en x ${r1(colDer)}; la división ${G_ !== Gp ? `de su contenedor` : 'única'} la pone en ${r1(f.v)} (columna ${div[1]}), Δ ${r1(colDer - f.v)}`);
         const soloControl = dcol.filter(a => a.caja.t < tDer + 4).every(a => a.tipo === 'control');
         if (tops && soloControl) { tops.d = r1(tops.bDer - tops.bIzq); tops.izq = tops.bIzq; tops.der = tops.bDer; tops.porAbajo = true; }
         if (tops && Math.abs(tops.d) > tol && id !== 'inicio') F('G4', id, tops.porAbajo ? `el control de la columna derecha no termina con el bloque izquierdo (Δ ${tops.d})` : `las dos columnas no comparten la línea superior: izquierda y ${r1(tops.izq - s.caja.t)}, derecha y ${r1(tops.der - s.caja.t)} (Δ ${tops.d})`);
@@ -699,7 +723,7 @@ function analizar(clave, m) {
     res.secciones[id].tamanos = tams;
     if (tams.length > SISTEMA.tamanosMax) F('T3', id, `${tams.length} tamaños de letra (${tams.join(', ')}); máximo ${SISTEMA.tamanosMax}`);
   }
-  return { res, fallos, G };
+  return { res, fallos, G, rejillaDe };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -805,7 +829,7 @@ for (const clave of claves) {
   let page = await ctx.newPage();
   await cargar(page, toque);
   const m = await page.evaluate(enPagina, { modo: 'pagina', secciones: SECCIONES, niveles: NIVELES, centrables: SISTEMA.centrables, asociados: SISTEMA.asociados, tarjetasConPrimaria: SISTEMA.tarjetasConPrimaria });
-  const { res, fallos, G } = analizar(clave, m);
+  const { res, fallos, G, rejillaDe } = analizar(clave, m);
 
   // barras: en el tope y con cada sección bajo la cabecera
   const barras = [];
@@ -836,7 +860,7 @@ for (const clave of claves) {
       const s = res.secciones[sc.id]; if (!s) continue;
       const ms = m.secciones[sc.id];
       const e = s.ejes;
-      await page.evaluate(pintar, { G, sec: s.caja, juicio: s.juicio, atomos: ms.atomos, aire: res.aire.filter(g => g.seccion === sc.id), W: m.W, tops: s.tops, casi: s.casi,
+      await page.evaluate(pintar, { G: rejillaDe(sc.id), sec: s.caja, juicio: s.juicio, atomos: ms.atomos, aire: res.aire.filter(g => g.seccion === sc.id), W: m.W, tops: s.tops, casi: s.casi,
         rotulo: `${sc.id} · ${clave} · ejes izq ${e.izq.join(' ')} · centro ${e.centro.join(' ')} · der ${e.der.join(' ')} · fuera de rejilla ${s.fuera}` });
       const shot = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: Math.max(0, s.caja.t - 16), width: m.W, height: s.caja.h + 32, scale: w < 760 ? 2 : 1 } });
       writeFileSync(join(DIR, `guias-${sc.id}-${clave}.png`), Buffer.from(shot.data, 'base64'));
@@ -920,6 +944,7 @@ for (const clave of claves) {
   // ---- tablas
   P(`\n================ ${nombre} · margen ${m.margen} · contenedor ${res.rejilla.L}–${res.rejilla.R} · eje ${res.rejilla.C}${res.rejilla.inicios.length > 1 ? ` · columna ${res.rejilla.col} + canal ${SISTEMA.canal} · col. 7 en x ${res.rejilla.inicios[6]}` : ''} ================`);
   P('GUÍAS por sección (ejes de las piezas de primer nivel)');
+  for (const [id, r] of Object.entries(res.rejillas || {})) P(`  ${id}: contenedor propio ${r.L}–${r.R} (${r.ancho} px; norma ${r.objetivo}) · columna ${r.col} · desfase con la página ${r.desfase} px · columnas ${r.inicios.join(' ')}${r.colDer !== undefined ? ` · col. derecha x ${r.colDer}` : ''}`);
   for (const id of Object.keys(res.secciones)) { const s = res.secciones[id]; P(`  ${id.padEnd(9)} izq [${s.ejes.izq.join(', ')}]  centro [${s.ejes.centro.join(', ')}]  der [${s.ejes.der.join(', ')}]  · ejes ${s.ejes.izq.length + s.ejes.centro.length + s.ejes.der.length} · fuera de rejilla ${s.fuera}${s.colDer !== null ? ` · col. derecha x ${s.colDer}` : ''}${s.tops ? ` · tope izq/der Δ ${s.tops.d}` : ''} · tamaños ${s.tamanos.join('/')}`); }
   P('RITMO por rol (valores encontrados → objetivo)');
   for (const [rol, d] of Object.entries(res.porRol)) P(`  ${rol.padEnd(26)} ${d.mal ? '✗' : '✓'} [${d.valores.join(', ')}] → ${d.objetivo ?? '—'}   ${d.casos.map(c => `${c.seccion}:${c.par.replace('→', '>')}=${c.v}`).join('  ')}`);

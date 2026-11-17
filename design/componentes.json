@@ -90,7 +90,7 @@
       "tipo": "control",
       "descripcion": "Píldora de 48 en fondo-3; elegido = primario con la palomita (trazo SVG que se dibuja al elegir). En fila es un radiogroup (colecciones del Catálogo, Café · Té); en Explorar, el filtro activo (.cat-chip) y el botón «Filtros».",
       "variantes": [
-        { "nombre": "radio", "selector": ".chip", "uso": "role=radio dentro de role=radiogroup (rail.js chipNode). En la carta el chip es un enlace de la BarraCategorias (.ct-chip)." },
+        { "nombre": "radio", "selector": ".chip", "uso": "role=radio dentro de role=radiogroup (rail.js chipNode). La barra de categorías de la carta ya no usa chips (2026-11-17: enlaces .ct-tab de BarraCategorias)." },
         { "nombre": "filtro-activo", "selector": ".cat-chip", "uso": "Filtro aplicado en Explorar, con su × para quitarlo." },
         { "nombre": "filtros", "selector": ".cat-filters-btn", "uso": "Abre los filtros hasta 1100 px (aria-expanded)." }
       ],
@@ -403,50 +403,49 @@
       "id": "barra-categorias",
       "nombre": "BarraCategorias",
       "tipo": "control",
-      "descripcion": "Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría, con el nombre corto de la categoría si lo trae (campo chip, hasta 16 letras: «Sin café») y entonces el nombre completo como aria-label («Bebidas sin café»; 2026-11-17, al modo de las apps de comida). Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista, para que un salto desde abajo no deje marcado el último chip; sin palomita, para que los chips no cambien de ancho al desplazar; la barra solo se desliza si el chip actual no se ve entero). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.",
+      "descripcion": "Barra de categorías de la carta (Café y té; recomposición del 2026-11-17, sustituye a las píldoras de 48 apiladas en las columnas 1–3 con la activa en el verde de la primaria): una fila de enlaces de sección encima de la carta, uno por categoría de assets/data/menu.json, con el nombre corto si lo trae (campo chip: «Sin café») y entonces el nombre completo como aria-label («Bebidas sin café»). Pintada en index.html con la carta (scripts/build-carta.mjs). Se ven como texto (Subheadline 600 en tinta-2) con objetivo de 44 (8 de relleno a cada lado y 8 entre vecinos; la barra los descuenta para que la tinta del primero caiga en el margen, el mismo eje que el titular y el primer producto). El actual: subrayado de 2 px y tinta, con aria-current (dos canales; sin el verde intenso, que queda para «Cómo llegar»). Fija bajo la cabecera mientras se recorre la carta (sticky, fondo opaco de la banda y un filete: no es vidrio); si los enlaces no caben en un renglón (texto ampliado, Zoom de pantalla) pasan a un segundo renglón —nunca se desliza en horizontal— y la barra deja de ser fija (data-envuelta, que mide cafe.js). Scroll-spy con IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista. Tocar un enlace lleva a su grupo (suave solo con movimiento), cuyo título queda 24 px bajo la barra y recibe el foco. Sin JavaScript son anclas normales.",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".ct-nav", ".ct-chip", ".ct", ".ct-grupo", ".ct-grupo-tit"] },
-        { "ruta": "mobile.css", "selectores": [".ct-nav .chip"] },
-        { "ruta": "index.html", "selectores": ["[data-cafe]", "[data-ct-nav]", ".ct-nav"] },
-        { "ruta": "cafe.js", "exporta": ["initCafe", "chipNode", "currentGroup", "groupId"], "ganchos": ["chip.setAttribute('aria-current', 'true')", "new IntersectionObserver(", "behavior: isMotion() ? 'smooth' : 'auto'", "a.setAttribute('aria-label', cat.nombre)"] }
+        { "ruta": "style.css", "selectores": [".ct-nav", ".ct-tab", ".ct", ".ct-grupo", ".ct-grupo-tit"] },
+        { "ruta": "index.html", "selectores": ["[data-cafe]", "[data-ct-nav]", ".ct-nav", ".ct-tab"] },
+        { "ruta": "cafe.js", "exporta": ["initCafe", "currentGroup", "groupId"], "ganchos": ["tab.setAttribute('aria-current', 'true')", "new IntersectionObserver(", "behavior: isMotion() ? 'smooth' : 'auto'", "nav.toggleAttribute('data-envuelta', envuelta)"] },
+        { "ruta": "scripts/build-carta.mjs", "exporta": ["cartaHtml", "withCarta"], "ganchos": ["aria-label=\"${esc(c.nombre)}\""] }
       ],
-      "tokens": ["primario", "en-primario", "fondo-3", "tinta", "linea", "alto-md", "radio-pildora", "radio-portada", "t-chip", "anillo-foco", "space-2", "space-3", "space-4", "space-6", "canal-rejilla"],
+      "tokens": ["tinta", "tinta-2", "fondo", "fondo-2", "fondo-3-presionado", "linea", "alto-sm", "radio-sm", "radio-portada", "t-boton-chico", "anillo-foco", "space-1", "space-2", "space-3", "space-4", "space-6", "ancho-carta"],
       "estados": {
-        "hover": { "css": [":is(.chip:not([aria-checked=\"true\"]), .cat-filters-btn:not([aria-expanded=\"true\"])):hover", ".ct-chip[aria-current=\"true\"]:hover"], "nota": "El de Chip; el actual conserva el primario." },
-        "foco": { "css": [":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible", ".ct-grupo-tit:focus-visible"], "nota": "Al llegar por su chip, el foco pasa al título del grupo." },
-        "presionado": { "css": [".chip:active"] },
-        "actual": { "css": [".ct-chip[aria-current=\"true\"]"], "js": [{ "ruta": "cafe.js", "texto": "chip.setAttribute('aria-current', 'true')" }], "nota": "El grupo a la vista: color y aria-current (dos canales)." },
-        "ocupado": { "css": [".sk-chip"], "nota": "Mientras llega menu.json, dos chips de esqueleto." },
-        "vacio": { "css": [".ct[data-state=\"vacio\"]"], "nota": "Sin carta (o sin JavaScript) no hay barra: quedan la foto y el cierre." },
+        "hover": { "css": [".ct-tab:hover"], "nota": "Con puntero fino, la tinta (el subrayado es solo del actual)." },
+        "foco": { "css": [".ct-tab:focus-visible", ".ct-grupo-tit:focus-visible"], "nota": "El anillo del sitio; al llegar por su enlace, el foco pasa al título del grupo." },
+        "presionado": { "css": [".ct-tab:active"], "nota": "Tono fondo-3-presionado (familia de los controles sin relleno), también con movimiento reducido y con la pausa." },
+        "actual": { "css": [".ct-tab[aria-current=\"true\"]"], "js": [{ "ruta": "cafe.js", "texto": "tab.setAttribute('aria-current', 'true')" }], "nota": "El grupo a la vista: subrayado y tinta además de aria-current (dos canales)." },
         "movimiento_reducido": { "js": [{ "ruta": "cafe.js", "texto": "behavior: isMotion() ? 'smooth' : 'auto'" }], "nota": "Sin movimiento el salto al grupo es inmediato." }
       },
-      "aria": { "patron": "Navigation (enlaces dentro de la página)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/", "atributos": ["nav con aria-label «Categorías de la carta»", "aria-current=true en el chip del grupo a la vista", "href=#carta-<id>", "aria-label con el nombre completo cuando el chip lleva el corto"], "teclado": "Tab recorre los chips; Enter lleva al grupo y deja el foco en su título." },
+      "no_aplica": { "ocupado": "La carta llega pintada en index.html: no hay esqueleto (2026-11-17)." },
+      "aria": { "patron": "Navigation (enlaces dentro de la página)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/", "atributos": ["nav con aria-label «Categorías de la carta»", "aria-current=true en el enlace del grupo a la vista", "href=#carta-<id>", "aria-label con el nombre completo cuando el enlace lleva el corto (contiene el visible: WCAG 2.5.3)"], "teclado": "Tab recorre los enlaces en el orden visual; Enter lleva al grupo y deja el foco en su título." },
       "qa": ["tools/qa/feed.mjs", "tools/qa/guias.mjs", "tools/qa/iphone.mjs", "tools/qa/inp.mjs", "tools/qa/controles.mjs", "tests/site.test.mjs"],
       "desde": "2026-11-16",
-      "decision": "DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16)."
+      "decision": "DESIGN.md, «Café: una cuadrícula» (2026-11-17), que sustituye a la barra de chips de «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16)."
     },
     {
       "id": "fila-producto",
       "nombre": "FilaProducto",
       "tipo": "bloque",
-      "descripcion": "Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17, sustituye a la parrilla de tarjetas del 2026-11-16): una columna de filas en el teléfono y dos desde 761 (en escritorio, en las columnas 4–12), entre líneas finas de 1 px (linea) y con 16 de aire arriba y abajo, sin caja (sin fondo, radio ni anillo). El nombre en Headline (h4), el precio justo debajo (Subheadline 600 en turquesa-texto, «$NN MXN», con la unidad si la trae, data-fuente=\"carta\"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, renglones parejos, sin cortar con «…»). Sin foto (.ct-prod--solo, la de hoy: la carta impresa no trae fotos) el texto ocupa la fila entera y no se reserva la columna de la foto; sin precio ni descripción (los tés, «Aguas frescas»), un renglón. Con foto (campo foto de menu.json, local y registrada): cuadrada a la derecha, 96 en el teléfono y 120 desde 761 (fondo-3, radio 12), sin mover el nombre ni el precio; si la foto falla, el icono de su categoría en el mismo recuadro. No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3 y su nota (Subheadline) si la trae. La sección cierra con «Pídelo en la barra de la sala.» y «Cómo llegar» (secundario de 56, a todo el ancho en el teléfono; el café se sirve en la librería, Matamoros 421, confirmado por Aldo el 2026-11-17).",
+      "descripcion": "Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17). Pintada en index.html desde assets/data/menu.json (scripts/build-carta.mjs, npm run carta; carta:check y npm test fallan si no coinciden): llega en el primer render, sin esqueleto, también sin JavaScript. Una columna en el teléfono y dos desde 761 (canal 32; en escritorio a todo el ancho del contenedor de Café, 1120), en el orden del marcado (izquierda a derecha, renglón por renglón), entre líneas finas de 1 px (linea) y con 12 de aire arriba y abajo, sin caja. El nombre en Headline (h4), el precio a 4 px (Subheadline 600 en tinta —antes turquesa-texto, el mismo valor que primario: competía con la acción principal—, «$NN MXN», con la unidad si la trae, data-fuente=\"carta\"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, sin cortar con «…»). Sin foto (.ct-prod--solo, todas hoy) el texto ocupa la fila entera. Con foto: cuadrada a la derecha, 96 en el teléfono y 120 desde 761, con el icono de su categoría debajo; si la foto falla, cafe.js la quita y queda el icono. Entre categorías hay más aire que entre filas (32 / 48 frente a 24). No es un control.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".ct-lista", ".ct-rejilla", ".ct-prod", ".ct-foto", ".ct-ic", ".ct-txt", ".ct-nom", ".ct-desc", ".ct-precio", ".ct-prod--solo", ".ct-grupo-nota", ".ct-cierre", ".cafe-foto"] },
-        { "ruta": "index.html", "selectores": ["[data-ct-lista]", ".ct-rejilla", ".ct-prod", ".ct-cierre", ".cafe-foto"] },
-        { "ruta": "cafe.js", "exporta": ["productNode", "groupNode", "validMenu", "menuProblems", "validFoto", "precioCarta", "MENU_URL"], "internas": ["iconNode"], "ganchos": ["s.dataset.fuente = 'carta'"] },
+        { "ruta": "index.html", "selectores": ["[data-ct-lista]", ".ct-rejilla", ".ct-prod", ".ct-precio", ".ct-cierre", ".cafe-foto"] },
+        { "ruta": "cafe.js", "exporta": ["validMenu", "menuProblems", "validFoto", "precioCarta", "MENU_URL"], "ganchos": ["img.addEventListener('error', quitar, { once: true })"] },
+        { "ruta": "scripts/build-carta.mjs", "exporta": ["cartaHtml", "withCarta"], "internas": ["productHtml", "groupHtml"], "ganchos": ["<p class=\"ct-precio\" data-fuente=\"carta\">"] },
         { "ruta": "assets/data/menu.json" }
       ],
-      "tokens": ["fondo", "linea", "fondo-3", "tinta", "tinta-2", "turquesa-texto", "radio-sm", "radio-portada", "icono-producto", "t-titulo-3", "t-titular", "t-subtitulo", "t-cuerpo", "space-1", "space-2", "space-3", "space-4", "space-6", "space-8", "space-12", "space-20", "space-24", "canal-rejilla"],
+      "tokens": ["fondo", "linea", "fondo-3", "tinta", "tinta-2", "radio-sm", "radio-portada", "icono-producto", "t-titulo-3", "t-titular", "t-subtitulo", "t-cuerpo", "space-1", "space-2", "space-3", "space-4", "space-6", "space-8", "space-12", "space-24", "canal-rejilla"],
       "estados": {
-        "ocupado": { "css": [".ct-prod.card--sk :is(.ct-nom, .ct-precio)"], "html": ["[data-ct-lista][aria-busy=\"true\"]"], "nota": "Cuatro filas de esqueleto con la forma y el alto de las reales (nombre y precio entre líneas finas). La carta se arma también en reposo: al llegar por un enlace ya está armada." },
-        "vacio": { "css": [".ct[data-state=\"vacio\"]"], "js": [{ "ruta": "cafe.js", "texto": "root.dataset.state = 'vacio';" }], "nota": "Sin carta válida no se promete nada: quedan la foto y el cierre." },
-        "error": { "js": [{ "ruta": "cafe.js", "texto": "img.addEventListener('error', () => img.remove());" }], "nota": "Si la foto de un producto falla, queda el icono de su categoría." }
+        "vacio": { "css": [".ct-cierre[hidden]"], "nota": "Sin carta válida, build-carta no pinta nada entre las marcas: quedan la foto y el cierre." },
+        "error": { "js": [{ "ruta": "cafe.js", "texto": "img.addEventListener('error', quitar, { once: true })" }], "nota": "Si la foto de un producto falla, queda el icono de su categoría." }
       },
-      "no_aplica": { "hover": "No es un control: no abre nada.", "foco": "No es un control.", "presionado": "No es un control." },
-      "aria": { "patron": "List (grupos con su título)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/", "atributos": ["section con aria-labelledby (el título del grupo)", "ul / li", "h4 por producto", "alt en la foto del producto; el icono es aria-hidden", "aria-busy mientras carga"], "teclado": "—" },
+      "no_aplica": { "hover": "No es un control: no abre nada.", "foco": "No es un control.", "presionado": "No es un control.", "ocupado": "Llega pintada en index.html: sin esqueleto." },
+      "aria": { "patron": "List (grupos con su título)", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/structural-roles/", "atributos": ["section con aria-labelledby (el título del grupo)", "ul / li", "h4 por producto", "alt en la foto del producto; el icono es aria-hidden"], "teclado": "—" },
       "qa": ["tools/qa/feed.mjs", "tools/qa/guias.mjs", "tools/qa/iphone.mjs", "tools/qa/responsive.mjs", "tests/site.test.mjs"],
       "desde": "2026-11-17",
-      "decision": "DESIGN.md, «Carta al modo de las apps de comida» (2026-11-17), que sustituye a la parrilla de «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16)."
+      "decision": "DESIGN.md, «Café: una cuadrícula» (2026-11-17), sobre «Carta al modo de las apps de comida» (2026-11-17)."
     },
     {
       "id": "tarjeta-libro",

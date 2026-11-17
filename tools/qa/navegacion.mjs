@@ -245,6 +245,7 @@ async function presionado(perfil, nucleos, { reduce, pausa = false }) {
   if (PERFILES[perfil].viewport.width >= 761) await familia('plano', '.hdr-list');
   await page.evaluate(() => document.querySelector('#prueba-estados').remove());
   await familia('fila de contacto', '.ftr-links .ftr-link'); // el pie: WhatsApp, Instagram, Facebook y Correo (2026-11-17)
+  await familia('categoría de la carta', '.ct-tab:not([aria-current="true"])'); // Café: enlaces de sección sin relleno (2026-11-17, recomposición): presionado fondo-3-presionado
   await centrar(page, '.c3d--portada', 2800);
   await familia('chip', '.rail-chip:not([aria-checked="true"])');
   await familia('chip elegido', '.rail-chip[aria-checked="true"]');

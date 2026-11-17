@@ -1195,61 +1195,68 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 :is(.rail-item, .card-item) .save:not(.save--wide):focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
 
 /* ---------- Café y té (#cafe): la carta por categorías al modo de las apps de comida (2026-11-17; cafe.js) ---------- */
-/* Sustituye a la parrilla de tarjetas del 2026-11-16 (y esta al Carrusel3D, variante carta, del 2026-11-13). Titular y entradilla; la barra de
-   categorías (BarraCategorias: chips de 48 con el nombre corto de la categoría, que llevan a cada grupo y marcan el que está a la vista),
-   fija bajo la cabecera mientras se recorre la carta, con el fondo opaco de la banda (no es vidrio); un grupo por categoría con su título
-   (Title 3), su nota y sus filas (FilaProducto: nombre, precio justo debajo solo si la librería lo dio y descripción; la foto, si la hay,
-   cuadrada a la derecha) en una columna (dos desde 761; desde 1024, con las categorías en una lista vertical fija en las columnas 1–3 y la
-   carta en 4–12); la foto real de la casa y el cierre: «Pídelo en la barra de la sala.» y «Cómo llegar» (secundario: la primaria de esa
-   pantalla es la de Visita). En el teléfono y la tableta la foto va después de la carta (al llegar se ve la carta); el orden de lectura
-   del marcado es titular, foto, carta y cierre. La fila no es un control: sin cursor de mano ni estados.
-   Aire por rol: texto → control 24 (16 + los 8 de relleno de la barra) · cabecera → contenido 24 (los 8 de la barra + 16) · título de grupo →
-   su parrilla 12 · grupo → grupo 32 / 48 · bloque → bloque 32 / 48 · texto → control 24. */
-.cafe { --ct-barra: calc(var(--alto-md) + 2 * var(--space-2)); display: grid; grid-template-columns: minmax(0, 1fr); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
+/* Recomposición del 2026-11-17 (pedido de Aldo: «el título, la fotografía, las categorías y los productos parecen ocupar cuadrículas
+   distintas»; sustituye a las píldoras apiladas en las columnas 1–3 con la carta en 4–12 y a la foto 5:2 en 7–12). Una sola cuadrícula y un
+   solo eje: titular, entradilla, la fila de categorías y el primer producto empiezan en el mismo margen. Cabecera corta (titular y
+   entradilla en un bloque; en escritorio, la foto a la derecha en un tercio, 5:2, alineada arriba con el titular); debajo, la barra de
+   categorías (BarraCategorias: enlaces de sección de 44 con el nombre corto; el actual con subrayado y tinta, sin el verde intenso, que queda
+   para «Cómo llegar»), fija bajo la cabecera con el fondo opaco de su banda y un filete (no es vidrio) mientras quepa en un renglón (si
+   pasa a dos, `data-envuelta`, deja de ser fija); y la carta: un grupo por categoría con su título (Title 3), su nota y sus filas
+   (FilaProducto: nombre, precio justo debajo, en tinta, solo si la librería lo dio, y descripción) en una columna en el teléfono y dos
+   desde 761, en el orden de lectura (izquierda a derecha, renglón por renglón, el del marcado). La carta llega pintada en index.html
+   (scripts/build-carta.mjs). En el teléfono y la tableta la foto va después de la carta; el cierre al final: «Pídelo en la barra de la sala.»
+   y «Cómo llegar» (secundario: la primaria de esa pantalla es la de Visita). La fila no es un control: sin cursor de mano ni estados.
+   Aire por rol: texto → control 24 (16 + los 8 de la barra) · cabecera → contenido 24 (de la barra al primer grupo) · título de grupo → sus
+   filas 12 · fila 12 + 12 entre líneas · grupo → grupo 32 / 48 (más que entre filas) · bloque → bloque 32 / 48. */
+.cafe { --ct-barra: calc(var(--alto-sm) + var(--space-2)); display: grid; grid-template-columns: minmax(0, 1fr); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
 .cafe > .sec-head { margin-bottom: var(--space-4); }
 .ct { order: 1; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .cafe-foto { order: 2; margin: var(--space-8) 0 0; }
 .cafe-foto .frame-clip { aspect-ratio: 4 / 3; }
 .ct-cierre { order: 3; display: grid; justify-items: start; gap: var(--space-6); margin-top: var(--space-8); }
 .ct-cierre p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
-/* Barra de categorías: de borde a borde de la pantalla, con el fondo de la banda y un filete debajo. Si no caben, se desliza (sin imán). */
+/* Barra de categorías: de borde a borde de la pantalla en el teléfono y la tableta (la tinta del primer enlace en el margen: cada enlace
+   lleva 8 de relleno para su objetivo de 44 y la barra los descuenta; 8 entre objetivos vecinos, 24 entre nombres), con el fondo de la banda y un filete debajo. Si no caben, pasan a un
+   segundo renglón (nunca se desliza) y la barra deja de ser fija (cafe.js mide los renglones: dos renglones fijos tapaban demasiado). */
 .ct-nav {
   position: sticky; top: var(--hdr-h); z-index: 3;
-  display: flex; gap: var(--space-2); margin: 0 calc(-1 * var(--margen)); padding: var(--space-2) var(--margen);
-  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 calc(-1 * var(--margen)) var(--space-6); padding: var(--space-2) calc(var(--margen) - var(--space-2)) 0;
   background: var(--fondo); box-shadow: 0 1px 0 var(--linea); /* el fondo de su banda: opaco, no es vidrio */
 }
+.ct-nav[data-envuelta] { position: relative; top: auto; }
+.cafe:has(.ct-nav[data-envuelta]) { --ct-barra: 0px; }
 .has-news .ct-nav { background: var(--fondo-2); } /* con Novedades, Café va sobre fondo-2 */
-.ct-nav::-webkit-scrollbar { display: none; }
-.ct-chip { flex: none; text-decoration: none; }
-.ct-chip[aria-current="true"] { background: var(--primario); color: var(--en-primario); }
-@media (hover: hover) { .ct-chip[aria-current="true"]:hover { background: var(--primario); } }
-.ct-chip[aria-current="true"]:active { background: var(--primario-pulsado); }
-.ct-nav { margin-bottom: var(--space-4); } /* barra → carta: 8 de la barra + 16 = 24 (cabecera → contenido) */
+.ct-tab {
+  display: inline-flex; align-items: center; min-height: var(--alto-sm); padding: 0 var(--space-2); border-radius: var(--radio-sm);
+  font: var(--t-boton-chico); letter-spacing: var(--ls-boton-chico); color: var(--tinta-2); text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+.ct-tab[aria-current="true"] { color: var(--tinta); text-decoration: underline 2px; text-underline-offset: var(--space-1); }
+@media (hover: hover) { .ct-tab:hover { color: var(--tinta); } }
+.ct-tab:active { background: var(--fondo-3-presionado); color: var(--tinta); }
+.ct-tab:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 .ct-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); min-width: 0; }
-/* Al llegar por su chip, el título del grupo queda 16 px bajo la barra (html ya aparta la cabecera y 8 px: scroll-padding-top). */
-.ct-grupo { scroll-margin-top: calc(var(--ct-barra) + var(--space-2)); }
+/* Al llegar por su enlace, el título del grupo queda 24 px bajo la barra (html ya aparta la cabecera y 8 px: scroll-padding-top). */
+.ct-grupo { scroll-margin-top: calc(var(--ct-barra) + var(--space-4)); }
 .ct-grupo-tit { margin: 0 0 var(--space-3); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
 .ct-grupo-nota { margin: calc(-1 * var(--space-2)) 0 var(--space-3); font: var(--t-subtitulo); color: var(--tinta-2); }
 .ct-grupo-tit:focus-visible { outline: 2px solid transparent; border-radius: var(--radio-portada); box-shadow: var(--anillo-foco); }
-/* Carta al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17): filas de una columna en el teléfono y dos desde 761, entre líneas finas;
-   nombre, precio justo debajo y descripción; la foto, si la hay, cuadrada a la derecha. Sustituye a la parrilla de tarjetas del 2026-11-16. */
+/* Filas entre líneas finas, 12 de aire arriba y abajo: nombre, precio a 4 px y descripción; la foto, si la hay, cuadrada a la derecha. */
 .ct-rejilla { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; border-bottom: 1px solid var(--linea); }
-.ct-prod { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: var(--space-4); padding: var(--space-4) 0; border-top: 1px solid var(--linea); }
-.ct-foto { position: relative; grid-column: 2; grid-row: 1; display: grid; place-items: center; overflow: hidden; width: var(--space-24); aspect-ratio: 1 / 1; border-radius: var(--radio-sm); background: var(--fondo-3); color: var(--turquesa-texto); }
+.ct-prod { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: var(--space-4); padding: var(--space-3) 0; border-top: 1px solid var(--linea); }
+.ct-foto { position: relative; grid-column: 2; grid-row: 1; display: grid; place-items: center; overflow: hidden; width: var(--space-24); aspect-ratio: 1 / 1; border-radius: var(--radio-sm); background: var(--fondo-3); color: var(--tinta-2); }
 .ct-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ct-ic { width: var(--icono-producto); height: var(--icono-producto); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .ct-txt { grid-column: 1; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-1); }
-.ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
+.ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; overflow-wrap: anywhere; }
 .ct-desc { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* renglones parejos, sin palabra viuda; nunca se corta con «…»: si hace falta, tres renglones */
-.ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--turquesa-texto); }
-/* Esqueleto: los chips y cuatro filas con la forma y el alto de las reales (nombre y precio) mientras llega menu.json. */
-.ct-grupo-tit--sk { display: block; width: var(--space-20); border-radius: var(--radio-portada); background: var(--fondo-3); }
+.ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--tinta); } /* en tinta: el verde (turquesa-texto = primario) competía con «Cómo llegar» */
 .ct-prod--solo { grid-template-columns: minmax(0, 1fr); } /* sin foto la fila no reserva su columna */
-.ct-prod.card--sk :is(.ct-nom, .ct-precio) { display: block; width: 40%; border-radius: var(--radio-portada); background: var(--fondo-3); color: transparent; }
-.ct-prod.card--sk .ct-precio { width: 20%; } /* nombre y precio: el alto de una fila con precio (79) */
-html:not(.js) .ct, .ct[data-state="vacio"], .ct-cierre[hidden] { display: none; }
-@media (min-width: 761px) { .ct-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--canal-rejilla); } .ct-foto { width: calc(var(--space-24) + var(--space-6)); } }
+.ct-cierre[hidden] { display: none; }
+@media (min-width: 761px) {
+  .ct-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--canal-rejilla); }
+  .ct-foto { width: calc(var(--space-24) + var(--space-6)); }
+  .cafe-foto .frame-clip { aspect-ratio: 2 / 1; }
+}
 @media print { .ct-nav { display: none; } }
 
 /* Esqueletos: ocupan el lugar exacto del contenido; quietos, con colores de los tokens. */
@@ -1321,7 +1328,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
    central (la pieza del centro, su pie de hasta dos renglones y las flechas). Las dos columnas de una fila comparten la línea de arriba.
    .books-head y .rail son display: contents para compartir la rejilla de su sección; la carta (.ct) repite la rejilla de la página. */
 @media (min-width: 1024px) {
-  .books, .cafe { display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
+  .books { display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
   /* Catálogo: titular 1–6 · «Buscar en el catálogo» 7–12 (termina con el titular) · chips en el margen con su nota y el conteo debajo · carrusel
      a todo el ancho · la capa Explorar con 48 a cada lado de su filete. */
   .books-head, .rail:not([hidden]) { display: contents; }
@@ -1332,16 +1339,19 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .books > .cat { margin-top: var(--space-12); padding-top: var(--space-12); padding-bottom: var(--space-6); }
   .cat-bar { grid-template-columns: minmax(0, calc(50% - var(--canal-rejilla) / 2)) auto; column-gap: var(--canal-rejilla); } /* el buscador, columnas 1–6 */
   .books-foot { padding-top: var(--space-6); } /* con los 24 de la capa: bloque → bloque 48 */
-  /* Café y té (2026-11-16): titular y entradilla en 1–6 y la foto en 7–12 (5:2), alineados arriba; debajo, a 48, la carta: las categorías en
-     una lista vertical fija en las columnas 1–3 y la carta en 4–12 (dos columnas de filas); el cierre vuelve al margen izquierdo, a 48. */
-  .cafe { --ct-barra: 0px; }
-  .cafe > .sec-head { grid-column: 1 / span 6; grid-row: 1; margin: 0; }
-  .cafe-foto { order: 0; grid-column: 7 / -1; grid-row: 1; margin: 0; }
-  .cafe-foto .frame-clip { aspect-ratio: 5 / 2; }
-  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; margin-top: var(--space-12); }
-  .ct-nav { grid-column: 1 / span 3; top: calc(var(--hdr-h) + var(--space-6)); flex-direction: column; margin: 0; padding: 0; overflow: visible; box-shadow: none; }
-  .ct-chip { justify-content: flex-start; }
-  .ct-lista { grid-column: 4 / -1; gap: var(--space-12); }
+  /* Café y té (recomposición del 2026-11-17): su propio contenedor, más estrecho que el de la página (--ancho-carta, 1120: 12 columnas de 64
+     con canal de 32), centrado; lo que sobra queda en los márgenes exteriores. Excepción escrita al Sistema de guías (DESIGN.md, «Café: una
+     cuadrícula», y SISTEMA.contenedores de tools/qa/guias.mjs): sus columnas son las de su contenedor y su división es 1–8 | 9–12.
+     Titular y entradilla en 1–8 y la foto (5:2) en 9–12, alineados arriba; debajo, a 48 de la foto, la barra de categorías a todo el ancho
+     (fija bajo la cabecera) y la carta en dos columnas; el cierre en el margen izquierdo, a 48. */
+  .cafe { display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; padding-inline: max(var(--margen), calc((100vw - var(--ancho-carta)) / 2)); }
+  .cafe > .sec-head { grid-column: 1 / span 8; grid-row: 1; margin: 0; }
+  .cafe-foto { order: 0; grid-column: 9 / -1; grid-row: 1; margin: 0; }
+  .cafe-foto .frame-clip { aspect-ratio: 5 / 2; } /* 347 × 139 a 1440: del alto del bloque de titular y entradilla (130–139), sin hueco bajo el texto */
+  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; margin-top: calc(var(--space-12) - var(--space-2)); } /* bloque → bloque 48 hasta los enlaces (la barra lleva 8 arriba) */
+  .ct-nav { margin-inline: calc(-1 * var(--space-2)); padding-inline: 0; box-shadow: none; }
+  .ct-nav::after { content: ""; position: absolute; left: var(--space-2); right: var(--space-2); bottom: 0; border-bottom: 1px solid var(--linea); } /* el filete, del ancho de la carta */
+  .ct-lista { gap: var(--space-12); }
   .ct-cierre { order: 0; grid-column: 1 / -1; grid-row: 3; margin-top: var(--space-12); }
 }
 
@@ -1356,7 +1366,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 /* ---------- Colores forzados (Windows alto contraste) ---------- */
 @media (forced-colors: active) {
   .btn, .chip, .cat-chip, .cat-filters-btn, .save, .menu-btn, .hdr-nav a, .menu-row, .tabbar a, .tab-list { border: 1px solid ButtonText; }
-  .chip[aria-checked="true"], .save[aria-pressed="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip, .hdr-nav a[aria-current="true"], .menu-row[aria-current="true"] { border-color: Highlight; color: Highlight; forced-color-adjust: none; }
+  .chip[aria-checked="true"], .save[aria-pressed="true"], .cat-filters-btn[aria-expanded="true"], .cat-chip, .hdr-nav a[aria-current="true"], .menu-row[aria-current="true"], .ct-tab[aria-current="true"] { border-color: Highlight; color: Highlight; forced-color-adjust: none; }
   .cover { border: 1px solid CanvasText; }
   .interruptor-pista { forced-color-adjust: none; background: Canvas; box-shadow: inset 0 0 0 2px ButtonText; }
   .interruptor-pulgar { forced-color-adjust: none; background: ButtonText; box-shadow: none; }

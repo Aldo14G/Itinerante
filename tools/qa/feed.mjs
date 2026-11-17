@@ -13,11 +13,13 @@
 //     de otro año y dos fuera de la ventana de 24 meses): fila compacta entre líneas finas (sin relleno, sin acciones, portada cuadrada de 64 / 88 con radio 12 y anillo),
 //     los 6 más recientes y «Ver los N anteriores» / «Ver menos» (aria-expanded, aria-controls, el foco se queda, al plegar el botón no se mueve bajo el cursor), solo
 //     pasados sin próximos, imagen inexistente (fila sin foto, nunca un recuadro roto), cartel enorme sin desborde y 150 eventos sin tareas largas con CPU 4×.
-//  3b. Café y té (#cafe, 2026-11-17, al modo de las apps de comida): la carta de menu.json en filas por categorías con su barra de categorías fija (enlaces, no
-//     un radiogroup; nombre corto «Sin café» con el completo en aria-label): filas entre líneas finas, nombre, precio justo debajo (solo el de la carta impresa) y
-//     descripción, una columna en el teléfono y dos desde 761, sin foto sin columna reservada, los tés y «Aguas frescas» en un renglón, barra fija bajo la cabecera,
-//     scroll-spy (llegando desde arriba, desde abajo y por cada grupo), tocar un chip lleva al grupo y deja el foco en su título, la foto real (abajo en el teléfono,
-//     a la derecha del titular en escritorio), el cierre («Pídelo en la barra de la sala.» y «Cómo llegar») y una fila con foto de prueba, a 393, 320 y 1280.
+//  3b. Café y té (#cafe, recomposición del 2026-11-17): la carta de menu.json pintada en index.html (npm run carta), en filas por categorías, con la fila de
+//     enlaces de sección encima (no un radiogroup; nombre corto «Sin café» con el completo en aria-label; el actual subrayado, sin el verde intenso): un eje
+//     (titular, primer enlace y primer producto en el mismo margen), filas entre líneas finas con 12 de aire, precio a 4 px del nombre en tinta, una columna en
+//     el teléfono y dos desde 761, sin foto sin columna reservada, los tés y «Aguas frescas» en un renglón, barra fija bajo la cabecera mientras quepa en un
+//     renglón (nunca se desliza), scroll-spy (desde arriba, desde abajo y por cada grupo), tocar una categoría lleva al grupo (título a 24 de la barra) y deja el
+//     foco en su título, la foto real (abajo en el teléfono, un tercio a la derecha del titular en escritorio), el cierre y una fila con foto de prueba (el
+//     documento se reescribe con la carta de prueba, como lo haría npm run carta), a 393, 320 y 1280.
 //  4. Novedades (CarruselNovedades): sin llegadas válidas no existen la sección, su enlace de la barra, su fila del menú ni el control del inicio; con llegadas, la tira
 //     son solo esas (lo más reciente primero) y «Nuevo» solo en lo reciente; «Ver todo» / «Ver menos» (aria-expanded, foco quieto, rejilla de 3 columnas a 393 y 2 a
 //     320); cada libro abre la ficha única (WhatsApp prellenado, Guardar, Compartir con respaldo de copiar, «Cómo llegar»; foco de vuelta al libro; enlace #libro-<id>).
@@ -27,6 +29,7 @@ import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, unlink
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { eventosPlan, validEventos, fechaBloque, fechaLarga, reservaUrl, reservaMessage, icsOf } from '../../feed.js';
+import { withCarta } from '../../scripts/build-carta.mjs';
 
 const URL_ = process.argv[2] || 'http://127.0.0.1:8094/';
 const out = process.argv[3] || '.';
@@ -40,7 +43,7 @@ const ws = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerU
 await new Promise(r => ws.addEventListener('open', r, { once: true }));
 let id = 0; const pending = new Map(); let problems = [];
 let override = null; // cuerpo alterno de collections.json
-let overrideMenu = null; // cuerpo alterno de menu.json (carta con fotos de prueba; null = el archivo real)
+let overrideMenu = null; // carta alterna (con fotos de prueba; null = la real): se sirve como menu.json y se pinta en el documento (withCarta), como npm run carta
 let cartelEnorme = null; // cuerpo alterno del cartel enorme de la prueba de robustez (null = el archivo real)
 let overrideEventos = null; // cuerpo alterno de eventos.json (datos de prueba de esta herramienta; null = el archivo real)
 ws.addEventListener('message', e => {
@@ -51,6 +54,16 @@ ws.addEventListener('message', e => {
   if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') problems.push(`LOG ${m.params.entry.text} ${m.params.entry.url || ''}`);
   if (m.method === 'Fetch.requestPaused') {
     const { requestId, request } = m.params;
+    if (m.params.resourceType === 'Document' && m.params.responseStatusCode !== undefined) {   // la carta de prueba, pintada en el documento
+      (async () => {
+        if (!overrideMenu) return send('Fetch.continueResponse', { requestId });
+        const b = (await send('Fetch.getResponseBody', { requestId })).result;
+        const htmlDoc = b.base64Encoded ? Buffer.from(b.body, 'base64').toString('utf8') : b.body;
+        const headers = (m.params.responseHeaders || []).filter(h => !/^(content-length|content-encoding|etag)$/i.test(h.name));
+        send('Fetch.fulfillRequest', { requestId, responseCode: m.params.responseStatusCode, responseHeaders: headers, body: Buffer.from(withCarta(htmlDoc, overrideMenu)).toString('base64') });
+      })();
+      return;
+    }
     if (cartelEnorme && /cartel-enorme/.test(request.url)) send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'image/jpeg' }], body: cartelEnorme.toString('base64') });
     else if (/eventos\.json/.test(request.url)) {
       if (overrideEventos) send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body: Buffer.from(JSON.stringify(overrideEventos)).toString('base64') });
@@ -74,7 +87,7 @@ const clickSel = async (sel, nth = 0) => {
 const enter = async () => { await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r' }); await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }); }; // Enter con texto: el botón enfocado recibe su clic
 const key = async (k, code, vk) => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: k, code, windowsVirtualKeyCode: vk }); };
 await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'); await send('Network.enable');
-await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }, { urlPattern: '*eventos.json*' }, { urlPattern: '*menu.json*' }] });
+await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }, { urlPattern: '*eventos.json*' }, { urlPattern: '*menu.json*' }, { urlPattern: '*', resourceType: 'Document', requestStage: 'Response' }] });
 // La lista de Novedades que se publica está vacía (la librería aún no registra fechas de llegada): la primera vista y Eventos se miden con
 // siete libros del inventario y fechas relativas a hoy (tres recientes), como se verá cuando haya llegadas. El estado vacío se mide en el punto 4.
 {
@@ -426,7 +439,7 @@ overrideEventos = null;
   const enorme = join(tmpdir(), 'cartel-enorme.jpg');
   if (!existsSync(enorme)) { const { spawnSync } = await import('node:child_process'); spawnSync('python3', ['-c', `from PIL import Image; Image.new('RGB', (4000, 6000), (122, 196, 180)).save(${JSON.stringify(enorme)}, quality=60)`]); }
   if (existsSync(enorme)) {
-    await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }, { urlPattern: '*eventos.json*' }, { urlPattern: '*menu.json*' }, { urlPattern: '*cartel-enorme*' }] });
+    await send('Fetch.enable', { patterns: [{ urlPattern: '*collections.json*' }, { urlPattern: '*eventos.json*' }, { urlPattern: '*menu.json*' }, { urlPattern: '*cartel-enorme*' }, { urlPattern: '*', resourceType: 'Document', requestStage: 'Response' }] });
     cartelEnorme = readFileSync(enorme);
     for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
       await open(vw, vh, { reset: true, mobile, wait: mobile ? 4000 : 2500 }); await irEventos(); await sleep(1500);
@@ -462,12 +475,12 @@ overrideEventos = null;
   overrideEventos = null;
 }
 
-// ---------- 3b. Café y té (#cafe): la carta al modo de las apps de comida (2026-11-17; datos en assets/data/menu.json) ----------
-// Sustituye a la parrilla de tarjetas del 2026-11-16. Una barra de enlaces (una por categoría, con su nombre corto si lo trae: «Sin café», y el
-// nombre completo como aria-label) que marca el grupo a la vista y lleva al grupo; cada grupo con su título (Title 3), su nota si la trae y sus
-// filas entre líneas finas: nombre (Headline), el precio justo debajo (15/600 turquesa-texto, solo el de la carta impresa) y la descripción;
-// una columna en el teléfono y dos desde 761; sin foto la fila no reserva columna; con foto, cuadrada a la derecha (96 / 120). El cierre
-// («Pídelo en la barra de la sala.» y «Cómo llegar», 56, a todo el ancho en el teléfono) vuelve: el café se sirve en la librería (Matamoros 421).
+// ---------- 3b. Café y té (#cafe): una cuadrícula (recomposición del 2026-11-17; datos en assets/data/menu.json, pintados en index.html) ----------
+// Sustituye a las píldoras apiladas en 1–3 con la carta en 4–12. Titular, entradilla, la fila de enlaces de sección (una por categoría, con su nombre
+// corto si lo trae: «Sin café», y el completo como aria-label; el actual subrayado en tinta con aria-current) y el primer producto en el mismo margen;
+// cada grupo con su título (Title 3), su nota si la trae y sus filas entre líneas finas con 12 de aire: nombre (Headline), el precio a 4 px (15/600 en
+// tinta, solo el de la carta impresa) y la descripción; una columna en el teléfono y dos desde 761; sin foto la fila no reserva columna; con foto,
+// cuadrada a la derecha (96 / 120). El cierre («Pídelo en la barra de la sala.» y «Cómo llegar», secundario de 56) al final.
 const menu = JSON.parse(readFileSync(new URL('../../assets/data/menu.json', import.meta.url), 'utf8'));
 const prodsMenu = menu.categorias.flatMap(c => c.productos);
 const precioEsperado = p => (typeof p.precio === 'number' ? `$${p.precio} MXN${p.unidad ? ` ${p.unidad}` : ''}` : '');
@@ -475,24 +488,27 @@ const MAPS_LIBRERIA = 'https://www.google.com/maps/dir/?api=1&destination=Librer
 const leerCarta = () => ev(`(() => { const q = s => document.querySelector(s); const sec = q('#cafe');
   const R = e => { const b = e.getBoundingClientRect(); return [Math.round(b.left * 10) / 10, Math.round(b.top * 10) / 10, Math.round(b.width * 10) / 10, Math.round(b.height * 10) / 10]; };
   const vis = e => { const b = e.getBoundingClientRect(); const cs = getComputedStyle(e); return b.width > 0 && b.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
-  const nav = q('[data-ct-nav]'), chips = [...nav.querySelectorAll('.ct-chip')], groups = [...sec.querySelectorAll('.ct-grupo')];
+  const tinta = e => { const tw = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); for (let n = tw.nextNode(); n; n = tw.nextNode()) { const i = n.data.search(/\\S/); if (i < 0) continue; const rg = document.createRange(); rg.setStart(n, i); rg.setEnd(n, i + 1); return Math.round(rg.getBoundingClientRect().left * 10) / 10; } return null; };
+  const color = v => { const x = document.createElement('i'); x.style.color = 'var(' + v + ')'; document.body.append(x); const c = getComputedStyle(x).color; x.remove(); return c; };
+  const nav = q('[data-ct-nav]'), tabs = [...nav.querySelectorAll('.ct-tab')], groups = [...sec.querySelectorAll('.ct-grupo')];
   const head = q('#cafe .sec-head'), foto = q('.cafe-foto'), cierre = q('.ct-cierre'), cBtn = cierre.querySelector('a');
   const contenido = (() => { const cs = getComputedStyle(sec), b = sec.getBoundingClientRect(); return [Math.round(b.left + parseFloat(cs.paddingLeft)), Math.round(b.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight))]; })();
   const lineas = [...sec.querySelectorAll('.ct-rejilla')].map(ul => getComputedStyle(ul).borderBottom);
-  return { ready: q('[data-cafe]').classList.contains('is-ready'), busy: q('[data-ct-lista]').getAttribute('aria-busy'), hdr: Math.round(q('.hdr').getBoundingClientRect().bottom), contenido, lineas,
-    linea: getComputedStyle(document.documentElement).getPropertyValue('--linea').trim(), turquesa: (() => { const x = document.createElement('i'); x.style.color = 'var(--turquesa-texto)'; document.body.append(x); const c = getComputedStyle(x).color; x.remove(); return c; })(),
-    nav: { label: nav.getAttribute('aria-label'), pos: getComputedStyle(nav).position, top: getComputedStyle(nav).top, bg: getComputedStyle(nav).backgroundColor, glass: getComputedStyle(nav).backdropFilter, box: R(nav), dir: getComputedStyle(nav).flexDirection, scrolls: nav.scrollWidth > nav.clientWidth + 1, scrollLeft: nav.scrollLeft },
-    chips: chips.map(c => [c.textContent.trim(), c.tagName, c.getAttribute('href'), c.getAttribute('aria-current'), Math.round(c.getBoundingClientRect().height), R(c), c.getAttribute('aria-label')]),
-    groups: groups.map(g => ({ id: g.id, tit: g.querySelector('.ct-grupo-tit').textContent, tag: g.querySelector('.ct-grupo-tit').tagName, fs: getComputedStyle(g.querySelector('.ct-grupo-tit')).fontSize, labelled: g.getAttribute('aria-labelledby') === g.querySelector('.ct-grupo-tit').id, nota: g.querySelector('.ct-grupo-nota')?.textContent || '', notaFs: g.querySelector('.ct-grupo-nota') ? getComputedStyle(g.querySelector('.ct-grupo-nota')).fontSize : '', n: g.querySelectorAll('.ct-prod').length, box: R(g), titBox: R(g.querySelector('.ct-grupo-tit')), cols: new Set([...g.querySelectorAll('.ct-prod')].map(li => Math.round(li.getBoundingClientRect().left))).size })),
+  return { ready: q('[data-cafe]').classList.contains('is-ready'), busy: q('[data-ct-lista]').getAttribute('aria-busy'), esqueleto: sec.querySelectorAll('.card--sk, .sk-chip').length, hdr: Math.round(q('.hdr').getBoundingClientRect().bottom), contenido, lineas,
+    tintaColor: color('--tinta'), verde: color('--primario'), ejes: { titular: tinta(q('#cafe-title')), entradilla: tinta(q('#cafe .sec-texto')), categoria: tinta(tabs[0]), producto: tinta(sec.querySelector('.ct-prod')), grupo: tinta(sec.querySelector('.ct-grupo-tit')) },
+    nav: { label: nav.getAttribute('aria-label'), pos: getComputedStyle(nav).position, top: getComputedStyle(nav).top, bg: getComputedStyle(nav).backgroundColor, glass: getComputedStyle(nav).backdropFilter, box: R(nav), dir: getComputedStyle(nav).flexDirection, wrap: getComputedStyle(nav).flexWrap, filas: new Set(tabs.map(t => Math.round(t.getBoundingClientRect().top))).size, envuelta: nav.hasAttribute('data-envuelta'), scrolls: nav.scrollWidth > nav.clientWidth + 1 },
+    chips: tabs.map(c => [c.textContent.trim(), c.tagName, c.getAttribute('href'), c.getAttribute('aria-current'), Math.round(c.getBoundingClientRect().height), R(c), c.getAttribute('aria-label'), getComputedStyle(c).color, getComputedStyle(c).backgroundColor, getComputedStyle(c).textDecorationLine]),
+    groups: groups.map(g => ({ id: g.id, tit: g.querySelector('.ct-grupo-tit').textContent, tag: g.querySelector('.ct-grupo-tit').tagName, fs: getComputedStyle(g.querySelector('.ct-grupo-tit')).fontSize, labelled: g.getAttribute('aria-labelledby') === g.querySelector('.ct-grupo-tit').id, nota: g.querySelector('.ct-grupo-nota')?.textContent || '', notaFs: g.querySelector('.ct-grupo-nota') ? getComputedStyle(g.querySelector('.ct-grupo-nota')).fontSize : '', n: g.querySelectorAll('.ct-prod').length, box: R(g), titBox: R(g.querySelector('.ct-grupo-tit')), cols: new Set([...g.querySelectorAll('.ct-prod')].map(li => Math.round(li.getBoundingClientRect().left))).size, orden: [...g.querySelectorAll('.ct-prod')].map(li => { const b = li.getBoundingClientRect(); return [Math.round(b.top), Math.round(b.left)]; }) })),
+    gruposGap: groups.slice(1).map((g, i) => Math.round(g.getBoundingClientRect().top - groups[i].getBoundingClientRect().bottom)),
     prods: [...sec.querySelectorAll('.ct-prod')].map(li => { const pr = li.querySelector('.ct-precio'), nm = li.querySelector('.ct-nom'), ds = li.querySelector('.ct-desc'), tx = li.querySelector('.ct-txt'), cs = getComputedStyle(li), fo = li.querySelector('.ct-foto');
       return { id: li.dataset.id, solo: li.classList.contains('ct-prod--solo'), nom: nm.textContent, nomTag: nm.tagName, nomFs: getComputedStyle(nm).fontSize + '/' + getComputedStyle(nm).fontWeight, nomBox: R(nm), desc: ds?.textContent || '', descBox: ds ? R(ds) : null, descFs: ds ? getComputedStyle(ds).fontSize : '',
         precio: pr?.textContent || '', fuente: pr?.dataset.fuente || '', precioBox: pr ? R(pr) : null, precioStyle: pr ? getComputedStyle(pr).fontSize + '/' + getComputedStyle(pr).fontWeight + '/' + getComputedStyle(pr).color : '', txtBox: R(tx),
         bg: cs.backgroundColor, radius: cs.borderRadius, ring: cs.boxShadow, borde: cs.borderTop, pad: cs.paddingTop + ' ' + cs.paddingBottom, cursor: cs.cursor, tab: li.tabIndex, focusables: li.querySelectorAll('a, button, [tabindex]').length, box: R(li),
         foto: fo ? { box: R(fo), img: !!fo.querySelector('img'), ic: !!fo.querySelector('.ct-ic use'), bg: getComputedStyle(fo).backgroundColor, radius: getComputedStyle(fo).borderRadius } : null }; }),
-    lista: R(q('[data-ct-lista]')), head: R(head), foto: foto && { box: R(foto), kind: foto.dataset.kind, alt: foto.querySelector('img').alt },
+    lista: R(q('[data-ct-lista]')), head: R(head), foto: foto && { box: R(foto), kind: foto.dataset.kind, alt: foto.querySelector('img').alt, vis: vis(foto) },
     cierre: { vis: vis(cierre), hidden: cierre.hidden, texto: cierre.querySelector('p')?.textContent.trim() || '', box: R(cierre), btn: cBtn ? { txt: cBtn.textContent.trim(), cls: cBtn.className, href: cBtn.getAttribute('href'), target: cBtn.target, rel: cBtn.rel, box: R(cBtn) } : null, txtBottom: cierre.querySelector('p') ? Math.round(cierre.querySelector('p').getBoundingClientRect().bottom) : null },
     text: sec.innerText, html: sec.innerHTML, wa: sec.querySelectorAll('a[href*="wa.me"]').length, primary: [...sec.querySelectorAll('.btn--primario')].filter(vis).length, over: document.documentElement.scrollWidth > innerWidth }; })()`);
-const chipActual = () => ev(`document.querySelector('.ct-chip[aria-current="true"]')?.dataset.id ?? null`);
+const chipActual = () => ev(`document.querySelector('.ct-tab[aria-current="true"]')?.dataset.id ?? null`);
 const alGrupo = id => ev(`document.getElementById('carta-${id}').scrollIntoView({ block: 'start', behavior: 'instant' })`);
 const irCarta = async () => { await ev(`document.querySelector('#cafe').scrollIntoView({ block: 'start', behavior: 'instant' })`); await sleep(1700); await ev(`document.querySelector('#cafe').scrollIntoView({ block: 'start', behavior: 'instant' })`); await sleep(600); };
 const cerca = (a, b, t = 1) => Math.abs(a - b) <= t;
@@ -503,49 +519,55 @@ for (const [vw, vh, mobile] of [[393, 659, true], [320, 640, true], [1280, 800, 
   const tag = `${vw}×${vh}`;
   const cols = vw >= 761 ? 2 : 1;
   const corto = k => (typeof k.chip === 'string' && k.chip.trim() ? k.chip.trim() : k.nombre);
-  check('café', `${tag}: la carta se pinta de menu.json: barra de categorías (nav con nombre; un enlace #carta-<id> por categoría, de 48, con su nombre corto si lo trae y el nombre completo como aria-label; el primero con aria-current) y un grupo por categoría (h3 Title 3, nombrado, con su nota en Subheadline si la trae) con todos sus productos`, c.ready && c.busy === null && c.nav.label === 'Categorías de la carta' && c.chips.map(x => x[0]).join('|') === menu.categorias.map(corto).join('|') && c.chips.every((x, i) => x[1] === 'A' && x[2] === `#carta-${menu.categorias[i].id}` && x[4] === 48 && x[6] === (corto(menu.categorias[i]) !== menu.categorias[i].nombre ? menu.categorias[i].nombre : null)) && menu.categorias.some(k => corto(k) !== k.nombre) && c.chips[0][3] === 'true' && c.chips.filter(x => x[3] === 'true').length === 1 && c.groups.length === menu.categorias.length && c.groups.every((g, i) => g.tit === menu.categorias[i].nombre && g.tag === 'H3' && g.fs === '20px' && g.labelled && g.n === menu.categorias[i].productos.length && g.nota === (menu.categorias[i].nota || '') && (!g.nota || g.notaFs === '15px')), JSON.stringify([c.chips, c.groups]).slice(0, 900));
+  check('café', `${tag}: la carta llega pintada (sin esqueleto ni aria-busy) con la de menu.json: barra de categorías (nav con nombre; un enlace #carta-<id> por categoría, de 44, con su nombre corto si lo trae y el nombre completo como aria-label; el primero con aria-current) y un grupo por categoría (h3 Title 3, nombrado, con su nota en Subheadline si la trae) con todos sus productos`, c.ready && c.busy === null && c.esqueleto === 0 && c.nav.label === 'Categorías de la carta' && c.chips.map(x => x[0]).join('|') === menu.categorias.map(corto).join('|') && c.chips.every((x, i) => x[1] === 'A' && x[2] === `#carta-${menu.categorias[i].id}` && x[4] === 44 && x[6] === (corto(menu.categorias[i]) !== menu.categorias[i].nombre ? menu.categorias[i].nombre : null)) && menu.categorias.some(k => corto(k) !== k.nombre) && c.chips[0][3] === 'true' && c.chips.filter(x => x[3] === 'true').length === 1 && c.groups.length === menu.categorias.length && c.groups.every((g, i) => g.tit === menu.categorias[i].nombre && g.tag === 'H3' && g.fs === '20px' && g.labelled && g.n === menu.categorias[i].productos.length && g.nota === (menu.categorias[i].nota || '') && (!g.nota || g.notaFs === '15px')), JSON.stringify([c.chips, c.groups]).slice(0, 900));
+  check('café', `${tag}: un eje: titular, entradilla, la tinta de la primera categoría, el título del primer grupo y el primer producto empiezan en el margen de la sección (x ${c.contenido[0]})`, Object.values(c.ejes).every(x => cerca(x, c.contenido[0], 1.5)), JSON.stringify([c.ejes, c.contenido]));
+  check('café', `${tag}: la categoría actual se marca con subrayado y tinta (aria-current), sin relleno ni el verde intenso (queda para «Cómo llegar»); las demás en tinta-2, sin subrayado`, c.chips.every(x => x[8] === 'rgba(0, 0, 0, 0)' && x[7] !== c.verde && (x[3] === 'true' ? x[7] === c.tintaColor && /underline/.test(x[9]) : !/underline/.test(x[9]))), JSON.stringify(c.chips.map(x => [x[0], x[3], x[7], x[8], x[9]])));
   check('café', `${tag}: precios solo los de la carta impresa («$NN MXN», con la unidad si la trae), marcados como dato de la carta; con precio null no se imprime nada (ni «por confirmar», ni «$0», ni «MX$»)`, c.prods.length === prodsMenu.length && c.prods.every((p, i) => p.id === prodsMenu[i].id && p.nom === prodsMenu[i].nombre && p.precio === precioEsperado(prodsMenu[i]) && p.fuente === (p.precio ? 'carta' : '') && p.desc === (prodsMenu[i].descripcion || '')) && !/por confirmar|gratis|\$\s?0\b|MX\$/i.test(c.text) && c.prods.filter(p => p.precio).length === prodsMenu.filter(p => typeof p.precio === 'number').length, JSON.stringify(c.prods.filter((p, i) => p.precio !== precioEsperado(prodsMenu[i]))).slice(0, 500));
-  const fila = p => p.solo && !p.foto && p.bg === 'rgba(0, 0, 0, 0)' && p.ring === 'none' && p.radius === '0px' && /^1px solid/.test(p.borde) && p.pad === '16px 16px' && p.nomTag === 'H4' && p.nomFs === '17px/600' && p.cursor !== 'pointer' && p.tab === -1 && p.focusables === 0
-    && (!p.precio || (p.precioStyle === `15px/600/${c.turquesa}` && p.precioBox[1] >= p.nomBox[1] + p.nomBox[3] && p.precioBox[1] - (p.nomBox[1] + p.nomBox[3]) <= 4.5))
+  const fila = p => p.solo && !p.foto && p.bg === 'rgba(0, 0, 0, 0)' && p.ring === 'none' && p.radius === '0px' && /^1px solid/.test(p.borde) && p.pad === '12px 12px' && p.nomTag === 'H4' && p.nomFs === '17px/600' && p.cursor !== 'pointer' && p.tab === -1 && p.focusables === 0
+    && (!p.precio || (p.precioStyle === `15px/600/${c.tintaColor}` && p.precioBox[1] >= p.nomBox[1] + p.nomBox[3] && p.precioBox[1] - (p.nomBox[1] + p.nomBox[3]) <= 4.5))
     && (!p.desc || (p.descFs === '15px' && p.descBox[1] >= (p.precioBox ? p.precioBox[1] + p.precioBox[3] : p.nomBox[1] + p.nomBox[3]) - 0.5))
     && cerca(p.txtBox[2], p.box[2]);
-  check('café', `${tag}: fila de la carta (todas sin foto, hoy): sin caja (sin fondo, radio ni anillo), una línea fina de 1 px arriba y 16 de aire arriba y abajo; nombre Headline 17/600 (h4), el precio justo debajo (≤ 4 px; 15/600 en turquesa-texto) y luego la descripción; sin foto el texto ocupa la fila entera (no reserva la columna de la foto); no es un control (sin cursor de mano, tabulador ni enlaces)`, c.prods.every(fila), JSON.stringify(c.prods.filter(p => !fila(p))).slice(0, 700));
-  check('café', `${tag}: líneas finas entre filas: cada lista de grupo cierra con su línea de 1 px abajo`, c.lineas.length === menu.categorias.length && c.lineas.every(b => /^1px solid/.test(b)), JSON.stringify(c.lineas));
+  check('café', `${tag}: fila de la carta (todas sin foto, hoy): sin caja (sin fondo, radio ni anillo), una línea fina de 1 px arriba y 12 de aire arriba y abajo; nombre Headline 17/600 (h4), el precio justo debajo (≤ 4 px; 15/600 en tinta, no en el verde de la primaria) y luego la descripción; sin foto el texto ocupa la fila entera (no reserva la columna de la foto); no es un control (sin cursor de mano, tabulador ni enlaces)`, c.prods.every(fila), JSON.stringify(c.prods.filter(p => !fila(p))).slice(0, 700));
+  check('café', `${tag}: líneas finas entre filas: cada lista de grupo cierra con su línea de 1 px abajo; entre grupos hay más aire (${mobile ? 32 : 48}) que entre filas (24 entre letras)`, c.lineas.length === menu.categorias.length && c.lineas.every(b => /^1px solid/.test(b)) && c.gruposGap.every(g => g === (vw >= 1024 ? 48 : 32)), JSON.stringify([c.lineas, c.gruposGap]));
   const ag = c.prods.find(p => p.id === 'aguas-frescas') || c.prods.find(p => /^Aguas frescas/.test(p.nom));
   const tes = c.prods.filter(p => !p.precio && !p.desc);
-  check('café', `${tag}: «Aguas frescas» y los tés (sin precio ni descripción) son una fila de un solo renglón (22 + 16 + 16 + la línea)${mobile ? ', a todo el ancho de la carta' : '; en dos columnas la fila iguala el alto de su vecina de renglón (las líneas siguen parejas)'}`, ag && tes.length && tes.every(p => p.nomBox[3] <= 23 && (p.box[3] <= 56 || (!mobile && c.prods.some(q => q !== p && cerca(q.box[1], p.box[1]) && cerca(q.box[3], p.box[3]) && q.box[3] > 56)))) && (!mobile || cerca(ag.box[2], c.lista[2])), JSON.stringify([ag, tes.map(p => [p.id, p.box[3]]), c.lista]).slice(0, 600));
-  check('café', `${tag}: ${cols === 1 ? 'una columna de filas en el teléfono' : 'dos columnas de filas desde 761'} en cada grupo`, c.groups.every(g => g.cols === Math.min(cols, g.n)), JSON.stringify(c.groups.map(g => [g.id, g.n, g.cols])));
-  check('café', `${tag}: la barra de categorías es fija bajo la cabecera con el fondo opaco de su banda (no es vidrio)${mobile ? ', de borde a borde' : ', en columna a la izquierda (columnas 1–3)'}`, c.nav.pos === 'sticky' && c.nav.bg !== 'rgba(0, 0, 0, 0)' && (c.nav.glass === 'none' || !c.nav.glass) && (mobile ? c.nav.box[0] === 0 && c.nav.box[2] === vw && c.nav.dir === 'row' : c.nav.dir === 'column' && c.nav.box[0] >= 32 && c.nav.box[0] + c.nav.box[2] < c.lista[0] && c.lista[0] > c.nav.box[0] + c.nav.box[2] + 20), JSON.stringify(c.nav));
-  check('café', `${tag}: foto real de la casa con alt; ${mobile ? 'debajo de la carta (al llegar se ve la carta)' : 'arriba a la derecha, junto al titular'}; sin desborde`, c.foto.kind === 'real' && c.foto.alt.length > 20 && (mobile ? c.foto.box[1] >= c.lista[1] + c.lista[3] : c.foto.box[0] > c.head[0] + c.head[2] - 10 && c.foto.box[1] <= c.head[1] + 5) && !c.over, JSON.stringify([c.foto, c.head, c.lista]));
+  check('café', `${tag}: «Aguas frescas» y los tés (sin precio ni descripción) son una fila de un solo renglón (22 + 12 + 12 + la línea)${mobile ? ', a todo el ancho de la carta' : '; en dos columnas la fila iguala el alto de su vecina de renglón (las líneas siguen parejas)'}`, ag && tes.length && tes.every(p => p.nomBox[3] <= 23 && (p.box[3] <= 48 || (!mobile && c.prods.some(q => q !== p && cerca(q.box[1], p.box[1]) && cerca(q.box[3], p.box[3]) && q.box[3] > 48)))) && (!mobile || cerca(ag.box[2], c.lista[2])), JSON.stringify([ag, tes.map(p => [p.id, p.box[3]]), c.lista]).slice(0, 600));
+  const ordenOk = c.groups.every(g => g.orden.every((o, i) => i === 0 || o[0] > g.orden[i - 1][0] + 1 || (cerca(o[0], g.orden[i - 1][0]) && o[1] > g.orden[i - 1][1])));
+  check('café', `${tag}: ${cols === 1 ? 'una columna de filas en el teléfono' : 'dos columnas de filas desde 761'} en cada grupo; el orden del marcado es el de lectura (izquierda a derecha, renglón por renglón)`, c.groups.every(g => g.cols === Math.min(cols, g.n)) && ordenOk, JSON.stringify(c.groups.map(g => [g.id, g.n, g.cols, g.orden])));
+  check('café', `${tag}: la barra de categorías va encima de la carta, fija bajo la cabecera con el fondo opaco de su banda (no es vidrio), en un renglón que nunca se desliza${mobile ? ', de borde a borde' : ', del ancho de la carta'}`, c.nav.pos === 'sticky' && !c.nav.envuelta && c.nav.filas === 1 && !c.nav.scrolls && c.nav.wrap === 'wrap' && c.nav.dir === 'row' && c.nav.bg !== 'rgba(0, 0, 0, 0)' && (c.nav.glass === 'none' || !c.nav.glass) && c.nav.box[1] + c.nav.box[3] <= c.lista[1] && (mobile ? c.nav.box[0] === 0 && c.nav.box[2] === vw : cerca(c.nav.box[0], c.contenido[0] - 8) && cerca(c.nav.box[2], c.contenido[1] + 16)), JSON.stringify([c.nav, c.contenido]));
+  const third = (c.contenido[1] - 11 * 32) / 12 * 4 + 3 * 32;
+  check('café', `${tag}: foto real de la casa con alt; ${mobile ? 'debajo de la carta (al llegar se ve la carta)' : vw >= 1024 ? 'un tercio a la derecha (columnas 9–12, 5:2), con su tope en el del titular' : 'debajo de la carta'}; sin desborde`, c.foto.kind === 'real' && c.foto.alt.length > 20 && (vw < 1024 ? c.foto.box[1] >= c.lista[1] + c.lista[3] : cerca(c.foto.box[2], third, 1.5) && cerca(c.foto.box[0] + c.foto.box[2], c.contenido[0] + c.contenido[1], 1.5) && cerca(c.foto.box[1], c.head[1], 1.5) && cerca(c.foto.box[2] / c.foto.box[3], 2.5, 0.03)) && !c.over, JSON.stringify([c.foto, c.head, c.lista, third]));
   const cb = c.cierre.btn;
-  check('café', `${tag}: el cierre vuelve: «Pídelo en la barra de la sala.» y «Cómo llegar» (56, a la librería en Matamoros 421, en otra pestaña${mobile ? ', a todo el ancho' : ', al ancho de su rótulo desde el margen'}; a 24 de su texto), después de la carta; de contorno secundario, no primaria (la primaria de esa pantalla es la de Visita); sin «Padre Mier», sin WhatsApp ni precios en el marcado del cierre`, !c.cierre.hidden && c.cierre.vis && c.cierre.texto === 'Pídelo en la barra de la sala.' && cb && /^Cómo llegar/.test(cb.txt) && /btn--secundario/.test(cb.cls) && !/btn--primario/.test(cb.cls) && cb.box[3] === 56 && cb.href === MAPS_LIBRERIA && cb.target === '_blank' && /noopener/.test(cb.rel) && (mobile ? cerca(cb.box[0], c.contenido[0]) && cerca(cb.box[2], c.contenido[1]) : cerca(cb.box[0], c.contenido[0]) && cb.box[2] < 300) && cerca(cb.box[1] - c.cierre.txtBottom, 24) && c.cierre.box[1] >= c.lista[1] + c.lista[3] && !/Padre Mier/i.test(c.html) && c.wa === 0 && c.primary === 0 && !/\$/.test(c.cierre.texto), JSON.stringify([c.cierre, c.contenido, c.wa, c.primary]));
+  check('café', `${tag}: el cierre: «Pídelo en la barra de la sala.» y «Cómo llegar» (56, a la librería en Matamoros 421, en otra pestaña${mobile ? ', a todo el ancho' : ', al ancho de su rótulo desde el margen'}; a 24 de su texto), después de la carta; secundario, no primaria (la primaria de esa pantalla es la de Visita); sin «Padre Mier», sin WhatsApp ni precios en el cierre`, !c.cierre.hidden && c.cierre.vis && c.cierre.texto === 'Pídelo en la barra de la sala.' && cb && /^Cómo llegar/.test(cb.txt) && /btn--secundario/.test(cb.cls) && !/btn--primario/.test(cb.cls) && cb.box[3] === 56 && cb.href === MAPS_LIBRERIA && cb.target === '_blank' && /noopener/.test(cb.rel) && (mobile ? cerca(cb.box[0], c.contenido[0]) && cerca(cb.box[2], c.contenido[1]) : cerca(cb.box[0], c.contenido[0]) && cb.box[2] < 300) && cerca(cb.box[1] - c.cierre.txtBottom, 24) && c.cierre.box[1] >= c.lista[1] + c.lista[3] && !/Padre Mier/i.test(c.html) && c.wa === 0 && c.primary === 0 && !/\$/.test(c.cierre.texto), JSON.stringify([c.cierre, c.contenido, c.wa, c.primary]));
   // Scroll-spy: llegando desde arriba, desde abajo, y por cada grupo.
   const id0 = menu.categorias[0].id;
-  check('café', `${tag}: scroll-spy: al llegar a la sección desde arriba el chip actual es «${corto(menu.categorias[0])}»`, (await chipActual()) === id0, String(await chipActual()));
+  check('café', `${tag}: scroll-spy: al llegar a la sección desde arriba la categoría actual es «${corto(menu.categorias[0])}»`, (await chipActual()) === id0, String(await chipActual()));
   await ev(`scrollTo(0, document.documentElement.scrollHeight)`); await sleep(900);
   await irCarta();
   const desdeAbajo = await chipActual();
   await ev(`scrollTo(0, 0)`); await sleep(900);
   const alInicio = await chipActual();
   await irCarta();
-  check('café', `${tag}: scroll-spy: llegando desde abajo (salto a #cafe tras recorrer la página) el chip actual es «${corto(menu.categorias[0])}», no el último (defecto del 2026-11-16)`, desdeAbajo === id0 && alInicio === id0, JSON.stringify([desdeAbajo, alInicio]));
+  check('café', `${tag}: scroll-spy: llegando desde abajo (salto a #cafe tras recorrer la página) la categoría actual es «${corto(menu.categorias[0])}», no la última (defecto del 2026-11-16)`, desdeAbajo === id0 && alInicio === id0, JSON.stringify([desdeAbajo, alInicio]));
   const spy = [];
   for (const k of menu.categorias) { await alGrupo(k.id); await sleep(700); spy.push([k.id, await chipActual()]); }
-  check('café', `${tag}: scroll-spy: al llegar a cada grupo su chip es el actual (uno solo con aria-current)`, spy.every(([a, b]) => a === b), JSON.stringify(spy));
+  check('café', `${tag}: scroll-spy: al llegar a cada grupo su categoría es la actual (una sola con aria-current)`, spy.every(([a, b]) => a === b), JSON.stringify(spy));
   await ev(`scrollTo(0, 0)`); await sleep(500); await irCarta();
-  // Tocar un chip: marca al instante, lleva al grupo (título visible bajo la barra), deja el foco en su título y no cambia la dirección.
-  if (menu.categorias.length > 2) {
-    const k = menu.categorias[2];
+  // Tocar una categoría: marca al instante, lleva al grupo (título 24 px bajo la barra fija), deja el foco en su título y no cambia la dirección.
+  for (const k of menu.categorias.slice(1)) {
     const hashAntes = await ev(`location.hash`);
-    await clickSel(`.ct-chip[data-id="${k.id}"]`); await sleep(1200);
-    const t = await ev(`(() => { const g = document.getElementById('carta-${k.id}'), t = g.querySelector('.ct-grupo-tit'), nav = document.querySelector('[data-ct-nav]'); const gb = t.getBoundingClientRect(), nb = nav.getBoundingClientRect(); return { cur: document.querySelector('.ct-chip[aria-current="true"]')?.dataset.id, foco: document.activeElement === t, hash: location.hash, titulo: Math.round(gb.top), barraAbajo: Math.round(nb.bottom), hdr: Math.round(document.querySelector('.hdr').getBoundingClientRect().bottom), navTop: Math.round(nb.top), n: document.querySelectorAll('.ct-chip[aria-current="true"]').length }; })()`);
-    check('café', `${tag}: tocar «${corto(k)}»: su chip queda actual, la página va a su grupo (el título queda visible${mobile ? ' bajo la barra, a ≥ 8 px' : ''}), el foco pasa al título y la dirección no cambia`, t.cur === k.id && t.n === 1 && t.foco && t.hash === hashAntes && t.titulo >= (mobile ? t.barraAbajo + 8 : t.hdr) && t.titulo <= (mobile ? t.barraAbajo + 40 : t.hdr + 90) && (!mobile || t.navTop === t.hdr), JSON.stringify(t));
+    await clickSel(`.ct-tab[data-id="${k.id}"]`); await sleep(1200);
+    const t = await ev(`(() => { const g = document.getElementById('carta-${k.id}'), t = g.querySelector('.ct-grupo-tit'), nav = document.querySelector('[data-ct-nav]'); const gb = t.getBoundingClientRect(), nb = nav.getBoundingClientRect(); return { cur: document.querySelector('.ct-tab[aria-current="true"]')?.dataset.id, foco: document.activeElement === t, hash: location.hash, titulo: Math.round(gb.top), barraAbajo: Math.round(nb.bottom), hdr: Math.round(document.querySelector('.hdr').getBoundingClientRect().bottom), navTop: Math.round(nb.top), n: document.querySelectorAll('.ct-tab[aria-current="true"]').length }; })()`);
+    const ultimo = k === menu.categorias.at(-1);   // el último grupo puede no llegar arriba si la página se acaba: basta con que quede visible bajo la barra
+    check('café', `${tag}: tocar «${corto(k)}»: queda actual, la página va a su grupo (el título ${ultimo ? 'visible bajo la barra' : 'a 24 px de la barra fija'}), el foco pasa al título y la dirección no cambia`, t.cur === k.id && t.n === 1 && t.foco && t.hash === hashAntes && t.navTop === t.hdr && (ultimo ? t.titulo >= t.barraAbajo + 23 : cerca(t.titulo - t.barraAbajo, 24, 1.5)), JSON.stringify(t));
   }
   if (vw === 393) await shot('05-cafe-393.jpg');
+  if (vw === 1280) await shot('05-cafe-1280.jpg');
   check('café', `${tag}: sin errores de consola`, !problems.length, problems.join(' | '));
 }
 // Con fotos de prueba (no están en el repo): una fila con foto cuadrada a la derecha (96 en el teléfono, 120 desde 761; fondo-3, radio 12) y otra cuya foto no carga
-// (queda el icono de su categoría). El nombre y el precio no se mueven: siguen arriba a la izquierda, el precio justo bajo el nombre.
+// (queda el icono de su categoría). El nombre y el precio no se mueven: siguen arriba a la izquierda, el precio justo bajo el nombre. El documento se sirve con la
+// carta de prueba pintada (withCarta, lo que haría npm run carta con ese JSON); el repo no se toca.
 overrideMenu = JSON.parse(JSON.stringify(menu));
 Object.assign(overrideMenu.categorias[0].productos[0], { foto: { src: 'assets/img/oficial-mesa-800.webp', alt: 'Foto de prueba del café de olla' } });
 Object.assign(overrideMenu.categorias[0].productos[2], { foto: { src: 'assets/img/portadas/no-existe.webp', alt: 'Foto que no carga' } });
@@ -555,7 +577,7 @@ for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
   const c = await leerCarta();
   const lado = mobile ? 96 : 120;
   const conFoto = c.prods.find(p => p.id === overrideMenu.categorias[0].productos[0].id), rota = c.prods.find(p => p.id === overrideMenu.categorias[0].productos[2].id);
-  const aLaDerecha = p => p && !p.solo && p.foto && cerca(p.foto.box[2], lado) && cerca(p.foto.box[2], p.foto.box[3]) && p.foto.box[0] >= p.txtBox[0] + p.txtBox[2] + 15 && cerca(p.foto.box[0] + p.foto.box[2], p.box[0] + p.box[2]) && cerca(p.foto.box[1], p.box[1] + 17) && p.foto.bg === 'rgb(230, 238, 236)' && p.foto.radius === '12px' && cerca(p.nomBox[0], p.box[0]) && cerca(p.nomBox[1], p.box[1] + 17) && p.precioBox[1] - (p.nomBox[1] + p.nomBox[3]) <= 4.5;
+  const aLaDerecha = p => p && !p.solo && p.foto && cerca(p.foto.box[2], lado) && cerca(p.foto.box[2], p.foto.box[3]) && p.foto.box[0] >= p.txtBox[0] + p.txtBox[2] + 15 && cerca(p.foto.box[0] + p.foto.box[2], p.box[0] + p.box[2]) && cerca(p.foto.box[1], p.box[1] + 13) && p.foto.bg === 'rgb(230, 238, 236)' && p.foto.radius === '12px' && cerca(p.nomBox[0], p.box[0]) && cerca(p.nomBox[1], p.box[1] + 13) && p.precioBox[1] - (p.nomBox[1] + p.nomBox[3]) <= 4.5;
   check('café', `${vw}×${vh} con foto de prueba: la fila con foto la lleva cuadrada a la derecha (${lado} × ${lado}, fondo-3, radio 12), con nombre y precio en su sitio (arriba a la izquierda, el precio justo debajo); si la foto falla, queda el icono de su categoría en el mismo recuadro; las demás filas siguen sin foto ni columna reservada`, aLaDerecha(conFoto) && conFoto.foto.img && conFoto.precio === '$65 MXN' && aLaDerecha(rota) && !rota.foto.img && rota.foto.ic && c.prods.filter(p => p.solo).length === c.prods.length - 2 && c.prods.filter(p => p.solo).every(p => !p.foto && cerca(p.txtBox[2], p.box[2])) && !c.over, JSON.stringify([conFoto, rota]).slice(0, 900));
   if (vw === 393) await shot('05-cafe-393-foto-prueba.jpg');
 }

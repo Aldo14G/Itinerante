@@ -42,6 +42,8 @@
     "tokens:check": "node scripts/build-tokens.mjs --check",
     "componentes": "node scripts/build-componentes.mjs",
     "componentes:check": "node scripts/build-componentes.mjs --check",
+    "carta": "node scripts/build-carta.mjs",
+    "carta:check": "node scripts/build-carta.mjs --check",
     "critique": "node scripts/critique.mjs",
     "critique:static": "node scripts/critique.mjs --static-only",
     "test:site": "node --test tests/site.test.mjs",

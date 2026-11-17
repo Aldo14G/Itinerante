@@ -170,7 +170,7 @@ Insumo: la curaduría de guías, aire, botones y títulos (auditoría con Chromi
 | capa → capa (con filete) | 32 + 32 | 48 + 48 |
 | sección → sección | 64 | 112 |
 
-Excepciones escritas (también en `SISTEMA.excepciones` de `guias.mjs`): el inicio del teléfono conserva sus posiciones fijas (24 / 8 / 8 / 24 / 12 / 24); en una fila de dos columnas la más corta absorbe la diferencia al final de su celda; el pie del libro cuenta su aire desde la reserva (`--cf-reserva`); en Café de escritorio, de la entradilla a los chips cuenta bloque → bloque (48): son el control de la carta, no del encabezado.
+Excepciones escritas (también en `SISTEMA.excepciones` de `guias.mjs`): el inicio del teléfono conserva sus posiciones fijas (24 / 8 / 8 / 24 / 12 / 24); en una fila de dos columnas la más corta absorbe la diferencia al final de su celda; el pie del libro cuenta su aire desde la reserva (`--cf-reserva`); en Café de escritorio, de la foto a la barra de categorías cuenta bloque → bloque (48): es el control de la carta, no del encabezado; y desde 2026-11-17 Café tiene su propio contenedor de 1120 (ver «Café: una cuadrícula»).
 
 **Botones.**
 
@@ -279,6 +279,50 @@ Excepciones escritas (también en `SISTEMA.excepciones` de `guias.mjs`): el inic
 | Carga para la persona | 1 de 3–8 filas por grupo | 4 chips | 1 acción, secundaria |
 | Entradas raras | Precio `null`: nada; foto que falla: icono | `chip` vacío o de más de 16 letras: `menuProblems` lo señala y la barra usa el nombre | Sin carta: quedan foto y cierre |
 | Patrón conocido | Fila de menú de Uber Eats y DiDi Food | Pestañas fijas de categorías de las apps de comida | Llamado al pie de una sección |
+
+### Café: una cuadrícula (2026-11-17; pedido de Aldo: «el título, la fotografía, las categorías y los productos parecen ocupar cuadrículas distintas»)
+
+**Encargo:** rediseñar solo la composición de Café (anchos, ejes, agrupación y orden de lectura), sin parallax ni animaciones. Se conservan el copy, los datos, los precios confirmados, la foto, el cierre y sus enlaces. **Decisiones que sustituye:** la cabecera en 1–6 con la foto 5:2 en 7–12 y las categorías como píldoras de 48 apiladas en las columnas 1–3 con la carta en 4–12 (Sistema de guías, 2026-11-15, y «Carta al modo de las apps de comida»); la píldora activa en `primario` y el precio en `turquesa-texto` (el mismo valor que `primario` en claro: #176b62); el esqueleto de la carta.
+
+**Una cuadrícula y un eje.** Desde 1024 px Café vive en **su propio contenedor centrado de 1120** (token `ancho-carta`; 12 columnas de 64 con canal de 32, `padding-inline: max(var(--margen), (100vw − 1120) / 2)`): el espacio sobrante queda en los márgenes exteriores. Titular, entradilla, la tinta de la primera categoría, el título del primer grupo y el primer producto empiezan en el mismo margen. La cabecera es un bloque (titular y entradilla en 1–8) con la **foto en un tercio a la derecha** (9–12, 5:2: 347 × 139 a 1440, del alto del bloque de texto, 130–139 px), alineada arriba con el titular. Debajo, a 48 de la foto (bloque → bloque), la barra de categorías a todo el ancho del contenedor y la carta en dos columnas. El cierre, en el margen, a 48.
+
+**Excepción al Sistema de guías (escrita en `SISTEMA.contenedores` y `SISTEMA.excepciones` de `tools/qa/guias.mjs`).** El contenedor de Café es 32 px más estrecho que el de la página (1152) desde 1184 px de ventana: su margen queda **16 px dentro** del de Eventos y Visita (x 160 frente a 144 a 1440 y a 1920). Sus columnas y su división (1–8 | 9–12) son las de su contenedor; su columna derecha no entra en la comparación entre secciones (G3 de página). Por qué: el encargo lo pide con cifras (1 040–1 120) y 1120 es el único valor de ese intervalo que da columnas enteras con el canal de 32 (64 px); en el resto (1 040: 57,3; 1 088: 61,3) las líneas caen en medio píxel. **Contra la norma:** 16 px es un desfase de los que G4 llama «casi alineado» (1–16 px). Se ve al pasar de Eventos a Café y de Café a Visita (captura de transición de la entrega). Alternativa propuesta a Aldo: el contenedor de la página (1152) también en Café, con la misma composición (cabecera 1–8 | 9–12, barra y carta a todo el ancho): un solo eje en toda la página y ninguna excepción.
+
+**Barra de categorías (BarraCategorias, cambio).** Encima de la carta, una **fila de enlaces de sección** (nombre corto de `chip`; el completo como `aria-label`), no píldoras: Subheadline 600 en `tinta-2`, objetivo de 44 (8 de relleno a cada lado, que la barra descuenta para que la tinta del primero caiga en el margen, y 8 entre objetivos vecinos: 24 entre nombres). La actual: **subrayado de 2 px y `tinta`** con `aria-current="true"` (dos canales; sin relleno ni el verde intenso, que queda para «Cómo llegar»). Presionado `fondo-3-presionado`; hover (puntero fino) en `tinta`; foco con el anillo. Fija bajo la cabecera (fondo opaco de la banda y filete) **mientras quepa en un renglón**: si los enlaces pasan a otro (flex-wrap, nunca desplazamiento horizontal), `cafe.js` lo mide (`data-envuelta`, ResizeObserver) y la barra deja de ser fija. Medido: un renglón de 320 a 1920 (los cuatro enlaces suman 289 px con su relleno y sus huecos); dos renglones solo con la ventana a 188 px CSS (375 al 200 %), y ahí no es fija: dos renglones fijos sumaban 96 px de cromo más la cabecera de 44 en 315 de alto. Al tocar una categoría, su título queda **24 px bajo la barra** (`scroll-margin-top: calc(--ct-barra + 16)`, con `--ct-barra` = 52) y recibe el foco.
+
+**Filas (FilaProducto, cambio).** 12 de aire arriba y abajo (antes 16), el precio a 4 px del nombre y **en `tinta`** con su peso (600; antes `turquesa-texto`: con el verde de la píldora, 14 precios verdes competían con la acción principal). Dos columnas desde 761 (canal 32) en el orden del marcado: izquierda a derecha, renglón por renglón (lo mismo para el teclado y el lector). Entre grupos, 32 / 48 (más que los 24 entre la letra de dos filas). Sin relleno para los grupos cortos: el hueco queda libre. El icono que queda cuando la foto de un producto falla pasa también de `turquesa-texto` a `tinta-2` (el mismo motivo).
+
+**Teléfono y tableta.** Titular, categorías y carta primero; la foto (4:3 en el teléfono, 2:1 desde 761) **sigue después de la carta**: no empuja nada fuera de la primera pantalla, así que no se omite. La barra va de borde a borde con la tinta del primer enlace en el margen (antes, 12 px dentro: la píldora tenía su relleno).
+
+**La carta llega pintada.** `index.html` trae la carta generada desde `assets/data/menu.json` (`scripts/build-carta.mjs`, entre `<!-- carta:inicio … -->` y `<!-- carta:fin -->`; `npm run carta` la regenera y `npm run carta:check` —y `tests/site.test.mjs`— fallan si no coinciden). `cafe.js` ya no pide `menu.json` ni arma nada: marca la categoría a la vista, lleva a cada grupo, deja el foco en su título, decide si la barra es fija y quita la foto de un producto que falle. Sin JavaScript la carta también se ve (antes se ocultaba). **Cambiar la carta = editar el JSON y correr `npm run carta`.**
+
+**Medido antes → después** (llegando por la barra a 1440 × 900 y por el ☰ a 768 × 1024 y 375 × 629; `medir-cafe.mjs` de la entrega):
+
+| | 1440 × 900 | 768 × 1024 | 375 × 629 |
+|---|---|---|---|
+| x titular · categorías (tinta) · primer producto · foto | 144 · 160 · 436 · 728 → 160 · 160 · 160 · 918 | 20 · 36 · 20 · (bajo la carta) → 20 · 20 · 20 · (bajo la carta) | 16 · 28 · 16 · (bajo la carta) → 16 · 16 · 16 · (bajo la carta) |
+| Titular → categorías | 269 → 187 | 124 → 124 | 126 → 126 |
+| Titular → primer producto | 306 → 292 | 233 → 229 | 235 → 231 |
+| Filas de producto enteras a la vista | 5 (9 productos) → 6 (11) | 8 (15) → 8 (15) | 3 → 4 |
+| Alto de la sección | 1 775 → 1 665 | 2 188 → 1 906 | 2 540 → 2 368 |
+| Foto | 553 × 221 en 7–12 → 347 × 139 en 9–12 | 728 × 546 → 728 × 364 | sin cambio (343 × 257) |
+| Acentos verdes en la carta | 1 píldora + 14 precios → 0 | igual | igual |
+
+**Fichas de diseño** (campos de `auditor-calidad` §6; sin animación nueva):
+
+| Campo | BarraCategorias (enlaces de sección) | FilaProducto (cambio) |
+|---|---|---|
+| Para qué | Orientar: saber en qué categoría se está y saltar a otra, sin competir con la carta | Escanear nombre y precio en un solo recorrido |
+| Disparador | Toque, clic o Enter; el desplazamiento marca la actual | — (no es un control) |
+| Estados | Reposo (`tinta-2`), hover con puntero fino (`tinta`), foco (anillo), presionado (`fondo-3-presionado`), actual (subrayado, `tinta`, `aria-current`), envuelta (no fija) | Reposo; sin precio, sin descripción, con foto, foto que falla |
+| Duración y curva | Ninguna propia; el salto al grupo es suave solo con movimiento (como antes) | — |
+| Qué se mueve | Nada | Nada |
+| Sin movimiento | Salto inmediato | Igual |
+| Segundo canal | `aria-current` además del subrayado; nombre completo en `aria-label` | Precio y descripción en texto |
+| Tamaño y lugar | 44 de alto, 58–74 de ancho, 8 entre vecinos; encima de la carta, fija bajo la cabecera en un renglón | 47 (un renglón) a 71 px (nombre y precio); 1 / 2 columnas |
+| Carga para la persona | 4 enlaces (≤ 7) | 1 de 3–8 filas por grupo |
+| Entradas raras | Nombres largos o texto ampliado: segundo renglón y la barra deja de ser fija; sin JavaScript, anclas | Nombre largo: baja de renglón (`overflow-wrap: anywhere`), el precio sigue a 4 px |
+| Patrón conocido | Pestañas de categorías de Uber Eats y DiDi Food en la web | Fila de menú de las apps de comida |
 
 ### Eventos anteriores y ventana de novedades (2026-11-16; el sitio se alimenta solo desde la hoja de la librería)
 
