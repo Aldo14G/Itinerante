@@ -43,6 +43,7 @@ export function menuProblems(menu) {
     else if (cats.has(c.id)) out.push(`${who}: id repetido`);
     cats.add(c?.id);
     if (!text(c?.nombre)) out.push(`${who}: falta «nombre»`);
+    if (c?.chip !== undefined && (typeof c.chip !== 'string' || !c.chip.trim() || c.chip.trim().length > 16)) out.push(`${who}: «chip» es un nombre corto de hasta 16 letras`);
     if (!Array.isArray(c?.productos) || !c.productos.length) { out.push(`${who}: sin productos`); continue; }
     const ids = new Set();
     for (const p of c.productos) {
@@ -106,9 +107,9 @@ export function productNode(p, cat) {
   }
   const txt = make('div', 'ct-txt');
   txt.append(make('h4', 'ct-nom', p.nombre));
-  if (p.descripcion) txt.append(make('p', 'ct-desc', p.descripcion));
-  const precio = precioCarta(p.precio);
+  const precio = precioCarta(p.precio); // justo bajo el nombre, como en las apps de comida: no se mueve cuando llegue la foto
   if (precio) { const s = make('p', 'ct-precio', p.unidad ? `${precio} ${p.unidad}` : precio); s.dataset.fuente = 'carta'; txt.append(s); }
+  if (p.descripcion) txt.append(make('p', 'ct-desc', p.descripcion));
   if (p.foto) li.append(box, txt); else li.append(txt);
   return li;
 }
@@ -127,7 +128,9 @@ export function groupNode(cat) {
   return sec;
 }
 export function chipNode(cat) {
-  const a = make('a', 'chip ct-chip', cat.nombre);
+  const corto = typeof cat.chip === 'string' && cat.chip.trim() ? cat.chip.trim() : cat.nombre; // nombre corto de la barra («Sin café»)
+  const a = make('a', 'chip ct-chip', corto);
+  if (corto !== cat.nombre) a.setAttribute('aria-label', cat.nombre);
   a.href = `#${groupId(cat.id)}`;
   a.dataset.id = cat.id;
   return a;

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "nota": "Carta de Café Itinerante (#cafe, cafe.js), transcrita el 2026-11-16 de la carta impresa que mandó Aldo (fotografía). Precios y nombres tal cual los trae la carta; los de los tés y las aguas frescas estaban tapados por una etiqueta en la foto: precio null (no se imprime nada) hasta que la librería los dé, y las aguas frescas no traen sabores. Es una parrilla por categorías: cada categoría (id, nombre, nota opcional, icono y productos) es un chip de la barra y un grupo; añadir una categoría es añadir un objeto a «categorias». `icono` es el nombre de un icono del sprite de index.html sin el prefijo «c-» (taza, tetera, plato). Cada producto lleva id, nombre, descripcion (o null), precio (null mientras no haya precio de la librería: no se imprime nada; con un número se muestra «$NN MXN») y, opcional, unidad («c/u», se imprime tras el precio) y foto ({ src, alt }: ruta local bajo assets/img/, registrada en assets/provenance.json como real; sin foto, la tarjeta va compacta, solo con texto). El cartel de la carta pone «Padre Mier 836A Pte., Centro de Monterrey»: no es la dirección de la librería (Matamoros 421) y está por confirmar con Aldo."
+    "nota": "Carta de Café Itinerante (#cafe, cafe.js), transcrita el 2026-11-16 de la carta impresa que mandó Aldo (fotografía). Precios y nombres tal cual los trae la carta; los de los tés y las aguas frescas estaban tapados por una etiqueta en la foto: precio null (no se imprime nada) hasta que la librería los dé, y las aguas frescas no traen sabores. Es una parrilla por categorías: cada categoría (id, nombre, nota opcional, icono y productos) es un chip de la barra y un grupo; añadir una categoría es añadir un objeto a «categorias». `icono` es el nombre de un icono del sprite de index.html sin el prefijo «c-» (taza, tetera, plato). Cada producto lleva id, nombre, descripcion (o null), precio (null mientras no haya precio de la librería: no se imprime nada; con un número se muestra «$NN MXN») y, opcional, unidad («c/u», se imprime tras el precio) y foto ({ src, alt }: ruta local bajo assets/img/, registrada en assets/provenance.json como real; sin foto, la tarjeta va compacta, solo con texto). Categorías, nombres y orden al modo de las apps de comida en México (Uber Eats, DiDi Food; medido el 2026-11-17): bebidas primero, el café aparte de lo que no lleva café, luego Salado y Postres; `chip` (opcional) es el nombre corto de la barra cuando el de la categoría es largo. La carta impresa trae «Padre Mier 836A Pte.», una dirección anterior: Aldo confirmó el 2026-11-17 que el café se sirve en la librería (Mariano Matamoros 421)."
   },
   "categorias": [
     {
@@ -39,12 +39,6 @@
           "precio": 45
         },
         {
-          "id": "chocolate",
-          "nombre": "Chocolate",
-          "descripcion": null,
-          "precio": 65
-        },
-        {
           "id": "espresso",
           "nombre": "Espresso",
           "descripcion": null,
@@ -59,11 +53,18 @@
       ]
     },
     {
-      "id": "te",
-      "nombre": "Tés y aguas",
+      "id": "sin-cafe",
+      "nombre": "Bebidas sin café",
+      "chip": "Sin café",
       "nota": "Los tés, fríos o calientes.",
       "icono": "tetera",
       "productos": [
+        {
+          "id": "chocolate",
+          "nombre": "Chocolate",
+          "descripcion": null,
+          "precio": 65
+        },
         {
           "id": "hierbabuena",
           "nombre": "Hierbabuena",
@@ -109,33 +110,6 @@
       ]
     },
     {
-      "id": "dulce",
-      "nombre": "Dulce",
-      "icono": "plato",
-      "productos": [
-        {
-          "id": "empanada-de-cajeta",
-          "nombre": "Empanada de cajeta",
-          "descripcion": null,
-          "precio": 35,
-          "unidad": "c/u"
-        },
-        {
-          "id": "empanada-de-pina",
-          "nombre": "Empanada de piña",
-          "descripcion": null,
-          "precio": 35,
-          "unidad": "c/u"
-        },
-        {
-          "id": "tarta-del-dia",
-          "nombre": "Tarta del día",
-          "descripcion": "Rebanada.",
-          "precio": 70
-        }
-      ]
-    },
-    {
       "id": "salado",
       "nombre": "Salado",
       "icono": "plato",
@@ -157,6 +131,31 @@
           "nombre": "Molletes",
           "descripcion": null,
           "precio": 65
+        }
+      ]
+    },
+    {
+      "id": "postres",
+      "nombre": "Postres",
+      "icono": "plato",
+      "productos": [
+        {
+          "id": "empanada-de-cajeta",
+          "nombre": "Empanada de cajeta",
+          "descripcion": null,
+          "precio": 35
+        },
+        {
+          "id": "empanada-de-pina",
+          "nombre": "Empanada de piña",
+          "descripcion": null,
+          "precio": 35
+        },
+        {
+          "id": "tarta-del-dia",
+          "nombre": "Tarta del día",
+          "descripcion": "Rebanada.",
+          "precio": 70
         }
       ]
     }

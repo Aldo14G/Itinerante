@@ -1228,27 +1228,25 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .ct-grupo-tit { margin: 0 0 var(--space-3); font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); }
 .ct-grupo-nota { margin: calc(-1 * var(--space-2)) 0 var(--space-3); font: var(--t-subtitulo); color: var(--tinta-2); }
 .ct-grupo-tit:focus-visible { outline: 2px solid transparent; border-radius: var(--radio-portada); box-shadow: var(--anillo-foco); }
-.ct-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); margin: 0; padding: 0; list-style: none; }
-.ct-prod { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-2); }
-.ct-foto { position: relative; display: grid; place-items: center; overflow: hidden; aspect-ratio: 1 / 1; border-radius: var(--radio-md); background: var(--fondo-3); color: var(--turquesa-texto); }
+/* Carta al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17): filas de una columna en el teléfono y dos desde 761, entre líneas finas;
+   nombre, precio justo debajo y descripción; la foto, si la hay, cuadrada a la derecha. Sustituye a la parrilla de tarjetas del 2026-11-16. */
+.ct-rejilla { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; border-bottom: 1px solid var(--linea); }
+.ct-prod { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: var(--space-4); padding: var(--space-4) 0; border-top: 1px solid var(--linea); }
+.ct-foto { position: relative; grid-column: 2; grid-row: 1; display: grid; place-items: center; overflow: hidden; width: var(--space-24); aspect-ratio: 1 / 1; border-radius: var(--radio-sm); background: var(--fondo-3); color: var(--turquesa-texto); }
 .ct-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ct-ic { width: var(--icono-producto); height: var(--icono-producto); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.ct-txt { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-1); }
+.ct-txt { grid-column: 1; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-1); }
 .ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
 .ct-desc { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* renglones parejos, sin palabra viuda; nunca se corta con «…»: si hace falta, tres renglones */
 .ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--turquesa-texto); }
 /* Tarjeta compacta (sin foto, solo texto): superficie sobre el fondo de la sección con un borde fino (linea), no un relleno macizo; el nombre en
    titular, la descripción en tinta-2 y el precio abajo (turquesa-texto, 600). Una sola línea cuando no hay precio ni descripción (los tés). */
-.ct-prod--solo { display: flex; flex-direction: column; gap: var(--space-1); min-height: var(--alto-lg); padding: var(--space-4); border-radius: var(--radio-md); background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea); }
-.ct-prod--solo .ct-txt { display: contents; }
-.ct-rejilla:has(> .ct-prod:not(.ct-prod--solo)) > .ct-prod--solo { align-self: start; } /* en una parrilla con fotos y compactas mezcladas, la compacta no se estira hasta el alto de la que trae foto */
-.ct-prod--solo .ct-precio { margin-top: auto; padding-top: var(--space-2); }
 /* Esqueleto: los chips y cuatro tarjetas del tamaño de las reales mientras llega menu.json. */
 .ct-grupo-tit--sk { display: block; width: var(--space-20); border-radius: var(--radio-portada); background: var(--fondo-3); }
+.ct-prod--solo { grid-template-columns: minmax(0, 1fr); } /* sin foto la fila no reserva su columna */
 .ct-prod.card--sk :is(.ct-nom, .ct-desc) { display: block; visibility: hidden; }
 html:not(.js) .ct, .ct[data-state="vacio"], .ct-cierre[hidden] { display: none; }
-@media (max-width: 760px) { .ct-rejilla > .ct-prod--solo:last-child:nth-child(odd) { grid-column: 1 / -1; } } /* una tarjeta sin pareja ocupa el renglón: no queda huérfana */
-@media (min-width: 761px) { .ct-rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8) var(--space-6); } }
+@media (min-width: 761px) { .ct-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--canal-rejilla); } .ct-foto { width: calc(var(--space-24) + var(--space-6)); } }
 @media print { .ct-nav { display: none; } }
 
 /* Esqueletos: ocupan el lugar exacto del contenido; quietos, con colores de los tokens. */
@@ -1332,7 +1330,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .cat-bar { grid-template-columns: minmax(0, calc(50% - var(--canal-rejilla) / 2)) auto; column-gap: var(--canal-rejilla); } /* el buscador, columnas 1–6 */
   .books-foot { padding-top: var(--space-6); } /* con los 24 de la capa: bloque → bloque 48 */
   /* Café y té (2026-11-16): titular y entradilla en 1–6 y la foto en 7–12 (5:2), alineados arriba; debajo, a 48, la carta: las categorías en
-     una lista vertical fija en las columnas 1–3 y la parrilla en 4–12 (cuatro por fila); el cierre vuelve al margen izquierdo, a 48. */
+     una lista vertical fija en las columnas 1–3 y la carta en 4–12 (dos columnas de filas); el cierre vuelve al margen izquierdo, a 48. */
   .cafe { --ct-barra: 0px; }
   .cafe > .sec-head { grid-column: 1 / span 6; grid-row: 1; margin: 0; }
   .cafe-foto { order: 0; grid-column: 7 / -1; grid-row: 1; margin: 0; }
@@ -1341,7 +1339,6 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .ct-nav { grid-column: 1 / span 3; top: calc(var(--hdr-h) + var(--space-6)); flex-direction: column; margin: 0; padding: 0; overflow: visible; box-shadow: none; }
   .ct-chip { justify-content: flex-start; }
   .ct-lista { grid-column: 4 / -1; gap: var(--space-12); }
-  .ct-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ct-cierre { order: 0; grid-column: 1 / -1; grid-row: 3; margin-top: var(--space-12); }
 }
 
