@@ -1,5 +1,5 @@
 // Catálogo (inventario real de la librería, assets/data/catalog.json): búsqueda predictiva, filtros con conteo, rejilla y ficha.
-import { DUR, EASE, ms, confirmThen } from './motion.js';
+import { DUR, EASE, ms, confirmThen, whenIdle } from './motion.js';
 import { loadSample } from './sample.js';
 import { saveButton, bindSaveButton, initSaved, notify } from './saved.js';
 import { openDialog, closeDialog } from './sheets.js';
@@ -582,7 +582,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   // Una sola ficha (el «modo redes» de Novedades se retiró el 2026-11-13): «Preguntar por WhatsApp», Guardar, Compartir y «Cómo llegar».
   function openBook(id, { trigger, tone } = {}) {
     const b = byId.get(id);
-    if (!b) return;
+    if (!b) return false; // un enlace compartido a un libro que ya no está (app.js lo avisa)
     $('[data-d-share]', drawer).setAttribute('aria-label', `Compartir «${b.t}»`);
     $('[data-d-cover]', drawer).replaceChildren(cover(b, tone)); // el tono de la tarjeta pulsada; sin él, el del libro
     titleInto($('[data-d-title]', drawer), b.t);
@@ -616,13 +616,15 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       $('[data-d-scroll]', drawer).scrollTop = 0;
       if (drawer.open && document.activeElement === drawer) $('[data-d-close]', drawer).focus({ preventScroll: true }); // el foco entra como antes: al botón de cerrar
     });
+    return true;
   }
   grid.addEventListener('click', e => {
     const c = e.target.closest('.card');
     if (c) confirmThen(c, () => openBook(c.dataset.id, { trigger: c.dataset.id, tone: toneOf(c) })); // confirma ya; la hoja (lo caro) va después de pintar
   });
   // Otras piezas (el carrusel de libros, Novedades) piden abrir una ficha sin conocer el diálogo.
-  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; openBook(e.detail.id, { tone: e.detail.tone }); } });
+  // `detail.found` vuelve a quien lo pidió: false si ese id ya no está en el catálogo (el enlace compartido de app.js lo avisa).
+  document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; e.detail.found = openBook(e.detail.id, { tone: e.detail.tone }); } });
   $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id, { tone: toneOf(r) }); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
   $('[data-d-share]', drawer).addEventListener('click', () => { const b = byId.get(drawer.dataset.book); if (b) shareBook(b); });
   $('[data-d-close]', drawer).addEventListener('click', () => closeDialog(drawer)); // sale primero; el cierre real corre después del fotograma
@@ -669,6 +671,6 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   compute();
   renderChips();
   renderGrid();
-  (window.requestIdleCallback || (cb => setTimeout(cb, 200)))(() => { if (!filtersDone) renderFilters(); }, { timeout: 1500 });
+  whenIdle(() => { if (!filtersDone) renderFilters(); }, { timeout: 1500, fallback: 'reposo-corto' });
   await tick();
 }

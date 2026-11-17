@@ -2,7 +2,7 @@
 // Sirve al objetivo del sitio: que lleguen a la librería sabiendo qué quieren ver y puedan preguntarlo.
 import { loadSample } from './sample.js';
 import { openDialog, closeDialog, topDialog } from './sheets.js';
-import { afterPaint, confirmThen, pickPop } from './motion.js';
+import { afterPaint, confirmThen, pickPop, ms } from './motion.js';
 
 const KEY = 'iti-saved-v1';
 export const MAX_SAVED = 30;
@@ -150,7 +150,7 @@ function toast(text, withAction = true) {
   toastEl.style.bottom = foot ? `${Math.round(innerHeight - foot.getBoundingClientRect().top) + 12}px` : '';
   toastEl.showPopover?.();
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(hideToast, 4500);
+  toastTimer = setTimeout(hideToast, ms('aviso-visible'));
 }
 
 async function renderList(dlg) {

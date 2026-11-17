@@ -33,9 +33,10 @@ html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-in
   min-width: 0; height: var(--alto-barra-inferior); margin: 0; padding: 0;
   border: 0; border-radius: var(--radio-pildora); background: none; color: var(--tinta);
   font: var(--t-pestana); text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
-  transition: color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida);
+  transition: color var(--dur-rapida) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida);
 }
-.tabbar a:active, .tab-list:active { transform: scale(0.94); }
+.tabbar a:active, .tab-list:active { transform: scale(0.94); background: var(--fondo-3-presionado); } /* presionado (2026-11-16): color además de escala, para el modo reducido */
+.tabbar a[aria-current]:active { background: var(--menta-presionado); }
 .tab-ic { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--dur-base) var(--curva-resorte); }
 .tab-lb { max-width: 100%; white-space: nowrap; }
 .tabbar a[aria-current] { color: var(--en-menta); }
@@ -148,7 +149,7 @@ html:not(.js) .tabbar { display: none; }
 .explorer .cat-filters-foot { position: sticky; bottom: calc(-1 * var(--space-24)); z-index: 2; margin: 0 calc(-1 * var(--margen)); padding: var(--space-3) var(--margen) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); background: var(--fondo); border-top: 1px solid var(--linea); }
 .explorer .cat-layout { padding-top: var(--space-4); }
 .explorer { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-salida); }
-.explorer::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
+.explorer::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) var(--curva-salida) allow-discrete, display var(--dur-base) var(--curva-salida) allow-discrete; }
 @starting-style { .explorer[open] { opacity: 0; } .motion .explorer[open] { transform: translateY(100%); opacity: 1; } }
 .explorer.is-closing { opacity: 0; transition-duration: var(--dur-rapida); }
 

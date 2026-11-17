@@ -1,5 +1,5 @@
 // Librería Itinerante y Más · sistema «Itinerante Líquido»: barra y menú, destino actual, entradas de los titulares, Eventos, Catálogo y estado de apertura. Sin dependencias.
-import { confirmThen } from './motion.js';
+import { confirmThen, ms, whenIdle } from './motion.js';
 import { openDialog, closeDialog, navigateFromSheet } from './sheets.js';
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
@@ -56,8 +56,8 @@ async function boot() {
     $$('.hours tr').forEach(tr => tr.classList.toggle('is-today', tr.dataset.days.split(' ').includes(String(now.day))));
   }
   // El HTML ya trae el horario habitual; la hora de Monterrey (Intl con zona horaria cuesta ~50 ms de CPU la primera vez) se calcula en reposo.
-  (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(updateStatus, { timeout: 2000 });
-  setInterval(updateStatus, 60_000);
+  whenIdle(updateStatus, { timeout: 2000 });
+  setInterval(updateStatus, ms('refresco-estado'));
 
   // ---------- Barra de navegación y destino actual (scroll-spy) ----------
   // Zonas del recorrido: cada una marca su enlace de la barra, su fila del menú y, en el teléfono, su casilla de la barra inferior.
@@ -101,7 +101,7 @@ async function boot() {
       if (Math.abs(h - lastH) < 2) return;
       lastH = h;
       clearTimeout(timer);
-      timer = setTimeout(queueMeasure, 120);
+      timer = setTimeout(queueMeasure, ms('remedir'));
     }).observe(document.body);
   }
 
@@ -115,13 +115,17 @@ async function boot() {
   // ---------- Movimiento (preferencia del sistema, ahorro de datos y la pausa del pie) ----------
   // «Pausar el movimiento» es un interruptor (role="switch", 2026-11-14): encendido = pausado. Si el sistema ya lo pausa (reducir movimiento o
   // ahorro de datos) queda encendido y no se puede apagar (aria-disabled, así sigue enfocable) y la nota de debajo dice por qué.
-  const toggle = $('[data-motion-toggle]');
-  const note = $('[data-motion-nota]');
+  // Hay dos (2026-11-16): el del pie y el del menú ☰ (lo ocasional a dos toques en vez de a siete pantallas). Una sola lógica los cablea: los dos
+  // salen de `userOff` y del sistema, así que siempre dicen lo mismo, y el estado se guarda una vez.
+  const toggles = $$('[data-motion-toggle]');
+  const notes = $$('[data-motion-nota]');
   function syncToggle() {
     const why = reduceMq.matches ? 'Movimiento reducido por el sistema' : saveData ? 'Ahorro de datos: movimiento pausado' : '';
-    toggle.setAttribute('aria-checked', String(Boolean(why) || userOff));
-    if (why) toggle.setAttribute('aria-disabled', 'true'); else toggle.removeAttribute('aria-disabled');
-    if (note) { note.textContent = why; note.hidden = !why; }
+    toggles.forEach(toggle => {
+      toggle.setAttribute('aria-checked', String(Boolean(why) || userOff));
+      if (why) toggle.setAttribute('aria-disabled', 'true'); else toggle.removeAttribute('aria-disabled');
+    });
+    notes.forEach(note => { note.textContent = why; note.hidden = !why; });
   }
   function applyMode() {
     const on = motionOn();
@@ -129,14 +133,14 @@ async function boot() {
     if (!on) { root.classList.remove('intro'); revealAll(); }
     syncToggle();
   }
-  toggle.addEventListener('click', () => {
+  toggles.forEach(toggle => toggle.addEventListener('click', () => {
     if (toggle.getAttribute('aria-disabled') === 'true') return; // lo pausa el sistema: la nota lo explica
     userOff = !userOff;
     try { localStorage.setItem('iti-b4-motion', userOff ? 'off' : 'on'); } catch { /* sin persistencia */ }
     applyMode();
-    toggle.scrollIntoView({ block: 'center' });
+    if (!toggle.closest('dialog')) toggle.scrollIntoView({ block: 'center' }); // el del pie se queda a la vista; el del menú ya está en la hoja
     toggle.focus();
-  });
+  }));
   reduceMq.addEventListener('change', applyMode);
 
   // ---------- Entradas (EncabezadoSeccion y revelado de imagen) ----------
@@ -203,7 +207,26 @@ async function boot() {
       pending.add(el);
       (el.matches('.visit-map') ? mapIo : revealIo).observe(el);
     });
+    arriveAt(sectionOf(location.hash)); // se abrió la página directamente en una sección (#visita): llega colocada
   }
+  // Llegar por un enlace de ancla (☰, barra, barra inferior, #hash): lo que entra «por línea» o por recorte en la sección de destino aparece ya
+  // colocado, sin transición (2026-11-16): la persona llegó a leer, no a ver la entrada, y esperar 120–240 ms al titular se notaba. Lo demás de la
+  // página sigue entrando al hacer scroll; el mapa de Visita (se dibuja al verse el 60 %) conserva su propio momento. Cada cambio de clase y
+  // el salto ocurren en el mismo fotograma, así que no hay transición que correr (.is-llegada: transition none, ver style.css).
+  const sectionOf = hash => { try { const t = hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null; return t ? t.closest('section, footer') || t : null; } catch { return null; } };
+  function arriveAt(scope) {
+    if (!scope) return;
+    [...pending].filter(el => scope.contains(el) && !el.matches('.visit-map')).forEach(el => {
+      el.classList.add('is-llegada', 'is-visible');
+      pending.delete(el);
+      revealIo?.unobserve(el);
+    });
+  }
+  document.addEventListener('click', e => { // en captura: antes de que el salto de la ancla (o el de la hoja del menú) llegue a pintarse
+    const a = e.target.closest?.('a[href^="#"]');
+    if (a) arriveAt(sectionOf(a.getAttribute('href')));
+  }, true);
+  addEventListener('hashchange', () => arriveAt(sectionOf(location.hash)));
   let lastW = innerWidth;
   addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; unsplit(); revealAll(); });
 
@@ -286,12 +309,26 @@ async function boot() {
     } else bootCatalog();
     addEventListener('hashchange', () => { if (location.hash === '#catalogo') bootCatalog(); });
     // Un enlace compartido desde la ficha (#libro-<id>, su botón «Compartir») abre la ficha de ese libro. La dirección queda limpia antes
-    // de abrir: cerrar la ficha no deja un ancla que la vuelva a abrir al recargar.
-    const openShared = () => {
-      const m = /^#libro-([a-z0-9-]+)$/.exec(location.hash);
+    // de abrir: cerrar la ficha no deja un ancla que la vuelva a abrir al recargar. Si el libro ya no está (o el id no es de un libro: caracteres
+    // raros, un % mal formado), la persona aterriza en el Catálogo con el aviso de siempre (2026-11-16; antes caía al inicio sin decir nada) y no se
+    // abre hoja alguna. Si el catálogo no carga no se afirma nada del libro: queda el Catálogo con su propio mensaje.
+    const landOnCatalog = notice => requestAnimationFrame(() => {
+      const libros = $('#libros');
+      arriveAt(libros); // llega como por cualquier enlace: titular colocado
+      libros?.scrollIntoView();
+      if (notice) import('./saved.js').then(m => m.notify('Ese libro ya no está en el catálogo.')).catch(() => {});
+    });
+    const openShared = async () => {
+      const m = /^#libro-(.*)$/.exec(location.hash);
       if (!m) return;
       history.replaceState(null, '', location.pathname + location.search);
-      bootCatalog().then(() => document.dispatchEvent(new CustomEvent('iti:open-book', { detail: { id: m[1] } })));
+      let id = '';
+      try { id = decodeURIComponent(m[1]); } catch { /* % mal formado: no es un id */ }
+      await bootCatalog();
+      if (catalogSection.dataset.state !== 'ready') return landOnCatalog(false);
+      const detail = { id };
+      if (/^[a-z0-9-]+$/.test(id)) document.dispatchEvent(new CustomEvent('iti:open-book', { detail }));
+      if (detail.found !== true) landOnCatalog(true);
     };
     addEventListener('hashchange', openShared);
     openShared();
@@ -374,7 +411,7 @@ async function boot() {
   }
 
   // ---------- Mi lista para la visita (en reposo: el menú y la cabecera muestran el conteo) ----------
-  (window.requestIdleCallback || (cb => setTimeout(cb, 600)))(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000 });
+  whenIdle(() => import('./saved.js').then(m => m.initSaved()).catch(() => {}), { timeout: 3000, fallback: 'reposo-largo' });
 
   await yieldNow();
   // ---------- Eventos y talleres: destacado y lista por fecha (feed.js, datos en assets/data/eventos.json) ----------
@@ -406,15 +443,18 @@ async function boot() {
   applyMode();
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const posterReady = $('.entry-poster').decode().catch(() => {});
-  Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, 900))]).then(() => {
+  Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, ms('espera-recursos')))]).then(() => {
     measureZones(); // una sola medición, con la letra y la foto ya puestas
     kick();
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
     // Las entradas se preparan en reposo: partir los titulares en líneas mide texto, y eso no debe competir con el primer render.
-    (window.requestIdleCallback || (cb => setTimeout(cb, 300)))(prepareReveals, { timeout: 1500 });
+    whenIdle(prepareReveals, { timeout: 1500 });
     // Conteo de novedades (control del inicio): después de la foto y las fuentes. Su sitio ya está reservado (boot.js), así que no mueve nada.
     loadNews().then(m => m.initNewsCount()).catch(() => {});
     // Aviso del próximo evento (renglón del inicio y punto de «Eventos»): mismo momento y mismo mecanismo; su sitio también está reservado.
     loadFeed().then(m => m.initEventosAviso()).catch(() => {});
+    // Eventos se arma también en reposo, no solo al acercarse: al llegar por un enlace (☰, barra) la sección ya está armada y no salta (2026-11-16;
+    // antes el destacado y la lista sustituían a las propuestas de index.html 120–240 ms después de llegar). Fuera de la vista: no mueve nada.
+    whenIdle(() => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}), { timeout: 3000 });
   });
 }

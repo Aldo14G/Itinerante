@@ -193,8 +193,11 @@ test('reglas globales de estado: hover solo con puntero que flota, movimiento so
   const anim = RULES.filter(r => /(^|;)\s*animation\s*:/.test(r.body) && !/animation\s*:\s*none/.test(r.body));
   assert.ok(anim.length >= 7, `animaciones encontradas: ${anim.length}`);
   for (const r of anim) assert.ok(r.items.every(i => i.startsWith('.motion ')) || inAt(r, /prefers-reduced-motion/), `animación solo con movimiento: ${r.selector}`);
-  const reduce = RULES.find(r => r.selector === '*, *::before, *::after' && inAt(r, /prefers-reduced-motion:\s*reduce/));
+  const reduce = RULES.find(r => r.items.includes('*') && r.items.includes('*::before') && inAt(r, /prefers-reduced-motion:\s*reduce/));
   assert.ok(reduce && /transition-duration: 0\.01ms !important/.test(reduce.body) && /animation-duration: 0\.01ms !important/.test(reduce.body), 'con «reducir movimiento» ninguna transición ni animación dura');
+  assert.ok(reduce.items.includes('::backdrop'), 'el velo de las hojas (::backdrop, que `*` no alcanza) tampoco tiene transición con «reducir movimiento»');
+  const pausa = RULES.find(r => r.items.includes('html.js:not(.motion) *') && !inAt(r, /prefers-reduced-motion/));
+  assert.ok(pausa && pausa.items.includes('html.js:not(.motion) ::backdrop'), 'ni con la pausa del pie');
   const siteJs = ['app.js', 'catalog.js', 'carousel3d.js', 'rail.js', 'feed.js', 'cafe.js', 'saved.js', 'sheets.js', 'news.js', 'motion.js'].map(read).join('\n');
   const dup = [...(RULES.map(r => r.selector).join('\n') + siteJs).matchAll(/\bis-(selected|checked|pressed|expanded|current|disabled|busy|invalid)\b/g)].map(m => m[0]);
   assert.deepEqual(dup, [], 'clase = parte o variante, aria-* = estado: ninguna clase is-* repite un estado ARIA');

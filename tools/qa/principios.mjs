@@ -31,15 +31,15 @@ export const NORMA = {
 // ---- Los 20 principios: qué herramienta los mide y qué se mira a ojo ----
 export const PRINCIPIOS = [
   [1, 'Squash & stretch', 'Compresión al toque', ['est:escalas', 'motion'], 'Al presionar, ¿la pieza cede y vuelve sin deformar texto ni foto?'],
-  [2, 'Anticipation', 'Aviso antes de la acción', ['componentes', 'skeleton'], '¿Cada control avisa antes (hover, foco, presionado) y cada carga muestra su esqueleto?'],
+  [2, 'Anticipation', 'Aviso antes de la acción', ['componentes', 'skeleton', 'navegacion'], '¿Cada control avisa antes (hover, foco, presionado) y cada carga muestra su esqueleto?'],
   [3, 'Staging', 'Un foco por vista', ['critique', 'carrusel', 'guias'], '¿Se sabe en un segundo qué es lo principal de cada vista?'],
   [4, 'Pose to pose', 'Estados con nombre', ['pruebas', 'carrusel', 'hojas'], '¿Toda animación va de un estado declarado a otro, y sin movimiento aparece ya en el final?'],
   [5, 'Follow through', 'Asentarse sin oscilar', ['est:bucles', 'motion', 'hojas'], '¿Lo que llega se asienta una sola vez (rebote ≤ 5 %) y nada sigue moviéndose solo?'],
   [6, 'Slow in & slow out', 'Curvas del sistema', ['est:curvas', 'motion'], '¿Las entradas frenan al llegar y nada arranca ni para en seco?'],
   [7, 'Arcs', 'Trayectorias en arco', ['carrusel'], '¿Las piezas del carrusel giran en arco y las hojas suben rectas, como en iOS?'],
   [8, 'Secondary action', 'Acción secundaria', ['saved', 'rail'], '¿La palomita, el conector o el brillo acompañan sin retrasar ni tapar la respuesta principal?'],
-  [9, 'Timing', 'Duraciones de la escala', ['est:duraciones', 'motion', 'hojas'], '¿Las respuestas al toque se sienten inmediatas y las salidas más cortas que las entradas?'],
-  [10, 'Exaggeration', 'Respuesta clara', ['est:escalas', 'saved', 'componentes', 'hojas'], '¿Cada acción que cambia algo lo dice en dos canales (forma y texto), sin sacudidas ni confeti?'],
+  [9, 'Timing', 'Duraciones de la escala', ['est:duraciones', 'motion', 'hojas', 'navegacion'], '¿Las respuestas al toque se sienten inmediatas y las salidas más cortas que las entradas?'],
+  [10, 'Exaggeration', 'Respuesta clara', ['est:escalas', 'saved', 'componentes', 'hojas', 'navegacion'], '¿Cada acción que cambia algo lo dice en dos canales (forma y texto), sin sacudidas ni confeti?'],
   [11, 'Solid drawing', 'Volumen coherente en 3D', ['est:profundidad', 'carrusel'], '¿Una sola perspectiva y una sola luz, sin piezas encimadas, y plano con la misma geometría sin movimiento?'],
   [12, 'Appeal', 'Atractivo del conjunto', ['piso'], 'Rúbrica visual (docs/agentes/rubrica-visual.md): promedio ≥ 8 y nada bajo 7.'],
   [13, "Fitts's law", 'Grande y cerca', ['controles', 'iphone', 'guias'], '¿La acción principal queda al alcance del pulgar y junto a lo que explica?'],
@@ -47,9 +47,9 @@ export const PRINCIPIOS = [
   [15, "Hick's law", 'Pocas opciones a la vez', ['critique', 'feed'], '¿Una sola primaria por vista y grupos de ≤ 7 opciones?'],
   [16, "Miller's law", 'Bloques de 3 a 5', ['carrusel', 'explorer'], '¿Lo que se ve de un golpe cabe en la memoria (≤ 5 piezas, listas agrupadas)?'],
   [17, 'Doherty threshold', 'Respuesta bajo 400 ms', ['inp', 'skeleton', 'e2e', 'hojas'], '¿Algo tarda sin avisar? ¿El primer contenido aparece sin saltos?'],
-  [18, "Postel's law", 'Tolerante al recibir', ['est:postel', 'explorer', 'pruebas', 'hojas'], '¿La búsqueda perdona acentos y mayúsculas, y un dato roto cae a un estado digno?'],
+  [18, "Postel's law", 'Tolerante al recibir', ['est:postel', 'explorer', 'pruebas', 'hojas', 'navegacion'], '¿La búsqueda perdona acentos y mayúsculas, y un dato roto cae a un estado digno?'],
   [19, "Jakob's law", 'Patrones conocidos', ['e2e', 'explorer'], '¿Se usa como las apps que la gente ya conoce (barra inferior, hoja, ☰, atrás, Escape)?'],
-  [20, 'Frequency of use', 'Lo frecuente, a un toque', ['feed', 'iphone'], '¿«Cómo llegar», Catálogo y Mi lista están a un toque desde cualquier punto, y lo raro no ocupa el lugar principal?'],
+  [20, 'Frequency of use', 'Lo frecuente, a un toque', ['feed', 'iphone', 'navegacion'], '¿«Cómo llegar», Catálogo y Mi lista están a un toque desde cualquier punto, y lo raro no ocupa el lugar principal?'],
 ].map(([n, en, es, medidas, ojo]) => ({ n, en, es, medidas, ojo }));
 
 // ---- Comprobaciones estáticas ----
@@ -71,6 +71,18 @@ export const ESTATICAS = {
       const d = m[0];
       if (/\b(ease|ease-in|ease-out|ease-in-out)\b/.test(d)) bad.push(`${f}:${lineOf(t, m.index)} curva genérica: ${d.slice(0, 70)}`);
       else if (/\blinear\b(?!\()/.test(d) && !NORMA.linealPermitido.some(k => d.includes(k))) bad.push(`${f}:${lineOf(t, m.index)} lineal: ${d.slice(0, 70)}`);
+    }
+    // Curva implícita (2026-11-16): cada propiedad de un `transition:` lleva su curva; sin ella el navegador usa `ease`, también en visibility,
+    // display y overlay (sin efecto visible, pero la norma es que ninguna transición dependa de la curva por omisión).
+    for (const [f, t] of css) for (const m of t.matchAll(/(?<![\w-])transition\s*:([^;{}]*)/g)) {
+      let hondo = 0, cur = '';
+      const items = [];
+      for (const ch of m[1]) { if (ch === '(') hondo += 1; if (ch === ')') hondo -= 1; if (ch === ',' && !hondo) { items.push(cur); cur = ''; } else cur += ch; }
+      items.push(cur);
+      for (const item of items.map(x => x.trim()).filter(Boolean)) {
+        if (/^(none|inherit|initial|unset)$/.test(item) || !/(?:\d(?:ms|s)\b|var\(--dur-)/.test(item)) continue;
+        if (!/var\(--curva-|cubic-bezier|linear\(|steps\(|\blinear\b/.test(item)) bad.push(`${f}:${lineOf(t, m.index)} curva implícita (ease): ${item.slice(0, 70)}`);
+      }
     }
     return bad;
   },
@@ -120,7 +132,7 @@ const HERRAMIENTAS = {
   motion: u => ['tools/qa/motion.mjs', u], controles: u => ['tools/qa/controles.mjs', u, DIR], carrusel: u => ['tools/qa/carrusel.mjs', u, DIR],
   iphone: u => ['tools/qa/iphone.mjs', u, DIR], skeleton: u => ['tools/qa/skeleton.mjs', u], saved: u => ['tools/qa/saved.mjs', u],
   rail: u => ['tools/qa/rail.mjs', u, DIR], piso: u => ['tools/qa/piso.mjs', u], axe: u => ['tools/qa/axe.mjs', u], feed: u => ['tools/qa/feed.mjs', u, DIR],
-  explorer: u => ['tools/qa/explorer.mjs', u], hojas: u => ['tools/qa/hojas.mjs', u], inp: u => ['tools/qa/inp.mjs', u], e2e: u => ['tools/qa/e2e.mjs', u, DIR],
+  explorer: u => ['tools/qa/explorer.mjs', u], hojas: u => ['tools/qa/hojas.mjs', u], navegacion: u => ['tools/qa/navegacion.mjs', u], inp: u => ['tools/qa/inp.mjs', u], e2e: u => ['tools/qa/e2e.mjs', u, DIR],
   guias: u => ['tools/qa/guias.mjs', u, join(DIR, 'guias'), ...(COMPLETO ? [] : ['--perfiles=iphone16,d1440']), '--capturas=no'],
   critique: () => ['scripts/critique.mjs'], componentes: () => ['--test', 'tests/componentes.test.mjs'],
   pruebas: () => ['--test', 'tests/site.test.mjs', 'tests/sheets.test.mjs'], // las funciones puras del sitio (poses, validadores, fechas)
@@ -133,7 +145,7 @@ function correr(nombre, url) {
   const args = script.startsWith('--') ? [script, ...rest.map(r => join(root, r))] : [join(root, script), ...rest];
   const res = spawnSync(process.execPath, args, { cwd: SIN_NAVEGADOR.has(nombre) ? root : DIR, encoding: 'utf8', timeout: 900000, maxBuffer: 64 * 1024 * 1024 });
   const out = `${res.stdout || ''}\n${res.stderr || ''}`;
-  if ((nombre === 'guias' || nombre === 'hojas') && res.status === 2) return { ok: null, nota: 'Playwright no disponible' };
+  if ((nombre === 'guias' || nombre === 'hojas' || nombre === 'navegacion') && res.status === 2) return { ok: null, nota: 'Playwright no disponible' };
   const n = /(?:FALLAN|FAIL|FALLOS)\s+(\d+)/.exec(out);
   const mal = res.status !== 0 || (n && Number(n[1]) > 0) || /^FALLA:/m.test(out) || /^# fail [1-9]/m.test(out);
   const lineas = out.trim().split('\n').filter(Boolean);

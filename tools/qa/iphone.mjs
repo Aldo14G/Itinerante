@@ -16,7 +16,7 @@
 //      central y su pie «título · autor · precio» · Eventos: titular, entradilla y la primera tarjeta de la lista (con --aviso, el titular, la
 //      entradilla y el arranque del destacado, que no cabe entero: lleva foto o cartel) ·
 //      Café: titular, la barra de categorías y la primera tarjeta de la carta · Visita: titular y «Cómo llegar»;
-//  · menú ☰: la hoja no se desplaza (todo cabe: Instagram y Facebook a la vista) y sus filas miden ≥ 44;
+//  · menú ☰: Instagram y Facebook a la vista sin desplazar (solo la fila «Pausar el movimiento», al pie, puede quedar bajo el borde en los iPhone de poco alto) y sus filas miden ≥ 44;
 //  · ficha (tocar la portada central): el borde de la hoja ≥ área segura + 12 (y ≥ 48 sin área segura) y las acciones del pie dentro de la ventana.
 // Sale con 1 si algo falla. Escribe una tabla, iphone.json y una captura por perfil y estado en DIR.
 import { spawn } from 'node:child_process';
@@ -192,9 +192,11 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
   await ev(`scrollTo(0, 0)`); await sleep(150);
   await tap('.hdr .menu-btn');
   await until(`document.querySelector('#menu').open`, 4000); await sleep(700);
-  const menu = await ev(`(() => { const h = document.querySelector('.menu-hoja'); const rows = [...document.querySelectorAll('#menu .menu-row')].map(r => Math.round(r.getBoundingClientRect().height)).filter(Boolean); /* Novedades sin llegadas no existe (alto 0) */ const redes = [...document.querySelectorAll('.menu-redes .btn')].map(r => Math.round(r.getBoundingClientRect().bottom)); return { sh: h.scrollHeight, ch: h.clientHeight, fondo: Math.round(h.getBoundingClientRect().bottom), rows, redes }; })()`);
+  const menu = await ev(`(() => { const h = document.querySelector('.menu-hoja'); const rows = [...document.querySelectorAll('#menu .menu-row')].map(r => Math.round(r.getBoundingClientRect().height)).filter(Boolean); /* Novedades sin llegadas no existe (alto 0) */ const redes = [...document.querySelectorAll('.menu-redes .btn')].map(r => Math.round(r.getBoundingClientRect().bottom)); const mov = document.querySelector('.menu-movimiento'); return { sh: h.scrollHeight, ch: h.clientHeight, fondo: Math.round(h.getBoundingClientRect().bottom), rows, redes, mov: mov ? Math.round(mov.getBoundingClientRect().height + parseFloat(getComputedStyle(document.querySelector('.menu-pie')).rowGap)) : 0 }; })()`);
   fila.menu = `desborda ${menu.sh - menu.ch} · filas ${Math.min(...menu.rows)}–${Math.max(...menu.rows)}`;
-  check(key, 'menú: todo cabe en la hoja (sin desplazar; Instagram y Facebook a la vista)', menu.sh - menu.ch <= 1 && menu.redes.every(y => y <= menu.fondo), `desborda ${menu.sh - menu.ch} px`);
+  // Desde el 2026-11-16 el menú trae al pie la fila «Pausar el movimiento» (aprobada por Aldo): en los iPhone de poco alto (13 mini, SE, 320 y también el 16) la hoja
+  // se desliza esa fila y nada más. Lo que no puede pasar: que Instagram y Facebook, o cualquier otra cosa, queden fuera de la vista, ni que sobre más que esa fila.
+  check(key, 'menú: Instagram y Facebook a la vista sin desplazar; solo la fila «Pausar el movimiento» puede quedar bajo el borde (se llega deslizando la hoja)', menu.sh - menu.ch <= Math.max(1, menu.mov + 1) && menu.redes.every(y => y <= menu.fondo), `desborda ${menu.sh - menu.ch} px (la fila mide ${menu.mov})`);
   check(key, 'menú: filas ≥ 44', Math.min(...menu.rows) >= 44, menu.rows.join(','));
   await shot(`${key}-menu`);
   await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });

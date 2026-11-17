@@ -34,11 +34,11 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | MiLista | — | sí |  |  |  |  |  |  | sí | sí | sí |
 | CampoBusqueda | sí | sí |  |  | sí |  | sí |  |  |  |  |
 | Explorar | sí | sí | sí |  | sí |  | sí | sí | sí | sí | sí |
-| Aviso | — | sí |  |  |  |  |  |  |  |  |  |
+| Aviso | — | sí | sí |  |  |  |  |  |  |  |  |
 | EncabezadoSeccion | — | — |  |  |  |  |  |  |  |  | sí |
 | TiraCasa |  | sí |  |  |  |  |  |  |  |  | sí |
 | MapaLlegada | — | sí |  |  |  |  |  |  |  |  | sí |
-| InterruptorMovimiento | sí | sí | — | sí | sí |  |  |  |  |  | sí |
+| InterruptorMovimiento | sí | sí | sí | sí | sí |  |  |  |  |  | sí |
 | ContactoPie | sí | sí | — |  |  |  |  |  |  |  |  |
 | Insignia | — | — |  |  |  |  |  |  |  |  |  |
 | Esqueletos |  |  |  |  |  |  |  | sí |  |  | — |
@@ -53,7 +53,12 @@ Calculados desde `design/tokens.json`. Texto ≥ 4.5:1 (WCAG 1.4.3); borde de co
 | Frente | Fondo | Tipo | Mínimo | Claro | Oscuro | Dónde |
 |---|---|---|--:|--:|--:|---|
 | `en-primario` | `primario` | texto | 4.5 | 6.33 | 7.71 | Boton primario, chip elegido, guardado, Insignia de conteo, «Nuevo» |
-| `en-primario` | `primario-presionado` | texto | 4.5 | 9.05 | 10.25 | Boton primario presionado y con el cursor |
+| `en-primario` | `primario-presionado` | texto | 4.5 | 9.05 | 10.25 | Boton primario con el cursor |
+| `en-primario` | `primario-pulsado` | texto | 4.5 | 12.13 | 11.74 | Boton primario, chip elegido, guardado e interruptor encendido mientras se presionan (:active) |
+| `en-menta` | `menta-presionado` | texto | 4.5 | 5.69 | 4.72 | Boton secundario, fila actual del menú, casilla actual de la barra inferior y acción del Aviso mientras se presionan |
+| `tinta` | `fondo-3-presionado` | texto | 4.5 | 11.21 | 7.74 | Chip, contorno, ☰, fila del menú, casilla de la barra inferior y botón de vidrio presionados |
+| `tinta-2` | `fondo-3-presionado` | texto | 4.5 | 4.58 | 5.15 | «Buscar en el catálogo» presionado |
+| `primario-presionado` | `fondo-3-presionado` | texto | 4.5 | 6.03 | 5.40 | Boton plano presionado (su texto pasa a primario-presionado) |
 | `en-menta` | `menta` | texto | 4.5 | 7.69 | 6.54 | Boton secundario, actual de la barra y del menú, pastilla de la barra inferior, Insignia de tipo, acción del Aviso, selección de texto |
 | `en-menta` | `mezcla:menta+en-menta@10` | texto | 4.5 | 6.51 | 5.31 | Boton secundario con el cursor |
 | `turquesa-texto` | `fondo` | texto | 4.5 | 6.33 | 11.44 | Boton plano, Recorrido («N de 3 paradas hojeadas»), enlaces |
@@ -113,13 +118,13 @@ Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y 
 - **style.css:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--contorno` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg` `.btn--ancho`
 - **index.html:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg`
 - **motion.js:** exporta `pickPop` `afterPaint` `confirmThen`
-- **Tokens:** `alto-sm` `alto-md` `alto-lg` `linea-fuerte` `radio-pildora` `t-boton` `ls-boton` `t-boton-chico` `ls-boton-chico` `space-2` `space-4` `space-5` `space-6` `primario` `en-primario` `primario-presionado` `menta` `en-menta` `turquesa-texto` `fondo-3` `tinta` `tinta-2` `vidrio` `vidrio-hoja` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `curva-resorte`
+- **Tokens:** `alto-sm` `alto-md` `alto-lg` `linea-fuerte` `radio-pildora` `t-boton` `ls-boton` `t-boton-chico` `ls-boton-chico` `space-2` `space-4` `space-5` `space-6` `primario` `en-primario` `primario-presionado` `menta` `en-menta` `turquesa-texto` `fondo-3` `tinta` `tinta-2` `vidrio` `vidrio-hoja` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `curva-resorte` `primario-pulsado` `menta-presionado` `fondo-3-presionado`
 - **Estado hover:** `.btn--primario:hover`, `.btn--secundario:hover`, `.btn--vidrio:hover`, `.btn--plano:hover`, `.btn--contorno:hover`
 - **Estado foco:** `.btn:focus-visible`, `.btn--vidrio:focus-visible`
-- **Estado presionado:** `.btn:active`, `.btn--primario:active`, `.btn--contorno:active`
+- **Estado presionado:** `.btn:active`, `.btn--primario:active`, `.btn--secundario:not([aria-pressed="true"]):active`, `.btn--plano:active`, `.btn--contorno:active`, `.btn--vidrio:active` — Un tono por familia (2026-11-16): primario-pulsado, menta-presionado y fondo-3-presionado, un paso más allá del hover. Responde también con movimiento reducido y con la pausa; la escala 0.97 solo con movimiento.
 - **Estado deshabilitado:** `.btn:disabled`, `.btn[aria-disabled="true"]`
 - **Estado seleccionado:** `.btn--secundario[aria-pressed="true"]`
-- **Estado movimiento_reducido:** `.btn:active` — En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo.
+- **Estado movimiento_reducido:** `.btn:active` — En prefers-reduced-motion y con la pausa la escala al presionar se quita; el color de :active (tono propio de la familia, distinto del hover) sigue respondiendo.
 - **ARIA:** Button (https://www.w3.org/WAI/ARIA/apg/patterns/button/) · `aria-pressed` `aria-disabled` `aria-label` · **Teclado:** Enter y Espacio (nativo de <button>); los enlaces con cara de botón, Enter.
 - **QA:** `tools/qa/controles.mjs` `tools/qa/contrast.mjs` `tools/qa/axe.mjs` `tests/critique.test.mjs` `tools/qa/guias.mjs`
 
@@ -133,9 +138,9 @@ Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y 
 - **index.html:** `[data-d-save]` `.save--icono`
 - **saved.js:** exporta `saveButton` `bindSaveButton` `toggleSaved` `isSaved` `savedIds` `MAX_SAVED`
 - **motion.js:** exporta `pickPop`
-- **Tokens:** `alto-sm` `alto-md` `alto-lg` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `primario` `en-primario` `menta` `en-menta` `tinta` `fondo` `foco` `anillo-foco` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida`
+- **Tokens:** `alto-sm` `alto-md` `alto-lg` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `primario` `en-primario` `menta` `en-menta` `tinta` `fondo` `foco` `anillo-foco` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `primario-pulsado` `fondo-3-presionado`
 - **Estado foco:** `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`, `:is(.rail-item, .card-item) .save:not(.save--wide):focus-visible`
-- **Estado presionado:** `.save:active`
+- **Estado presionado:** `.save:active`, `.save[aria-pressed="true"]:not(.save--wide):active`, `.save:not([aria-pressed="true"]):not(.save--wide):active` — Escala 0.94 con movimiento y, siempre, el color: guardado a primario-pulsado, sin guardar a fondo-3-presionado (también en los respaldos opacos del vidrio).
 - **Estado seleccionado:** `.save[aria-pressed="true"]:not(.save--wide)`, `.save[aria-pressed="true"] .ic`, `.save[aria-pressed="true"] .save-chk`, `.save--wide[aria-pressed="true"]`, saved.js `btn.setAttribute('aria-pressed', String(on))`
 - **Estado movimiento_reducido:** `.motion .save.is-pop .save-chk`, `.save:active`
 - **hover: no aplica.** Sin cambio al pasar el cursor: el vidrio sobre la portada ya se lee como botón; el cursor cambia (cursor: pointer).
@@ -153,10 +158,10 @@ Píldora de 48 en fondo-3; elegido = primario con la palomita (trazo SVG que se 
 - **carousel3d.js:** exporta `wireRadioChips` `checkMark` `checkChip`
 - **rail.js:** exporta `chipNode`
 - **motion.js:** exporta `drawCheck`
-- **Tokens:** `alto-md` `radio-pildora` `space-2` `space-4` `fondo-3` `tinta` `primario` `en-primario` `t-chip` `ls-chip` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida`
+- **Tokens:** `alto-md` `radio-pildora` `space-2` `space-4` `fondo-3` `tinta` `primario` `en-primario` `t-chip` `ls-chip` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `primario-pulsado` `fondo-3-presionado`
 - **Estado hover:** `:is(.chip:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover`
 - **Estado foco:** `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`
-- **Estado presionado:** `.chip:active`, `.cat-filters-btn:active`, `.cat-chip:active`
+- **Estado presionado:** `.chip:active`, `.cat-filters-btn:active`, `.cat-chip:active`, `.chip[aria-checked="true"]:active` — Sin elegir, fondo-3-presionado; elegido, primario-pulsado; la escala 0.96 solo con movimiento.
 - **Estado seleccionado:** `.chip[aria-checked="true"]`, `.chip[aria-checked="true"] > .chip-chk`, carousel3d.js `c.setAttribute('aria-checked', String(on))`
 - **Estado expandido:** `.cat-filters-btn[aria-expanded="true"]`
 - **Estado ocupado:** `.sk-chip`, HTML `.sk-chip`
@@ -205,10 +210,10 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 - **index.html:** `#menu` `[data-menu-open]` `[data-menu-close]` `.menu-row` `.menu-hoja`
 - **sheets.js:** exporta `openDialog` `closeDialog` `pushSheet` `navigateFromSheet`
 - **app.js:** ganchos `opener.setAttribute('aria-expanded', 'true')`
-- **Tokens:** `alto-sm` `alto-lg` `vidrio` `vidrio-hoja` `filtro-vidrio` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `sombra-flotante` `velo` `menta` `en-menta` `fondo-3` `tinta` `tinta-2` `linea` `foco` `anillo-foco` `radio-lg` `radio-sm` `t-titulo-2` `dur-instantanea` `dur-rapida` `dur-base` `escalon-linea` `curva-salida` `curva-resorte`
+- **Tokens:** `alto-sm` `alto-lg` `vidrio` `vidrio-hoja` `filtro-vidrio` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `sombra-flotante` `velo` `menta` `en-menta` `fondo-3` `tinta` `tinta-2` `linea` `foco` `anillo-foco` `radio-lg` `radio-sm` `t-titulo-2` `dur-instantanea` `dur-rapida` `dur-base` `escalon-linea` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado`
 - **Estado hover:** `.menu-btn:hover`, `.menu-row:not([aria-current="true"]):hover`
 - **Estado foco:** `.menu-btn:focus-visible`, `.menu-row:focus-visible`, `.menu-close:focus-visible`
-- **Estado presionado:** `.menu-btn:active`, `.menu-row:active`
+- **Estado presionado:** `.menu-btn:active`, `.menu-row:active`, `.menu-row[aria-current="true"]:active`, `.menu-close:active`
 - **Estado actual:** `.menu-row[aria-current="true"]`
 - **Estado expandido:** `[aria-expanded="true"] > .menu-lines span:nth-child(1)`, HTML `[aria-expanded="false"]`
 - **Estado movimiento_reducido:** `.motion .menu.is-closing .menu-hoja`, `.menu-btn:active`
@@ -223,9 +228,9 @@ Solo ≤ 760 px: cápsula de vidrio de 49 × 228 con Inicio, Catálogo y Mi list
 - **mobile.css:** `.tabbar` `.tabbar-pastilla` `.tabbar a` `.tab-list` `.tab-ic` `.tab-lb` `.tab-ic-box`
 - **index.html:** `.tabbar` `.tabbar-pastilla` `.tab-list` `.tab-lb`
 - **app.js:** ganchos `a.setAttribute('aria-current', 'location')`
-- **Tokens:** `alto-barra-inferior` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `menta` `en-menta` `tinta` `foco` `radio-pildora` `t-pestana` `space-1` `space-2` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte`
+- **Tokens:** `alto-barra-inferior` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `menta` `en-menta` `tinta` `foco` `radio-pildora` `t-pestana` `space-1` `space-2` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado`
 - **Estado foco:** `.tabbar a:focus-visible`, `.tab-list:focus-visible`
-- **Estado presionado:** `.tabbar a:active`, `.tab-list:active`
+- **Estado presionado:** `.tabbar a:active`, `.tab-list:active`, `.tabbar a[aria-current]:active` — Escala 0.94 y color (fondo-3-presionado; la casilla actual, menta-presionado): con movimiento reducido el color es la respuesta.
 - **Estado actual:** `.tabbar a[aria-current]`, `.tabbar a[aria-current] .tab-ic`
 - **Estado oculto:** `html.sheet-open .tabbar` — Con una hoja abierta (estado de la página, no del control).
 - **hover: no aplica.** Solo existe en el teléfono (mobile.css, ≤ 760 px).
@@ -488,7 +493,7 @@ Píldora de 48 en fondo-3 con letra de 17 (iOS no acerca la página); con foco, 
 - **mobile.css:** `.explorer`
 - **index.html:** `#catalogo` `#explorer` `[data-ex-open]` `[data-ex-close]` `[data-cat-form]` `[data-cat-filters]` `[data-cat-status]` `[data-cat-chips]` `[data-cat-grid]` `[data-cat-fold]` `[data-cat-empty]` `[data-cat-reset]`
 - **catalog.js:** exporta `initCatalog` `filterBooks` `sortBooks` `facetCounts` `foldView` `facetView` `FOLD_ROWS` `FACET_FOLD_AT` `FACET_LIMIT` `PAGE_SIZE` `GENRE_ES` `genreLabel` · internas `renderFilters` `renderChips` `renderGrid` `applyFold` `staggerIn` `clearAll` · ganchos `data-clear` `cat-clear-all`
-- **Tokens:** `alto-sm` `alto-md` `fondo-3` `fondo-2` `fondo` `tinta` `tinta-2` `linea` `linea-fuerte` `primario` `en-primario` `turquesa-texto` `foco` `anillo-foco` `radio-md` `radio-sm` `radio-portada` `radio-pildora` `t-campo` `t-subtitulo` `t-rotulo` `t-boton-chico` `t-titulo-3` `space-8` `dur-rapida` `dur-lenta` `escalon-linea` `curva-salida`
+- **Tokens:** `alto-sm` `alto-md` `fondo-3` `fondo-2` `fondo` `tinta` `tinta-2` `linea` `linea-fuerte` `primario` `en-primario` `turquesa-texto` `foco` `anillo-foco` `radio-md` `radio-sm` `radio-portada` `radio-pildora` `t-campo` `t-subtitulo` `t-rotulo` `t-boton-chico` `t-titulo-3` `space-8` `dur-rapida` `dur-lenta` `escalon-linea` `curva-salida` `fondo-3-presionado`
 - **Estado hover:** `.explore-open:hover`, `.cat-opt label:hover`
 - **Estado foco:** `.cat-opt input:focus-visible + label`, `.cat-clear-all:focus-visible`, `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`
 - **Estado presionado:** `.explore-open:active`, `.explore-open[data-opening]`
@@ -503,13 +508,14 @@ Píldora de 48 en fondo-3 con letra de 17 (iOS no acerca la página); con foco, 
 
 ### Aviso
 
-Cápsula de vidrio (popover manual, por encima de las hojas) con el mensaje («Guardado en Mi lista.») y una acción menta; en la ficha flota justo encima de las acciones del pie.
+Cápsula de vidrio (popover manual, por encima de las hojas) con el mensaje («Guardado en Mi lista.»; también «Ese libro ya no está en el catálogo.», sin acción, al llegar por un enlace compartido a un libro que ya no está) y, si hace falta, una acción menta; en la ficha flota justo encima de las acciones del pie.
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Hojas: aviso).
 - **style.css:** `.toast` `.toast:popover-open` `.toast-action`
 - **saved.js:** exporta `notify` · internas `toast` `hideToast` · ganchos `toastEl.setAttribute('role', 'status')` `toastEl.popover = 'manual'`
-- **Tokens:** `vidrio-hoja` `filtro-vidrio-hoja` `luz-vidrio` `sombra-flotante` `radio-md` `radio-pildora` `tinta` `menta` `en-menta` `alto-md` `t-subtitulo` `t-boton-chico` `anillo-foco`
+- **Tokens:** `vidrio-hoja` `filtro-vidrio-hoja` `luz-vidrio` `sombra-flotante` `radio-md` `radio-pildora` `tinta` `menta` `en-menta` `alto-md` `t-subtitulo` `t-boton-chico` `anillo-foco` `menta-presionado`
 - **Estado foco:** `.toast-action:focus-visible`
+- **Estado presionado:** `.toast-action:active`
 - **Estado abierto:** `.toast:popover-open`
 - **hover: no aplica.** La acción es menta fija; el aviso dura poco y no invita a explorar con el cursor.
 - **ARIA:** Status message (WCAG 4.1.3) (https://www.w3.org/TR/WCAG22/#status-messages) · `role=status` `popover=manual` · **Teclado:** La acción es un botón (Enter/Espacio).
@@ -562,22 +568,22 @@ SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de
 
 ### InterruptorMovimiento
 
-«Pausar el movimiento» del pie: <button role="switch" aria-checked> con su rótulo visible y la pista de 51 × 31 (geometría de iOS) en un objetivo de 44. Encendido = pausado (pista primario, pulgar a la derecha). Con «reducir movimiento» o ahorro de datos: encendido, aria-disabled y la nota dice por qué.
+«Pausar el movimiento» en dos sitios con la misma lógica (2026-11-16): al pie de la página y al pie del menú ☰ (una fila con filete, rótulo a la izquierda y la pista a la derecha). Uno controla al otro: los dos salen de un mismo estado (`app.js`, `syncToggle`) y de un mismo `localStorage`. <button role="switch" aria-checked> con su rótulo visible y la pista de 51 × 31 (geometría de iOS) en un objetivo de 44. Encendido = pausado (pista primario, pulgar a la derecha). Con «reducir movimiento» o ahorro de datos: encendido, aria-disabled y la nota dice por qué.
 
-- **Tipo:** control · **desde** 2026-11-14 · DESIGN.md, «Interruptor «Pausar el movimiento»» (2026-11-14).
-- **style.css:** `.interruptor` `.interruptor-pista` `.interruptor-pulgar` `.interruptor-nota` `.ftr-row`
-- **index.html:** `[data-motion-toggle]` `[data-motion-nota]` `#motion-nota` `.interruptor`
+- **Tipo:** control · **desde** 2026-11-14 · DESIGN.md, «Interruptor «Pausar el movimiento»» (2026-11-14) y «Cambios de la auditoría de calidad» (2026-11-16: también en el menú ☰).
+- **style.css:** `.interruptor` `.interruptor-pista` `.interruptor-pulgar` `.interruptor-nota` `.ftr-row` `.menu-movimiento`
+- **index.html:** `[data-motion-toggle]` `[data-motion-nota]` `#motion-nota` `#menu-motion-nota` `.menu-movimiento` `.interruptor`
 - **app.js:** internas `syncToggle` `applyMode` · ganchos `iti-b4-motion`
 - **assets/js/boot.js:** ganchos `r.classList.add('motion')`
-- **Tokens:** `interruptor-ancho` `interruptor-alto` `interruptor-pulgar` `alto-sm` `fondo-3` `linea-fuerte` `primario` `primario-presionado` `superficie` `sombra-pulgar` `tinta` `tinta-2` `anillo-foco` `radio-pildora` `t-subtitulo` `t-nota-pie` `dur-rapida` `curva-salida` `curva-resorte`
+- **Tokens:** `interruptor-ancho` `interruptor-alto` `interruptor-pulgar` `alto-sm` `fondo-3` `linea-fuerte` `primario` `primario-presionado` `superficie` `sombra-pulgar` `tinta` `tinta-2` `anillo-foco` `radio-pildora` `t-subtitulo` `t-nota-pie` `dur-rapida` `curva-salida` `curva-resorte` `primario-pulsado` `fondo-3-presionado`
 - **Estado hover:** `.interruptor:not([aria-disabled="true"]):hover .interruptor-pista`, `.interruptor[aria-checked="true"]:not([aria-disabled="true"]):hover .interruptor-pista`
 - **Estado foco:** `.interruptor:focus-visible`
+- **Estado presionado:** `.interruptor:not([aria-disabled="true"]):active .interruptor-pista`, `.interruptor[aria-checked="true"]:not([aria-disabled="true"]):active .interruptor-pista` — Apagado, fondo-3-presionado; encendido, primario-pulsado. Con «reducir movimiento» está deshabilitado y no responde, por diseño.
 - **Estado seleccionado:** `.interruptor[aria-checked="true"] .interruptor-pista`, `.interruptor[aria-checked="true"] .interruptor-pulgar`
 - **Estado deshabilitado:** `.interruptor[aria-disabled="true"]`, `.interruptor[aria-disabled="true"] .interruptor-pista`
 - **Estado movimiento_reducido:** `.motion .interruptor-pulgar`
 - **Estado colores_forzados ((forced-colors: active)):** `.interruptor-pista`, `.interruptor[aria-checked="true"] .interruptor-pista`
-- **presionado: no aplica.** El cambio de estado es la respuesta (el pulgar se desliza); sin escala.
-- **ARIA:** Switch (https://www.w3.org/WAI/ARIA/apg/patterns/switch/) · `role=switch` `aria-checked` `aria-disabled` `aria-describedby=motion-nota` · **Teclado:** Espacio y Enter alternan; el foco se queda en el interruptor.
+- **ARIA:** Switch (https://www.w3.org/WAI/ARIA/apg/patterns/switch/) · `role=switch` `aria-checked` `aria-disabled` `aria-describedby=motion-nota (el del menú: menu-motion-nota)` · **Teclado:** Espacio y Enter alternan; el foco se queda en el interruptor.
 - **QA:** `tools/qa/motion.mjs` `tools/qa/controles.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs`
 
 ### ContactoPie

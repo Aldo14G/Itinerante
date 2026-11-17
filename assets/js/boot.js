@@ -33,6 +33,10 @@
   r.classList.add('motion');
   if (!scrollY) {
     r.classList.add('intro');
-    setTimeout(function () { r.classList.remove('intro'); }, 2000);
+    // Tope de la entrada del inicio: si app.js no la quita antes (la quita al tener la letra y la foto), se quita a los 2 s. Es el único
+    // milisegundo escrito a mano que queda en el JS, a propósito: este archivo es crítico, corre antes que los módulos y que los tokens y no puede
+    // importar motion.js. (No es espera-larga, 1200 ms: aquí se cubre además la espera de la red.)
+    var INTRO_TOPE = 2000;
+    setTimeout(function () { r.classList.remove('intro'); }, INTRO_TOPE);
   }
 })();

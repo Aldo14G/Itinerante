@@ -41,14 +41,14 @@
         { "ruta": "index.html", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg"] },
         { "ruta": "motion.js", "exporta": ["pickPop", "afterPaint", "confirmThen"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "alto-lg", "linea-fuerte", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte"],
+      "tokens": ["alto-sm", "alto-md", "alto-lg", "linea-fuerte", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte", "primario-pulsado", "menta-presionado", "fondo-3-presionado"],
       "estados": {
         "hover": { "css": [".btn--primario:hover", ".btn--secundario:hover", ".btn--vidrio:hover", ".btn--plano:hover", ".btn--contorno:hover"] },
         "foco": { "css": [".btn:focus-visible", ".btn--vidrio:focus-visible"] },
-        "presionado": { "css": [".btn:active", ".btn--primario:active", ".btn--contorno:active"] },
+        "presionado": { "css": [".btn:active", ".btn--primario:active", ".btn--secundario:not([aria-pressed=\"true\"]):active", ".btn--plano:active", ".btn--contorno:active", ".btn--vidrio:active"], "nota": "Un tono por familia (2026-11-16): primario-pulsado, menta-presionado y fondo-3-presionado, un paso más allá del hover. Responde también con movimiento reducido y con la pausa; la escala 0.97 solo con movimiento." },
         "deshabilitado": { "css": [".btn:disabled", ".btn[aria-disabled=\"true\"]"] },
         "seleccionado": { "css": [".btn--secundario[aria-pressed=\"true\"]"] },
-        "movimiento_reducido": { "css": [".btn:active"], "nota": "En prefers-reduced-motion la escala al presionar se quita; el color sigue respondiendo." }
+        "movimiento_reducido": { "css": [".btn:active"], "nota": "En prefers-reduced-motion y con la pausa la escala al presionar se quita; el color de :active (tono propio de la familia, distinto del hover) sigue respondiendo." }
       },
       "aria": { "patron": "Button", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "atributos": ["aria-pressed", "aria-disabled", "aria-label"], "teclado": "Enter y Espacio (nativo de <button>); los enlaces con cara de botón, Enter." },
       "qa": ["tools/qa/controles.mjs", "tools/qa/contrast.mjs", "tools/qa/axe.mjs", "tests/critique.test.mjs", "tools/qa/guias.mjs"],
@@ -71,10 +71,10 @@
         { "ruta": "saved.js", "exporta": ["saveButton", "bindSaveButton", "toggleSaved", "isSaved", "savedIds", "MAX_SAVED"] },
         { "ruta": "motion.js", "exporta": ["pickPop"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "alto-lg", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "primario", "en-primario", "menta", "en-menta", "tinta", "fondo", "foco", "anillo-foco", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida"],
+      "tokens": ["alto-sm", "alto-md", "alto-lg", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "primario", "en-primario", "menta", "en-menta", "tinta", "fondo", "foco", "anillo-foco", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "primario-pulsado", "fondo-3-presionado"],
       "estados": {
         "foco": { "css": [":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible", ":is(.rail-item, .card-item) .save:not(.save--wide):focus-visible"] },
-        "presionado": { "css": [".save:active"] },
+        "presionado": { "css": [".save:active", ".save[aria-pressed=\"true\"]:not(.save--wide):active", ".save:not([aria-pressed=\"true\"]):not(.save--wide):active"], "nota": "Escala 0.94 con movimiento y, siempre, el color: guardado a primario-pulsado, sin guardar a fondo-3-presionado (también en los respaldos opacos del vidrio)." },
         "seleccionado": { "css": [".save[aria-pressed=\"true\"]:not(.save--wide)", ".save[aria-pressed=\"true\"] .ic", ".save[aria-pressed=\"true\"] .save-chk", ".save--wide[aria-pressed=\"true\"]"], "js": [{ "ruta": "saved.js", "texto": "btn.setAttribute('aria-pressed', String(on))" }] },
         "movimiento_reducido": { "css": [".motion .save.is-pop .save-chk", ".save:active"] }
       },
@@ -101,11 +101,11 @@
         { "ruta": "rail.js", "exporta": ["chipNode"] },
         { "ruta": "motion.js", "exporta": ["drawCheck"] }
       ],
-      "tokens": ["alto-md", "radio-pildora", "space-2", "space-4", "fondo-3", "tinta", "primario", "en-primario", "t-chip", "ls-chip", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida"],
+      "tokens": ["alto-md", "radio-pildora", "space-2", "space-4", "fondo-3", "tinta", "primario", "en-primario", "t-chip", "ls-chip", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "primario-pulsado", "fondo-3-presionado"],
       "estados": {
         "hover": { "css": [":is(.chip:not([aria-checked=\"true\"]), .cat-filters-btn:not([aria-expanded=\"true\"])):hover"] },
         "foco": { "css": [":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
-        "presionado": { "css": [".chip:active", ".cat-filters-btn:active", ".cat-chip:active"] },
+        "presionado": { "css": [".chip:active", ".cat-filters-btn:active", ".cat-chip:active", ".chip[aria-checked=\"true\"]:active"], "nota": "Sin elegir, fondo-3-presionado; elegido, primario-pulsado; la escala 0.96 solo con movimiento." },
         "seleccionado": { "css": [".chip[aria-checked=\"true\"]", ".chip[aria-checked=\"true\"] > .chip-chk"], "js": [{ "ruta": "carousel3d.js", "texto": "c.setAttribute('aria-checked', String(on))" }] },
         "expandido": { "css": [".cat-filters-btn[aria-expanded=\"true\"]"] },
         "ocupado": { "css": [".sk-chip"], "html": [".sk-chip"] },
@@ -170,11 +170,11 @@
         { "ruta": "sheets.js", "exporta": ["openDialog", "closeDialog", "pushSheet", "navigateFromSheet"] },
         { "ruta": "app.js", "ganchos": ["opener.setAttribute('aria-expanded', 'true')"] }
       ],
-      "tokens": ["alto-sm", "alto-lg", "vidrio", "vidrio-hoja", "filtro-vidrio", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-flotante", "velo", "menta", "en-menta", "fondo-3", "tinta", "tinta-2", "linea", "foco", "anillo-foco", "radio-lg", "radio-sm", "t-titulo-2", "dur-instantanea", "dur-rapida", "dur-base", "escalon-linea", "curva-salida", "curva-resorte"],
+      "tokens": ["alto-sm", "alto-lg", "vidrio", "vidrio-hoja", "filtro-vidrio", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-flotante", "velo", "menta", "en-menta", "fondo-3", "tinta", "tinta-2", "linea", "foco", "anillo-foco", "radio-lg", "radio-sm", "t-titulo-2", "dur-instantanea", "dur-rapida", "dur-base", "escalon-linea", "curva-salida", "curva-resorte", "fondo-3-presionado", "menta-presionado"],
       "estados": {
         "hover": { "css": [".menu-btn:hover", ".menu-row:not([aria-current=\"true\"]):hover"] },
         "foco": { "css": [".menu-btn:focus-visible", ".menu-row:focus-visible", ".menu-close:focus-visible"] },
-        "presionado": { "css": [".menu-btn:active", ".menu-row:active"] },
+        "presionado": { "css": [".menu-btn:active", ".menu-row:active", ".menu-row[aria-current=\"true\"]:active", ".menu-close:active"] },
         "actual": { "css": [".menu-row[aria-current=\"true\"]"] },
         "expandido": { "css": ["[aria-expanded=\"true\"] > .menu-lines span:nth-child(1)"], "html": ["[aria-expanded=\"false\"]"] },
         "movimiento_reducido": { "css": [".motion .menu.is-closing .menu-hoja", ".menu-btn:active"] }
@@ -194,10 +194,10 @@
         { "ruta": "index.html", "selectores": [".tabbar", ".tabbar-pastilla", ".tab-list", ".tab-lb"] },
         { "ruta": "app.js", "ganchos": ["a.setAttribute('aria-current', 'location')"] }
       ],
-      "tokens": ["alto-barra-inferior", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "tinta", "foco", "radio-pildora", "t-pestana", "space-1", "space-2", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "curva-resorte"],
+      "tokens": ["alto-barra-inferior", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "tinta", "foco", "radio-pildora", "t-pestana", "space-1", "space-2", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "curva-resorte", "fondo-3-presionado", "menta-presionado"],
       "estados": {
         "foco": { "css": [".tabbar a:focus-visible", ".tab-list:focus-visible"] },
-        "presionado": { "css": [".tabbar a:active", ".tab-list:active"] },
+        "presionado": { "css": [".tabbar a:active", ".tab-list:active", ".tabbar a[aria-current]:active"], "nota": "Escala 0.94 y color (fondo-3-presionado; la casilla actual, menta-presionado): con movimiento reducido el color es la respuesta." },
         "actual": { "css": [".tabbar a[aria-current]", ".tabbar a[aria-current] .tab-ic"] },
         "oculto": { "css": ["html.sheet-open .tabbar"], "nota": "Con una hoja abierta (estado de la página, no del control)." }
       },
@@ -558,7 +558,7 @@
         { "ruta": "index.html", "selectores": ["#catalogo", "#explorer", "[data-ex-open]", "[data-ex-close]", "[data-cat-form]", "[data-cat-filters]", "[data-cat-status]", "[data-cat-chips]", "[data-cat-grid]", "[data-cat-fold]", "[data-cat-empty]", "[data-cat-reset]"] },
         { "ruta": "catalog.js", "exporta": ["initCatalog", "filterBooks", "sortBooks", "facetCounts", "foldView", "facetView", "FOLD_ROWS", "FACET_FOLD_AT", "FACET_LIMIT", "PAGE_SIZE", "GENRE_ES", "genreLabel"], "internas": ["renderFilters", "renderChips", "renderGrid", "applyFold", "staggerIn", "clearAll"], "ganchos": ["data-clear", "cat-clear-all"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida"],
+      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida", "fondo-3-presionado"],
       "estados": {
         "hover": { "css": [".explore-open:hover", ".cat-opt label:hover"] },
         "foco": { "css": [".cat-opt input:focus-visible + label", ".cat-clear-all:focus-visible", ":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
@@ -579,14 +579,15 @@
       "id": "aviso",
       "nombre": "Aviso",
       "tipo": "bloque",
-      "descripcion": "Cápsula de vidrio (popover manual, por encima de las hojas) con el mensaje («Guardado en Mi lista.») y una acción menta; en la ficha flota justo encima de las acciones del pie.",
+      "descripcion": "Cápsula de vidrio (popover manual, por encima de las hojas) con el mensaje («Guardado en Mi lista.»; también «Ese libro ya no está en el catálogo.», sin acción, al llegar por un enlace compartido a un libro que ya no está) y, si hace falta, una acción menta; en la ficha flota justo encima de las acciones del pie.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".toast", ".toast:popover-open", ".toast-action"] },
         { "ruta": "saved.js", "exporta": ["notify"], "internas": ["toast", "hideToast"], "ganchos": ["toastEl.setAttribute('role', 'status')", "toastEl.popover = 'manual'"] }
       ],
-      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-flotante", "radio-md", "radio-pildora", "tinta", "menta", "en-menta", "alto-md", "t-subtitulo", "t-boton-chico", "anillo-foco"],
+      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-flotante", "radio-md", "radio-pildora", "tinta", "menta", "en-menta", "alto-md", "t-subtitulo", "t-boton-chico", "anillo-foco", "menta-presionado"],
       "estados": {
         "foco": { "css": [".toast-action:focus-visible"] },
+        "presionado": { "css": [".toast-action:active"] },
         "abierto": { "css": [".toast:popover-open"] }
       },
       "no_aplica": { "hover": "La acción es menta fija; el aviso dura poco y no invita a explorar con el cursor." },
@@ -661,27 +662,27 @@
       "id": "interruptor-movimiento",
       "nombre": "InterruptorMovimiento",
       "tipo": "control",
-      "descripcion": "«Pausar el movimiento» del pie: <button role=\"switch\" aria-checked> con su rótulo visible y la pista de 51 × 31 (geometría de iOS) en un objetivo de 44. Encendido = pausado (pista primario, pulgar a la derecha). Con «reducir movimiento» o ahorro de datos: encendido, aria-disabled y la nota dice por qué.",
+      "descripcion": "«Pausar el movimiento» en dos sitios con la misma lógica (2026-11-16): al pie de la página y al pie del menú ☰ (una fila con filete, rótulo a la izquierda y la pista a la derecha). Uno controla al otro: los dos salen de un mismo estado (`app.js`, `syncToggle`) y de un mismo `localStorage`. <button role=\"switch\" aria-checked> con su rótulo visible y la pista de 51 × 31 (geometría de iOS) en un objetivo de 44. Encendido = pausado (pista primario, pulgar a la derecha). Con «reducir movimiento» o ahorro de datos: encendido, aria-disabled y la nota dice por qué.",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".interruptor", ".interruptor-pista", ".interruptor-pulgar", ".interruptor-nota", ".ftr-row"] },
-        { "ruta": "index.html", "selectores": ["[data-motion-toggle]", "[data-motion-nota]", "#motion-nota", ".interruptor"] },
+        { "ruta": "style.css", "selectores": [".interruptor", ".interruptor-pista", ".interruptor-pulgar", ".interruptor-nota", ".ftr-row", ".menu-movimiento"] },
+        { "ruta": "index.html", "selectores": ["[data-motion-toggle]", "[data-motion-nota]", "#motion-nota", "#menu-motion-nota", ".menu-movimiento", ".interruptor"] },
         { "ruta": "app.js", "internas": ["syncToggle", "applyMode"], "ganchos": ["iti-b4-motion"] },
         { "ruta": "assets/js/boot.js", "ganchos": ["r.classList.add('motion')"] }
       ],
-      "tokens": ["interruptor-ancho", "interruptor-alto", "interruptor-pulgar", "alto-sm", "fondo-3", "linea-fuerte", "primario", "primario-presionado", "superficie", "sombra-pulgar", "tinta", "tinta-2", "anillo-foco", "radio-pildora", "t-subtitulo", "t-nota-pie", "dur-rapida", "curva-salida", "curva-resorte"],
+      "tokens": ["interruptor-ancho", "interruptor-alto", "interruptor-pulgar", "alto-sm", "fondo-3", "linea-fuerte", "primario", "primario-presionado", "superficie", "sombra-pulgar", "tinta", "tinta-2", "anillo-foco", "radio-pildora", "t-subtitulo", "t-nota-pie", "dur-rapida", "curva-salida", "curva-resorte", "primario-pulsado", "fondo-3-presionado"],
       "estados": {
         "hover": { "css": [".interruptor:not([aria-disabled=\"true\"]):hover .interruptor-pista", ".interruptor[aria-checked=\"true\"]:not([aria-disabled=\"true\"]):hover .interruptor-pista"] },
         "foco": { "css": [".interruptor:focus-visible"] },
+        "presionado": { "css": [".interruptor:not([aria-disabled=\"true\"]):active .interruptor-pista", ".interruptor[aria-checked=\"true\"]:not([aria-disabled=\"true\"]):active .interruptor-pista"], "nota": "Apagado, fondo-3-presionado; encendido, primario-pulsado. Con «reducir movimiento» está deshabilitado y no responde, por diseño." },
         "seleccionado": { "css": [".interruptor[aria-checked=\"true\"] .interruptor-pista", ".interruptor[aria-checked=\"true\"] .interruptor-pulgar"] },
         "deshabilitado": { "css": [".interruptor[aria-disabled=\"true\"]", ".interruptor[aria-disabled=\"true\"] .interruptor-pista"] },
         "movimiento_reducido": { "css": [".motion .interruptor-pulgar"] },
         "colores_forzados": { "css": [".interruptor-pista", ".interruptor[aria-checked=\"true\"] .interruptor-pista"], "media": "(forced-colors: active)" }
       },
-      "no_aplica": { "presionado": "El cambio de estado es la respuesta (el pulgar se desliza); sin escala." },
-      "aria": { "patron": "Switch", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/", "atributos": ["role=switch", "aria-checked", "aria-disabled", "aria-describedby=motion-nota"], "teclado": "Espacio y Enter alternan; el foco se queda en el interruptor." },
+      "aria": { "patron": "Switch", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/", "atributos": ["role=switch", "aria-checked", "aria-disabled", "aria-describedby=motion-nota (el del menú: menu-motion-nota)"], "teclado": "Espacio y Enter alternan; el foco se queda en el interruptor." },
       "qa": ["tools/qa/motion.mjs", "tools/qa/controles.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs"],
       "desde": "2026-11-14",
-      "decision": "DESIGN.md, «Interruptor «Pausar el movimiento»» (2026-11-14)."
+      "decision": "DESIGN.md, «Interruptor «Pausar el movimiento»» (2026-11-14) y «Cambios de la auditoría de calidad» (2026-11-16: también en el menú ☰)."
     },
     {
       "id": "contacto-pie",
@@ -781,7 +782,12 @@
   ],
   "contraste": [
     { "frente": "en-primario", "fondo": "primario", "tipo": "texto", "donde": "Boton primario, chip elegido, guardado, Insignia de conteo, «Nuevo»" },
-    { "frente": "en-primario", "fondo": "primario-presionado", "tipo": "texto", "donde": "Boton primario presionado y con el cursor" },
+    { "frente": "en-primario", "fondo": "primario-presionado", "tipo": "texto", "donde": "Boton primario con el cursor" },
+    { "frente": "en-primario", "fondo": "primario-pulsado", "tipo": "texto", "donde": "Boton primario, chip elegido, guardado e interruptor encendido mientras se presionan (:active)" },
+    { "frente": "en-menta", "fondo": "menta-presionado", "tipo": "texto", "donde": "Boton secundario, fila actual del menú, casilla actual de la barra inferior y acción del Aviso mientras se presionan" },
+    { "frente": "tinta", "fondo": "fondo-3-presionado", "tipo": "texto", "donde": "Chip, contorno, ☰, fila del menú, casilla de la barra inferior y botón de vidrio presionados" },
+    { "frente": "tinta-2", "fondo": "fondo-3-presionado", "tipo": "texto", "donde": "«Buscar en el catálogo» presionado" },
+    { "frente": "primario-presionado", "fondo": "fondo-3-presionado", "tipo": "texto", "donde": "Boton plano presionado (su texto pasa a primario-presionado)" },
     { "frente": "en-menta", "fondo": "menta", "tipo": "texto", "donde": "Boton secundario, actual de la barra y del menú, pastilla de la barra inferior, Insignia de tipo, acción del Aviso, selección de texto" },
     { "frente": "en-menta", "fondo": "mezcla:menta+en-menta@10", "tipo": "texto", "donde": "Boton secundario con el cursor" },
     { "frente": "turquesa-texto", "fondo": "fondo", "tipo": "texto", "donde": "Boton plano, Recorrido («N de 3 paradas hojeadas»), enlaces" },

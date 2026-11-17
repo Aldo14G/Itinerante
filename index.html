@@ -105,6 +105,11 @@
           <li><a class="btn btn--plano btn--sm" href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-ig"/></svg><span>Instagram</span></a></li>
           <li><a class="btn btn--plano btn--sm" href="https://www.facebook.com/profile.php?id=100095548961064" target="_blank" rel="noopener noreferrer"><svg class="ic" aria-hidden="true"><use href="#i-fb"/></svg><span>Facebook</span></a></li>
         </ul>
+        <!-- El mismo interruptor del pie (app.js los cablea juntos): lo ocasional queda a dos toques, no a siete pantallas. -->
+        <div class="menu-movimiento">
+          <button class="motion-btn interruptor" type="button" role="switch" aria-checked="false" aria-describedby="menu-motion-nota" data-motion-toggle><span class="interruptor-rotulo">Pausar el movimiento</span><span class="interruptor-pista" aria-hidden="true"><span class="interruptor-pulgar"></span></span></button>
+          <p class="interruptor-nota" id="menu-motion-nota" data-motion-nota hidden></p>
+        </div>
       </div>
     </div>
   </dialog>

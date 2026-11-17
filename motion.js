@@ -5,7 +5,10 @@ const ALIAS = {
   'dur-instant': 'dur-instantanea', 'dur-fast': 'dur-rapida', 'dur-slow': 'dur-lenta', 'dur-scene': 'espera-larga',
   'stagger-char': 'escalon-letra', 'stagger-line': 'escalon-linea', 'intent-topic': 'intencion-tema', 'intent-disclosure': 'intencion-despliegue'
 };
-const FALLBACK = { 'dur-instantanea': 120, 'dur-rapida': 240, 'dur-base': 400, 'dur-lenta': 700, 'espera-larga': 1200, 'escalon-letra': 24, 'escalon-linea': 60, 'intencion-tema': 250, 'intencion-despliegue': 320 };
+const FALLBACK = {
+  'dur-instantanea': 120, 'dur-rapida': 240, 'dur-base': 400, 'dur-lenta': 700, 'espera-larga': 1200, 'escalon-letra': 24, 'escalon-linea': 60, 'intencion-tema': 250, 'intencion-despliegue': 320,
+  'reposo-corto': 200, reposo: 300, 'reposo-largo': 600, remedir: 120, 'espera-recursos': 900, 'aviso-visible': 4500, 'refresco-estado': 60000
+};
 
 const cache = new Map();
 // Los tokens no cambian durante la sesión: se lee el estilo calculado una sola vez por nombre.
@@ -15,7 +18,7 @@ const token = name => {
   return cache.get(name);
 };
 
-/** Milisegundos de un token (--dur-*, --escalon-*, --intencion-*, --espera-larga; o su nombre corto de antes). */
+/** Milisegundos de un token (--dur-*, --escalon-*, --intencion-*, --espera-larga, --reposo*, --remedir, --espera-recursos, --aviso-visible, --refresco-estado; o su nombre corto de antes). */
 export function ms(name) {
   const real = ALIAS[name] ?? name;
   const value = parseFloat(token(real));
@@ -23,6 +26,15 @@ export function ms(name) {
 }
 
 export const DUR = name => ms(`dur-${name}`);
+
+/**
+ * Trabajo en reposo: corre `fn` cuando el navegador está libre (requestIdleCallback, con su `timeout` como tope) o, donde no existe (Safari), tras el
+ * retraso `fallback` (un token de reposo: reposo-corto, reposo, reposo-largo). Una sola forma de pedirlo, sin milisegundos escritos en cada sitio.
+ */
+export function whenIdle(fn, { timeout = 1500, fallback = 'reposo' } = {}) {
+  if (typeof requestIdleCallback === 'function') return requestIdleCallback(fn, { timeout });
+  return setTimeout(fn, ms(fallback));
+}
 export const EASE = () => token('curva-salida') || 'cubic-bezier(0.16, 1, 0.3, 1)';
 export const EASE_IO = () => token('curva-entrada-salida') || 'cubic-bezier(0.65, 0, 0.35, 1)';
 

@@ -16,8 +16,11 @@
   --primario: #176b62;
   --en-primario: #ffffff;
   --primario-presionado: #0f5248;
+  --primario-pulsado: #0a3d35;
   --menta: #dcf1ec;
   --en-menta: #0f5248;
+  --menta-presionado: #b7d3cc;
+  --fondo-3-presionado: #cbd5d2;
   --vidrio: #ffffffd6;
   --vidrio-hoja: #ffffffe6;
   --vidrio-luz: #ffffffb3;
@@ -179,6 +182,13 @@
 
   /* Tiempos de JavaScript (no son transiciones) */
   --espera-larga: 1200ms;
+  --reposo-corto: 200ms;
+  --reposo: 300ms;
+  --reposo-largo: 600ms;
+  --remedir: 120ms;
+  --espera-recursos: 900ms;
+  --aviso-visible: 4500ms;
+  --refresco-estado: 60000ms;
   --intencion-tema: 250ms;
   --intencion-despliegue: 320ms;
   --escalon-letra: 24ms;
@@ -209,8 +219,11 @@
     --primario: #7ac4b4;
     --en-primario: #0c2825;
     --primario-presionado: #8fe0d5;
+    --primario-pulsado: #a9ece3;
     --menta: #1b4a44;
     --en-menta: #8fe0d5;
+    --menta-presionado: #2c6059;
+    --fondo-3-presionado: #385451;
     --vidrio: #0f2724d1;
     --vidrio-hoja: #0f2724e6;
     --vidrio-luz: #ffffff2e;

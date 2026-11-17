@@ -1033,7 +1033,7 @@ test('ritmo y movimiento: relleno de secciones con la escala de 4 px y movimient
     const r = rule(cssFlat, `.${sel}`);
     assert.ok(/var\(--(sec|space-\d+)\)/.test(r) && !/clamp\([^)]*vh/.test(r), `.${sel} usa el ritmo de la escala y no el alto de la pantalla`);
   }
-  assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\*, \*::before, \*::after \{ transition-duration: 0\.01ms !important/.test(css), 'regla general de movimiento reducido');
+  assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\*, \*::before, \*::after, ::backdrop \{ transition-duration: 0\.01ms !important/.test(css), 'regla general de movimiento reducido (incluye el velo de las hojas)');
   assert.ok(!/animation:[^;]*infinite/.test(css + mobileCss), 'nada anima en reposo para siempre (el punto «abierto» ya no late)');
 });
 test('Mi lista: guardar, quitar, tope y mensaje de WhatsApp informativo', () => {
@@ -1446,7 +1446,9 @@ test('ficha única (sin «modo redes»): «Preguntar por WhatsApp», Guardar y C
   assert.ok(copied === `https://x.example/#libro-${b.id}` && said.at(-1) === 'Enlace copiado.', 'sin Web Share se copia el enlace y se avisa');
   assert.equal(await shareBook(b, { nav: { clipboard: { writeText: async () => { throw new Error('no'); } } }, href: 'https://x.example/', say: t => said.push(t) }), 'sin copiar');
   assert.ok(/Copia la dirección/.test(said.at(-1)), 'si tampoco se puede copiar, se dice qué hacer');
-  assert.ok(/\/\^#libro-\(\[a-z0-9-\]\+\)\$\/\.exec\(location\.hash\)/.test(app) && /detail: \{ id: m\[1\] \}/.test(app), 'un enlace compartido (#libro-<id>) abre la ficha de su libro');
+  assert.ok(/\/\^#libro-\(\.\*\)\$\/\.exec\(location\.hash\)/.test(app) && /\/\^\[a-z0-9-\]\+\$\/\.test\(id\)/.test(app) && /const detail = \{ id \};/.test(app), 'un enlace compartido (#libro-<id>) abre la ficha de su libro, sea cual sea lo que siga al guion');
+  assert.ok(/m\.notify\('Ese libro ya no está en el catálogo\.'\)/.test(app) && /if \(catalogSection\.dataset\.state !== 'ready'\) return landOnCatalog\(false\);/.test(app) && /if \(detail\.found !== true\) landOnCatalog\(true\);/.test(app) && /\$\('#libros'\)/.test(app), 'un libro que ya no está (o un id raro) aterriza en el Catálogo con el aviso estándar; si el catálogo no carga no se afirma nada del libro');
+  assert.ok(/if \(!b\) return false;/.test(cat) && /e\.detail\.found = openBook\(/.test(cat), 'el catálogo dice si encontró el libro (detail.found)');
 });
 test('Novedades: nada se presenta como ranking ni como inventario', async () => {
   const files = await Promise.all(['index.html', 'app.js', 'news.js', 'feed.js', 'rail.js', 'catalog.js', 'saved.js'].map(f => readFile(here(`./${f}`), 'utf8')));
@@ -1507,7 +1509,7 @@ test('Eventos (2026-11-16): destacado y lista por fecha en lugar del carrusel; s
   assert.ok(/\.ev-card \{[^}]*padding: var\(--space-5\) 0; border-top: 1px solid var\(--linea\);/.test(cssFlat) && !/\.ev-card \{[^}]*(background|border-radius|box-shadow|vidrio|cursor: pointer)/.test(cssFlat), 'la lista son filas entre líneas finas: sin relleno, radio, sombra ni vidrio, y no es un control');
   assert.ok(/\.ev-prox \{[^}]*border: 1px solid var\(--linea\); border-radius: var\(--radio-lg\); background: var\(--superficie\);/.test(cssFlat) && !/\.ev-(card|prox) \{[^}]*box-shadow/.test(cssFlat), 'el destacado es un panel de superficie con borde fino y sin sombra');
   assert.ok(/\.ev-prox-tit \{[^}]*font: var\(--t-titulo-1\)/.test(cssFlat) && /\.ev-fecha-num \{ font: var\(--t-fecha-grande\);[^}]*font-variant-numeric: tabular-nums;/.test(cssFlat) && tokensCss.includes('--t-fecha-grande: 300 52px/52px') && tokensCss.includes('--t-fecha-lista: 300 32px/36px') && /--ls-versalitas: 0\.08em;/.test(tokensCss), 'título del destacado en Title 1 y fecha tipográfica: versalitas arriba y número ligero (300) con cifras tabulares, de los tokens');
-  assert.ok(/\.btn--contorno \{ background: transparent; color: var\(--tinta\); box-shadow: inset 0 0 0 1px var\(--linea-fuerte\);/.test(cssFlat) && /\.btn--contorno:active \{ background: var\(--fondo-3\); \}/.test(cssFlat) && /@media \(hover: hover\) \{[\s\S]*?\.btn--contorno:hover \{ background: var\(--fondo-3\); \}/.test(cssFlat), 'botón de contorno: transparente, borde linea-fuerte, presionado y hover solo con puntero fino');
+  assert.ok(/\.btn--contorno \{ background: transparent; color: var\(--tinta\); box-shadow: inset 0 0 0 1px var\(--linea-fuerte\);/.test(cssFlat) && /\.btn--contorno:active \{ background: var\(--fondo-3-presionado\); \}/.test(cssFlat) && /@media \(hover: hover\) \{[\s\S]*?\.btn--contorno:hover \{ background: var\(--fondo-3\); \}/.test(cssFlat), 'botón de contorno: transparente, borde linea-fuerte, presionado y hover solo con puntero fino');
   assert.ok(/\.ev-card-img \{[^}]*width: var\(--portada-evento\); height: var\(--portada-evento\);[^}]*object-fit: cover;[^}]*outline: 1px solid var\(--linea\);[^}]*\}/.test(cssFlat) && tokensCss.includes('--portada-evento: 88px;') && tokensCss.includes('--portada-evento-amplia: 120px;'), 'portada cuadrada de 88 (120 en escritorio), de los tokens');
   assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.ev-prox \{ grid-template-columns: var\(--rejilla\); column-gap: var\(--canal-rejilla\); \}\s*\.ev-prox-fig \{ grid-column: 7 \/ -1; grid-row: 1; \}[\s\S]*?\.ev-lista \{ grid-column: 1 \/ span 8; \}\s*\.ev-lado \{ grid-column: 9 \/ -1; position: sticky;/.test(css), 'escritorio: destacado 1–6 | 7–12; lista 1–8 y nota 9–12, fija al desplazar');
   assert.ok(/\.motion \.ev-espera \{ opacity: 0; \}/.test(cssFlat) && /waiting = nodes\.filter\(n => n\.getBoundingClientRect\(\)\.top >= innerHeight\)/.test(feed) && /delay: Math\.min\(i \* step, tope\)/.test(feed) && /tope: DUR\('lenta'\) - DUR\('rapida'\)/.test(feed), 'entrada escalonada dentro de dur-lenta, solo de lo que aún no se ve y solo con movimiento');
@@ -1656,7 +1658,7 @@ test('arranque (R01): tramos cortos, hora de Monterrey en reposo y medidas de de
   const zones = appSrc.slice(appSrc.indexOf('const measureZones'), appSrc.indexOf('function spy()'));
   assert.ok(/z\.from\.offsetHeight && z\.to\.offsetHeight/.test(zones) && !/querySelector|\$\(/.test(zones), 'el scroll-spy mide solo las secciones, no sus descendientes');
   assert.ok(/async function boot\(\)/.test(appSrc) && (appSrc.match(/await yieldNow\(\)/g) || []).length >= 6, 'boot() cede el hilo entre secciones');
-  assert.ok(/requestIdleCallback \|\| \(cb => setTimeout\(cb, 300\)\)\)\(updateStatus/.test(appSrc), 'la hora de Monterrey (Intl) no corre en la tarea de arranque');
+  assert.ok(/whenIdle\(updateStatus/.test(appSrc), 'la hora de Monterrey (Intl) no corre en la tarea de arranque');
   assert.ok(!/fitOnly|fitWord/.test(appSrc), 'ya no hay rótulo que ajustar al ancho');
 });
 
@@ -1946,12 +1948,12 @@ test('movimiento: titulares por línea, revelado de imagen y respuesta al toque,
   assert.ok(/function splitHeading\(h\)/.test(app) && /words\.forEach\(w => \{ const t = w\.offsetTop;/.test(app) && /line\.className = 'linea';/.test(app) && /inner\.className = 'linea-in';/.test(app), 'el titular se parte en sus líneas reales (medidas en pantalla)');
   assert.ok(/if \(el\.getBoundingClientRect\(\)\.top < innerHeight\) return;/.test(app) && /el\.dataset\.revelar = 'listo';/.test(app) && /if \(!isMotion\(\) \|\| !\('IntersectionObserver' in window\)\) return;/.test(app), 'solo lo que no se ve y solo con movimiento: nada visible se oculta');
   assert.ok(/unsplit\(\); revealAll\(\);/.test(app) && /h\.innerHTML = h\.dataset\.src;/.test(app), 'si cambia el ancho, los titulares vuelven a su texto');
-  assert.ok(/\(window\.requestIdleCallback \|\| \(cb => setTimeout\(cb, 300\)\)\)\(prepareReveals/.test(app), 'se prepara en reposo, después del primer render');
+  assert.ok(/whenIdle\(prepareReveals/.test(app), 'se prepara en reposo, después del primer render');
   assert.ok(/\.motion \[data-revelar="listo"\] \.linea-in \{ transform: translateY\(105%\); transition: transform var\(--dur-lenta\) var\(--curva-salida\); transition-delay: calc\(var\(--i, 0\) \* var\(--escalon-linea\)\); \}/.test(cssFlat), 'cada línea sube con dur-lenta y 60 ms de escalón');
   assert.ok(/\.linea:nth-child\(2\) \{ --i: 1; \}/.test(cssFlat) && !/setProperty\('--i'/.test(app), 'el escalón sale de nth-child, sin estilos en línea');
   assert.ok(/\.motion :is\(\.still-img, \.frame-clip\)\[data-revelar="listo"\] \{ clip-path: inset\(6% 6% 6% 6% round var\(--radio-lg\)\);/.test(cssFlat) && /img \{ transform: scale\(1\.06\); transition: transform calc\(var\(--dur-lenta\) \* 1\.6\) var\(--curva-salida\); \}/.test(cssFlat), 'la imagen se abre desde un recorte del 6 % y baja de 1.06 a 1');
-  assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\*, \*::before, \*::after \{ transition-duration: 0\.01ms !important;[^}]*animation-duration: 0\.01ms !important;/.test(css) && /\.btn:active, \.menu-btn:active, \.chip:active[^{]*\{ transform: none; \}/.test(cssFlat), 'reducir movimiento: sin desplazamientos ni escalas, el color sí responde');
-  assert.ok(/\.btn:active \{ transform: scale\(0\.97\)/.test(cssFlat) && /\.chip:active, \.cat-filters-btn:active, \.cat-chip:active \{ transform: scale\(0\.96\); \}/.test(cssFlat) && /\.tabbar a:active, \.tab-list:active \{ transform: scale\(0\.94\); \}/.test(mobileFlat), 'botones 0.97, chips 0.96, casillas 0.94');
+  assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\*, \*::before, \*::after, ::backdrop \{ transition-duration: 0\.01ms !important;[^}]*animation-duration: 0\.01ms !important;/.test(css) && /\.btn:active, \.menu-btn:active, \.chip:active[^{]*\{ transform: none; \}/.test(cssFlat), 'reducir movimiento: sin desplazamientos ni escalas, el color sí responde');
+  assert.ok(/\.btn:active \{ transform: scale\(0\.97\)/.test(cssFlat) && /\.chip:active, \.cat-filters-btn:active, \.cat-chip:active \{ transform: scale\(0\.96\); \}/.test(cssFlat) && /\.tabbar a:active, \.tab-list:active \{ transform: scale\(0\.94\); background: var\(--fondo-3-presionado\); \}/.test(mobileFlat), 'botones 0.97, chips 0.96, casillas 0.94');
   const motionJs = await readFile(here('./motion.js'), 'utf8');
   assert.ok(/'dur-instant': 'dur-instantanea'/.test(motionJs) && /EASE = \(\) => token\('curva-salida'\)/.test(motionJs), 'motion.js lee los tokens nuevos (los nombres cortos siguen sirviendo)');
   for (const m of (css + mobileCss).matchAll(/(transition|animation)(?:-duration)?:\s*([^;]+);/g)) {

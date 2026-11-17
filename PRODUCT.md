@@ -205,5 +205,5 @@ genérico.
 
 La experiencia completa debe poder recorrerse con teclado, foco visible,
 controles táctiles suficientes y estructura semántica. Debe respetar
-`prefers-reduced-motion`, ahorro de datos y el botón «Pausar el movimiento» del
-pie, usando fotogramas estáticos sin ocultar contenido ni acciones.
+`prefers-reduced-motion`, ahorro de datos y el interruptor «Pausar el movimiento»
+(al pie de la página y al final del menú ☰), usando fotogramas estáticos sin ocultar contenido ni acciones.

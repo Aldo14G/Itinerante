@@ -129,11 +129,9 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .btn:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--anillo-foco); }
 
 .btn--primario { background: var(--primario); color: var(--en-primario); }
-.btn--primario:active { background: var(--primario-presionado); }
 .btn--secundario { background: var(--menta); color: var(--en-menta); }
 .btn--plano { background: transparent; color: var(--turquesa-texto); }
 .btn--contorno { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1px var(--linea-fuerte); } /* de contorno (Eventos, 2026-11-16): sin relleno, para lo que no debe competir con la primaria */
-.btn--contorno:active { background: var(--fondo-3); }
 /* De vidrio: solo lo que flota (cerrar una hoja, botones sobre una foto). */
 .btn--vidrio { background: var(--vidrio); color: var(--tinta); -webkit-backdrop-filter: var(--filtro-vidrio); backdrop-filter: var(--filtro-vidrio); box-shadow: var(--luz-vidrio), var(--sombra-flotante); }
 .btn--vidrio:focus-visible { box-shadow: var(--anillo-foco), var(--luz-vidrio); }
@@ -146,8 +144,16 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
   .btn--contorno:hover { background: var(--fondo-3); }
   a.btn:hover .ic:has(use[href="#i-ne"]) { transform: translate(2px, -2px); }
 }
+.btn--primario:active, .btn--secundario[aria-pressed="true"]:active, .save--wide[aria-pressed="true"]:active { background: var(--primario-pulsado); }
+.btn--secundario:not([aria-pressed="true"]):active, .save--wide:not([aria-pressed="true"]):active { background: var(--menta-presionado); }
+.btn--plano:active { background: var(--fondo-3-presionado); color: var(--primario-presionado); }
+.btn--contorno:active { background: var(--fondo-3-presionado); }
+.btn--vidrio:active { background: var(--fondo-3-presionado) !important; } /* !important: los respaldos opacos del vidrio fijan su fondo; el presionado se nota también ahí */
 .btn:disabled, .btn[aria-disabled="true"] { background: var(--fondo-3); color: var(--tinta-2); box-shadow: none; cursor: not-allowed; transform: none; }
 
+/* Presionado (:active, 2026-11-16): un tono por familia en los tokens (primario-pulsado, menta-presionado, fondo-3-presionado), un paso más allá del
+   hover y declarado después de él (mismo peso, gana el último): el toque siempre pasa al cursor. Es el color el que responde al toque y por eso
+   sirve con «reducir movimiento» y con la pausa del pie, donde la escala se anula (más abajo); con movimiento se suman los dos. */
 /* Alternado (aria-pressed): el secundario toma el primario y su icono se rellena («Guardado en mi lista»). */
 .btn--secundario[aria-pressed="true"], .save--wide[aria-pressed="true"] { background: var(--primario); color: var(--en-primario); }
 .save[aria-pressed="true"] .ic { fill: currentColor; fill-opacity: 0.25; }
@@ -263,6 +269,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-btn:active { transform: scale(0.94); }
 .menu-btn:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .menu-btn:hover { background: var(--fondo-3); } }
+.menu-btn:active { background: var(--fondo-3-presionado); }
 .menu-lines { position: relative; width: 20px; height: 14px; }
 .menu-lines span { position: absolute; left: 0; width: 20px; height: 2px; border-radius: var(--radio-pildora); background: currentColor; transition: transform var(--dur-base) var(--curva-resorte), opacity var(--dur-rapida) var(--curva-salida); }
 .menu-lines span:nth-child(1) { top: 0; }
@@ -281,6 +288,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-top .menu-close { pointer-events: auto; }
 .menu-close { background: var(--vidrio); -webkit-backdrop-filter: var(--filtro-vidrio); backdrop-filter: var(--filtro-vidrio); box-shadow: var(--luz-vidrio), var(--sombra-flotante); }
 .menu-close:focus-visible { box-shadow: var(--anillo-foco), var(--luz-vidrio); }
+.menu-close:active { background: var(--fondo-3-presionado) !important; }
 .menu-hoja {
   position: absolute; top: calc(var(--hdr-h) + var(--space-2)); right: var(--space-2); bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px)); left: var(--space-2);
   display: flex; flex-direction: column;
@@ -304,9 +312,10 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-row > .ic { width: 20px; height: 20px; color: var(--tinta-2); }
 .menu-row[aria-current="true"] { background: var(--menta); color: var(--en-menta); }
 .menu-row[aria-current="true"] > .ic { color: var(--en-menta); }
-.menu-row:active { background: var(--fondo-3); }
 .menu-row:focus-visible { outline: 2px solid transparent; box-shadow: inset 0 0 0 2px var(--foco); }
 @media (hover: hover) { .menu-row:not([aria-current="true"]):hover { background: var(--fondo-3); } }
+.menu-row:active { background: var(--fondo-3-presionado); }
+.menu-row[aria-current="true"]:active { background: var(--menta-presionado); }
 /* Un eje de tinta en toda la hoja (Sistema de guías, 2026-11-15; antes tres: 20, 28 y 36): el texto de las filas, el estado, la semana y los
    iconos de Instagram y Facebook empiezan a 8 px de la caja de la fila; las cajas con fondo (fila actual, «Cómo llegar») comparten su borde. */
 .menu-pie { display: grid; gap: var(--space-3); margin-top: auto; padding-top: var(--space-6); }
@@ -316,14 +325,18 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-acciones .btn { min-width: 0; }
 .menu-redes { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 calc(-1 * var(--space-2)); padding: 0; list-style: none; } /* botón sin fondo de relleno 16: su icono queda en el eje (16 − 8) */
 .menu-redes .btn { color: var(--tinta); }
+/* «Pausar el movimiento» en el menú (2026-11-16): la fila del interruptor al pie, separada por un filete; rótulo a la izquierda y la pista a la derecha, como en Ajustes de iOS. */
+.menu-movimiento { display: grid; gap: var(--space-1); border-top: 1px solid var(--linea); } /* el filete a 12 de Facebook (el hueco del pie) y la fila de 44 debajo: 57 px en total */
+.menu-movimiento .interruptor { width: 100%; margin: 0; justify-content: space-between; }
+.menu-movimiento .interruptor-nota { padding-inline: var(--space-2); }
 
 /* Entrada de la hoja: aparece desde la esquina del ☰ (escala 0.98) y sus filas entran en cascada, 30 ms entre una y otra. Sin movimiento, solo se funde. */
-.menu-hoja, .menu::backdrop { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
+.menu-hoja, .menu::backdrop { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte), overlay var(--dur-base) var(--curva-salida) allow-discrete, display var(--dur-base) var(--curva-salida) allow-discrete; }
 @starting-style { .menu[open] .menu-hoja, .menu[open]::backdrop { opacity: 0; } }
 .menu.is-closing .menu-hoja, .menu.is-closing::backdrop { opacity: 0; }
 .motion .menu.is-closing .menu-hoja { transform: translateY(-12px) scale(0.98); }
 @starting-style { .motion .menu[open] .menu-hoja { transform: translateY(-12px) scale(0.98); } }
-.menu-lista li { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-salida); transition-delay: calc(var(--i, 0) * var(--escalon-linea) / 2); }
+.menu-lista li { transition: opacity var(--dur-rapida) var(--curva-salida), transform var(--dur-rapida) var(--curva-salida); transition-delay: calc(var(--i, 0) * var(--escalon-linea) / 2); } /* cada fila en dur-rapida (antes dur-base: la octava terminaba a los 636 ms; 2026-11-16): con el mismo escalón de 30 ms la última termina a los 450 */
 @starting-style { .motion .menu[open] .menu-lista li { opacity: 0; transform: translateY(8px); } }
 .menu-lista li:nth-child(2) { --i: 1; } .menu-lista li:nth-child(3) { --i: 2; } .menu-lista li:nth-child(4) { --i: 3; }
 .menu-lista li:nth-child(5) { --i: 4; } .menu-lista li:nth-child(6) { --i: 5; } .menu-lista li:nth-child(7) { --i: 6; } .menu-lista li:nth-child(8) { --i: 7; }
@@ -682,6 +695,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .interruptor:not([aria-disabled="true"]):hover .interruptor-pista { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); }
   .interruptor[aria-checked="true"]:not([aria-disabled="true"]):hover .interruptor-pista { background: var(--primario-presionado); }
 }
+.interruptor:not([aria-disabled="true"]):active .interruptor-pista { background: var(--fondo-3-presionado); }
+.interruptor[aria-checked="true"]:not([aria-disabled="true"]):active .interruptor-pista { background: var(--primario-pulsado); }
 .interruptor-nota { margin: 0; font: var(--t-nota-pie); color: var(--tinta-2); }
 @media (min-width: 761px) {
   /* Dos por fila: WhatsApp e Instagram arriba, Facebook y Correo abajo; el filete separa solo las filas. */
@@ -712,6 +727,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .motion :is(.still-img, .frame-clip)[data-revelar="listo"] img { transform: scale(1.06); transition: transform calc(var(--dur-lenta) * 1.6) var(--curva-salida); }
 .motion :is(.still-img, .frame-clip)[data-revelar="listo"].is-visible { clip-path: inset(0 0 0 0 round var(--radio-lg)); }
 .motion :is(.still-img, .frame-clip)[data-revelar="listo"].is-visible img { transform: none; }
+/* Llegar por un enlace (app.js, arriveAt; 2026-11-16): lo de la sección de destino aparece colocado, sin recorrido: la misma pose final, sin transición. */
+.motion [data-revelar="listo"].is-llegada, .motion [data-revelar="listo"].is-llegada :is(.linea-in, .sec-texto, img) { transition: none; }
 
 /* Fotos diferidas: entran con un fundido al llegar; mientras faltan, el marco queda quieto con su color. */
 @keyframes img-in { from { opacity: 0; } }
@@ -736,6 +753,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .explore-open .ic { width: 22px; height: 22px; flex: none; }
 .explore-open:active, .explore-open[data-opening] { transform: scale(0.98); }
 @media (hover: hover) { .explore-open:hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
+.explore-open:active { background: var(--fondo-3-presionado); }
 
 /* Chip (Chip): píldora de 48 px en fondo-3; elegido = primario con la palomita (la forma acompaña al color). La palomita es un trazo SVG
    (.chip-chk, checkMark en carousel3d.js) para que se dibuje al elegir (2026-11-14); antes era una máscara en ::before. */
@@ -757,6 +775,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .motion .is-dibuja > .chip-chk path { animation: chk-dibuja var(--dur-rapida) var(--curva-salida) backwards; }
 :is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { :is(.chip:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); } }
+.chip:not([aria-checked="true"]):active, .cat-filters-btn:not([aria-expanded="true"]):active { background: var(--fondo-3-presionado); }
+.chip[aria-checked="true"]:active, .cat-filters-btn[aria-expanded="true"]:active, .cat-chip:active { background: var(--primario-pulsado); }
 
 
 /* Campo (CampoBusqueda): píldora de 48 px en fondo-3, letra de 17 px (Safari no acerca la página). Con foco: fondo de página, borde linea-fuerte y anillo. */
@@ -815,7 +835,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .cat-opt { position: relative; }
 .cat-opt input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
 .cat-opt label { position: relative; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); min-height: var(--alto-sm); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-10); border-radius: var(--radio-sm); cursor: pointer; font: var(--t-subtitulo); }
-.cat-opt label::before { content: ""; position: absolute; left: var(--space-2); top: 50%; width: 24px; height: 24px; translate: 0 -50%; border: 2px solid var(--linea-fuerte); border-radius: var(--radio-portada); background: var(--fondo); transition: background-color var(--dur-rapida), border-color var(--dur-rapida); }
+.cat-opt label::before { content: ""; position: absolute; left: var(--space-2); top: 50%; width: 24px; height: 24px; translate: 0 -50%; border: 2px solid var(--linea-fuerte); border-radius: var(--radio-portada); background: var(--fondo); transition: background-color var(--dur-rapida) var(--curva-salida), border-color var(--dur-rapida) var(--curva-salida); }
 .cat-opt label::after { content: ""; position: absolute; left: 17px; top: 50%; width: 6px; height: 11px; translate: 0 -60%; rotate: 45deg; border: solid var(--en-primario); border-width: 0 2px 2px 0; opacity: 0; } /* ci:token-space-grid palomita centrada en la caja de 24 px */
 .cat-opt input:checked + label::before { background: var(--primario); border-color: var(--primario); }
 .cat-opt input:checked + label::after { opacity: 1; }
@@ -916,6 +936,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .save .ic { width: 22px; height: 22px; }
 /* !important: los respaldos opacos del vidrio (gama media, sin backdrop-filter, transparencia reducida, contraste alto) pintan el disco en `superficie` y dejaban el marcador guardado blanco sobre blanco (1:1; 2026-11-16). */
 .save[aria-pressed="true"]:not(.save--wide) { background: var(--primario) !important; color: var(--en-primario); }
+.save[aria-pressed="true"]:not(.save--wide):active { background: var(--primario-pulsado) !important; }
+.save:not([aria-pressed="true"]):not(.save--wide):active { background: var(--fondo-3-presionado) !important; } /* también en los respaldos opacos del vidrio, que fijan el fondo */
 .save--wide {
   position: static; display: inline-flex; gap: var(--space-2); justify-self: start; width: auto; height: auto; min-height: var(--alto-md);
   padding: 0 var(--space-5); border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta);
@@ -1011,7 +1033,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .is-filling > * { content-visibility: hidden; }
 /* La hoja solo anima opacidad y posición; `overlay` y `display` van solo en su velo. Con ellos en la hoja, al cerrarse seguía pintada sin pose de «cerrado»: volvía a entrar tras salir y, con Escape o «atrás», se quedaba 420 ms con la maqueta rota (auditoría de los 20 principios, 2026-11-16). */
 .drawer, .mylist { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte); }
-.drawer::backdrop, .mylist::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) allow-discrete, display var(--dur-base) allow-discrete; }
+.drawer::backdrop, .mylist::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) var(--curva-salida) allow-discrete, display var(--dur-base) var(--curva-salida) allow-discrete; }
 @starting-style { .drawer[open], .mylist[open], .drawer[open]::backdrop, .mylist[open]::backdrop { opacity: 0; } }
 .drawer.is-closing, .mylist.is-closing, .drawer.is-closing::backdrop, .mylist.is-closing::backdrop { opacity: 0; transition-duration: var(--dur-rapida); transition-timing-function: var(--curva-entrada-salida); }
 @starting-style { .motion .drawer[open], .motion .mylist[open] { transform: translateY(4%) scale(0.96); } }
@@ -1030,6 +1052,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .toast > :only-child { padding: var(--space-3) var(--space-4) var(--space-3) 0; }
 .toast-action { margin-inline-start: auto; min-height: var(--alto-md); padding: 0 var(--space-4); border: 0; border-radius: var(--radio-pildora); background: var(--menta); color: var(--en-menta); font: var(--t-boton-chico); white-space: nowrap; cursor: pointer; }
 .toast-action:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+.toast-action:active { background: var(--menta-presionado); }
 
 /* ---------- Carrusel3D (carousel3d.js): el motor del carrusel de portadas del Catálogo ---------- */
 /* La pista se desplaza con el dedo (imán al centro) y carousel3d.js da a cada pieza su pose según su distancia al centro, una vez por
@@ -1142,7 +1165,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .rail-item .card { content-visibility: visible; }
 .rail-item.is-centro .cover { box-shadow: var(--sombra-portada); }
 /* Guardar solo sobre la portada del centro: en una vecina girada no se leería ni se tocaría bien. */
-.rail-item .save { transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida); }
+.rail-item .save { transition: transform var(--dur-instantanea) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), color var(--dur-rapida) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida), visibility var(--dur-rapida) var(--curva-salida); }
 .rail-item:not(.is-centro) .save { opacity: 0; visibility: hidden; }
 /* Pie del libro del centro: el título (Title 3) y «autor · precio» (Subheadline), enteros y sin cortar: si no caben, bajan de renglón y el precio
    nunca se parte. En un pie angosto el bloque reserva dos renglones de cada uno (2 × 25 + 2 × 20 px), así pasar de un libro a otro casi nunca
@@ -1197,6 +1220,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .ct-chip { flex: none; text-decoration: none; }
 .ct-chip[aria-current="true"] { background: var(--primario); color: var(--en-primario); }
 @media (hover: hover) { .ct-chip[aria-current="true"]:hover { background: var(--primario); } }
+.ct-chip[aria-current="true"]:active { background: var(--primario-pulsado); }
 .ct-nav { margin-bottom: var(--space-4); } /* barra → carta: 8 de la barra + 16 = 24 (cabecera → contenido) */
 .ct-lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); min-width: 0; }
 /* Al llegar por su chip, el título del grupo queda 16 px bajo la barra (html ya aparta la cabecera y 8 px: scroll-padding-top). */
@@ -1345,11 +1369,15 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
 /* ---------- Movimiento reducido ---------- */
 /* Sin desplazamientos, escalas, giros ni rebotes: los cambios de color se conservan y responden al toque sin moverse. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+  *, *::before, *::after, ::backdrop { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
   .btn:active, .menu-btn:active, .chip:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover { transform: none; }
   [data-inclina]:active { scale: none; }
+  /* Las piezas del carrusel (la envoltura de la pose, la imagen que se atenúa) no llevan transición propia, pero `transition-duration: 0.01ms` activa la de `all` por omisión y dura dos fotogramas: el
+     desplazamiento ya hecho se pintaba con las poses de antes (flecha con movimiento reducido en 1440, 2026-11-16). Sin movimiento, la pose es inmediata. */
+  .c3d-item, .c3d-item * { transition: none !important; }
 }
 /* La pausa del pie («Pausar el movimiento», html.js sin .motion) vale lo mismo que reducir movimiento (DESIGN.md, Movimiento). */
-html.js:not(.motion) *, html.js:not(.motion) *::before, html.js:not(.motion) *::after { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+html.js:not(.motion) *, html.js:not(.motion) *::before, html.js:not(.motion) *::after, html.js:not(.motion) ::backdrop { transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 html.js:not(.motion) :is(.btn:active, .menu-btn:active, .chip:active, .cat-chip:active, .cat-filters-btn:active, .save:active, .card:active .cover, .rel:active .cover) { transform: none; }
 html.js:not(.motion) [data-inclina]:active { scale: none; }
+html.js:not(.motion) :is(.c3d-item, .c3d-item *) { transition: none !important; }
