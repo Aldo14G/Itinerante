@@ -1,3 +1,11 @@
+# Continuidad de Itinerante — 2026-11-17 (Café: contenedor de la página y galería de la carta; rama `claude/cool-turing-37uiqt`, sin commit)
+
+- **Decisiones de Aldo (2026-11-17):** (1) Café en el contenedor de la página (1152), con la misma composición: un solo eje; (2) encima de la carta, una galería en carrusel con fotos de los productos (la lista se queda para leer y comparar precios). Hoy no hay fotos de producto: Aldo las mandará.
+- **Hecho (1):** retirado el contenedor de 1120 (token `ancho-carta`, `SISTEMA.contenedores.cafe` y su excepción); 1440: titular, categorías y primer producto x 160 → 144 (Eventos y Visita 144); la foto de cabecera, en 9–12, es pieza lateral de la columna 9 como la nota de Eventos (`SISTEMA.laterales`, ahora por sección).
+- **Hecho (2):** GaleriaCarta (variante galería del Carrusel3D): solo con ≥ 5 productos con foto (hasta 12; `galeria` opcional en `menu.json`), pintada por `build-carta.mjs` (sin JS, fila con imán), motor en `cafe.js` (import dinámico de `carousel3d.js`), pieza cuadrada del ancho de la portada, nombre y precio en tinta, tocar la central lleva a la fila (foco en el nombre, realce menta solo con movimiento); con galería la foto de cabecera no se pinta. `menuProblems` valida fotos (con disco: existen y registradas) y `galeria`; `npm run carta` no pinta si algo falla. `scripts/foto-carta.py` carga cada foto (cuadrado al centro, 1200 y 600, procedencia «foto aportada por Aldo»).
+- **Arnés:** fixture de prueba `tools/qa/carta-prueba.mjs` (fotos reales de la casa como sustitutas, solo en la prueba); `feed.mjs` 3c, `carrusel.mjs --galeria`, `guias.mjs --galeria`.
+- **Pendiente:** las fotos reales de Aldo; con ellas, revisar el encuadre (criterio «Foto» de la rúbrica) y correr de nuevo `feed`, `carrusel --galeria` sin fixture y `guias`.
+
 # Continuidad de Itinerante — 2026-11-17 (Café: una cuadrícula; rama `claude/cool-turing-37uiqt`, sin commit)
 
 - **Pedido de Aldo (2026-11-17):** rediseñar solo la composición de Café (anchos, ejes, agrupación y orden de lectura): «el título, la fotografía, las categorías y los productos parecen ocupar cuadrículas distintas». Sin parallax ni animaciones. Nada llega a `main` hasta que vea las comparativas.

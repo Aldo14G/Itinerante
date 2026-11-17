@@ -400,6 +400,33 @@
       "decision": "DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16)."
     },
     {
+      "id": "galeria-carta",
+      "nombre": "GaleriaCarta",
+      "tipo": "bloque",
+      "variante_de": "carrusel3d",
+      "descripcion": "Galería de la carta de Café y té (2026-11-17, decisión de Aldo: fotos arriba para abrir el antojo y la lista abajo para leer y comparar precios, como las apps de comida). Solo existe con fotos de producto: desde GALERIA_MIN (5) productos con foto y hasta GALERIA_MAX (12), en el orden de la carta o en el de «galeria» de menu.json; con menos no se pinta nada (ni hueco ni encabezado). La pinta scripts/build-carta.mjs entre la cabecera y la barra de categorías (sin JavaScript, una fila que se desliza con imán y el nombre bajo cada pieza) y cafe.js le pone el motor del Carrusel3D (variante galería): piezas cuadradas del ancho de las portadas del Catálogo, radio 12, solo la central con sombra-portada; bajo ella, nombre (Headline) y precio («$NN MXN», data-fuente=carta; sin precio, nada) en tinta, con el alto reservado. Tocar una vecina la trae al centro; tocar la central lleva a la fila de su producto (título del grupo bajo la barra si cabe; si no, la fila), deja el foco en su nombre y, con movimiento, la fila se realza un momento (menta en dur-lenta). Con galería, la foto de la cabecera no se pinta.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".c3d--galeria", ".ct-gal", ".ct-gal-pieza", ".ct-gal-foto", ".ct-gal-pie", ".ct-gal-nom", ".ct-gal-precio", ".ct-gal-txt", ".ct-prod.is-realce"] },
+        { "ruta": "cafe.js", "exporta": ["galeriaItems", "filaId", "GALERIA_MIN", "GALERIA_MAX", "menuProblems"], "ganchos": ["await import('./carousel3d.js')", "focusSel: '.ct-gal-pieza'", "fila.classList.add('is-realce')"] },
+        { "ruta": "scripts/build-carta.mjs", "exporta": ["cartaHtml", "withCarta", "problemasDisco", "srcsetDisco"], "ganchos": ["aria-roledescription=\"carrusel\" aria-label=\"Fotos de la carta\"", "data-ct-gal-live"] }
+      ],
+      "tokens": ["sombra-portada", "sombra-flotante", "radio-sm", "radio-portada", "fondo-3", "menta", "tinta", "tinta-2", "t-titular", "t-subtitulo", "anillo-foco", "dur-rapida", "dur-lenta", "curva-salida", "curva-entrada-salida", "space-2", "space-4", "space-5", "space-6", "space-12"],
+      "estados": {
+        "foco": { "css": [".ct-gal-pieza:focus-visible", ".ct-nom:focus-visible"], "nota": "Una parada de tabulador: la pieza central; al abrirla, el foco pasa al nombre del producto en su fila." },
+        "actual": { "css": [".ct-gal-item.is-centro .ct-gal-foto"], "nota": "La central: sombra-portada; la región viva anuncia el producto que llega por una flecha o el teclado." },
+        "presionado": { "css": [".ct-gal-item.is-centro .ct-gal-pieza:active .ct-gal-foto"], "nota": "La sombra baja a sombra-flotante (y la escala 0.97 de [data-inclina] con movimiento)." },
+        "deshabilitado": { "css": [".c3d-flecha:disabled"] },
+        "vacio": { "js": [{ "ruta": "cafe.js", "texto": "return lista.length >= GALERIA_MIN ? lista : [];" }], "nota": "Con menos de 5 fotos no existe: ni hueco ni encabezado; la cabecera vuelve a llevar su foto." },
+        "error": { "js": [{ "ruta": "cafe.js", "texto": "img.addEventListener('error', quitar, { once: true })" }], "nota": "Una foto que falla se quita y queda el icono de su categoría en el mismo recuadro." },
+        "movimiento_reducido": { "css": [".motion .ct-prod.is-realce::before"], "js": [{ "ruta": "cafe.js", "texto": "if (!suave) return;" }], "nota": "Sin movimiento: el carrusel plano (motor), el salto a la fila inmediato y sin realce." },
+        "tactil": { "css": [".c3d-flecha"], "media": "(hover: none) and (pointer: coarse)", "nota": "Con toque no hay flechas: deslizar o tocar la vecina." }
+      },
+      "aria": { "patron": "Carousel", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["role=region", "aria-roledescription=carrusel", "aria-label=Fotos de la carta", "aria-live=polite (región viva)", "href=#producto-<id> (cada pieza)", "aria-hidden en el pie común (lo dice el enlace de la pieza)"], "teclado": "El del Carrusel3D: una parada (la central), ← → Inicio Fin; Enter lleva a la fila del producto." },
+      "qa": ["tools/qa/feed.mjs", "tools/qa/carrusel.mjs", "tools/qa/guias.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-17",
+      "decision": "DESIGN.md, «Galería de la carta» (2026-11-17)."
+    },
+    {
       "id": "barra-categorias",
       "nombre": "BarraCategorias",
       "tipo": "control",
@@ -410,7 +437,7 @@
         { "ruta": "cafe.js", "exporta": ["initCafe", "currentGroup", "groupId"], "ganchos": ["tab.setAttribute('aria-current', 'true')", "new IntersectionObserver(", "behavior: isMotion() ? 'smooth' : 'auto'", "nav.toggleAttribute('data-envuelta', envuelta)"] },
         { "ruta": "scripts/build-carta.mjs", "exporta": ["cartaHtml", "withCarta"], "ganchos": ["aria-label=\"${esc(c.nombre)}\""] }
       ],
-      "tokens": ["tinta", "tinta-2", "fondo", "fondo-2", "fondo-3-presionado", "linea", "alto-sm", "radio-sm", "radio-portada", "t-boton-chico", "anillo-foco", "space-1", "space-2", "space-3", "space-4", "space-6", "ancho-carta"],
+      "tokens": ["tinta", "tinta-2", "fondo", "fondo-2", "fondo-3-presionado", "linea", "alto-sm", "radio-sm", "radio-portada", "t-boton-chico", "anillo-foco", "space-1", "space-2", "space-3", "space-4", "space-6"],
       "estados": {
         "hover": { "css": [".ct-tab:hover"], "nota": "Con puntero fino, la tinta (el subrayado es solo del actual)." },
         "foco": { "css": [".ct-tab:focus-visible", ".ct-grupo-tit:focus-visible"], "nota": "El anillo del sitio; al llegar por su enlace, el foco pasa al título del grupo." },

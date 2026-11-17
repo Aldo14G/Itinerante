@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 31 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 32 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -27,6 +27,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | EventosAnteriores | sí | sí | sí |  |  |  | sí |  | sí |  | sí |
 | FilaEventoAnterior | — | — |  |  |  |  |  |  |  | sí |  |
 | AvisoEvento | sí | sí |  |  |  |  |  |  |  |  |  |
+| GaleriaCarta (variante de Carrusel3D) |  | sí | sí | sí |  | sí |  |  | sí | sí | sí |
 | BarraCategorias | sí | sí | sí |  |  | sí |  | — |  |  | sí |
 | FilaProducto | — | — | — |  |  |  |  | — | sí | sí |  |
 | TarjetaLibro | sí | sí | sí |  |  |  |  | sí |  |  | sí |
@@ -373,6 +374,26 @@ Renglón del inicio «Próximo: Sáb 21 nov · título» (el día del evento, «
 - **ARIA:** Link (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `href=#cartelera` `el punto es aria-hidden: «, próximo: Sáb 21 nov · título» va en .sr-only` · **Teclado:** Enlace: Enter.
 - **QA:** `tools/qa/feed.mjs` `tools/qa/iphone.mjs` `tools/qa/guias.mjs` `tests/site.test.mjs`
 
+### GaleriaCarta
+
+Galería de la carta de Café y té (2026-11-17, decisión de Aldo: fotos arriba para abrir el antojo y la lista abajo para leer y comparar precios, como las apps de comida). Solo existe con fotos de producto: desde GALERIA_MIN (5) productos con foto y hasta GALERIA_MAX (12), en el orden de la carta o en el de «galeria» de menu.json; con menos no se pinta nada (ni hueco ni encabezado). La pinta scripts/build-carta.mjs entre la cabecera y la barra de categorías (sin JavaScript, una fila que se desliza con imán y el nombre bajo cada pieza) y cafe.js le pone el motor del Carrusel3D (variante galería): piezas cuadradas del ancho de las portadas del Catálogo, radio 12, solo la central con sombra-portada; bajo ella, nombre (Headline) y precio («$NN MXN», data-fuente=carta; sin precio, nada) en tinta, con el alto reservado. Tocar una vecina la trae al centro; tocar la central lleva a la fila de su producto (título del grupo bajo la barra si cabe; si no, la fila), deja el foco en su nombre y, con movimiento, la fila se realza un momento (menta en dur-lenta). Con galería, la foto de la cabecera no se pinta.
+
+- **Tipo:** bloque · variante de Carrusel3D · **desde** 2026-11-17 · DESIGN.md, «Galería de la carta» (2026-11-17).
+- **style.css:** `.c3d--galeria` `.ct-gal` `.ct-gal-pieza` `.ct-gal-foto` `.ct-gal-pie` `.ct-gal-nom` `.ct-gal-precio` `.ct-gal-txt` `.ct-prod.is-realce`
+- **cafe.js:** exporta `galeriaItems` `filaId` `GALERIA_MIN` `GALERIA_MAX` `menuProblems` · ganchos `await import('./carousel3d.js')` `focusSel: '.ct-gal-pieza'` `fila.classList.add('is-realce')`
+- **scripts/build-carta.mjs:** exporta `cartaHtml` `withCarta` `problemasDisco` `srcsetDisco` · ganchos `aria-roledescription="carrusel" aria-label="Fotos de la carta"` `data-ct-gal-live`
+- **Tokens:** `sombra-portada` `sombra-flotante` `radio-sm` `radio-portada` `fondo-3` `menta` `tinta` `tinta-2` `t-titular` `t-subtitulo` `anillo-foco` `dur-rapida` `dur-lenta` `curva-salida` `curva-entrada-salida` `space-2` `space-4` `space-5` `space-6` `space-12`
+- **Estado foco:** `.ct-gal-pieza:focus-visible`, `.ct-nom:focus-visible` — Una parada de tabulador: la pieza central; al abrirla, el foco pasa al nombre del producto en su fila.
+- **Estado actual:** `.ct-gal-item.is-centro .ct-gal-foto` — La central: sombra-portada; la región viva anuncia el producto que llega por una flecha o el teclado.
+- **Estado presionado:** `.ct-gal-item.is-centro .ct-gal-pieza:active .ct-gal-foto` — La sombra baja a sombra-flotante (y la escala 0.97 de [data-inclina] con movimiento).
+- **Estado deshabilitado:** `.c3d-flecha:disabled`
+- **Estado vacio:** cafe.js `return lista.length >= GALERIA_MIN ? lista : [];` — Con menos de 5 fotos no existe: ni hueco ni encabezado; la cabecera vuelve a llevar su foto.
+- **Estado error:** cafe.js `img.addEventListener('error', quitar, { once: true })` — Una foto que falla se quita y queda el icono de su categoría en el mismo recuadro.
+- **Estado movimiento_reducido:** `.motion .ct-prod.is-realce::before`, cafe.js `if (!suave) return;` — Sin movimiento: el carrusel plano (motor), el salto a la fila inmediato y sin realce.
+- **Estado tactil ((hover: none) and (pointer: coarse)):** `.c3d-flecha` — Con toque no hay flechas: deslizar o tocar la vecina.
+- **ARIA:** Carousel (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `role=region` `aria-roledescription=carrusel` `aria-label=Fotos de la carta` `aria-live=polite (región viva)` `href=#producto-<id> (cada pieza)` `aria-hidden en el pie común (lo dice el enlace de la pieza)` · **Teclado:** El del Carrusel3D: una parada (la central), ← → Inicio Fin; Enter lleva a la fila del producto.
+- **QA:** `tools/qa/feed.mjs` `tools/qa/carrusel.mjs` `tools/qa/guias.mjs` `tests/site.test.mjs`
+
 ### BarraCategorias
 
 Barra de categorías de la carta (Café y té; recomposición del 2026-11-17, sustituye a las píldoras de 48 apiladas en las columnas 1–3 con la activa en el verde de la primaria): una fila de enlaces de sección encima de la carta, uno por categoría de assets/data/menu.json, con el nombre corto si lo trae (campo chip: «Sin café») y entonces el nombre completo como aria-label («Bebidas sin café»). Pintada en index.html con la carta (scripts/build-carta.mjs). Se ven como texto (Subheadline 600 en tinta-2) con objetivo de 44 (8 de relleno a cada lado y 8 entre vecinos; la barra los descuenta para que la tinta del primero caiga en el margen, el mismo eje que el titular y el primer producto). El actual: subrayado de 2 px y tinta, con aria-current (dos canales; sin el verde intenso, que queda para «Cómo llegar»). Fija bajo la cabecera mientras se recorre la carta (sticky, fondo opaco de la banda y un filete: no es vidrio); si los enlaces no caben en un renglón (texto ampliado, Zoom de pantalla) pasan a un segundo renglón —nunca se desliza en horizontal— y la barra deja de ser fija (data-envuelta, que mide cafe.js). Scroll-spy con IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista. Tocar un enlace lleva a su grupo (suave solo con movimiento), cuyo título queda 24 px bajo la barra y recibe el foco. Sin JavaScript son anclas normales.
@@ -382,7 +403,7 @@ Barra de categorías de la carta (Café y té; recomposición del 2026-11-17, su
 - **index.html:** `[data-cafe]` `[data-ct-nav]` `.ct-nav` `.ct-tab`
 - **cafe.js:** exporta `initCafe` `currentGroup` `groupId` · ganchos `tab.setAttribute('aria-current', 'true')` `new IntersectionObserver(` `behavior: isMotion() ? 'smooth' : 'auto'` `nav.toggleAttribute('data-envuelta', envuelta)`
 - **scripts/build-carta.mjs:** exporta `cartaHtml` `withCarta` · ganchos `aria-label="${esc(c.nombre)}"`
-- **Tokens:** `tinta` `tinta-2` `fondo` `fondo-2` `fondo-3-presionado` `linea` `alto-sm` `radio-sm` `radio-portada` `t-boton-chico` `anillo-foco` `space-1` `space-2` `space-3` `space-4` `space-6` `ancho-carta`
+- **Tokens:** `tinta` `tinta-2` `fondo` `fondo-2` `fondo-3-presionado` `linea` `alto-sm` `radio-sm` `radio-portada` `t-boton-chico` `anillo-foco` `space-1` `space-2` `space-3` `space-4` `space-6`
 - **Estado hover:** `.ct-tab:hover` — Con puntero fino, la tinta (el subrayado es solo del actual).
 - **Estado foco:** `.ct-tab:focus-visible`, `.ct-grupo-tit:focus-visible` — El anillo del sitio; al llegar por su enlace, el foco pasa al título del grupo.
 - **Estado presionado:** `.ct-tab:active` — Tono fondo-3-presionado (familia de los controles sin relleno), también con movimiento reducido y con la pausa.

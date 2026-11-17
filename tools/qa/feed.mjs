@@ -30,6 +30,8 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { eventosPlan, validEventos, fechaBloque, fechaLarga, reservaUrl, reservaMessage, icsOf } from '../../feed.js';
 import { withCarta } from '../../scripts/build-carta.mjs';
+import { menuConGaleria } from './carta-prueba.mjs';
+import { galeriaItems } from '../../cafe.js';
 
 const URL_ = process.argv[2] || 'http://127.0.0.1:8094/';
 const out = process.argv[3] || '.';
@@ -581,6 +583,76 @@ for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
   check('café', `${vw}×${vh} con foto de prueba: la fila con foto la lleva cuadrada a la derecha (${lado} × ${lado}, fondo-3, radio 12), con nombre y precio en su sitio (arriba a la izquierda, el precio justo debajo); si la foto falla, queda el icono de su categoría en el mismo recuadro; las demás filas siguen sin foto ni columna reservada`, aLaDerecha(conFoto) && conFoto.foto.img && conFoto.precio === '$65 MXN' && aLaDerecha(rota) && !rota.foto.img && rota.foto.ic && c.prods.filter(p => p.solo).length === c.prods.length - 2 && c.prods.filter(p => p.solo).every(p => !p.foto && cerca(p.txtBox[2], p.box[2])) && !c.over, JSON.stringify([conFoto, rota]).slice(0, 900));
   if (vw === 393) await shot('05-cafe-393-foto-prueba.jpg');
 }
+overrideMenu = null;
+
+// ---------- 3c. Galería de la carta (GaleriaCarta, 2026-11-17): solo con fotos de producto ----------
+// Hoy ninguna: la carta de prueba (tools/qa/carta-prueba.mjs) pone fotos reales de la casa como sustitutas en 6 productos (o en 4, que no
+// bastan) y el documento se sirve con esa carta pintada (withCarta). Se mide: que exista entre la cabecera y la barra y que la foto de la
+// cabecera no se pinte; pieza cuadrada centrada; el pie con el producto central; tocar una vecina la trae al centro; tocar la central lleva a
+// su fila (bajo la barra, encima de la barra inferior), con el foco en su nombre y la categoría marcada; el realce solo con movimiento; teclado
+// con región viva; sin desplazamiento horizontal. Con 4 fotos, nada (ni hueco): la cabecera conserva su foto.
+// Toca el centro de lo que se ve de la pieza (una vecina en el teléfono asoma ~28 %: el centro de su caja queda fuera de la pantalla).
+const clickAt = async sel => { const p = await ev(`(()=>{ const e = document.querySelector(${JSON.stringify(sel)}); if (!e) return null; const b = e.getBoundingClientRect(), W = document.documentElement.clientWidth; const l = Math.max(0, b.left), r = Math.min(W, b.right); return { x: (l + r) / 2, y: b.y + b.height / 2 }; })()`); if (!p) return false; await mouse(p.x, p.y); return true; };
+const leerGaleria = () => ev(`(() => { const q = s => document.querySelector(s), R = e => { const r = e.getBoundingClientRect(); return [Math.round(r.left * 10) / 10, Math.round(r.top * 10) / 10, Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10]; };
+  const gal = q('[data-ct-gal]'); if (!gal) return { existe: false, foto: getComputedStyle(q('.cafe-foto')).display !== 'none', ids: [...document.querySelectorAll('[id^="producto-"]')].length };
+  const items = [...gal.querySelectorAll('.ct-gal-item')], ci = items.findIndex(li => li.classList.contains('is-centro')), cen = items[ci]?.querySelector('.ct-gal-foto'), c3d = q('.c3d--galeria');
+  const flechas = [...gal.querySelectorAll('.c3d-flecha')].map(f => getComputedStyle(f).display !== 'none' && getComputedStyle(f).visibility !== 'hidden');
+  return { existe: true, ready: gal.classList.contains('is-ready'), foto: getComputedStyle(q('.cafe-foto')).display !== 'none', ids: items.map(li => li.dataset.id), ci,
+    cen: cen && R(cen), c3d: R(c3d), head: R(q('#cafe .sec-head')), nav: R(q('.ct-nav')), pie: R(q('.ct-gal-pie .cf-texto')), nom: q('[data-ct-gal-nom]').textContent, precio: q('[data-ct-gal-precio]').textContent, fuente: q('[data-ct-gal-precio]').dataset.fuente || '',
+    live: q('[data-ct-gal-live]').textContent, flechas, tab: [...gal.querySelectorAll('.ct-gal-pieza')].map(a => a.tabIndex), alts: [...gal.querySelectorAll('.ct-gal-foto img')].map(i => i.getAttribute('alt')),
+    nomes: [...gal.querySelectorAll('.ct-gal-txt .ct-gal-nom')].map(n => n.textContent), mitad: (() => { const c = q('#cafe'), r = c.getBoundingClientRect(), cs = getComputedStyle(c); return (r.left + parseFloat(cs.paddingLeft) + r.right - parseFloat(cs.paddingRight)) / 2; })(), sx: document.documentElement.scrollWidth - document.documentElement.clientWidth, region: [c3d.getAttribute('role'), c3d.getAttribute('aria-roledescription'), c3d.getAttribute('aria-label')].join('|') }; })()`);
+for (const [vw, vh, mobile] of [[393, 659, true], [1280, 800, false]]) {
+  const tag = `${vw}×${vh} galería de prueba`;
+  overrideMenu = menuConGaleria(menu, 6);
+  const esperados = galeriaItems(overrideMenu);
+  await open(vw, vh, { reset: true, mobile, wait: 2500 });
+  await irCarta(); await sleep(1200);
+  const g = await leerGaleria();
+  const medio = Math.floor(esperados.length / 2);
+  check('café', `${tag}: con ${esperados.length} productos con foto la galería existe entre la cabecera y la barra de categorías y la foto de la cabecera no se pinta; región con rol de carrusel y nombre`, g.existe && g.ready && !g.foto && g.ids.join() === esperados.map(p => p.id).join() && g.c3d[1] >= g.head[1] + g.head[3] - 1 && g.c3d[1] + g.c3d[3] <= g.nav[1] + 40 && g.region === 'region|carrusel|Fotos de la carta', JSON.stringify(g).slice(0, 600));
+  check('café', `${tag}: empieza por el producto del medio; pieza central cuadrada (${mobile ? '58 % del ancho' : '240–280 px'}) y centrada en la sección (≤ 1 px); el pie dice su nombre y su precio de la carta`, g.ci === medio && cerca(g.cen[2], g.cen[3], 0.5) && (mobile ? cerca(g.cen[2], Math.min(248, Math.max(176, vw * 0.58)), 1) : g.cen[2] >= 240 && g.cen[2] <= 280) && cerca(g.cen[0] + g.cen[2] / 2, g.mitad, 1) && g.nom === esperados[medio].nombre && g.precio === precioEsperado(esperados[medio]) && g.fuente === (g.precio ? 'carta' : ''), JSON.stringify([g.ci, g.cen, g.nom, g.precio]));
+  check('café', `${tag}: aire: entradilla → pieza 24, pieza → pie 20, pie → enlaces de la barra ${mobile ? 32 : 48}; una parada de tabulador (la central); foto decorativa (alt vacío: su texto va en la fila); ${mobile ? 'sin flechas con toque' : 'flechas a la vista con puntero fino'}; sin desplazamiento horizontal`, cerca(g.cen[1] - (g.head[1] + g.head[3]), 24, 1.5) && cerca(g.pie[1] - (g.cen[1] + g.cen[3]), 20, 1.5) && cerca(g.nav[1] + 8 - (g.pie[1] + g.pie[3]), mobile ? 32 : 48, 1.5) && g.tab.filter(t => t === 0).length === 1 && g.tab[g.ci] === 0 && g.alts.every(a => a === '') && g.flechas.every(f => f === !mobile) && g.sx <= 0, JSON.stringify([g.head, g.cen, g.pie, g.nav, g.tab, g.flechas, g.sx]));
+  if (vw === 393) await shot('05-cafe-393-galeria.jpg');
+  if (vw === 1280) await shot('05-cafe-1280-galeria.jpg');
+  // Tocar la vecina de la derecha: viene al centro (no abre nada) y el pie cambia.
+  await clickAt(`.ct-gal-item:nth-child(${medio + 2}) .ct-gal-foto`); await sleep(1100);
+  const g2 = await leerGaleria();
+  check('café', `${tag}: tocar la vecina la trae al centro (sin ir a su fila) y el pie dice la nueva`, g2.ci === medio + 1 && g2.nom === esperados[medio + 1].nombre && cerca(g2.cen[0] + g2.cen[2] / 2, g2.mitad, 1), JSON.stringify([g2.ci, g2.nom, g2.cen]));
+  // Tocar la central: a su fila, con el foco en su nombre, la categoría marcada y el realce (con movimiento).
+  await ev(`window.__realce = 0; new MutationObserver(ms => { for (const m of ms) if (m.target.classList?.contains('is-realce')) window.__realce++; }).observe(document.querySelector('[data-ct-lista]'), { subtree: true, attributes: true, attributeFilter: ['class'] })`);
+  await clickAt('.ct-gal-item.is-centro .ct-gal-foto'); await sleep(1600);
+  const dest = esperados[medio + 1];
+  const f = await ev(`(() => { const fila = document.getElementById('producto-${dest.id}'), nav = document.querySelector('.ct-nav').getBoundingClientRect(), tab = document.querySelector('.tabbar'); const abajo = tab && getComputedStyle(tab).display !== 'none' ? tab.getBoundingClientRect().top : innerHeight; const r = fila.getBoundingClientRect(), t = fila.closest('.ct-grupo').querySelector('.ct-grupo-tit').getBoundingClientRect();
+    return { foco: document.activeElement === fila.querySelector('.ct-nom'), top: Math.round(r.top), bottom: Math.round(r.bottom), navB: Math.round(nav.bottom), abajo: Math.round(abajo), tit: Math.round(t.top), cur: document.querySelector('.ct-tab[aria-current="true"]')?.dataset.id, grupo: fila.closest('.ct-grupo').id, hash: location.hash, realce: window.__realce }; })()`);
+  check('café', `${tag}: tocar la central lleva a la fila de «${dest.nombre}»: entera entre la barra de categorías y ${mobile ? 'la barra inferior' : 'el borde de la ventana'}, con el título de su grupo a 24 de la barra si cabe, el foco en su nombre, su categoría marcada, sin cambiar la dirección y con el realce (movimiento)`, f.foco && f.top >= f.navB && f.bottom <= f.abajo && (cerca(f.tit - f.navB, 24, 2) || cerca(f.top - f.navB, 24, 2)) && `carta-${f.cur}` === f.grupo && f.hash === '' && f.realce >= 1, JSON.stringify(f));
+  // Teclado en la pieza central: ← trae la anterior y la región viva la anuncia.
+  await ev(`(() => { const a = document.querySelector('.ct-gal-item.is-centro .ct-gal-pieza'); a.scrollIntoView({ block: 'center', inline: 'nearest' }); a.focus(); })()`); await sleep(500);
+  const antes = (await leerGaleria()).ci;
+  await key('ArrowLeft', 'ArrowLeft', 37); await sleep(1100);
+  const g3 = await leerGaleria();
+  check('café', `${tag}: teclado: ← en la pieza central trae la anterior, el foco la sigue y la región viva dice «nombre, precio. N de ${esperados.length}.»`, g3.ci === antes - 1 && (await ev(`document.activeElement === document.querySelector('.ct-gal-item.is-centro .ct-gal-pieza')`)) && g3.live === `${esperados[g3.ci].nombre}${precioEsperado(esperados[g3.ci]) ? `, ${precioEsperado(esperados[g3.ci])}` : ''}. ${g3.ci + 1} de ${esperados.length}.`, JSON.stringify([antes, g3.ci, g3.live]));
+  check('café', `${tag}: sin errores de consola`, !problems.length, problems.join(' | '));
+}
+// Movimiento reducido: plano, salto inmediato y sin realce.
+{
+  overrideMenu = menuConGaleria(menu, 6);
+  await open(393, 659, { reset: true, mobile: true, wait: 2500 });
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+  await send('Page.reload'); await sleep(2500);
+  await irCarta(); await sleep(1000);
+  const poses = await ev(`[...document.querySelectorAll('.ct-gal-item .cf-pose')].map(p => getComputedStyle(p).transform)`);
+  await ev(`window.__realce = 0; new MutationObserver(ms => { for (const m of ms) if (m.target.classList?.contains('is-realce')) window.__realce++; }).observe(document.querySelector('[data-ct-lista]'), { subtree: true, attributes: true, attributeFilter: ['class'] })`);
+  await clickAt('.ct-gal-item.is-centro .ct-gal-foto'); await sleep(300);
+  const r = await ev(`({ realce: window.__realce, foco: document.activeElement?.classList.contains('ct-nom'), motion: document.documentElement.classList.contains('motion') })`);
+  check('café', '393×659 galería con movimiento reducido: piezas planas (sin giro ni profundidad), el salto a la fila es inmediato (foco en su nombre a los 300 ms) y sin realce', !r.motion && poses.every(t => t === 'none' || t.startsWith('matrix(')) && r.foco && r.realce === 0, JSON.stringify([poses, r]));
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
+}
+// Con 4 fotos no basta: ni galería, ni hueco, ni ids de destino; la cabecera conserva su foto.
+overrideMenu = menuConGaleria(menu, 4);
+await open(393, 659, { reset: true, mobile: true, wait: 2500 });
+await irCarta(); await sleep(800);
+const g4 = await leerGaleria();
+check('café', '393×659 con 4 fotos: no hay galería (ni hueco, ni encabezado, ni filas con id de destino) y la foto de la sección sigue', !g4.existe && g4.foto && g4.ids === 0, JSON.stringify(g4));
 overrideMenu = null;
 
 // ---------- 4. Novedades (CarruselNovedades): solo existe con llegadas registradas; «Nuevo» solo en lo reciente ----------

@@ -2,7 +2,10 @@
 // en nueve tamaños, con movimiento y con movimiento reducido, y sale con código 1 si algo se sale de la norma. Desde el 2026-11-14 los teléfonos son iPhone reales (alto = la zona
 // visible de Safari): 16 393×659, 13 mini 375×629, SE 375×667, 16 Pro Max 440×763 y 16 Pro a pantalla completa 402×874 con áreas seguras
 // 62/34 (Emulation.setSafeAreaInsetsOverride), más 320×640 (Zoom de pantalla); antes 360×740, 390×844 y 430×932, que ningún iPhone tiene.
-// node tools/qa/carrusel.mjs URL [DIR]   (DIR: capturas y carrusel.json; por omisión, el directorio actual)
+// node tools/qa/carrusel.mjs URL [DIR] [--galeria]   (DIR: capturas y carrusel.json; por omisión, el directorio actual)
+//   --galeria: además mide la galería de la carta de Café (GaleriaCarta, variante galería, 2026-11-17), que hoy no existe (sin fotos de
+//              producto): el documento se sirve con la carta de prueba de tools/qa/carta-prueba.mjs (fotos reales de la casa como sustitutas,
+//              solo en la prueba). Misma norma que la portada (pieza del ancho de la portada, cuadrada) y su pie (nombre y precio).
 // Cambia el navegador con CHROME_PATH. Teléfonos y tableta (≤ 768 px) con toque (puntero grueso); 1024 px o más con puntero fino.
 //
 // Por carrusel y tamaño comprueba:
@@ -25,8 +28,10 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-const URL_ = process.argv[2] || 'http://127.0.0.1:8094/';
-const out = process.argv[3] || '.';
+const posArgs = process.argv.slice(2).filter(a => !a.startsWith('--'));
+const GALERIA = process.argv.includes('--galeria');
+const URL_ = posArgs[0] || 'http://127.0.0.1:8094/';
+const out = posArgs[1] || '.';
 mkdirSync(out, { recursive: true });
 // [ancho, alto, área segura arriba, abajo]
 const SIZES = [[320, 640], [375, 629], [375, 667], [393, 659], [440, 763], [402, 874, 62, 34], [768, 1024], [1024, 768], [1280, 800], [1440, 900], [1920, 1080]];
@@ -56,21 +61,37 @@ const ev = async expr => {
   return r.result?.result?.value;
 };
 await send('Page.enable'); await send('Runtime.enable');
+if (GALERIA) {   // el documento con la carta de prueba pintada (como npm run carta con ese JSON); el repositorio no se toca
+  const { documentoConGaleria } = await import('./carta-prueba.mjs');
+  const { readFileSync } = await import('node:fs');
+  const menu = JSON.parse(readFileSync(new URL('../../assets/data/menu.json', import.meta.url), 'utf8'));
+  await send('Fetch.enable', { patterns: [{ urlPattern: '*', resourceType: 'Document', requestStage: 'Response' }] });
+  ws.addEventListener('message', async e => {
+    const m = JSON.parse(e.data);
+    if (m.method !== 'Fetch.requestPaused') return;
+    const { requestId } = m.params;
+    if (!m.params.request.url.startsWith(URL_)) return send('Fetch.continueResponse', { requestId });
+    const b = (await send('Fetch.getResponseBody', { requestId })).result;
+    const html = b.base64Encoded ? Buffer.from(b.body, 'base64').toString('utf8') : b.body;
+    send('Fetch.fulfillRequest', { requestId, responseCode: m.params.responseStatusCode, responseHeaders: m.params.responseHeaders, body: Buffer.from(documentoConGaleria(html, menu)).toString('base64') });
+  });
+}
 
 const VARIANTES = [
-  { name: 'portada', sec: '#libros', c3d: '.c3d--portada', top: '.rail-head' }
+  { name: 'portada', sec: '#libros', c3d: '.c3d--portada', top: '.rail-nota-fila', pie: '.cf-texto' },
+  ...(GALERIA ? [{ name: 'galeria', sec: '#cafe', c3d: '.c3d--galeria', top: '.sec-head', pie: '.ct-gal-pie .cf-texto' }] : [])
 ];
-// Norma (skill ux-apple §3). Teléfono: % del ancho del carrusel. Escritorio: px.
-const TEL = { portada: [54, 60] };
-const ESC = { portada: [280, 320] };
-const TAB = { portada: [240, 320] };
+// Norma (skill ux-apple §3). Teléfono: % del ancho del carrusel. Escritorio: px. La galería, del ancho de la portada (una familia de carrusel).
+const TEL = { portada: [54, 60], galeria: [54, 60] };
+const ESC = { portada: [280, 320], galeria: [280, 320] };
+const TAB = { portada: [240, 320], galeria: [240, 320] };
 
 const report = [];
 const rows = [];
 const check = (where, name, ok, detail = '') => report.push({ where, name, ok: !!ok, detail: ok ? '' : String(detail) });
 
 // Medición dentro de la página (una sola pasada por carrusel).
-const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
+const MEDIR = String.raw`(([secSel, c3dSel, name, arribaSel, pieSel]) => {
   const R = e => e.getBoundingClientRect();
   const sec = document.querySelector(secSel), c = sec.querySelector(c3dSel), vp = c.querySelector('.c3d-viewport');
   const cr = R(c), vr = R(vp);
@@ -78,7 +99,7 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   const colL = sr.left + parseFloat(ps.paddingLeft), colR = sr.right - parseFloat(ps.paddingRight);
   const items = [...c.querySelectorAll('.c3d-item')];
   const ci = items.findIndex(i => i.classList.contains('is-centro'));
-  const visual = it => it.querySelector('.cover') || it.querySelector('.cf-pose');
+  const visual = it => it.querySelector('.cover, .ct-gal-foto') || it.querySelector('.cf-pose');
   const op = el => { let o = 1; for (let p = el; p && p !== c; p = p.parentElement) o *= +getComputedStyle(p).opacity; return o; };
   const info = items.map((it, i) => {
     const r = R(visual(it)); const inside = Math.max(0, Math.min(r.right, vr.right) - Math.max(r.left, vr.left));
@@ -98,7 +119,9 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
     fuera: f.prev ? extL - f.r : f.l - extR,
     dy: (f.t + f.h / 2) - (cen.t + cen.h / 2) }));
   // Texto cortado: en la central y el pie (nada); en las vecinas, ningún texto visible que cruce el borde de la ventana.
-  const leaves = root => [...root.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.cover, .sr-only') && getComputedStyle(e).display !== 'none');
+  // Texto visualmente oculto (un ancestro recortado a 1 × 1, como .sr-only o el nombre de cada pieza de la galería con JavaScript): no se ve, no cuenta.
+  const recortado = e => { for (let p = e; p && p !== c; p = p.parentElement) { const r = R(p); if (r.width <= 1 && r.height <= 1 && getComputedStyle(p).overflow === 'hidden') return true; } return false; };
+  const leaves = root => [...root.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.cover, .sr-only') && !recortado(e) && getComputedStyle(e).display !== 'none');
   const visibleTxt = e => { const r = R(e); return r.width > 1 && r.height > 1 && op(e) > 0.05 && getComputedStyle(e).visibility !== 'hidden'; };
   const cenEl = visual(items[ci]);
   const cortesCentro = leaves(items[ci]).filter(visibleTxt).filter(e => { const r = R(e); return e.scrollWidth > e.clientWidth + 1 || r.bottom > cen.b + 0.5 || r.right > cen.r + 0.5 || r.left < cen.l - 0.5; }).map(e => e.textContent.trim().slice(0, 30));
@@ -106,7 +129,7 @@ const MEDIR = String.raw`(([secSel, c3dSel, name]) => {
   // Arriba, pie y acción de cada variante.
   const q = s => sec.querySelector(s);
   let arriba, pie = null, accion = null;
-  arriba = q('.rail-nota-fila'); pie = q('.cf-texto');
+  arriba = q(arribaSel); pie = q(pieSel);
   const pieTxt = pie ? [...pie.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && !e.closest('.sr-only')).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim().slice(0, 30)) : [];
   const hdr = document.querySelector('.hdr'), tab = document.querySelector('.tabbar');
   const top = hdr ? R(hdr).bottom : 0;
@@ -141,17 +164,17 @@ for (const modo of MODOS) {
     for (const v of VARIANTES) {
       const where = `${modo} ${w}×${h} ${v.name}`;
       try {
-        await ev(`(() => { const s = document.querySelector('${v.sec}'); const el = s.querySelector('${v.top}'); const hh = document.querySelector('.hdr')?.getBoundingClientRect().height || 0; scrollTo(0, scrollY + el.getBoundingClientRect().top - hh - 16); })()`);
+        await ev(`(() => { const s = document.querySelector('${v.sec}'); const el = s.querySelector('${v.name === 'portada' ? '.rail-head' : v.top}'); const hh = document.querySelector('.hdr')?.getBoundingClientRect().height || 0; scrollTo(0, scrollY + el.getBoundingClientRect().top - hh - 16); })()`);
         // Espera por condición: pieza central, sin esqueletos, imágenes de la central cargadas y desplazamiento quieto.
         const ok = await ev(`new Promise(res => { const t0 = performance.now(); let last = -1, quiet = 0; const tick = () => {
           const c = document.querySelector('${v.sec} ${v.c3d}'); const vp = c?.querySelector('.c3d-viewport'); const cen = c?.querySelector('.c3d-item.is-centro');
-          const ready = cen && !c.querySelector('.card--sk') && [...cen.querySelectorAll('img')].every(i => i.complete);
+          const ready = cen && !c.querySelector('.card--sk') && [...cen.querySelectorAll('img')].every(i => { if (!i.complete) i.loading = 'eager'; return i.complete; });
           if (ready && vp.scrollLeft === last) quiet++; else quiet = 0; last = vp?.scrollLeft ?? -1;
           if (quiet >= 6) return res(true); if (performance.now() - t0 > 8000) return res(false); setTimeout(tick, 60); }; tick(); })`);
         if (!ok) { check(where, 'el carrusel está listo', false, 'tope de 8 s sin pieza central quieta'); continue; }
         await ev('document.fonts.ready.then(() => true)');
         await sleep(450);
-        const m = await ev(`${MEDIR}(${JSON.stringify([v.sec, v.c3d, v.name])})`);
+        const m = await ev(`${MEDIR}(${JSON.stringify([v.sec, v.c3d, v.name, v.top, v.pie])})`);
         const r1 = n => Math.round(n * 10) / 10;
         // Centro
         check(where, 'pieza central centrada en el carrusel (≤ 1 px)', Math.abs(m.dxC3d) <= 1, `Δ ${r1(m.dxC3d)} px`);

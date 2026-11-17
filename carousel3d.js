@@ -1,6 +1,7 @@
 // Carrusel3D: el motor del carrusel de portadas del Catálogo (rail.js, variante «portada»). Nació el 2026-11-13 como motor único de tres
 // carruseles; el 2026-11-16 Eventos pasó a destacado y lista por fecha (feed.js) y la carta de Café y té a una parrilla (cafe.js), y sus
-// variantes «evento» y «carta» se retiraron. Lo que hace:
+// variantes «evento» y «carta» se retiraron. Desde el 2026-11-17 mueve también la galería de la carta de Café (cafe.js, variante «galería»,
+// solo con fotos de producto). Lo que hace:
 //   · desplazamiento nativo con imán al centro (scroll-snap en CSS); una pose por fotograma según la distancia al centro (giro hasta
 //     --giro-carrusel, profundidad y empuje hacia fuera: las vecinas asoman separadas de la central, con hueco, sin encimarse);
 //     solo la central lleva sombra-portada (CSS: .is-centro);

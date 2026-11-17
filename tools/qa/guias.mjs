@@ -6,6 +6,8 @@
 //               1440×900 y 1920×1080 —puntero fino—). --capturas: ref = iPhone 16 y 1440 (por omisión), todas o no. --oscuro: tema oscuro.
 //   --css / --js: inyecta un parche de prueba en el navegador (sin tocar el sitio, con la CSP de producción) para medir una propuesta antes de
 //               construirla: el CSS se añade al final de style.css y mobile.css mientras viajan y el JS corre al terminar de leerse el documento.
+//   --galeria:  sirve el documento con una carta de prueba con galería (tools/qa/carta-prueba.mjs: fotos reales de la casa como sustitutas de
+//               las de producto, solo en la prueba) para medir Café con la galería de la carta, que hoy no existe (sin fotos de producto).
 // Cambia el navegador con CHROME_PATH. A diferencia del resto del arnés (CDP a mano) usa Playwright, que no es dependencia del repo: lo toma
 // de PLAYWRIGHT_PATH, de «playwright» si está instalado o de /opt/node-tools (el contenedor de trabajo); sin él sale con 2 y lo dice.
 //
@@ -64,13 +66,12 @@ const SISTEMA = {
   // Nota lateral (2026-11-16): la única pieza que no sigue la división 1–6 | 7–12. La lista de Eventos va en las columnas 1–8 y su nota en
   // 9–12 (estructura aprobada por Aldo: lista ancha y panel estrecho, como en Luma). No se le perdona nada más: empieza exactamente en su
   // columna, termina en el margen derecho y comparte tope con la lista (G3 y G4 la miden aparte).
-  laterales: [{ sel: '.ev-lado', columna: 9 }],
-  // Contenedor propio (2026-11-17, recomposición de Café pedida por Aldo: «una sola cuadrícula, contenedor centrado de 1 040–1 120 px»): desde
-  // 1024 px la sección mide sus columnas en su propio contenedor (token ancho-carta, 1120: 12 columnas de 64 con canal de 32), no en el de la
-  // página (1152), y su división es la suya: cabecera en 1–8 y la foto en un tercio, 9–12. Se exige que el contenedor mida lo que dice el token
-  // (o el de la página, si la ventana no da para más), que esté centrado en el eje, que titular, categorías y primer producto compartan su
-  // margen y que la foto empiece en su columna 9; su columna derecha no se compara con la de las demás secciones (G3 de página).
-  contenedores: { cafe: { ancho: 1120, division: [8, 9] } },
+  // Café (2026-11-17, con el contenedor de la página): la foto de la cabecera va en 9–12, en un tercio, junto al titular y la entradilla de 1–8
+  // (la composición aprobada; sin galería de la carta). Empieza en la misma x que la nota de Eventos. Con galería no se pinta.
+  laterales: [{ sel: '.ev-lado', columna: 9 }, { sel: '.frame-clip', seccion: 'cafe', columna: 9 }],
+  // Contenedor propio de una sección (su ancho y su división, desde 1024 px). Vacío desde el 2026-11-17: Café tuvo uno de 1120 (token
+  // ancho-carta) y Aldo decidió el de la página para todas (un solo eje). El mecanismo queda por si una sección lo necesita con su razón escrita.
+  contenedores: {},
   // Primaria dentro de una tarjeta (2026-11-16, el evento destacado): se mide contra su tarjeta, no contra la página. Empieza en la sangría
   // de la tarjeta; en el teléfono su fila de acciones llega al borde interior derecho (la primaria sola a todo el ancho interior, o seguida de
   // sus iconos); desde 761, al ancho del rótulo.
@@ -123,7 +124,7 @@ const SISTEMA = {
     'Primaria del evento destacado: vive dentro de su tarjeta (`tarjetasConPrimaria`); se le exige la sangría de la tarjeta y, en el teléfono, que su fila llegue al borde interior (no el ancho de la página).',
     'Fecha tipográfica de Eventos (el número de 52 del destacado y el de 32 del día): es una cifra decorativa (aria-hidden; la fecha se lee en texto sr-only), no texto de lectura: no cuenta para el máximo de tamaños por sección (T3).',
     'Ficha del libro: tiene retícula interior propia; de ella solo fallan el margen (H1) y los botones aplastados (H2).',
-    'Café desde 1024 px (2026-11-17, pedido de Aldo): contenedor propio de 1120 (`contenedores.cafe`, token ancho-carta) centrado, 16 px más estrecho por lado que el de la página a partir de 1184 px; sus columnas y su división (1–8 | 9–12: la foto en un tercio) son las de ese contenedor. Su columna derecha no entra en la comparación entre secciones (G3 de página). Titular, categorías y primer producto comparten su margen.',
+    'Café desde 1024 px (2026-11-17): el contenedor de la página (1152), como las demás; la foto de la cabecera va en 9–12 (`laterales`, como la nota de Eventos): titular y entradilla en 1–8, la foto en un tercio, con su tope en el del titular. Con la galería de la carta la foto no se pinta y no hay columna derecha.',
     'Barra de categorías de la carta (2026-11-17): enlaces sin fondo (texto con objetivo de 44): se alinea por la tinta de su primer enlace, no por la caja de toque.'
   ]
 };
@@ -161,7 +162,8 @@ const SECCIONES = [
     ['rotulo', '.ev-propuestas > .ev-sub'], ['contenido', '.ev-propuestas .ev-filas'], ['bloque', '.ev-lado'],
     ['rotulo', '.ev-anteriores > .ev-sub'], ['contenido', '.ev-pasados'], ['accion', '.ev-fold'] ] },
   { id: 'cafe', sel: '#cafe', piezas: [
-    ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['control', '.ct-nav', { bloque: true }], ['contenido', '.ct-lista'],
+    ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['escenario', '.c3d--galeria', { c3d: true }], ['pie-escenario', '.ct-gal-pie .cf-texto'],
+    ['control', '.ct-nav', { bloque: true }], ['contenido', '.ct-lista'],
     ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p', { bloque: true }], ['control', '.ct-cierre .btn'] ] },
   { id: 'visita', sel: '#visita', piezas: [
     ['titular', '#visit-title'], ['subtitular', '.visit address'], ['estado', '.visit-status'], ['control', '.visit-actions .btn'],
@@ -184,7 +186,7 @@ const NIVELES = {
   'título de fila anterior': ['.ev-pas-tit'],   // Headline 17 (2026-11-16): «Eventos anteriores» es archivo; su título no compite con el de una fila de «Después» (Title 3)
   'rótulo de dato': ['.ev-dato dt'],
   'valor de dato': ['.ev-dato dd'],
-  'nombre de producto': ['.ct-nom'],      // Headline 17: la fila de la carta (1 / 2 columnas, 2026-11-17) lleva su nombre bajo el título del grupo, sin competir con él
+  'nombre de producto': ['.ct-nom', '.ct-gal-pie .ct-gal-nom'],      // Headline 17: la fila de la carta (1 / 2 columnas, 2026-11-17) lleva su nombre bajo el título del grupo, sin competir con él
   'texto de pieza': ['.cf-meta', '.ct-desc'],
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],
@@ -280,7 +282,7 @@ function enPagina(cfg) {
       let centro = null, d = 1e9;
       for (const li of e.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; centro = li; } }
       if (centro) {
-        const cara = centro.querySelector('.cover') || centro;
+        const cara = centro.querySelector('.cover, .ct-gal-foto') || centro;
         const id = empuja(cara, 'pieza-central', sup, { escenario: true, ejeEscenario: rd(cx + sx), piezas: e.querySelectorAll('.c3d-track > li').length });
         camina(cara, id);
       }
@@ -323,7 +325,7 @@ function enPagina(cfg) {
       if (o && o.c3d) {
         const c = document.querySelector(sel); if (!c || !visible(c)) continue;
         const cr = c.getBoundingClientRect(), cx = cr.left + cr.width / 2; let d = 1e9;
-        for (const li of c.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; e = li.querySelector('.cover') || li; } }
+        for (const li of c.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; e = li.querySelector('.cover, .ct-gal-foto') || li; } }
       } else e = [...document.querySelectorAll(sel)].find(visible) || null;
       if (!e) continue;
       const p = { rol, sel, fila: (o && o.fila) || null, bloque: !!(o && o.bloque), caja: e.matches('[role="radiogroup"], .ct-nav') ? union(e) : B(e.getBoundingClientRect()), txt: texto(e) };
@@ -552,7 +554,7 @@ function analizar(clave, m) {
     if (k === 2) {
       const tl = s.atomos.filter(a => a.sup === null && !['escenario', 'flecha', 'pieza-central', 'rejilla'].includes(a.tipo) && !a.escenario);
       const izqX = a => (a.tinta && a.tipo !== 'control' ? a.tinta.ml : a.caja.l);
-      const esLateral = a => SISTEMA.laterales.find(l => a.sel.includes(l.sel));
+      const esLateral = a => SISTEMA.laterales.find(l => (!l.seccion || l.seccion === id) && a.sel.includes(l.sel));   // `seccion`: solo en esa sección
       for (const a of tl.filter(esLateral)) {   // la nota lateral: su columna, el margen derecho y el tope de la lista que acompaña
         const lat = esLateral(a), x0 = G_.inicios[lat.columna - 1];
         if (Math.abs(a.caja.l - x0) > tol || Math.abs(a.caja.r - G_.R) > tol) F('G3', id, `${a.sel}: la nota lateral va de la columna ${lat.columna} al margen (${r1(x0)}–${r1(G_.R)}); está en ${a.caja.l}–${a.caja.r}`);
@@ -787,6 +789,11 @@ async function navegador(toque) {
 async function cargar(page, toque) {
   // Parche de prueba: se añade al final de las hojas del sitio mientras viajan (así vale desde el primer render y con la CSP de producción)
   // y el script corre al terminar de leerse el documento. Nada de esto toca los archivos del sitio.
+  if (opt.galeria) {
+    const { documentoConGaleria } = await import('./carta-prueba.mjs');
+    const menu = JSON.parse(readFileSync(new URL('../../assets/data/menu.json', import.meta.url), 'utf8'));
+    await page.route(r => new URL(r).pathname === new URL(URL_).pathname, async route => { const r = await route.fetch(); await route.fulfill({ response: r, body: documentoConGaleria(await r.text(), menu) }); });
+  }
   if (opt.css) {
     const parche = readFileSync(String(opt.css), 'utf8');
     await page.route(/\/(style|mobile)\.css(\?.*)?$/, async route => { const r = await route.fetch(); await route.fulfill({ status: 200, contentType: 'text/css; charset=utf-8', body: (await r.text()) + '\n' + parche }); });
