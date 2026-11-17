@@ -5,8 +5,16 @@
 //       en el mismo fotograma en que la sección llega a la vista (≤ 1 fotograma de diferencia) y lo que se queda fuera de esa sección sigue por
 //       entrar (ninguna otra sección lleva `is-llegada`).
 //  L2 · Eventos al llegar por enlace: con un evento con fecha, la sección ya está armada (sin esqueleto, sin salto: CLS 0 y el destacado ya presente).
+//  L3 · (2026-11-17, segunda auditoría) Eventos al llegar por enlace con eventos con fecha inyectados: el destacado y las filas aparecen colocados en
+//       ≤ 1 fotograma desde que la sección llega a la vista (opacidad 1, sin desplazamiento) y no corre ninguna animación dentro de #cartelera
+//       (salvo el fundido de una foto diferida cuando termina de cargar, `img-in`, que es de la carga y no de la llegada: se cuenta aparte).
+//  L4 · (2026-11-17) en el teléfono, tras pausar y reanudar el movimiento con el interruptor del menú, llegar por el ☰ a una sección aún no vista deja
+//       su titular y su entradilla colocados en ≤ 1 fotograma (antes volvían a entrar hasta los 930 ms: `content-visibility` conservaba la pose vieja).
+//  L5 · (2026-11-17) Café al llegar por enlace: la carta ya está armada antes del toque (en reposo, como Eventos), ningún fotograma muestra el
+//       esqueleto ni `aria-busy`, y nada visible se desplaza (suma de layout-shift tras el toque, también los que siguen a una entrada, < 0.001).
 //  P1 · presionado: con «reducir movimiento» el color de `:active` es distinto del de reposo y del de hover en cada familia (primaria, secundaria,
-//       chip y chip elegido, contorno, plano, marcador sin guardar y guardado, casilla de la barra inferior, ☰, fila del menú, interruptor); la
+//       chip y chip elegido, contorno, plano, marcador sin guardar y guardado, casilla de la barra inferior, ☰, fila del menú, interruptor y, desde
+//       el 2026-11-17, la fila de contacto del pie `.ftr-link`); la
 //       escala sigue solo con movimiento. Con vidrio (8 núcleos) y en gama media (4).
 //  B1 · #libro-<id> que no existe (id inexistente, caracteres raros, % mal formado, catálogo que no carga): aterriza en el Catálogo, muestra el
 //       aviso «Ese libro ya no está en el catálogo.» (rol status, dentro de la ventana) y no abre ninguna hoja; un id real sigue abriendo su ficha.
@@ -48,6 +56,9 @@ const ok = (regla, cond, texto) => { res.push({ regla, ok: Boolean(cond), texto 
 
 const enDias = n => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + n * 86_400_000));
 const EVENTO_DE_PRUEBA = { eventos: [{ id: 'prueba-navegacion', tipo: 'Lectura', titulo: 'Evento de prueba', fecha: enDias(5), hora: '18:57', fin: null, con: null, descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null }] };
+
+// Tres eventos con fecha (L3): un destacado y dos filas de la lista por día. Texto de prueba, no son eventos reales.
+const EVENTOS_CON_FECHA = { eventos: [5, 9, 13].map((d, i) => ({ id: `prueba-llegada-${i + 1}`, tipo: 'Lectura', titulo: `Evento de prueba ${i + 1}`, fecha: enDias(d), hora: '18:57', fin: null, con: null, descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null })) };
 
 async function abrir(perfil, { init = [], reduce = false, eventos = null, rutas = [], url = URL_, esperar = 3200 } = {}) {
   const browser = await pw.chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--hide-scrollbars'] });
@@ -129,6 +140,76 @@ if (quiere('L2')) await intenta('L2', async () => {
   }
 });
 
+// ---------- L3 · Eventos con fecha al llegar por enlace: el destacado y las filas ya colocados ----------
+const SONDA_EVENTOS = ms => new Promise(done => {
+  const out = [];
+  addEventListener('click', () => {
+    const t0 = performance.now();
+    const tick = () => {
+      const t = performance.now() - t0; const s = document.querySelector('#cartelera');
+      const piezas = [...s.querySelectorAll('.ev-prox, .ev-dia-tit, .ev-fila')].filter(e => { const r = e.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+      const h = s.querySelector('.h2')?.getBoundingClientRect();
+      out.push({ t: +t.toFixed(1), enVista: Boolean(h && h.top >= 0 && h.top < innerHeight), piezas: piezas.length, op: Math.min(1, ...piezas.map(e => +getComputedStyle(e).opacity)), ty: Math.max(0, ...piezas.map(e => Math.abs(new DOMMatrix(getComputedStyle(e).transform).m42))), anim: s.getAnimations({ subtree: true }).filter(a => a.playState === 'running' && a.animationName !== 'img-in').length, foto: s.getAnimations({ subtree: true }).filter(a => a.playState === 'running' && a.animationName === 'img-in').length, espera: s.querySelectorAll('.ev-espera').length });
+      if (t < ms) requestAnimationFrame(tick); else done(out);
+    };
+    requestAnimationFrame(tick);
+  }, { capture: true, once: true });
+});
+if (quiere('L3')) await intenta('L3', async () => {
+  for (const [perfil, nombre] of [['iphone', 'iPhone 16'], ['d1440', '1440']]) {
+    const { browser, page } = await abrir(perfil, { eventos: EVENTOS_CON_FECHA, esperar: 3600 });
+    if (PERFILES[perfil].hasTouch) { await tap(page, perfil, '[data-menu-open]'); await sleep(900); }
+    const antes = await page.evaluate(() => ({ destacado: Boolean(document.querySelector('#cartelera .ev-prox')), espera: document.querySelectorAll('#cartelera .ev-espera').length }));
+    const p = page.evaluate(SONDA_EVENTOS, 1000);
+    await tap(page, perfil, PERFILES[perfil].hasTouch ? '.menu-row[href="#cartelera"]' : '.hdr-nav a[href="#cartelera"]');
+    const m = await p; await browser.close();
+    const llegada = m.findIndex(x => x.enVista && x.piezas > 0);
+    const listo = m.findIndex((x, i) => i >= llegada && x.op >= 0.99 && x.ty < 0.5 && x.anim === 0);
+    const despues = llegada >= 0 ? m.slice(llegada) : [];
+    const malos = despues.filter(x => x.op < 0.99 || x.ty >= 0.5 || x.anim > 0).length;
+    ok('L3', antes.destacado && llegada >= 0 && listo >= 0 && listo - llegada <= 1 && malos <= 1,
+      `${nombre} → #cartelera con eventos con fecha (destacado presente antes del toque: ${antes.destacado}; piezas esperando su entrada: ${antes.espera}): ${llegada >= 0 ? `${m[llegada].piezas} piezas a la vista al llegar (${m[llegada].t} ms); colocadas ${listo >= 0 ? `${listo - llegada} fotograma(s) después` : 'nunca'}; fotogramas con opacidad < 1, desplazamiento o animación viva: ${malos} (peor opacidad ${Math.min(...despues.map(x => x.op)).toFixed(2)}, animaciones ${Math.max(0, ...despues.map(x => x.anim))}; aparte, fundido de foto diferida al cargar —«Imágenes y carga», no es una entrada—: ${Math.max(0, ...despues.map(x => x.foto))})` : 'la sección no llegó a la vista'}`);
+  }
+});
+
+// ---------- L4 · llegar tras pausar y reanudar el movimiento (teléfono) ----------
+if (quiere('L4')) await intenta('L4', async () => {
+  for (const d of ['cafe', 'visita']) {
+    const { browser, page } = await abrir('iphone', { esperar: 3400 });
+    await tap(page, 'iphone', '[data-menu-open]'); await sleep(900);
+    await tap(page, 'iphone', '#menu [data-motion-toggle]'); await sleep(500);
+    await tap(page, 'iphone', '#menu [data-motion-toggle]'); await sleep(500);
+    const motion = await page.evaluate(() => document.documentElement.classList.contains('motion'));
+    await tap(page, 'iphone', '[data-menu-close]'); await sleep(900);
+    await tap(page, 'iphone', '[data-menu-open]'); await sleep(900);
+    const p = page.evaluate(SONDA_LLEGADA, [`#${d}`, 1500]);
+    await tap(page, 'iphone', `.menu-row[href="#${d}"]`);
+    const m = await p; await browser.close();
+    const llegada = m.findIndex(x => x.enVista), listo = m.findIndex((x, i) => colocado(x) && x.enVista && i >= llegada);
+    const ultimoMovido = m.findLast(x => !colocado(x));
+    ok('L4', motion && llegada >= 0 && listo >= 0 && listo - llegada <= 1,
+      `iPhone 16, tras pausar y reanudar (movimiento de vuelta: ${motion}) → #${d}: titular y entradilla colocados ${listo >= 0 && llegada >= 0 ? `${listo - llegada} fotograma(s) después de llegar` : 'nunca'}; último fotograma sin colocar a los ${ultimoMovido ? ultimoMovido.t : '—'} ms`);
+  }
+});
+
+// ---------- L5 · Café ya armada al llegar por enlace ----------
+if (quiere('L5')) await intenta('L5', async () => {
+  for (const [perfil, nombre] of [['iphone', 'iPhone 16'], ['d1440', '1440']]) {
+    const { browser, page } = await abrir(perfil, { esperar: 3600, init: [`window.__ls = []; new PerformanceObserver(l => l.getEntries().forEach(e => window.__ls.push({ t: e.startTime, v: e.value, input: e.hadRecentInput }))).observe({ type: 'layout-shift', buffered: true });`] });
+    if (PERFILES[perfil].hasTouch) { await tap(page, perfil, '[data-menu-open]'); await sleep(900); }
+    const antes = await page.evaluate(() => ({ listo: document.querySelector('[data-cafe]')?.classList.contains('is-ready'), filas: document.querySelectorAll('#cafe .ct-prod:not(.card--sk)').length }));
+    const p = page.evaluate(() => new Promise(done => { const out = []; addEventListener('click', () => { const t0 = performance.now(); window.__t0 = t0; const tick = () => { const t = performance.now() - t0; const s = document.querySelector('#cafe'); const r = s.getBoundingClientRect(); out.push({ t, enVista: r.top < innerHeight && r.bottom > 0, sk: s.querySelectorAll('.card--sk, .ct-grupo-tit--sk, .sk-chip').length, busy: s.querySelector('[data-ct-lista]')?.getAttribute('aria-busy') === 'true', h: Math.round(r.height) }); if (t < 1200) requestAnimationFrame(tick); else done(out); }; requestAnimationFrame(tick); }, { capture: true, once: true }); }));
+    await tap(page, perfil, PERFILES[perfil].hasTouch ? '.menu-row[href="#cafe"]' : '.hdr-nav a[href="#cafe"]');
+    const m = await p;
+    const cls = await page.evaluate(() => window.__ls.filter(e => e.t >= window.__t0).reduce((a, e) => a + e.v, 0));
+    await browser.close();
+    const vista = m.filter(x => x.enVista);
+    const conEsqueleto = vista.filter(x => x.sk || x.busy).length;
+    ok('L5', antes.listo && antes.filas > 0 && vista.length && !conEsqueleto && cls < 0.001,
+      `${nombre} → #cafe: carta armada antes del toque: ${antes.listo} (${antes.filas} filas); fotogramas a la vista con esqueleto o aria-busy: ${conEsqueleto} de ${vista.length}; desplazamiento tras el toque ${cls.toFixed(4)}; alto de la sección ${[...new Set(vista.map(x => x.h))].join(' / ')} px`);
+  }
+});
+
 // ---------- P1 · presionado ----------
 async function presionado(perfil, nucleos, { reduce, pausa = false }) {
   const { browser, page } = await abrir(perfil, { reduce, init: [NUCLEOS(nucleos), ...(pausa ? [PAUSA] : [])], esperar: 3000 });
@@ -163,6 +244,7 @@ async function presionado(perfil, nucleos, { reduce, pausa = false }) {
   await familia('vidrio', '#t-vid');
   if (PERFILES[perfil].viewport.width >= 761) await familia('plano', '.hdr-list');
   await page.evaluate(() => document.querySelector('#prueba-estados').remove());
+  await familia('fila de contacto', '.ftr-links .ftr-link'); // el pie: WhatsApp, Instagram, Facebook y Correo (2026-11-17)
   await centrar(page, '.c3d--portada', 2800);
   await familia('chip', '.rail-chip:not([aria-checked="true"])');
   await familia('chip elegido', '.rail-chip[aria-checked="true"]');

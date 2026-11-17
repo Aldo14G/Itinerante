@@ -183,7 +183,10 @@ async function boot() {
     }));
   }
   const unsplit = () => $$('[data-src]').forEach(h => { h.innerHTML = h.dataset.src; delete h.dataset.src; });
-  function revealAll() { pending.forEach(el => el.classList.add('is-visible')); pending.clear(); }
+  // Sin movimiento (la pausa o «reducir movimiento») o al cambiar el ancho, todo lo pendiente queda colocado. Con `is-llegada` (transition: none):
+  // en el teléfono las secciones con content-visibility: auto no recalculan su estilo mientras están fuera de la vista y, al reanudar el
+  // movimiento, su titular volvía a entrar desde la pose vieja (hasta 930 ms; segunda auditoría, 2026-11-17).
+  function revealAll() { pending.forEach(el => el.classList.add('is-visible', 'is-llegada')); pending.clear(); }
   let revealIo = null;
   function prepareReveals() {
     if (!isMotion() || !('IntersectionObserver' in window)) return;
@@ -214,8 +217,11 @@ async function boot() {
   // página sigue entrando al hacer scroll; el mapa de Visita (se dibuja al verse el 60 %) conserva su propio momento. Cada cambio de clase y
   // el salto ocurren en el mismo fotograma, así que no hay transición que correr (.is-llegada: transition none, ver style.css).
   const sectionOf = hash => { try { const t = hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null; return t ? t.closest('section, footer') || t : null; } catch { return null; } };
+  // La sección de destino avisa además con `iti:llegada` (en el mismo fotograma, antes del salto): lo que entra al verse por su cuenta (el
+  // destacado y las filas de Eventos, feed.js) queda colocado en vez de entrar (2026-11-17, segunda auditoría: el destacado se fundía 240 ms tras llegar).
   function arriveAt(scope) {
     if (!scope) return;
+    scope.dispatchEvent(new CustomEvent('iti:llegada', { bubbles: true }));
     [...pending].filter(el => scope.contains(el) && !el.matches('.visit-map')).forEach(el => {
       el.classList.add('is-llegada', 'is-visible');
       pending.delete(el);
@@ -435,8 +441,9 @@ async function boot() {
   };
   nearby($('[data-ev]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
 
-  // ---------- Café y té: la carta (parrilla por categorías, cafe.js) se pide al acercarse ----------
-  nearby($('[data-cafe]'), () => import('./cafe.js').then(m => m.initCafe({ isMotion })).catch(() => {}));
+  // ---------- Café y té: la carta (filas por categorías, cafe.js) se pide al acercarse y también en reposo (ver «Start») ----------
+  const bootCafe = () => import('./cafe.js').then(m => m.initCafe({ isMotion })).catch(() => {});
+  nearby($('[data-cafe]'), bootCafe);
 
   await yieldNow();
   // ---------- Start ----------
@@ -456,5 +463,8 @@ async function boot() {
     // Eventos se arma también en reposo, no solo al acercarse: al llegar por un enlace (☰, barra) la sección ya está armada y no salta (2026-11-16;
     // antes el destacado y la lista sustituían a las propuestas de index.html 120–240 ms después de llegar). Fuera de la vista: no mueve nada.
     whenIdle(() => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}), { timeout: 3000 });
+    // La carta de Café, igual (2026-11-17, segunda auditoría): al llegar por un enlace se veía el esqueleto 51–64 ms y la sección crecía de 892 a
+    // 2 043 px. initCafe no se repite: la llamada que llegue segunda (esta o la del acercamiento) no hace nada.
+    whenIdle(bootCafe, { timeout: 3000 });
   });
 }

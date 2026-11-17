@@ -28,7 +28,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | FilaEventoAnterior | — | — |  |  |  |  |  |  |  | sí |  |
 | AvisoEvento | sí | sí |  |  |  |  |  |  |  |  |  |
 | BarraCategorias | sí | sí | sí |  |  | sí |  | sí | sí |  | sí |
-| TarjetaProducto | — | — | — |  |  |  |  | sí | sí | sí |  |
+| FilaProducto | — | — | — |  |  |  |  | sí | sí | sí |  |
 | TarjetaLibro | sí | sí | sí |  |  |  |  | sí |  |  | sí |
 | FichaLibro | sí | sí | sí |  |  |  |  |  |  |  | sí |
 | MiLista | — | sí |  |  |  |  |  |  | sí | sí | sí |
@@ -39,7 +39,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | TiraCasa |  | sí |  |  |  |  |  |  |  |  | sí |
 | MapaLlegada | — | sí |  |  |  |  |  |  |  |  | sí |
 | InterruptorMovimiento | sí | sí | sí | sí | sí |  |  |  |  |  | sí |
-| ContactoPie | sí | sí | — |  |  |  |  |  |  |  |  |
+| ContactoPie | sí | sí | sí |  |  |  |  |  |  |  |  |
 | Insignia | — | — |  |  |  |  |  |  |  |  |  |
 | Esqueletos |  |  |  |  |  |  |  | sí |  |  | — |
 | CarruselNovedades | sí | sí | sí | sí |  |  | sí | sí | sí |  | sí |
@@ -375,13 +375,13 @@ Renglón del inicio «Próximo: Sáb 21 nov · título» (el día del evento, «
 
 ### BarraCategorias
 
-Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría. Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista, para que un salto desde abajo no deje marcado el último chip; sin palomita, para que los chips no cambien de ancho al desplazar; la barra solo se desliza si el chip actual no se ve entero). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.
+Barra de categorías de la carta (Café y té): un chip de 48 por categoría de assets/data/menu.json, enlace al grupo de esa categoría, con el nombre corto de la categoría si lo trae (campo chip, hasta 16 letras: «Sin café») y entonces el nombre completo como aria-label («Bebidas sin café»; 2026-11-17, al modo de las apps de comida). Fija bajo la cabecera mientras se recorre la carta (position: sticky, con el fondo opaco de la banda y un filete: no es vidrio); marca el grupo a la vista con aria-current y el color primario (IntersectionObserver sobre una línea bajo la barra y otro sobre la ventana que recalcula cuando la carta entra a la vista, para que un salto desde abajo no deje marcado el último chip; sin palomita, para que los chips no cambien de ancho al desplazar; la barra solo se desliza si el chip actual no se ve entero). Tocar un chip lleva a su grupo (suave solo con movimiento), cuyo título queda bajo la barra y recibe el foco. Desde 1024 px es una lista vertical fija en las columnas 1–3.
 
 - **Tipo:** control · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
 - **style.css:** `.ct-nav` `.ct-chip` `.ct` `.ct-grupo` `.ct-grupo-tit`
 - **mobile.css:** `.ct-nav .chip`
 - **index.html:** `[data-cafe]` `[data-ct-nav]` `.ct-nav`
-- **cafe.js:** exporta `initCafe` `chipNode` `currentGroup` `groupId` · ganchos `chip.setAttribute('aria-current', 'true')` `new IntersectionObserver(` `behavior: isMotion() ? 'smooth' : 'auto'`
+- **cafe.js:** exporta `initCafe` `chipNode` `currentGroup` `groupId` · ganchos `chip.setAttribute('aria-current', 'true')` `new IntersectionObserver(` `behavior: isMotion() ? 'smooth' : 'auto'` `a.setAttribute('aria-label', cat.nombre)`
 - **Tokens:** `primario` `en-primario` `fondo-3` `tinta` `linea` `alto-md` `radio-pildora` `radio-portada` `t-chip` `anillo-foco` `space-2` `space-3` `space-4` `space-6` `canal-rejilla`
 - **Estado hover:** `:is(.chip:not([aria-checked="true"]), .cat-filters-btn:not([aria-expanded="true"])):hover`, `.ct-chip[aria-current="true"]:hover` — El de Chip; el actual conserva el primario.
 - **Estado foco:** `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`, `.ct-grupo-tit:focus-visible` — Al llegar por su chip, el foco pasa al título del grupo.
@@ -390,20 +390,20 @@ Barra de categorías de la carta (Café y té): un chip de 48 por categoría de 
 - **Estado ocupado:** `.sk-chip` — Mientras llega menu.json, dos chips de esqueleto.
 - **Estado vacio:** `.ct[data-state="vacio"]` — Sin carta (o sin JavaScript) no hay barra: quedan la foto y el cierre.
 - **Estado movimiento_reducido:** cafe.js `behavior: isMotion() ? 'smooth' : 'auto'` — Sin movimiento el salto al grupo es inmediato.
-- **ARIA:** Navigation (enlaces dentro de la página) (https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/) · `nav con aria-label «Categorías de la carta»` `aria-current=true en el chip del grupo a la vista` `href=#carta-<id>` · **Teclado:** Tab recorre los chips; Enter lleva al grupo y deja el foco en su título.
+- **ARIA:** Navigation (enlaces dentro de la página) (https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/) · `nav con aria-label «Categorías de la carta»` `aria-current=true en el chip del grupo a la vista` `href=#carta-<id>` `aria-label con el nombre completo cuando el chip lleva el corto` · **Teclado:** Tab recorre los chips; Enter lleva al grupo y deja el foco en su título.
 - **QA:** `tools/qa/feed.mjs` `tools/qa/guias.mjs` `tools/qa/iphone.mjs` `tools/qa/inp.mjs` `tools/qa/controles.mjs` `tests/site.test.mjs`
 
-### TarjetaProducto
+### FilaProducto
 
-Producto de la carta en la parrilla (2 columnas en el teléfono, 3 desde 761 y 4 desde 1024, en las columnas 4–12), en dos variantes. Con foto (campo foto de menu.json, local y registrada): recuadro cuadrado con la foto (fondo-3, radio 20) y debajo el nombre (Headline), la descripción (Subheadline, renglones parejos, sin cortar con «…») y el precio; si la foto falla, el icono de su categoría. Compacta (.ct-prod--solo, la de hoy: la carta impresa no trae fotos): solo texto en una tarjeta de superficie con un anillo fino de 1 px (linea), radio 20 y mínimo 56 de alto; nombre en Headline, descripción en tinta-2 y el precio al fondo (Subheadline 600 en turquesa-texto, «$NN MXN», con la unidad si la trae, data-fuente="carta"); sin precio ni descripción (los tés), una sola línea; una compacta sin pareja ocupa el renglón en el teléfono. No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3 y su nota (Subheadline) si la trae. El cierre («Pídelo en la barra de la sala.» y «Cómo llegar») está retirado hasta nuevo aviso (hidden; pendiente de Aldo).
+Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17, sustituye a la parrilla de tarjetas del 2026-11-16): una columna de filas en el teléfono y dos desde 761 (en escritorio, en las columnas 4–12), entre líneas finas de 1 px (linea) y con 16 de aire arriba y abajo, sin caja (sin fondo, radio ni anillo). El nombre en Headline (h4), el precio justo debajo (Subheadline 600 en turquesa-texto, «$NN MXN», con la unidad si la trae, data-fuente="carta"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, renglones parejos, sin cortar con «…»). Sin foto (.ct-prod--solo, la de hoy: la carta impresa no trae fotos) el texto ocupa la fila entera y no se reserva la columna de la foto; sin precio ni descripción (los tés, «Aguas frescas»), un renglón. Con foto (campo foto de menu.json, local y registrada): cuadrada a la derecha, 96 en el teléfono y 120 desde 761 (fondo-3, radio 12), sin mover el nombre ni el precio; si la foto falla, el icono de su categoría en el mismo recuadro. No es un control: no abre nada, sin cursor de mano ni estados. Los grupos llevan su título en Title 3 y su nota (Subheadline) si la trae. La sección cierra con «Pídelo en la barra de la sala.» y «Cómo llegar» (secundario de 56, a todo el ancho en el teléfono; el café se sirve en la librería, Matamoros 421, confirmado por Aldo el 2026-11-17).
 
-- **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
+- **Tipo:** bloque · **desde** 2026-11-17 · DESIGN.md, «Carta al modo de las apps de comida» (2026-11-17), que sustituye a la parrilla de «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
 - **style.css:** `.ct-lista` `.ct-rejilla` `.ct-prod` `.ct-foto` `.ct-ic` `.ct-txt` `.ct-nom` `.ct-desc` `.ct-precio` `.ct-prod--solo` `.ct-grupo-nota` `.ct-cierre` `.cafe-foto`
 - **index.html:** `[data-ct-lista]` `.ct-rejilla` `.ct-prod` `.ct-cierre` `.cafe-foto`
 - **cafe.js:** exporta `productNode` `groupNode` `validMenu` `menuProblems` `validFoto` `precioCarta` `MENU_URL` · internas `iconNode` · ganchos `s.dataset.fuente = 'carta'`
 - **assets/data/menu.json:** datos
-- **Tokens:** `fondo` `superficie` `linea` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `radio-md` `radio-portada` `icono-producto` `t-titulo-3` `t-titular` `t-subtitulo` `t-cuerpo` `space-1` `space-2` `space-3` `space-6` `space-8` `space-12` `space-20`
-- **Estado ocupado:** `.ct-prod.card--sk :is(.ct-nom, .ct-desc)`, HTML `[data-ct-lista][aria-busy="true"]` — Cuatro tarjetas de esqueleto del tamaño de las reales.
+- **Tokens:** `fondo` `linea` `fondo-3` `tinta` `tinta-2` `turquesa-texto` `radio-sm` `radio-portada` `icono-producto` `t-titulo-3` `t-titular` `t-subtitulo` `t-cuerpo` `space-1` `space-2` `space-3` `space-4` `space-6` `space-8` `space-12` `space-20` `space-24` `canal-rejilla`
+- **Estado ocupado:** `.ct-prod.card--sk :is(.ct-nom, .ct-precio)`, HTML `[data-ct-lista][aria-busy="true"]` — Cuatro filas de esqueleto con la forma y el alto de las reales (nombre y precio entre líneas finas). La carta se arma también en reposo: al llegar por un enlace ya está armada.
 - **Estado vacio:** `.ct[data-state="vacio"]`, cafe.js `root.dataset.state = 'vacio';` — Sin carta válida no se promete nada: quedan la foto y el cierre.
 - **Estado error:** cafe.js `img.addEventListener('error', () => img.remove());` — Si la foto de un producto falla, queda el icono de su categoría.
 - **hover: no aplica.** No es un control: no abre nada.
@@ -594,10 +594,10 @@ El pie es el único lugar con el contacto: titular «Contacto» (titular de secc
 - **style.css:** `.ftr` `.ftr-contacto` `.ftr-texto` `.ftr-title` `.ftr-lede` `.ftr-links` `.ftr-link` `.ftr-ne`
 - **mobile.css:** `.ftr`
 - **index.html:** `.ftr` `.ftr-links` `.ftr-link` `#ftr-title`
-- **Tokens:** `fondo` `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `radio-md` `radio-sm` `alto-md` `t-titulo-1` `t-cuerpo` `anillo-foco` `canal-rejilla` `space-1` `space-3` `space-4` `space-6` `space-8` `space-12`
+- **Tokens:** `fondo` `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `radio-md` `radio-sm` `alto-md` `t-titulo-1` `t-cuerpo` `anillo-foco` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-6` `space-8` `space-12` `fondo-3-presionado` `dur-rapida` `curva-salida`
 - **Estado hover:** `.ftr-link:hover span`
 - **Estado foco:** `.ftr-link:focus-visible`
-- **presionado: no aplica.** Enlaces de una lista agrupada: responde el subrayado y el foco (convención de lista de iOS).
+- **Estado presionado:** `.ftr-link:active` — La fila se tiñe de fondo-3-presionado (2026-11-17, segunda auditoría de los 20 principios): también con movimiento reducido y con la pausa; sin escala.
 - **ARIA:** Landmark contentinfo + lista de enlaces (https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/contentinfo.html) · `aria-labelledby=ftr-title` · **Teclado:** Tab entre enlaces.
 - **QA:** `tests/site.test.mjs` `tools/qa/controles.mjs` `tools/qa/contrast.mjs` `tools/qa/guias.mjs`
 

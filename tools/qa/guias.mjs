@@ -106,7 +106,7 @@ const SISTEMA = {
     'Inicio del teléfono: posiciones fijas aprobadas (variante A, 2026-11-14): sus roles llevan el prefijo «inicio·» y sus propios valores.',
     'Inicio de escritorio: el bloque de texto se centra en el alto de la foto (texto en 1–5, foto en 7–12): no se le exige compartir tope (G4) ni un valor de barra → titular.',
     'Una fila de dos columnas: la más corta absorbe la diferencia al final de su celda; de cada fila cuenta el hueco menor (piezas con `fila`).',
-    'Café en escritorio: la barra de categorías es el control de la carta, no del encabezado: la carta empieza un bloque nuevo a todo el ancho, así que su aire es bloque → bloque (48) y se mide desde lo más bajo que tiene encima (la foto de 7–12, más alta que el encabezado), no desde la entradilla (pieza con `bloque`); en teléfono y tableta, texto → control (24).',
+    'Café en escritorio: la barra de categorías es el control de la carta, no del encabezado: la carta empieza un bloque nuevo a todo el ancho, así que su aire es bloque → bloque (48) y se mide desde lo más bajo que tiene encima (la foto de 7–12, más alta que el encabezado), no desde la entradilla (pieza con `bloque`); en teléfono y tableta, texto → control (24). Lo mismo el cierre de la carta (de vuelta el 2026-11-17, a todo el ancho bajo la carta): su texto abre un bloque nuevo y su aire es bloque → bloque (48) desde lo más bajo que tiene encima (la carta de 4–12), no desde la barra de categorías de 1–3, que es más corta.',
     'Barra de categorías de la carta: como una fila de chips de radio, cuenta como un solo control (la unión de sus chips), no chip por chip.',
     'Pie del libro: el aire hacia abajo se cuenta desde la reserva (--cf-reserva), no desde la última letra: con un título de un renglón se ve más.',
     'Tira de La casa y ventana del carrusel: van a sangre; de la tira se mide su primera pieza y del carrusel, la pieza central.',
@@ -154,7 +154,7 @@ const SECCIONES = [
     ['rotulo', '.ev-anteriores > .ev-sub'], ['contenido', '.ev-pasados'], ['accion', '.ev-fold'] ] },
   { id: 'cafe', sel: '#cafe', piezas: [
     ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['control', '.ct-nav', { bloque: true }], ['contenido', '.ct-lista'],
-    ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p'], ['control', '.ct-cierre .btn'] ] },
+    ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p', { bloque: true }], ['control', '.ct-cierre .btn'] ] },
   { id: 'visita', sel: '#visita', piezas: [
     ['titular', '#visit-title'], ['subtitular', '.visit address'], ['estado', '.visit-status'], ['control', '.visit-actions .btn'],
 ['contenido', '.visit-map-link', { fila: 'figuras' }], ['pie', '.visit-map figcaption'], ['rotulo', '.hours caption'], ['contenido', '.hours tbody'],
@@ -176,7 +176,7 @@ const NIVELES = {
   'título de fila anterior': ['.ev-pas-tit'],   // Headline 17 (2026-11-16): «Eventos anteriores» es archivo; su título no compite con el de una fila de «Después» (Title 3)
   'rótulo de dato': ['.ev-dato dt'],
   'valor de dato': ['.ev-dato dd'],
-  'nombre de producto': ['.ct-nom'],      // Headline 17: la tarjeta de la carta es pequeña (2 a 4 por fila) y su nombre no compite con el título del grupo
+  'nombre de producto': ['.ct-nom'],      // Headline 17: la fila de la carta (1 / 2 columnas, 2026-11-17) lleva su nombre bajo el título del grupo, sin competir con él
   'texto de pieza': ['.cf-meta', '.ct-desc'],
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],

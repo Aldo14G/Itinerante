@@ -1,14 +1,17 @@
-// Café y té (#cafe): la carta de la sala en una parrilla por categorías con su barra de categorías fija (2026-11-16; sustituye al Carrusel3D,
-// variante carta, del 2026-11-13). Los datos viven en assets/data/menu.json y se editan sin tocar HTML ni JS: cada categoría es un chip de la
-// barra y un grupo de la parrilla, y añadir otra (p. ej. «Para comer») es añadir un objeto a «categorias».
-//   · Tarjeta de producto: foto cuadrada si el producto trae `foto` ({ src: ruta local bajo assets/img/, alt }, registrada en
-//     assets/provenance.json); sin foto, el recuadro con el icono de su categoría (`icono`: taza, tetera, plato). Nombre, descripción y precio
+// Café y té (#cafe): la carta de la sala por categorías, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17), con su barra de
+// categorías fija. Sustituye a la parrilla de tarjetas del 2026-11-16 (y esta al Carrusel3D, variante carta, del 2026-11-13). Los datos viven
+// en assets/data/menu.json y se editan sin tocar HTML ni JS: cada categoría es un chip de la barra (con su nombre corto `chip` si lo trae:
+// «Sin café») y un grupo de filas, y añadir otra (p. ej. «Para comer») es añadir un objeto a «categorias».
+//   · Fila de producto: nombre, el precio justo debajo y la descripción, entre líneas finas; una columna en el teléfono y dos desde 761. Precio
 //     solo si la librería lo dio: con `precio: null` no se imprime nada; con un número, «$NN MXN» marcado como dato de la carta
-//     (data-fuente="carta"). La tarjeta no es un control: no abre nada.
+//     (data-fuente="carta"). Foto cuadrada a la derecha si el producto trae `foto` ({ src: ruta local bajo assets/img/, alt }, registrada en
+//     assets/provenance.json); si no carga, el icono de su categoría (`icono`: taza, tetera, plato); sin foto, la fila no reserva su columna.
+//     La fila no es un control: no abre nada.
 //   · Barra de categorías: enlaces a cada grupo; marca el grupo a la vista (aria-current, IntersectionObserver sobre una línea bajo la barra)
 //     y, al tocar, lleva al grupo (con desplazamiento suave solo si hay movimiento) y deja el foco en su título.
 // Se pide en la sala: la sección cierra con «Pídelo en la barra de la sala.» y «Cómo llegar» (index.html); sin consulta por WhatsApp.
-// Se carga al acercarse a la sección. Sin JavaScript, o si el JSON no llega, quedan la foto y el cierre.
+// Se carga al acercarse a la sección y también en reposo (app.js, 2026-11-17): al llegar por un enlace ya está armada. Sin JavaScript, o si el
+// JSON no llega, quedan la foto y el cierre.
 
 export const MENU_URL = 'assets/data/menu.json';
 
@@ -89,7 +92,7 @@ function iconNode(name) {
   svg.append(use);
   return svg;
 }
-// Tarjeta de producto (TarjetaProducto): el recuadro (foto o icono de la categoría), el nombre, la descripción y, si existe, el precio.
+// Fila de producto (FilaProducto, 2026-11-17): el nombre, el precio justo debajo (si existe) y la descripción; la foto, si la hay, cuadrada a la derecha (o el icono de la categoría si no carga).
 export function productNode(p, cat) {
   const li = make('li', p.foto ? 'ct-prod' : 'ct-prod ct-prod--solo'); // sin foto (la carta impresa no las trae), tarjeta compacta de solo texto
   li.dataset.id = p.id;

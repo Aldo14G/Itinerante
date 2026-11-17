@@ -589,7 +589,7 @@ export function pasadoNode(e, now = new Date(), { level = 'h4' } = {}) {
 }
 // «Ver los N anteriores» / «Ver menos»: despliega en su sitio. El resto de las filas se arma en el primer despliegue (con cientos de eventos
 // pasados, el inicio solo pinta 6); el foco se queda en el botón y, al plegar, la página sube lo que la lista encogió para que el botón no se
-// mueva bajo el cursor. Las filas que se suman entran escalonadas solo con movimiento (como «Ver los 41 títulos» del Catálogo).
+// mueva bajo el cursor; en los dos casos el botón termina entero a la vista (fuera de la barra inferior). Las filas que se suman entran escalonadas solo con movimiento (como «Ver los 41 títulos» del Catálogo).
 let motionOn = () => false;
 function wireFold(btn, ul, rest, now) {
   const total = ul.children.length + rest.length;
@@ -604,6 +604,9 @@ function wireFold(btn, ul, rest, now) {
     btn.textContent = v.label;
     if (expanded) staggerIn([...ul.children].slice(before));
     else scrollBy(0, btn.getBoundingClientRect().top - y);
+    // El botón (con el foco) queda a la vista: al desplegar, las filas nuevas lo empujaban bajo la barra inferior del teléfono (2026-11-17). Solo
+    // se desplaza si hace falta; respeta el scroll-padding de la cabecera y de la barra inferior; suave solo con movimiento.
+    btn.scrollIntoView({ block: 'nearest', behavior: motionOn() ? 'smooth' : 'auto' });
   });
 }
 function anterioresNode(plan, now) {
@@ -711,6 +714,11 @@ function enterOnView(nodes, isMotion) {
     });
   }, { rootMargin: '0px 0px -8% 0px' });
   waiting.forEach(n => io.observe(n));
+  // Llegar por un enlace (app.js, arriveAt: ☰, barra, #hash) no espera la entrada: lo que espera dentro de la sección de destino queda colocado en
+  // el mismo fotograma del salto (2026-11-17; antes el destacado estaba vacío a los 60 ms y completo a los 240).
+  document.addEventListener('iti:llegada', e => {
+    waiting.filter(n => n.classList.contains('ev-espera') && e.target.contains(n)).forEach(n => { n.classList.remove('ev-espera'); io.unobserve(n); });
+  });
 }
 // Las filas que suma «Ver los N anteriores» y caen en la vista entran escalonadas (mismo gesto, mismos tokens); arrancan en el fotograma siguiente
 // al cambio. Sin movimiento no hacen nada.

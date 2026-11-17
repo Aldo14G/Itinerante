@@ -2110,7 +2110,7 @@ test('Sistema de guías (2026-11-15): una rejilla de 12 con canal 32 y división
   assert.ok(/\.hdr-nav \+ \.hdr-end \{ margin-inline-end: calc\(-1 \* var\(--space-4\)\); \}/.test(cssFlat), 'cabecera desde 1101: la tinta de «Mi lista» termina en el borde del contenido');
 });
 
-test('Café y té (#cafe): titular, entradilla, foto real y la carta en parrilla por categorías con su barra fija; se pide en la sala; en la barra, el menú y el scroll-spy', async () => {
+test('Café y té (#cafe): titular, entradilla, foto real y la carta en filas por categorías con su barra fija (2026-11-17); se pide en la sala; en la barra, el menú y el scroll-spy', async () => {
   const sec = html.match(/<section id="cafe"[\s\S]*?\n {4}<\/section>/)[0];
   assert.ok(/<header class="sec-head" data-revelar>\s*<h2 id="cafe-title" class="h2">Café y té <em>en la sala<\/em><\/h2>\s*<p class="sec-texto">Algo de tomar mientras hojeas\.<\/p>/.test(sec), 'titular y entradilla de siempre (el título se decide cuando exista «Para comer»)');
   const img = sec.match(/<img src="assets\/(img\/[^"]+)"[^>]*>/);
@@ -2118,11 +2118,11 @@ test('Café y té (#cafe): titular, entradilla, foto real y la carta en parrilla
   const page = html.replace(sec, '');
   assert.ok(!page.includes(img[1].replace('img/', 'assets/img/')), 'la foto no se repite en otra sección');
   assert.ok(/<div class="ct" data-cafe>\s*<nav class="ct-nav" aria-label="Categorías de la carta" data-ct-nav>/.test(sec) && /<div class="ct-lista" data-ct-lista aria-busy="true">/.test(sec), 'barra de categorías (nav con nombre) y la parrilla, que nace ocupada con su esqueleto');
-  assert.equal((sec.match(/<li class="ct-prod card--sk">/g) || []).length, 4, 'esqueleto: cuatro tarjetas del tamaño de las reales');
+  assert.equal((sec.match(/<li class="ct-prod ct-prod--solo card--sk"><span class="ct-txt"><span class="ct-nom">&nbsp;<\/span><span class="ct-precio">&nbsp;<\/span><\/span><\/li>/g) || []).length, 4, 'esqueleto: cuatro filas con la forma y el alto de las reales (nombre y precio; 2026-11-17)');
   assert.ok(!/c3d|carrusel|role="radiogroup"|aria-live|c3d-flecha/.test(sec.replace(/<!--[\s\S]*?-->/g, '')), 'sin carrusel, flechas ni chips de radio: la carta es una parrilla estática');
-  assert.ok(/<div class="ct-cierre">\s*<p>Pídelo en la barra de la sala\.<\/p>\s*<a class="btn btn--primario btn--lg" href="https:\/\/www\.google\.com\/maps\/dir\/[^"]+" target="_blank" rel="noopener noreferrer"><span>Cómo llegar<\/span>/.test(sec), 'cierre: «Pídelo en la barra de la sala.» y «Cómo llegar» (primaria de 56); el café se sirve en la librería, Matamoros 421 (Aldo, 2026-11-17)');
+  assert.ok(/<div class="ct-cierre">\s*<p>Pídelo en la barra de la sala\.<\/p>\s*<a class="btn btn--secundario btn--lg" href="https:\/\/www\.google\.com\/maps\/dir\/[^"]+" target="_blank" rel="noopener noreferrer"><span>Cómo llegar<\/span>/.test(sec), 'cierre: «Pídelo en la barra de la sala.» y «Cómo llegar» (secundario de 56: la primaria de esa pantalla es la de Visita, 2026-11-17); el café se sirve en la librería, Matamoros 421 (Aldo, 2026-11-17)');
   assert.ok(/Mariano Matamoros 421/.test(sec) && /\.ct-cierre\[hidden\]/.test(cssFlat), 'el marcado dice por qué el cierre lleva a la librería; la regla que respeta `hidden` sigue por si hay que retirarlo');
-  assert.ok(!/wa\.me|data-cafe-ask|WhatsApp/.test(sec) && (sec.match(/btn--primario/g) || []).length === 1, 'sin WhatsApp en la sección (se pide en la sala); una sola primaria');
+  assert.ok(!/wa\.me|data-cafe-ask|WhatsApp/.test(sec) && !/btn--primario/.test(sec), 'sin WhatsApp en la sección (se pide en la sala); sin primaria: al pie de Café asoma la de Visita y solo va una por pantalla');
   assert.ok(!/\$\s?\d|MXN|por confirmar/.test(sec), 'sin precios en el marcado');
   const at = s => html.indexOf(s);
   assert.ok(at('<section id="novedades"') < at('<section id="cafe"') && at('<section id="cafe"') < at('<section id="visita"') && at('<section id="cartelera"') < at('<section id="cafe"'), 'entre Eventos/Novedades y Visita');
@@ -2142,7 +2142,7 @@ test('Café y té (#cafe): titular, entradilla, foto real y la carta en parrilla
   assert.ok(!/\.ct-desc \{[^}]*(line-clamp|text-overflow|overflow: hidden)/.test(cssFlat), 'la descripción no se corta con «…»');
   assert.ok(/html:not\(\.js\) \.ct, \.ct\[data-state="vacio"\], \.ct-cierre\[hidden\] \{ display: none; \}/.test(cssFlat), 'sin JavaScript (o sin carta) queda la foto; un cierre con `hidden` no se ve');
   const app = readFileSync_('app.js');
-  assert.ok(/nearby\(\$\('\[data-cafe\]'\), \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app), 'se carga al acercarse');
+  assert.ok(/const bootCafe = \(\) => import\('\.\/cafe\.js'\)\.then\(m => m\.initCafe\(\{ isMotion \}\)\)/.test(app) && /nearby\(\$\('\[data-cafe\]'\), bootCafe\)/.test(app) && /whenIdle\(bootCafe, \{ timeout: 3000 \}\)/.test(app), 'se carga al acercarse y también en reposo: al llegar por un enlace ya está armada (2026-11-17)');
   assert.ok(/<a href="#cafe">Café<\/a>/.test(html.match(/<nav class="hdr-nav"[\s\S]*?<\/nav>/)[0]) && /<a class="menu-row" href="#cafe"><span>Café y té<\/span>/.test(html) && !/#cafe/.test(html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0]), 'en la barra de escritorio y el menú; la barra inferior no cambia');
   assert.ok(/@media \(min-width: 1024px\) \{[\s\S]*?\.books, \.cafe \{ display: grid; grid-template-columns: var\(--rejilla\); column-gap: var\(--canal-rejilla\); align-items: start; \}[\s\S]*?\.cafe > \.sec-head \{ grid-column: 1 \/ span 6; grid-row: 1; margin: 0; \}\s*\.cafe-foto \{ order: 0; grid-column: 7 \/ -1; grid-row: 1; margin: 0; \}[\s\S]*?\.ct-nav \{ grid-column: 1 \/ span 3;[\s\S]*?\.ct-lista \{ grid-column: 4 \/ -1;[\s\S]*?\.ct-cierre \{ order: 0; grid-column: 1 \/ -1; grid-row: 3;/.test(css) && !/subgrid|cafe-cuerpo|cafe-carta/.test(css + html), 'escritorio (Sistema de guías): titular 1–6 y foto 7–12; categorías en 1–3 (lista vertical fija) y parrilla en 4–12; el cierre vuelve al margen izquierdo');
   assert.ok(/\.ct \{ order: 1;/.test(cssFlat) && /\.cafe-foto \{ order: 2;/.test(cssFlat) && /\.ct-cierre \{ order: 3;/.test(cssFlat) && /\.ct-cierre \.btn \{ width: 100%; \}/.test(mobileFlat), 'teléfono y tableta: la carta antes que la foto (al llegar se ve la carta) y el cierre al final; la primaria a todo el ancho en el teléfono');

@@ -66,12 +66,21 @@ export function pushSheet({ close, lock: cls = 'sheet-open', url = '', dlg = nul
 // 180-280 ms seguidos. Con `defer` el contenido espera (`is-filling`, content-visibility: hidden) y se muestra tras el
 // siguiente fotograma, de modo que cada tarea queda por debajo de 200 ms. La promesa se resuelve con el contenido ya
 // visible: lo que dependa de que sea enfocable (llevar el foco dentro) va después de ella.
+// Los avisos que viven dentro de una hoja (popover de capa superior: «Guardado en Mi lista.») se van con ella: si no, flotaban sobre la portada
+// mientras la hoja salía (240 ms tras ×; segunda auditoría, 2026-11-17). `:popover-open` puede no existir en un navegador viejo: entonces no hay nada que ocultar.
+function hidePopovers(dlg) {
+  let open = [];
+  try { open = [...dlg.querySelectorAll(':popover-open')]; } catch { return; }
+  open.forEach(p => { try { p.hidePopover(); } catch { /* ya cerrado */ } });
+}
+
 export function openDialog(dlg, { defer = false, ...opts } = {}) {
   if (defer) dlg.classList.add('is-filling');
   dlg.showModal();
   const release = pushSheet({ ...opts, dlg, close: () => dlg.close() });
   // En captura: corre antes que los `close` de cada hoja, que enfocan cosas.
   dlg.addEventListener('close', release, { once: true, capture: true });
+  dlg.addEventListener('close', () => hidePopovers(dlg), { once: true }); // Escape, «atrás» y el fondo
   return defer ? afterPaint(() => dlg.classList.remove('is-filling')) : Promise.resolve();
 }
 
@@ -85,6 +94,7 @@ export function openDialog(dlg, { defer = false, ...opts } = {}) {
 // vía mientras tanto, el evento `close` limpia las clases y los pasos pendientes no hacen nada.
 export function closeDialog(dlg) {
   if (!dlg.open || dlg.classList.contains('is-closing')) return;
+  hidePopovers(dlg); // en el mismo fotograma en que empieza la salida
   dlg.classList.add('is-closing');
   let live = true;
   dlg.addEventListener('close', () => { live = false; dlg.classList.remove('is-closing', 'is-filling'); }, { once: true });

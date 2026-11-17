@@ -397,7 +397,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     if (!append) grid.replaceChildren();
     grid.removeAttribute('aria-busy');
     grid.append(frag);
-    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: Math.min(i * ms('stagger-char'), DUR('lenta') - DUR('base')), easing: EASE(), fill: 'backwards' }));
+    if (animate && isMotion() && fresh.length) fresh.slice(0, 18).forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: DUR('base'), delay: Math.min(i * ms('stagger-char'), DUR('lenta') - DUR('base') - ms('stagger-char')), easing: EASE(), fill: 'backwards' })); // el tope del escalón se recorta un escalón (24): la última termina a los 676 ms de animación y dentro de dur-lenta contada desde el clic (medía 714; 2026-11-17)
     const left = results.length - slice.length;
     const folded = applyFold();
     moreBtn.hidden = left <= 0 || folded;

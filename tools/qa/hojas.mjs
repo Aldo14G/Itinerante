@@ -9,7 +9,11 @@
 //       con un evento de prueba que inyecta esta herramienta (no está en el repo).
 //  A2 · el marcador guardado sobre la portada se distingue de su disco (≥ 3:1) con vidrio y en gama media (`data-glass="lite"`).
 //  P1 · con `localStorage` bloqueado (leerlo lanza) el carrusel del Catálogo sigue ahí y «Catálogo» de la barra inferior aterriza.
-//  T1 · la rejilla que se repinta al filtrar termina dentro de dur-lenta (+ 50 ms de respuesta).
+//  T1 · la rejilla que se repinta al filtrar termina dentro de dur-lenta contada desde el clic (2026-11-17: antes con 50 ms de holgura; medía 714).
+//  A3 · (2026-11-17) al cerrar la ficha con × el aviso «Guardado en Mi lista.» deja de verse en el mismo fotograma (≤ 1) en que empieza la salida:
+//       no queda suelto sobre la portada mientras la hoja sale.
+//  F1 · (2026-11-17) «Ver los N anteriores» / «Ver menos» de Eventos anteriores, en el teléfono: tras desplegar y tras plegar, el botón (con el
+//       foco) queda entero en la ventana, ≥ 8 px sobre la barra inferior y bajo la cabecera.
 // Sale con 1 si algo falla.
 import { existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -36,6 +40,8 @@ const ok = (regla, cond, texto) => { res.push({ regla, ok: Boolean(cond), texto 
 
 // Evento de prueba (dentro de cinco días, hora de Monterrey): da un destacado con «Añadir al calendario» y «Compartir».
 const enDias = n => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() + n * 86_400_000));
+// Nueve eventos anteriores (F1): seis a la vista y «Ver los 9 anteriores». Texto de prueba, no son eventos reales.
+const ANTERIORES_DE_PRUEBA = { eventos: Array.from({ length: 9 }, (_, i) => ({ id: `prueba-anterior-${i + 1}`, tipo: 'Lectura', titulo: `Evento anterior de prueba ${i + 1}`, fecha: enDias(-(7 + i * 9)), hora: '18:00', fin: null, con: 'Persona de prueba', descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null })) };
 const EVENTO_DE_PRUEBA = { eventos: [{ id: 'prueba-hojas', tipo: 'Lectura', titulo: 'Evento de prueba', fecha: enDias(5), hora: '18:57', fin: null, con: null, descripcion: 'Texto de prueba del arnés. No es un evento real.', imagen: 'assets/img/cartelera-1.webp', alt: 'La sala central', reserva: null }] };
 async function abrir(perfil, init, { eventos = null } = {}) {
   const browser = await pw.chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--hide-scrollbars'] });
@@ -134,7 +140,7 @@ for (const nucleos of [8, 4]) {
   const f = await page.locator('.cat-opt label').first().boundingBox();
   await page.mouse.click(f.x + 14, f.y + f.height / 2);
   const g = await p;
-  ok('T1', g.tarjetas > 0 && g.fin <= dur.lenta + 50, `1440: la rejilla al filtrar (${g.tarjetas} tarjetas) termina a los ${g.fin} ms (tope ${dur.lenta + 50})`);
+  ok('T1', g.tarjetas > 0 && g.fin <= dur.lenta, `1440: la rejilla al filtrar (${g.tarjetas} tarjetas) termina a los ${g.fin} ms desde el clic (tope ${dur.lenta})`);
   await centrar(page, '#cartelera .ev-prox');
   await tap(page, perfil, '.ev-prox [data-share]'); await sleep(700);
   const a = await aviso(page);
@@ -151,6 +157,41 @@ for (const nucleos of [8, 4]) {
   await tap(page, perfil, '[data-d-close]');
   const c = cierre(await pc);
   ok('H1', c.oculto !== null && c.oculto <= dur.base + 50 && !c.reaparece, `1440: ficha con ×: deja de verse a los ${c.oculto} ms; reaparece: ${c.reaparece}`);
+  await browser.close();
+}
+
+// ---- Teléfono: el aviso al cerrar la ficha (A3) ----
+{
+  const perfil = 'iphone';
+  const { browser, page } = await abrir(perfil, NUCLEOS(8));
+  await centrar(page, '.c3d--portada');
+  await tap(page, perfil, '.rail-item.is-centro .card .cover', 0.5, 0.3); await sleep(900);
+  await tap(page, perfil, '#cat-drawer [data-d-save]'); await sleep(600);
+  const abierto = await page.evaluate(() => { const t = document.querySelector('.toast'); return Boolean(t?.matches(':popover-open')); });
+  const p = page.evaluate(() => new Promise(done => { const out = []; addEventListener('click', () => { const t0 = performance.now(); const tick = () => { const t = performance.now() - t0; const a = document.querySelector('.toast'); const b = a?.getBoundingClientRect(); const cs = a ? getComputedStyle(a) : null; const d = document.querySelector('#cat-drawer').getBoundingClientRect(); out.push({ t: Math.round(t), aviso: Boolean(a && a.matches(':popover-open') && b.height > 0 && cs.display !== 'none' && +cs.opacity > 0.01 && cs.visibility !== 'hidden'), y: b ? Math.round(b.top) : null, hoja: d.height > 0 && d.top < innerHeight - 1 }); if (t < 700) requestAnimationFrame(tick); else done(out); }; requestAnimationFrame(tick); }, { capture: true, once: true }); }));
+  await tap(page, perfil, '[data-d-close]');
+  const m = await p;
+  const visto = m.filter(x => x.aviso);
+  const i = m.findIndex(x => !x.aviso);
+  ok('A3', abierto && i >= 0 && i <= 1 && !m.slice(i).some(x => x.aviso), `iPhone 16: aviso abierto antes de cerrar: ${abierto}; al cerrar la ficha con × deja de verse en el fotograma ${i} (${i >= 0 ? m[i].t : '—'} ms); fotogramas con el aviso a la vista: ${visto.length}${visto.length ? ` (hasta los ${visto.at(-1).t} ms, en y ${visto.at(-1).y})` : ''}`);
+  await browser.close();
+}
+
+// ---- Teléfono: «Ver los N anteriores» y «Ver menos» fuera de la barra inferior (F1) ----
+for (const reduce of [false, true]) {
+  const perfil = 'iphone';
+  const browser = await pw.chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--hide-scrollbars'] });
+  const context = await browser.newContext({ ...PERFILES[perfil], locale: 'es-MX', timezoneId: 'America/Monterrey', reducedMotion: reduce ? 'reduce' : 'no-preference' });
+  await context.route('**/assets/data/eventos.json', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ANTERIORES_DE_PRUEBA) }));
+  const page = await context.newPage();
+  await page.goto(URL_, { waitUntil: 'load' }); await sleep(3600);
+  await centrar(page, '#cartelera .ev-fold', 1200);
+  const lugar = () => page.evaluate(() => { const b = document.querySelector('#cartelera .ev-fold'); const r = b.getBoundingClientRect(); const tb = document.querySelector('.tabbar').getBoundingClientRect(); const hd = document.querySelector('.hdr').getBoundingClientRect(); return { txt: b.textContent.trim(), exp: b.getAttribute('aria-expanded'), foco: document.activeElement === b, top: Math.round(r.top), bottom: Math.round(r.bottom), barra: Math.round(tb.top), cabecera: Math.round(hd.bottom), filas: [...document.querySelectorAll('#ev-pasados > li')].filter(li => !li.hidden).length }; });
+  for (const paso of ['desplegar', 'plegar']) {
+    await tap(page, perfil, '#cartelera .ev-fold'); await sleep(1000);
+    const r = await lugar();
+    ok('F1', r.foco && r.top >= r.cabecera && r.bottom <= r.barra - 8, `iPhone 16${reduce ? ' (movimiento reducido)' : ''}, tras ${paso} (${r.filas} filas, «${r.txt}», aria-expanded ${r.exp}): el botón en y ${r.top}–${r.bottom}; la barra inferior empieza en ${r.barra} y la cabecera termina en ${r.cabecera}; foco en el botón: ${r.foco}`);
+  }
   await browser.close();
 }
 

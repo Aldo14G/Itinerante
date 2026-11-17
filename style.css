@@ -660,7 +660,10 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .ftr-links { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--space-8); margin: 0; padding: 0 var(--space-4); list-style: none; border-radius: var(--radio-md); background: var(--fondo-2); }
 .ftr-links li { padding-block: var(--space-1); } /* fila de 56: enlace de 48 y 4 px arriba y abajo; entre dos enlaces quedan 9 px (≥ 8 entre vecinos) */
 .ftr-links li + li { border-top: 1px solid var(--linea); }
-.ftr-link { display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-md); border-radius: var(--radio-sm); color: var(--tinta); font: var(--t-cuerpo); text-decoration: none; }
+.ftr-link { display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-md); margin-inline: calc(-1 * var(--space-2)); padding-inline: var(--space-2); border-radius: var(--radio-sm); color: var(--tinta); font: var(--t-cuerpo); text-decoration: none; transition: background-color var(--dur-rapida) var(--curva-salida); }
+/* Presionado (2026-11-17, segunda auditoría de los 20 principios): la fila se tiñe como las del menú (fondo-3-presionado), también con movimiento
+   reducido y con la pausa. La caja sobresale 8 px a cada lado (margen negativo y relleno iguales): la tinta del texto y del icono no se mueve. */
+.ftr-link:active { background: var(--fondo-3-presionado); }
 .ftr-link span { flex: 1 1 auto; min-width: 0; }
 .ftr-link .ic { flex: none; width: 24px; height: 24px; color: var(--turquesa-texto); }
 .ftr-link .ftr-ne { width: 20px; height: 20px; color: var(--tinta-2); }
@@ -1191,14 +1194,15 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 /* El foco de «Guardar» sobre una portada se separa con el color de esa portada. */
 :is(.rail-item, .card-item) .save:not(.save--wide):focus-visible { box-shadow: 0 0 0 2px var(--fondo), 0 0 0 4px var(--foco); }
 
-/* ---------- Café y té (#cafe): la carta en parrilla por categorías (2026-11-16; cafe.js) ---------- */
-/* Sustituye al Carrusel3D, variante carta (2026-11-13). Titular y entradilla; la barra de categorías (BarraCategorias: chips de 48 que
-   llevan a cada grupo y marcan el que está a la vista), fija bajo la cabecera mientras se recorre la carta, con el fondo opaco de la banda
-   (no es vidrio); la parrilla, un grupo por categoría con su título (Title 3) y sus productos (TarjetaProducto: foto cuadrada o el icono de
-   la categoría, nombre, descripción y precio solo si la librería lo dio) a dos columnas (tres desde 761; cuatro desde 1024, con las
-   categorías en una lista vertical fija en las columnas 1–3 y la parrilla en 4–12); la foto real de la casa y el cierre: «Pídelo en la barra
-   de la sala.» y «Cómo llegar». En el teléfono y la tableta la foto va después de la carta (al llegar se ve la carta); el orden de lectura
-   del marcado es titular, foto, carta y cierre. La tarjeta no es un control: sin cursor de mano ni estados.
+/* ---------- Café y té (#cafe): la carta por categorías al modo de las apps de comida (2026-11-17; cafe.js) ---------- */
+/* Sustituye a la parrilla de tarjetas del 2026-11-16 (y esta al Carrusel3D, variante carta, del 2026-11-13). Titular y entradilla; la barra de
+   categorías (BarraCategorias: chips de 48 con el nombre corto de la categoría, que llevan a cada grupo y marcan el que está a la vista),
+   fija bajo la cabecera mientras se recorre la carta, con el fondo opaco de la banda (no es vidrio); un grupo por categoría con su título
+   (Title 3), su nota y sus filas (FilaProducto: nombre, precio justo debajo solo si la librería lo dio y descripción; la foto, si la hay,
+   cuadrada a la derecha) en una columna (dos desde 761; desde 1024, con las categorías en una lista vertical fija en las columnas 1–3 y la
+   carta en 4–12); la foto real de la casa y el cierre: «Pídelo en la barra de la sala.» y «Cómo llegar» (secundario: la primaria de esa
+   pantalla es la de Visita). En el teléfono y la tableta la foto va después de la carta (al llegar se ve la carta); el orden de lectura
+   del marcado es titular, foto, carta y cierre. La fila no es un control: sin cursor de mano ni estados.
    Aire por rol: texto → control 24 (16 + los 8 de relleno de la barra) · cabecera → contenido 24 (los 8 de la barra + 16) · título de grupo →
    su parrilla 12 · grupo → grupo 32 / 48 · bloque → bloque 32 / 48 · texto → control 24. */
 .cafe { --ct-barra: calc(var(--alto-md) + 2 * var(--space-2)); display: grid; grid-template-columns: minmax(0, 1fr); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
@@ -1239,12 +1243,11 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
 .ct-desc { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* renglones parejos, sin palabra viuda; nunca se corta con «…»: si hace falta, tres renglones */
 .ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--turquesa-texto); }
-/* Tarjeta compacta (sin foto, solo texto): superficie sobre el fondo de la sección con un borde fino (linea), no un relleno macizo; el nombre en
-   titular, la descripción en tinta-2 y el precio abajo (turquesa-texto, 600). Una sola línea cuando no hay precio ni descripción (los tés). */
-/* Esqueleto: los chips y cuatro tarjetas del tamaño de las reales mientras llega menu.json. */
+/* Esqueleto: los chips y cuatro filas con la forma y el alto de las reales (nombre y precio) mientras llega menu.json. */
 .ct-grupo-tit--sk { display: block; width: var(--space-20); border-radius: var(--radio-portada); background: var(--fondo-3); }
 .ct-prod--solo { grid-template-columns: minmax(0, 1fr); } /* sin foto la fila no reserva su columna */
-.ct-prod.card--sk :is(.ct-nom, .ct-desc) { display: block; visibility: hidden; }
+.ct-prod.card--sk :is(.ct-nom, .ct-precio) { display: block; width: 40%; border-radius: var(--radio-portada); background: var(--fondo-3); color: transparent; }
+.ct-prod.card--sk .ct-precio { width: 20%; } /* nombre y precio: el alto de una fila con precio (79) */
 html:not(.js) .ct, .ct[data-state="vacio"], .ct-cierre[hidden] { display: none; }
 @media (min-width: 761px) { .ct-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--canal-rejilla); } .ct-foto { width: calc(var(--space-24) + var(--space-6)); } }
 @media print { .ct-nav { display: none; } }

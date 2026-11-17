@@ -169,7 +169,7 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 .bill { content-visibility: auto; contain-intrinsic-size: auto 760px; }
 .books { content-visibility: auto; contain-intrinsic-size: auto 1076px; }
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
-.cafe { content-visibility: auto; contain-intrinsic-size: auto 828px; }
+.cafe { content-visibility: auto; contain-intrinsic-size: auto 2548px; } /* 2026-11-17, carta en filas con el cierre de vuelta: 2 529–2 564 de 360 a 414 (antes 828, de la parrilla sin cierre) */
 .visit { content-visibility: auto; contain-intrinsic-size: auto 1122px; } /* 2026-11-14: + el mapa de llegada (+290 px: 266 del mapa y su atribución y 24 de aire; Visita mide 1 165–1 190 de 360 a 414) */
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 567px; } /* 2026-11-13, contacto en el pie: el Catálogo −124, Café −52, Visita −68 y el pie +247 px (medido de 360 a 414) */
 

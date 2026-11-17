@@ -143,3 +143,6 @@ La lista de veinte la dio Aldo («20 Principles of UX & Animation»). Sus doce p
 
 ## Luma (lu.ma), referencia de estructura para Eventos (2026-11-16)
 Aldo pidió que la lista de Eventos siga el orden de la agenda de Luma (la plataforma de eventos; no es el estilo «Luma» de shadcn/ui). Se abrieron en Chromium sus páginas públicas (lista por ciudad y página de un evento) y se midió la estructura; **no se copió código, imágenes ni textos**, no hay licencia que lo permita y el sitio no carga nada de su dominio. Detalle y medidas en `docs/ux/investigacion-2026-11/luma.md`. No verificado: sesión iniciada, registro con aprobación y cambios posteriores de su hoja de estilos.
+
+## Uber Eats y DiDi Food, referencia de estructura para la carta (2026-11-17)
+Aldo pidió que los nombres y el acomodo de la carta de Café y té sigan los estándares de las apps de comida. Se midieron en Chromium las páginas públicas de 15 cafeterías de Monterrey en DiDi Food (categorías, filas, precio bajo el nombre, una o dos columnas); de Uber Eats solo los nombres de categoría por el índice de un buscador (sus tiendas piden un reto anti-bot, no se intentó saltar). **Solo estructura**: sin código, textos, logotipos ni imágenes, y el sitio no carga nada de sus dominios. Detalle, fuentes y lo que no se pudo medir en `docs/ux/investigacion-2026-11/apps-de-comida.md`.

@@ -505,8 +505,8 @@
   },
   "menuData": {
     "file": "data/menu.json",
-    "origin": "Carta impresa de Café Itinerante que mandó Aldo el 2026-11-16 (fotografía), transcrita tal cual: nombres, descripciones y precios; los precios de los tés y las aguas frescas estaban tapados por una etiqueta (precio null, sin precios hasta que la librería los dé)",
-    "rule": "precio: null mientras la librería no dé el precio; con un número se muestra «$NN MXN» (data-fuente=\"carta\"). Hoy sin fotos de producto (recuadro con el icono de la categoría); una foto de producto (campo `foto` del producto) se registra en «real» antes de publicarla y npm test lo exige."
+    "origin": "Carta impresa de Café Itinerante que mandó Aldo el 2026-11-16 (fotografía), transcrita tal cual: nombres, descripciones y precios; los precios de los tés y las aguas frescas estaban tapados por una etiqueta (precio null, sin precios hasta que la librería los dé). El 2026-11-17 se reacomodaron categorías y orden al modo de Uber Eats y DiDi Food (Cafés, Bebidas sin café, Salado y Postres) sin cambiar nombres de producto ni precios; la carta impresa trae «Padre Mier 836A Pte.», una dirección anterior: Aldo confirmó que el café se sirve en la librería (Mariano Matamoros 421)",
+    "rule": "precio: null mientras la librería no dé el precio; con un número se muestra «$NN MXN» (data-fuente=\"carta\"). Hoy sin fotos de producto (la fila es solo texto; si una foto no carga, el recuadro queda con el icono de la categoría); una foto de producto (campo `foto` del producto) se registra en «real» antes de publicarla y npm test lo exige."
   },
   "eventosData": {
     "file": "data/eventos.json",
