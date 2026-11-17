@@ -679,6 +679,9 @@ await open(393, 659, { wait: 2500 }); await approach();
 const v45 = await newsState();
 const guardado = await ev(`({ estado: localStorage.getItem('iti-news-estado'), vence: localStorage.getItem('iti-news-vence') })`);
 check('novedades', 'ventana de 45 días: la llegada de hace 45 días se muestra y la de hace 46 no (1 tarjeta); la visita deja iti-news-vence = llegada + 45 días (hoy, el último día)', v45.cards === 1 && v45.ids[0] === ids[0] && guardado.vence === dayMty(0), JSON.stringify({ cards: v45.cards, guardado, hoy: dayMty(0) }));
+// boot.js compara con el día del dispositivo; la prueba fija el reloj en Monterrey (como la gente que visita el sitio), si no, entre las 18:00 y las 24:00
+// de Monterrey el contenedor (UTC) ya va un día adelante y «vence hoy» se leía como vencido.
+await send('Emulation.setTimezoneOverride', { timezoneId: 'America/Monterrey' }).catch(() => {});
 await send('Page.addScriptToEvaluateOnNewDocument', { source: `document.addEventListener('DOMContentLoaded', () => { window.__arranque = [...document.documentElement.classList].filter(c => /has-news|news-hint/.test(c)).join(' '); });` });
 await ev(`localStorage.setItem('iti-news-estado', 'p'); localStorage.setItem('iti-news-vence', ${JSON.stringify(dayMty(-1))})`);
 await open(393, 659, { wait: 800 });
