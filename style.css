@@ -426,6 +426,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Pie de foto: solo el nombre del cuarto (lo demás lo dice la foto y, para lectores de pantalla, su alt). */
 .still figcaption { padding-top: var(--space-2); } /* contenido → pie de figura 8, como el mapa y la foto de Visita */
 .still figcaption b { font: var(--t-titular); letter-spacing: var(--ls-titular); }
+.still figcaption span { display: block; margin-top: var(--space-1); font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; } /* la línea que acompaña al nombre del cuarto (curaduría de textos, 2026-11-18): nombre → su texto 4, como el nombre y el precio de una fila de la carta */
 /* Enfoque al deslizar (2026-11-14; idea de Focus Cards de Aceternity, solo inspiración): la foto que se ve entera queda plena y la que asoma
    por un borde se atenúa según lo que asoma (0.6 fuera, como la vecina del carrusel plano), con la línea de tiempo de su propia vista en la
    tira (view(inline 0px): cuenta lo que se ve, no el scroll-padding, que a 2560 px mide 592): corre en el compositor, sin JavaScript. Solo la imagen: el nombre del cuarto conserva su contraste. Sin soporte, con

@@ -109,7 +109,7 @@ export function trailState(cols, seen) {
   const done = cols.map(c => seen.has(c.id));
   return { count: done.filter(Boolean).length, total: cols.length, done, links: done.slice(1).map((d, i) => d && done[i]) };
 }
-export const trailLine = (n, total) => `${n} de ${total} paradas hojeadas`;
+export const trailLine = (n, total) => (n <= 0 ? `${total} paradas por recorrer` : n >= total ? `Recorriste las ${total} paradas` : `Llevas ${n} de ${total} paradas`);
 
 // Libro por el que empieza el carrusel (2026-11-18, aprobado por Aldo): el más cercano al medio que tenga portada real, para que la pieza
 // protagonista nunca sea una portada tipográfica; a igual distancia, el de la izquierda. Sin ninguna portada real, el del medio, como antes.

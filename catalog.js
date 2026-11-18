@@ -234,7 +234,7 @@ export function bookWaUrl(book) {
 export function bookShareData(book, href = '') {
   const url = `${String(href).split('#')[0]}#libro-${book.id}`;
   const by = book.a && book.a !== 'Autor no indicado' ? ` de ${book.a}` : '';
-  return { title: `${book.t} · Librería Itinerante y Más`, text: `«${book.t}»${by} en Librería Itinerante y Más. La librería confirma si lo tiene.`, url };
+  return { title: `${book.t} · Librería Itinerante y Más`, text: `«${book.t}»${by}, en el catálogo de Librería Itinerante y Más, en el centro de Monterrey.`, url };
 }
 // Web Share (la hoja del teléfono) y, si no existe o falla, copiar el enlace y avisarlo. Cancelar la hoja no copia nada.
 export async function shareBook(book, { nav = globalThis.navigator, href = globalThis.location?.href ?? '', say = notify } = {}) {
@@ -258,7 +258,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   try {
     data = await loadSample();
   } catch {
-    status.textContent = 'No pudimos cargar el catálogo. Escríbenos por WhatsApp y te ayudamos a buscar.';
+    status.textContent = 'No pudimos cargar el catálogo. Escríbenos por WhatsApp: te ayudamos a buscar tu libro o a pedirlo.';
     root.dataset.state = 'error';
     delete root.dataset.ready; // permite reintentar (p. ej. al volver a #catalogo)
     $('[data-cat-grid]', root).replaceChildren();
@@ -417,7 +417,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     grid.hidden = !results.length;
     // «41 títulos» / «N títulos»; sin resultados la frase visible es la del estado vacío y esta línea solo la anuncia (sr-only).
     const n = results.length;
-    status.textContent = !n ? 'No hay títulos con esa combinación.' : slice.length < n ? `Mostrando ${slice.length} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
+    status.textContent = !n ? 'No está en el catálogo, pero te lo podemos pedir.' : slice.length < n ? `Mostrando ${slice.length} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
     status.classList.toggle('sr-only', !n);
     return fresh;
   }

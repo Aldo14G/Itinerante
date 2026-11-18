@@ -16,7 +16,7 @@
 //   G · guías verticales: cada pieza de primer nivel de cada sección empieza en una línea de la rejilla (margen, columna de 12 con canal de 32
 //       desde 761 px, o el eje central solo para el escenario del carrusel y su pie); las columnas derechas de todas las secciones empiezan
 //       en la misma x (columna 7); las dos columnas de una sección comparten la línea superior; lo centrado, centrado al píxel; un dato
-//       asociado («N de 3 paradas hojeadas») va junto a lo suyo: en el renglón de su nota, 16 px después, o debajo de ella a 8 (G6).
+//       asociado («Llevas N de 3 paradas») va junto a lo suyo: en el renglón de su nota, 16 px después, o debajo de ella a 8 (G6).
 //   R · ritmo vertical: cada hueco entre piezas consecutivas se clasifica por rol; un rol tiene un solo valor por perfil y está en la escala de 4.
 //   B · botones: los de la misma jerarquía miden lo mismo (alto, relleno, rótulo, icono) y se colocan igual (ancho, alineación, aire).
 //   T · títulos: cada nivel (h1, titular de sección, entradilla, pie, rótulo…) tiene un solo estilo en toda la página; el titular de sección

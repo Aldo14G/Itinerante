@@ -13,7 +13,7 @@
       "con": null,
       "descripcion": "Un libro, una mesa y una conversación sin prisa. La idea: elegir una lectura en común y reunirse en la sala para comentarla.",
       "imagen": "assets/img/cartelera-1.webp",
-      "alt": "La sala central",
+      "alt": "La sala central con sillas plegables en filas frente a las mesas, libreros a los lados y el ventanal al fondo",
       "reserva": null
     },
     {
@@ -26,7 +26,7 @@
       "con": null,
       "descripcion": "El tablero ya está en la casa. La propuesta: tardes de partidas abiertas, para quien quiera aprender o volver a jugar.",
       "imagen": "assets/img/cartelera-2.webp",
-      "alt": "La mesa de ajedrez",
+      "alt": "Tablero de ajedrez con piezas sobre un mantel rojo, junto a un muro descascarado y un aro colgado",
       "reserva": null
     },
     {
@@ -39,7 +39,7 @@
       "con": null,
       "descripcion": "Leer, escribir y compartir en voz alta, rodeados de libros. Un taller para empezar o retomar un texto propio.",
       "imagen": "assets/img/cartelera-3.webp",
-      "alt": "El rincón de lectura",
+      "alt": "Muro de piedra con una foto en blanco y negro de una camioneta, una estrella y libreros a los lados",
       "reserva": null
     }
   ]

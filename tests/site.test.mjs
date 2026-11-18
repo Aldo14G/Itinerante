@@ -87,7 +87,7 @@ test('contacto en un solo lugar (decisión de Aldo, 2026-11-13): el pie; las sec
   assert.deepEqual(links, [['wa.me', 'i-chat', 'WhatsApp'], ['www.instagram.com', 'i-ig', 'Instagram'], ['www.facebook.com', 'i-fb', 'Facebook'], ['mailto', 'i-mail', 'Correo']], 'WhatsApp, Instagram, Facebook y Correo, cada uno con su icono');
   // Se quedan los que son la función de su objeto: la ficha, Mi lista, el estado vacío de Explorar, Instagram en Eventos y el menú ☰.
   assert.ok(/data-d-cta href="https:\/\/wa\.me/.test(html) && /data-ml-wa href="https:\/\/wa\.me/.test(html) && /<div class="cat-empty"[\s\S]*?wa\.me[\s\S]*?<\/div>/.test(html), 'ficha, Mi lista y estado vacío conservan su WhatsApp');
-  assert.ok(/class="sec-texto" data-ev-lede>Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\//.test(html), 'la entradilla de Eventos dice dónde se anuncian las fechas');
+  assert.ok(/class="sec-texto" data-ev-lede>Ideas de la casa que todavía buscan fecha\. Las anunciamos en <a href="https:\/\/www\.instagram\.com\//.test(html), 'la entradilla de Eventos dice qué son las propuestas y dónde se anuncian las fechas (curaduría de textos, 2026-11-18)');
   // «Reservar por WhatsApp» de un evento (2026-11-16) es la función de su objeto, como «Preguntar por WhatsApp» en la ficha: solo lo pinta
   // feed.js para un evento con reserva por WhatsApp; index.html no lo trae.
   assert.ok(/'Reservar por WhatsApp'/.test(readFileSync_('feed.js')) && !/Reservar por WhatsApp/.test(html), 'la reserva por WhatsApp de un evento solo existe si el evento la trae');
@@ -599,7 +599,10 @@ test('recorrido (A4): conteo, tramos y persistencia en localStorage, con el alma
   assert.deepEqual(trailState(cols, new Set(['poesia'])), { count: 1, total: 3, done: [false, true, false], links: [false, false] }, 'una sola parada no pinta tramos');
   assert.deepEqual(trailState(cols, new Set(['narrativa', 'poesia'])).links, [true, false], 'el tramo entre dos hojeadas va en primario');
   assert.deepEqual(trailState(cols, new Set(['narrativa', 'ensayo', 'otra'])), { count: 2, total: 3, done: [true, false, true], links: [false, false] }, 'cuenta solo las paradas a la vista; dos hojeadas no vecinas no se unen');
-  assert.equal(trailLine(2, 3), '2 de 3 paradas hojeadas');
+  assert.equal(trailLine(0, 3), '3 paradas por recorrer', 'al llegar no se lee un cero (curaduría de textos, 2026-11-18)');
+  assert.equal(trailLine(1, 3), 'Llevas 1 de 3 paradas');
+  assert.equal(trailLine(2, 3), 'Llevas 2 de 3 paradas');
+  assert.equal(trailLine(3, 3), 'Recorriste las 3 paradas');
   assert.equal(TRAIL_KEY, 'iti-recorrido-v2');
   const mem = { data: {}, getItem(k) { return this.data[k] ?? null; }, setItem(k, v) { this.data[k] = String(v); } };
   assert.equal(readTrail(mem).size, 0, 'primera visita: nada hojeado');
@@ -1205,20 +1208,20 @@ test('Novedades: «nuevo» es lo que llegó después de la última visita; en la
   assert.equal(first.vence, '2026-12-26', 'boot.js recuerda hasta cuándo sigue vigente la llegada más reciente (11 de noviembre + 45 días)');
   assert.ok(first.show && first.n === 2 && first.primera === true && first.estado === '2 llegaron en las últimas dos semanas' && first.titulo === 'Recién llegados');
   const back = newsPlan(data.books, raw, { hoy: HOY, visto: '2026-11-09' });
-  assert.ok(back.n === 1 && back.primera === false && back.estado === '1 llegó desde tu última visita', JSON.stringify(back.estado));
-  assert.equal(newsPlan(data.books, raw, { hoy: HOY, visto: '2026-10-01' }).estado, '4 llegaron desde tu última visita');
+  assert.ok(back.n === 1 && back.primera === false && back.estado === '1 llegó desde tu último vistazo', JSON.stringify(back.estado));
+  assert.equal(newsPlan(data.books, raw, { hoy: HOY, visto: '2026-10-01' }).estado, '4 llegaron desde tu último vistazo');
   const seen = newsPlan(data.books, raw, { hoy: HOY, visto: HOY });
-  assert.ok(seen.show && seen.n === 0 && seen.estado === 'Ya viste todo lo que ha llegado' && seen.books.length === 4, 'sin pendientes la sección sigue, sin insignias');
+  assert.ok(seen.show && seen.n === 0 && seen.estado === 'Ya viste todo lo que ha llegado. Lo próximo aparecerá aquí.' && seen.books.length === 4, 'sin pendientes la sección sigue, sin insignias');
   assert.equal(newsPlan(data.books, { novedades: { entradas: [entry(0, '2026-10-20'), { id: 'no-existe', llegada: '2026-11-10' }] } }, { hoy: HOY }).n, 0, 'un id que no existe en el catálogo no cuenta ni se muestra');
   assert.equal(newsPlan(data.books, { novedades: { entradas: data.books.slice(0, 40).map((b, i) => ({ id: b.id, llegada: `2026-10-${String(i % 28 + 1).padStart(2, '0')}` })) } }, { hoy: HOY }).books.length, NEWS_SIZE, 'tope de 12');
   assert.ok(!('note' in first) && !('llegadas' in first), 'el plan no trae rótulo de muestra ni fechas para imprimir');
   // textos
   assert.equal(statusLine(1, true), '1 llegó en las últimas dos semanas');
-  assert.equal(statusLine(3, false), '3 llegaron desde tu última visita');
-  assert.equal(statusLine(0, false), 'Ya viste todo lo que ha llegado');
+  assert.equal(statusLine(3, false), '3 llegaron desde tu último vistazo', '«vistazo», no «visita»: la visita es a la casa (curaduría de textos, 2026-11-18)');
+  assert.equal(statusLine(0, false), 'Ya viste todo lo que ha llegado. Lo próximo aparecerá aquí.');
   assert.equal(statusLine(0, true), 'Lo más reciente que ha llegado a la casa', 'en una primera visita sin llegadas recientes no se afirma que la persona ya lo vio');
-  assert.equal(hintLine(4, false), '4 novedades desde tu visita');
-  assert.equal(hintLine(1, false), '1 novedad desde tu visita');
+  assert.equal(hintLine(4, false), '4 novedades desde tu último vistazo');
+  assert.equal(hintLine(1, false), '1 novedad desde tu último vistazo');
   assert.equal(hintLine(5, true), '5 novedades recientes');
   assert.equal(hintLine(1, true), '1 novedad reciente');
 });
@@ -1229,7 +1232,7 @@ test('Novedades: capítulo propio que solo existe con llegadas registradas; tira
   const libros = html.match(/<section id="libros"[\s\S]*?\n {4}<\/section>/)[0];
   assert.ok(!libros.includes('novedades') && !libros.includes('data-news'), 'Novedades salió de dentro de Libros');
   // Cabecera (CarruselNovedades): titular, «Ver todo» plano de 44 px con aria-expanded y aria-controls, y la línea de estado ya escrita (sin salto).
-  assert.ok(/<h2 id="news-title" class="h2">Novedades<\/h2>\s*<button class="btn btn--plano btn--sm news-toggle" type="button" aria-expanded="false" aria-controls="news-list" data-news-toggle disabled>Ver todo<\/button>/.test(markup), '«Ver todo» junto al titular: plano de 44 px, con aria-expanded y aria-controls; deshabilitado hasta que llega la tira');
+  assert.ok(/<h2 id="news-title" class="h2">Novedades <em>lo recién llegado<\/em><\/h2>\s*<button class="btn btn--plano btn--sm news-toggle" type="button" aria-expanded="false" aria-controls="news-list" data-news-toggle disabled>Ver todo<\/button>/.test(markup), '«Ver todo» junto al titular: plano de 44 px, con aria-expanded y aria-controls; deshabilitado hasta que llega la tira');
   assert.ok(markup.includes('<p class="news-status" data-news-status></p>') && /\.news-status \{[^}]*min-height: 1lh;/.test(css), 'la línea de estado reserva su renglón: no salta al llegar el conteo');
   assert.ok(/<ul class="news-list" id="news-list" aria-label="Libros recién llegados" data-news-track aria-busy="true">/.test(markup) && (markup.match(/class="news-item card--sk"/g) || []).length === 5, 'la tira reserva su forma con esqueletos');
   assert.ok(/\.news-list \{[^}]*grid-auto-flow: column; grid-auto-columns: var\(--nov-w\);[^}]*overscroll-behavior-x: contain; scroll-snap-type: x mandatory;[^}]*touch-action: manipulation;/.test(cssFlat) && /\.news \{ --nov-w: 120px;/.test(css) && /\.news \{ --nov-w: 152px; \}/.test(css), 'tira de 120 px (152 desde 768) con imán, sin arrastrar la página al llegar al borde');
@@ -1509,7 +1512,7 @@ test('Eventos (2026-11-16): destacado y lista por fecha en lugar del carrusel; s
     assert.ok(!/\b\d+\s*(me gusta|likes?|reseñas|personas|interesad|lugares|asistentes)/i.test(block.replace(/<[^>]+>/g, ' ')), `${id}: sin contadores ni números de interacción`);
   }
   assert.equal((bill.match(/data-ev-when>Propuesta · sin fecha</g) || []).length, 3, 'la insignia de estado se queda en cada tarjeta');
-  assert.ok(/<p class="sec-texto" data-ev-lede>Aún sin fecha\. Las fechas se anuncian en <a href="https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/"[^>]*>Instagram<svg/.test(bill) && !/bill-foot|propuestas para la agenda/.test(bill), 'entradilla «Aún sin fecha. Las fechas se anuncian en Instagram.»');
+  assert.ok(/<p class="sec-texto" data-ev-lede>Ideas de la casa que todavía buscan fecha\. Las anunciamos en <a href="https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/"[^>]*>Instagram<svg/.test(bill) && !/bill-foot|propuestas para la agenda|Aún sin fecha/.test(bill), 'entradilla «Ideas de la casa que todavía buscan fecha. Las anunciamos en Instagram.» (curaduría de textos, 2026-11-18)');
   assert.ok(/\.sec-texto a \{ position: relative; white-space: nowrap; color: var\(--turquesa-texto\); \}/.test(css) && /\.sec-texto a::after \{ content: ""; position: absolute; inset: calc\(-1 \* var\(--space-4\)\) 0; \}/.test(css), 'el enlace a Instagram de la entradilla es texto en línea con 44 px de objetivo');
   const feed = await readFile(here('./feed.js'), 'utf8');
   assert.ok(/if \(lede && plan\.conFecha\) lede\.textContent = 'Lo que viene en la casa\.';/.test(feed), 'con fechas, la entradilla pasa a «Lo que viene en la casa.» (Instagram queda en la nota lateral)');
@@ -1914,7 +1917,7 @@ test('hojas (FichaLibro): ficha y Mi lista suben desde abajo en el teléfono y s
   // Guardado = marcador relleno y su palomita; al guardar con un toque la palomita se dibuja (2026-11-14).
   assert.ok(/\.save\[aria-pressed="true"\] \.save-chk \{ stroke-dashoffset: 0; opacity: 1; \}/.test(cssFlat) && /\.motion \.save\.is-pop \.save-chk \{ animation: chk-dibuja var\(--dur-base\) var\(--curva-salida\) backwards; \}/.test(cssFlat) && /const CHK = 'm9 10\.3 2\.2 2\.2 4-4\.4';/.test(readFileSync_('saved.js')), 'la palomita de Guardar: la misma en la ficha y en las portadas, dibujada al guardar');
   assert.ok(/<a class="btn btn--secundario btn--lg" data-d-visit href="https:\/\/www\.google\.com\/maps\/dir\//.test(foot), '«Cómo llegar» secundario de 56 px');
-  assert.ok(/<p class="drawer-note">La librería confirma si lo tienen\.<\/p>/.test(foot) && !/y el precio|existencia y precio/.test(html), 'la nota dice quién confirma la existencia (el precio ya es de la hoja de la librería)');
+  assert.ok(/<p class="drawer-note">Antes de venir, te confirmamos si lo tenemos\.<\/p>/.test(foot) && !/y el precio|existencia y precio|La librería confirma/.test(html), 'la nota dice, en la voz de la casa, quién confirma la existencia (curaduría de textos, 2026-11-18; el precio ya es de la hoja de la librería)');
   assert.ok(/<button type="button" class="btn btn--vidrio btn--icono drawer-close" data-d-close aria-label="Cerrar ficha">/.test(drawer), 'cerrar: botón de vidrio de 48 px');
   assert.ok(/\.drawer \{[^}]*width: min\(680px, calc\(100% - var\(--space-16\)\)\);[^}]*border-radius: var\(--radio-lg\);[^}]*background: var\(--vidrio-hoja\);[^}]*box-shadow: var\(--luz-vidrio\), var\(--sombra-hoja\);/.test(cssFlat), 'escritorio: diálogo de hasta 680 px, vidrio de hoja');
   assert.ok(/\.drawer, \.mylist \{ inset: auto 0 0 0; width: 100%; margin: 0; border-radius: var\(--radio-lg\) var\(--radio-lg\) 0 0; \}/.test(mobileFlat) && /\.drawer \{ height: calc\(100dvh - max\(var\(--space-12\), env\(safe-area-inset-top, 0px\) \+ var\(--space-3\)\)\); \}/.test(mobileFlat), 'teléfono: hoja inferior hasta 48 px del borde de arriba o, a pantalla completa, 12 px bajo el área segura (2026-11-14)');
@@ -1924,7 +1927,7 @@ test('hojas (FichaLibro): ficha y Mi lista suben desde abajo en el teléfono y s
   assert.ok(/@starting-style \{ \.motion \.drawer\[open\], \.motion \.mylist\[open\] \{ transform: translateY\(100%\); opacity: 1; \} \}/.test(mobileFlat) && /\.motion \.drawer\.is-closing, \.motion \.mylist\.is-closing \{ transform: translateY\(100%\); opacity: 1; \}/.test(mobileFlat), 'sube desde abajo y sale hacia abajo; con movimiento reducido se funde');
   const ml = html.match(/<dialog class="mylist" id="mylist" aria-labelledby="mylist-title">[\s\S]*?<\/dialog>/)[0];
   assert.ok(/<div class="ml-body">[\s\S]*<\/div>\s*<div class="ml-actions">/.test(ml) && /data-ml-visit/.test(ml.slice(ml.indexOf('ml-actions'))), 'Mi lista: cuerpo que se desplaza y acciones al pie');
-  assert.ok(/La librería confirma si los tienen\./.test(ml), 'Mi lista dice quién confirma');
+  assert.ok(/Antes de venir, te confirmamos cuáles tenemos\./.test(ml), 'Mi lista dice quién confirma, en la voz de la casa');
 });
 
 test('Inicio: foto real de la sala, nombre, estado de hoy y «Cómo llegar» de 56 px, sin texto sobre la foto', () => {
@@ -1944,7 +1947,7 @@ test('Inicio: foto real de la sala, nombre, estado de hoy y «Cómo llegar» de 
 });
 
 test('secciones: encabezado (EncabezadoSeccion) sin antetítulo, «Nombre *frase*» y entradilla; bandas fondo / fondo-2 alternas; ritmo 64 / 112 (2026-11-14)', () => {
-  const heads = { casa: 'La casa <em>no es una tienda de paso</em>', cartelera: 'Eventos y talleres <em>en la casa</em>', cafe: 'Café y té <em>en la sala</em>', visita: 'Visita <em>los libros se eligen mejor en persona</em>' };
+  const heads = { casa: 'La casa <em>no es una tienda de paso</em>', cartelera: 'Eventos y talleres <em>alrededor de la mesa</em>', cafe: 'Café y té <em>para quedarse un rato</em>', visita: 'Visita <em>los libros se eligen mejor en persona</em>' };
   for (const [id, h] of Object.entries(heads)) {
     const sec = html.match(new RegExp(`<section id="${id}"[\\s\\S]*?</section>`))[0];
     assert.ok(new RegExp(`<header class="sec-head" data-revelar>\\s*<h2 id="[a-z]+-title" class="h2">${h}</h2>`).test(sec), `#${id}: el titular abre la sección y lleva su nombre («Nombre *frase*»)`);
@@ -2011,7 +2014,7 @@ test('Visita y pie: horario como lista agrupada con «Hoy», «Cómo llegar» de
   assert.ok(/<button class="motion-btn interruptor" type="button" role="switch" aria-checked="false" aria-describedby="motion-nota" data-motion-toggle><span class="interruptor-rotulo">Pausar el movimiento<\/span><span class="interruptor-pista" aria-hidden="true"><span class="interruptor-pulgar"><\/span><\/span><\/button>/.test(ftr) && /<p class="interruptor-nota" id="motion-nota" data-motion-nota hidden><\/p>/.test(ftr), '«Pausar el movimiento» es un interruptor (role="switch") con su rótulo visible y su nota');
   // Interruptor al modo de iOS (2026-11-14): pista de 51 × 31 en un objetivo de 44, pulgar de 27 con el resorte (solo con movimiento).
   assert.ok(/\.interruptor \{[^}]*min-height: var\(--alto-sm\);/.test(cssFlat) && /\.interruptor-pista \{[^}]*width: var\(--interruptor-ancho\); height: var\(--interruptor-alto\);[^}]*box-shadow: inset 0 0 0 2px var\(--linea-fuerte\);/.test(cssFlat) && /\.motion \.interruptor-pulgar \{ transition: transform var\(--dur-rapida\) var\(--curva-resorte\); \}/.test(cssFlat) && /\.interruptor\[aria-checked="true"\] \.interruptor-pista \{ background: var\(--primario\); box-shadow: none; \}/.test(cssFlat), 'pista 51 × 31, borde ≥ 3:1 apagado, primario encendido, pulgar con resorte');
-  assert.ok(/toggle\.setAttribute\('aria-checked', String\(Boolean\(why\) \|\| userOff\)\);/.test(readFileSync_('app.js')) && /'Movimiento reducido por el sistema'/.test(readFileSync_('app.js')) && /if \(toggle\.getAttribute\('aria-disabled'\) === 'true'\) return;/.test(readFileSync_('app.js')) && !/aria-pressed/.test(readFileSync_('app.js')), 'con el sistema en movimiento reducido queda encendido, no se apaga y dice por qué');
+  assert.ok(/toggle\.setAttribute\('aria-checked', String\(Boolean\(why\) \|\| userOff\)\);/.test(readFileSync_('app.js')) && /'Tu dispositivo pide menos movimiento'/.test(readFileSync_('app.js')) && /if \(toggle\.getAttribute\('aria-disabled'\) === 'true'\) return;/.test(readFileSync_('app.js')) && !/aria-pressed/.test(readFileSync_('app.js')), 'con el sistema en movimiento reducido queda encendido, no se apaga y dice por qué');
   assert.ok(!/maps\/dir|ftr-brand|Matamoros/.test(ftr), 'el pie no repite la marca, la dirección ni «Cómo llegar»: Visita, justo encima, ya los trae');
   assert.ok(!/<blockquote|Cervantes/.test(html), 'sin la cita de Cervantes (retirada el 2026-11-13)');
   assert.ok(!/<section class="call"/.test(html) && /<h2 id="visit-title" class="h2">Visita <em>los libros se eligen mejor en persona<\/em><\/h2>/.test(visit), 'el llamado se fundió con el titular de Visita');
@@ -2130,7 +2133,7 @@ test('Sistema de guías (2026-11-15): una rejilla de 12 con canal 32 y división
 
 test('Café y té (#cafe): titular, entradilla, foto real y la carta en filas por categorías con su barra fija (2026-11-17); se pide en la sala; en la barra, el menú y el scroll-spy', async () => {
   const sec = html.match(/<section id="cafe"[\s\S]*?\n {4}<\/section>/)[0];
-  assert.ok(/<header class="sec-head" data-revelar>\s*<h2 id="cafe-title" class="h2">Café y té <em>en la sala<\/em><\/h2>\s*<p class="sec-texto">Algo de tomar mientras hojeas\.<\/p>/.test(sec), 'titular y entradilla de siempre (el título se decide cuando exista «Para comer»)');
+  assert.ok(/<header class="sec-head" data-revelar>\s*<h2 id="cafe-title" class="h2">Café y té <em>para quedarse un rato<\/em><\/h2>\s*<p class="sec-texto">Algo de tomar mientras hojeas\. Con tu café, puedes quedarte a leer en la sala\.<\/p>/.test(sec) && !/gratis/i.test(sec), 'titular y entradilla: quedarse a leer va con la condición del café, sin «gratis» (curaduría de textos, 2026-11-18)');
   const img = sec.match(/<img src="assets\/(img\/[^"]+)"[^>]*>/);
   assert.ok(img && img[1] === 'img/oficial-mesa-800.webp' && prov.real.some(f => f.file === img[1]) && /alt="[^"]{20,}"/.test(img[0]) && /width="\d+" height="\d+"/.test(img[0]) && /<figure class="cafe-foto" data-kind="real">/.test(sec), 'la foto real de la sección, la de siempre, registrada, con alt y medidas');
   const page = html.replace(sec, '');
@@ -2251,14 +2254,15 @@ test('orden de la página: Inicio → La casa → Catálogo → Eventos y taller
   const at = s => html.indexOf(s);
   const order = ['<section id="inicio"', '<section id="casa"', '<section id="libros"', '<section id="cartelera"', '<section id="novedades"', '<section id="visita"', '<footer class="ftr"'].map(at);
   assert.ok(order.every((n, i) => n > 0 && (i === 0 || n > order[i - 1])), `orden ${order}`);
-  assert.ok(/<h2 id="books-title" class="h2">Catálogo /.test(html) && /<h2 id="news-title" class="h2">Novedades<\/h2>/.test(html) && /<h2 id="bill-title" class="h2">Eventos y talleres /.test(html) && /<h2 id="house-title" class="h2">La casa /.test(html) && /<h2 id="visit-title" class="h2">Visita /.test(html), 'los titulares empiezan con el nombre con el que se llega a ellos');
+  assert.ok(/<h2 id="books-title" class="h2">Catálogo /.test(html) && /<h2 id="news-title" class="h2">Novedades /.test(html) && /<h2 id="bill-title" class="h2">Eventos y talleres /.test(html) && /<h2 id="house-title" class="h2">La casa /.test(html) && /<h2 id="visit-title" class="h2">Visita /.test(html), 'los titulares empiezan con el nombre con el que se llega a ellos');
   assert.equal([...html.matchAll(/<section[^>]*id="catalogo"/g)].length, 0, 'el catálogo es una capa dentro de #libros');
 });
 
 test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cosa (inicio, Explora, estado vacío, Mi lista, aviso, WhatsApp, pies de foto)', async () => {
   const [cat, saved, app] = await Promise.all(['catalog.js', 'saved.js', 'app.js'].map(f => readFile(here('./' + f), 'utf8')));
   // P13: la entradilla del inicio, a la mitad.
-  assert.ok(/<p class="entry-lede">Libros, café y talleres en una casa de piedra del centro de Monterrey\.<\/p>/.test(html), 'entradilla del inicio de una frase');
+  assert.ok(/<p class="entry-lede">Libros de editoriales independientes, café, eventos y talleres en el centro\.<\/p>/.test(html), 'entradilla del inicio de una frase: lo que se hace aquí, en el centro (curaduría de textos, 2026-11-18)');
+  assert.ok(!/casa de piedra|Barrio Antiguo|almas viajeras/i.test(html), 'la página habla del negocio: ni la casa de piedra, ni el barrio, ni viajes (decisión de Aldo, 2026-11-18)');
   // P14: Explora sin entradilla; una sola forma de nombrar la búsqueda (el ISBN sigue funcionando sin anunciarse).
   assert.ok(/<label for="cat-q">Título, autor o editorial<\/label>/.test(html) && /placeholder="Ej\.: Lomelí"/.test(html) && !/cat-lede|Buscar título, autor o ISBN/.test(html), 'botón «Buscar en el catálogo», etiqueta «Título, autor o editorial», ejemplo «Ej.: Lomelí»');
   const fabre = book('las-hojas-de-fabre-jesus-ferreiro');
@@ -2267,20 +2271,23 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   assert.ok(PAGE_SIZE >= data.books.length, `una página cabe todo el inventario (${PAGE_SIZE} ≥ ${data.books.length}): sin «Ver N más»`);
   assert.ok(/n === 1 \? '1 título' : `\$\{n\} títulos`/.test(cat) && !/Mostrando \$\{slice\.length\} de \$\{results\.length\}/.test(cat), 'el estado dice «41 títulos» (o «N títulos» al filtrar)');
   // P18: estado vacío con una sola frase visible; la línea de estado solo la anuncia.
-  assert.ok(/'No hay títulos con esa combinación\.'/.test(cat) && /status\.classList\.toggle\('sr-only', !n\);/.test(cat) && !/Ningún título coincide/.test(cat), 'sin resultados se ve una sola frase («No hay títulos con esa combinación.»)');
-  assert.ok(/<div class="cat-empty" data-cat-empty hidden>\s*<p>No hay títulos con esa combinación\.<\/p>/.test(html));
+  assert.ok(/'No está en el catálogo, pero te lo podemos pedir\.'/.test(cat) && /status\.classList\.toggle\('sr-only', !n\);/.test(cat) && !/Ningún título coincide|No hay títulos con esa combinación/.test(cat), 'sin resultados se ve una sola frase, que ofrece el pedido («No está en el catálogo, pero te lo podemos pedir.», 2026-11-18)');
+  assert.ok(/<div class="cat-empty" data-cat-empty hidden>\s*<p>No está en el catálogo, pero te lo podemos pedir\.<\/p>/.test(html));
   // P21: Mi lista y su aviso, más cortos; la nota de dispositivo y confirmación se queda.
-  assert.ok(/data-ml-empty hidden>Aún no guardas libros\. Toca el marcador de un libro para anotarlo\.<\/p>/.test(html) && /<p class="ml-note">Se guarda solo en este dispositivo\. La librería confirma si los tienen\.<\/p>/.test(html), 'Mi lista vacía en una frase; la nota de verdad sigue');
+  assert.ok(/data-ml-empty hidden>Anota aquí los libros que quieres ver en persona: toca el marcador de cualquier portada\.<\/p>/.test(html) && /<p class="ml-note">Se guarda solo en este dispositivo\. Antes de venir, te confirmamos cuáles tenemos\.<\/p>/.test(html), 'Mi lista vacía en una frase que empieza por el para qué; la nota de verdad sigue, en la voz de la casa');
   assert.ok(/toast\('Guardado en Mi lista\.'\)/.test(saved) && !/tu lista para la visita/.test(saved), 'el aviso usa el mismo nombre que la pestaña: «Guardado en Mi lista.»');
   // P23: un solo rótulo genérico para WhatsApp; los específicos conservan su objeto; el pie dice «WhatsApp».
   const labels = [...html.matchAll(/href="https:\/\/wa\.me\/[^"]*"[^>]*>(?:<svg[^>]*><use[^>]*\/><\/svg>)?<span[^>]*>([^<]+)<\/span>/g)].map(m => m[1]);
   assert.ok(!labels.some(l => /^(Pedir informes|Pregúntanos por WhatsApp|Pregunta por un libro|Escribir por WhatsApp)$/.test(l)) && !/Escribir por WhatsApp|Pedir informes|Pregúntanos por WhatsApp/.test(html), `sin rótulos viejos: ${labels.join(' · ')}`);
   assert.ok(new Set(labels).size <= 3 && labels.every(l => /^(Preguntar por WhatsApp|Enviar mi lista por WhatsApp|WhatsApp)$/.test(l)), `rótulos (2026-11-13, contacto en el pie): «Preguntar por WhatsApp» (ficha, estado vacío, menú), «Enviar mi lista por WhatsApp» y «WhatsApp» en el pie (${[...new Set(labels)].join(' · ')})`);
   assert.ok(/aria-label="Preguntar por WhatsApp"><svg class="ic" aria-hidden="true"><use href="#i-chat"/.test(html), 'el botón de icono del menú se nombra igual');
-  // P20: los pies de foto de La casa dicen solo el nombre del cuarto (el alt describe la foto).
+  // P20: los pies de foto de La casa: el nombre del cuarto y, si hay algo verdadero que acompañar, una línea sobre lo que se hace ahí (curaduría de textos, 2026-11-18; el alt describe la foto).
   const caps = [...html.matchAll(/<li class="still">[\s\S]*?<figcaption data-kind="real">([\s\S]*?)<\/figcaption>/g)].map(m => m[1]);
   assert.equal(caps.length, 6);
-  assert.ok(caps.every(c => /^<b>[^<]+<\/b>$/.test(c)), 'cada pie es solo el nombre del cuarto');
+  assert.ok(caps.every(c => /^<b>[^<]+<\/b>(?:<span>[^<]+<\/span>)?$/.test(c)), 'cada pie es el nombre del cuarto y, a lo más, una línea');
+  assert.equal(caps.filter(c => c.includes('<span>')).length, 4, 'cuatro pies con su línea; el globo y el gong, solo el nombre (la decoración no es el foco)');
+  assert.ok(!caps.some(c => /gong|globo|viaj|lejos|piedra/i.test(c.replace(/<b>[^<]+<\/b>/, ''))), 'las líneas no giran alrededor de la decoración ni de la casa');
+  assert.ok(/\.still figcaption span \{ display: block; margin-top: var\(--space-1\); font: var\(--t-subtitulo\); color: var\(--tinta-2\);/.test(cssFlat), 'la línea va en Subheadline, tinta-2, a 4 del nombre');
   assert.ok([...html.matchAll(/<li class="still">[\s\S]*?alt="([^"]{20,})"/g)].length === 6, 'el alt de cada foto se queda');
   // P22: el horario del menú no repite la hora; P9 y P10: «Cómo llegar» en Inicio, menú, Mi lista, cierre del Catálogo, ficha y Visita (y la barra).
   assert.equal((html.match(/<span>Cómo llegar<\/span>/g) || []).length, 8, '8 «Cómo llegar»: cabecera, menú, Mi lista, inicio, ficha, cierre del Catálogo, cierre de la carta (2026-11-16) y Visita; el del pie se fue el 2026-11-13');

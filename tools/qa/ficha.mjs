@@ -51,7 +51,7 @@ for (const [w, h] of [[375, 629], [375, 667], [320, 640], [393, 659], [440, 763]
       note: note.textContent.trim(), seal: !!d.querySelector('.drawer-seal, .drawer-tag, .tag'), focus: document.activeElement.getAttribute('aria-label') };
   })()`);
   ck(`${w}x${h}: acciones fijas al pie dentro de la ventana («Cómo llegar» ${m.bottom} <= ${h - 8}); WhatsApp primaria de 56 a todo el ancho, Guardar y Compartir de 56 × 56 (Compartir con el título en su nombre; sin Instagram ni Facebook); hoja sin desplazar, sin desborde`, m.open && m.bottom <= h - 8 && m.inFoot && m.primary && m.cta[1] === 56 && m.save.join() === '56,56' && m.share.join() === '56,56' && /^Compartir «.+»$/.test(m.shareName) && !m.redes && m.scroll === 0 && !m.hover, JSON.stringify(m));
-  ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma la existencia y el foco inicial va en Cerrar`, !m.seal && m.note === 'La librería confirma si lo tienen.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
+  ck(`${w}x${h}: sin sello ni rótulo, la nota dice quién confirma la existencia y el foco inicial va en Cerrar`, !m.seal && m.note === 'Antes de venir, te confirmamos si lo tenemos.' && m.focus === 'Cerrar ficha', JSON.stringify(m));
   // Inventario real: la portada real carga, la ficha técnica trae el precio de la hoja y la sinopsis (con su encabezado) va bajo ella.
   const dd = await ev(`(async () => {
     const d = document.querySelector('#cat-drawer'); const id = d.dataset.book;

@@ -2,8 +2,8 @@
 // sigue al chip, sin salto de alto), carrusel 3D de portadas (la del centro de frente, las vecinas giradas; flechas, ← → Inicio Fin, toque en
 // una vecina la trae al centro y en la del centro abre la ficha; plano con movimiento reducido), «autor · precio» sin cortar en ningún libro,
 // ficha y foco, a 393×659 (iPhone 16), 375×629 (13 mini), 320 y 1280 (desde el 2026-11-14; antes 390×844 y 360×740). El carrusel es la variante «portada» del Carrusel3D (carousel3d.js): flechas de vidrio a los lados, región
-// con rol de carrusel (la palomita del chip es un trazo SVG, .chip-chk, desde el 2026-11-14). Recorrido ligero (A4, 2026-11-13): los chips son las paradas (conector, palomita en las hojeadas, «N de 3 paradas
-// hojeadas» y su dato en localStorage) y caben en un renglón a 320 px. En escritorio (≥ 1024) .rail es display: contents (dos columnas,
+// con rol de carrusel (la palomita del chip es un trazo SVG, .chip-chk, desde el 2026-11-14). Recorrido ligero (A4, 2026-11-13): los chips son las paradas (conector, palomita en las hojeadas, «3 paradas por recorrer» → «Llevas N de 3 paradas» → «Recorriste las 3 paradas»
+// y su dato en localStorage) y caben en un renglón a 320 px. En escritorio (≥ 1024) .rail es display: contents (dos columnas,
 // A6): las medidas toman como referencia la cabecera del carrusel (.rail-head), que sí tiene caja.
 // node tools/qa/rail.mjs URL [DIR]   Las capturas van a DIR (por defecto, el directorio actual).
 // Robusto con la máquina cargada (QA1-04): ev() devuelve un valor definido o lanza un error legible (nunca un TypeError
@@ -140,7 +140,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['móvil 375', 3
     ck(name + ': empieza por la portada real más cercana al medio (2026-11-18), centrado y de frente, con vecinas a los dos lados' + (reduced ? ' (sin movimiento: planas)' : ' giradas hacia el centro'), st.ci === st.mid && st.centroReal && st.centered && st.front && st.both && (reduced ? !st.turned : st.turned) && st.sw > st.vw, JSON.stringify(st));
     ck(name + ': bajo el carrusel, el título y «autor · precio» del libro del centro; sin puntos, recorrido ni «Ver todo el catálogo»', st.caption.length > 2 && /\s· \$\d+ MXN$/.test(st.meta) && st.dots === 0, JSON.stringify({ caption: st.caption, meta: st.meta, retirados: st.dots }));
     // Con toque (teléfono) las flechas no se muestran: el control es deslizar o tocar la vecina (norma del 2026-11-13); con puntero fino, vidrio de 48.
-    ck(name + (mobile ? ': con toque, sin flechas a la vista' : ': flechas de vidrio de 48 px a los lados') + '; el recorrido empieza en «0 de 3 paradas hojeadas»', st.flechas.length === 2 && st.flechas.every(f => f[0] && (mobile ? f[2] === 0 : f[2] === 48)) && st.progreso === '0 de 3 paradas hojeadas', JSON.stringify([st.flechas, st.progreso]));
+    ck(name + (mobile ? ': con toque, sin flechas a la vista' : ': flechas de vidrio de 48 px a los lados') + '; el recorrido empieza en «3 paradas por recorrer»', st.flechas.length === 2 && st.flechas.every(f => f[0] && (mobile ? f[2] === 0 : f[2] === 48)) && st.progreso === '3 paradas por recorrer', JSON.stringify([st.flechas, st.progreso]));
     ck(name + ': sin desborde de la página', st.docW);
     ck(name + ': objetivos de 44px o más', st.small === 0, String(st.small));
     // «autor · precio» de cada libro de las tres colecciones: nunca cortado y el precio entero en un renglón (defecto de 320 px).
@@ -167,7 +167,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['móvil 375', 3
     ck(name + ': cada chip mide 48 px de alto, con su nombre entero en 15 px y ≥ 8 px entre vecinos', t0.chips.every(x => x.h === 48 && !x.cut && x.fs === '15px') && t0.gap.every(g => g >= 8), JSON.stringify({ chips: t0.chips.map(x => [x.w, x.h, x.fs, x.cut]), gap: t0.gap }));
     ck(name + ': el esqueleto reserva la fila de chips (uno por colección): la cabecera del carrusel mide lo mismo antes y después de cargar', !sk.ready && sk.n === 3 && sk.headH === t0.headH, JSON.stringify({ sk, headH: t0.headH }));
     ck(name + ': bajo el carrusel, ningún llamado a WhatsApp (el contacto vive en el pie de la página desde el 2026-11-13)', t0.wa === 0, JSON.stringify({ wa: t0.wa }));
-    ck(name + ': recorrido: tras elegir las tres colecciones, «3 de 3 paradas hojeadas», palomita en las tres, conectores de 2 px en primario y guardado en este dispositivo', t0.progreso === '3 de 3 paradas hojeadas' && t0.hojeadas.every(Boolean) && t0.links.length === 2 && t0.links.every(l => l[0] && l[1] >= 8 && l[2] === 2) && JSON.stringify([...t0.stored].sort()) === JSON.stringify(['ensayo', 'narrativa', 'poesia']), JSON.stringify({ p: t0.progreso, h: t0.hojeadas, l: t0.links, s: t0.stored }));
+    ck(name + ': recorrido: tras elegir las tres colecciones, «Recorriste las 3 paradas», palomita en las tres, conectores de 2 px en primario y guardado en este dispositivo', t0.progreso === 'Recorriste las 3 paradas' && t0.hojeadas.every(Boolean) && t0.links.length === 2 && t0.links.every(l => l[0] && l[1] >= 8 && l[2] === 2) && JSON.stringify([...t0.stored].sort()) === JSON.stringify(['ensayo', 'narrativa', 'poesia']), JSON.stringify({ p: t0.progreso, h: t0.hojeadas, l: t0.links, s: t0.stored }));
     ck(name + ': las paradas (con su palomita) y sus conectores caben en un renglón, sin partirse ni desbordar', t0.row.one && t0.row.right <= t0.row.limit + 1 && t0.chips.every(x => !x.cut), JSON.stringify(t0.row));
     // Teclado: las flechas mueven la selección y el foco juntos; Tab entra por el chip marcado.
     await run(`document.querySelector('.rail-chip[tabindex="0"]').focus()`);
