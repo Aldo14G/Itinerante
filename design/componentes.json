@@ -120,7 +120,7 @@
       "id": "recorrido",
       "nombre": "Recorrido",
       "tipo": "bloque",
-      "descripcion": "Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva, junto a la nota de la colección y en el eje izquierdo (2026-11-15: 16 px después en su renglón desde 761 px; debajo a 8 en el teléfono). Se guarda en localStorage (iti-recorrido-v2).",
+      "descripcion": "Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y el estado del recorrido («3 paradas por recorrer» → «Llevas N de 3 paradas» → «Recorriste las 3 paradas», 2026-11-18) en región viva, junto a la nota de la colección y en el eje izquierdo (2026-11-15: 16 px después en su renglón desde 761 px; debajo a 8 en el teléfono). Se guarda en localStorage (iti-recorrido-v2).",
       "archivos": [
         { "ruta": "style.css", "selectores": [".rail-conector", ".rail-conector::after", ".rail-conector.is-hecho::after", ".rail-progreso", ".rail-nota-fila", ".rail-note"] },
         { "ruta": "index.html", "selectores": ["[data-rail-progreso]", "[data-rail-note]"] },
@@ -301,7 +301,7 @@
       "tokens": ["fondo-2", "tinta", "tinta-2", "turquesa-texto", "linea", "linea-fuerte", "radio-sm", "portada-evento", "portada-evento-amplia", "t-titulo-3", "t-titular", "t-versalitas", "t-fecha-lista", "t-subtitulo", "t-lectura", "anillo-foco", "canal-rejilla", "space-1", "space-2", "space-3", "space-4", "space-5", "space-6", "space-8", "space-12"],
       "estados": {
         "foco": { "css": [".ev-lado-txt a:focus-visible", ".btn:focus-visible"], "nota": "La fila no es un control: el foco va a sus acciones y al enlace de la nota." },
-        "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (!plan.conFecha && staticSignature(root) === planSignature(plan)) {" }], "nota": "Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»), sin repintarla; una propuesta no lleva acciones. Los eventos pasados de los últimos 24 meses van aparte, en EventosAnteriores." },
+        "vacio": { "js": [{ "ruta": "feed.js", "texto": "if (!plan.conFecha && staticSignature(root) === planSignature(plan)) {" }], "nota": "Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Ideas de la casa que todavía buscan fecha…»), sin repintarla; una propuesta no lleva acciones. Los eventos pasados de los últimos 24 meses van aparte, en EventosAnteriores." },
         "error": { "js": [{ "ruta": "feed.js", "texto": "catch { delete root.dataset.ready; return; }" }], "nota": "Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio." },
         "movimiento_reducido": { "css": [".motion .ev-espera"] }
       },
@@ -862,7 +862,7 @@
     { "frente": "primario-presionado", "fondo": "fondo-3-presionado", "tipo": "texto", "donde": "Boton plano presionado (su texto pasa a primario-presionado)" },
     { "frente": "en-menta", "fondo": "menta", "tipo": "texto", "donde": "Boton secundario, actual de la barra y del menú, pastilla de la barra inferior, Insignia de tipo, acción del Aviso, selección de texto" },
     { "frente": "en-menta", "fondo": "mezcla:menta+en-menta@10", "tipo": "texto", "donde": "Boton secundario con el cursor" },
-    { "frente": "turquesa-texto", "fondo": "fondo", "tipo": "texto", "donde": "Boton plano, Recorrido («N de 3 paradas hojeadas»), enlaces" },
+    { "frente": "turquesa-texto", "fondo": "fondo", "tipo": "texto", "donde": "Boton plano, Recorrido («Llevas N de 3 paradas»), enlaces" },
     { "frente": "turquesa-texto", "fondo": "fondo-2", "tipo": "texto", "donde": "Boton plano sobre banda, «Limpiar todo» en la hoja" },
     { "frente": "turquesa-texto", "fondo": "fondo-3", "tipo": "texto", "donde": "Boton plano con el cursor" },
     { "frente": "turquesa-texto", "fondo": "superficie", "tipo": "texto", "donde": "«Ver todos los resultados» de las sugerencias" },

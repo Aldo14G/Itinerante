@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Libreria Itinerante y Mas//Eventos//ES
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:prueba-cartel-20261123@libreria-itinerante-y-mas
+DTSTAMP:20261118T213949Z
+DTSTART:20261124T005700Z
+DTEND:20261124T015700Z
+SUMMARY:Tarde de prueba XVII
+LOCATION:Librería Itinerante y Más\, Mariano Matamoros Pte. 421\, Centro\
+ , Monterrey
+DESCRIPTION:Lectura · Ciclo de prueba · Invita a Nombre de prueba · Cola
+ bora Editorial de prueba\nTexto de prueba del arnés: dos o tres renglones
+  que dicen de qué trata el evento y para quién es. No es un evento real.
+ \n$90 MXN entrada\n$120 MXN con libro en PDF\n$160 MXN con libro en físic
+ o\nReserva por WhatsApp: +52 8100000000
+END:VEVENT
+END:VCALENDAR

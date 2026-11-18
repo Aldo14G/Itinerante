@@ -4,6 +4,11 @@
 - **Cifras:** telón fuera a 1000 ms, todo quieto a 1300; aterrizaje Δ 0.00 px; CLS 0; LCP (CPU 4×, Slow 4G, mediana de 7) 2 432 → 2 460 (iPhone 16) y 2 572 → 2 596 (1440).
 - **Abierto (decide Aldo):** una vez por sesión (vigente) o solo la primera visita; la skill `auditor-calidad` §7 aún dice que no autoriza logotipos animados al cargar: conviene anotar la excepción allí. No medido: Safari e iPhone físicos (nitidez de la marca escalada, `content: url()` en `img`).
 - **Commit:** el trabajo quedó en `25ab30e` («WIP: brand intro animation»), hecho por un proceso automático de la sesión, no a pedido; lo posterior está sin commit.
+# Continuidad de Itinerante — 2026-11-18 (curaduría de textos con las respuestas de Aldo; rama del worktree de la curaduría)
+
+- **Decisiones de Aldo (2026-11-18):** la página se dedica a divulgar el negocio (libros, eventos y talleres, y el café); «Itinerante» es solo el nombre y el logo (nada de origen, viajes ni «almas viajeras»); «en el centro», sin «Barrio Antiguo» ni fechas; la casa no se describe; la decoración no es el foco de los pies; datos nuevos: lectura en la sala con el consumo del café y libros sobre pedido; frase de existencias «Antes de venir, te confirmamos si lo tenemos.» (la revisa antes de publicar).
+- **Hecho:** 28 cambios de la propuesta aplicados y corregidos con esas respuestas (más el error de Explorar y la entradilla de Café, por los datos nuevos); `alt` de la sala, el rincón, el ajedrez y los tres de Eventos; regla `.still figcaption span`; `feed.js` cambia la entradilla de Eventos cuando no hay propuestas. Guía de voz en `PRODUCT.md` («Voz y textos»); decisiones en `CONTEXT.md`; cifras y tabla en `DESIGN.md` («Curaduría de textos»); `AGENTS.md` al día. Pruebas y arnés (`site.test.mjs`, `feed`, `explorer`, `ficha`, `rail`, `guias`) fijan los textos nuevos.
+- **Abierto (decide Aldo):** la frase de existencias; el `alt` del pasillo dice «la puerta al patio» (sin confirmar); para qué se usa el gong (sin dato, su pie queda solo con el nombre).
 
 # Continuidad de Itinerante — 2026-11-18 (plan premium: paquetes A y B; rama `claude/cool-turing-37uiqt`, sin commit)
 

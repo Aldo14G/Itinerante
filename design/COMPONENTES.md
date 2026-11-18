@@ -64,7 +64,7 @@ Calculados desde `design/tokens.json`. Texto ≥ 4.5:1 (WCAG 1.4.3); borde de co
 | `primario-presionado` | `fondo-3-presionado` | texto | 4.5 | 6.03 | 5.40 | Boton plano presionado (su texto pasa a primario-presionado) |
 | `en-menta` | `menta` | texto | 4.5 | 7.69 | 6.54 | Boton secundario, actual de la barra y del menú, pastilla de la barra inferior, Insignia de tipo, acción del Aviso, selección de texto |
 | `en-menta` | `mezcla:menta+en-menta@10` | texto | 4.5 | 6.51 | 5.31 | Boton secundario con el cursor |
-| `turquesa-texto` | `fondo` | texto | 4.5 | 6.33 | 11.44 | Boton plano, Recorrido («N de 3 paradas hojeadas»), enlaces |
+| `turquesa-texto` | `fondo` | texto | 4.5 | 6.33 | 11.44 | Boton plano, Recorrido («Llevas N de 3 paradas»), enlaces |
 | `turquesa-texto` | `fondo-2` | texto | 4.5 | 5.92 | 10.32 | Boton plano sobre banda, «Limpiar todo» en la hoja |
 | `turquesa-texto` | `fondo-3` | texto | 4.5 | 5.37 | 7.78 | Boton plano con el cursor |
 | `turquesa-texto` | `superficie` | texto | 4.5 | 6.33 | 8.81 | «Ver todos los resultados» de las sugerencias |
@@ -175,7 +175,7 @@ Píldora de 48 en fondo-3; elegido = primario con la palomita (trazo SVG que se 
 
 ### Recorrido
 
-Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y «N de 3 paradas hojeadas» en región viva, junto a la nota de la colección y en el eje izquierdo (2026-11-15: 16 px después en su renglón desde 761 px; debajo a 8 en el teléfono). Se guarda en localStorage (iti-recorrido-v2).
+Recorrido ligero sobre los chips del Catálogo (A4): conector de 2 px entre paradas (primario entre dos hojeadas, que crece una vez), palomita y borde primario en las hojeadas y el estado del recorrido («3 paradas por recorrer» → «Llevas N de 3 paradas» → «Recorriste las 3 paradas», 2026-11-18) en región viva, junto a la nota de la colección y en el eje izquierdo (2026-11-15: 16 px después en su renglón desde 761 px; debajo a 8 en el teléfono). Se guarda en localStorage (iti-recorrido-v2).
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Carrusel3D, Eventos, Café y té, recorrido y profundidad» y «Recorrido que se llena» (2026-11-14).
 - **style.css:** `.rail-conector` `.rail-conector::after` `.rail-conector.is-hecho::after` `.rail-progreso` `.rail-nota-fila` `.rail-note`
@@ -307,7 +307,7 @@ Lista estática de Eventos (estructura tomada de Luma como referencia): «Despu�
 - **feed.js:** exporta `cardNode` `eventosNodes` `notaCopy` `fechaBloque` `horario` `eventBadge` `NO_DATE` · internas `listNode` `notaNode` `staticSignature` `planSignature`
 - **Tokens:** `fondo-2` `tinta` `tinta-2` `turquesa-texto` `linea` `linea-fuerte` `radio-sm` `portada-evento` `portada-evento-amplia` `t-titulo-3` `t-titular` `t-versalitas` `t-fecha-lista` `t-subtitulo` `t-lectura` `anillo-foco` `canal-rejilla` `space-1` `space-2` `space-3` `space-4` `space-5` `space-6` `space-8` `space-12`
 - **Estado foco:** `.ev-lado-txt a:focus-visible`, `.btn:focus-visible` — La fila no es un control: el foco va a sus acciones y al enlace de la nota.
-- **Estado vacio:** feed.js `if (!plan.conFecha && staticSignature(root) === planSignature(plan)) {` — Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Aún sin fecha…»), sin repintarla; una propuesta no lleva acciones. Los eventos pasados de los últimos 24 meses van aparte, en EventosAnteriores.
+- **Estado vacio:** feed.js `if (!plan.conFecha && staticSignature(root) === planSignature(plan)) {` — Sin eventos con fecha queda la lista de propuestas de index.html (y la entradilla «Ideas de la casa que todavía buscan fecha…»), sin repintarla; una propuesta no lleva acciones. Los eventos pasados de los últimos 24 meses van aparte, en EventosAnteriores.
 - **Estado error:** feed.js `catch { delete root.dataset.ready; return; }` — Si eventos.json no llega, queda lo que trae index.html; una portada que falla se retira y el texto ocupa su sitio.
 - **Estado movimiento_reducido:** `.motion .ev-espera`
 - **hover: no aplica.** Las filas no son controles (no abren nada): sin cursor de mano ni estados de control; sus botones usan los de Boton.

@@ -76,15 +76,15 @@ export function newsEntries(data, hoy) {
 export function statusLine(n, primera) {
   if (n > 0) {
     const verbo = n === 1 ? '1 llegó' : `${n} llegaron`;
-    return primera ? `${verbo} en las últimas dos semanas` : `${verbo} desde tu última visita`;
+    return primera ? `${verbo} en las últimas dos semanas` : `${verbo} desde tu último vistazo`;
   }
-  return primera ? 'Lo más reciente que ha llegado a la casa' : 'Ya viste todo lo que ha llegado';
+  return primera ? 'Lo más reciente que ha llegado a la casa' : 'Ya viste todo lo que ha llegado. Lo próximo aparecerá aquí.';
 }
 
 /** Rótulo del control del inicio (solo existe con n > 0). En una primera visita no hay «tu visita» que citar. */
 export function hintLine(n, primera) {
   if (primera) return n === 1 ? '1 novedad reciente' : `${n} novedades recientes`;
-  return n === 1 ? '1 novedad desde tu visita' : `${n} novedades desde tu visita`;
+  return n === 1 ? '1 novedad desde tu último vistazo' : `${n} novedades desde tu último vistazo`;
 }
 
 /**

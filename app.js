@@ -120,7 +120,7 @@ async function boot() {
   const toggles = $$('[data-motion-toggle]');
   const notes = $$('[data-motion-nota]');
   function syncToggle() {
-    const why = reduceMq.matches ? 'Movimiento reducido por el sistema' : saveData ? 'Ahorro de datos: movimiento pausado' : '';
+    const why = reduceMq.matches ? 'Tu dispositivo pide menos movimiento' : saveData ? 'Con ahorro de datos, el movimiento queda en pausa' : '';
     toggles.forEach(toggle => {
       toggle.setAttribute('aria-checked', String(Boolean(why) || userOff));
       if (why) toggle.setAttribute('aria-disabled', 'true'); else toggle.removeAttribute('aria-disabled');
@@ -332,7 +332,7 @@ async function boot() {
     const bootCatalog = () => (catalogReady ??= import('./catalog.js').then(m => m.initCatalog({ isMotion })).catch(() => {
       catalogReady = undefined;
       const st = $('[data-cat-status]', catalogSection);
-      if (st) st.textContent = 'No pudimos cargar el catálogo. Escríbenos por WhatsApp y te ayudamos a buscar.';
+      if (st) st.textContent = 'No pudimos cargar el catálogo. Escríbenos por WhatsApp: te ayudamos a buscar tu libro o a pedirlo.';
       $('[data-cat-grid]', catalogSection)?.replaceChildren();
       $('[data-cat-grid]', catalogSection)?.removeAttribute('aria-busy');
       $('[data-cat-filters]', catalogSection)?.replaceChildren();

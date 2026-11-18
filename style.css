@@ -473,6 +473,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Pie de foto: solo el nombre del cuarto (lo demás lo dice la foto y, para lectores de pantalla, su alt). */
 .still figcaption { padding-top: var(--space-2); } /* contenido → pie de figura 8, como el mapa y la foto de Visita */
 .still figcaption b { font: var(--t-titular); letter-spacing: var(--ls-titular); }
+.still figcaption span { display: block; margin-top: var(--space-1); font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* la línea que acompaña al nombre del cuarto (curaduría de textos, 2026-11-18): nombre → su texto 4, como el nombre y el precio de una fila de la carta */
 /* Enfoque al deslizar (2026-11-14; idea de Focus Cards de Aceternity, solo inspiración): la foto que se ve entera queda plena y la que asoma
    por un borde se atenúa según lo que asoma (0.6 fuera, como la vecina del carrusel plano), con la línea de tiempo de su propia vista en la
    tira (view(inline 0px): cuenta lo que se ve, no el scroll-padding, que a 2560 px mide 592): corre en el compositor, sin JavaScript. Solo la imagen: el nombre del cuarto conserva su contraste. Sin soporte, con
@@ -926,7 +927,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 }
 .cat-empty { display: grid; gap: var(--space-5); justify-items: start; padding: var(--space-12) 0; }
 .cat-empty[hidden] { display: none; }
-.cat-empty p { margin: 0; font: var(--t-titulo-3); }
+.cat-empty p { margin: 0; font: var(--t-titulo-3); text-wrap: balance; } /* sin «te lo» colgado al final del renglón (2026-11-18) */
 .cat-noscript { margin: var(--space-6) 0 0; color: var(--tinta-2); }
 .cat-error { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: 0 0 var(--space-6); }
 .cat [hidden] { display: none !important; }

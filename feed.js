@@ -8,7 +8,7 @@
 //     de «Después» y de las propuestas, una fila compacta por evento (fecha tipográfica pequeña, título, «tipo · Con …» y portada cuadrada),
 //     sin acciones; los 6 más recientes y «Ver los N anteriores» / «Ver menos» para el resto. Lo más viejo no se pinta aunque siga en el JSON;
 //     sin ningún evento pasado válido el apartado no existe (ni hueco, ni encabezado);
-//   · sin ningún evento con fecha queda lo que trae index.html (las propuestas y la entradilla «Aún sin fecha…»): es también lo que se lee
+//   · sin ningún evento con fecha queda lo que trae index.html (las propuestas y la entradilla «Ideas de la casa que todavía buscan fecha…»): es también lo que se lee
 //     sin JavaScript.
 // Reserva (`reserva`): { tipo: "luma", url } → «Registrarme», un enlace normal a la página del evento en Luma, en otra pestaña (el sitio no
 // carga nada de Luma ni guarda registros, cupos o asistentes); { tipo: "whatsapp", telefono } → «Reservar por WhatsApp», con el mensaje ya
@@ -753,6 +753,8 @@ export async function initEventos({ isMotion = () => false } = {}) {
   root.replaceChildren(...eventosNodes(plan, now));
   const lede = document.querySelector('[data-ev-lede]');
   if (lede && plan.conFecha) lede.textContent = 'Lo que viene en la casa.';
+  // Sin fechas ni propuestas (solo anteriores, o nada) no hay «ideas que buscan fecha»: la entradilla dice solo dónde se anuncian, con su enlace.
+  else if (lede && !plan.propuestas.length && lede.firstChild?.nodeType === Node.TEXT_NODE) lede.firstChild.textContent = 'Las fechas nuevas las anunciamos en ';
   root.classList.add('is-ready');
   enterOnView([...root.querySelectorAll('.ev-prox, .ev-dia-tit, .ev-fila, .ev-pasado, .ev-lado')], isMotion);
   if (plan.destacado) document.dispatchEvent(new CustomEvent('iti:primarias')); // app.js: la primaria de la barra cede ante la del destacado

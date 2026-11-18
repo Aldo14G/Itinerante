@@ -237,7 +237,7 @@ export function initSaved() {
       afterPaint(() => { // el aviso (capa superior) va después de pintar
         if (res.full) toast(`Tu lista llegó a ${MAX_SAVED} libros: quita alguno para sumar otro.`, true);
         else if (res.on) toast('Guardado en Mi lista.');
-        else toast('Quitado de tu lista.', false);
+        else toast('Quitado de Mi lista.', false);
       });
       return;
     }
