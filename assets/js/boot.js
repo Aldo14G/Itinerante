@@ -31,12 +31,39 @@
   }
   if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   r.classList.add('motion');
-  if (!scrollY) {
-    r.classList.add('intro');
-    // Tope de la entrada del inicio: si app.js no la quita antes (la quita al tener la letra y la foto), se quita a los 2 s. Es el único
-    // milisegundo escrito a mano que queda en el JS, a propósito: este archivo es crítico, corre antes que los módulos y que los tokens y no puede
-    // importar motion.js. (No es espera-larga, 1200 ms: aquí se cubre además la espera de la red.)
-    var INTRO_TOPE = 2000;
-    setTimeout(function () { r.classList.remove('intro'); }, INTRO_TOPE);
-  }
+  // Entrada de marca (IntroMarca, 2026-11-18; DESIGN.md, «Entrada de marca»): la marca de la barra sale del centro con su trazo de marcatextos y
+  // vuelve a su sitio mientras el telón sube (todo en style.css; el titular, en app.js). Solo con movimiento (arriba), con la página arriba del
+  // todo, sin #ancla (un enlace directo, también #libro-<id>), sin volver con «atrás» (bfcache o historial) y una vez por sesión (sessionStorage,
+  // iti-intro, que se anota solo cuando se muestra). Si el almacenamiento lanza no se puede recordar que ya se vio, así que no se muestra: mejor
+  // nunca que en cada carga.
+  var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+  if (scrollY || location.hash || (nav && nav.type === 'back_forward') || document.visibilityState === 'hidden') return;
+  try {
+    if (sessionStorage.getItem('iti-intro') === '1') return;
+    sessionStorage.setItem('iti-intro', '1');
+  } catch (e) { return; /* almacenamiento bloqueado */ }
+  r.classList.add('intro-marca');
+  // Se salta con cualquier toque, tecla, rueda o scroll (el telón no recibe toques: el toque llega a lo de debajo). Termina sola al acabar el
+  // telón (animationend) o, si algo falla (sin CSS, sin módulos), por su tope, contado desde el primer render (el primer requestAnimationFrame).
+  // Tope: el otro milisegundo escrito a mano en el JS, a propósito, por la misma razón que el resto de este archivo: corre antes que los tokens.
+  // Es la duración máxima permitida de la entrada (1600 ms); el telón termina a intro-asentar + dur-base (1000 ms) y todo queda quieto a los 1300.
+  var INTRO_TOPE = 1600;
+  var EVENTOS = ['pointerdown', 'keydown', 'wheel', 'scroll'];
+  var fin = function () {
+    EVENTOS.forEach(function (t) { removeEventListener(t, salta, true); });
+    if (!r.classList.contains('intro-marca')) return;
+    r.classList.remove('intro-marca');
+    document.dispatchEvent(new CustomEvent('iti:intro-fin'));
+  };
+  var salta = function (e) {
+    // La marca grande ocupa el centro: el toque que la salta no la sigue como enlace (#inicio).
+    if (e.type === 'pointerdown' && e.target.closest && e.target.closest('.hdr-brand')) {
+      addEventListener('click', function (c) { if (c.target.closest && c.target.closest('.hdr-brand')) c.preventDefault(); }, { capture: true, once: true });
+    }
+    fin();
+  };
+  EVENTOS.forEach(function (t) { addEventListener(t, salta, { capture: true, passive: true }); });
+  document.addEventListener('animationend', function (e) { if (e.animationName === 'intro-telon') fin(); });
+  addEventListener('pageshow', function (e) { if (e.persisted) fin(); });
+  requestAnimationFrame(function () { setTimeout(fin, INTRO_TOPE); });
 })();

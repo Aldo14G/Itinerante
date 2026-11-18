@@ -827,6 +827,29 @@
       "qa": ["tests/site.test.mjs", "tools/qa/skeleton.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Catálogo y Novedades» (Novedades)."
+    },
+    {
+      "id": "intro-marca",
+      "nombre": "IntroMarca",
+      "tipo": "bloque",
+      "descripcion": "Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de texto al iniciar, un resaltado y luego se despliega el contenido»). Un telón del color de la página (.intro-telon, aria-hidden, sin toques) tapa todo menos la barra; la marca de la barra (.hdr-brand, el elemento compartido) empieza en el centro óptico intro-escala veces más grande: el logo aparece, el nombre sube por su máscara y lo recorre un trazo de marcatextos (intro-resalte); desde intro-asentar (600 ms) vuelve en arco a su sitio en dur-base mientras el telón sube con la misma curva, la foto del inicio se abre (recorte del 6 % y 1.06 → 1) y el titular sube por líneas (app.js, introTitular). Telón fuera a los 1000 ms, todo quieto a los 1300. Solo con movimiento, sin #ancla, sin volver con «atrás» y una vez por sesión; se salta con cualquier toque, tecla, rueda o scroll.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".intro-telon", ".hdr-brand", ".hdr-brand-nombre", ".entry-media", ".entry-poster"] },
+        { "ruta": "index.html", "selectores": ["[data-intro]", ".intro-telon", ".hdr-brand-nombre"] },
+        { "ruta": "app.js", "internas": ["introTitular", "endIntro", "splitHeading"], "ganchos": ["iti:intro-fin", "intro-marca"] },
+        { "ruta": "assets/js/boot.js", "ganchos": ["r.classList.add('intro-marca')", "iti-intro", "INTRO_TOPE", "iti:intro-fin"] },
+        { "ruta": "motion.js", "ganchos": ["'intro-asentar'"] }
+      ],
+      "tokens": ["intro-asentar", "intro-escala-chica", "intro-escala", "intro-escala-tableta", "intro-escala-amplia", "intro-centro", "intro-resalte", "fondo", "tinta", "dur-instantanea", "dur-rapida", "dur-base", "dur-lenta", "escalon-linea", "curva-salida", "curva-entrada-salida", "radio-lg", "alto-sm", "space-3"],
+      "estados": {
+        "movimiento_reducido": { "js": [{ "ruta": "assets/js/boot.js", "texto": "if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;" }], "nota": "Con «reducir movimiento», la pausa del pie o ahorro de datos boot.js no pone intro-marca: no hay telón y la página aparece como siempre. Las reglas viven además dentro de @media (prefers-reduced-motion: no-preference)." },
+        "actual": { "js": [{ "ruta": "assets/js/boot.js", "texto": "sessionStorage.setItem('iti-intro', '1')" }], "nota": "Una vez por sesión: se anota solo cuando se muestra." }
+      },
+      "no_aplica": { "hover": "No es un control.", "foco": "No recibe foco: el telón es aria-hidden y vacío; el primer Tab va a «Saltar al contenido» y termina la entrada." },
+      "aria": { "patron": "Decoración (aria-hidden); la marca sigue siendo el enlace de la barra", "apg": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html", "atributos": ["aria-hidden=\"true\" (telón)"], "teclado": "Cualquier tecla la termina; Tab sigue a lo de siempre." },
+      "qa": ["tools/qa/intro.mjs", "tests/site.test.mjs"],
+      "desde": "2026-11-18",
+      "decision": "DESIGN.md, «Entrada de marca (IntroMarca)»."
     }
   ],
   "contraste": [
@@ -883,6 +906,7 @@
     { "frente": "abierto", "fondo": "vidrio-hoja@peor", "tipo": "icono", "donde": "Punto «Abierto ahora» (menú)" },
     { "frente": "cerrado", "fondo": "fondo", "tipo": "icono", "donde": "Aro «Cerrado» (Inicio)" },
     { "frente": "cerrado", "fondo": "fondo-2", "tipo": "icono", "donde": "Aro «Cerrado» (Visita)" },
-    { "frente": "cerrado", "fondo": "vidrio-hoja@peor", "tipo": "icono", "donde": "Aro «Cerrado» (menú)" }
+    { "frente": "cerrado", "fondo": "vidrio-hoja@peor", "tipo": "icono", "donde": "Aro «Cerrado» (menú)" },
+    { "frente": "tinta", "fondo": "intro-resalte", "tipo": "texto", "donde": "Entrada de marca: «Itinerante y Más» sobre el trazo de marcatextos" }
   ]
 }

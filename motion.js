@@ -6,7 +6,7 @@ const ALIAS = {
   'stagger-char': 'escalon-letra', 'stagger-line': 'escalon-linea', 'intent-topic': 'intencion-tema', 'intent-disclosure': 'intencion-despliegue'
 };
 const FALLBACK = {
-  'dur-instantanea': 120, 'dur-rapida': 240, 'dur-base': 400, 'dur-lenta': 700, 'espera-larga': 1200, 'escalon-letra': 24, 'escalon-linea': 60, 'intencion-tema': 250, 'intencion-despliegue': 320,
+  'dur-instantanea': 120, 'dur-rapida': 240, 'dur-base': 400, 'dur-lenta': 700, 'intro-asentar': 600, 'espera-larga': 1200, 'escalon-letra': 24, 'escalon-linea': 60, 'intencion-tema': 250, 'intencion-despliegue': 320,
   'reposo-corto': 200, reposo: 300, 'reposo-largo': 600, remedir: 120, 'espera-recursos': 900, 'aviso-visible': 4500, 'refresco-estado': 60000
 };
 
@@ -18,7 +18,7 @@ const token = name => {
   return cache.get(name);
 };
 
-/** Milisegundos de un token (--dur-*, --escalon-*, --intencion-*, --espera-larga, --reposo*, --remedir, --espera-recursos, --aviso-visible, --refresco-estado; o su nombre corto de antes). */
+/** Milisegundos de un token (--dur-*, --intro-asentar, --escalon-*, --intencion-*, --espera-larga, --reposo*, --remedir, --espera-recursos, --aviso-visible, --refresco-estado; o su nombre corto de antes). */
 export function ms(name) {
   const real = ALIAS[name] ?? name;
   const value = parseFloat(token(real));

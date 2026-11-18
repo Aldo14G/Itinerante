@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 33 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 34 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -45,6 +45,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | Insignia | — | — |  |  |  |  |  |  |  |  |  |
 | Esqueletos |  |  |  |  |  |  |  | sí |  |  | — |
 | CarruselNovedades | sí | sí | sí | sí |  |  | sí | sí | sí |  | sí |
+| IntroMarca | — | — |  |  |  | sí |  |  |  |  | sí |
 
 Estados propios de algún componente, fuera de la tabla: `oculto`, `tactil`, `plano`, `abriendo`, `abierto`, `colores_forzados`, `cerrado` (ver el detalle).
 
@@ -108,6 +109,7 @@ Calculados desde `design/tokens.json`. Texto ≥ 4.5:1 (WCAG 1.4.3); borde de co
 | `cerrado` | `fondo` | icono | 3 | 4.34 | 6.05 | Aro «Cerrado» (Inicio) |
 | `cerrado` | `fondo-2` | icono | 3 | 4.05 | 5.46 | Aro «Cerrado» (Visita) |
 | `cerrado` | `vidrio-hoja@peor` | icono | 3 | 3.48 | 4.07 | Aro «Cerrado» (menú) |
+| `tinta` | `intro-resalte` | texto | 4.5 | 11.64 | 6.83 | Entrada de marca: «Itinerante y Más» sobre el trazo de marcatextos |
 
 ## Detalle
 
@@ -694,3 +696,21 @@ Solo existe con llegadas registradas en assets/data/collections.json (hoy la lis
 - **Estado movimiento_reducido:** `.motion .news.is-in .badge-new`
 - **ARIA:** Disclosure (https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/) · `aria-expanded` `aria-controls=news-list` `aria-haspopup=dialog` · **Teclado:** «Ver todo» con Enter/Espacio; el foco se queda en el botón.
 - **QA:** `tests/site.test.mjs` `tools/qa/skeleton.mjs`
+
+### IntroMarca
+
+Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de texto al iniciar, un resaltado y luego se despliega el contenido»). Un telón del color de la página (.intro-telon, aria-hidden, sin toques) tapa todo menos la barra; la marca de la barra (.hdr-brand, el elemento compartido) empieza en el centro óptico intro-escala veces más grande: el logo aparece, el nombre sube por su máscara y lo recorre un trazo de marcatextos (intro-resalte); desde intro-asentar (600 ms) vuelve en arco a su sitio en dur-base mientras el telón sube con la misma curva, la foto del inicio se abre (recorte del 6 % y 1.06 → 1) y el titular sube por líneas (app.js, introTitular). Telón fuera a los 1000 ms, todo quieto a los 1300. Solo con movimiento, sin #ancla, sin volver con «atrás» y una vez por sesión; se salta con cualquier toque, tecla, rueda o scroll.
+
+- **Tipo:** bloque · **desde** 2026-11-18 · DESIGN.md, «Entrada de marca (IntroMarca)».
+- **style.css:** `.intro-telon` `.hdr-brand` `.hdr-brand-nombre` `.entry-media` `.entry-poster`
+- **index.html:** `[data-intro]` `.intro-telon` `.hdr-brand-nombre`
+- **app.js:** internas `introTitular` `endIntro` `splitHeading` · ganchos `iti:intro-fin` `intro-marca`
+- **assets/js/boot.js:** ganchos `r.classList.add('intro-marca')` `iti-intro` `INTRO_TOPE` `iti:intro-fin`
+- **motion.js:** ganchos `'intro-asentar'`
+- **Tokens:** `intro-asentar` `intro-escala-chica` `intro-escala` `intro-escala-tableta` `intro-escala-amplia` `intro-centro` `intro-resalte` `fondo` `tinta` `dur-instantanea` `dur-rapida` `dur-base` `dur-lenta` `escalon-linea` `curva-salida` `curva-entrada-salida` `radio-lg` `alto-sm` `space-3`
+- **Estado movimiento_reducido:** assets/js/boot.js `if (off \|\| saveData \|\| matchMedia('(prefers-reduced-motion: reduce)').matches) return;` — Con «reducir movimiento», la pausa del pie o ahorro de datos boot.js no pone intro-marca: no hay telón y la página aparece como siempre. Las reglas viven además dentro de @media (prefers-reduced-motion: no-preference).
+- **Estado actual:** assets/js/boot.js `sessionStorage.setItem('iti-intro', '1')` — Una vez por sesión: se anota solo cuando se muestra.
+- **hover: no aplica.** No es un control.
+- **foco: no aplica.** No recibe foco: el telón es aria-hidden y vacío; el primer Tab va a «Saltar al contenido» y termina la entrada.
+- **ARIA:** Decoración (aria-hidden); la marca sigue siendo el enlace de la barra (https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html) · `aria-hidden="true" (telón)` · **Teclado:** Cualquier tecla la termina; Tab sigue a lo de siempre.
+- **QA:** `tools/qa/intro.mjs` `tests/site.test.mjs`

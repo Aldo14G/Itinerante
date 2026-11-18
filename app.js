@@ -1,5 +1,5 @@
 // Librería Itinerante y Más · sistema «Itinerante Líquido»: barra y menú, destino actual, entradas de los titulares, Eventos, Catálogo y estado de apertura. Sin dependencias.
-import { confirmThen, ms, whenIdle } from './motion.js';
+import { confirmThen, EASE, ms, whenIdle } from './motion.js';
 import { openDialog, closeDialog, navigateFromSheet, swipeToClose } from './sheets.js';
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
@@ -130,7 +130,7 @@ async function boot() {
   function applyMode() {
     const on = motionOn();
     root.classList.toggle('motion', on);
-    if (!on) { root.classList.remove('intro'); revealAll(); }
+    if (!on) { endIntro(); revealAll(); }
     syncToggle();
   }
   toggles.forEach(toggle => toggle.addEventListener('click', () => {
@@ -235,6 +235,34 @@ async function boot() {
   addEventListener('hashchange', () => arriveAt(sectionOf(location.hash)));
   let lastW = innerWidth;
   addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; unsplit(); revealAll(); });
+
+  // ---------- Entrada de marca (IntroMarca, 2026-11-18): el titular del inicio sube por líneas cuando la marca vuelve a la barra ----------
+  // boot.js decide si hay entrada (html.intro-marca) y la termina; el telón, la marca y la foto son CSS (style.css). Aquí solo el titular, con la
+  // entrada de los titulares (sus líneas reales suben desde su máscara con escalon-linea y curva-salida; aquí en dur-base, no dur-lenta, para que
+  // todo quede quieto antes de 1400 ms), dur-rapida después de que el telón empieza a subir: lo descubre al final. Se cuenta desde el mismo origen
+  // que el telón (startTime compartido): corre en el compositor aunque el hilo principal esté ocupado con la carga.
+  // Se parte bajo el telón; si el módulo llega cuando el telón ya se va, no se toca (queda colocado). Al terminar, el titular vuelve a su texto.
+  function endIntro() {
+    if (!root.classList.contains('intro-marca')) return;
+    root.classList.remove('intro-marca');
+    document.dispatchEvent(new CustomEvent('iti:intro-fin'));
+  }
+  function introTitular() {
+    const h1 = $('.entry-title');
+    const telon = $('[data-intro]')?.getAnimations?.().find(a => a.animationName === 'intro-telon');
+    if (!root.classList.contains('intro-marca') || !h1 || !telon) return;
+    const desde = ms('intro-asentar') + ms('dur-rapida');
+    if ((telon.currentTime ?? 0) > ms('intro-asentar')) return; // ya no da tiempo: el titular se queda como está
+    splitHeading(h1);
+    const anims = $$('.linea-in', h1).map((line, i) => line.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }],
+      { duration: ms('dur-base'), delay: desde + i * ms('escalon-linea'), easing: EASE(), fill: 'backwards' }));
+    const sync = () => anims.forEach(a => { a.startTime = telon.startTime; });
+    if (telon.startTime === null) telon.ready.then(sync).catch(() => {}); else sync();
+    const back = () => { if (h1.dataset.src) { h1.innerHTML = h1.dataset.src; delete h1.dataset.src; } };
+    document.addEventListener('iti:intro-fin', () => anims.forEach(a => a.finish()), { once: true }); // saltada: cada línea a su sitio
+    Promise.all(anims.map(a => a.finished)).then(back, back);
+  }
+  introTitular();
 
   await yieldNow();
   // ---------- Menú (MenuHamburguesa): hoja de vidrio con todas las secciones ----------
@@ -455,7 +483,6 @@ async function boot() {
   Promise.race([Promise.all([fontsReady, posterReady]), new Promise(r => setTimeout(r, ms('espera-recursos')))]).then(() => {
     measureZones(); // una sola medición, con la letra y la foto ya puestas
     kick();
-    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('intro')));
     // Las entradas se preparan en reposo: partir los titulares en líneas mide texto, y eso no debe competir con el primer render.
     whenIdle(prepareReveals, { timeout: 1500 });
     // Conteo de novedades (control del inicio): después de la foto y las fuentes. Su sitio ya está reservado (boot.js), así que no mueve nada.

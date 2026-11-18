@@ -43,6 +43,7 @@ export function renderSite(tokens) {
   group('Profundidad (carrusel 3D y tarjeta que voltea)', own(s.profundidad ?? {}));
   group('Movimiento', [...own(s.duration), ...own(s.easing)]);
   group('Tiempos de JavaScript (no son transiciones)', own(s.tiempo));
+  group('Entrada de marca (IntroMarca): tamaño de la marca al empezar y su centro', own(s.intro ?? {}));
   group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
   own(t.root).forEach(([k, v]) => light.push(`  ${k}: ${v};`));
   const print = own(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');

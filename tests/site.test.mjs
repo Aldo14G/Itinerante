@@ -2286,3 +2286,29 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   assert.equal((html.match(/<span>Cómo llegar<\/span>/g) || []).length, 8, '8 «Cómo llegar»: cabecera, menú, Mi lista, inicio, ficha, cierre del Catálogo, cierre de la carta (2026-11-16) y Visita; el del pie se fue el 2026-11-13');
   assert.ok(!/data-ex-open\)\?\.addEventListener\('click'/.test(app), '«Buscar en el catálogo» no lleva un manejador aparte: es un enlace a #catalogo');
 });
+
+test('entrada de marca (IntroMarca, 2026-11-18): solo con movimiento, sin #ancla ni «atrás», una vez por sesión; telón decorativo; tokens y tope', () => {
+  const boot = readFileSync_('assets/js/boot.js');
+  const app = readFileSync_('app.js');
+  const tok = JSON.parse(readFileSync_('design/tokens.json'));
+  const ms = v => parseFloat(v);
+  // Orden en boot.js: la salida por movimiento reducido, pausa o ahorro de datos va antes de la entrada.
+  const corte = boot.indexOf("if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;");
+  assert.ok(corte > 0 && corte < boot.indexOf("r.classList.add('intro-marca')"), 'sin movimiento no hay entrada');
+  assert.ok(/if \(scrollY \|\| location\.hash \|\| \(nav && nav\.type === 'back_forward'\) \|\| document\.visibilityState === 'hidden'\) return;/.test(boot), 'ni con #ancla, ni con la página desplazada, ni al volver con «atrás», ni en una pestaña oculta');
+  assert.ok(/if \(sessionStorage\.getItem\('iti-intro'\) === '1'\) return;\s*sessionStorage\.setItem\('iti-intro', '1'\);\s*\} catch \(e\) \{ return;/.test(boot), 'una vez por sesión; con el almacenamiento bloqueado, nunca');
+  assert.ok(/var EVENTOS = \['pointerdown', 'keydown', 'wheel', 'scroll'\];/.test(boot) && /addEventListener\('pageshow'/.test(boot) && /animationName === 'intro-telon'\) fin\(\)/.test(boot), 'se salta con toque, tecla, rueda o scroll y termina sola');
+  // Tiempos: el telón termina antes del tope y el tope no pasa de 1600 ms.
+  const i = tok.scales.intro, d = tok.scales.duration;
+  const tope = Number(/var INTRO_TOPE = (\d+);/.exec(boot)[1]);
+  const telon = ms(i['intro-asentar']) + ms(d['dur-base']);
+  const quieto = Math.max(ms(i['intro-asentar']) + ms(d['dur-lenta']), ms(i['intro-asentar']) + ms(tok.scales.duration['dur-rapida']) + ms(d['dur-base']) + ms(d['escalon-linea']));
+  assert.ok(telon < tope && quieto <= tope && tope <= 1600, `telón ${telon} ms, todo quieto ${quieto} ms, tope ${tope} ms`);
+  assert.ok(/const desde = ms\('intro-asentar'\) \+ ms\('dur-rapida'\);/.test(app) && /duration: ms\('dur-base'\), delay: desde \+ i \* ms\('escalon-linea'\)/.test(app), 'el titular sube con los tokens');
+  // El telón: decorativo, oculto sin JavaScript y sin CSS, y sin toques.
+  assert.ok(/<div class="intro-telon" data-intro hidden aria-hidden="true"><\/div>/.test(html), 'telón aria-hidden y oculto por omisión');
+  assert.ok(/@media \(prefers-reduced-motion: no-preference\) \{\s*html\.intro-marca \.intro-telon \{[^}]*pointer-events: none;/.test(css), 'las reglas viven bajo no-preference y el telón no recibe toques');
+  // El logo grande está registrado.
+  assert.ok(prov.brand.some(b => b.file === 'img/logo-240.webp' && b.derivedFrom === 'Logo.webp'), 'logo de 240 px con procedencia');
+  assert.ok(existsSync(new URL('./assets/img/logo-240.webp', repo)), 'logo de 240 px en assets/img');
+});

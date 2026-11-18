@@ -225,7 +225,54 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 }
 .hdr-brand img { width: 40px; height: 40px; flex: none; border-radius: var(--radio-sm); }
 .hdr-brand > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* El nombre en su propia caja (2026-11-18): la de fuera es la máscara de la entrada de marca y esta sube desde ella; la elipsis la pone esta. */
+.hdr-brand-nombre { position: relative; isolation: isolate; display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
 .hdr-brand:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+
+/* ---------- Entrada de marca (IntroMarca, 2026-11-18; DESIGN.md, «Entrada de marca») ----------
+   Solo con html.intro-marca: assets/js/boot.js la pone antes del primer render (con movimiento, sin #ancla, sin volver con «atrás», una vez por
+   sesión) y la quita al terminar el telón, al primer toque, tecla, rueda o scroll, o por su tope. La marca de la barra es el elemento compartido:
+   empieza en el centro óptico (intro-centro), intro-escala veces más grande; el logo aparece, el nombre sube por su máscara y lo recorre un trazo
+   de marcatextos (intro-resalte); desde intro-asentar vuelve a su sitio en dur-base con curva-entrada-salida (se mueve dentro de la pantalla),
+   el ancho un escalón (escalon-linea) después que la altura: la trayectoria es un arco. El telón (fondo) sube a la vez y con la misma curva: su
+   borde va siempre bajo la marca, que así nunca pasa sobre el texto de la página (al final solo coinciden sobre el hueco entre la barra y el
+   titular). La foto, que el telón descubre primero, se abre como el revelado de imagen (recorte del 6 % y escala 1.06 → 1, dur-lenta); el
+   titular, que descubre al final, sube por líneas dur-rapida después (app.js, introTitular). Solo transform, opacity y clip-path.
+   El telón no recibe toques (pointer-events: none): un toque pasa a lo de debajo y además termina la entrada. */
+.intro-telon { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  html.intro-marca .intro-telon {
+    display: block; position: fixed; inset: 0; z-index: 49; background: var(--fondo); pointer-events: none;
+    animation: intro-telon var(--dur-base) var(--curva-entrada-salida) var(--intro-asentar) forwards;
+  }
+  html.intro-marca .hdr-brand {
+    --k: var(--intro-escala); --marca-y: calc((var(--hdr-h) + env(safe-area-inset-top, 0px) - var(--alto-sm)) / 2);
+    transform-origin: 0 0;
+    animation: intro-marca-alto var(--dur-base) var(--curva-entrada-salida) var(--intro-asentar) backwards, intro-marca-ancho calc(var(--dur-base) - var(--escalon-linea)) var(--curva-entrada-salida) calc(var(--intro-asentar) + var(--escalon-linea)) backwards;
+  }
+  /* El logo de 240 px (assets/img/logo-240.webp) mientras la marca se ve hasta 3 veces más grande; mientras llega, el de la barra de fondo. */
+  html.intro-marca .hdr-brand img { content: url(assets/img/logo-240.webp); background: url(assets/img/logo-96.webp) center / cover; animation: intro-aparece var(--dur-rapida) var(--curva-salida) backwards; }
+  html.intro-marca .hdr-brand-nombre { animation: intro-sube var(--dur-base) var(--curva-salida) var(--escalon-linea) backwards; }
+  html.intro-marca .hdr-brand-nombre::before {
+    content: ""; position: absolute; inset: 44% 0 6%; z-index: -1; background: var(--intro-resalte); transform-origin: 0 50%;
+    animation: intro-resalta var(--dur-base) var(--curva-entrada-salida) var(--dur-instantanea) backwards, intro-apaga var(--dur-rapida) var(--curva-salida) var(--intro-asentar) forwards;
+  }
+  html.intro-marca :is(.hdr-nav, .hdr-end) { animation: intro-aparece var(--dur-rapida) var(--curva-salida) calc(var(--intro-asentar) + var(--dur-base) - var(--dur-rapida)) backwards; }
+  html.intro-marca .entry-media { animation: intro-recorte var(--dur-lenta) var(--curva-salida) var(--intro-asentar) backwards; }
+  html.intro-marca .entry-poster { animation: intro-acerca var(--dur-lenta) var(--curva-salida) var(--intro-asentar) backwards; }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 359px) { html.intro-marca .hdr-brand { --k: var(--intro-escala-chica); } }
+@media (prefers-reduced-motion: no-preference) and (min-width: 761px) { html.intro-marca .hdr-brand { --k: var(--intro-escala-tableta); } }
+@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) { html.intro-marca .hdr-brand { --k: var(--intro-escala-amplia); } }
+@keyframes intro-telon { to { transform: translateY(-100%); visibility: hidden; } }
+@keyframes intro-marca-alto { from { transform: translateY(calc(var(--intro-centro) - var(--marca-y) - var(--k) * 50%)) scale(var(--k)); } }
+@keyframes intro-marca-ancho { from { translate: calc(50vw - var(--margen) - var(--k) * 50% + var(--k) * var(--space-3) / 2) 0; } }
+@keyframes intro-aparece { from { opacity: 0; } }
+@keyframes intro-sube { from { transform: translateY(105%); } }
+@keyframes intro-resalta { from { transform: scaleX(0); } }
+@keyframes intro-apaga { to { opacity: 0; } }
+@keyframes intro-recorte { from { clip-path: inset(6% round var(--radio-lg)); } }
+@keyframes intro-acerca { from { transform: scale(1.06); } }
 
 /* Secciones en la barra: solo desde 1101 px (antes, el ☰). El destino actual lleva la pastilla menta. */
 .hdr-nav { display: none; gap: var(--space-2); margin-inline: auto; }

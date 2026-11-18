@@ -31,6 +31,7 @@
   --cerrado: #6b7d7a;
   --brillo-lamina: #ffffff24;
   --mapa-tierra: #e6eeec;
+  --intro-resalte: #b6dfd6;
   --mapa-calle: #ffffff;
 
   /* Portadas tipográficas (iguales en ambos temas) */
@@ -199,6 +200,14 @@
   --intencion-despliegue: 320ms;
   --escalon-letra: 24ms;
 
+  /* Entrada de marca (IntroMarca): tamaño de la marca al empezar y su centro */
+  --intro-asentar: 600ms;
+  --intro-escala-chica: 1.5;
+  --intro-escala: 1.75;
+  --intro-escala-tableta: 2.5;
+  --intro-escala-amplia: 3;
+  --intro-centro: 42svh;
+
   /* Objetivos y medida */
   --target-fine: 24px;
   --target-coarse: 44px;
@@ -240,6 +249,7 @@
     --cerrado: #8a9c99;
     --brillo-lamina: #ffffff1c;
     --mapa-tierra: #0b1d1b;
+    --intro-resalte: #24605a;
     --mapa-calle: #1f4a45;
 
     /* Sombras (tema oscuro) */

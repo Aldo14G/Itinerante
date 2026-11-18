@@ -265,6 +265,13 @@
     {
       "file": "img/logo-96.webp",
       "origin": "images/brand/logo-96.webp"
+    },
+    {
+      "file": "img/logo-240.webp",
+      "origin": "Logo.webp (768 x 768, raíz del repo) reducido a 240 x 240 (Pillow, LANCZOS, WebP calidad 82): el logo de la entrada de marca, que se ve hasta 3 veces más grande que en la barra (2026-11-18)",
+      "derivedFrom": "Logo.webp",
+      "date": "2026-11-18",
+      "sha256": "7bf5f0fd5e4b021b1ba580bd70cd7d2d4a43d9b5a95b8ff502be77ab3d9409bc"
     }
   ],
   "fonts": "fonts/sources.json (Inter variable, de Fontsource; licencia OFL incluida)",

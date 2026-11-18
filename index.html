@@ -28,6 +28,10 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BookStore","name":"Librería Itinerante y Más","address":{"@type":"PostalAddress","streetAddress":"Mariano Matamoros Pte. 421","addressLocality":"Monterrey","addressRegion":"Nuevo León","addressCountry":"MX"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"20:00"}],"sameAs":["https://www.instagram.com/libreriaitineranteymasmty/"]}</script>
 </head>
 <body>
+  <!-- Entrada de marca (IntroMarca, 2026-11-18): un telón del color de la página, encima de todo menos de la barra, que solo existe con
+       html.intro-marca (assets/js/boot.js: con movimiento, sin #ancla, sin volver con «atrás», una vez por sesión). La marca de la barra sale del
+       centro con su trazo de marcatextos, vuelve a su sitio y el telón sube; el contenido ya está pintado debajo. Decorativo: no recibe toques ni foco. -->
+  <div class="intro-telon" data-intro hidden aria-hidden="true"></div>
   <!-- Iconos de trazo de 24 px (trazo 1.8, puntas redondas), los del sistema «Itinerante Líquido». Los de redes son glifos simples, no logotipos. -->
   <svg class="sprite" aria-hidden="true">
     <symbol id="i-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
@@ -62,7 +66,7 @@
   <header class="hdr" data-hdr>
     <a class="hdr-brand" href="#inicio" aria-label="Librería Itinerante y Más, inicio">
       <img src="assets/img/logo-96.webp" width="40" height="40" alt="">
-      <span>Itinerante <span class="hdr-brand-mas">y Más</span></span>
+      <span><span class="hdr-brand-nombre">Itinerante <span class="hdr-brand-mas">y Más</span></span></span>
     </a>
     <nav class="hdr-nav" aria-label="Secciones">
       <a href="#libros">Catálogo</a>
