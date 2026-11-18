@@ -1,7 +1,7 @@
 // Carrusel de libros: una sola pieza para cualquier colección del inventario; una lista curada se escribe como `ids` en
 // assets/data/collections.json. Las colecciones se eligen en una fila de chips (Narrativa · Poesía · Ensayo) sobre el carrusel 3D (el
 // contacto por WhatsApp vive en el pie desde el 2026-11-13). Los chips son también las paradas de un recorrido ligero (A4,
-// 2026-11-13): conector entre ellas, palomita en las hojeadas y «N de 3 paradas hojeadas» junto a la nota. El carrusel es la variante
+// 2026-11-13): conector entre ellas, palomita en las hojeadas y el estado del recorrido («Llevas N de 3 paradas», 2026-11-18) junto a la nota. El carrusel es la variante
 // «portada» del Carrusel3D (carousel3d.js).
 import { coverLayout, coverTone, coverTones, filterBooks, sortBooks, toneOf, imageCover, priceLabel } from './catalog.js';
 import { loadSample, loadCollections } from './sample.js';
@@ -92,7 +92,7 @@ export { coverflowPose, nearestIndex, CF_GIRO } from './carousel3d.js';
 // ---------- Recorrido ligero (A4, recuperado el 2026-11-13): los chips son las paradas ----------
 // Una parada cuenta como hojeada cuando la persona la elige o mueve el carrusel en ella (la colección que se pinta sola al cargar no cuenta).
 // Se guarda en este dispositivo (localStorage, sin cuenta); si el almacenamiento falla, el recorrido vive solo en la visita. No es un ranking
-// ni un juego: «N de 3 paradas hojeadas» es un dato local y verdadero.
+// ni un juego: «Llevas N de 3 paradas» es un dato local y verdadero (al llegar, «3 paradas por recorrer»: no se lee un cero; 2026-11-18).
 export const TRAIL_KEY = 'iti-recorrido-v2';
 export function readTrail(storage) {
   try {
@@ -265,7 +265,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`; // la región viva del carrusel: la colección elegida
   }
 
-  // Chips con un conector entre parada y parada (decorativo: el estado va en la palomita y en «N de 3 paradas hojeadas»).
+  // Chips con un conector entre parada y parada (decorativo: el estado va en la palomita y en «Llevas N de 3 paradas»).
   chipsEl.replaceChildren(...cols.flatMap((c, i) => (i ? [conector(), chipNode(c)] : [chipNode(c)])));
   // Elegir por toque o teclado: el chip confirma ya (aria-checked y su palomita) y el carrusel cambia después de pintar.
   wireRadioChips(chipsEl, {

@@ -548,7 +548,7 @@ test('carrusel de libros: marcado accesible, sin autoplay, publicable y alimenta
 });
 
 // ---------- Recorrido, eventos y filtros (sistema táctil) ----------
-test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poesía · Ensayo son las paradas, con conector, palomita en las hojeadas y «N de 3 paradas hojeadas»', async () => {
+test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poesía · Ensayo son las paradas, con conector, palomita en las hojeadas y el estado del recorrido («Llevas N de 3 paradas»)', async () => {
   const railJs = await readFile(here('./rail.js'), 'utf8');
   const motor = await readFile(here('./carousel3d.js'), 'utf8');
   const cols = JSON.parse(await readFile(here('./assets/data/collections.json'), 'utf8')).collections;
@@ -568,7 +568,7 @@ test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poes
   assert.ok(/@keyframes conector-llena \{ from \{ transform: scaleX\(0\); \} to \{ transform: scaleX\(1\); \} \}/.test(css) && /\.motion \.rail-conector\.is-llena::after \{ animation: conector-llena var\(--dur-base\) var\(--curva-salida\); \}/.test(css) && /if \(!was && st\.links\[i\] && nueva >= 0\) fillLink\(l, nueva === i \? 'izq' : 'der'\);/.test(railJs) && /function fillLink\(l, haciaIzq\) \{\s*if \(!isMotion\(\)\) return;/.test(railJs), 'el conector crece una vez, solo por la persona y solo con movimiento');
   assert.ok(/\.rail-chip\.is-hojeada:not\(\[aria-checked="true"\]\) \{ box-shadow: inset 0 0 0 2px var\(--primario\); \}/.test(cssFlat), 'la hojeada que no es la elegida lleva borde primario');
   assert.ok(/\.rail-chips \{ display: flex; flex-wrap: nowrap;/.test(cssFlat) && /\.rail-chips:has\(\.rail-conector\) \{ gap: 0; \}/.test(cssFlat) && /@media \(max-width: 419px\) \{[^}]*\.rail-chips \.chip \{ padding: 0 var\(--space-3\); \}/.test(mobileFlat), 'un solo renglón (no se parten los chips): hasta 389 px menos relleno y el conector es la separación');
-  assert.ok(/<p class="rail-progreso" aria-live="polite" data-rail-progreso><\/p>/.test(html) && /\.rail-progreso \{[^}]*font: var\(--t-nota-pie\); font-weight: 600; color: var\(--turquesa-texto\);/.test(cssFlat), '«N de 3 paradas hojeadas» junto a la nota (tras ella o debajo, en el eje izquierdo; 2026-11-15), Footnote semibold en turquesa-texto, región viva');
+  assert.ok(/<p class="rail-progreso" aria-live="polite" data-rail-progreso><\/p>/.test(html) && /\.rail-progreso \{[^}]*font: var\(--t-nota-pie\); font-weight: 600; color: var\(--turquesa-texto\);/.test(cssFlat), 'el estado del recorrido («Llevas N de 3 paradas») junto a la nota (tras ella o debajo, en el eje izquierdo; 2026-11-15), Footnote semibold en turquesa-texto, región viva');
   assert.ok(/onUserMove: \(\) => mark\(current\)/.test(railJs) && /choose: chip => \{[^}]*mark\(chip\.dataset\.id\);/.test(railJs) && /for \(const type of \['pointerdown', 'wheel'\]\) viewport\.addEventListener/.test(motor), 'cuenta como hojeada al elegirla o al mover el carrusel en ella (no la que se pinta sola al cargar)');
   // Lo retirado no vuelve: iconos de parada, <progress>, «Pregúntanos», puntos y «Ver todo el catálogo».
   for (const gone of ['iti-recorrido-v1', 'stopNode', 'rail-stop', 'iti:topic', 'cf-progreso', 'dotsEl', '<progress']) assert.ok(!railJs.includes(gone) && !html.includes(gone), `retirado: ${gone}`);

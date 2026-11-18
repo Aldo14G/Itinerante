@@ -55,7 +55,7 @@ genérico.
   El Catálogo va titular → «Buscar en el catálogo» → chips Narrativa · Poesía ·
   Ensayo → carrusel 3D (sin «Pregúntanos»; el
   recorrido volvió ligero sobre los mismos chips el 2026-11-13: conector, palomita
-  en las hojeadas y «N de 3 paradas hojeadas», un dato local, nunca un ranking); la rejilla de Explorar muestra los 41 títulos sin
+  en las hojeadas y el estado del recorrido —«3 paradas por recorrer», «Llevas N de 3 paradas», «Recorriste las 3 paradas» desde el 2026-11-18—, un dato local, nunca un ranking); la rejilla de Explorar muestra los 41 títulos sin
   paginar (en tableta y escritorio, plegada a dos filas con «Ver los 41 títulos» hasta que la persona la despliega, busca o
   filtra; no se esconde inventario ni se inventa orden), cada tarjeta con título y «autor · precio» (sin tarjeta que voltea); la
   ficha es una sola (sin «modo redes»); no hay cita, llamado suelto ni
@@ -73,7 +73,7 @@ genérico.
 - **Hoy la lista de llegadas está vacía** (la librería aún no registra fechas). La fecha no
   se imprime; solo ordena (lo más reciente primero) y decide qué lleva «Nuevo». Las cifras que
   se muestran con llegadas («3 llegaron en las últimas dos semanas», «3 novedades desde tu
-  visita») son conteos reales de esa lista frente a la última vez que la persona vio la
+  último vistazo»; «vistazo» y no «visita» desde el 2026-11-18: la visita es a la casa) son conteos reales de esa lista frente a la última vez que la persona vio la
   sección en su dispositivo: no se inventa ninguna.
 - **Café y té** (`#cafe`; parrilla por categorías desde el 2026-11-16, antes un carrusel): la
   carta de la sala, **transcrita de la carta impresa de Café Itinerante que mandó Aldo**:
@@ -83,11 +83,12 @@ genérico.
   impreso se muestra «$NN MXN» marcado como dato de la carta; no se inventan platillos,
   descripciones ni precios. Se edita en `assets/data/menu.json` sin tocar HTML ni JS
   (añadir «Para comer» es añadir un objeto); su origen queda en `assets/provenance.json`
-  (`menuData`). Sin fotos de producto todavía (cuando las haya, `foto` por producto). **El
-  cierre «Pídelo en la barra de la sala.» + «Cómo llegar» está retirado hasta nuevo aviso:**
-  la carta impresa dice «Padre Mier 836A Pte., Centro de Monterrey», que no es la dirección
-  de la librería (Matamoros 421) y está por confirmar con Aldo; el sitio no afirma dónde se
-  pide. La consulta por la carta se hace desde el bloque Contacto del pie.
+  (`menuData`). Sin fotos de producto todavía (cuando las haya, `foto` por producto). El cierre «Pídelo en la
+  barra de la sala.» + «Cómo llegar» volvió el 2026-11-17: Aldo confirmó que el café se sirve en la
+  librería (Matamoros 421; la carta impresa trae una dirección anterior, «Padre Mier 836A Pte.»).
+  **Quedarse a leer en la sala va con el consumo del café** (decisión de Aldo, 2026-11-18): el
+  sitio lo dice siempre con esa condición («Con tu café, puedes quedarte a leer en la sala.») y
+  nunca promete «gratis».
 - **Eventos y talleres** (2026-11-16: destacado y lista por día, antes un carrusel; datos en
   `assets/data/eventos.json`): solo se publica lo que el anuncio de la librería dice (fecha,
   hora, quién conduce, invitado, colaboración, costo tal como lo da), y lo que falta no se
@@ -164,7 +165,7 @@ genérico.
 ## Brand Commitments
 
 - El nombre público es Librería Itinerante y Más.
-- La voz es cálida, culta y práctica.
+- La voz es cálida, culta y práctica; su guía está en «Voz y textos», abajo.
 - El espacio, su arquitectura y sus fotografías reales son parte de la identidad
   del producto y no deben sustituirse por una librería genérica.
 - El sistema visual vigente es «Itinerante Líquido» (`DESIGN.md`, desde el
@@ -174,6 +175,43 @@ genérico.
   la escala de Apple HIG y el vidrio solo en lo que flota, siempre con respaldo
   opaco. Nunito y Archivo, el sistema táctil y el canon anterior (Claude Design y
   Higgsfield) son historia.
+
+## Voz y textos (curaduría del 2026-11-18; decisiones de Aldo)
+
+Pedido de Aldo: «Deben ser textos que acompañen al lector o al usuario, no nada más una explicación de "esta es una
+imagen"… Algo que acompañe al proyecto y que sea orgánico.» Regla madre: **el texto acompaña lo que la persona hace
+en ese momento** (hojear, elegir, guardar, venir, quedarse); no explica la pantalla ni repite la foto.
+
+**La página está dedicada únicamente a la divulgación del negocio**: libros, eventos y talleres, y el café.
+
+| # | Principio | Así no | Así sí |
+|---|---|---|---|
+| 1 | **Acompaña el momento, no la pantalla.** Cada texto responde «¿qué estoy haciendo y qué sigue?». | «Así se ve llegar a la sala» | «Pasando el arco está la sala, con la barra del café.» |
+| 2 | **Un pie de foto acompaña lo que la persona hace en ese espacio** (hojear, leer con su café, los eventos y talleres). El nombre del cuarto orienta; la línea de abajo acompaña. Si no hay nada verdadero que acompañar, va solo el nombre. La decoración (gong, ajedrez, globo terráqueo) no es el foco. El `alt` es otra cosa: describe la imagen. | «El globo terráqueo» + «Por si la novela te lleva lejos…» | «Los libreros» + «Recorre los lomos con calma; si no alcanzas uno, pide ayuda.» |
+| 3 | **Habla la casa, en «nosotros»; tú eres quien lee.** | «La librería confirma si lo tienen.» (además, sin concordancia) | «Antes de venir, te confirmamos si lo tenemos.» |
+| 4 | **Un dato verdadero vale más que un adjetivo.** Nada se inventa; si una línea necesita un dato que no tenemos, se escribe sin él o se queda como estaba. | «…en una casa de piedra del centro de Monterrey» | «Libros de editoriales independientes, café, eventos y talleres en el centro.» |
+| 5 | **Cada titular toma postura.** El patrón «Nombre *frase*» funciona cuando la frase dice algo de esta casa; un lugar («en la sala») no es una frase. | «Café y té *en la sala*» | «Café y té *para quedarse un rato*» (con su condición en la entradilla) |
+| 6 | **Empieza por lo que sí.** En estados vacíos y esperas, primero el para qué o la salida. | «No hay títulos con esa combinación.» · «0 de 3 paradas hojeadas» | «No está en el catálogo, pero te lo podemos pedir.» · «3 paradas por recorrer» |
+| 7 | **Los controles son literales; la voz vive alrededor.** Botones, filtros, rótulos de ficha y avisos de sistema dicen su acción y nada más. | Cambiar «Preguntar por WhatsApp» por «Platiquemos» | Botón «Preguntar por WhatsApp»; al lado: «Escríbenos por WhatsApp: te ayudamos a buscar tu libro o a pedirlo.» |
+| 8 | **Corto y medido para el teléfono.** Una idea por frase; la frase del titular cabe en un renglón a 393 y 375 px; sin muletillas («descubre», «sumérgete», «experiencia», «único», «ideal»), sin superlativos, sin emojis. | — | Se mide con Playwright antes de publicar (titulares, botones y entradillas a 393 y 375). |
+
+**Lo que se dice** (datos verdaderos que acompañan):
+- **Libros de editoriales independientes**, café, eventos y talleres.
+- **En el centro** (de Monterrey). Sin fechas ni «desde…».
+- **Quedarse a leer en la sala va con el consumo del café**: siempre con la condición («con tu café»), nunca «gratis».
+- **Libros sobre pedido**: si alguien busca una obra que no está en ese momento, la librería se la puede pedir. Se dice donde
+  acompaña (estado vacío y error de Explorar, cierre del Catálogo), sin plazos ni precios: «te lo podemos pedir».
+- La existencia se confirma con la casa: «Antes de venir, te confirmamos si lo tenemos.» (Aldo la revisa antes de publicar).
+
+**Lo que no se dice**:
+- «Itinerante» es solo el nombre y el logo: nada del origen del nombre, de viajes ni de «almas viajeras».
+- Ni «Barrio Antiguo», ni fechas de llegada a la casa, ni «desde…».
+- La casa no se describe como rústica, de piedra o antigua, ni se cuenta qué fue antes (las fotos y sus `alt` muestran lo
+  que se ve; el texto habla del negocio).
+- Los textos de los eventos son de la librería (`assets/data/eventos.json`): no se reescriben; solo sus `alt`, que deben
+  coincidir con `index.html`.
+
+Inventario y tabla de cambios de la curaduría: `DESIGN.md`, «Curaduría de textos».
 
 ## Evidence on Hand
 
