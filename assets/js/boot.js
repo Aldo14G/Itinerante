@@ -45,7 +45,8 @@
   r.classList.add('intro-marca');
   // Se salta con cualquier toque, tecla, rueda o scroll (el telón no recibe toques: el toque llega a lo de debajo). Termina sola al acabar el
   // telón (animationend) o, si algo falla (sin CSS, sin módulos), por su tope, contado desde el primer render (el primer requestAnimationFrame).
-  // Tope: el otro milisegundo escrito a mano en el JS, a propósito, por la misma razón que el resto de este archivo: corre antes que los tokens.
+  // Tope: el único milisegundo escrito a mano en el JS, a propósito: este archivo corre antes que los módulos y que los tokens (sustituye al tope de
+  // 2 s de la antigua clase intro, que ya no tenía CSS).
   // Es la duración máxima permitida de la entrada (1600 ms); el telón termina a intro-asentar + dur-base (1000 ms) y todo queda quieto a los 1300.
   var INTRO_TOPE = 1600;
   var EVENTOS = ['pointerdown', 'keydown', 'wheel', 'scroll'];

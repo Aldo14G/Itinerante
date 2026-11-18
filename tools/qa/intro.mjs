@@ -228,9 +228,8 @@ const sinTope = async (ctx, variante) => {
     route.fulfill({ response: r, body: `${await r.text()}\n/* Variante B (propuesta, solo en la tira): subrayado de 2 px en primario y telón que se funde. */
 @media (prefers-reduced-motion: no-preference) {
   html.intro-marca .hdr-brand-nombre::before { inset: auto 0 1px; height: 2px; background: var(--primario); }
-  html.intro-marca .intro-telon { animation-name: intro-telon-b; }
 }
-@keyframes intro-telon-b { to { opacity: 0; visibility: hidden; } }` });
+@keyframes intro-telon { to { opacity: 0; visibility: hidden; } }` }); // el mismo nombre: la última regla @keyframes gana
   });
 };
 const ratio = (a, b) => {
