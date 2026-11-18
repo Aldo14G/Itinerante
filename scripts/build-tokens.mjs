@@ -47,7 +47,13 @@ export function renderSite(tokens) {
   own(t.root).forEach(([k, v]) => light.push(`  ${k}: ${v};`));
   const print = own(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');
   const darkBody = dark.map(l => (l ? `  ${l}` : l)).join('\n').replace(/\n+$/, '');
-  return `${HEADER}\n\n:root {\n${light.join('\n')}\n}\n\n@media (prefers-color-scheme: dark) {\n  :root {\n${darkBody}\n  }\n}\n\n@media print {\n  :root {\n${print}\n  }\n}\n`;
+  // Alto contraste (prefers-contrast: more): el bloque claro y, después, el oscuro (gana el último con el mismo peso).
+  const hc = own(t.contraste ?? {});
+  const hcBlock = mode => hc.map(([k, v]) => `    --${k}: ${v[mode]};`).join('\n');
+  const contrast = hc.length
+    ? `\n@media (prefers-contrast: more) {\n  :root {\n${hcBlock('light')}\n  }\n}\n\n@media (prefers-contrast: more) and (prefers-color-scheme: dark) {\n  :root {\n${hcBlock('dark')}\n  }\n}\n`
+    : '';
+  return `${HEADER}\n\n:root {\n${light.join('\n')}\n}\n\n@media (prefers-color-scheme: dark) {\n  :root {\n${darkBody}\n  }\n}\n${contrast}\n@media print {\n  :root {\n${print}\n  }\n}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

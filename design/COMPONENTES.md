@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 32 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 33 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -16,7 +16,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | BotonGuardar | — | sí | sí |  | sí |  |  |  |  |  | sí |
 | Chip | sí | sí | sí |  | sí |  | sí | sí |  |  | sí |
 | Recorrido | — | — |  |  | sí |  |  |  |  |  | sí |
-| BarraNavegacion | sí | sí |  | — |  | sí |  |  |  |  |  |
+| BarraNavegacion | sí | sí | sí | — |  | sí |  |  |  |  |  |
 | MenuHamburguesa | sí | sí | sí |  |  | sí | sí |  |  |  | sí |
 | BarraInferior | — | sí | sí |  |  | sí |  |  |  |  |  |
 | Carrusel3D | — | sí | sí | sí |  | sí |  |  |  |  | sí |
@@ -33,6 +33,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | TarjetaLibro | sí | sí | sí |  |  |  |  | sí |  |  | sí |
 | FichaLibro | sí | sí | sí |  |  |  |  |  |  |  | sí |
 | MiLista | — | sí |  |  |  |  |  |  | sí | sí | sí |
+| AsaHoja | — | — | sí | — |  |  |  |  |  |  | sí |
 | CampoBusqueda | sí | sí |  |  | sí |  | sí |  |  |  |  |
 | Explorar | sí | sí | sí |  | sí |  | sí | sí | sí | sí | sí |
 | Aviso | — | sí | sí |  |  |  |  |  |  |  |  |
@@ -119,7 +120,7 @@ Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y 
 - **style.css:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--contorno` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg` `.btn--ancho`
 - **index.html:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg`
 - **motion.js:** exporta `pickPop` `afterPaint` `confirmThen`
-- **Tokens:** `alto-sm` `alto-md` `alto-lg` `linea-fuerte` `radio-pildora` `t-boton` `ls-boton` `t-boton-chico` `ls-boton-chico` `space-2` `space-4` `space-5` `space-6` `primario` `en-primario` `primario-presionado` `menta` `en-menta` `turquesa-texto` `fondo-3` `tinta` `tinta-2` `vidrio` `vidrio-hoja` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `curva-resorte` `primario-pulsado` `menta-presionado` `fondo-3-presionado`
+- **Tokens:** `alto-sm` `alto-md` `alto-lg` `linea-fuerte` `radio-pildora` `t-boton` `ls-boton` `t-boton-chico` `ls-boton-chico` `space-2` `space-4` `space-5` `space-6` `primario` `en-primario` `primario-presionado` `menta` `en-menta` `turquesa-texto` `fondo-3` `tinta` `tinta-2` `vidrio` `vidrio-hoja` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `anillo-foco` `dur-instantanea` `dur-rapida` `curva-salida` `curva-resorte` `primario-pulsado` `menta-presionado` `fondo-3-presionado` `deshabilitado`
 - **Estado hover:** `.btn--primario:hover`, `.btn--secundario:hover`, `.btn--vidrio:hover`, `.btn--plano:hover`, `.btn--contorno:hover`
 - **Estado foco:** `.btn:focus-visible`, `.btn--vidrio:focus-visible`
 - **Estado presionado:** `.btn:active`, `.btn--primario:active`, `.btn--secundario:not([aria-pressed="true"]):active`, `.btn--plano:active`, `.btn--contorno:active`, `.btn--vidrio:active` — Un tono por familia (2026-11-16): primario-pulsado, menta-presionado y fondo-3-presionado, un paso más allá del hover. Responde también con movimiento reducido y con la pausa; la escala 0.97 solo con movimiento.
@@ -194,10 +195,11 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 - **style.css:** `.hdr` `.hdr.is-solid` `.hdr-brand` `.hdr-nav` `.hdr-nav a` `.hdr-end` `.hdr-list` `.hdr-cta` `.hdr.has-primary .hdr-cta`
 - **index.html:** `.hdr` `[data-hdr]` `.hdr-brand` `.hdr-nav` `.hdr-cta` `.hdr-list` `[data-open-mylist]`
 - **app.js:** internas `spy` `updateStatus` · ganchos `navLinks.forEach(a =>`
-- **Tokens:** `alto-barra-nav` `alto-sm` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `menta` `en-menta` `fondo-3` `tinta` `radio-pildora` `radio-sm` `t-titular` `t-boton-chico` `anillo-foco` `dur-rapida` `curva-salida` `space-16`
+- **Tokens:** `alto-barra-nav` `alto-sm` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `menta` `en-menta` `fondo-3` `tinta` `radio-pildora` `radio-sm` `t-titular` `t-boton-chico` `anillo-foco` `dur-rapida` `curva-salida` `space-16` `fondo-3-presionado` `menta-presionado`
 - **Estado hover:** `.hdr-nav a:not([aria-current="true"]):hover`
 - **Estado foco:** `.hdr-brand:focus-visible`, `.hdr-nav a:focus-visible`
 - **Estado actual:** `.hdr-nav a[aria-current="true"]`, app.js `a.setAttribute('aria-current', 'true')`
+- **Estado presionado:** `.hdr-nav a:not([aria-current="true"]):active`, `.hdr-nav a[aria-current="true"]:active`
 - **deshabilitado: no aplica.** Nada se deshabilita en la barra.
 - **ARIA:** Landmark navigation + aria-current (https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html) · `aria-label=Secciones` `aria-current` · **Teclado:** Tab entre enlaces; Enter sigue el enlace.
 - **QA:** `tools/qa/e2e.mjs` `tools/qa/responsive.mjs` `tools/qa/controles.mjs` `tools/qa/axe.mjs` `tools/qa/guias.mjs`
@@ -211,7 +213,7 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 - **index.html:** `#menu` `[data-menu-open]` `[data-menu-close]` `.menu-row` `.menu-hoja`
 - **sheets.js:** exporta `openDialog` `closeDialog` `pushSheet` `navigateFromSheet`
 - **app.js:** ganchos `opener.setAttribute('aria-expanded', 'true')`
-- **Tokens:** `alto-sm` `alto-lg` `vidrio` `vidrio-hoja` `filtro-vidrio` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `sombra-flotante` `velo` `menta` `en-menta` `fondo-3` `tinta` `tinta-2` `linea` `foco` `anillo-foco` `radio-lg` `radio-sm` `t-titulo-2` `dur-instantanea` `dur-rapida` `dur-base` `escalon-linea` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado`
+- **Tokens:** `alto-sm` `alto-lg` `vidrio` `vidrio-hoja` `filtro-vidrio` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `sombra-flotante` `velo` `menta` `en-menta` `fondo-3` `tinta` `tinta-2` `linea` `foco` `anillo-foco` `radio-lg` `radio-sm` `t-titulo-2` `dur-instantanea` `dur-rapida` `dur-base` `escalon-linea` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado` `curva-aceleracion`
 - **Estado hover:** `.menu-btn:hover`, `.menu-row:not([aria-current="true"]):hover`
 - **Estado foco:** `.menu-btn:focus-visible`, `.menu-row:focus-visible`, `.menu-close:focus-visible`
 - **Estado presionado:** `.menu-btn:active`, `.menu-row:active`, `.menu-row[aria-current="true"]:active`, `.menu-close:active`
@@ -439,7 +441,7 @@ Un solo botón con la portada 2:3 (real o tipográfica), el título (Subheadline
 
 - **Tipo:** control · **desde** 2026-11-13 · DESIGN.md, «Catálogo y Novedades» (Tarjeta de la rejilla) y «Brillo de lámina» (2026-11-14).
 - **Variantes:** `.cover--img` portada-real (Imagen sin alt (el nombre va en el botón).); `.cover--blank` portada-tipografica (Sin imagen o si falla: campo de color con título y autor.)
-- **style.css:** `.card` `.cover` `.cover--img` `.cover--blank` `.card-item` `.card-t` `.card-m` `.card-pr` `.cover-title` `.cover-author`
+- **style.css:** `.card` `.cover` `.cover--img` `.cover--blank` `.card-item` `.card-t` `.card-au` `.card-m` `.card-pr` `.cover-title` `.cover-author`
 - **catalog.js:** exporta `imageCover` `coverFallback` `coverTone` `priceLabel` `splitTitle` `titleSize` `COVER_LAYOUTS` · internas `card` `cover` `blankCover`
 - **rail.js:** exporta `bookCard` `wireBookOpen`
 - **carousel3d.js:** exporta `initDepth` `tiltPose` `tiltTransform`
@@ -462,7 +464,7 @@ Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el tel
 - **index.html:** `#cat-drawer` `[data-d-close]` `[data-d-cta]` `[data-d-save]` `[data-d-share]` `[data-d-visit]` `[data-d-scroll]`
 - **catalog.js:** exporta `shareBook` `bookShareData` `bookMessage` `bookWaUrl` `relatedBooks` · internas `openBook`
 - **sheets.js:** exporta `openDialog` `closeDialog`
-- **Tokens:** `vidrio-hoja` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `sombra-portada` `velo` `radio-lg` `tinta` `tinta-2` `linea` `alto-lg` `t-titulo-2` `t-cuerpo` `t-subtitulo` `t-nota-pie` `dur-base` `dur-rapida` `curva-salida` `curva-resorte` `curva-entrada-salida`
+- **Tokens:** `vidrio-hoja` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `sombra-portada` `velo` `radio-lg` `tinta` `tinta-2` `linea` `alto-lg` `t-titulo-2` `t-cuerpo` `t-subtitulo` `t-nota-pie` `dur-base` `dur-rapida` `curva-salida` `curva-resorte` `curva-entrada-salida` `curva-aceleracion`
 - **Estado foco:** `.btn:focus-visible`, `.btn--vidrio:focus-visible`
 - **Estado presionado:** `.rel:active .cover`
 - **Estado hover:** `.rel:hover span`
@@ -480,7 +482,7 @@ Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el tel
 - **mobile.css:** `.mylist`
 - **index.html:** `#mylist` `[data-ml-close]` `[data-ml-items]` `[data-ml-empty]` `[data-ml-error]` `[data-ml-retry]` `[data-ml-status]` `[data-ml-wa]` `[data-saved-dot]`
 - **saved.js:** exporta `initSaved` `listMessage` `listWaUrl` `clearSaved` `savedIds` `MAX_SAVED`
-- **Tokens:** `vidrio-hoja` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `velo` `radio-lg` `fondo-3` `tinta` `tinta-2` `linea` `primario` `en-primario` `alto-md` `alto-lg` `anillo-foco` `t-titulo-2` `t-titular` `t-subtitulo` `t-nota-pie`
+- **Tokens:** `vidrio-hoja` `filtro-vidrio-hoja` `luz-vidrio` `sombra-hoja` `velo` `radio-lg` `fondo-3` `tinta` `tinta-2` `linea` `primario` `en-primario` `alto-md` `alto-lg` `anillo-foco` `t-titulo-2` `t-titular` `t-subtitulo` `t-nota-pie` `curva-aceleracion`
 - **Estado foco:** `.ml-remove:focus-visible`
 - **Estado vacio:** `.ml-empty`, HTML `[data-ml-empty]`
 - **Estado error:** `.ml-error`, HTML `[data-ml-error]`, HTML `[data-ml-retry]`
@@ -488,6 +490,24 @@ Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el tel
 - **hover: no aplica.** Las filas no son enlaces; «Quitar» y las acciones del pie llevan el estado de su botón.
 - **ARIA:** Dialog (Modal) (https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) · `aria-labelledby=mylist-title` `role=status (data-ml-status)` · **Teclado:** Igual que la ficha; «Quitar «…» de mi lista» con su título en el nombre.
 - **QA:** `tools/qa/saved.mjs` `tools/qa/axe.mjs` `tools/qa/inp.mjs` `tools/qa/guias.mjs`
+
+### AsaHoja
+
+Deslizar para cerrar las hojas inferiores del teléfono (ficha, Mi lista y Explorar; 2026-11-18, Apple, Sheets): la píldora de 36 × 5 a 8 px del borde (en Explorar, a 4 bajo el área segura) dentro de una franja táctil de 64 × 24. El gesto empieza en el asa, en la cabecera de la hoja (Mi lista, la barra de Explorar) o, con el contenido arriba, en sus primeros 72 px; un enlace o un botón no lo empiezan. Con movimiento la hoja sigue al dedo; al soltar pasados 120 px o a más de 0.7 px/ms sale por closeDialog desde donde quedó y, si no, vuelve a su sitio en dur-rapida. Con «reducir movimiento» o la pausa no sigue al dedo, pero el gesto cierra igual. Para el lector de pantalla es decorativa: el × y Escape siguen cerrando.
+
+- **Tipo:** bloque · **desde** 2026-11-18 · DESIGN.md, «Plan premium (2026-11-18)»: deslizar para cerrar en las tres hojas inferiores.
+- **mobile.css:** `.sheet-grab` `.sheet-grab::before` `.explorer:modal .sheet-grab` `.ml-head`
+- **style.css:** `.sheet-grab`
+- **index.html:** `[data-sheet-grab]`
+- **sheets.js:** exporta `swipeToClose` `SWIPE_CLOSE`
+- **Tokens:** `linea-fuerte` `radio-pildora` `space-2` `space-6` `dur-rapida` `curva-salida` `curva-aceleracion`
+- **Estado presionado:** sheets.js `if (follow) dlg.style.translate = '0 ${dy}px';`
+- **Estado movimiento_reducido:** sheets.js `follow = isMotion();`
+- **hover: no aplica.** Solo existe en el teléfono (hoja inferior) y no es un control de puntero.
+- **foco: no aplica.** No recibe el foco: es un atajo táctil; el × de la hoja y Escape cierran con teclado.
+- **deshabilitado: no aplica.** Nunca se deshabilita.
+- **ARIA:** Decorativo (aria-hidden) dentro de un diálogo modal con su botón de cerrar (https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) · `aria-hidden=true` · **Teclado:** Sin teclado propio: Escape y el × cierran la hoja (WCAG 2.5.7: el arrastre tiene alternativa de un toque).
+- **QA:** `tools/qa/hojas.mjs` `tools/qa/e2e.mjs`
 
 ### CampoBusqueda
 
@@ -514,7 +534,7 @@ Píldora de 48 en fondo-3 con letra de 17 (iOS no acerca la página); con foco, 
 - **mobile.css:** `.explorer`
 - **index.html:** `#catalogo` `#explorer` `[data-ex-open]` `[data-ex-close]` `[data-cat-form]` `[data-cat-filters]` `[data-cat-status]` `[data-cat-chips]` `[data-cat-grid]` `[data-cat-fold]` `[data-cat-empty]` `[data-cat-reset]`
 - **catalog.js:** exporta `initCatalog` `filterBooks` `sortBooks` `facetCounts` `foldView` `facetView` `FOLD_ROWS` `FACET_FOLD_AT` `FACET_LIMIT` `PAGE_SIZE` `GENRE_ES` `genreLabel` · internas `renderFilters` `renderChips` `renderGrid` `applyFold` `staggerIn` `clearAll` · ganchos `data-clear` `cat-clear-all`
-- **Tokens:** `alto-sm` `alto-md` `fondo-3` `fondo-2` `fondo` `tinta` `tinta-2` `linea` `linea-fuerte` `primario` `en-primario` `turquesa-texto` `foco` `anillo-foco` `radio-md` `radio-sm` `radio-portada` `radio-pildora` `t-campo` `t-subtitulo` `t-rotulo` `t-boton-chico` `t-titulo-3` `space-8` `dur-rapida` `dur-lenta` `escalon-linea` `curva-salida` `fondo-3-presionado`
+- **Tokens:** `alto-sm` `alto-md` `fondo-3` `fondo-2` `fondo` `tinta` `tinta-2` `linea` `linea-fuerte` `primario` `en-primario` `turquesa-texto` `foco` `anillo-foco` `radio-md` `radio-sm` `radio-portada` `radio-pildora` `t-campo` `t-subtitulo` `t-rotulo` `t-boton-chico` `t-titulo-3` `space-8` `dur-rapida` `dur-lenta` `escalon-linea` `curva-salida` `fondo-3-presionado` `curva-aceleracion`
 - **Estado hover:** `.explore-open:hover`, `.cat-opt label:hover`
 - **Estado foco:** `.cat-opt input:focus-visible + label`, `.cat-clear-all:focus-visible`, `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`
 - **Estado presionado:** `.explore-open:active`, `.explore-open[data-opening]`
@@ -596,7 +616,7 @@ SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de
 - **index.html:** `[data-motion-toggle]` `[data-motion-nota]` `#motion-nota` `#menu-motion-nota` `.menu-movimiento` `.interruptor`
 - **app.js:** internas `syncToggle` `applyMode` · ganchos `iti-b4-motion`
 - **assets/js/boot.js:** ganchos `r.classList.add('motion')`
-- **Tokens:** `interruptor-ancho` `interruptor-alto` `interruptor-pulgar` `alto-sm` `fondo-3` `linea-fuerte` `primario` `primario-presionado` `superficie` `sombra-pulgar` `tinta` `tinta-2` `anillo-foco` `radio-pildora` `t-subtitulo` `t-nota-pie` `dur-rapida` `curva-salida` `curva-resorte` `primario-pulsado` `fondo-3-presionado`
+- **Tokens:** `interruptor-ancho` `interruptor-alto` `interruptor-pulgar` `alto-sm` `fondo-3` `linea-fuerte` `primario` `primario-presionado` `superficie` `sombra-pulgar` `tinta` `tinta-2` `anillo-foco` `radio-pildora` `t-subtitulo` `t-nota-pie` `dur-rapida` `curva-salida` `curva-resorte` `primario-pulsado` `fondo-3-presionado` `deshabilitado`
 - **Estado hover:** `.interruptor:not([aria-disabled="true"]):hover .interruptor-pista`, `.interruptor[aria-checked="true"]:not([aria-disabled="true"]):hover .interruptor-pista`
 - **Estado foco:** `.interruptor:focus-visible`
 - **Estado presionado:** `.interruptor:not([aria-disabled="true"]):active .interruptor-pista`, `.interruptor[aria-checked="true"]:not([aria-disabled="true"]):active .interruptor-pista` — Apagado, fondo-3-presionado; encendido, primario-pulsado. Con «reducir movimiento» está deshabilitado y no responde, por diseño.
@@ -663,7 +683,7 @@ Solo existe con llegadas registradas en assets/data/collections.json (hoy la lis
 - **index.html:** `#novedades` `[data-news]` `[data-news-toggle]` `[data-news-track]` `[data-news-status]` `[data-news-link]`
 - **news.js:** exporta `initNews` `initNewsCount` `newsPlan` `newsEntries` `isNew` `validDay` `statusLine` `hintLine` `wireToggle` `NEWS_SIZE` `NEW_DAYS`
 - **assets/js/boot.js:** ganchos `iti-news-estado` `has-news` `news-hint`
-- **Tokens:** `fondo` `fondo-2` `fondo-3` `primario` `en-primario` `tinta` `tinta-2` `radio-portada` `sombra-portada` `anillo-foco` `t-subtitulo` `t-nota-pie` `space-2` `space-3` `space-5` `dur-instantanea` `dur-base` `curva-resorte`
+- **Tokens:** `fondo` `fondo-2` `fondo-3` `primario` `en-primario` `tinta` `tinta-2` `radio-portada` `sombra-portada` `anillo-foco` `t-subtitulo` `t-nota-pie` `space-2` `space-3` `space-5` `dur-instantanea` `dur-base` `curva-resorte` `deshabilitado`
 - **Estado hover:** `.news-book:hover .cover`
 - **Estado foco:** `.news-book:focus-visible .cover`
 - **Estado presionado:** `.news-book:active`, `.news-book[data-opening]`

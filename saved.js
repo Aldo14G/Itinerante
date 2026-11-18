@@ -1,7 +1,7 @@
 // Mi lista para la visita: libros que la persona anota en este dispositivo (sin cuenta, sin servidor).
 // Sirve al objetivo del sitio: que lleguen a la librería sabiendo qué quieren ver y puedan preguntarlo.
 import { loadSample } from './sample.js';
-import { openDialog, closeDialog, topDialog } from './sheets.js';
+import { openDialog, closeDialog, topDialog, swipeToClose } from './sheets.js';
 import { afterPaint, confirmThen, pickPop, ms } from './motion.js';
 
 const KEY = 'iti-saved-v1';
@@ -256,6 +256,9 @@ export function initSaved() {
     const dlg = document.getElementById('mylist');
     if (dlg?.open && (e.target === dlg || e.target.closest('[data-ml-close]'))) closeDialog(dlg); // sale primero; el cierre real corre después del fotograma
   });
+  // Hoja inferior del teléfono: se desliza hacia abajo desde el asa o la cabecera para cerrarla (swipeToClose, como la ficha y Explorar).
+  const ml = document.getElementById('mylist');
+  if (ml) swipeToClose(ml, { grab: ml.querySelector('[data-sheet-grab]'), head: ml.querySelector('.ml-head'), scroller: ml.querySelector('.ml-body'), zone: 72 });
   // Al cerrar, el foco vuelve al primer abridor visible (Mi lista en la cabecera o en la barra inferior) o, si no hay ninguno, al botón del menú.
   document.getElementById('mylist')?.addEventListener('close', () => {
     const back = [...document.querySelectorAll('[data-open-mylist]:not(.toast-action)')].find(b => b.offsetParent !== null) || document.querySelector('[data-menu-open]');

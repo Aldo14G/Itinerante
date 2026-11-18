@@ -48,7 +48,8 @@ test("las portadas del inventario se publican: toda ruta `c` de catalog.json exi
   assert.ok(covers.length >= 30, `se esperaban las portadas reales (${covers.length})`);
   const set = new Set(files);
   assert.deepEqual(covers.filter((c) => !set.has(c)), [], "portadas que faltan en public/");
-  assert.deepEqual(files.filter((f) => f.startsWith("assets/img/portadas/")).sort(), [...covers].sort(), "solo las portadas que usa el catalogo");
+  const variants = catalog.books.filter((b) => b.c && b.cw > 600).map((b) => b.c.replace(/\.webp$/, "-600.webp")); // srcset de la rejilla (2026-11-18)
+  assert.deepEqual(files.filter((f) => f.startsWith("assets/img/portadas/")).sort(), [...covers, ...variants].sort(), "solo las portadas que usa el catalogo y sus variantes de 600");
   assert.ok(!files.includes("data/portadas.json") && !files.some((f) => f.endsWith("inventario-itinerante.json")), "los registros internos (data/) no se publican");
 });
 

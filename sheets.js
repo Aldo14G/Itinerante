@@ -107,6 +107,50 @@ export function closeDialog(dlg) {
     .then(() => { if (live && dlg.open) dlg.close(); });
 }
 
+// Deslizar para cerrar (hoja inferior del teléfono; Apple, Sheets: asa y deslizar hacia abajo cierra). Una sola lógica para la ficha, Mi lista y
+// Explorar (2026-11-18; antes solo la ficha, en catalog.js). El gesto empieza en el asa (`[data-sheet-grab]`, 36 × 5 a 8 px del borde, dentro de
+// una franja táctil), en la cabecera de la hoja (`head`) o, con el contenido arriba del todo, en sus primeros `zone` px; un enlace o un botón
+// no lo empiezan. Con movimiento la hoja sigue al dedo; con «reducir movimiento» o la pausa se queda quieta, pero el gesto cierra igual.
+// Al soltar pasados 120 px, o a más de 0.7 px/ms, la hoja sale por closeDialog desde donde quedó; si no, vuelve a su sitio.
+export const SWIPE_CLOSE = { dist: 120, speed: 0.7 };
+export function swipeToClose(dlg, { grab = null, head = null, scroller = null, zone = 0, media = '(max-width: 760px)', isMotion = () => root.classList.contains('motion') } = {}) {
+  let startY = 0, dy = 0, t0 = 0, active = false, follow = false;
+  const sheetMode = () => matchMedia(media).matches && dlg.matches(':modal') && !dlg.classList.contains('is-closing');
+  const reset = () => { dlg.style.removeProperty('translate'); dlg.style.removeProperty('transition'); };
+  dlg.addEventListener('close', reset);
+  dlg.addEventListener('pointerdown', e => {
+    if (!sheetMode() || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const onGrab = !!(grab && grab.contains(e.target));
+    if (!onGrab && e.target.closest('a, button, input, select, textarea, label, [role="combobox"]')) return;
+    const onHead = !!(head && head.contains(e.target));
+    const inZone = zone > 0 && (!scroller || scroller.scrollTop <= 0) && e.clientY - dlg.getBoundingClientRect().top <= zone;
+    if (!onGrab && !onHead && !inZone) return;
+    active = true; follow = isMotion(); startY = e.clientY; dy = 0; t0 = performance.now();
+    try { dlg.setPointerCapture(e.pointerId); } catch { /* el puntero ya no existe */ }
+    if (follow) dlg.style.transition = 'none';
+  });
+  dlg.addEventListener('pointermove', e => {
+    if (!active) return;
+    dy = Math.max(0, e.clientY - startY);
+    if (follow) dlg.style.translate = `0 ${dy}px`;
+  });
+  const end = cancel => {
+    if (!active) return;
+    active = false;
+    const speed = dy / Math.max(1, performance.now() - t0);
+    const shut = !cancel && (dy > SWIPE_CLOSE.dist || speed > SWIPE_CLOSE.speed);
+    dlg.style.removeProperty('transition'); // vuelve la transición de la hoja: la salida (o el regreso) parte de donde quedó el dedo
+    if (shut) { closeDialog(dlg); return; }
+    if (!follow || !dy) { reset(); return; }
+    // Regreso: la hoja vuelve a su sitio con la curva de entrada (translate no está en su transición: se pone solo para esto).
+    dlg.style.transition = `translate ${DUR('rapida')}ms var(--curva-salida)`;
+    requestAnimationFrame(() => { dlg.style.translate = '0 0'; });
+    setTimeout(() => { if (!active && !dlg.classList.contains('is-closing')) reset(); }, DUR('rapida'));
+  };
+  dlg.addEventListener('pointerup', () => end(false));
+  dlg.addEventListener('pointercancel', () => end(true));
+}
+
 // Una hoja cuyo enlace lleva a una sección del mismo documento reutiliza su entrada de historial como entrada del destino
 // (en vez de dejar una entrada fantasma debajo): no hay que consumirla después.
 export function navigateFromSheet(href) {

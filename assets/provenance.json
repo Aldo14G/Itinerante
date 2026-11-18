@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-12",
+  "updated": "2026-11-18",
   "rule": "Todas las imágenes del sitio son fotografías reales de la casa, salvo las portadas de los libros (img/portadas/, registradas aparte en «covers»): el lote oficial entregado por Aldo (2026-10-27), fotos publicadas por la cuenta oficial de Instagram (con su autor) y fotos de Aldo (2026-11-10). No quedan recreaciones generadas con IA; la secuencia de fotogramas del inicio se retiró el 2026-11-10. La procedencia es un dato interno (data-kind y este archivo): la página no imprime rótulos. Pendiente de la librería: confirmar el permiso de uso de las fotos de @sharonmirelesgong y @alfonso_boeta, o sustituirlas por la sesión profesional.",
   "real": [
     {
@@ -225,6 +225,39 @@
       "date": "2026-11-10",
       "note": "foto de teléfono tomada en la casa (Matamoros 421)",
       "sha256": "78b994c5fdaa90263e2431009f652f05ac19b77f9475c6eb61ca6567ca893d11"
+    },
+    {
+      "file": "img/inicio-sala-5x4.webp",
+      "origin": "recorte 5:4 de 1080x864 (x0 y176) de la foto completa, sin ampliar, Pillow, WebP calidad 74 (87 KB: no pesa más que la de antes, 102 KB)",
+      "source": "Instagram oficial, diapositiva 1 (docs/cuaderno-de-margen/fotos/ig-01.jpg en la rama agent/atenea/casa-editorial-base, 1080x1080, sha256 f1bd6b060e4749c4141b90ad0e26b005297d7e6033f0fa4f896e4e0cde439974)",
+      "post": "https://www.instagram.com/p/DVmde4oEVzw/",
+      "author": "@sharonmirelesgong",
+      "account": "@libreriaitineranteymasmty",
+      "date": "2026-11-18",
+      "note": "inicio de escritorio (desde 1024 px, caja 5:4): la misma foto de la sala que el inicio del teléfono, recortada del original de 1080x1080 en vez del recorte 16:9 de 1080x608 (densidad 0.69 → 0.98 a 1440 × 900 @2x; Instagram sirve 1080 px como máximo, no hay más resolución)",
+      "sha256": "4a3fb8e27f4f6bc2ba1a7e24e82bf02ba9eed638e569176de358a11e7201d424"
+    },
+    {
+      "file": "img/casa-globo.webp",
+      "origin": "recorte 4:3 de 1080x810 (x0 y230) de la foto completa, sin ampliar, Pillow, WebP calidad 80",
+      "source": "Instagram oficial, diapositiva 2 (docs/cuaderno-de-margen/fotos/ig-02.jpg en la rama agent/atenea/casa-editorial-base, 1080x1080, sha256 d74e5decca176afeeec605553efb44662cd1ef366050ff625cc95089f8c793b3)",
+      "post": "https://www.instagram.com/p/DVmde4oEVzw/",
+      "author": "@sharonmirelesgong",
+      "account": "@libreriaitineranteymasmty",
+      "date": "2026-11-18",
+      "note": "La casa (2026-11-18, aprobado por Aldo: una foto por sección): sustituye a la sala central, que ya es la foto del inicio. La misma toma que img/libro-infantil.webp (sin uso), recortada de nuevo del original para la caja 4:3 de la tira",
+      "sha256": "757fbb12089d54a1b8bdc63266a8688b35bb8f0f743de16fc38e5db6f7193a0e"
+    },
+    {
+      "file": "img/casa-globo-800.webp",
+      "origin": "el mismo recorte reducido a 800x600 (Pillow, LANCZOS, WebP calidad 78)",
+      "derivedFrom": "img/casa-globo.webp",
+      "source": "Instagram oficial, diapositiva 2 (docs/cuaderno-de-margen/fotos/ig-02.jpg en la rama agent/atenea/casa-editorial-base, 1080x1080, sha256 d74e5decca176afeeec605553efb44662cd1ef366050ff625cc95089f8c793b3)",
+      "post": "https://www.instagram.com/p/DVmde4oEVzw/",
+      "author": "@sharonmirelesgong",
+      "account": "@libreriaitineranteymasmty",
+      "date": "2026-11-18",
+      "sha256": "1587fa63613751b3bc3fb176c0681f0e54a753af8dd3c8ac6c925b5b17602b5a"
     }
   ],
   "aiRecreation": [],
@@ -238,7 +271,7 @@
   "covers": {
     "dir": "img/portadas/",
     "registry": "data/portadas.json",
-    "rule": "Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 600 px de ancho como máximo. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).",
+    "rule": "Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 1200 px de lado mayor como máximo, sin ampliar (2026-11-18; antes 600 de ancho), con una variante de 600 de ancho (<id>-600.webp) cuando el original es más ancho. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).",
     "files": [
       {
         "file": "img/portadas/las-hojas-de-fabre-jesus-ferreiro.webp",
@@ -273,12 +306,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/amigos-rodrigo-garnica-600.webp",
+        "book": "amigos-rodrigo-garnica",
+        "isbn": "9798288544323",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61ySEhBZH0L.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/amigos-rodrigo-garnica.webp"
+      },
+      {
         "file": "img/portadas/rito-de-iniciacion-diego-uribe.webp",
         "book": "rito-de-iniciacion-diego-uribe",
         "isbn": "9798284002780",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/51OVHVqODCL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/rito-de-iniciacion-diego-uribe-600.webp",
+        "book": "rito-de-iniciacion-diego-uribe",
+        "isbn": "9798284002780",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51OVHVqODCL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/rito-de-iniciacion-diego-uribe.webp"
       },
       {
         "file": "img/portadas/perorata-luis-felipe-lomeli.webp",
@@ -292,9 +343,18 @@
         "file": "img/portadas/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp",
         "book": "los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla",
         "isbn": "9798649937733",
-        "source": "Goodreads",
-        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1678255876i/80562270.jpg",
-        "reviewed": "2026-11-12"
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/81S8wWUx10L._SL1360_.jpg",
+        "reviewed": "2026-11-18"
+      },
+      {
+        "file": "img/portadas/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla-600.webp",
+        "book": "los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla",
+        "isbn": "9798649937733",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/81S8wWUx10L._SL1360_.jpg",
+        "reviewed": "2026-11-18",
+        "derivedFrom": "img/portadas/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp"
       },
       {
         "file": "img/portadas/las-ruinas-de-la-caza-alfredo-leal.webp",
@@ -305,12 +365,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/las-ruinas-de-la-caza-alfredo-leal-600.webp",
+        "book": "las-ruinas-de-la-caza-alfredo-leal",
+        "isbn": null,
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61nalhU1ylL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/las-ruinas-de-la-caza-alfredo-leal.webp"
+      },
+      {
         "file": "img/portadas/demonios-huascar-robles.webp",
         "book": "demonios-huascar-robles",
         "isbn": "9798264705427",
-        "source": "Goodreads",
-        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1758372356i/241859512.jpg",
-        "reviewed": "2026-11-12"
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61rTRCHkUML._SL1500_.jpg",
+        "reviewed": "2026-11-18"
+      },
+      {
+        "file": "img/portadas/demonios-huascar-robles-600.webp",
+        "book": "demonios-huascar-robles",
+        "isbn": "9798264705427",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61rTRCHkUML._SL1500_.jpg",
+        "reviewed": "2026-11-18",
+        "derivedFrom": "img/portadas/demonios-huascar-robles.webp"
       },
       {
         "file": "img/portadas/el-lugar-de-la-noche-david-ornelas.webp",
@@ -321,12 +399,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/el-lugar-de-la-noche-david-ornelas-600.webp",
+        "book": "el-lugar-de-la-noche-david-ornelas",
+        "isbn": "9798336751734",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71YwY08UuFL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/el-lugar-de-la-noche-david-ornelas.webp"
+      },
+      {
         "file": "img/portadas/las-funciones-del-placer-carlos-rangel.webp",
         "book": "las-funciones-del-placer-carlos-rangel",
         "isbn": "9798278144199",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/61l9GzNGrbL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/las-funciones-del-placer-carlos-rangel-600.webp",
+        "book": "las-funciones-del-placer-carlos-rangel",
+        "isbn": "9798278144199",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61l9GzNGrbL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/las-funciones-del-placer-carlos-rangel.webp"
       },
       {
         "file": "img/portadas/perlas-de-obsidiana-olaf-marin.webp",
@@ -337,12 +433,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/perlas-de-obsidiana-olaf-marin-600.webp",
+        "book": "perlas-de-obsidiana-olaf-marin",
+        "isbn": "9798872431039",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51IvmSkMdTL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/perlas-de-obsidiana-olaf-marin.webp"
+      },
+      {
         "file": "img/portadas/amanecer-de-california-j-enrique-vazquez-m.webp",
         "book": "amanecer-de-california-j-enrique-vazquez-m",
         "isbn": "9798279346790",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/51-Y3mHEIeL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/amanecer-de-california-j-enrique-vazquez-m-600.webp",
+        "book": "amanecer-de-california-j-enrique-vazquez-m",
+        "isbn": "9798279346790",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51-Y3mHEIeL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/amanecer-de-california-j-enrique-vazquez-m.webp"
       },
       {
         "file": "img/portadas/otra-vez-el-crepusculo-asbel-hernandez.webp",
@@ -353,12 +467,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/otra-vez-el-crepusculo-asbel-hernandez-600.webp",
+        "book": "otra-vez-el-crepusculo-asbel-hernandez",
+        "isbn": "9781072678540",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61pjyHxLrWL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/otra-vez-el-crepusculo-asbel-hernandez.webp"
+      },
+      {
         "file": "img/portadas/la-sombra-del-guerrero-hermes-millan.webp",
         "book": "la-sombra-del-guerrero-hermes-millan",
         "isbn": "9798199939584",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/71G6WtVj6TL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/la-sombra-del-guerrero-hermes-millan-600.webp",
+        "book": "la-sombra-del-guerrero-hermes-millan",
+        "isbn": "9798199939584",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71G6WtVj6TL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/la-sombra-del-guerrero-hermes-millan.webp"
       },
       {
         "file": "img/portadas/la-voz-vertical-bruno-clemet.webp",
@@ -369,20 +501,47 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/la-voz-vertical-bruno-clemet-600.webp",
+        "book": "la-voz-vertical-bruno-clemet",
+        "isbn": "9798266911147",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41V+33ZE47L.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/la-voz-vertical-bruno-clemet.webp"
+      },
+      {
         "file": "img/portadas/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar.webp",
         "book": "pensamiento-e-ideologia-en-america-latina-compiladora-sidhar",
         "isbn": "9798289373700",
-        "source": "Goodreads",
-        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1759950146i/242540214.jpg",
-        "reviewed": "2026-11-12"
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41YgPKYDflL._SL1500_.jpg",
+        "reviewed": "2026-11-18"
+      },
+      {
+        "file": "img/portadas/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar-600.webp",
+        "book": "pensamiento-e-ideologia-en-america-latina-compiladora-sidhar",
+        "isbn": "9798289373700",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41YgPKYDflL._SL1500_.jpg",
+        "reviewed": "2026-11-18",
+        "derivedFrom": "img/portadas/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar.webp"
       },
       {
         "file": "img/portadas/maurice-blanchot-sergio-espinosa-proa.webp",
         "book": "maurice-blanchot-sergio-espinosa-proa",
         "isbn": "9798303443310",
-        "source": "Goodreads",
-        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1735661631i/223130311.jpg",
-        "reviewed": "2026-11-12"
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41iuhh0ANEL._SL1500_.jpg",
+        "reviewed": "2026-11-18"
+      },
+      {
+        "file": "img/portadas/maurice-blanchot-sergio-espinosa-proa-600.webp",
+        "book": "maurice-blanchot-sergio-espinosa-proa",
+        "isbn": "9798303443310",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41iuhh0ANEL._SL1500_.jpg",
+        "reviewed": "2026-11-18",
+        "derivedFrom": "img/portadas/maurice-blanchot-sergio-espinosa-proa.webp"
       },
       {
         "file": "img/portadas/cartografias-del-pensamiento-latinoamericano-compiladora-mai.webp",
@@ -393,12 +552,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/cartografias-del-pensamiento-latinoamericano-compiladora-mai-600.webp",
+        "book": "cartografias-del-pensamiento-latinoamericano-compiladora-mai",
+        "isbn": "9798283285757",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41uxtxYZPbL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/cartografias-del-pensamiento-latinoamericano-compiladora-mai.webp"
+      },
+      {
         "file": "img/portadas/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp.webp",
         "book": "maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp",
         "isbn": "9798315333005",
-        "source": "Goodreads",
-        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1748018728i/234825882.jpg",
-        "reviewed": "2026-11-12"
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41rw00+dXaL._SL1499_.jpg",
+        "reviewed": "2026-11-18"
+      },
+      {
+        "file": "img/portadas/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp-600.webp",
+        "book": "maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp",
+        "isbn": "9798315333005",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/41rw00+dXaL._SL1499_.jpg",
+        "reviewed": "2026-11-18",
+        "derivedFrom": "img/portadas/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp.webp"
       },
       {
         "file": "img/portadas/polvo-carlos-bortoni.webp",
@@ -407,6 +584,15 @@
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/512wuZdVNgL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/polvo-carlos-bortoni-600.webp",
+        "book": "polvo-carlos-bortoni",
+        "isbn": "9798195788827",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/512wuZdVNgL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/polvo-carlos-bortoni.webp"
       },
       {
         "file": "img/portadas/yita-y-el-arcoiris-cristi-na-han.webp",
@@ -425,12 +611,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/el-circo-miguel-del-valle-600.webp",
+        "book": "el-circo-miguel-del-valle",
+        "isbn": "9786079946968",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61Ec699J+yL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/el-circo-miguel-del-valle.webp"
+      },
+      {
         "file": "img/portadas/reino-mundo-juan-mireles.webp",
         "book": "reino-mundo-juan-mireles",
         "isbn": "9786078900251",
         "source": "Goodreads",
         "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1765604854i/245172308.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/reino-mundo-juan-mireles-600.webp",
+        "book": "reino-mundo-juan-mireles",
+        "isbn": "9786078900251",
+        "source": "Goodreads",
+        "url": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1765604854i/245172308.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/reino-mundo-juan-mireles.webp"
       },
       {
         "file": "img/portadas/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano.webp",
@@ -441,12 +645,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano-600.webp",
+        "book": "domingo-por-la-tarde-cuando-llueve-alejandro-mandujano",
+        "isbn": "9786078900213",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51dxg9qh+YL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano.webp"
+      },
+      {
         "file": "img/portadas/todas-las-lluvias-francisco-javier-hernandez-m.webp",
         "book": "todas-las-lluvias-francisco-javier-hernandez-m",
         "isbn": "9786078900244",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/51nbwcYm3xL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/todas-las-lluvias-francisco-javier-hernandez-m-600.webp",
+        "book": "todas-las-lluvias-francisco-javier-hernandez-m",
+        "isbn": "9786078900244",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51nbwcYm3xL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/todas-las-lluvias-francisco-javier-hernandez-m.webp"
       },
       {
         "file": "img/portadas/no-pelear-pelear-arturo-r-orozco-padilla.webp",
@@ -457,12 +679,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/no-pelear-pelear-arturo-r-orozco-padilla-600.webp",
+        "book": "no-pelear-pelear-arturo-r-orozco-padilla",
+        "isbn": "9786078900206",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71w6NLpKydL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/no-pelear-pelear-arturo-r-orozco-padilla.webp"
+      },
+      {
         "file": "img/portadas/cuanto-ha-visto-el-hombre-antonio-estudillo.webp",
         "book": "cuanto-ha-visto-el-hombre-antonio-estudillo",
         "isbn": "9786078900121",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/51qwlySVkwL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/cuanto-ha-visto-el-hombre-antonio-estudillo-600.webp",
+        "book": "cuanto-ha-visto-el-hombre-antonio-estudillo",
+        "isbn": "9786078900121",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51qwlySVkwL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/cuanto-ha-visto-el-hombre-antonio-estudillo.webp"
       },
       {
         "file": "img/portadas/material-sensible-francisco-javier-hernandez-m.webp",
@@ -473,12 +713,30 @@
         "reviewed": "2026-11-12"
       },
       {
+        "file": "img/portadas/material-sensible-francisco-javier-hernandez-m-600.webp",
+        "book": "material-sensible-francisco-javier-hernandez-m",
+        "isbn": "9786078900145",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/71JIZRIwIyL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/material-sensible-francisco-javier-hernandez-m.webp"
+      },
+      {
         "file": "img/portadas/me-llaman-loca-cristina-arreola-marquez.webp",
         "book": "me-llaman-loca-cristina-arreola-marquez",
         "isbn": "9786078900107",
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/61mkX7o9amL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/me-llaman-loca-cristina-arreola-marquez-600.webp",
+        "book": "me-llaman-loca-cristina-arreola-marquez",
+        "isbn": "9786078900107",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/61mkX7o9amL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/me-llaman-loca-cristina-arreola-marquez.webp"
       },
       {
         "file": "img/portadas/los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux.webp",
@@ -495,6 +753,15 @@
         "source": "Amazon",
         "url": "https://m.media-amazon.com/images/I/51E4cK+I3NL.jpg",
         "reviewed": "2026-11-12"
+      },
+      {
+        "file": "img/portadas/antologia-gris-compilador-francisco-javier-hernandez-m-600.webp",
+        "book": "antologia-gris-compilador-francisco-javier-hernandez-m",
+        "isbn": "9786078900046",
+        "source": "Amazon",
+        "url": "https://m.media-amazon.com/images/I/51E4cK+I3NL.jpg",
+        "reviewed": "2026-11-12",
+        "derivedFrom": "img/portadas/antologia-gris-compilador-francisco-javier-hernandez-m.webp"
       }
     ]
   },

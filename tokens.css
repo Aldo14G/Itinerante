@@ -20,6 +20,7 @@
   --menta: #dcf1ec;
   --en-menta: #0f5248;
   --menta-presionado: #b7d3cc;
+  --deshabilitado: #95a09e;
   --fondo-3-presionado: #cbd5d2;
   --vidrio: #ffffffd6;
   --vidrio-hoja: #ffffffe6;
@@ -63,12 +64,16 @@
   --ls-titulo-grande: -0.022em;
   --t-titulo-1: 700 28px/34px var(--font-display);
   --ls-titulo-1: -0.02em;
+  --t-titulo-1-amplio: 700 36px/44px var(--font-display);
+  --ls-titulo-1-amplio: -0.02em;
   --t-titulo-2: 600 22px/28px var(--font-display);
   --ls-titulo-2: -0.012em;
   --t-titulo-3: 600 20px/25px var(--font-display);
   --ls-titulo-3: -0.01em;
   --t-display: 700 56px/60px var(--font-display);
   --ls-display: -0.025em;
+  --t-display-compacto: 700 44px/48px var(--font-display);
+  --ls-display-compacto: -0.025em;
   --t-titular: 600 17px/22px var(--font-texto);
   --ls-titular: -0.01em;
   --t-cuerpo: 400 17px/22px var(--font-texto);
@@ -179,6 +184,7 @@
   --curva-salida: cubic-bezier(0.16, 1, 0.3, 1);
   --curva-entrada-salida: cubic-bezier(0.65, 0, 0.35, 1);
   --curva-resorte: linear(0, 0.42 8%, 0.86 16%, 1.04 26%, 1.05 32%, 0.99 46%, 1.002 62%, 1);
+  --curva-aceleracion: cubic-bezier(0.3, 0, 0.8, 0.15);
 
   /* Tiempos de JavaScript (no son transiciones) */
   --espera-larga: 1200ms;
@@ -223,6 +229,7 @@
     --menta: #1b4a44;
     --en-menta: #8fe0d5;
     --menta-presionado: #2c6059;
+    --deshabilitado: #6f8482;
     --fondo-3-presionado: #385451;
     --vidrio: #0f2724d1;
     --vidrio-hoja: #0f2724e6;
@@ -242,6 +249,22 @@
     --sombra-portada: 0 2px 6px #00000080, 0 14px 32px #000000b3;
     --luz-vidrio: inset 0 1px 0 #ffffff2e, inset 0 0 0 1px #ffffff14;
     --anillo-foco: 0 0 0 2px #0b1d1b, 0 0 0 4px #8fe0d5;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --tinta-2: #3a4b48;
+    --linea-fuerte: #4f6662;
+    --linea: #768985;
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root {
+    --tinta-2: #c9dfdb;
+    --linea-fuerte: #8fb8b1;
+    --linea: #6f8f8a;
   }
 }
 

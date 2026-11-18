@@ -31,6 +31,7 @@ const SWEEP = `window.__sweep = (label) => {
   const bad = [];
   document.querySelectorAll('body *').forEach(e => {
     if (e.closest('.cover, [inert], [hidden], .sprite, noscript, script, style')) return;
+    if (e.closest(':disabled, [aria-disabled="true"]')) return; // lo inactivo (token deshabilitado, 2026-11-18) está exento de 1.4.3 (WCAG): no se mide
     if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) return;
     const cs = getComputedStyle(e); const r = e.getBoundingClientRect();
     if (cs.visibility === 'hidden' || cs.display === 'none' || r.width === 0 || r.height === 0 || Number(cs.opacity) < 0.5) return;

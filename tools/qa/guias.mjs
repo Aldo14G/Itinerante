@@ -23,7 +23,8 @@
 //       va en dos renglones («Nombre / frase») sin palabra viuda; ≤ 6 tamaños de letra por sección.
 //   C · tarjetas: sin vacíos interiores (> 25 % del alto) y con una sola sangría.
 //   H · hojas: margen interior de la escala (16 / 20 / 32), que no crece con la ventana; botones sin aplastar; en el menú ☰, Mi lista y
-//       Explorar, un solo eje de tinta (texto y controles sin fondo) y uno de cajas (controles con fondo) (H3).
+//       Explorar, un solo eje de tinta (texto y controles sin fondo) y uno de cajas (controles con fondo) (H3); radios concéntricos con la hoja (H4,
+//       2026-11-18: radio de la hoja − distancia al borde).
 //   N · barras: cabecera alineada al contenedor (la tinta, no la caja), sin piezas que se muevan al desplazar; barra inferior centrada.
 //   E · estado: nada se mide sobre un esqueleto (una lista en aria-busy).
 // Escribe guias.json, guias.txt y, en DIR, guias-<seccion>-<perfil>.png y guias-hoja-<hoja>-<perfil>.png con la superposición (magenta =
@@ -924,6 +925,16 @@ for (const clave of claves) {
         if (eT.length > 1) fallos.push({ perfil: clave, regla: 'H3', seccion: nombreHoja, detalle: `${eT.length} ejes de tinta (${eT.map(e => `x ${r1(e.x - panel.l)}: ${e.n} × ${e.sel} «${e.txt}»`).join(' · ')}); la hoja lleva uno` });
         if (eC.length > 1) fallos.push({ perfil: clave, regla: 'H3', seccion: nombreHoja, detalle: `${eC.length} bordes de caja (${eC.map(e => `x ${r1(e.x - panel.l)}: ${e.n} × ${e.sel} «${e.txt}»`).join(' · ')}); las cajas con fondo comparten uno` });
       }
+      // H4: radios concéntricos (2026-11-18; Apple, Toolbars): una pieza ancha con radio propio (no píldora) dentro de una hoja redondeada lleva
+      // el radio de la hoja menos su distancia al borde (mínimo 8). Hoy lo cumplen las filas del menú ☰ (28 − 12 = 16 a 393; 28 − 8 = 20 a 375).
+      const conc = await page.evaluate(([r, ps]) => {
+        const panel = document.querySelector(ps) || document.querySelector(r); const pb = panel.getBoundingClientRect(); const R = parseFloat(getComputedStyle(panel).borderTopLeftRadius) || 0;
+        if (!R) return [];
+        return [...panel.querySelectorAll('*')].filter(e => { const b = e.getBoundingClientRect(); const rr = parseFloat(getComputedStyle(e).borderTopLeftRadius) || 0; return !e.closest('[popover]') && b.width >= pb.width * 0.6 && rr > 0 && rr < b.height / 2 - 1 && b.left - pb.left <= 40; })
+          .map(e => { const b = e.getBoundingClientRect(); const d = Math.round(b.left - pb.left); return { sel: e.className && typeof e.className === 'string' ? '.' + e.className.split(' ')[0] : e.tagName, r: parseFloat(getComputedStyle(e).borderTopLeftRadius), esperado: Math.max(8, R - d), d, R }; });
+      }, [raizSel, panelSel]);
+      res.hojas[nombreHoja].concentricos = conc;
+      for (const c of conc.filter(c => Math.abs(c.r - c.esperado) > 1)) fallos.push({ perfil: clave, regla: 'H4', seccion: nombreHoja, detalle: `${c.sel} lleva radio ${c.r} a ${c.d} px del borde de una hoja de radio ${c.R}: el concéntrico es ${c.esperado}` });
       if (conCaptura) {
         const e = res.hojas[nombreHoja].ejes;
         await page.evaluate(pintar, { G: Gh, sec: { t: panel.t, h: panel.h }, juicio, atomos: mh.atomos, aire: [], W: m.W, dentro: raizSel,

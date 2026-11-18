@@ -1,6 +1,6 @@
 // Librería Itinerante y Más · sistema «Itinerante Líquido»: barra y menú, destino actual, entradas de los titulares, Eventos, Catálogo y estado de apertura. Sin dependencias.
 import { confirmThen, ms, whenIdle } from './motion.js';
-import { openDialog, closeDialog, navigateFromSheet } from './sheets.js';
+import { openDialog, closeDialog, navigateFromSheet, swipeToClose } from './sheets.js';
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
@@ -379,6 +379,8 @@ async function boot() {
       settle();
       phone.addEventListener('change', settle);
       explorer.addEventListener('close', () => { if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true }); });
+      // En el teléfono Explorar es una hoja a pantalla completa: se desliza hacia abajo desde el asa o su barra de arriba para cerrarla (swipeToClose).
+      swipeToClose(explorer, { grab: $('[data-sheet-grab]', explorer), head: $('.ex-top', explorer) });
       $('[data-ex-close]', explorer).addEventListener('click', () => closeDialog(explorer)); // el cierre real (volver a activar la página) corre después del fotograma
       document.addEventListener('iti:open-explorer', openExplorer);
       // Cualquier enlace al catálogo («Buscar en el catálogo», arriba del capítulo, incluido) abre la hoja en móvil: confirma el toque y la hoja

@@ -10,7 +10,11 @@ Uso:  python3 scripts/import-inventario.py RUTA/Catálogo_Itinerante.xlsx [--hoj
 - Lee la hoja (columnas: Editorial, Título, Autor, Precio, Sinopsis, Género, ISBN, Foto) desde la fila 3 y salta los renglones vacíos.
 - Escribe data/inventario-itinerante.json (copia fiel de la hoja, con avisos por renglón) y assets/data/catalog.json (lo que lee el sitio).
 - Portadas: data/portadas.json dice de dónde sale cada una (fuente y URL, revisadas a mano); si falta su WebP en assets/img/portadas/,
-  la descarga y la convierte (600 px de ancho). Un libro sin entrada en data/portadas.json usa la portada tipográfica.
+  la descarga y la convierte: hasta 1200 px de lado mayor (2026-11-18, aprobado por Aldo; antes 600 de ancho), sin ampliar nunca, y, si
+  mide más de 600 de ancho, también <id>-600.webp para el srcset de la rejilla. Un libro sin entrada en data/portadas.json usa la
+  portada tipográfica.
+- `--portadas` (sin hoja): vuelve a descargar todas las portadas registradas, las reconvierte y actualiza sus medidas en
+  assets/data/catalog.json y su procedencia; no toca el inventario.
 - Nada se inventa: sin año, formato o páginas en la hoja, el campo queda en null y la ficha no lo muestra.
 Necesita openpyxl y Pillow; la descarga usa curl.
 """
@@ -20,6 +24,8 @@ from PIL import Image
 
 ROOT = os.environ.get('ITI_RAIZ') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COVERS = os.path.join(ROOT, 'assets', 'img', 'portadas')
+LADO_MAX = 1200  # lado mayor de la portada (la pieza central del carrusel y la ficha la piden a 1×–3×)
+ANCHO_VARIANTE = 600  # variante para el srcset (rejilla, Novedades): <id>-600.webp
 
 GENEROS = {  # género de la hoja → (id, nombre, categoría)
     'narrativa': ('narrativa', 'Narrativa', 'literatura'),
@@ -51,16 +57,47 @@ def clean(v):
     return re.sub(r'\s+', ' ', str(v)).strip() if v not in (None, '') else None
 
 
-def cover(key, entry):
+def variant_path(key):
+    return os.path.join(COVERS, f'{key}-{ANCHO_VARIANTE}.webp')
+
+
+def cover(key, entry, refresh=False):
     path = os.path.join(COVERS, f'{key}.webp')
-    if not os.path.exists(path):
+    if refresh or not os.path.exists(path):
         data = subprocess.run(['curl', '-sL', '--max-time', '40', '-A', 'Mozilla/5.0', entry['url']], capture_output=True, check=True).stdout
         img = Image.open(io.BytesIO(data)).convert('RGB')
-        if img.width > 600: img = img.resize((600, round(img.height * 600 / img.width)), Image.LANCZOS)
+        k = LADO_MAX / max(img.size)
+        if k < 1: img = img.resize((round(img.width * k), round(img.height * k)), Image.LANCZOS)  # nunca se amplía
         os.makedirs(COVERS, exist_ok=True)
         img.save(path, 'WEBP', quality=80, method=6)
+        if img.width > ANCHO_VARIANTE:
+            img.resize((ANCHO_VARIANTE, round(img.height * ANCHO_VARIANTE / img.width)), Image.LANCZOS).save(variant_path(key), 'WEBP', quality=80, method=6)
+        elif os.path.exists(variant_path(key)):
+            os.remove(variant_path(key))
     w, h = Image.open(path).size
     return f'assets/img/portadas/{key}.webp', w, h
+
+
+def cover_files(b, reg):
+    base = {'book': b['id'], 'isbn': reg.get('isbn'), 'source': reg['fuente'], 'url': reg['url'], 'reviewed': reg.get('revisada')}
+    out = [{'file': b['c'].removeprefix('assets/'), **base}]
+    if os.path.exists(variant_path(b['id'])):
+        out.append({'file': f"img/portadas/{b['id']}-{ANCHO_VARIANTE}.webp", **base, 'derivedFrom': b['c'].removeprefix('assets/')})
+    return out
+
+
+def refresh_covers():
+    """--portadas: vuelve a bajar y convertir las portadas registradas y actualiza cw/ch del catálogo y la procedencia."""
+    portadas = json.load(open(os.path.join(ROOT, 'data', 'portadas.json'), encoding='utf-8'))
+    cat_path = os.path.join(ROOT, 'assets', 'data', 'catalog.json')
+    cat = json.load(open(cat_path, encoding='utf-8'))
+    for b in cat['books']:
+        if b['id'] in portadas:
+            b['c'], b['cw'], b['ch'] = cover(b['id'], portadas[b['id']], refresh=True)
+            print(f"  {b['id']}: {b['cw']}x{b['ch']}")
+    with open(cat_path, 'w', encoding='utf-8') as f:
+        json.dump(cat, f, ensure_ascii=False, separators=(',', ':')); f.write('\n')
+    provenance(cat['books'], portadas)
 
 
 def provenance(books, portadas):
@@ -76,9 +113,8 @@ def provenance(books, portadas):
     prov['covers'] = {
         'dir': 'img/portadas/',
         'registry': 'data/portadas.json',
-        'rule': 'Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 600 px de ancho como máximo. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).',
-        'files': [{'file': b['c'].removeprefix('assets/'), 'book': b['id'], 'isbn': portadas[b['id']].get('isbn'), 'source': portadas[b['id']]['fuente'],
-                   'url': portadas[b['id']]['url'], 'reviewed': portadas[b['id']].get('revisada')} for b in books if b['c']]
+        'rule': 'Portadas de los libros del inventario tomadas de bases públicas (Goodreads y Amazon), revisadas a mano una por una y convertidas a WebP de 1200 px de lado mayor como máximo, sin ampliar (2026-11-18; antes 600 de ancho), con una variante de 600 de ancho (<id>-600.webp) cuando el original es más ancho. Un libro sin portada encontrada usa la portada tipográfica (catalog.js).',
+        'files': [f for b in books if b['c'] for f in cover_files(b, portadas[b['id']])]
     }
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(prov, f, ensure_ascii=False, indent=2); f.write('\n')
@@ -132,6 +168,7 @@ def main(xlsx, hoja=None):
 
 if __name__ == '__main__':
     args = sys.argv[1:]
+    if args == ['--portadas']: refresh_covers(); sys.exit(0)
     hoja = None
     if len(args) == 3 and args[1] == '--hoja': hoja = args[2]; args = args[:1]
     if len(args) != 1: sys.exit(__doc__)

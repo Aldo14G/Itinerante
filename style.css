@@ -91,7 +91,7 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 }
 .h2 em, .layer-title em, .h2 .pal-em { font-style: normal; color: var(--tinta-2); }
 .h2 em, .layer-title em { display: block; }
-@media (min-width: 761px) { .h2, .ftr-title { font-size: clamp(28px, 1.25vw + 18px, 40px); line-height: 1.18; } }
+@media (min-width: 1024px) { .h2, .ftr-title { font: var(--t-titulo-1-amplio); letter-spacing: var(--ls-titulo-1-amplio); } } /* Title 1 amplio 36/44 desde 1024 (2026-11-18; antes clamp) */
 
 /* Titular de capa (una capa dentro de un capítulo): Title 3, el mismo nivel que la dirección de Visita y el nombre de la pieza central del
    carrusel de portadas (2026-11-15; antes de los tres carruseles; antes Title 2: 22 y 20 px juntos no se distinguen y el Catálogo sumaba siete tamaños). */
@@ -106,6 +106,7 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .sec-texto > a { z-index: 1; } /* su área táctil (::after, 52 px de alto) queda sobre el carrusel, que sube 16 px por debajo de la entradilla */
 .sec-texto a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-4)) 0; }
 .sec-texto a .ic { width: 16px; height: 16px; margin-inline-start: var(--space-1); vertical-align: -0.125em; }
+@media (hover: hover) { .sec-texto a:hover, .visit-map figcaption a:hover { color: var(--primario-presionado); text-decoration-thickness: 2px; } } /* hover del enlace (2026-11-18) */
 
 /* ---------- Botón (Boton): píldora de 48 px; 44 solo en línea y en las barras; 56 en las acciones principales ---------- */
 
@@ -149,7 +150,7 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .btn--plano:active { background: var(--fondo-3-presionado); color: var(--primario-presionado); }
 .btn--contorno:active { background: var(--fondo-3-presionado); }
 .btn--vidrio:active { background: var(--fondo-3-presionado) !important; } /* !important: los respaldos opacos del vidrio fijan su fondo; el presionado se nota también ahí */
-.btn:disabled, .btn[aria-disabled="true"] { background: var(--fondo-3); color: var(--tinta-2); box-shadow: none; cursor: not-allowed; transform: none; }
+.btn:disabled, .btn[aria-disabled="true"] { background: var(--fondo-3); color: var(--deshabilitado); box-shadow: none; cursor: not-allowed; transform: none; } /* deshabilitado: tinta al 38 % (2026-11-18) */
 
 /* Presionado (:active, 2026-11-16): un tono por familia en los tokens (primario-pulsado, menta-presionado, fondo-3-presionado), un paso más allá del
    hover y declarado después de él (mismo peso, gana el último): el toque siempre pasa al cursor. Es el color el que responde al toque y por eso
@@ -237,6 +238,8 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .hdr-nav a[aria-current="true"] { background: var(--menta); color: var(--en-menta); }
 .hdr-nav a:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .hdr-nav a:not([aria-current="true"]):hover { background: var(--fondo-3); } }
+.hdr-nav a:not([aria-current="true"]):active { background: var(--fondo-3-presionado); } /* presionado (2026-11-18) */
+.hdr-nav a[aria-current="true"]:active { background: var(--menta-presionado); }
 
 .hdr-end { display: flex; align-items: center; gap: var(--space-2); margin-inline-start: auto; }
 .hdr-list { color: var(--tinta); }
@@ -292,7 +295,8 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-hoja {
   position: absolute; top: calc(var(--hdr-h) + var(--space-2)); right: var(--space-2); bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px)); left: var(--space-2);
   display: flex; flex-direction: column;
-  padding: var(--space-4) calc(var(--margen) - var(--space-2)) var(--space-5);
+  --hoja-inset: calc(var(--margen) - var(--space-2)); /* hoja → fila */
+  padding: var(--space-4) var(--hoja-inset) var(--space-5);
   border-radius: var(--radio-lg);
   background: var(--vidrio-hoja); -webkit-backdrop-filter: var(--filtro-vidrio-hoja); backdrop-filter: var(--filtro-vidrio-hoja);
   box-shadow: var(--luz-vidrio), var(--sombra-hoja);
@@ -304,7 +308,8 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .menu-lista li + li { border-top: 1px solid var(--linea); }
 .menu-row {
   display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: var(--alto-lg);
-  margin: 0; padding: 0 var(--space-2); border: 0; border-radius: var(--radio-sm); background: none; color: var(--tinta);
+  margin: 0; padding: 0 var(--space-2); border: 0; background: none; color: var(--tinta);
+  border-radius: max(var(--space-2), calc(var(--radio-lg) - var(--hoja-inset))); /* concéntrico: radio de la hoja − inset (2026-11-18) */
   font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); text-align: left; text-decoration: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent; transition: background-color var(--dur-rapida) var(--curva-salida);
 }
@@ -333,13 +338,14 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Entrada de la hoja: aparece desde la esquina del ☰ (escala 0.98) y sus filas entran en cascada, 30 ms entre una y otra. Sin movimiento, solo se funde. */
 .menu-hoja, .menu::backdrop { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte), overlay var(--dur-base) var(--curva-salida) allow-discrete, display var(--dur-base) var(--curva-salida) allow-discrete; }
 @starting-style { .menu[open] .menu-hoja, .menu[open]::backdrop { opacity: 0; } }
-.menu.is-closing .menu-hoja, .menu.is-closing::backdrop { opacity: 0; }
+.menu.is-closing .menu-hoja, .menu.is-closing::backdrop { opacity: 0; transition-duration: var(--dur-rapida); transition-timing-function: var(--curva-aceleracion); } /* salida: 60 % de la entrada, acelerando (2026-11-18) */
 .motion .menu.is-closing .menu-hoja { transform: translateY(-12px) scale(0.98); }
 @starting-style { .motion .menu[open] .menu-hoja { transform: translateY(-12px) scale(0.98); } }
-.menu-lista li { transition: opacity var(--dur-rapida) var(--curva-salida), transform var(--dur-rapida) var(--curva-salida); transition-delay: calc(var(--i, 0) * var(--escalon-linea) / 2); } /* cada fila en dur-rapida (antes dur-base: la octava terminaba a los 636 ms; 2026-11-16): con el mismo escalón de 30 ms la última termina a los 450 */
+.menu-lista li { transition: opacity var(--dur-rapida) var(--curva-salida), transform var(--dur-rapida) var(--curva-salida); transition-delay: calc(var(--i, 0) * var(--escalon-linea) / 4); } /* escalón de 15 ms (2026-11-18; antes 30): la séptima fila termina a los 330 */
 @starting-style { .motion .menu[open] .menu-lista li { opacity: 0; transform: translateY(8px); } }
-.menu-lista li:nth-child(2) { --i: 1; } .menu-lista li:nth-child(3) { --i: 2; } .menu-lista li:nth-child(4) { --i: 3; }
-.menu-lista li:nth-child(5) { --i: 4; } .menu-lista li:nth-child(6) { --i: 5; } .menu-lista li:nth-child(7) { --i: 6; } .menu-lista li:nth-child(8) { --i: 7; }
+/* el escalón cuenta solo las filas visibles */
+.menu-lista li:nth-child(2 of :not([hidden])) { --i: 1; } .menu-lista li:nth-child(3 of :not([hidden])) { --i: 2; } .menu-lista li:nth-child(4 of :not([hidden])) { --i: 3; }
+.menu-lista li:nth-child(5 of :not([hidden])) { --i: 4; } .menu-lista li:nth-child(6 of :not([hidden])) { --i: 5; } .menu-lista li:nth-child(7 of :not([hidden])) { --i: 6; } .menu-lista li:nth-child(8 of :not([hidden])) { --i: 7; }
 
 /* La barra inferior solo existe en el teléfono (mobile.css). */
 .tabbar { display: none; }
@@ -387,7 +393,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .entry { padding-top: var(--space-8); }
   .entry-actions { display: flex; flex-wrap: wrap; width: auto; }
   .entry-media { aspect-ratio: 16 / 9; }
-  .entry-title { font-size: clamp(34px, 3.2vw + 2px, 56px); line-height: 1.08; letter-spacing: var(--ls-display); }
+  .entry-title { font: var(--t-titulo-grande); letter-spacing: var(--ls-titulo-grande); } /* tableta: Large Title (2026-11-18; antes clamp) */
 }
 @media (min-width: 1024px) {
   /* Inicio en dos columnas sobre la rejilla de 12 del contenedor de 1152 px (2026-11-14, como Uber): el texto en las columnas 1 a 5 y la foto
@@ -397,9 +403,11 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .entry { grid-template-columns: var(--rejilla); align-items: center; gap: 0 var(--canal-rejilla); padding-top: var(--space-20); }
   .entry-copy { grid-column: 1 / span 5; padding-bottom: var(--space-8); }
   .entry-media { grid-column: 7 / -1; aspect-ratio: 5 / 4; }
-  .entry-title { font: var(--t-display); font-size: clamp(44px, 2.5vw + 20px, 56px); line-height: 1.07; letter-spacing: var(--ls-display); }
+  .entry-title { font: var(--t-display-compacto); letter-spacing: var(--ls-display-compacto); } /* 44/48 hasta 1279; 56/60 desde 1280 (2026-11-18) */
   .entry-lede { font: var(--t-titulo-3); font-weight: 400; letter-spacing: 0; } /* entradilla 20/25 (Pinterest 20/28) */
 }
+
+@media (min-width: 1280px) { .entry-title { font: var(--t-display); letter-spacing: var(--ls-display); } }
 
 /* ---------- La casa ---------- */
 
@@ -460,10 +468,11 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .ev-card-img { grid-column: 2; grid-row: 1; width: var(--portada-evento); height: var(--portada-evento); border-radius: var(--radio-sm); object-fit: cover; outline: 1px solid var(--linea); outline-offset: -1px; }
 /* Rótulo de la pieza: «17:00 · Juego», «Lectura · Propuesta · sin fecha» o, en el destacado, la insignia «Próximo» y el tipo. Texto, no píldoras:
    la insignia «Próximo» es lo único con relleno. El punto medio es decoración: no se lee. */
-.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); font: var(--t-subtitulo); color: var(--tinta-2); }
-.ev-rot > * + *::before { content: "·"; content: "·" / ""; margin-inline-end: var(--space-2); }
+/* separador con nbsp a cada lado, como el «·» del texto (2026-11-18) */
+.ev-rot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) 0; font: var(--t-subtitulo); color: var(--tinta-2); }
+.ev-rot > * + *::before { content: "\00a0·\00a0"; content: "\00a0·\00a0" / ""; }
 .ev-rot > .badge + *::before { content: none; }
-.ev-rot > .badge { font: var(--t-rotulo); letter-spacing: var(--ls-rotulo); } /* «Próximo» a 13, como los demás rótulos de la sección (≤ 6 tamaños por sección) */
+.ev-rot > .badge { margin-inline-end: var(--space-2); font: var(--t-rotulo); letter-spacing: var(--ls-rotulo); } /* «Próximo» a 13, como los demás rótulos de la sección (≤ 6 tamaños por sección) */
 .ev-hora { font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; }
 .ev-tipo, .ev-estado { min-width: 0; }
 .ev-card-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
@@ -585,14 +594,15 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .visit { display: grid; gap: var(--space-8); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo-2); }
 .visit address { margin: var(--space-6) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); font-style: normal; }
 .visit address span { display: inline-block; margin-top: var(--space-2); font: var(--t-subtitulo); letter-spacing: var(--ls-cuerpo); color: var(--tinta-2); } /* una nota como las demás: sin la interletra del Title 3 que la envuelve */
-.visit-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-2) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); } /* texto → texto 8; el mismo estilo que el estado del inicio */
+.visit-status { display: flex; align-items: flex-start; gap: var(--space-2); margin: var(--space-2) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); font-variant-numeric: tabular-nums; }
+.visit-status .status-dot { margin-top: calc(0.5lh - var(--space-1) - 1px); } /* punto en el centro del primer renglón (2026-11-18) */ /* texto → texto 8; el mismo estilo que el estado del inicio */
 .visit-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .visit-side { display: grid; align-content: start; }
 /* .visit-datos (dirección, estado y «Cómo llegar») y .visit-horario (horario y su nota) son las dos celdas de la primera fila en escritorio. */
 /* Horario: lista agrupada (fondo-2, radio-md), una fila por renglón; hoy lleva la insignia «Hoy». */
 .hours { width: 100%; padding: 0 var(--space-4); border-collapse: separate; border-spacing: 0; border-radius: var(--radio-md); background: var(--fondo); font-variant-numeric: tabular-nums; }
 .hours caption { padding: 0 0 var(--space-2); text-align: left; font: var(--t-rotulo); color: var(--tinta-2); }
-.hours th, .hours td { padding: var(--space-4) 0; text-align: left; font: var(--t-cuerpo); }
+.hours th, .hours td { padding: var(--space-4) 0; text-align: left; font: var(--t-cuerpo); font-variant-numeric: tabular-nums; } /* `font` las borra: se vuelven a pedir */
 .hours th { font-weight: 400; }
 .hours td { text-align: right; white-space: nowrap; }
 .hours tr + tr :is(th, td) { border-top: 1px solid var(--linea); }
@@ -611,6 +621,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .visit-map { margin: var(--space-6) 0 0; }
 .visit-map-link { display: block; overflow: hidden; border-radius: var(--radio-lg); background: var(--mapa-tierra); color: inherit; -webkit-tap-highlight-color: transparent; }
 .visit-map-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .visit-map-link:hover { outline: 2px solid var(--linea-fuerte); outline-offset: -2px; } } /* hover del mapa (2026-11-18) */
 .mapa { display: block; width: 100%; height: 240px; }
 @media (min-width: 761px) { .mapa { height: 260px; } }
 .mapa-tierra { fill: var(--mapa-tierra); }
@@ -693,7 +704,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .interruptor[aria-checked="true"] .interruptor-pista { background: var(--primario); box-shadow: none; }
 .interruptor[aria-checked="true"] .interruptor-pulgar { transform: translateX(calc(var(--interruptor-ancho) - var(--interruptor-alto))); }
 .interruptor[aria-disabled="true"] { cursor: default; }
-.interruptor[aria-disabled="true"] .interruptor-pista { opacity: 0.5; }
+.interruptor[aria-disabled="true"] .interruptor-rotulo { color: var(--deshabilitado); }
+.interruptor[aria-disabled="true"] .interruptor-pista, .interruptor[aria-checked="true"][aria-disabled="true"] .interruptor-pista { background: var(--deshabilitado); box-shadow: none; } /* inactivo, encendido o no */
 @media (hover: hover) {
   .interruptor:not([aria-disabled="true"]):hover .interruptor-pista { background: color-mix(in oklab, var(--fondo-3), var(--tinta) 6%); }
   .interruptor[aria-checked="true"]:not([aria-disabled="true"]):hover .interruptor-pista { background: var(--primario-presionado); }
@@ -897,7 +909,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
    hoja, data-fuente="hoja") no se parte ni se corta: si no cabe, baja entero al renglón siguiente. */
 .card-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2lh; margin-top: var(--space-2); overflow: hidden; font: var(--t-subtitulo); font-weight: 600; color: var(--tinta); overflow-wrap: anywhere; }
 .card-m { display: block; min-height: 2lh; margin-top: var(--space-1); font: var(--t-nota-pie); color: var(--tinta-2); font-variant-numeric: tabular-nums; } /* dos renglones reservados, como el título: las tarjetas de una fila miden igual y el esqueleto reserva lo mismo */
-.card-pr { white-space: nowrap; font-weight: 600; color: var(--tinta); }
+.card-au { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; contain: inline-size; } /* el autor en su renglón (2026-11-18); contain: no ensancha la columna */
+.card-pr { display: block; white-space: nowrap; font-weight: 600; color: var(--tinta); } /* y el precio en el siguiente, siempre: sin «·» colgado */
 .card--sk :is(.card-t, .card-m) { visibility: hidden; }
 /* Portada real: 2:3 de siempre; si la foto es más alta se recorta abajo. Título y autor van como texto oculto (nombre accesible del botón). */
 .cover--img { background: var(--fondo-3); }
@@ -964,17 +977,18 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .drawer::backdrop, .mylist::backdrop { background: var(--velo); }
 .drawer-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; grid-template-columns: 200px minmax(0, 1fr); align-content: start; gap: var(--space-4) var(--space-6); padding: var(--space-8) var(--space-8) var(--space-6); }
 .drawer-body > * { grid-column: 1 / -1; }
-.drawer-grabber { display: none; }
+.sheet-grab { display: none; } /* asa: solo en el teléfono */
 .drawer-close { position: absolute; top: var(--space-3); right: var(--space-3); z-index: 2; }
 .drawer-cover { grid-column: 1; }
 .drawer-cover .cover { box-shadow: var(--sombra-portada); }
 .drawer-head { grid-column: 2; display: grid; justify-items: start; align-content: end; gap: var(--space-2); min-width: 0; padding-right: var(--space-12); container-type: inline-size; }
-.drawer h3 { margin: 0; font: var(--t-titulo-2); font-size: clamp(28px, 1.2vw + 18px, 34px); line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; overflow-wrap: break-word; }
+.drawer h3 { margin: 0; font: var(--t-titulo-1); letter-spacing: var(--ls-titulo-1); text-wrap: balance; overflow-wrap: break-word; } /* 28/34 en la tableta; 34/41 desde 1024 (2026-11-18; antes clamp) */
+@media (min-width: 1024px) { .drawer h3 { font: var(--t-titulo-grande); letter-spacing: var(--ls-titulo-grande); } }
 .drawer h3.is-long { font-size: clamp(20px, 12.5cqi, 28px); }
 .drawer-sub { display: block; margin-top: var(--space-1); font: var(--t-titular); letter-spacing: 0; color: var(--tinta-2); }
 .drawer-author { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); }
 /* Ficha técnica: filas con filete (no hay vidrio sobre vidrio); el precio sale de la hoja de la librería. */
-.drawer-facts { display: grid; grid-template-columns: auto 1fr; gap: 0; margin: var(--space-2) 0 0; }
+.drawer-facts { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 0; margin: var(--space-2) 0 0; } /* dt y dd en la misma línea base (2026-11-18) */
 .drawer-facts dt, .drawer-facts dd { margin: 0; padding: var(--space-3) 0; border-bottom: 1px solid var(--linea); }
 .drawer-facts dt:nth-last-of-type(1), .drawer-facts dd:nth-last-of-type(1) { border-bottom: 0; }
 .drawer-facts dd { padding-left: var(--space-6); }
@@ -1038,7 +1052,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .drawer, .mylist { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-resorte); }
 .drawer::backdrop, .mylist::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) var(--curva-salida) allow-discrete, display var(--dur-base) var(--curva-salida) allow-discrete; }
 @starting-style { .drawer[open], .mylist[open], .drawer[open]::backdrop, .mylist[open]::backdrop { opacity: 0; } }
-.drawer.is-closing, .mylist.is-closing, .drawer.is-closing::backdrop, .mylist.is-closing::backdrop { opacity: 0; transition-duration: var(--dur-rapida); transition-timing-function: var(--curva-entrada-salida); }
+.drawer.is-closing, .mylist.is-closing, .drawer.is-closing::backdrop, .mylist.is-closing::backdrop { opacity: 0; transition-duration: var(--dur-rapida); transition-timing-function: var(--curva-aceleracion); } /* salida: 60 % de la entrada, acelerando (2026-11-18) */
 @starting-style { .motion .drawer[open], .motion .mylist[open] { transform: translateY(4%) scale(0.96); } }
 .motion .drawer.is-closing, .motion .mylist.is-closing { transform: translateY(4%) scale(0.96); }
 
@@ -1312,7 +1326,7 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
 .news { --nov-w: 120px; padding: calc(var(--sec) / 2) 0; background: var(--fondo); }
 .news-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--margen); }
 .news-toggle { flex: none; margin-inline-end: calc(-1 * var(--space-3)); }
-.news-toggle:disabled { background: transparent; color: var(--tinta-2); }
+.news-toggle:disabled { background: transparent; color: var(--deshabilitado); }
 .news-status { min-height: 1lh; margin: var(--space-2) var(--margen) 0; font: var(--t-subtitulo); color: var(--tinta-2); }
 /* Tira: portadas de 120 px (152 desde 768) con 12 px entre ellas e imán al borde; se asoma la siguiente (2.6 a 390 px, 2.2 a 320). */
 .news-list {

@@ -46,10 +46,13 @@ export function conector() {
   return s;
 }
 
+// Ancho de la pieza del carrusel (58 % de la ventana en el teléfono, 280 en escritorio): con él el navegador pide la portada grande a 3×
+// (228 × 3 = 684 px) y la de 600 a 2× en escritorio (280 × 2 = 560): la pieza central queda a ≥ 1.0× sin bajar 1200 px de más (2026-11-18).
+export const RAIL_SIZES = '(max-width: 760px) 58vw, 280px';
 // `tone` lo da la lista (coverTones: sin vecinas del mismo tono); sin él, el tono propio del libro.
 export function bookCard(b, tone = coverTone(b)) {
   let cover;
-  if (b.c) cover = imageCover(b, tone); // portada real; título y autor siguen dentro, ocultos a la vista
+  if (b.c) cover = imageCover(b, tone, { sizes: RAIL_SIZES }); // portada real; título y autor siguen dentro, ocultos a la vista
   else {
     cover = make('span', `cover cover--blank tone-${tone}`);
     cover.dataset.coverTone = tone;
@@ -107,6 +110,14 @@ export function trailState(cols, seen) {
   return { count: done.filter(Boolean).length, total: cols.length, done, links: done.slice(1).map((d, i) => d && done[i]) };
 }
 export const trailLine = (n, total) => `${n} de ${total} paradas hojeadas`;
+
+// Libro por el que empieza el carrusel (2026-11-18, aprobado por Aldo): el más cercano al medio que tenga portada real, para que la pieza
+// protagonista nunca sea una portada tipográfica; a igual distancia, el de la izquierda. Sin ninguna portada real, el del medio, como antes.
+export function startIndex(list) {
+  const mid = Math.floor(list.length / 2);
+  for (let d = 0; d <= mid + 1; d++) for (const i of [mid - d, mid + d]) if (list[i]?.c) return i;
+  return mid;
+}
 
 // Pie del carrusel: título (sin subtítulo) y «autor · precio» del libro del centro. El precio es el de la hoja de la librería.
 export function captionOf(b, price = null) {
@@ -249,7 +260,7 @@ export async function initRail({ ensureCatalog, isMotion = () => false } = {}) {
     track.removeAttribute('aria-busy');
     region.setAttribute('aria-label', `Libros de la colección ${col.titulo}`);
     noteEl.textContent = col.nota || ''; // la nota de la colección
-    c3d.setItems(items);
+    c3d.setItems(items, startIndex(list)); // empieza por la portada real más cercana al medio
     measureCaptions(pie, list);
     if (announce) live.textContent = `${col.titulo}: ${list.length} libros.`; // la región viva del carrusel: la colección elegida
   }

@@ -190,7 +190,7 @@ const badge = () => make('span', 'badge-new', 'Nuevo');
 // Un libro de la tira: un solo botón (portada, título y autor) que abre su ficha. «Nuevo» va dentro: entra en su nombre accesible.
 function newsItem(b, tone, nuevo, i, cat) {
   let cover;
-  if (b.c) cover = cat.imageCover(b, tone, { named: false, eager: i < 6 }); // el título y el autor ya van debajo, a la vista
+  if (b.c) cover = cat.imageCover(b, tone, { named: false, eager: i < 6, sizes: cat.CARD_SIZES }); // el título y el autor ya van debajo, a la vista
   else {
     cover = make('span', `cover cover--blank tone-${tone}`);
     cover.dataset.coverTone = tone;

@@ -41,7 +41,7 @@
         { "ruta": "index.html", "selectores": [".btn", ".btn--primario", ".btn--secundario", ".btn--plano", ".btn--vidrio", ".btn--icono", ".btn--sm", ".btn--lg"] },
         { "ruta": "motion.js", "exporta": ["pickPop", "afterPaint", "confirmThen"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "alto-lg", "linea-fuerte", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte", "primario-pulsado", "menta-presionado", "fondo-3-presionado"],
+      "tokens": ["alto-sm", "alto-md", "alto-lg", "linea-fuerte", "radio-pildora", "t-boton", "ls-boton", "t-boton-chico", "ls-boton-chico", "space-2", "space-4", "space-5", "space-6", "primario", "en-primario", "primario-presionado", "menta", "en-menta", "turquesa-texto", "fondo-3", "tinta", "tinta-2", "vidrio", "vidrio-hoja", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "anillo-foco", "dur-instantanea", "dur-rapida", "curva-salida", "curva-resorte", "primario-pulsado", "menta-presionado", "fondo-3-presionado", "deshabilitado"],
       "estados": {
         "hover": { "css": [".btn--primario:hover", ".btn--secundario:hover", ".btn--vidrio:hover", ".btn--plano:hover", ".btn--contorno:hover"] },
         "foco": { "css": [".btn:focus-visible", ".btn--vidrio:focus-visible"] },
@@ -147,11 +147,12 @@
         { "ruta": "index.html", "selectores": [".hdr", "[data-hdr]", ".hdr-brand", ".hdr-nav", ".hdr-cta", ".hdr-list", "[data-open-mylist]"] },
         { "ruta": "app.js", "internas": ["spy", "updateStatus"], "ganchos": ["navLinks.forEach(a =>"] }
       ],
-      "tokens": ["alto-barra-nav", "alto-sm", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "fondo-3", "tinta", "radio-pildora", "radio-sm", "t-titular", "t-boton-chico", "anillo-foco", "dur-rapida", "curva-salida", "space-16"],
+      "tokens": ["alto-barra-nav", "alto-sm", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "fondo-3", "tinta", "radio-pildora", "radio-sm", "t-titular", "t-boton-chico", "anillo-foco", "dur-rapida", "curva-salida", "space-16", "fondo-3-presionado", "menta-presionado"],
       "estados": {
         "hover": { "css": [".hdr-nav a:not([aria-current=\"true\"]):hover"] },
         "foco": { "css": [".hdr-brand:focus-visible", ".hdr-nav a:focus-visible"] },
-        "actual": { "css": [".hdr-nav a[aria-current=\"true\"]"], "js": [{ "ruta": "app.js", "texto": "a.setAttribute('aria-current', 'true')" }] }
+        "actual": { "css": [".hdr-nav a[aria-current=\"true\"]"], "js": [{ "ruta": "app.js", "texto": "a.setAttribute('aria-current', 'true')" }] },
+        "presionado": { "css": [".hdr-nav a:not([aria-current=\"true\"]):active", ".hdr-nav a[aria-current=\"true\"]:active"] }
       },
       "no_aplica": { "deshabilitado": "Nada se deshabilita en la barra." },
       "aria": { "patron": "Landmark navigation + aria-current", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/navigation.html", "atributos": ["aria-label=Secciones", "aria-current"], "teclado": "Tab entre enlaces; Enter sigue el enlace." },
@@ -170,7 +171,7 @@
         { "ruta": "sheets.js", "exporta": ["openDialog", "closeDialog", "pushSheet", "navigateFromSheet"] },
         { "ruta": "app.js", "ganchos": ["opener.setAttribute('aria-expanded', 'true')"] }
       ],
-      "tokens": ["alto-sm", "alto-lg", "vidrio", "vidrio-hoja", "filtro-vidrio", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-flotante", "velo", "menta", "en-menta", "fondo-3", "tinta", "tinta-2", "linea", "foco", "anillo-foco", "radio-lg", "radio-sm", "t-titulo-2", "dur-instantanea", "dur-rapida", "dur-base", "escalon-linea", "curva-salida", "curva-resorte", "fondo-3-presionado", "menta-presionado"],
+      "tokens": ["alto-sm", "alto-lg", "vidrio", "vidrio-hoja", "filtro-vidrio", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-flotante", "velo", "menta", "en-menta", "fondo-3", "tinta", "tinta-2", "linea", "foco", "anillo-foco", "radio-lg", "radio-sm", "t-titulo-2", "dur-instantanea", "dur-rapida", "dur-base", "escalon-linea", "curva-salida", "curva-resorte", "fondo-3-presionado", "menta-presionado", "curva-aceleracion"],
       "estados": {
         "hover": { "css": [".menu-btn:hover", ".menu-row:not([aria-current=\"true\"]):hover"] },
         "foco": { "css": [".menu-btn:focus-visible", ".menu-row:focus-visible", ".menu-close:focus-visible"] },
@@ -484,7 +485,7 @@
         { "nombre": "portada-tipografica", "selector": ".cover--blank", "uso": "Sin imagen o si falla: campo de color con título y autor." }
       ],
       "archivos": [
-        { "ruta": "style.css", "selectores": [".card", ".cover", ".cover--img", ".cover--blank", ".card-item", ".card-t", ".card-m", ".card-pr", ".cover-title", ".cover-author"] },
+        { "ruta": "style.css", "selectores": [".card", ".cover", ".cover--img", ".cover--blank", ".card-item", ".card-t", ".card-au", ".card-m", ".card-pr", ".cover-title", ".cover-author"] },
         { "ruta": "catalog.js", "exporta": ["imageCover", "coverFallback", "coverTone", "priceLabel", "splitTitle", "titleSize", "COVER_LAYOUTS"], "internas": ["card", "cover", "blankCover"] },
         { "ruta": "rail.js", "exporta": ["bookCard", "wireBookOpen"] },
         { "ruta": "carousel3d.js", "exporta": ["initDepth", "tiltPose", "tiltTransform"] }
@@ -514,7 +515,7 @@
         { "ruta": "catalog.js", "exporta": ["shareBook", "bookShareData", "bookMessage", "bookWaUrl", "relatedBooks"], "internas": ["openBook"] },
         { "ruta": "sheets.js", "exporta": ["openDialog", "closeDialog"] }
       ],
-      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-portada", "velo", "radio-lg", "tinta", "tinta-2", "linea", "alto-lg", "t-titulo-2", "t-cuerpo", "t-subtitulo", "t-nota-pie", "dur-base", "dur-rapida", "curva-salida", "curva-resorte", "curva-entrada-salida"],
+      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "sombra-portada", "velo", "radio-lg", "tinta", "tinta-2", "linea", "alto-lg", "t-titulo-2", "t-cuerpo", "t-subtitulo", "t-nota-pie", "dur-base", "dur-rapida", "curva-salida", "curva-resorte", "curva-entrada-salida", "curva-aceleracion"],
       "estados": {
         "foco": { "css": [".btn:focus-visible", ".btn--vidrio:focus-visible"] },
         "presionado": { "css": [".rel:active .cover"] },
@@ -538,7 +539,7 @@
         { "ruta": "index.html", "selectores": ["#mylist", "[data-ml-close]", "[data-ml-items]", "[data-ml-empty]", "[data-ml-error]", "[data-ml-retry]", "[data-ml-status]", "[data-ml-wa]", "[data-saved-dot]"] },
         { "ruta": "saved.js", "exporta": ["initSaved", "listMessage", "listWaUrl", "clearSaved", "savedIds", "MAX_SAVED"] }
       ],
-      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "velo", "radio-lg", "fondo-3", "tinta", "tinta-2", "linea", "primario", "en-primario", "alto-md", "alto-lg", "anillo-foco", "t-titulo-2", "t-titular", "t-subtitulo", "t-nota-pie"],
+      "tokens": ["vidrio-hoja", "filtro-vidrio-hoja", "luz-vidrio", "sombra-hoja", "velo", "radio-lg", "fondo-3", "tinta", "tinta-2", "linea", "primario", "en-primario", "alto-md", "alto-lg", "anillo-foco", "t-titulo-2", "t-titular", "t-subtitulo", "t-nota-pie", "curva-aceleracion"],
       "estados": {
         "foco": { "css": [".ml-remove:focus-visible"] },
         "vacio": { "css": [".ml-empty"], "html": ["[data-ml-empty]"] },
@@ -550,6 +551,28 @@
       "qa": ["tools/qa/saved.mjs", "tools/qa/axe.mjs", "tools/qa/inp.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-13",
       "decision": "DESIGN.md, «Componentes» (Hojas) y AGENTS.md (saved.js)."
+    },
+    {
+      "id": "asa-hoja",
+      "nombre": "AsaHoja",
+      "tipo": "bloque",
+      "descripcion": "Deslizar para cerrar las hojas inferiores del teléfono (ficha, Mi lista y Explorar; 2026-11-18, Apple, Sheets): la píldora de 36 × 5 a 8 px del borde (en Explorar, a 4 bajo el área segura) dentro de una franja táctil de 64 × 24. El gesto empieza en el asa, en la cabecera de la hoja (Mi lista, la barra de Explorar) o, con el contenido arriba, en sus primeros 72 px; un enlace o un botón no lo empiezan. Con movimiento la hoja sigue al dedo; al soltar pasados 120 px o a más de 0.7 px/ms sale por closeDialog desde donde quedó y, si no, vuelve a su sitio en dur-rapida. Con «reducir movimiento» o la pausa no sigue al dedo, pero el gesto cierra igual. Para el lector de pantalla es decorativa: el × y Escape siguen cerrando.",
+      "archivos": [
+        { "ruta": "mobile.css", "selectores": [".sheet-grab", ".sheet-grab::before", ".explorer:modal .sheet-grab", ".ml-head"] },
+        { "ruta": "style.css", "selectores": [".sheet-grab"] },
+        { "ruta": "index.html", "selectores": ["[data-sheet-grab]"] },
+        { "ruta": "sheets.js", "exporta": ["swipeToClose", "SWIPE_CLOSE"] }
+      ],
+      "tokens": ["linea-fuerte", "radio-pildora", "space-2", "space-6", "dur-rapida", "curva-salida", "curva-aceleracion"],
+      "estados": {
+        "presionado": { "js": [{ "ruta": "sheets.js", "texto": "if (follow) dlg.style.translate = `0 ${dy}px`;" }] },
+        "movimiento_reducido": { "js": [{ "ruta": "sheets.js", "texto": "follow = isMotion();" }] }
+      },
+      "no_aplica": { "hover": "Solo existe en el teléfono (hoja inferior) y no es un control de puntero.", "foco": "No recibe el foco: es un atajo táctil; el × de la hoja y Escape cierran con teclado.", "deshabilitado": "Nunca se deshabilita." },
+      "aria": { "patron": "Decorativo (aria-hidden) dentro de un diálogo modal con su botón de cerrar", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "atributos": ["aria-hidden=true"], "teclado": "Sin teclado propio: Escape y el × cierran la hoja (WCAG 2.5.7: el arrastre tiene alternativa de un toque)." },
+      "qa": ["tools/qa/hojas.mjs", "tools/qa/e2e.mjs"],
+      "desde": "2026-11-18",
+      "decision": "DESIGN.md, «Plan premium (2026-11-18)»: deslizar para cerrar en las tres hojas inferiores."
     },
     {
       "id": "campo-busqueda",
@@ -584,7 +607,7 @@
         { "ruta": "index.html", "selectores": ["#catalogo", "#explorer", "[data-ex-open]", "[data-ex-close]", "[data-cat-form]", "[data-cat-filters]", "[data-cat-status]", "[data-cat-chips]", "[data-cat-grid]", "[data-cat-fold]", "[data-cat-empty]", "[data-cat-reset]"] },
         { "ruta": "catalog.js", "exporta": ["initCatalog", "filterBooks", "sortBooks", "facetCounts", "foldView", "facetView", "FOLD_ROWS", "FACET_FOLD_AT", "FACET_LIMIT", "PAGE_SIZE", "GENRE_ES", "genreLabel"], "internas": ["renderFilters", "renderChips", "renderGrid", "applyFold", "staggerIn", "clearAll"], "ganchos": ["data-clear", "cat-clear-all"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida", "fondo-3-presionado"],
+      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida", "fondo-3-presionado", "curva-aceleracion"],
       "estados": {
         "hover": { "css": [".explore-open:hover", ".cat-opt label:hover"] },
         "foco": { "css": [".cat-opt input:focus-visible + label", ".cat-clear-all:focus-visible", ":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
@@ -695,7 +718,7 @@
         { "ruta": "app.js", "internas": ["syncToggle", "applyMode"], "ganchos": ["iti-b4-motion"] },
         { "ruta": "assets/js/boot.js", "ganchos": ["r.classList.add('motion')"] }
       ],
-      "tokens": ["interruptor-ancho", "interruptor-alto", "interruptor-pulgar", "alto-sm", "fondo-3", "linea-fuerte", "primario", "primario-presionado", "superficie", "sombra-pulgar", "tinta", "tinta-2", "anillo-foco", "radio-pildora", "t-subtitulo", "t-nota-pie", "dur-rapida", "curva-salida", "curva-resorte", "primario-pulsado", "fondo-3-presionado"],
+      "tokens": ["interruptor-ancho", "interruptor-alto", "interruptor-pulgar", "alto-sm", "fondo-3", "linea-fuerte", "primario", "primario-presionado", "superficie", "sombra-pulgar", "tinta", "tinta-2", "anillo-foco", "radio-pildora", "t-subtitulo", "t-nota-pie", "dur-rapida", "curva-salida", "curva-resorte", "primario-pulsado", "fondo-3-presionado", "deshabilitado"],
       "estados": {
         "hover": { "css": [".interruptor:not([aria-disabled=\"true\"]):hover .interruptor-pista", ".interruptor[aria-checked=\"true\"]:not([aria-disabled=\"true\"]):hover .interruptor-pista"] },
         "foco": { "css": [".interruptor:focus-visible"] },
@@ -789,7 +812,7 @@
         { "ruta": "news.js", "exporta": ["initNews", "initNewsCount", "newsPlan", "newsEntries", "isNew", "validDay", "statusLine", "hintLine", "wireToggle", "NEWS_SIZE", "NEW_DAYS"] },
         { "ruta": "assets/js/boot.js", "ganchos": ["iti-news-estado", "has-news", "news-hint"] }
       ],
-      "tokens": ["fondo", "fondo-2", "fondo-3", "primario", "en-primario", "tinta", "tinta-2", "radio-portada", "sombra-portada", "anillo-foco", "t-subtitulo", "t-nota-pie", "space-2", "space-3", "space-5", "dur-instantanea", "dur-base", "curva-resorte"],
+      "tokens": ["fondo", "fondo-2", "fondo-3", "primario", "en-primario", "tinta", "tinta-2", "radio-portada", "sombra-portada", "anillo-foco", "t-subtitulo", "t-nota-pie", "space-2", "space-3", "space-5", "dur-instantanea", "dur-base", "curva-resorte", "deshabilitado"],
       "estados": {
         "hover": { "css": [".news-book:hover .cover"] },
         "foco": { "css": [".news-book:focus-visible .cover"] },

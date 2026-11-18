@@ -2,7 +2,7 @@
 import { DUR, EASE, ms, confirmThen, whenIdle } from './motion.js';
 import { loadSample } from './sample.js';
 import { saveButton, bindSaveButton, initSaved, notify } from './saved.js';
-import { openDialog, closeDialog } from './sheets.js';
+import { openDialog, closeDialog, swipeToClose } from './sheets.js';
 
 export { loadSample };
 // La parte pura (sin DOM) se prueba con check.mjs; initCatalog() solo corre en el navegador.
@@ -53,13 +53,22 @@ export function coverTones(books) {
 // Portada real (assets/img/portadas, ver data/portadas.json): la imagen no lleva texto alternativo porque el título y el autor van como
 // texto dentro de la portada (ocultos a la vista); así siguen siendo el nombre accesible del botón y la búsqueda del navegador los encuentra.
 // Sin portada real o si la imagen falla, la tarjeta tipográfica de siempre (`coverFallback`).
-export function imageCover(b, tone, { named = true, eager = false } = {}) {
+// Portadas en alta (2026-11-18, aprobado por Aldo): el archivo llega hasta 1200 px de lado mayor y, si mide más de 600 de ancho, trae
+// <id>-600.webp. La ficha pide la grande (src); el carrusel (RAIL_SIZES, rail.js), la rejilla, los relacionados de la ficha y Novedades
+// pasan `sizes` y el navegador elige por srcset: una tarjeta de ~170–200 px se queda con la de 600 y la pieza central del carrusel del teléfono
+// (228 × 3) con la grande.
+export const COVER_VARIANT = 600;
+export const CARD_SIZES = '(max-width: 519px) calc(50vw - 28px), (max-width: 760px) 30vw, 200px';
+export const coverVariant = b => (b?.c && b.cw > COVER_VARIANT ? b.c.replace(/\.webp$/, `-${COVER_VARIANT}.webp`) : null);
+export function imageCover(b, tone, { named = true, eager = false, sizes = null } = {}) {
   const span = (cls, text) => { const s = document.createElement('span'); s.className = cls; if (text != null) s.textContent = text; return s; };
   const holder = span(`cover cover--img tone-${tone}`);
   holder.dataset.coverTone = tone;
   const img = document.createElement('img');
   img.src = b.c; img.alt = ''; img.decoding = 'async'; img.loading = eager ? 'eager' : 'lazy';
   if (b.cw && b.ch) { img.width = b.cw; img.height = b.ch; }
+  const small = sizes && coverVariant(b);
+  if (small) { img.srcset = `${small} ${COVER_VARIANT}w, ${b.c} ${b.cw}w`; img.sizes = sizes; }
   const t = span('cover-title sr-only', b.t), a = span('cover-author sr-only', b.a);
   if (!named) { t.setAttribute('aria-hidden', 'true'); a.setAttribute('aria-hidden', 'true'); }
   holder.append(img, t, a);
@@ -360,8 +369,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   // Una sola familia de portadas: tarjeta tipográfica propia (sin imágenes de terceros ni SVG heterogéneos).
   // Título y autor van una sola vez, dentro de la portada: en la tarjeta de la rejilla son el nombre accesible del botón;
   // en la ficha y en «Relacionados» ya hay un encabezado aparte y la portada los oculta a los lectores de pantalla.
-  function cover(b, tone = coverTone(b), layout = true, named = false) {
-    return b.c ? imageCover(b, tone, { named }) : blankCover(b, tone, layout, named);
+  function cover(b, tone = coverTone(b), layout = true, named = false, sizes = null) {
+    return b.c ? imageCover(b, tone, { named, sizes }) : blankCover(b, tone, layout, named);
   }
   function blankCover(b, tone, layout, named) {
     const attrs = { class: `cover cover--blank tone-${tone}`, 'data-cover-tone': tone };
@@ -375,8 +384,10 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   // se lee: título, autor y precio. La tarjeta que voltea (su reverso y el giro) se retiró el 2026-11-13.
   function card(b) {
     const price = priceLabel(b.pr);
-    const meta = el('span', { class: 'card-m' }, b.a, price ? [b.a ? '\u00a0· ' : '', el('span', { class: 'card-pr', 'data-fuente': 'hoja' }, price)] : null);
-    const btn = el('button', { type: 'button', class: 'card', 'data-id': b.id, 'aria-haspopup': 'dialog' }, cover(b, tones.get(b.id), true, false), el('span', { class: 'card-t' }, b.t), meta);
+    // Autor y precio en dos renglones (2026-11-18, aprobado por Aldo): el autor en el primero (con elipsis si no cabe; el nombre entero sigue en
+    // el nombre accesible del botón) y el precio en el segundo, sin «·» colgado al final del primero (antes 30 de 40 tarjetas del teléfono).
+    const meta = el('span', { class: 'card-m' }, b.a ? el('span', { class: 'card-au' }, b.a) : null, price ? el('span', { class: 'card-pr', 'data-fuente': 'hoja' }, price) : null);
+    const btn = el('button', { type: 'button', class: 'card', 'data-id': b.id, 'aria-haspopup': 'dialog' }, cover(b, tones.get(b.id), true, false, CARD_SIZES), el('span', { class: 'card-t' }, b.t), meta);
     return el('li', { class: 'card-item', 'data-inclina': '' }, btn, saveButton(b));
   }
 
@@ -602,7 +613,7 @@ export async function initCatalog({ isMotion = () => false } = {}) {
       if (!drawer.open || drawer.dataset.book !== id) return;
       const rel = relatedBooks(books, b);
       const relTones = coverTones(rel);
-      $('[data-d-related]', drawer).replaceChildren(...rel.map((r, i) => el('li', {}, el('button', { type: 'button', class: 'rel', 'data-id': r.id }, cover(r, relTones[i], false), el('span', {}, r.t)))));
+      $('[data-d-related]', drawer).replaceChildren(...rel.map((r, i) => el('li', {}, el('button', { type: 'button', class: 'rel', 'data-id': r.id }, cover(r, relTones[i], false, false, CARD_SIZES), el('span', {}, r.t)))));
       relWrap.hidden = !rel.length;
     });
     drawer.dataset.book = id;
@@ -629,35 +640,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   $('[data-d-share]', drawer).addEventListener('click', () => { const b = byId.get(drawer.dataset.book); if (b) shareBook(b); });
   $('[data-d-close]', drawer).addEventListener('click', () => closeDialog(drawer)); // sale primero; el cierre real corre después del fotograma
   drawer.addEventListener('click', e => { if (e.target === drawer) closeDialog(drawer); });
-  // Hoja inferior (móvil): se arrastra desde el asa o la parte alta y se cierra al soltar pasado un umbral.
-  (function sheetDrag() {
-    const grab = $('[data-d-grab]', drawer);
-    const scroller = $('[data-d-scroll]', drawer);
-    let startY = 0, dy = 0, t0 = 0, active = false;
-    const sheetMode = () => matchMedia('(max-width: 760px)').matches;
-    drawer.addEventListener('pointerdown', e => {
-      if (!sheetMode() || e.target.closest('a, button:not([data-d-grab])') || (scroller.scrollTop > 0 && e.target !== grab)) return;
-      if (e.target !== grab && e.clientY - drawer.getBoundingClientRect().top > 72) return;
-      active = true; startY = e.clientY; dy = 0; t0 = performance.now();
-      drawer.setPointerCapture(e.pointerId);
-      drawer.style.transition = 'none';
-    });
-    drawer.addEventListener('pointermove', e => {
-      if (!active) return;
-      dy = Math.max(0, e.clientY - startY);
-      drawer.style.translate = `0 ${dy}px`;
-    });
-    const end = () => {
-      if (!active) return;
-      active = false;
-      const speed = dy / Math.max(1, performance.now() - t0);
-      drawer.style.transition = '';
-      drawer.style.translate = '';
-      if (dy > 120 || speed > 0.7) drawer.close();
-    };
-    drawer.addEventListener('pointerup', end);
-    drawer.addEventListener('pointercancel', end);
-  })();
+  // Hoja inferior (móvil): se desliza hacia abajo desde el asa o la parte alta para cerrarla (swipeToClose, la misma lógica que Mi lista y Explorar).
+  swipeToClose(drawer, { grab: $('[data-sheet-grab]', drawer), scroller: $('[data-d-scroll]', drawer), zone: 72 });
   drawer.addEventListener('close', () => {
     const id = drawer.dataset.trigger && CSS.escape(drawer.dataset.trigger);
     const t = id && grid.querySelector(`.card[data-id="${id}"]`); // el foco vuelve a la tarjeta que abrió la ficha

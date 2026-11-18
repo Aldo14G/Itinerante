@@ -363,7 +363,7 @@ if (quiere('M1')) await intenta('M1', async () => {
   await tap(page, 'iphone', '[data-menu-open]');
   const m = await p;
   const ultimo = Math.max(...m.fin);
-  ok("M1", m.n >= 7 && ultimo > 0 && ultimo <= 480, `la última fila del menú (${m.n} filas) termina de entrar a los ${Math.round(ultimo)} ms (tope 480)`);
+  ok("M1", m.n >= 7 && ultimo > 0 && ultimo <= 350, `la última fila del menú (${m.n} filas) termina de entrar a los ${Math.round(ultimo)} ms (tope 350: 240 + 6 × 15 = 330 con siete filas; 2026-11-18, antes 480)`);
   await browser.close();
 });
 

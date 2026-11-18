@@ -119,7 +119,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['móvil 375', 3
         ready: r.classList.contains('is-ready'), hidden: r.hidden, n: items.length,
         chips: [...r.querySelectorAll('.rail-chip')].map(c => c.textContent.trim()),
         checked: r.querySelectorAll('.rail-chip[aria-checked=true]').length,
-        vw: v.clientWidth, sw: v.scrollWidth, centerW: Math.round(c.offsetWidth), ci, mid: Math.floor(items.length / 2),
+        vw: v.clientWidth, sw: v.scrollWidth, centerW: Math.round(c.offsetWidth), ci, mid: (() => { const m = Math.floor(items.length / 2); for (let d = 0; d <= m + 1; d++) for (const i of [m - d, m + d]) if (items[i]?.querySelector('.cover--img')) return i; return m; })(), centroReal: !!c.querySelector('.cover--img'),
         centered: Math.abs(cb.left + cb.width / 2 - (vb.left + vb.width / 2)) <= 2, front: /rotateY\\(-?0(\\.0+)?deg\\)/.test(pose(c)),
         turned: [items[ci - 1], items[ci + 1]].every(n => n && /rotateY\\(-?[1-9]/.test(pose(n))), both: !!items[ci - 1] && !!items[ci + 1],
         snap: getComputedStyle(v).scrollSnapType, role: reg.getAttribute('aria-roledescription') + '/' + reg.getAttribute('role'), tab: v.tabIndex, progreso: r.querySelector('[data-rail-progreso]').textContent, cardTabs: items.filter(i => i.querySelector('.card').tabIndex === 0).map(i => items.indexOf(i)),
@@ -137,7 +137,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['móvil 375', 3
     ck(name + ': portadas reales en el carrusel: ninguna rota, sin alt (el título y el autor nombran el botón) y todas del mismo tamaño', pics.imgs >= 8 && !pics.broken.length && JSON.stringify(pics.alt) === '[""]' && pics.sizes.length === 1 && pics.named, JSON.stringify(pics));
     ck(name + ': imán, rol de carrusel y una sola parada de tabulador: la portada del centro', /x mandatory/.test(st.snap) && st.role === 'carrusel/region' && st.tab === -1 && JSON.stringify(st.cardTabs) === JSON.stringify([st.ci]), JSON.stringify(st));
     const reduced = await ev(`!document.documentElement.classList.contains('motion')`);
-    ck(name + ': empieza por el libro del medio, centrado y de frente, con vecinas a los dos lados' + (reduced ? ' (sin movimiento: planas)' : ' giradas hacia el centro'), st.ci === st.mid && st.centered && st.front && st.both && (reduced ? !st.turned : st.turned) && st.sw > st.vw, JSON.stringify(st));
+    ck(name + ': empieza por la portada real más cercana al medio (2026-11-18), centrado y de frente, con vecinas a los dos lados' + (reduced ? ' (sin movimiento: planas)' : ' giradas hacia el centro'), st.ci === st.mid && st.centroReal && st.centered && st.front && st.both && (reduced ? !st.turned : st.turned) && st.sw > st.vw, JSON.stringify(st));
     ck(name + ': bajo el carrusel, el título y «autor · precio» del libro del centro; sin puntos, recorrido ni «Ver todo el catálogo»', st.caption.length > 2 && /\s· \$\d+ MXN$/.test(st.meta) && st.dots === 0, JSON.stringify({ caption: st.caption, meta: st.meta, retirados: st.dots }));
     // Con toque (teléfono) las flechas no se muestran: el control es deslizar o tocar la vecina (norma del 2026-11-13); con puntero fino, vidrio de 48.
     ck(name + (mobile ? ': con toque, sin flechas a la vista' : ': flechas de vidrio de 48 px a los lados') + '; el recorrido empieza en «0 de 3 paradas hojeadas»', st.flechas.length === 2 && st.flechas.every(f => f[0] && (mobile ? f[2] === 0 : f[2] === 48)) && st.progreso === '0 de 3 paradas hojeadas', JSON.stringify([st.flechas, st.progreso]));

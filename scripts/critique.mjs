@@ -206,6 +206,7 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
     const cs = getComputedStyle(el);
     const fs = parseFloat(cs.fontSize);
     if (fs < 12) add('a11y-font-small', el, `${fs.toFixed(1)}px · «${el.textContent.trim().slice(0, 32)}»`);
+    if (el.closest(':disabled, [aria-disabled="true"]')) continue; // lo inactivo (token deshabilitado, 2026-11-18) está exento de WCAG 1.4.3
     // fondo efectivo
     const r = el.getBoundingClientRect();
     const px = Math.min(innerWidth - 1, Math.max(0, r.x + r.width / 2)), py = Math.min(innerHeight - 1, Math.max(0, r.y + r.height / 2));

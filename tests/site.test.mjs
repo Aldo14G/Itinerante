@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { readFile, access, readdir } from 'node:fs/promises';
-import { pickBooks, chipNode, coverflowPose, nearestIndex, captionOf, CF_GIRO, readTrail, writeTrail, trailState, trailLine, TRAIL_KEY } from '../rail.js';
+import { pickBooks, chipNode, coverflowPose, nearestIndex, captionOf, CF_GIRO, readTrail, writeTrail, trailState, trailLine, TRAIL_KEY, startIndex } from '../rail.js';
 import { coverflowPose as poseMotor, keyTarget, tiltPose, tiltTransform, ATENUADA } from '../carousel3d.js';
 import { validMenu, menuProblems, validFoto, precioCarta, currentGroup, groupId, filaId, galeriaItems, GALERIA_MIN, GALERIA_MAX } from '../cafe.js';
 import { cartaHtml, withCarta, problemasDisco, srcsetDisco, INICIO as CARTA_INICIO, FIN as CARTA_FIN } from '../scripts/build-carta.mjs';
@@ -12,7 +12,7 @@ import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, addDays, NEWS_SIZE, NEW_DAYS, NEWS_DAYS } from '../news.js';
 import { shareName, calName, registroName, reservaName, eventBadge, NO_DATE, validEventos, eventosProblems, eventosPlan, validRegistro, validTelefono, validReserva, reservaUrl, reservaMessage, notaCopy, quienLine, avisoLine, fechaBloque, fechaLarga, horario, icsOf, mtyToUtc, shareData, LUGAR, ICS_BLOQUE_MIN, shiftMonths, fechaPasada, foldAnteriores, ANTERIORES_MESES, ANTERIORES_VISIBLES, PROXIMOS_MESES } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, CARD_SIZES, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -205,11 +205,14 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
     assert.ok(reg && ['Goodreads', 'Amazon'].includes(reg.fuente) && /^https:\/\//.test(reg.url) && reg.revisada, `${b.id}: portada registrada en data/portadas.json con fuente, URL y revisión`);
     assert.equal(reg.isbn ?? null, b.n, `${b.id}: el registro de la portada es del mismo ISBN`);
     assert.deepEqual(webpSize(await readFile(here(`./${b.c}`))), [b.cw, b.ch], `${b.id}: cw/ch son las medidas del archivo`);
-    assert.ok(b.cw <= 600 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 600 px como máximo (${b.cw}×${b.ch})`);
+    assert.ok(Math.max(b.cw, b.ch) <= 1200 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 1200 px de lado mayor como máximo (${b.cw}×${b.ch}; antes 600 de ancho, 2026-11-18)`);
+    const v600 = here(`./assets/img/portadas/${b.id}-600.webp`);
+    if (b.cw > 600) assert.deepEqual(webpSize(await readFile(v600)), [600, Math.round(b.ch * 600 / b.cw)], `${b.id}: variante de 600 de ancho para el srcset`);
+    else assert.ok(!existsSync(v600), `${b.id}: sin variante si la portada no pasa de 600 (nunca se amplía)`);
   }
   for (const b of data.books.filter(x => !x.c)) assert.ok(b.cw === null && b.ch === null && !portadas[b.id], `${b.id}: sin portada no hay medidas ni registro`);
   const files = await readdir(here('./assets/img/portadas'));
-  assert.deepEqual(files.sort(), conPortada.map(b => `${b.id}.webp`).sort(), 'ninguna portada huérfana en assets/img/portadas');
+  assert.deepEqual(files.sort(), conPortada.flatMap(b => (b.cw > 600 ? [`${b.id}.webp`, `${b.id}-600.webp`] : [`${b.id}.webp`])).sort(), 'ninguna portada huérfana en assets/img/portadas (la portada y, si mide más de 600, su variante)');
   assert.deepEqual(Object.keys(portadas).sort(), conPortada.map(b => b.id).sort(), 'data/portadas.json no registra libros que no estén en el catálogo');
   // Nada del catálogo de prueba (CSV de Amazon) queda en lo que carga el sitio.
   const titles = new Set(data.books.map(b => b.t));
@@ -406,6 +409,12 @@ test('portada real: la imagen va sin alt, título y autor como texto oculto (nom
     const quiet = imageCover(fabre, 3, { named: false, eager: true });
     assert.equal(quiet.children[0].loading, 'eager');
     assert.ok(quiet.children.slice(1).every(s => s.getAttribute('aria-hidden') === 'true'), 'en la ficha (con encabezado propio) el texto de la portada no se repite al lector');
+    assert.ok(img.srcset === undefined, 'sin sizes no hay srcset: la ficha pide la grande');
+    const big = book(data.books.find(x => x.c && x.cw > 600).id);
+    const grid = imageCover(big, 3, { sizes: CARD_SIZES }).children[0];
+    assert.equal(grid.srcset, `${big.c.replace('.webp', '-600.webp')} 600w, ${big.c} ${big.cw}w`, 'la rejilla elige por srcset entre la de 600 y la grande');
+    assert.equal(grid.sizes, CARD_SIZES);
+    assert.ok(imageCover(fabre, 3, { sizes: CARD_SIZES }).children[0].srcset === undefined, 'una portada de 600 o menos no tiene variante');
     const noSize = imageCover({ ...fabre, cw: null, ch: null }, 3).children[0];
     assert.ok(noSize.width === undefined && noSize.height === undefined, 'sin medidas no se inventan');
     // Si la imagen falla: tipográfica, con el texto a la vista, sin imagen; una segunda llamada no hace nada.
@@ -421,7 +430,7 @@ test('portada real: la imagen va sin alt, título y autor como texto oculto (nom
   }
   const [cat, rail] = await Promise.all(['catalog.js', 'rail.js'].map(f => readFile(here(`./${f}`), 'utf8')));
   assert.ok(/document\.addEventListener\('error', e => \{ if \(e\.target instanceof HTMLImageElement && e\.target\.closest\('\.cover--img'\)\) coverFallback\(e\.target\); \}, true\)/.test(cat), 'un solo oyente (en captura) atiende las portadas rotas de la rejilla, el carrusel, Novedades y la ficha');
-  assert.ok(/return b\.c \? imageCover\(b, tone, \{ named \}\) : blankCover/.test(cat) && /if \(b\.c\) cover = imageCover\(b, tone\);/.test(rail), 'rejilla, ficha y carrusel usan la portada real cuando existe');
+  assert.ok(/return b\.c \? imageCover\(b, tone, \{ named, sizes \}\) : blankCover/.test(cat) && /if \(b\.c\) cover = imageCover\(b, tone, \{ sizes: RAIL_SIZES \}\);/.test(rail), 'rejilla, ficha y carrusel usan la portada real cuando existe (carrusel y rejilla eligen por srcset; la ficha pide la grande)');
   assert.ok(/\.cover--img img \{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; \}/.test(css) && /\.cover \{[^}]*aspect-ratio: 2 \/ 3;/.test(css), 'la imagen llena la portada 2:3 sin deformarla (object-fit) y, si sobra alto, se recorta abajo: el título de la portada queda a la vista');
   assert.ok(/\.sr-only \{[^}]*clip: rect\(0 0 0 0\)/.test(css), 'sr-only existe');
 });
@@ -579,6 +588,13 @@ test('chips de colección y recorrido ligero (A4, 2026-11-13): Narrativa · Poes
 });
 test('recorrido (A4): conteo, tramos y persistencia en localStorage, con el almacenamiento bloqueado sin romper nada', () => {
   const cols = [{ id: 'narrativa' }, { id: 'poesia' }, { id: 'ensayo' }];
+  // El carrusel empieza por la portada real más cercana al medio (2026-11-18); a igual distancia, la de la izquierda; sin ninguna, el medio.
+  const L = s => [...s].map(x => ({ c: x === '1' ? 'p.webp' : null }));
+  assert.equal(startIndex(L('11111')), 2, 'el medio, si tiene portada real');
+  assert.equal(startIndex(L('11011')), 1, 'la vecina izquierda del medio');
+  assert.equal(startIndex(L('00001')), 4, 'la más cercana aunque esté lejos');
+  assert.equal(startIndex(L('00000')), 2, 'sin portadas reales, el medio');
+  for (const col of JSON.parse(readFileSync_('assets/data/collections.json')).collections) { const list = pickBooks(data.books, col); assert.ok(list[startIndex(list)].c, `${col.id}: empieza por una portada real`); }
   assert.deepEqual(trailState(cols, new Set()), { count: 0, total: 3, done: [false, false, false], links: [false, false] });
   assert.deepEqual(trailState(cols, new Set(['poesia'])), { count: 1, total: 3, done: [false, true, false], links: [false, false] }, 'una sola parada no pinta tramos');
   assert.deepEqual(trailState(cols, new Set(['narrativa', 'poesia'])).links, [true, false], 'el tramo entre dos hojeadas va en primario');
@@ -1408,14 +1424,14 @@ test('tarjeta de la rejilla (TarjetaLibro): portada que abre la ficha y «Guarda
   const cat = await readFile(here('./catalog.js'), 'utf8');
   const saved = await readFile(here('./saved.js'), 'utf8');
   const card = cat.slice(cat.indexOf('function card(b)'), cat.indexOf('let results = [];'));
-  assert.ok(/el\('button', \{ type: 'button', class: 'card', 'data-id': b\.id, 'aria-haspopup': 'dialog' \}, cover\(b, tones\.get\(b\.id\), true, false\), el\('span', \{ class: 'card-t' \}, b\.t\), meta\)/.test(card), 'un solo botón: portada, título y «autor · precio» (su nombre accesible es lo que se lee)');
-  assert.ok(/el\('span', \{ class: 'card-pr', 'data-fuente': 'hoja' \}, price\)/.test(card) && /const price = priceLabel\(b\.pr\);/.test(card) && /b\.a \? '\\u00a0· ' : ''/.test(card), '«autor · $250 MXN»: el precio es el de la hoja y va marcado');
+  assert.ok(/el\('button', \{ type: 'button', class: 'card', 'data-id': b\.id, 'aria-haspopup': 'dialog' \}, cover\(b, tones\.get\(b\.id\), true, false, CARD_SIZES\), el\('span', \{ class: 'card-t' \}, b\.t\), meta\)/.test(card), 'un solo botón: portada, título, autor y precio (su nombre accesible es lo que se lee)');
+  assert.ok(/el\('span', \{ class: 'card-pr', 'data-fuente': 'hoja' \}, price\)/.test(card) && /const price = priceLabel\(b\.pr\);/.test(card) && /b\.a \? el\('span', \{ class: 'card-au' \}, b\.a\) : null/.test(card) && !/u00a0· /.test(card) && /\.card-au \{ display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; contain: inline-size; \}/.test(css) && /\.card-pr \{ display: block; white-space: nowrap;/.test(css), 'el autor en un renglón y «$250 MXN» (el precio de la hoja, marcado) en el siguiente, sin «·» colgado (2026-11-18)');
   assert.ok(/return el\('li', \{ class: 'card-item', 'data-inclina': '' \}, btn, saveButton\(b\)\);/.test(card), '«Guardar» flota sobre la portada; la tarjeta entera se inclina con el cursor en escritorio (A5)');
   for (const gone of ['card-voltear', 'card-giro', 'card-reverso', 'data-card-flip', 'data-card-open', 'flipCard', 'is-volteada', 'Voltear', 'inert']) assert.ok(!cat.includes(gone), `retirado: ${gone}`);
   assert.ok(!/card-giro|card-cara|card-reverso|card-voltear|rev-t|save--reverso/.test(css), 'sin CSS de la tarjeta que voltea');
   assert.ok(!/reverso|saveShort/.test(saved), '«Guardar» ya no tiene variante de reverso ni rótulo corto');
   assert.ok(/\.card-t \{[^}]*-webkit-line-clamp: 2;[^}]*min-height: 2lh;[^}]*font: var\(--t-subtitulo\); font-weight: 600;/.test(css), 'título en Subheadline semibold, dos renglones (reservados: las filas no saltan)');
-  assert.ok(/\.card-m \{[^}]*font: var\(--t-nota-pie\);/.test(css) && /\.card-pr \{ white-space: nowrap;/.test(css), '«autor · precio» en Footnote; el precio no se parte ni se corta');
+  assert.ok(/\.card-m \{[^}]*font: var\(--t-nota-pie\);/.test(css) && /\.card-pr \{ display: block; white-space: nowrap;/.test(css), 'autor y precio en Footnote; el precio no se parte ni se corta');
   assert.ok(/const t = id && grid\.querySelector\(`\.card\[data-id="\$\{id\}"\]`\);/.test(cat), 'al cerrar la ficha el foco vuelve a la tarjeta');
 });
 test('ficha única (sin «modo redes»): «Preguntar por WhatsApp», Guardar y Compartir (iconos) y «Cómo llegar»; Compartir usa la hoja del teléfono o copia el enlace', async () => {
@@ -1824,7 +1840,7 @@ test('menú (MenuHamburguesa): hoja de vidrio con todas las secciones, Mi lista,
   const hrefs = [...dlg.matchAll(/class="menu-row" href="#([a-z]+)"/g)].map(m => m[1]);
   assert.deepEqual(hrefs, ['inicio', 'libros', 'cartelera', 'novedades', 'cafe', 'casa', 'visita']);
   assert.ok(hrefs.length <= 7, 'a lo sumo 7 enlaces en el grupo (Miller)');
-  assert.ok(/\.menu-lista li:nth-child\(8\) \{ --i: 7; \}/.test(cssFlat), 'la cascada alcanza la octava fila');
+  assert.ok(/\.menu-lista li:nth-child\(8 of :not\(\[hidden\]\)\) \{ --i: 7; \}/.test(cssFlat), 'la cascada alcanza la octava fila y cuenta solo las filas visibles (2026-11-18)');
   for (const id of hrefs) assert.ok(html.includes(`id="${id}"`), `destino #${id}`);
   assert.ok(/<li data-news-link><a class="menu-row" href="#novedades">/.test(dlg), 'Novedades desaparece sin entradas');
   assert.ok(/<button class="menu-row" type="button" data-open-mylist><span>Mi lista<span class="sr-only">, <span data-saved-count>Vacía<\/span><\/span><\/span><span class="count-badge" data-saved-dot hidden aria-hidden="true"><\/span>/.test(dlg), 'Mi lista con su conteo');
@@ -1836,7 +1852,7 @@ test('menú (MenuHamburguesa): hoja de vidrio con todas las secciones, Mi lista,
   assert.ok(/\.menu-row\[aria-current="true"\] \{ background: var\(--menta\); color: var\(--en-menta\); \}/.test(cssFlat), 'la sección actual en menta');
   assert.ok(/\.menu::backdrop \{ background: var\(--velo\); \}/.test(cssFlat), 'detrás, el velo (solo opacidad)');
   assert.ok(/@media \(min-width: 761px\) \{ \.menu-hoja \{ left: auto; width: 380px;/.test(cssFlat), 'desde 761 px es un panel de 380 px a la derecha');
-  assert.ok(/\.menu-lista li:nth-child\(2\) \{ --i: 1; \}/.test(cssFlat) && /transition-delay: calc\(var\(--i, 0\) \* var\(--escalon-linea\) \/ 2\);/.test(cssFlat) && !/style\.setProperty\('--i'/.test(readFileSync_('app.js')), 'las filas entran en cascada (30 ms) sin estilos puestos desde JS');
+  assert.ok(/\.menu-lista li:nth-child\(2 of :not\(\[hidden\]\)\) \{ --i: 1; \}/.test(cssFlat) && /transition-delay: calc\(var\(--i, 0\) \* var\(--escalon-linea\) \/ 4\);/.test(cssFlat) && !/style\.setProperty\('--i'/.test(readFileSync_('app.js')), 'las filas entran en cascada (15 ms desde el 2026-11-18; antes 30) sin estilos puestos desde JS');
   assert.ok(!/id="sheet-menu"|class="sheet-menu"|<div class="menu"/.test(html), 'un solo menú para teléfono y tableta: se retiraron la hoja «Más» y el menú de tableta');
 });
 
@@ -1851,7 +1867,7 @@ test('menú: abre después de pintar, atrapa el foco, Escape y «atrás» lo cie
   // Escape y «atrás»: los da el diálogo modal y sheets.js (openDialog registra la hoja en el historial).
   const sheets = await readFile(here('./sheets.js'), 'utf8');
   assert.ok(/export function openDialog\(dlg[\s\S]*?dlg\.showModal\(\);[\s\S]*?pushSheet\(\{ \.\.\.opts, dlg, close: \(\) => dlg\.close\(\) \}\)/.test(sheets), 'showModal + entrada de historial: Escape y «atrás» cierran');
-  assert.ok(/\.menu\.is-closing \.menu-hoja, \.menu\.is-closing::backdrop \{ opacity: 0; \}/.test(cssFlat), 'el menú define su salida en CSS (closeDialog)');
+  assert.ok(/\.menu\.is-closing \.menu-hoja, \.menu\.is-closing::backdrop \{ opacity: 0; transition-duration: var\(--dur-rapida\); transition-timing-function: var\(--curva-aceleracion\); \}/.test(cssFlat), 'el menú define su salida en CSS (closeDialog): 60 % de la entrada y acelerando (2026-11-18)');
   assert.ok(/const menu = document\.getElementById\('menu'\);/.test(readFileSync_('saved.js')), 'Mi lista cierra el menú antes de abrirse');
 });
 
@@ -1918,12 +1934,12 @@ test('Inicio: foto real de la sala, nombre, estado de hoy y «Cómo llegar» de 
   assert.ok(/<div class="entry-actions">\s*<a class="btn btn--primario btn--lg" href="https:\/\/www\.google\.com\/maps\/dir\/[^"]*"[^>]*><span>Cómo llegar<\/span>/.test(sec), '«Cómo llegar» primario de 56 px');
   assert.ok(!/wa\.me/.test(sec) && (sec.match(/<div class="entry-actions">[\s\S]*?<\/div>/)[0].match(/class="btn /g) || []).length === 1, 'una sola acción: «Cómo llegar» (el contacto vive en el pie desde el 2026-11-13)');
   assert.ok(/@media \(min-width: 1024px\) \{[^}]*\.entry \{ grid-template-columns: var\(--rejilla\); align-items: center;[^}]*\}\s*\.entry-copy \{ grid-column: 1 \/ span 5; padding-bottom: var\(--space-8\); \}\s*\.entry-media \{ grid-column: 7 \/ -1;/.test(css.replace(/\/\*[\s\S]*?\*\//g, '')), 'en escritorio, rejilla de 12: texto en 1–5 y foto en 7–12; el texto se centra en el alto de la foto, 16 px arriba (centro óptico)');
-  assert.ok(/<figure class="entry-media">\s*<picture><source media="\(max-width: 760px\)" srcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w" sizes="\(max-width: 375px\) calc\(100vw - 32px\), calc\(100vw - 40px\)" width="912" height="608"><img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp" width="1080" height="608" alt="[^"]+" fetchpriority="high"/.test(sec), 'foto real: la sala en 3:2 en el teléfono (recorte del 2026-11-14, con srcset y medidas reales) y la sala central en escritorio, con alt y prioridad alta');
+  assert.ok(/<figure class="entry-media">\s*<picture><source media="\(max-width: 760px\)" srcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w" sizes="\(max-width: 375px\) calc\(100vw - 32px\), calc\(100vw - 40px\)" width="912" height="608"><source media="\(min-width: 1024px\)" srcset="assets\/img\/inicio-sala-5x4\.webp" width="1080" height="864"><img class="entry-poster" src="assets\/img\/03-home-sala-central\.webp" width="1080" height="608" alt="[^"]+" fetchpriority="high"/.test(sec), 'foto real: la sala en 3:2 en el teléfono (recorte del 2026-11-14), 16:9 en la tableta y 5:4 de 1080 × 864 desde 1024 (2026-11-18, recortada del original de Instagram: 0.69 → 0.98×), con alt y prioridad alta');
   assert.ok(/\.entry-title-mas \{ display: block; \}/.test(mobileFlat) && /\.entry-media \{ aspect-ratio: auto; height: clamp\(160px, calc\(100svh - var\(--hdr-h\) - var\(--entrada-arriba\) - var\(--reserva-inferior\)\), calc\(\(100vw - 2 \* var\(--margen\)\) \/ 1\.5\)\); \}/.test(mobileFlat), 'teléfono (variante A): titular en dos renglones fijos y la foto 3:2 con alto mín(ancho / 1.5, lo que queda sobre la barra inferior), nunca menos de 160');
   assert.ok(sec.indexOf('entry-copy') < sec.indexOf('entry-media'), 'el texto va antes que la foto: nada se escribe encima de la foto');
   assert.ok(/\.entry-media \{[^}]*overflow: hidden; border-radius: var\(--radio-lg\);/.test(cssFlat) && !/entry-shade|entry-canvas|entry-beat|wordmark|profile-av/.test(html + css + mobileCss), 'foto limpia con radio-lg, sin velos, lienzo de fotogramas ni rótulo gigante');
-  assert.ok(/\.entry-title \{ margin: 0; font: var\(--t-titulo-grande\); letter-spacing: var\(--ls-titulo-grande\); text-wrap: balance; \}/.test(cssFlat) && /\.entry-title \{ font-size: clamp\(34px, 3\.2vw \+ 2px, 56px\);/.test(cssFlat) && /\.entry-title \{ font: var\(--t-display\); font-size: clamp\(44px, 2\.5vw \+ 20px, 56px\); line-height: 1\.07;/.test(cssFlat), 'Large Title en el teléfono; en escritorio crece hasta display (56/60 a 1440)');
-  assert.ok(/<link rel="preload" as="image" type="image\/webp" imagesrcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w" imagesizes="[^"]+" fetchpriority="high" media="\(max-width: 760px\)">/.test(html) && /<link rel="preload" href="assets\/img\/03-home-sala-central\.webp" as="image" type="image\/webp" fetchpriority="high" media="\(min-width: 761px\)">/.test(html), 'la foto del inicio se precarga, una por tamaño');
+  assert.ok(/\.entry-title \{ margin: 0; font: var\(--t-titulo-grande\); letter-spacing: var\(--ls-titulo-grande\); text-wrap: balance; \}/.test(cssFlat) && /\.entry-title \{ font: var\(--t-titulo-grande\); letter-spacing: var\(--ls-titulo-grande\); \}/.test(cssFlat) && /\.entry-title \{ font: var\(--t-display-compacto\); letter-spacing: var\(--ls-display-compacto\); \}/.test(cssFlat) && /@media \(min-width: 1280px\) \{ \.entry-title \{ font: var\(--t-display\); letter-spacing: var\(--ls-display\); \} \}/.test(cssFlat) && !/\.entry-title \{[^}]*clamp\(/.test(cssFlat), 'Large Title en el teléfono y la tableta; 44/48 de 1024 a 1279 y display 56/60 desde 1280, de los tokens (2026-11-18: sin clamp())');
+  assert.ok(/<link rel="preload" as="image" type="image\/webp" imagesrcset="assets\/img\/inicio-sala-3x2-640\.webp 640w, assets\/img\/inicio-sala-3x2\.webp 912w" imagesizes="[^"]+" fetchpriority="high" media="\(max-width: 760px\)">/.test(html) && /<link rel="preload" href="assets\/img\/03-home-sala-central\.webp" as="image" type="image\/webp" fetchpriority="high" media="\(min-width: 761px\) and \(max-width: 1023px\)">/.test(html) && /<link rel="preload" href="assets\/img\/inicio-sala-5x4\.webp" as="image" type="image\/webp" fetchpriority="high" media="\(min-width: 1024px\)">/.test(html), 'la foto del inicio se precarga, una por tamaño');
   assert.ok(/<a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden>/.test(sec) && sec.indexOf('entry-news') > sec.indexOf('btn--primario'), 'el control de novedades es secundario y va después de «Cómo llegar»');
 });
 
@@ -1934,7 +1950,7 @@ test('secciones: encabezado (EncabezadoSeccion) sin antetítulo, «Nombre *frase
     assert.ok(new RegExp(`<header class="sec-head" data-revelar>\\s*<h2 id="[a-z]+-title" class="h2">${h}</h2>`).test(sec), `#${id}: el titular abre la sección y lleva su nombre («Nombre *frase*»)`);
   }
   assert.ok(!/sec-rotulo/.test(html + css + mobileCss), 'sin antetítulos sobre los titulares (retirados el 2026-11-13; piso.mjs los marca)');
-  assert.ok(/\.h2, \.ftr-title \{ margin: 0; font: var\(--t-titulo-1\); letter-spacing: var\(--ls-titulo-1\); text-wrap: balance;/.test(cssFlat) && /@media \(min-width: 761px\) \{ \.h2, \.ftr-title \{ font-size: clamp\(28px, 1\.25vw \+ 18px, 40px\);/.test(cssFlat), 'Title 1 que crece hasta 40 en escritorio; «Contacto» es un titular de sección como los demás (2026-11-15)');
+  assert.ok(/\.h2, \.ftr-title \{ margin: 0; font: var\(--t-titulo-1\); letter-spacing: var\(--ls-titulo-1\); text-wrap: balance;/.test(cssFlat) && /@media \(min-width: 1024px\) \{ \.h2, \.ftr-title \{ font: var\(--t-titulo-1-amplio\); letter-spacing: var\(--ls-titulo-1-amplio\); \} \}/.test(cssFlat) && !/\.h2, \.ftr-title \{[^}]*clamp\(/.test(cssFlat), 'Title 1 (28/34) hasta 1023 y 36/44 desde 1024, de los tokens (2026-11-18; antes clamp() hasta 40); «Contacto» es un titular de sección como los demás (2026-11-15)');
   assert.ok(/\.sec-texto, \.ftr-lede \{ margin: var\(--space-3\) 0 0; max-width: 60ch; font: var\(--t-cuerpo\); color: var\(--tinta-2\); \}/.test(cssFlat), 'entradilla en Body, tinta-2, 60 caracteres (la de Contacto, igual)');
   const fills = ['.house', '.books', '.bill', '.news', '.cafe', '.visit', '.ftr'].map(s => rule(cssFlat, s).match(/background: var\(--(fondo(?:-2)?)\)/)?.[1]);
   assert.deepEqual(fills, ['fondo-2', 'fondo', 'fondo-2', 'fondo', 'fondo', 'fondo-2', 'fondo'], 'La casa → Catálogo → Eventos → (Novedades, si hay llegadas) → Café → Visita → pie: sin Novedades, todos los vecinos son de fondo distinto');

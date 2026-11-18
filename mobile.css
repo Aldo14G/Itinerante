@@ -116,7 +116,12 @@ html:not(.js) .tabbar { display: none; }
    Dynamic Island (2026-11-14; antes empezaba en y 48 con un área segura de 59–62). */
 .drawer { height: calc(100dvh - max(var(--space-12), env(safe-area-inset-top, 0px) + var(--space-3))); }
 .mylist { max-height: calc(100dvh - max(var(--space-12), env(safe-area-inset-top, 0px) + var(--space-3))); }
-.drawer-grabber { display: block; position: absolute; top: var(--space-2); left: 50%; translate: -50% 0; width: 36px; height: 5px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.5; touch-action: none; }
+/* Asa de las hojas inferiores (swipeToClose, sheets.js; 2026-11-18): píldora de 36 × 5 en una franja de 64 × 24 que no desplaza. */
+.sheet-grab { display: block; position: absolute; z-index: 3; top: 0; left: 50%; translate: -50% 0; width: 64px; height: var(--space-6); touch-action: none; }
+.sheet-grab::before { content: ""; position: absolute; top: var(--space-2); left: calc(50% - 18px); width: 36px; height: 5px; border-radius: var(--radio-pildora); background: var(--linea-fuerte); opacity: 0.5; }
+.explorer:modal .sheet-grab { top: env(safe-area-inset-top, 0px); }
+.explorer:modal .sheet-grab::before { top: var(--space-1); } /* a 4 del borde: no roza el título */
+.ml-head, .explorer:modal .ex-top { touch-action: none; }
 .drawer-body { grid-template-columns: 38% minmax(0, 1fr); gap: var(--space-4); padding: var(--space-6) var(--margen) var(--space-5); touch-action: pan-y; }
 .drawer-close { top: var(--space-3); right: var(--space-3); }
 .drawer-head { align-content: center; padding-right: 0; } /* centrado en el alto de la portada (2026-11-14; al pie dejaba 127–160 px vacíos bajo el ×) */
@@ -151,7 +156,8 @@ html:not(.js) .tabbar { display: none; }
 .explorer { transition: opacity var(--dur-base) var(--curva-salida), transform var(--dur-base) var(--curva-salida); }
 .explorer::backdrop { transition: opacity var(--dur-base) var(--curva-salida), overlay var(--dur-base) var(--curva-salida) allow-discrete, display var(--dur-base) var(--curva-salida) allow-discrete; }
 @starting-style { .explorer[open] { opacity: 0; } .motion .explorer[open] { transform: translateY(100%); opacity: 1; } }
-.explorer.is-closing { opacity: 0; transition-duration: var(--dur-rapida); }
+.explorer.is-closing { opacity: 0; transition-duration: var(--dur-rapida); transition-timing-function: var(--curva-aceleracion); }
+.motion .explorer.is-closing { transform: translateY(100%); opacity: 1; } /* sale por donde entró (2026-11-18) */
 
 /* Menú ☰ en ventanas bajas (13 mini, 16e, 16, SE, 16 Pro en Safari): filas de 48 (la escala estándar) y 16 de aire sobre el pie, así Instagram y
    Facebook caben sin desplazar la hoja desde 629 px de alto (2026-11-14; antes desbordaba 11–63 px). */
@@ -192,3 +198,8 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   .drawer-actions [data-d-cta] { grid-column: auto; }
 }
 @media (max-height: 420px) { .hdr { position: relative; } }
+
+/* Propuesta de Eventos: la portada flota junto a la descripción; título → descripción 12 (2026-11-18; antes 47). */
+.ev-card:has(> .ev-card-desc) { display: flow-root; }
+.ev-card:has(> .ev-card-desc) > .ev-card-img { float: right; margin: var(--space-3) 0 var(--space-2) var(--space-4); } /* a 12, como la descripción */
+.ev-card:has(> .ev-card-desc) > .ev-card-desc { margin-top: var(--space-3); text-wrap: pretty; }
