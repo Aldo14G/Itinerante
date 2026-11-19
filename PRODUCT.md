@@ -201,7 +201,8 @@ en ese momento** (hojear, elegir, guardar, venir, quedarse); no explica la panta
 - **Quedarse a leer en la sala va con el consumo del café**: siempre con la condición («con tu café»), nunca «gratis».
 - **Libros sobre pedido**: si alguien busca una obra que no está en ese momento, la librería se la puede pedir. Se dice donde
   acompaña (estado vacío y error de Explorar, cierre del Catálogo), sin plazos ni precios: «te lo podemos pedir».
-- La existencia se confirma con la casa: «Antes de venir, te confirmamos si lo tenemos.» (Aldo la revisa antes de publicar).
+- La existencia se confirma con la casa: en la ficha, el botón **«Consultar disponibilidad»** (WhatsApp con el mensaje ya escrito; decisión de Aldo del 2026-11-19, que retiró la nota «Antes de venir, te confirmamos si lo tenemos.» porque el botón ya lo dice). Que un libro esté en el catálogo no dice que haya ejemplar: nada dice «disponible» ni «en existencia».
+- Sin resultados en Explorar: «No encontramos coincidencias para «…».» y «te lo podemos pedir» (sin plazos), o, con filtros, «Quitar filtros» primero.
 
 **Lo que no se dice**:
 - «Itinerante» es solo el nombre y el logo: nada del origen del nombre, de viajes ni de «almas viajeras».
@@ -212,6 +213,13 @@ en ese momento** (hojear, elegir, guardar, venir, quedarse); no explica la panta
   coincidir con `index.html`.
 
 Inventario y tabla de cambios de la curaduría: `DESIGN.md`, «Curaduría de textos».
+
+### Decisiones del 2026-11-19 (Aldo)
+
+1. Ficha: «Consultar disponibilidad» al WhatsApp real; se retira «Antes de venir, te confirmamos si lo tenemos.».
+2. Ajedrez: el pie de La casa queda solo «Ajedrez» (sin línea) hasta que haya actividades confirmadas.
+3. Entrada animada: solo en la primera visita, breve y sin bloquear la navegación; se omite con movimiento reducido, «Pausar el movimiento», ahorro de datos y al abrir un enlace directo a una sección o ficha.
+4. Pasillo: su `alt` describe lo observable sin el patio ni repetir el pie.
 
 ## Evidence on Hand
 
