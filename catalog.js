@@ -160,6 +160,44 @@ export function facetCounts(books, f, dim) {
   return counts;
 }
 
+// Editoriales (bloque «Editoriales» del Catálogo, 2026-11-19): una entrada por editorial con su número de títulos, de los datos reales de catalog.json
+// (campo `p`). Dos grafías son la misma editorial solo si difieren en mayúsculas, acentos o espacios (`editorialKey`): se muestra la más
+// frecuente (a igualdad, la primera por orden alfabético) y el filtro Editorial toma todas las variantes. No se inventa nada: un libro sin editorial
+// no cuenta en ninguna. Orden estable: más títulos primero y luego alfabético (sin acentos ni mayúsculas, es-MX). Con menos de EDITORIALES_MIN
+// editoriales no hay bloque (como Novedades sin llegadas): con una sola, «una por una» no diría nada.
+export const EDITORIALES_MIN = 3;
+export const editorialKey = s => norm(s).replace(/\s+/g, ' ');
+export function editorialesDe(books) {
+  const porClave = new Map();
+  for (const b of books) {
+    const nombre = typeof b?.p === 'string' ? b.p.replace(/\s+/g, ' ').trim() : '';
+    if (!nombre) continue;
+    const k = editorialKey(nombre);
+    const e = porClave.get(k) ?? { clave: k, titulos: 0, grafias: new Map() };
+    e.titulos++;
+    e.grafias.set(nombre, (e.grafias.get(nombre) ?? 0) + 1);
+    porClave.set(k, e);
+  }
+  const alfa = (a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }) || (a < b ? -1 : a > b ? 1 : 0);
+  return [...porClave.values()].map(e => {
+    const grafias = [...e.grafias].sort((a, b) => b[1] - a[1] || alfa(a[0], b[0]));
+    return { nombre: grafias[0][0], variantes: grafias.map(g => g[0]), titulos: e.titulos, clave: e.clave };
+  }).sort((a, b) => b.titulos - a.titulos || alfa(a.nombre, b.nombre));
+}
+/** El plan del bloque: la lista, cuántos títulos traen editorial, cuántos hay, y si se pinta. */
+export function editorialesPlan(books) {
+  const lista = editorialesDe(books);
+  const conEditorial = lista.reduce((n, e) => n + e.titulos, 0);
+  return { lista, conEditorial, total: books.length, mostrar: lista.length >= EDITORIALES_MIN };
+}
+/** «19 títulos» / «1 título». */
+export const titulosLabel = n => `${n} ${n === 1 ? 'título' : 'títulos'}`;
+/** La nota del bloque con sus hechos reales: «4 editoriales · 40 de los 41 títulos» (o «… · 41 títulos» si todos traen editorial). */
+export function editorialesNota({ lista, conEditorial, total }) {
+  const ed = `${lista.length} ${lista.length === 1 ? 'editorial' : 'editoriales'}`;
+  return conEditorial === total ? `${ed} · ${titulosLabel(total)}` : `${ed} · ${conEditorial} de los ${titulosLabel(total)}`;
+}
+
 // Rejilla en línea (tableta y escritorio, 2026-11-13): sin búsqueda ni filtros muestra dos filas y «Ver los N títulos» despliega el resto en
 // su sitio (aria-expanded; el foco se queda en el botón, como «Ver todo» de Novedades). Con búsqueda o filtros, o en la hoja del teléfono,
 // los resultados van completos. No esconde inventario ni inventa orden: las dos filas son las primeras de la A a la Z.
@@ -702,6 +740,21 @@ export async function initCatalog({ isMotion = () => false } = {}) {
   });
   // Otras piezas (el carrusel de libros, Novedades) piden abrir una ficha sin conocer el diálogo.
   // `detail.found` vuelve a quien lo pidió: false si ese id ya no está en el catálogo (el enlace compartido de app.js lo avisa).
+  // «Editoriales» (bloque del Catálogo) pide filtrar por una: se quitan la búsqueda y los demás filtros (el resultado es exactamente sus títulos) y
+  // se aplica el filtro Editorial con todas las grafías de ese nombre. `detail.found` y `detail.count` vuelven a quien lo pidió (app.js).
+  document.addEventListener('iti:filtrar-editorial', e => {
+    const d = e.detail;
+    if (!d || typeof d.editorial !== 'string') return;
+    const k = editorialKey(d.editorial);
+    const variantes = new Set(books.filter(b => b.p && editorialKey(b.p) === k).map(b => b.p));
+    d.found = variantes.size > 0;
+    if (!d.found) return;
+    state.q = ''; input.value = ''; state.k.clear(); state.g.clear(); state.f.clear(); state.sort = 'az'; state.expanded = false;
+    state.p = variantes;
+    refresh();
+    d.count = results.length;
+    if (d.focus !== false) restFocus();
+  });
   document.addEventListener('iti:open-book', e => { if (e.detail?.id) { drawer.dataset.trigger = ''; e.detail.found = openBook(e.detail.id, { tone: e.detail.tone }); } });
   $('[data-d-related]', drawer).addEventListener('click', e => { const r = e.target.closest('.rel'); if (r) { openBook(r.dataset.id, { tone: toneOf(r) }); $('[data-d-close]', drawer).focus({ preventScroll: true }); } });
   $('[data-d-share]', drawer).addEventListener('click', () => { const b = byId.get(drawer.dataset.book); if (b) shareBook(b); });

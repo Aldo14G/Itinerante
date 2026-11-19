@@ -876,6 +876,57 @@
       "qa": ["tests/contenido.test.mjs", "tools/qa/guias.mjs", "tools/qa/controles.mjs"],
       "desde": "2026-11-19",
       "decision": "DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19)."
+    },
+    {
+      "id": "editoriales",
+      "nombre": "Editoriales",
+      "tipo": "control",
+      "descripcion": "Bloque «Editoriales» del Catálogo (2026-11-19), después de Explorar y antes del cierre; sin entrada propia en la barra, el menú ni la barra inferior. Pintado en index.html desde assets/data/catalog.json (scripts/build-editoriales.mjs, npm run editoriales; editoriales:check y npm test fallan si no coinciden): subtitular Title 3, nota con los hechos reales («4 editoriales · 40 de los 41 títulos») y una lista agrupada de filas de 56 (nombre, número de títulos, chevron), de más a menos títulos y luego alfabético. Cada fila abre Explorar con el filtro Editorial de esa editorial ya aplicado (teléfono: la hoja, y al cerrarla el foco vuelve a la fila; tableta y escritorio: baja a la rejilla en línea y el foco va al estado de resultados); sin JavaScript es un enlace a #catalogo. Con menos de 3 editoriales no se pinta nada; con más de 7, las primeras 7 y «Ver las N editoriales» (details nativo). Desde 1024 px, subtitular en 1–6 y lista en 7–12.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".edit", ".edit-head", ".edit-tit", ".edit-nota", ".edit-lista", ".edit-fila", ".edit-nom", ".edit-n", ".edit-ir", ".edit-resto", ".edit-resto-btn"] },
+        { "ruta": "index.html", "selectores": ["#editoriales", "[data-editoriales]", ".edit-fila", "[data-editorial]"] },
+        { "ruta": "catalog.js", "exporta": ["editorialesDe", "editorialesPlan", "editorialesNota", "editorialKey", "titulosLabel", "EDITORIALES_MIN"], "ganchos": ["iti:filtrar-editorial"] },
+        { "ruta": "app.js", "ganchos": ["iti:filtrar-editorial", "editorialOrigin"] },
+        { "ruta": "scripts/build-editoriales.mjs", "exporta": ["editorialesHtml", "withEditoriales"] }
+      ],
+      "tokens": ["fondo-2", "linea", "tinta", "tinta-2", "turquesa-texto", "radio-md", "radio-sm", "alto-md", "alto-lg", "t-titulo-3", "ls-titulo-3", "t-titular", "t-subtitulo", "t-boton", "anillo-foco", "fondo-3-presionado", "space-1", "space-2", "space-3", "space-4", "space-6", "space-8", "space-12", "canal-rejilla"],
+      "estados": {
+        "hover": { "css": [".edit-fila:hover .edit-nom"] },
+        "foco": { "css": [".edit-fila:focus-visible", ".edit-resto-btn:focus-visible"] },
+        "presionado": { "css": [".edit-fila:active", ".edit-resto-btn:active"], "nota": "La fila se tiñe de fondo-3-presionado, también con movimiento reducido; sin escala." },
+        "vacio": { "js": [{"ruta": "scripts/build-editoriales.mjs", "texto": "if (!plan.mostrar)"}], "nota": "Con menos de 3 editoriales el generador no pinta nada: ni hueco ni encabezado (como Novedades sin llegadas)." },
+        "expandido": { "css": [".edit-resto[open] .edit-resto-cerrar"], "nota": "Solo con más de 7 editoriales: details[open] muestra el resto." }
+      },
+      "aria": { "patron": "Lista de enlaces", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "atributos": ["ul con aria-labelledby (el subtitular)", "cada fila es un enlace a #catalogo; su nombre es «editorial, N títulos» (coma en sr-only)", "el chevron es aria-hidden"], "teclado": "Tab entre filas; Enter abre Explorar con el filtro; al cerrar la hoja el foco vuelve a la fila." },
+      "qa": ["tests/contenido.test.mjs", "tools/qa/guias.mjs", "tools/qa/contenido.mjs"],
+      "desde": "2026-11-19",
+      "decision": "DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19)."
+    },
+    {
+      "id": "tarjeta-merch",
+      "nombre": "TarjetaMerch",
+      "tipo": "control",
+      "descripcion": "Tarjeta de un artículo de Merch (2026-11-19), la TarjetaLibro adaptada: un enlace a WhatsApp, «Consultar disponibilidad», con el producto y su precio ya escritos (el sitio nunca afirma existencias; sin carrito ni pagos). Foto cuadrada (radio-portada; si no hay foto o falla, el icono de la tarjeta), tipo (con «Por encargo» solo si la librería lo dice), nombre (Subheadline 600, dos renglones), descripción (dos renglones), precio en su renglón (solo si lo hay) y la acción al pie, alineada entre las tarjetas de una fila. 2 columnas en el teléfono, 3 desde 761 y 4 desde 1024 (3 de las 12 columnas). La sección NO existe (ni en el DOM, ni en la barra, el ☰ o el destino actual) mientras assets/data/merch.json no tenga productos válidos: merch.js la monta entre Café y Visita con el primero y pone .has-merch, que invierte la banda de Visita y el pie como con Novedades. Datos: scripts/foto-merch.py y docs/MERCH.md.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".merch", ".merch-grid", ".merch-item", ".merch-card", ".merch-foto", ".merch-ic", ".merch-tipo", ".merch-nom", ".merch-desc", ".merch-precio", ".merch-accion"] },
+        { "ruta": "merch.js", "exporta": ["validMerch", "merchProblems", "merchMessage", "merchWaUrl", "merchCard", "merchSection", "initMerch", "precioMerch", "validFotoMerch"], "ganchos": ["iti:merch", "has-merch"] },
+        { "ruta": "app.js", "ganchos": ["iti:merch", "import('./merch.js')"] },
+        { "ruta": "scripts/check-merch.mjs", "exporta": ["problemasDisco"] },
+        { "ruta": "assets/data/merch.json" }
+      ],
+      "tokens": ["fondo", "fondo-2", "fondo-3", "linea", "tinta", "tinta-2", "turquesa-texto", "primario-presionado", "radio-portada", "icono-producto", "alto-sm", "t-subtitulo", "t-boton-chico", "anillo-foco", "dur-instantanea", "curva-salida", "space-2", "space-4", "space-6", "space-8", "canal-rejilla"],
+      "estados": {
+        "hover": { "css": [".merch-card:hover .merch-accion span"] },
+        "foco": { "css": [".merch-card:focus-visible"] },
+        "presionado": { "css": [".merch-card:active .merch-accion"], "nota": "La acción toma primario-presionado, también con movimiento reducido; la foto se escala 0.98 solo con movimiento." },
+        "vacio": { "js": [{"ruta": "merch.js", "texto": "if (!productos.length || !visita) return false;"}], "nota": "Sin productos válidos (hoy) no se monta nada: ni sección, ni enlaces, ni clase." },
+        "error": { "js": [{"ruta": "merch.js", "texto": "img.addEventListener('error', () => img.remove(), { once: true })"}], "nota": "Si la foto falla, se retira y queda el icono de la tarjeta." },
+        "movimiento_reducido": { "css": [".motion .merch-card:active .merch-foto"] }
+      },
+      "aria": { "patron": "Link", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "atributos": ["la tarjeta es un enlace (target=_blank con rel=noopener noreferrer); su nombre es el texto de la tarjeta", "ul con aria-label «Artículos de la librería»", "alt en la foto; el icono es aria-hidden"], "teclado": "Tab entre tarjetas; Enter abre WhatsApp en otra pestaña." },
+      "qa": ["tests/contenido.test.mjs", "tools/qa/contenido.mjs", "tools/qa/guias.mjs"],
+      "desde": "2026-11-19",
+      "decision": "DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19)."
     }
   ],
   "contraste": [

@@ -290,7 +290,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .hdr-nav a[aria-current="true"]:active { background: var(--menta-presionado); }
 
 .hdr-end { display: flex; align-items: center; gap: var(--space-2); margin-inline-start: auto; }
-.hdr-list { color: var(--tinta); }
+.hdr-list { color: var(--tinta); white-space: nowrap; }
 .hdr-list .ic { width: 20px; height: 20px; }
 /* Una sola primaria a la vista: la de la barra cede su sitio mientras otra «Cómo llegar» está en pantalla (app.js pone has-primary). */
 .hdr-cta { transition: opacity var(--dur-rapida) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida); }
@@ -301,7 +301,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   .hdr-nav + .hdr-end .menu-btn { display: none; }
   /* Tres columnas (marca | secciones | Mi lista y «Cómo llegar»): las secciones quedan en el eje de la página, como el contenido, y no se
      mueven cuando «Cómo llegar» cede su sitio. Sin JavaScript la barra sigue en flex (las secciones bajan a su renglón). */
-  html.js .hdr { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  html.js .hdr { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(max-content, 1fr); } /* 2026-11-19: las acciones nunca bajan de su contenido (con Novedades y Merch las seis secciones estrechaban a «Mi lista» a dos renglones a 1101); con espacio, las dos columnas siguen iguales y las secciones en el eje */
   html.js .hdr-brand { justify-self: start; max-width: 100%; }
   html.js .hdr-end { justify-self: end; }
   /* «Mi lista» es el último control y no lleva fondo: se alinea por su tinta (16 de relleno), que termina en el borde del contenido, donde
@@ -715,7 +715,6 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 @keyframes faq-entra { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .motion .faq-chev { transition: transform var(--dur-rapida) var(--curva-salida); }
 .motion .faq-item[open] > .faq-resp { animation: faq-entra var(--dur-rapida) var(--curva-salida); }
-@media (min-width: 761px) { .faq-lista { max-width: 640px; } }
 .frame-clip { position: relative; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); }
 /* Mapa de llegada (2026-11-14; idea de mapcn, reescrita sin MapLibre ni teselas): SVG propio con las calles de OpenStreetMap (1 unidad = 1 m,
    norte arriba), recortado a su caja (slice: los anchos grandes ven más calles, los chicos la cuadra). Colores de los tokens en los dos temas:
@@ -931,6 +930,35 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 @media (hover: hover) { .cat-clear:hover { color: var(--tinta); } }
 .books-foot { display: grid; justify-items: start; gap: var(--space-6); padding: var(--space-8) 0 calc(var(--sec) / 2); } /* texto → botón 24 (2026-11-14; antes 16); bloque → bloque 32 sobre el texto */
 .books-foot p { margin: 0; max-width: 46ch; font: var(--t-cuerpo); color: var(--tinta-2); }
+
+/* Editoriales (2026-11-19): una capa más del Catálogo, después de Explorar y antes del cierre; sin entrada propia en la barra ni el menú. Pintada en
+   index.html desde catalog.json (scripts/build-editoriales.mjs). Subtitular Title 3 («Editoriales / independientes, una por una»), su nota con los hechos
+   reales y una lista agrupada de filas de 56 —nombre, número de títulos y chevron—, como el pie y el horario. En el teléfono, a 32 del carrusel (bloque →
+   bloque); desde 761, una capa con su filete, como Explorar (capa → capa 32 + 32 / 48 + 48). Titular → nota 8; nota → lista 24. */
+.edit { margin-top: var(--space-8); }
+.edit-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; } /* Title 3, el subtitular de siempre (no .layer-title: guias.mjs la usa para el de Explorar) */
+.edit-tit em { display: block; font-style: normal; color: var(--tinta-2); }
+.edit-nota { margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.edit-lista { margin: var(--space-6) 0 0; padding: 0 var(--space-4); list-style: none; border-radius: var(--radio-md); background: var(--fondo-2); }
+.edit-lista li + li, .edit-resto .edit-lista { border-top: 1px solid var(--linea); }
+.edit-lista--resto { margin: 0; padding: 0; border-radius: 0; background: none; }
+.edit-lista li { padding-block: var(--space-1); } /* fila de 56: enlace de 48 y 4 px arriba y abajo, como las del pie */
+.edit-fila { display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-md); margin-inline: calc(-1 * var(--space-2)); padding: var(--space-1) var(--space-2); border-radius: var(--radio-sm); color: var(--tinta); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.edit-nom { flex: 1 1 auto; min-width: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
+.edit-n { flex: none; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.edit-ir { flex: none; width: 20px; height: 20px; color: var(--tinta-2); }
+.edit-fila:active { background: var(--fondo-3-presionado); }
+.edit-fila:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .edit-fila:hover .edit-nom { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; } }
+/* Más de 7 editoriales: las primeras 7 y «Ver las N editoriales» (details nativo, sin JavaScript). Con las 4 de hoy no se pinta. */
+.edit-mas { padding-block: 0 !important; }
+.edit-resto-btn { display: flex; align-items: center; min-height: var(--alto-lg); margin-inline: calc(-1 * var(--space-2)); padding-inline: var(--space-2); border-radius: var(--radio-sm); color: var(--turquesa-texto); font: var(--t-boton); cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent; }
+.edit-resto-btn::-webkit-details-marker { display: none; }
+.edit-resto-cerrar, .edit-resto[open] .edit-resto-abrir { display: none; }
+.edit-resto[open] .edit-resto-cerrar { display: inline; }
+.edit-resto-btn:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+.edit-resto-btn:active { background: var(--fondo-3-presionado); }
+@media (min-width: 761px) { .books > .edit { margin: var(--space-8) calc(-1 * var(--margen)) 0; padding: var(--space-8) var(--margen) 0; border-top: 1px solid var(--linea); } }
 
 /* Explorar el catálogo (capa 2). En escritorio el diálogo queda abierto en línea; en móvil es una hoja a pantalla completa (mobile.css). */
 /* Capa → capa: la mitad del aire a cada lado del filete (32 + 32 en tableta, 48 + 48 desde 1024; antes 32 + 48 y 56 + 48). */
@@ -1489,6 +1517,47 @@ html:not(.has-news) :is(.news, [data-news-link]), .news[hidden], [data-news-link
 .has-news .visit { background: var(--fondo); }
 .has-news .visit .hours { background: var(--fondo-2); }
 .has-news .ftr { background: var(--fondo-2); }
+.has-news .visit .faq-lista { background: var(--fondo-2); }
+.has-news .ftr-links { background: var(--fondo); } /* el pie y su lista no pueden ser del mismo fondo (con Novedades el pie es fondo-2) */
+
+/* Merch (2026-11-19): NO existe hasta que merch.js la monta con productos válidos (assets/data/merch.json; hoy vacío): sin sección, sin entrada en la barra ni el ☰.
+   Entre Café y Visita, con la banda contraria a Café (fondo-2; fondo si hay Novedades) y Visita y el pie invierten la suya, como con Novedades
+   (.has-merch la pone merch.js al montar). Rejilla de tarjetas del sistema: 2 columnas en el teléfono, 3 desde 761 y 4 desde 1024 (3 de las 12 columnas
+   cada una); tarjeta = enlace a WhatsApp «Consultar disponibilidad» (el sitio nunca afirma existencias). Foto cuadrada, tipo, nombre, descripción,
+   precio en su renglón y la acción al pie (alineada entre las tarjetas de una fila). */
+.merch { padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo-2); }
+.has-news .merch { background: var(--fondo); }
+.has-merch .visit { background: var(--fondo); }
+.has-merch .visit :is(.hours, .faq-lista), .has-merch .ftr { background: var(--fondo-2); }
+.has-merch .ftr-links { background: var(--fondo); }
+.has-news.has-merch .visit { background: var(--fondo-2); }
+.has-news.has-merch .visit :is(.hours, .faq-lista), .has-news.has-merch .ftr { background: var(--fondo); }
+.has-news.has-merch .ftr-links { background: var(--fondo-2); }
+.merch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8) var(--space-4); margin: var(--space-6) 0 0; padding: 0; list-style: none; }
+.merch-item { display: flex; }
+.merch-card { display: flex; flex-direction: column; width: 100%; color: inherit; text-decoration: none; border-radius: var(--radio-portada); -webkit-tap-highlight-color: transparent; }
+.merch-foto { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--radio-portada); background: var(--fondo-3); box-shadow: inset 0 0 0 1px var(--linea); transition: transform var(--dur-instantanea) var(--curva-salida); }
+.merch-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.merch-ic { width: var(--icono-producto); height: var(--icono-producto); color: var(--tinta-2); }
+.merch-tipo, .merch-nom, .merch-desc, .merch-precio { display: block; margin-top: var(--space-2); overflow-wrap: anywhere; }
+.merch-tipo { font: var(--t-subtitulo); color: var(--tinta-2); }
+.merch-nom { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font: var(--t-subtitulo); font-weight: 600; color: var(--tinta); text-wrap: balance; }
+.merch-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font: var(--t-subtitulo); color: var(--tinta-2); }
+.merch-precio { font: var(--t-subtitulo); font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.merch-accion { display: flex; align-items: center; gap: var(--space-2); min-height: var(--alto-sm); margin-top: auto; padding-top: var(--space-6); font: var(--t-boton-chico); color: var(--turquesa-texto); }
+.merch-accion .ic { flex: none; width: 20px; height: 20px; }
+.merch-card:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+.merch-card:active .merch-accion { color: var(--primario-presionado); }
+.motion .merch-card:active .merch-foto { transform: scale(0.98); }
+@media (hover: hover) { .merch-card:hover .merch-accion span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; } }
+@media (min-width: 761px) { .merch-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8) var(--space-6); } }
+@media (min-width: 1024px) {
+  .merch { display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); }
+  .merch > .sec-head { grid-column: 1 / span 8; margin: 0; }
+  .merch-grid { grid-column: 1 / -1; grid-template-columns: var(--rejilla); gap: var(--space-8) var(--canal-rejilla); }
+  .merch-item { grid-column: span 3; }
+}
+@media print { .merch { display: none; } }
 
 /* ---------- Sin JavaScript ---------- */
 /* Lo que necesita JS no se ofrece: el ☰, Mi lista, el buscador y «Pausar el movimiento». Las secciones quedan en la barra. */
@@ -1513,6 +1582,11 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .books > .cat { margin-top: var(--space-12); padding-top: var(--space-12); padding-bottom: var(--space-6); }
   .cat-bar { grid-template-columns: minmax(0, calc(50% - var(--canal-rejilla) / 2)) auto; column-gap: var(--canal-rejilla); } /* el buscador, columnas 1–6 */
   .books-foot { padding-top: var(--space-6); } /* con los 24 de la capa: bloque → bloque 48 */
+  /* Editoriales: otra capa con 48 a cada lado de su filete; el subtitular y su nota en 1–6 y la lista en 7–12 (como el pie: misma división única,
+     misma línea de arriba). */
+  .books > .edit { margin-top: var(--space-6); padding-top: var(--space-12); padding-bottom: var(--space-6); display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; } /* su caja llega al borde (filete a todo el ancho): dentro del relleno es la misma rejilla de la sección */
+  .edit-head { grid-column: 1 / span 6; }
+  .edit-lista { grid-column: 7 / -1; margin: 0; max-width: none; }
   /* Café y té (recomposición del 2026-11-17; contenedor de la página desde el mismo día, decisión de Aldo: un solo eje en toda la página).
      Vive en el contenedor de 1152 como Eventos y Visita (antes, uno propio de 1120 con su margen 16 px dentro). Titular y entradilla en 1–8 y
      la foto (5:2) en 9–12, alineados arriba: la foto empieza en la misma columna que la nota lateral de Eventos (SISTEMA.laterales de

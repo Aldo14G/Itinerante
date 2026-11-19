@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "nota": "Merch de la librería. Mientras `productos` esté vacío (o sin productos válidos) la sección #merch NO existe: ni en el DOM, ni en la barra, el ☰ o el destino actual. Cada producto: id, nombre, tipo, descripcion (o null), precio (número o null: con null no se imprime nada), foto { src, alt, chica } (la deja scripts/foto-merch.py; ruta local registrada en assets/provenance.json) o null, disponibilidad (\"hay\", \"encargo\" o null; el sitio nunca afirma existencias: la tarjeta es «Consultar disponibilidad» por WhatsApp). Plantilla y comandos en docs/MERCH.md."
+  },
+  "productos": []
+}

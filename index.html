@@ -57,6 +57,7 @@
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7.5 7.5 5.75 7.5-5.75"/></symbol>
     <symbol id="c-taza" viewBox="0 0 24 24"><path d="M4.5 9.5h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM15.5 11h1.25a2.25 2.25 0 0 1 0 4.5H15M3.5 21h14M8.5 3.5c-.7.9-.7 1.8 0 2.7M12 3.5c-.7.9-.7 1.8 0 2.7"/></symbol>
     <symbol id="c-plato" viewBox="0 0 24 24"><circle cx="12.5" cy="12" r="5.5"/><circle cx="12.5" cy="12" r="2.4"/><path d="M4 4v16M2.5 4v3.5a1.5 1.5 0 0 0 3 0V4M21 20V4c-1.6 1.2-2.2 3.4-2.2 6.5H21"/></symbol>
+    <symbol id="c-merch" viewBox="0 0 24 24"><path d="M5.5 8.5h13l-1 11.5h-11zM9 8.5V7a3 3 0 0 1 6 0v1.5"/></symbol>
     <symbol id="c-tetera" viewBox="0 0 24 24"><path d="M12 5v2M8.5 8.5h7M6.5 13a5.5 5.5 0 0 0 11 0c0-2.5-1.6-4.5-3.5-4.5h-4c-1.9 0-3.5 2-3.5 4.5zM6.6 12.2 3.5 9.5M17.4 11h.6a2.5 2.5 0 0 1 0 5h-1.3M8 20.5h8"/></symbol>
   </svg>
 
@@ -346,6 +347,23 @@
         </div>
       </dialog>
     </div>
+
+    <!-- Editoriales (2026-11-19): dentro del Catálogo, sin entrada propia en la barra, el menú ni la barra inferior. Cada editorial abre Explorar con su filtro (app.js);
+         sin JavaScript es un enlace a #catalogo. Con menos de 3 editoriales no se pinta nada. -->
+    <!-- editoriales:inicio · generadas desde assets/data/catalog.json con `npm run editoriales`; no se editan a mano -->
+    <div class="edit" id="editoriales" data-editoriales>
+      <div class="edit-head">
+        <h3 class="edit-tit" id="edit-title">Editoriales <em>independientes, una por una</em></h3>
+        <p class="edit-nota">4 editoriales · 40 de los 41 títulos</p>
+      </div>
+      <ul class="edit-lista" aria-labelledby="edit-title">
+        <li><a class="edit-fila" href="#catalogo" data-editorial="Abismos Casa Editorial"><span class="edit-nom">Abismos Casa Editorial</span><span class="sr-only">, </span><span class="edit-n">19 títulos</span><svg class="ic edit-ir" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
+        <li><a class="edit-fila" href="#catalogo" data-editorial="Capítulo Siete"><span class="edit-nom">Capítulo Siete</span><span class="sr-only">, </span><span class="edit-n">10 títulos</span><svg class="ic edit-ir" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
+        <li><a class="edit-fila" href="#catalogo" data-editorial="Iridiscencias"><span class="edit-nom">Iridiscencias</span><span class="sr-only">, </span><span class="edit-n">10 títulos</span><svg class="ic edit-ir" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
+        <li><a class="edit-fila" href="#catalogo" data-editorial="Libro Objeto"><span class="edit-nom">Libro Objeto</span><span class="sr-only">, </span><span class="edit-n">1 título</span><svg class="ic edit-ir" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
+      </ul>
+    </div>
+    <!-- editoriales:fin -->
 
       <div class="books-foot">
         <p>Pásate a hojearlos; antes, te confirmamos si los tenemos. ¿No está el que buscas? Te&nbsp;lo&nbsp;podemos pedir.</p>

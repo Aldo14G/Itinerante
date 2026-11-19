@@ -106,6 +106,13 @@ async function boot() {
     measureQueued = requestAnimationFrame(() => { measureQueued = 0; measureZones(); current = null; kick(); });
   };
   addEventListener('resize', queueMeasure);
+  // Merch (2026-11-19): la sección no existe hasta que merch.js la monta (solo con productos válidos); entonces entra al destino actual: su zona, sus
+  // enlaces de la barra y del ☰ marcan `aria-current` como los demás. Sin productos este gestor nunca corre.
+  document.addEventListener('iti:merch', () => {
+    zones.push({ hash: '#merch', from: $('#merch'), to: $('#merch') });
+    navLinks.push(...$$('.hdr-nav a[href="#merch"], .menu-row[href="#merch"]'));
+    queueMeasure();
+  });
   if ('ResizeObserver' in window) {
     let lastH = document.body.offsetHeight, timer = 0;
     new ResizeObserver(() => {
@@ -386,6 +393,7 @@ async function boot() {
     if (explorer) {
       const phone = matchMedia('(max-width: 760px)');
       let opening = false;
+      let editorialOrigin = null; // la fila de «Editoriales» que abrió la hoja (el foco vuelve a ella al cerrar)
       // En escritorio el diálogo queda abierto en línea. Se abre con el atributo y no con show(): show() ejecuta los pasos de
       // enfoque del diálogo, que mandan el foco (y el scroll) al campo de búsqueda al cargar la página.
       const settle = () => {
@@ -418,16 +426,49 @@ async function boot() {
       };
       settle();
       phone.addEventListener('change', settle);
-      explorer.addEventListener('close', () => { if (phone.matches) $('[data-ex-open]')?.focus({ preventScroll: true }); });
+      explorer.addEventListener('close', () => {
+        // Si la hoja se abrió desde una editorial (bloque «Editoriales»), el foco vuelve a esa fila; si no, a «Buscar en el catálogo».
+        const origen = editorialOrigin;
+        editorialOrigin = null;
+        if (!phone.matches) return;
+        (origen?.isConnected ? origen : $('[data-ex-open]'))?.focus({ preventScroll: true });
+      });
       // En el teléfono Explorar es una hoja a pantalla completa: se desliza hacia abajo desde el asa o su barra de arriba para cerrarla (swipeToClose).
       swipeToClose(explorer, { grab: $('[data-sheet-grab]', explorer), head: $('.ex-top', explorer) });
       $('[data-ex-close]', explorer).addEventListener('click', () => closeDialog(explorer)); // el cierre real (volver a activar la página) corre después del fotograma
       document.addEventListener('iti:open-explorer', openExplorer);
+      // «Editoriales» (2026-11-19): cada fila abre Explorar con el filtro Editorial de esa editorial ya aplicado (catalog.js, `iti:filtrar-editorial`: quita la
+      // búsqueda y los demás filtros). Teléfono: la hoja sube (la respuesta no espera a la red), se filtra cuando el catálogo está listo y el foco se queda en
+      // su ×; al cerrarla vuelve a la fila de origen. Tableta y escritorio: la rejilla ya está en línea; se baja a ella, se filtra y el foco va al estado de
+      // resultados (que anuncia «N títulos»). Sin catálogo (error de carga) no se afirma nada: queda el mensaje del Catálogo.
+      document.addEventListener('click', async e => {
+        const a = e.target.closest?.('a[data-editorial]');
+        if (!a) return;
+        e.preventDefault();
+        const editorial = a.dataset.editorial;
+        const aplicar = async focus => {
+          await bootCatalog();
+          const detail = { editorial, focus };
+          if (catalogSection.dataset.state === 'ready') document.dispatchEvent(new CustomEvent('iti:filtrar-editorial', { detail }));
+          return detail;
+        };
+        if (phone.matches) {
+          editorialOrigin = a;
+          confirmThen(a, async () => {
+            await openExplorer();
+            if (explorer.open) await aplicar(false);
+          });
+        } else {
+          const detail = await aplicar(true);
+          // El filete de la capa queda 8 px bajo la barra (el titular «Explora el catálogo» a ~56): la persona llega a ver el estado y las primeras tarjetas.
+          if (detail.found) scrollTo({ top: absTop(catalogSection) - hdr.offsetHeight - 8, behavior: isMotion() ? 'smooth' : 'auto' });
+        }
+      });
       // Cualquier enlace al catálogo («Buscar en el catálogo», arriba del capítulo, incluido) abre la hoja en móvil: confirma el toque y la hoja
       // (lo caro) va después de pintar. En escritorio el enlace baja a la rejilla en línea y deja el foco en su buscador.
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href="#catalogo"]');
-        if (!a) return;
+        if (!a || a.dataset.editorial !== undefined) return; // las editoriales las atiende su propio gestor (abajo)
         if (phone.matches) { e.preventDefault(); confirmThen(a, openExplorer); } else focusSearch();
       });
       addEventListener('hashchange', () => { if (location.hash === '#catalogo') focusSearch(); });
@@ -554,6 +595,8 @@ async function boot() {
     whenIdle(prepareReveals, { timeout: 1500 });
     // Conteo de novedades (control del inicio): después de la foto y las fuentes. Su sitio ya está reservado (boot.js), así que no mueve nada.
     loadNews().then(m => m.initNewsCount()).catch(() => {});
+    // Merch: se pide en reposo; sin productos válidos (hoy) no monta nada ni toca la barra, el ☰ ni el destino actual.
+    whenIdle(() => import('./merch.js').then(m => m.initMerch()).catch(() => {}), { timeout: 3000 });
     // Aviso del próximo evento (renglón del inicio y punto de «Eventos»): mismo momento y mismo mecanismo; su sitio también está reservado.
     loadFeed().then(m => m.initEventosAviso()).catch(() => {});
     // Eventos se arma también en reposo, no solo al acercarse: al llegar por un enlace (☰, barra) la sección ya está armada y no salta (2026-11-16;

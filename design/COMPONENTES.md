@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 35 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 37 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -47,6 +47,8 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | CarruselNovedades | sí | sí | sí | sí |  |  | sí | sí | sí |  | sí |
 | IntroMarca | — | — |  |  |  | sí |  |  |  |  | sí |
 | PreguntasFrecuentes | sí | sí | sí |  |  |  | sí |  |  |  | sí |
+| Editoriales | sí | sí | sí |  |  |  | sí |  | sí |  |  |
+| TarjetaMerch | sí | sí | sí |  |  |  |  |  | sí | sí | sí |
 
 Estados propios de algún componente, fuera de la tabla: `oculto`, `tactil`, `plano`, `abriendo`, `abierto`, `colores_forzados`, `cerrado` (ver el detalle).
 
@@ -735,3 +737,42 @@ Preguntas frecuentes de Visita (2026-11-19): una lista agrupada (fondo, radio-md
 - **Estado movimiento_reducido:** `.motion .faq-item[open] > .faq-resp` — El fundido de la respuesta y el giro del chevron viven bajo .motion; sin movimiento, el cambio es inmediato.
 - **ARIA:** Disclosure (details y summary nativos) (https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/) · `details/summary nativos (el navegador expone abierto y cerrado)` `role=group con aria-labelledby (el titular «Preguntas frecuentes»)` `el chevron es aria-hidden` · **Teclado:** Tab entre preguntas; Enter o Espacio abre y cierra.
 - **QA:** `tests/contenido.test.mjs` `tools/qa/guias.mjs` `tools/qa/controles.mjs`
+
+### Editoriales
+
+Bloque «Editoriales» del Catálogo (2026-11-19), después de Explorar y antes del cierre; sin entrada propia en la barra, el menú ni la barra inferior. Pintado en index.html desde assets/data/catalog.json (scripts/build-editoriales.mjs, npm run editoriales; editoriales:check y npm test fallan si no coinciden): subtitular Title 3, nota con los hechos reales («4 editoriales · 40 de los 41 títulos») y una lista agrupada de filas de 56 (nombre, número de títulos, chevron), de más a menos títulos y luego alfabético. Cada fila abre Explorar con el filtro Editorial de esa editorial ya aplicado (teléfono: la hoja, y al cerrarla el foco vuelve a la fila; tableta y escritorio: baja a la rejilla en línea y el foco va al estado de resultados); sin JavaScript es un enlace a #catalogo. Con menos de 3 editoriales no se pinta nada; con más de 7, las primeras 7 y «Ver las N editoriales» (details nativo). Desde 1024 px, subtitular en 1–6 y lista en 7–12.
+
+- **Tipo:** control · **desde** 2026-11-19 · DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19).
+- **style.css:** `.edit` `.edit-head` `.edit-tit` `.edit-nota` `.edit-lista` `.edit-fila` `.edit-nom` `.edit-n` `.edit-ir` `.edit-resto` `.edit-resto-btn`
+- **index.html:** `#editoriales` `[data-editoriales]` `.edit-fila` `[data-editorial]`
+- **catalog.js:** exporta `editorialesDe` `editorialesPlan` `editorialesNota` `editorialKey` `titulosLabel` `EDITORIALES_MIN` · ganchos `iti:filtrar-editorial`
+- **app.js:** ganchos `iti:filtrar-editorial` `editorialOrigin`
+- **scripts/build-editoriales.mjs:** exporta `editorialesHtml` `withEditoriales`
+- **Tokens:** `fondo-2` `linea` `tinta` `tinta-2` `turquesa-texto` `radio-md` `radio-sm` `alto-md` `alto-lg` `t-titulo-3` `ls-titulo-3` `t-titular` `t-subtitulo` `t-boton` `anillo-foco` `fondo-3-presionado` `space-1` `space-2` `space-3` `space-4` `space-6` `space-8` `space-12` `canal-rejilla`
+- **Estado hover:** `.edit-fila:hover .edit-nom`
+- **Estado foco:** `.edit-fila:focus-visible`, `.edit-resto-btn:focus-visible`
+- **Estado presionado:** `.edit-fila:active`, `.edit-resto-btn:active` — La fila se tiñe de fondo-3-presionado, también con movimiento reducido; sin escala.
+- **Estado vacio:** scripts/build-editoriales.mjs `if (!plan.mostrar)` — Con menos de 3 editoriales el generador no pinta nada: ni hueco ni encabezado (como Novedades sin llegadas).
+- **Estado expandido:** `.edit-resto[open] .edit-resto-cerrar` — Solo con más de 7 editoriales: details[open] muestra el resto.
+- **ARIA:** Lista de enlaces (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `ul con aria-labelledby (el subtitular)` `cada fila es un enlace a #catalogo; su nombre es «editorial, N títulos» (coma en sr-only)` `el chevron es aria-hidden` · **Teclado:** Tab entre filas; Enter abre Explorar con el filtro; al cerrar la hoja el foco vuelve a la fila.
+- **QA:** `tests/contenido.test.mjs` `tools/qa/guias.mjs` `tools/qa/contenido.mjs`
+
+### TarjetaMerch
+
+Tarjeta de un artículo de Merch (2026-11-19), la TarjetaLibro adaptada: un enlace a WhatsApp, «Consultar disponibilidad», con el producto y su precio ya escritos (el sitio nunca afirma existencias; sin carrito ni pagos). Foto cuadrada (radio-portada; si no hay foto o falla, el icono de la tarjeta), tipo (con «Por encargo» solo si la librería lo dice), nombre (Subheadline 600, dos renglones), descripción (dos renglones), precio en su renglón (solo si lo hay) y la acción al pie, alineada entre las tarjetas de una fila. 2 columnas en el teléfono, 3 desde 761 y 4 desde 1024 (3 de las 12 columnas). La sección NO existe (ni en el DOM, ni en la barra, el ☰ o el destino actual) mientras assets/data/merch.json no tenga productos válidos: merch.js la monta entre Café y Visita con el primero y pone .has-merch, que invierte la banda de Visita y el pie como con Novedades. Datos: scripts/foto-merch.py y docs/MERCH.md.
+
+- **Tipo:** control · **desde** 2026-11-19 · DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19).
+- **style.css:** `.merch` `.merch-grid` `.merch-item` `.merch-card` `.merch-foto` `.merch-ic` `.merch-tipo` `.merch-nom` `.merch-desc` `.merch-precio` `.merch-accion`
+- **merch.js:** exporta `validMerch` `merchProblems` `merchMessage` `merchWaUrl` `merchCard` `merchSection` `initMerch` `precioMerch` `validFotoMerch` · ganchos `iti:merch` `has-merch`
+- **app.js:** ganchos `iti:merch` `import('./merch.js')`
+- **scripts/check-merch.mjs:** exporta `problemasDisco`
+- **assets/data/merch.json:** datos
+- **Tokens:** `fondo` `fondo-2` `fondo-3` `linea` `tinta` `tinta-2` `turquesa-texto` `primario-presionado` `radio-portada` `icono-producto` `alto-sm` `t-subtitulo` `t-boton-chico` `anillo-foco` `dur-instantanea` `curva-salida` `space-2` `space-4` `space-6` `space-8` `canal-rejilla`
+- **Estado hover:** `.merch-card:hover .merch-accion span`
+- **Estado foco:** `.merch-card:focus-visible`
+- **Estado presionado:** `.merch-card:active .merch-accion` — La acción toma primario-presionado, también con movimiento reducido; la foto se escala 0.98 solo con movimiento.
+- **Estado vacio:** merch.js `if (!productos.length \|\| !visita) return false;` — Sin productos válidos (hoy) no se monta nada: ni sección, ni enlaces, ni clase.
+- **Estado error:** merch.js `img.addEventListener('error', () => img.remove(), { once: true })` — Si la foto falla, se retira y queda el icono de la tarjeta.
+- **Estado movimiento_reducido:** `.motion .merch-card:active .merch-foto`
+- **ARIA:** Link (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `la tarjeta es un enlace (target=_blank con rel=noopener noreferrer); su nombre es el texto de la tarjeta` `ul con aria-label «Artículos de la librería»` `alt en la foto; el icono es aria-hidden` · **Teclado:** Tab entre tarjetas; Enter abre WhatsApp en otra pestaña.
+- **QA:** `tests/contenido.test.mjs` `tools/qa/contenido.mjs` `tools/qa/guias.mjs`

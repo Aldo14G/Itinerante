@@ -35,6 +35,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { productosDePrueba, rutearMerch } from './merch-prueba.mjs';
 
 let pw = null;
 for (const ruta of [process.env.PLAYWRIGHT_PATH, 'playwright', '/opt/node-tools/node_modules/playwright/index.js'].filter(Boolean)) {
@@ -70,6 +71,9 @@ const SISTEMA = {
   // Café (2026-11-17, con el contenedor de la página): la foto de la cabecera va en 9–12, en un tercio, junto al titular y la entradilla de 1–8
   // (la composición aprobada; sin galería de la carta). Empieza en la misma x que la nota de Eventos. Con galería no se pinta.
   laterales: [{ sel: '.ev-lado', columna: 9 }, { sel: '.frame-clip', seccion: 'cafe', columna: 9 }],
+  // Filas aparte (2026-11-19): capas que repiten la división 1–6 | 7–12 más abajo en su sección y se miden por su cuenta (ver `filasAparte` en el análisis):
+  // Editoriales (Catálogo): subtitular y nota en 1–6, la lista en 7–12 con su misma línea de arriba.
+  filasAparte: [{ seccion: 'catalogo', sel: ['edit-tit', 'edit-nota', 'edit-lista'], derecha: 'edit-lista' }],
   // Contenedor propio de una sección (su ancho y su división, desde 1024 px). Vacío desde el 2026-11-17: Café tuvo uno de 1120 (token
   // ancho-carta) y Aldo decidió el de la página para todas (un solo eje). El mecanismo queda por si una sección lo necesita con su razón escrita.
   contenedores: {},
@@ -125,6 +129,8 @@ const SISTEMA = {
     'Primaria del evento destacado: vive dentro de su tarjeta (`tarjetasConPrimaria`); se le exige la sangría de la tarjeta y, en el teléfono, que su fila llegue al borde interior (no el ancho de la página).',
     'Fecha tipográfica de Eventos (el número de 52 del destacado y el de 32 del día): es una cifra decorativa (aria-hidden; la fecha se lee en texto sr-only), no texto de lectura: no cuenta para el máximo de tamaños por sección (T3).',
     'Ficha del libro: tiene retícula interior propia; de ella solo fallan el margen (H1) y los botones aplastados (H2).',
+    'Editoriales (2026-11-19): una capa del Catálogo con su propio filete que repite la división 1–6 | 7–12 (subtitular y nota a la izquierda, lista a la derecha, misma línea de arriba): se mide aparte (`filasAparte`) y no cuenta como columna derecha de la fila del titular del Catálogo.',
+    'Merch (2026-11-19): la rejilla de tarjetas es una pieza de primer nivel a todo el ancho (como .cat-grid y .news-list); sus tarjetas se miden contra ella (2 columnas con canal 16 en el teléfono, 3 en tableta, 4 de 3 columnas desde 1024: contenido.mjs M2 comprueba que cada una empiece en una línea de la rejilla). Solo existe con productos: `--merch=N`.',
     'Café desde 1024 px (2026-11-17): el contenedor de la página (1152), como las demás; la foto de la cabecera va en 9–12 (`laterales`, como la nota de Eventos): titular y entradilla en 1–8, la foto en un tercio, con su tope en el del titular. Con la galería de la carta la foto no se pinta y no hay columna derecha.',
     'Barra de categorías de la carta (2026-11-17): enlaces sin fondo (texto con objetivo de 44): se alinea por la tinta de su primer enlace, no por la caja de toque.'
   ]
@@ -158,7 +164,11 @@ const SECCIONES = [
     ['titular', '#books-title'], ['control', '.explore-open'], ['control', '.rail-chips'], ['nota', '.rail-note'], ['dato', '.rail-progreso'],
     ['escenario', '.c3d--portada', { c3d: true }], ['pie-escenario', '.cf-texto'],
 ['subtitular', '.layer-title'], ['rotulo', '.cat-search label'], ['control', '.cat-combo'], ['rotulo', '.cat-status'],
-['contenido', '.cat-grid'], ['accion', '.cat-fold'], ['texto', '.books-foot p'], ['control', '.books-foot .btn'] ] },
+['contenido', '.cat-grid'], ['accion', '.cat-fold'],
+// 2026-11-19: Editoriales, una capa más tras Explorar (capa → capa con filete; subtitular → nota 8; nota → lista 24).
+// En escritorio el subtitular y la lista comparten fila (1–6 | 7–12): de cada fila cuenta el hueco menor; el cierre abre un bloque nuevo.
+['subtitular', '.edit-tit', { fila: 'editoriales' }], ['nota', '.edit-nota'], ['contenido', '.edit-lista', { fila: 'editoriales' }],
+['texto', '.books-foot p', { bloque: true }], ['control', '.books-foot .btn'] ] },
   { id: 'eventos', sel: '#cartelera', piezas: [
     ['titular', '#bill-title'], ['entradilla', '.bill .sec-texto'], ['contenido', '.ev-prox'], ['rotulo', '.ev-grupo:not(.ev-propuestas):not(.ev-anteriores) > .ev-sub'], ['contenido', '.ev-dias'],
     ['rotulo', '.ev-propuestas > .ev-sub'], ['contenido', '.ev-propuestas .ev-filas'], ['bloque', '.ev-lado'],
@@ -167,6 +177,9 @@ const SECCIONES = [
     ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['escenario', '.c3d--galeria', { c3d: true }], ['pie-escenario', '.ct-gal-pie .cf-texto'],
     ['control', '.ct-nav'], ['contenido', '.ct-lista'],
     ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p', { bloque: true }], ['control', '.ct-cierre .btn'] ] },
+  // Merch (2026-11-19): solo existe con productos (hoy ninguno): se mide con `--merch=N` (productos de prueba del arnés). Sin la sección, se omite.
+  { id: 'merch', sel: '#merch', piezas: [
+    ['titular', '#merch-title'], ['entradilla', '.merch .sec-texto'], ['contenido', '.merch-grid'] ] },
   { id: 'visita', sel: '#visita', piezas: [
     // 2026-11-19: «Cómo llegar» bajo el titular y, debajo, los datos del lugar (dirección, estado, horario) en un solo bloque.
     ['titular', '#visit-title'], ['control', '.visit-actions .btn'], ['dato', '.visit address'], ['estado', '.visit-status'],
@@ -183,7 +196,7 @@ const SECCIONES = [
 const NIVELES = {
   'h1': ['.entry-title'],
   'titular de sección': ['#house-title', '#books-title', '#bill-title', '#cafe-title', '#visit-title', '#ftr-title'],
-  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ev-lado-tit', '.ct-grupo-tit', '.faq-tit'],
+  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ev-lado-tit', '.ct-grupo-tit', '.faq-tit', '.edit-tit'],
   'entradilla y cuerpo': ['.house .sec-texto', '.bill .sec-texto', '.cafe .sec-texto', '.ftr-lede', '.books-foot p', '.ct-cierre p'],
   'párrafo de lectura': ['.ev-card-desc', '.ev-prox-desc'],   // tres renglones o más (≥ 120 caracteres): token `lectura` 17/24; la crítica (law-lineheight) pide ≥ 1.35
   'estado': ['.entry-status', '.visit-status'],
@@ -195,10 +208,10 @@ const NIVELES = {
   'valor de dato': ['.ev-dato dd'],
   'nombre de producto': ['.ct-nom', '.ct-gal-pie .ct-gal-nom'],      // Headline 17: la fila de la carta (1 / 2 columnas, 2026-11-17) lleva su nombre bajo el título del grupo, sin competir con él
   'texto de pieza': ['.cf-meta', '.ct-desc'],
-  'pregunta de la lista': ['.faq-preg'],   // Headline 17 semibold (FAQ, 2026-11-19): el mismo peso que el nombre de un producto, dentro de una lista agrupada
+  'fila de lista agrupada': ['.faq-preg', '.edit-nom'],   // Headline 17 semibold (FAQ, 2026-11-19): el mismo peso que el nombre de un producto, dentro de una lista agrupada
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],
-  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-lado-txt', '.ev-pas-meta']
+  'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-lado-txt', '.ev-pas-meta', '.edit-nota']
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -307,7 +320,7 @@ function enPagina(cfg) {
         if (h.matches('[role="radiogroup"]')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
         if (h.matches('.ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // enlaces sin fondo: la tinta del primero
         if (h.matches('.house-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }   // «Foto anterior» y «Foto siguiente» (2026-11-19): un grupo que empieza en el margen
-        if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ev-pasados, .ct-rejilla')) {
+        if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ev-pasados, .ct-rejilla, .merch-grid')) {
           const id = empuja(h, 'rejilla', sup);
           let i = 0;
           for (const li of h.children) { const r = li.getBoundingClientRect(); if (r.left < -1 || r.right > document.documentElement.clientWidth + 1 || !visible(li)) continue; if (i++ > 5) break; camina(li, id); }
@@ -566,7 +579,22 @@ function analizar(clave, m) {
     // columnas (desde 1024): dónde empieza la columna derecha y si las dos comparten la línea superior
     let colDer = null, tops = null;
     if (k === 2) {
-      const tl = s.atomos.filter(a => a.sup === null && !['escenario', 'flecha', 'pieza-central', 'rejilla'].includes(a.tipo) && !a.escenario);
+      const tl0 = s.atomos.filter(a => a.sup === null && !['escenario', 'flecha', 'pieza-central', 'rejilla'].includes(a.tipo) && !a.escenario);
+      // Filas aparte (2026-11-19): una capa que repite la división 1–6 | 7–12 más abajo en la sección (Editoriales: subtitular y nota a la izquierda, lista a
+      // la derecha). No cuenta como «la columna derecha» de la fila del titular (G3/G4 de la sección), pero se mide por su cuenta: la lista empieza
+      // exactamente en la columna 7 y comparte la línea de arriba con su subtitular.
+      const aparte = a => (SISTEMA.filasAparte || []).find(f => (!f.seccion || f.seccion === id) && f.sel.some(x => a.sel.includes(x)));
+      const tl = tl0.filter(a => !aparte(a));
+      for (const f of (SISTEMA.filasAparte || []).filter(f => !f.seccion || f.seccion === id)) {
+        const ia = tl0.filter(a => f.sel.some(x => a.sel.includes(x)) && !a.sel.includes(f.derecha)), da = tl0.find(a => a.sel.includes(f.derecha));
+        if (!da || !ia.length) continue;
+        const x7 = G_.inicios[SISTEMA.division[1] - 1], t0 = Math.min(...ia.map(a => a.caja.t));
+        if (Math.abs(da.caja.l - x7) > tol) F('G3', id, `${f.derecha}: la lista de su fila va en la columna 7 (x ${r1(x7)}); está en x ${da.caja.l}`);
+        if (Math.abs(da.caja.t - t0) > tol) F('G4', id, `${f.derecha}: la lista no comparte tope con su subtitular (lista y ${r1(da.caja.t - s.caja.t)}, subtitular y ${r1(t0 - s.caja.t)}, Δ ${r1(da.caja.t - t0)})`);
+        if (Math.abs(da.caja.r - G_.R) > tol) F('G3', id, `${f.derecha}: la lista termina en x ${da.caja.r}; el margen está en ${r1(G_.R)}`);
+        if (Math.abs(Math.min(...ia.map(a => a.caja.l)) - G_.L) > tol) F('G1', id, `${f.derecha}: su subtitular y su nota empiezan en el margen (x ${r1(G_.L)})`);
+        res.filasAparte = [...(res.filasAparte || []), { seccion: id, derecha: f.derecha, l: da.caja.l, t: da.caja.t }];
+      }
       const izqX = a => (a.tinta && a.tipo !== 'control' ? a.tinta.ml : a.caja.l);
       const esLateral = a => SISTEMA.laterales.find(l => (!l.seccion || l.seccion === id) && a.sel.includes(l.sel));   // `seccion`: solo en esa sección
       for (const a of tl.filter(esLateral)) {   // la nota lateral: su columna, el margen derecho y el tope de la lista que acompaña
@@ -844,8 +872,12 @@ const P = (...a) => { const s = a.join(' '); lineas.push(s); console.log(s); };
 
 for (const clave of claves) {
   const [nombre, w, h, dpr, toque] = PERFILES[clave];
-  const nuevoCtx = async () => (await navegador(toque)).newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, isMobile: toque, hasTouch: toque, userAgent: toque && w < 760 ? UA_IPHONE : undefined,
-    locale: 'es-MX', timezoneId: 'America/Monterrey', colorScheme: opt.oscuro ? 'dark' : 'light' });
+  const nuevoCtx = async () => {
+    const c = await (await navegador(toque)).newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, isMobile: toque, hasTouch: toque, userAgent: toque && w < 760 ? UA_IPHONE : undefined,
+      locale: 'es-MX', timezoneId: 'America/Monterrey', colorScheme: opt.oscuro ? 'dark' : 'light' });
+    if (opt.merch) await rutearMerch(c, productosDePrueba(Number(opt.merch)));   // --merch=N: N productos de prueba (solo en el arnés; tools/qa/merch-prueba.mjs)
+    return c;
+  };
   let ctx = await nuevoCtx();
   let page = await ctx.newPage();
   await cargar(page, toque);

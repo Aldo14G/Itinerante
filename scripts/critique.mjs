@@ -282,9 +282,9 @@ const PAGE_AUDIT = (params) => `(${function (cfg) {
     [/\b(garantizad[oa]|el mejor|premiad[oa]|más vendid[oa])\b/i, 'superlativo'],
   ];
   // El precio de la hoja de la librería (PRODUCT.md, 2026-11-12), el de la carta impresa de Café Itinerante (2026-11-16) y el costo que da el anuncio
-  // de un evento (2026-11-16) son datos con fuente: van marcados con data-fuente="hoja", "carta" o "anuncio" y no cuentan como precio inventado.
+  // de un evento (2026-11-16) son datos con fuente: van marcados con data-fuente="hoja", "carta", "anuncio" o "merch" (el del merch de la librería, 2026-11-19) y no cuentan como precio inventado.
   // Cualquier otra cifra con signo de pesos sigue fallando.
-  const sourced = [...document.querySelectorAll('[data-fuente="hoja"], [data-fuente="carta"], [data-fuente="anuncio"]')].map(e => e.innerText).filter(Boolean);
+  const sourced = [...document.querySelectorAll('[data-fuente="hoja"], [data-fuente="carta"], [data-fuente="anuncio"], [data-fuente="merch"]')].map(e => e.innerText).filter(Boolean);
   const unsourced = sourced.reduce((t, s) => t.split(s).join(' '), text);
   truth.forEach(([re, what]) => { const m = (what === 'precio' ? unsourced : text).match(re); if (m) out.push({ rule: 'copy-truth', sel: 'texto', detail: `${what}: «${m[0]}»` }); });
   // Palabras pegadas: un <br> oculto (p. ej. en móvil) entre texto sin espacio a ninguno de sus lados.
