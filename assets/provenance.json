@@ -788,6 +788,7 @@
     "rule": "fecha: null = propuesta («Propuesta · sin fecha»). Un evento con fecha lleva solo lo que anuncia la librería (hora tal cual, costo en sus renglones, reserva por Luma o WhatsApp); su imagen se registra en «real» antes de publicarlo (un cartel, con su autor y la publicación de origen)."
   },
   "visitMap": {
+    "uso": "Respaldo del mapa de Visita (2026-11-19): es el mapa que se ve mientras assets/data/sitio.json → mapa.clave esté vacía y mientras el iframe de la Maps Embed API de Google (modo place) termina de cargar; con clave válida, cuando el iframe carga el SVG deja de verse. Sin JavaScript sigue siendo el mapa. Su atribución a OpenStreetMap solo se muestra mientras el SVG es el mapa visible.",
     "file": "index.html (#visita, figure.visit-map: SVG en línea)",
     "source": "OpenStreetMap: calles (highway trunk, tertiary y residential) de la API de OSM, GET https://www.openstreetmap.org/api/0.6/map?bbox=-100.3262,25.6688,-100.3178,25.6740",
     "retrieved": "2026-11-14T03:09:26Z",

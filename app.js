@@ -4,6 +4,17 @@ import { openDialog, closeDialog, navigateFromSheet, swipeToClose } from './shee
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
+// Mapa de Visita con la Maps Embed API de Google, modo place (2026-11-19). La clave la crea Aldo y vive en assets/data/sitio.json (mapa.clave); mientras
+// esté vacía —o no tenga forma de clave de Google— no se carga nada de Google y el SVG de OpenStreetMap sigue siendo el mapa.
+export const MAPA_CLAVE = /^AIza[0-9A-Za-z_-]{35}$/;
+export const MAPA_CONSULTA = 'Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey';
+export function mapaUrl(cfg) {
+  const m = cfg && cfg.mapa;
+  if (!m || typeof m.clave !== 'string' || !MAPA_CLAVE.test(m.clave)) return null;
+  const q = typeof m.consulta === 'string' && m.consulta.trim() ? m.consulta.trim() : MAPA_CONSULTA;
+  return `https://www.google.com/maps/embed/v1/place?key=${m.clave}&q=${encodeURIComponent(q)}&language=es&region=MX`;
+}
+
 let monterreyFormat;
 export function monterreyNow(date = new Date()) {
   monterreyFormat ??= new Intl.DateTimeFormat('en-US', {
@@ -61,11 +72,13 @@ async function boot() {
 
   // ---------- Barra de navegación y destino actual (scroll-spy) ----------
   // Zonas del recorrido: cada una marca su enlace de la barra, su fila del menú y, en el teléfono, su casilla de la barra inferior.
-  // «Inicio» abarca la entrada y La casa; la barra inferior solo tiene Inicio y Catálogo, así que en el resto de la página no marca ninguna.
+  // Cada enlace marca la zona a la que lleva (2026-11-19: «La casa» del menú ☰ se marca en La casa, ya no se funde con Inicio; «Catálogo» lleva al
+  // mismo sitio —#libros— desde la barra inferior, el menú y la barra de escritorio). La barra inferior solo tiene Inicio, Catálogo y Mi lista:
+  // su «Inicio» abarca también La casa (data-zona="#inicio #casa": no hay casilla propia) y en el resto de la página no marca ninguna.
   const hdr = $('[data-hdr]');
   const navLinks = $$('.hdr-nav a, .menu-row[href]');
   const tabLinks = $$('.tabbar a');
-  const zones = [['#inicio', '#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#cafe'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
+  const zones = [['#inicio'], ['#casa'], ['#libros'], ['#cartelera'], ['#novedades'], ['#cafe'], ['#visita']].map(([from, to = from]) => ({ hash: from, from: $(from), to: $(to) }));
   let zoneRanges = [], current = null, raf = 0;
   const measureZones = () => {
     vh = innerHeight;
@@ -82,9 +95,8 @@ async function boot() {
     if (hash === current) return;
     current = hash;
     navLinks.forEach(a => { if (a.getAttribute('href') === hash) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
-    // La entrada «#inicio» abarca La casa: su fila del menú «La casa» no se marca por separado.
-    // «Catálogo» de la barra inferior aterriza en las colecciones (#colecciones) pero su zona es la del capítulo (data-zona="#libros").
-    tabLinks.forEach(a => { if ((a.dataset.zona || a.getAttribute('href')) === hash) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    // La casilla «Inicio» de la barra inferior abarca la entrada y La casa (data-zona lista las zonas que cubre); «Catálogo» solo #libros.
+    tabLinks.forEach(a => { if ((a.dataset.zona || a.getAttribute('href')).split(' ').includes(hash)) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
   }
   const kick = () => { if (!raf) raf = requestAnimationFrame(spy); };
   addEventListener('scroll', kick, { passive: true });
@@ -469,6 +481,33 @@ async function boot() {
     const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); boot(); } }, { rootMargin: margin });
     io.observe(el);
   };
+  // ---------- Mapa de Visita: iframe de Google solo con clave y al acercarse (2026-11-19) ----------
+  // Nada de Google se pide antes de que la sección esté cerca (700 px) y el navegador esté en reposo. El SVG de OpenStreetMap es el mapa hasta que el
+  // iframe termina de cargar: entonces la caja del iframe toma su sitio (misma altura: sin salto), el SVG se oculta y el pie dice de dónde es el mapa.
+  // Sin clave, con clave inválida, sin red o con la CSP bloqueándolo, el SVG se queda. Un solo mapa visible en cualquier estado.
+  nearby($('.visit-map'), () => whenIdle(async () => {
+    const fig = $('.visit-map'), link = fig && $('.visit-map-link', fig), cap = fig && $('figcaption', fig);
+    if (!link) return;
+    let cfg = null;
+    try { const r = await fetch('assets/data/sitio.json'); cfg = r.ok ? await r.json() : null; } catch { /* sin configuración: el SVG se queda */ }
+    const src = mapaUrl(cfg);
+    if (!src || fig.querySelector('.visit-map-embed')) return;
+    const caja = document.createElement('div');
+    caja.className = 'visit-map-embed';
+    const frame = document.createElement('iframe');
+    frame.title = 'Mapa de Google: Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey';
+    frame.loading = 'lazy';
+    frame.referrerPolicy = 'strict-origin-when-cross-origin';
+    frame.addEventListener('load', () => {
+      fig.classList.add('has-google');
+      link.hidden = true;
+      if (cap) cap.textContent = 'Mapa de Google Maps';
+    }, { once: true });
+    frame.src = src;
+    caja.append(frame);
+    link.after(caja);
+  }, { timeout: 3000 }), '700px 0px');
+
   nearby($('[data-ev]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
 
   // ---------- La casa: «Foto anterior» y «Foto siguiente» bajo la tira (2026-11-19, iteración de lectura; APG, carrusel) ----------

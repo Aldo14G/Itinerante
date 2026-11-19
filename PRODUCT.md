@@ -221,6 +221,11 @@ Inventario y tabla de cambios de la curaduría: `DESIGN.md`, «Curaduría de tex
 3. Entrada animada: solo en la primera visita, breve y sin bloquear la navegación; se omite con movimiento reducido, «Pausar el movimiento», ahorro de datos y al abrir un enlace directo a una sección o ficha.
 4. Pasillo: su `alt` describe lo observable sin el patio ni repetir el pie.
 
+### Decisiones posteriores del 2026-11-19 (Aldo)
+
+5. Barra inferior: vuelve la cápsula flotante (la anclada se retiró). Catálogo lleva al mismo sitio (`#libros`) desde todas las entradas.
+6. Mapa de Visita con Google (Maps Embed API, modo `place`) cuando Aldo cree la clave; mientras tanto, el mapa SVG de OpenStreetMap. **Qué implica para quien visita:** con la clave puesta, al llegar a Visita el navegador carga una página de Google dentro del sitio; Google puede recibir la IP y el agente del navegador y guardar cookies propias (de terceros). El sitio no guarda nada de eso. **Pendiente de negocio: un aviso de privacidad** que lo diga antes de encender la clave (qué se carga, de quién y que la dirección y «Cómo llegar» no dependen de ello). Pasos de la clave: `docs/MAPA-GOOGLE.md`.
+
 ## Evidence on Hand
 
 - Fotografías reales de la casa en `assets/img/` (lote oficial, cuenta oficial de Instagram y

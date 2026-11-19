@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b1d1b" media="(prefers-color-scheme: dark)">
@@ -137,11 +137,12 @@
   </dialog>
 
   <!-- Barra inferior (BarraInferior, solo móvil): cápsula de vidrio de 49 px con tres destinos. La pastilla menta se desliza a la casilla actual (aria-current, scroll-spy de app.js).
-       «Catálogo» aterriza en las colecciones (#colecciones, 2026-11-14): chips, carrusel y pie del libro caben entre las dos barras; su zona del scroll-spy es #libros (data-zona). -->
+       «Catálogo» lleva a #libros, el mismo sitio que desde el menú ☰ y la barra de escritorio (2026-11-19): el titular a 24 px bajo la cabecera con «Buscar en el catálogo» y los chips a la vista.
+       «Inicio» abarca también La casa (data-zona): esta barra no tiene casilla propia para ella. -->
   <nav class="tabbar" aria-label="Accesos">
     <span class="tabbar-pastilla" aria-hidden="true"></span>
-    <a href="#inicio" aria-current="location"><svg class="tab-ic" aria-hidden="true"><use href="#t-casa"/></svg><span class="tab-lb">Inicio</span></a>
-    <a href="#colecciones" data-zona="#libros"><svg class="tab-ic" aria-hidden="true"><use href="#t-libros"/></svg><span class="tab-lb">Catálogo</span></a>
+    <a href="#inicio" aria-current="location" data-zona="#inicio #casa"><svg class="tab-ic" aria-hidden="true"><use href="#t-casa"/></svg><span class="tab-lb">Inicio</span></a>
+    <a href="#libros"><svg class="tab-ic" aria-hidden="true"><use href="#t-libros"/></svg><span class="tab-lb">Catálogo</span></a>
     <button class="tab-list" type="button" data-open-mylist><span class="tab-ic-box"><svg class="tab-ic" aria-hidden="true"><use href="#i-mark"/></svg><span class="count-badge" data-saved-dot hidden aria-hidden="true"></span></span><span class="tab-lb">Mi lista<span class="sr-only">, <span data-saved-count>Vacía</span></span></span></button>
   </nav>
 

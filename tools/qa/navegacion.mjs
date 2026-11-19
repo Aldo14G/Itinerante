@@ -21,6 +21,10 @@
 //  I1 · «Pausar el movimiento» también en el menú ☰: mismo interruptor (role="switch", rótulo visible, objetivo ≥ 44), un toque en uno mueve al
 //       otro, el estado se guarda en `localStorage`, con «reducir movimiento» los dos quedan encendidos, `aria-disabled` y con su nota.
 //  M1 · la última fila del menú ☰ termina de entrar en ≤ 480 ms (con movimiento).
+//  N1 · (2026-11-19, Aldo: «todos los puntos de entrada Catálogo aterrizan en el mismo lugar») «Catálogo» desde la barra inferior, el menú ☰, la barra
+//       de escritorio y un #hash directo deja la página en la misma posición (± 2 px), con el titular a 24 px bajo la cabecera, «Buscar en el
+//       catálogo» y los chips a la vista, y todas las entradas visibles marcan ese mismo destino (aria-current) y solo ese; en La casa el menú ☰
+//       marca «La casa» (no «Inicio») y la casilla Inicio de la barra inferior abarca las dos.
 //  V1 · el velo (`::backdrop`) de cada hoja no tiene transición con movimiento reducido ni con la pausa del pie.
 // Sale con 1 si algo falla.
 import { existsSync, readFileSync } from 'node:fs';
@@ -43,6 +47,9 @@ const PERFILES = {
   iphone: { viewport: { width: 393, height: 659 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true,
     userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' },
   // El ancho del teléfono con puntero: `:active` solo se sostiene con el ratón (CDP no lo sostiene con toque) y así se mide la barra inferior.
+  iphone13mini: { viewport: { width: 375, height: 629 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' },
+  tableta: { viewport: { width: 820, height: 1180 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false },
   ancho393: { viewport: { width: 393, height: 659 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false },
   d1440: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false },
 };
@@ -255,7 +262,7 @@ async function presionado(perfil, nucleos, { reduce, pausa = false }) {
   if (!reduce) await familia('interruptor', '.ftr .interruptor-pista', { medir: sel => page.evaluate(s => getComputedStyle(document.querySelector(s)).backgroundColor, sel) }); // con «reducir movimiento» está encendido y deshabilitado: no responde por diseño
   if (PERFILES[perfil].viewport.width <= 760) {
     await page.evaluate(() => window.scrollTo(0, 0)); await sleep(500);
-    await familia('casilla', '.tabbar a[href="#colecciones"]');
+    await familia('casilla', '.tabbar a[href="#libros"]');
     await familia('☰', '.hdr [data-menu-open]');
   }
   await browser.close();
@@ -364,6 +371,45 @@ if (quiere('M1')) await intenta('M1', async () => {
   const m = await p;
   const ultimo = Math.max(...m.fin);
   ok("M1", m.n >= 7 && ultimo > 0 && ultimo <= 350, `la última fila del menú (${m.n} filas) termina de entrar a los ${Math.round(ultimo)} ms (tope 350: 240 + 6 × 15 = 330 con siete filas; 2026-11-18, antes 480)`);
+  await browser.close();
+});
+
+// ---------- N1 · «Catálogo» aterriza en el mismo lugar desde cada entrada ----------
+if (quiere('N1')) await intenta('N1', async () => {
+  const medir = page => page.evaluate(() => {
+    const R = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), l: Math.round(r.left), r: Math.round(r.right) }; };
+    const vis = e => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
+    const tb = document.querySelector('.tabbar'); const tbr = tb && getComputedStyle(tb).display !== 'none' ? tb.getBoundingClientRect() : null;
+    const marcadas = [...document.querySelectorAll('.hdr-nav a, .menu-row[href], .tabbar a')].filter(a => a.getAttribute('aria-current') && (vis(a) || a.closest('#menu'))).map(a => `${a.closest('.tabbar') ? 'barra-inferior' : a.closest('#menu') ? 'menu' : 'barra'}:${a.getAttribute('href')}`);
+    const pc = document.querySelector('.rail-item.is-centro .cover')?.getBoundingClientRect();
+    const limite = tbr ? tbr.top : innerHeight; const vistaPortada = pc ? Math.max(0, Math.min(pc.bottom, limite) - Math.max(pc.top, 0)) / pc.height : null;
+    return { y: Math.round(scrollY), hash: location.hash, hdr: Math.round(document.querySelector('.hdr').getBoundingClientRect().bottom), titular: R('#books-title'), buscar: R('.explore-open'), chips: R('.rail-chips'), limite: Math.round(limite), portada: vistaPortada === null ? null : +vistaPortada.toFixed(2), marcadas };
+  });
+  const PERF = [['iphone', 'iPhone 16 393×659', ['barra-inferior', 'menu', 'hash']], ['iphone13mini', 'iPhone 13 mini 375×629', ['barra-inferior', 'menu', 'hash']], ['tableta', 'tableta 820', ['menu', 'hash']], ['d1440', 'escritorio 1440', ['barra', 'hash']]];
+  for (const [perfil, nombre, entradas] of PERF) {
+    const lugares = {};
+    for (const entrada of entradas) {
+      const { browser, page } = await abrir(perfil, { esperar: 2400 });
+      if (entrada === 'barra-inferior') await tap(page, perfil, '.tabbar a[href="#libros"]');
+      else if (entrada === 'barra') await page.click('.hdr-nav a[href="#libros"]');
+      else if (entrada === 'menu') { await tap(page, perfil, '[data-menu-open]'); await sleep(900); await tap(page, perfil, '#menu a[href="#libros"]'); }
+      else await page.evaluate(() => { location.hash = '#libros'; });
+      await sleep(1800);
+      lugares[entrada] = await medir(page);
+      await browser.close();
+    }
+    const L = Object.values(lugares), a = L[0];
+    ok('N1', L.every(l => Math.abs(l.y - a.y) <= 2 && l.hash === '#libros'), `${nombre}: ${entradas.join(', ')} dejan la página en la misma posición (scrollY ${L.map(l => l.y).join(' · ')}; hash ${[...new Set(L.map(l => l.hash))].join()})`);
+    ok('N1', Math.abs(a.titular.t - (a.hdr + 24)) <= 2, `${nombre}: el titular «Catálogo» queda a ${a.titular.t - a.hdr} px bajo la cabecera (24 ± 2, como las demás secciones)`);
+    ok('N1', (a.buscar.t >= a.titular.b || a.buscar.l >= a.titular.r - 1 || a.buscar.l > a.titular.l + 200) && a.buscar.b <= a.limite && a.chips && a.chips.b <= a.limite, `${nombre}: «Buscar en el catálogo» (${a.buscar.t}–${a.buscar.b}) y los chips (${a.chips?.t}–${a.chips?.b}) a la vista sobre ${a.limite}`);
+    if (a.portada !== null && perfil.startsWith('iphone')) ok('N1', a.portada >= 0.6, `${nombre}: de la portada central se ve el ${Math.round(a.portada * 100)} % entre la cabecera y la cápsula (≥ 60 %; el pie del libro queda para el primer desplazamiento)`);
+    ok('N1', Object.entries(lugares).every(([e, l]) => l.marcadas.length >= 1 && l.marcadas.every(m => m.endsWith(':#libros'))), `${nombre}: todas las entradas visibles marcan #libros y solo ese: ${Object.entries(lugares).map(([e, l]) => `${e} → ${l.marcadas.join('+')}`).join(' · ')}`);
+  }
+  // La casa: el menú ☰ marca «La casa» (no «Inicio»); la casilla Inicio de la barra inferior abarca las dos.
+  const { browser, page } = await abrir('iphone', { esperar: 2400 });
+  await page.evaluate(() => { location.hash = '#casa'; }); await sleep(1800);
+  const casa = await page.evaluate(() => ({ menu: [...document.querySelectorAll('#menu .menu-row[aria-current]')].map(a => a.getAttribute('href')), tab: [...document.querySelectorAll('.tabbar a[aria-current]')].map(a => a.getAttribute('href')) }));
+  ok('N1', casa.menu.join() === '#casa' && casa.tab.join() === '#inicio', `en La casa el menú ☰ marca ${casa.menu.join() || 'ninguna'} y la barra inferior ${casa.tab.join() || 'ninguna'} (esperado: #casa y #inicio)`);
   await browser.close();
 });
 

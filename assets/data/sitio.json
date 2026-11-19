@@ -1,0 +1,9 @@
+{
+  "meta": {
+    "nota": "Configuración pública del sitio (nada secreto). mapa.clave: clave de la Maps Embed API de Google, CREADA POR ALDO en Google Cloud (pasos en docs/MAPA-GOOGLE.md) y restringida por referrer HTTP a su dominio y a la API «Maps Embed API»; es pública por diseño (viaja en la URL del iframe), la restricción es lo que la protege. VACÍA mientras no exista: el sitio sigue mostrando el mapa SVG de OpenStreetMap y no carga nada de Google. Con una clave válida (empieza con AIza), el SVG es el respaldo hasta que el iframe termina de cargar y después deja de verse. mapa.consulta: lo que Google busca (modo place)."
+  },
+  "mapa": {
+    "clave": "",
+    "consulta": "Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey"
+  }
+}

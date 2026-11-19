@@ -34,7 +34,7 @@ Después de cada cambio visual, antes de pedir commit. Nadie juzga una página q
 5. **Color y luz:** `fondo`/`fondo-2` alternos, `tinta`, `tinta-2` y un acento (turquesa). Un solo primario por vista («Cómo llegar»; en la ficha, «Consultar disponibilidad», 2026-11-19); el secundario es menta. Sombras solo en lo que flota. Los dos temas se ven igual de cuidados.
 6. **Foto:** encuadrada a propósito (`object-position`), sin chocar con el texto.
 7. **Movimiento:** respuesta, no decoración (titulares por línea, revelado de imagen, escala al toque, pastilla con resorte). Duraciones de tokens y nada con «reducir movimiento».
-8. **Móvil:** primero el teléfono: márgenes 16/20, acciones a todo el ancho, objetivos de 48 (44 en línea y barras, 56 los principales), barra inferior de vidrio anclada con su espacio propio (2026-11-19), que no tapa nada ni deja leer texto a sus lados y la firma sigue presente.
+8. **Móvil:** primero el teléfono: márgenes 16/20, acciones a todo el ancho, objetivos de 48 (44 en línea y barras, 56 los principales), cápsula de vidrio flotante (decisión de Aldo, 2026-11-19: volver a ella) con el espacio reservado al final de la página y el foco nunca bajo ella; la firma sigue presente.
 9. **Texto:** concreto y verdadero. Verbo al frente en las acciones.
 10. **Pulido:** anillo de foco del sistema, radios 12/20/28/píldora consistentes, sin saltos al cargar fuentes o datos.
 

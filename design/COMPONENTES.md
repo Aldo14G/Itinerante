@@ -227,13 +227,13 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 
 ### BarraInferior
 
-Solo ≤ 760 px: barra anclada al borde inferior, a todo el ancho y con su espacio propio (iteración de lectura, 2026-11-19; antes una cápsula flotante de 49 × 228 a 8 px del borde que dejaba leer el texto a sus lados): 49 px de casillas más el área segura (env(safe-area-inset-bottom)), vidrio con filete arriba, tres casillas iguales (131 × 49 a 393; hasta 480 px de casillas centradas) con Inicio, Catálogo y Mi lista (botón con el conteo). La pastilla menta de 68 × 41 se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta. El documento le deja su sitio (html: scroll-padding-bottom de 49 + área + 24, para que el foco por teclado no quede debajo; .ftr: padding-bottom de 49 + área + 32). Ajusta: el alto al área segura. Estira: el ancho de la ventana (casillas en 1fr). Límites: casillas ≤ 480 px en total, 49 de alto útil.
+Solo ≤ 760 px: cápsula de vidrio de 49 × 228 que flota 8 px sobre el área segura, centrada, con Inicio, Catálogo y Mi lista (botón con el conteo); tres casillas de 76 × 49 sin huecos entre objetivos. La pastilla menta se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta. 2026-11-19: la barra anclada de la iteración de lectura se retiró por decisión de Aldo («volver a la cápsula flotante»). Mitigación que no cambia su forma: el documento le deja su sitio (html: scroll-padding-bottom de 49 + área + 24, el foco por teclado queda 16 px sobre su borde; .ftr: padding-bottom de 49 + área + 32, el último control del pie queda 24 px sobre ella; el inicio descuenta su alto, su aire al borde y 16 de respiro). Lo que sigue pasando por debajo de ella mientras se desplaza es inherente a un elemento flotante (DESIGN.md, «Vuelta a la cápsula»). Catálogo lleva a #libros, el mismo sitio que el menú ☰ y la barra de escritorio; Inicio abarca también La casa (data-zona).
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Barra inferior).
 - **mobile.css:** `.tabbar` `.tabbar-pastilla` `.tabbar a` `.tab-list` `.tab-ic` `.tab-lb` `.tab-ic-box`
 - **index.html:** `.tabbar` `.tabbar-pastilla` `.tab-list` `.tab-lb`
 - **app.js:** ganchos `a.setAttribute('aria-current', 'location')`
-- **Tokens:** `alto-barra-inferior` `vidrio` `filtro-vidrio` `menta` `en-menta` `tinta` `foco` `radio-pildora` `t-pestana` `space-1` `space-2` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado` `linea` `radio-md` `space-5` `space-6` `space-8`
+- **Tokens:** `alto-barra-inferior` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `menta` `en-menta` `tinta` `foco` `radio-pildora` `t-pestana` `space-1` `space-2` `space-6` `space-8` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado`
 - **Estado foco:** `.tabbar a:focus-visible`, `.tab-list:focus-visible`
 - **Estado presionado:** `.tabbar a:active`, `.tab-list:active`, `.tabbar a[aria-current]:active` — Escala 0.94 y color (fondo-3-presionado; la casilla actual, menta-presionado): con movimiento reducido el color es la respuesta.
 - **Estado actual:** `.tabbar a[aria-current]`, `.tabbar a[aria-current] .tab-ic`
@@ -597,19 +597,19 @@ La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve ent
 
 ### MapaLlegada
 
-SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de Matamoros, el pin aproximado y la ruta en primario, que se dibuja una vez al verse el 60 % del mapa. Todo el mapa enlaza a «Cómo llegar».
+El mapa de Visita, con dos estados y un solo mapa visible en cualquiera. (1) SVG propio en línea con las calles reales de OpenStreetMap (ODbL), la cuadra de Matamoros, el pin aproximado y la ruta en primario, que se dibuja una vez al verse el 60 % del mapa; todo el mapa enlaza a «Cómo llegar». Es la verdad sin JavaScript y el mapa mientras assets/data/sitio.json → mapa.clave esté vacía (hoy). (2) Con una clave de la Maps Embed API de Google (la crea Aldo; docs/MAPA-GOOGLE.md), app.js monta al acercarse (IntersectionObserver a 700 px + whenIdle) un iframe en modo place (.visit-map-embed, título «Mapa de Google: …», loading lazy, referrerpolicy strict-origin-when-cross-origin) con la misma caja que el SVG (240 / 260 / 2:1); mientras carga el SVG sigue siendo el mapa, al cargar el SVG se oculta y el pie dice «Mapa de Google Maps» (sin salto: CLS 0). CSP: solo se añade frame-src https://www.google.com. Límite conocido: si Google está bloqueado el navegador también dispara load para su página de error y no se puede distinguir; queda «Cómo llegar».
 
-- **Tipo:** bloque · **desde** 2026-11-14 · DESIGN.md, «Mapa de llegada en Visita» (2026-11-14).
-- **style.css:** `.visit-map` `.visit-map-link` `.mapa` `.mapa-tierra` `.mapa-via` `.mapa-ruta` `.mapa-nombre` `.mapa-pin path`
+- **Tipo:** bloque · **desde** 2026-11-14 · DESIGN.md, «Mapa de llegada en Visita» (2026-11-14) y «Vuelta a la cápsula, Catálogo único y mapa de Google» (2026-11-19).
+- **style.css:** `.visit-map` `.visit-map-link` `.mapa` `.mapa-tierra` `.mapa-via` `.mapa-ruta` `.mapa-nombre` `.mapa-pin path` `.visit-map-embed` `.visit-map.has-google`
 - **index.html:** `.visit-map` `.visit-map-link` `.mapa` `.mapa-ruta`
-- **app.js:** ganchos `mapIo`
+- **app.js:** exporta `mapaUrl` `MAPA_CLAVE` · ganchos `mapIo` `visit-map-embed`
 - **Tokens:** `mapa-tierra` `mapa-calle` `linea` `primario` `en-primario` `tinta` `tinta-2` `radio-lg` `anillo-foco` `t-subtitulo` `t-nota-pie` `dur-lenta` `dur-rapida` `curva-salida`
 - **Estado foco:** `.visit-map-link:focus-visible`
 - **Estado movimiento_reducido:** `.motion .visit-map[data-revelar="listo"] .mapa-ruta`, `.motion .visit-map[data-revelar="listo"].is-visible .mapa-ruta`
 - **Estado colores_forzados ((forced-colors: active)):** `.mapa-ruta`
 - **hover: no aplica.** Es un enlace grande; el cursor cambia (enlace nativo).
 - **ARIA:** Imagen con nombre dentro de un enlace (https://www.w3.org/WAI/tutorials/images/functional/) · `role=img` `aria-labelledby=mapa-t` · **Teclado:** Enter sigue el enlace.
-- **QA:** `tools/qa/responsive.mjs` `tools/qa/motion.mjs` `tools/qa/axe.mjs` `tools/qa/guias.mjs`
+- **QA:** `tools/qa/responsive.mjs` `tools/qa/motion.mjs` `tools/qa/axe.mjs` `tools/qa/guias.mjs` `tools/qa/mapa.mjs`
 
 ### InterruptorMovimiento
 

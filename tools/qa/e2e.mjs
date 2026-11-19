@@ -149,17 +149,17 @@ for (const [w, h, mobile, tag] of [[393, 659, true, 'móvil'], [1280, 800, false
 
 // ---------- 4. Barra inferior, Eventos, inicio (móvil) ----------
 await open(393, 659);
-// Cada tramo de la página y la casilla que debe marcar: Inicio abarca la entrada y La casa; el Catálogo, su capítulo; en el resto no hay casilla.
+// Cada tramo de la página y la casilla que debe marcar: Inicio abarca la entrada y La casa (data-zona); el Catálogo, su capítulo (#libros, el mismo destino que desde el menú y la barra de escritorio); en el resto no hay casilla.
 for (const [sel, want] of [['#inicio', '#inicio'], ['#casa', '#inicio'], ['#libros', '#libros'], ['[data-rail]', '#libros'], ['#cartelera', ''], ['#novedades', ''], ['#cafe', ''], ['#visita', ''], ['.ftr', '']]) {
   // En el teléfono #catalogo no ocupa sitio (es la hoja Explorar): el Catálogo se mide en su titular y en el carrusel.
   for (let i = 0; i < 4; i++) { await ev(`scrollTo(0, document.querySelector('${sel}').getBoundingClientRect().top + scrollY + ${['#inicio'].includes(sel) ? 0 : 120})`); await sleep(900); }
   await ev(`scrollBy(0,1)`); await sleep(600);
-  const cur = await ev(`[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>a.getAttribute('aria-current')?(a.dataset.zona||a.getAttribute('href'))+'='+a.getAttribute('aria-current'):null).filter(Boolean)`); // «Catálogo» aterriza en #colecciones; su zona es #libros
+  const cur = await ev(`[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>a.getAttribute('aria-current')?a.getAttribute('href')+'='+a.getAttribute('aria-current'):null).filter(Boolean)`);
   const pill = await ev(`getComputedStyle(document.querySelector('.tabbar-pastilla')).opacity`);
   check('barra inferior', want ? `en ${sel} marca ${want} (con la pastilla)` : `en ${sel} no marca ninguna casilla (sin pastilla)`, want ? cur.length === 1 && cur[0] === want + '=location' && pill === '1' : cur.length === 0 && pill === '0', JSON.stringify([cur, pill]));
 }
 const tabs = await ev(`[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>{const r=a.getBoundingClientRect(); const l=a.querySelector('.tab-lb').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), a.querySelector('.tab-lb').firstChild.textContent.trim(), l.width > 8 && l.height > 8]})`);
-check('barra inferior', 'tres casillas iguales de 49 px de alto que se reparten el ancho (barra anclada, 2026-11-19; antes 76 × 49) con nombre a la vista (Inicio, Catálogo, Mi lista)', tabs.length === 3 && tabs.every(t => Math.abs(t[0] - tabs[0][0]) <= 1 && t[0] >= 100 && t[1] === 49 && t[3]) && tabs.map(t => t[2]).join('|') === 'Inicio|Catálogo|Mi lista', JSON.stringify(tabs));
+check('barra inferior', 'tres casillas iguales de 76 × 49 px con nombre a la vista (Inicio, Catálogo, Mi lista): la cápsula flotante (2026-11-19: Aldo pidió volver a ella)', tabs.length === 3 && tabs.every(t => t[0] === 76 && t[1] === 49 && t[3]) && tabs.map(t => t[2]).join('|') === 'Inicio|Catálogo|Mi lista', JSON.stringify(tabs));
 const steady = await ev(`(async()=>{const box=()=>[...document.querySelectorAll('.tabbar a, .tab-list')].map(a=>{const r=a.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)].join()}).join('|'); scrollTo(0,0); await new Promise(r=>setTimeout(r,1200)); const a=box(); scrollTo(0, document.querySelector('#libros').getBoundingClientRect().top+scrollY+120); await new Promise(r=>setTimeout(r,1200)); const b=box(); return a===b})()`);
 check('barra inferior', 'las casillas no cambian de tamaño ni de sitio al cambiar la activa (solo se desliza la pastilla)', steady === true, String(steady));
 const secs = await ev(`Object.fromEntries([...document.querySelectorAll('main > section')].map(s=>[s.id||s.className.split(' ')[0], Math.round(s.getBoundingClientRect().top+scrollY)]))`);
@@ -184,7 +184,7 @@ for (let i = 0; i < 12 && !(await ev(`document.querySelectorAll('.cover--blank')
 const cov = await ev(`(()=>{const num=c=>c.match(/[0-9.]+/g).slice(0,3).map(Number); const lum=c=>{const [r,g,b]=num(c).map(v=>v/255).map(v=>v<=0.03928?v/12.92:((v+0.055)/1.055)**2.4); return 0.2126*r+0.7152*g+0.0722*b}; const ratio=(a,b)=>{const x=lum(a),y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)}; return [...document.querySelectorAll('.cover--blank')].slice(0,24).map(c=>{ const cs=getComputedStyle(c); const stops=cs.backgroundImage.match(/rgba?\\([^)]*\\)/g)||(cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'?[cs.backgroundColor]:[]); const worst=sel=>Math.min(...stops.map(s=>ratio(getComputedStyle(c.querySelector(sel)).color,s))); return stops.length?[worst('.cover-title'), worst('.cover-author')]:[0,0]})})()`);
 const covCount = await ev(`document.querySelectorAll('.cover--blank').length`);
 check('portadas', 'título y autor se leen sobre el campo plano de su portada tipográfica (≥ 4.5:1), si hay alguna sin imagen', !covCount || (cov?.length > 0 && cov.every(r => r[0] >= 4.5 && r[1] >= 4.5)), JSON.stringify((cov || []).slice(0, 3)));
-for (const [id, how] of [['colecciones', 'tab'], ['libros', 'menu'], ['cartelera', 'menu'], ['novedades', 'menu'], ['cafe', 'menu'], ['inicio', 'tab']]) {
+for (const [id, how] of [['libros', 'tab'], ['libros', 'menu'], ['cartelera', 'menu'], ['novedades', 'menu'], ['cafe', 'menu'], ['inicio', 'tab']]) {
   await ev(`scrollTo(0, ${id === 'inicio' ? 3000 : 0})`); await sleep(600);
   if (how === 'tab') await ev(`document.querySelector('.tabbar a[href="#${id}"]').click()`);
   else { await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(900); await ev(`document.querySelector('#menu a[href="#${id}"]').click()`); }

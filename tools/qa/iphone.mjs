@@ -10,11 +10,12 @@
 // Para cada perfil comprueba, como lo haría una persona (toque real en la barra inferior o en el menú ☰, no scrollIntoView):
 //  · Inicio sin desplazar: titular a 24 px (± 2) bajo la cabecera y de dos renglones; «Cómo llegar» a 182 px (± 2) bajo la cabecera (y 226–282
 //    con la barra de 44; 2026-11-19: el estado de hoy pasó bajo el botón, junto a la dirección; antes 212 y 256–312
-//    con la barra de 44); la foto ≥ 160 px de alto, con proporción ≤ 3:2 y entera sobre la barra inferior (≥ 8 px de aire);
-//  · al llegar a cada sección por su enlace (barra inferior: Catálogo; menú ☰: La casa, Catálogo, Eventos, Café y Visita): el titular a 24 px
+//    con la barra de 44); la foto ≥ 160 px de alto, con proporción ≤ 3:2 y entera sobre la cápsula de la barra inferior (≥ 8 px de aire);
+//  · al llegar a cada sección por su enlace (barra inferior: Catálogo; menú ☰: La casa, Catálogo, Eventos, Café y Visita; 2026-11-19: «Catálogo» va a
+//    #libros desde la barra inferior y desde el menú, el mismo sitio): el titular a 24 px
 //    (± 4) bajo la cabecera y, entre la cabecera y la barra inferior (≥ 8 px de aire con la barra), lo que importa en esa sección:
-//      La casa: titular y la primera foto · Catálogo (menú): titular y «Buscar en el catálogo» · Catálogo (barra inferior): chips, la portada
-//      central y su pie «título · autor · precio» · Eventos: titular, entradilla y la primera tarjeta de la lista (con --aviso, el titular, la
+//      La casa: titular y la primera foto · Catálogo (menú y barra inferior): titular, «Buscar en el catálogo» y los chips, y de la portada central
+//      al menos el 60 % sobre la cápsula (el pie «título · autor · precio» queda bajo ella hasta el primer desplazamiento) · Eventos: titular, entradilla y la primera tarjeta de la lista (con --aviso, el titular, la
 //      entradilla y el arranque del destacado, que no cabe entero: lleva foto o cartel) ·
 //      Café: titular, la barra de categorías y la primera tarjeta de la carta · Visita: titular y «Cómo llegar»;
 //  · menú ☰: Instagram y Facebook a la vista sin desplazar (solo la fila «Pausar el movimiento», al pie, puede quedar bajo el borde en los iPhone de poco alto) y sus filas miden ≥ 44;
@@ -103,8 +104,8 @@ const medir = sels => ev(`${MEDIR}(${JSON.stringify(sels)})`);
 const DESTINOS = [
   // [clave, cómo se llega, enlace, selectores que deben verse entre las barras, titular (o null)]
   ['casa', 'menu', '#casa', { titular: '#house-title', foto: '.house-track .still-img' }, 'titular'],
-  ['catalogo-menu', 'menu', '#libros', { titular: '#books-title', accion: '.explore-open' }, 'titular'],
-  ['catalogo-barra', 'barra', '#colecciones', { chips: '.rail-chips', pieza: '.c3d--portada .c3d-item.is-centro .cover', pie: '.cf-meta' }, null],
+  ['catalogo-menu', 'menu', '#libros', { titular: '#books-title', accion: '.explore-open', chips: '.rail-chips' }, 'titular'],
+  ['catalogo-barra', 'barra', '#libros', { titular: '#books-title', accion: '.explore-open', chips: '.rail-chips' }, 'titular'],
   ['eventos', 'menu', '#cartelera', AVISO ? { titular: '#bill-title', entradilla: '.bill .sec-texto' } : { titular: '#bill-title', entradilla: '.bill .sec-texto', pieza: '.ev-fila .ev-card' }, 'titular'],
   ['cafe', 'menu', '#cafe', { titular: '#cafe-title', chips: '.ct-nav', pieza: '.ct-lista .ct-prod' }, 'titular'],
   ['visita', 'menu', '#visita', { titular: '#visit-title', accion: '.visit-actions .btn' }, 'titular']
@@ -165,7 +166,7 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
       await tap(`#menu .menu-row[href="${href}"]`);
       await until(`!document.querySelector('#menu').open`, 4000);
     } else {
-      await tap(`.tabbar a[href="${href}"], .tabbar a[href="#libros"]`); // (#libros: la página de antes del 2026-11-14, para comparar)
+      await tap(`.tabbar a[href="${href}"]`);
     }
     await sleep(300); await quieto();
     // Carga diferida del carrusel de la sección: se espera a su pieza central (y vuelve a quedarse quieto).
@@ -180,9 +181,16 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
     }
     if (tit) check(key, `${dest}: titular a 24 px bajo la cabecera (± 4)`, m.el.titular && Math.abs(m.el.titular.t - b.t - 24) <= 4, m.el.titular ? `${m.el.titular.t - b.t}` : '∅');
     if (dest === 'eventos' && AVISO) { await until(`!!document.querySelector('.ev-prox:not(.ev-espera)')`, 8000); await sleep(700); const p = await medir({ destacado: '.ev-prox' }); check(key, 'eventos con fecha: el destacado arranca a la vista, bajo la entradilla (24 px)', p.el.destacado && p.el.destacado.vis && m.el.entradilla && Math.abs(p.el.destacado.t - m.el.entradilla.b - 24) <= 2 && p.el.destacado.t < b.b - 120, p.el.destacado ? `${p.el.destacado.t} (entradilla hasta ${m.el.entradilla?.b}; franja hasta ${b.b})` : 'no existe'); }
+    if (dest.startsWith('catalogo')) {
+      // La portada central (carrusel diferido): se espera a que exista y se mide cuánto se ve entre la cabecera y la cápsula.
+      await until(`!!document.querySelector('.c3d--portada .c3d-item.is-centro .cover')`, 8000); await sleep(500); await quieto();
+      const pm = await medir({ portada: '.c3d--portada .c3d-item.is-centro .cover' }); const pr = pm.el.portada;
+      const visto = pr ? Math.max(0, Math.min(pr.b, pm.band.b) - Math.max(pr.t, pm.band.t)) / pr.h : 0;
+      check(key, `${dest}: la portada central se ve al menos al 60 % entre la cabecera y la cápsula (el pie del libro queda para el primer desplazamiento)`, visto >= 0.6, `${Math.round(visto * 100)} % (${pr ? `${pr.t}–${pr.b}` : '∅'} en la franja ${pm.band.t}–${pm.band.b})`);
+    }
     if (dest === 'catalogo-barra') check(key, 'catálogo: la barra inferior marca «Catálogo»', await ev(`document.querySelector('.tabbar a:nth-of-type(2)').getAttribute('aria-current') === 'location'`), 'sin aria-current');
     const marca = { casa: '#inicio', 'catalogo-menu': '#libros', 'catalogo-barra': '#libros' }[dest] || '';
-    const cur = await ev(`[...document.querySelectorAll('.tabbar a')].filter(a => a.getAttribute('aria-current')).map(a => a.dataset.zona || a.getAttribute('href')).join()`);
+    const cur = await ev(`[...document.querySelectorAll('.tabbar a')].filter(a => a.getAttribute('aria-current')).map(a => a.getAttribute('href')).join()`);
     check(key, `${dest}: la barra inferior marca ${marca || 'ninguna casilla'}`, cur === marca, cur || 'ninguna');
     fila[dest] = res.join(' · ');
     await sleep(450); // la pastilla de la barra inferior termina de irse o de llegar (dur-base) antes de la captura

@@ -693,7 +693,14 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
    norte arriba), recortado a su caja (slice: los anchos grandes ven más calles, los chicos la cuadra). Colores de los tokens en los dos temas:
    manzana mapa-tierra, calle mapa-calle con su filete linea, nombres en tinta (los menores en tinta-2) con halo, la ruta en primario y el pin
    en primario con su centro en-primario. Radio de las fotos de sección (radio-lg). Todo el mapa enlaza a «Cómo llegar». */
-.visit-map { margin: var(--space-6) 0 0; }
+.visit-map { position: relative; margin: var(--space-6) 0 0; }
+.visit-map-link[hidden] { display: none; }
+/* Mapa de Google (Maps Embed API, modo place; 2026-11-19): app.js lo monta solo con clave (assets/data/sitio.json) y cerca de la sección. Hasta que el iframe
+   carga, su caja va encima del SVG, invisible y sin recibir toques; al cargar, toma su sitio (misma altura que .mapa: sin salto) y el SVG deja de verse. */
+.visit-map-embed { position: absolute; top: 0; left: 0; right: 0; height: 240px; overflow: hidden; border-radius: var(--radio-lg); background: var(--mapa-tierra); opacity: 0; pointer-events: none; }
+.visit-map-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
+.visit-map.has-google .visit-map-embed { position: relative; opacity: 1; pointer-events: auto; }
+@media (min-width: 761px) { .visit-map-embed { height: 260px; } }
 .visit-map-link { display: block; overflow: hidden; border-radius: var(--radio-lg); background: var(--mapa-tierra); color: inherit; -webkit-tap-highlight-color: transparent; }
 .visit-map-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
 @media (hover: hover) { .visit-map-link:hover { outline: 2px solid var(--linea-fuerte); outline-offset: -2px; } } /* hover del mapa (2026-11-18) */
@@ -737,6 +744,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .visit-arrival { grid-column: 7 / -1; grid-row: 3; margin: 0; }
   .mapa { height: auto; aspect-ratio: 2 / 1; }
   .visit-arrival .frame-clip { aspect-ratio: 2 / 1; }
+  .visit-map-embed { height: auto; aspect-ratio: 2 / 1; }
 }
 
 /* Pie (2026-11-13): el único lugar de la página con el contacto, como bloque «Contacto»: titular, para qué escribir y WhatsApp, Instagram,

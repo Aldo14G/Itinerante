@@ -53,10 +53,11 @@ test("las portadas del inventario se publican: toda ruta `c` de catalog.json exi
   assert.ok(!files.includes("data/portadas.json") && !files.some((f) => f.endsWith("inventario-itinerante.json")), "los registros internos (data/) no se publican");
 });
 
-test("la CSP del HTML no abre origenes externos", async () => {
+test("la CSP del HTML no abre origenes externos salvo frame-src de Google (mapa de Visita, 2026-11-19)", async () => {
   const html = await readFile(join(out, "index.html"), "utf8");
   const csp = html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
-  assert.ok(!/https?:|\*/.test(csp), csp);
+  assert.match(csp, /frame-src https:\/\/www\.google\.com(;|$)/);
+  assert.ok(!/https?:|\*/.test(csp.replace("frame-src https://www.google.com", "")), csp);
   assert.match(csp, /default-src 'self'/);
 });
 

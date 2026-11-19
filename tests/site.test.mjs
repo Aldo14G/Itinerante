@@ -8,7 +8,7 @@ import { coverflowPose as poseMotor, keyTarget, tiltPose, tiltTransform, ATENUAD
 import { validMenu, menuProblems, validFoto, precioCarta, currentGroup, groupId, filaId, galeriaItems, GALERIA_MIN, GALERIA_MAX } from '../cafe.js';
 import { cartaHtml, withCarta, problemasDisco, srcsetDisco, INICIO as CARTA_INICIO, FIN as CARTA_FIN } from '../scripts/build-carta.mjs';
 import { toggleSaved, isSaved, savedIds, clearSaved, listMessage, listWaUrl, MAX_SAVED } from '../saved.js';
-import { openingStatus, monterreyNow } from '../app.js';
+import { openingStatus, monterreyNow, mapaUrl, MAPA_CONSULTA } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, addDays, NEWS_SIZE, NEW_DAYS, NEWS_DAYS } from '../news.js';
 import { shareName, calName, registroName, reservaName, eventBadge, NO_DATE, validEventos, eventosProblems, eventosPlan, validRegistro, validTelefono, validReserva, reservaUrl, reservaMessage, notaCopy, quienLine, avisoLine, fechaBloque, fechaLarga, horario, icsOf, mtyToUtc, shareData, LUGAR, ICS_BLOQUE_MIN, shiftMonths, fechaPasada, foldAnteriores, ANTERIORES_MESES, ANTERIORES_VISIBLES, PROXIMOS_MESES } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
@@ -270,7 +270,10 @@ test('marcado compatible con la CSP de producción', () => {
   const csp = html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
   assert.match(csp, /script-src 'self'(;|$)/);
   assert.match(csp, /font-src 'self'/);
-  assert.ok(!/https?:\/\//.test(csp), 'la CSP no permite orígenes externos');
+  assert.match(csp, /frame-src https:\/\/www\.google\.com(;|$)/, 'solo frame-src abre un origen: Google, para el mapa de Visita (2026-11-19; modo place de la Maps Embed API)');
+  assert.ok(!/https?:\/\//.test(csp.replace('frame-src https://www.google.com', '')), 'ninguna otra directiva permite orígenes externos');
+  assert.ok(!/(?:script|style|img|font|connect|media|object|default)-src[^;]*google/.test(csp) && /default-src 'self'/.test(csp) && /script-src 'self'(;|$)/.test(csp) && /connect-src 'self'(;|$)/.test(csp), 'Google no entra en script, estilo, imagen, fuente, conexión ni media: sin aflojar nada más');
+  assert.ok(readFileSync_('tools/preview-site.mjs').includes("media-src 'self'; frame-src https://www.google.com; object-src 'none'"), 'la vista previa local sirve la misma CSP que la producción');
   assert.ok(html.indexOf('Content-Security-Policy') < html.indexOf('rel="preload"'), 'la CSP va antes de las precargas');
 });
 test('integridad del documento: ids únicos, anclas y referencias ARIA válidas', () => {
@@ -1877,32 +1880,35 @@ test('menú: abre después de pintar, atrapa el foco, Escape y «atrás» lo cie
 test('barra inferior (BarraInferior): cápsula de vidrio de 49 px con Inicio, Catálogo y Mi lista; la pastilla menta marca el destino actual', () => {
   const nav = html.match(/<nav class="tabbar"[\s\S]*?<\/nav>/)[0];
   assert.ok(/aria-label="Accesos"/.test(nav) && !/role="tablist"/.test(nav), 'navegación con nombre, no tablist');
-  assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)"/g)].map(m => m[1]), ['inicio', 'colecciones'], 'dos destinos de la página: «Catálogo» aterriza en las colecciones (2026-11-14)');
-  assert.ok(/<a href="#colecciones" data-zona="#libros">/.test(nav) && /<div class="rail" id="colecciones" data-rail/.test(html) && /\.rail \{ scroll-margin-top: var\(--space-2\); \}/.test(mobileFlat) && /a\.dataset\.zona \|\| a\.getAttribute\('href'\)/.test(readFileSync_('app.js')), '«Catálogo» lleva a los chips (16 px bajo la cabecera) y su zona del scroll-spy es el capítulo');
+  assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)"/g)].map(m => m[1]), ['inicio', 'libros'], 'dos destinos de la página: «Catálogo» lleva a #libros, el mismo sitio que el menú ☰ y la barra de escritorio (2026-11-19)');
+  assert.ok(/<a href="#libros"><svg class="tab-ic"/.test(nav) && /<a href="#inicio" aria-current="location" data-zona="#inicio #casa">/.test(nav) && !/#colecciones/.test(nav) && /<div class="rail" id="colecciones" data-rail/.test(html) && /\.rail \{ scroll-margin-top: var\(--space-6\); \}/.test(mobileFlat) && /\(a\.dataset\.zona \|\| a\.getAttribute\('href'\)\)\.split\(' '\)\.includes\(hash\)/.test(readFileSync_('app.js')), '«Catálogo» lleva al capítulo (#libros), como el menú ☰ y la barra de escritorio; «Inicio» abarca también La casa (data-zona)');
+  const hrefsCatalogo = [...html.matchAll(/<a [^>]*href="#(libros|colecciones)"[^>]*>/g)].map(m => m[1]);
+  assert.ok(hrefsCatalogo.length === 3 && hrefsCatalogo.every(h => h === 'libros'), 'barra de escritorio, menú ☰ y barra inferior: los tres «Catálogo» llevan a #libros (2026-11-19); ningún enlace va a #colecciones');
   assert.deepEqual([...nav.matchAll(/<span class="tab-lb">([^<]+)/g)].map(m => m[1]), ['Inicio', 'Catálogo', 'Mi lista'], 'tres casillas con nombre siempre visible');
   assert.ok(/<button class="tab-list" type="button" data-open-mylist><span class="tab-ic-box"><svg class="tab-ic" aria-hidden="true"><use href="#i-mark"\/><\/svg><span class="count-badge" data-saved-dot hidden aria-hidden="true"><\/span><\/span><span class="tab-lb">Mi lista<span class="sr-only">, <span data-saved-count>Vacía<\/span><\/span><\/span><\/button>/.test(nav), 'Mi lista abre su hoja y lleva el conteo (en texto para lectores de pantalla)');
   assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)" aria-current="location"/g)].map(m => m[1]), ['inicio'], 'la página carga en Inicio; el scroll-spy corrige');
   for (const m of nav.matchAll(/<use href="#([it]-[a-z]+)"/g)) assert.ok(html.includes(`<symbol id="${m[1]}"`), `icono ${m[1]} en el sprite`);
+  // 2026-11-19: Aldo pidió volver a la cápsula flotante (la barra anclada de la iteración de lectura se retiró); la reserva de espacio al final de la página y el scroll-padding se quedan.
   const bar = rule(mobileFlat, '.tabbar');
-  // 2026-11-19 (iteración de lectura): anclada a todo el ancho con su espacio propio; antes una cápsula flotante de 228 px a 8 px del borde.
-  assert.ok(/position: fixed; left: 0; right: 0; bottom: 0;/.test(bar) && !/translate: -50%/.test(bar), 'anclada al borde inferior, a todo el ancho');
-  assert.ok(/height: calc\(var\(--alto-barra-inferior\) \+ env\(safe-area-inset-bottom, 0px\)\); padding: 0 var\(--pad-x\) env\(safe-area-inset-bottom, 0px\);/.test(bar) && /grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/.test(bar) && /\(100% - 480px\) \/ 2/.test(bar), '49 px de casillas más el área segura; tres casillas iguales, hasta 480 px centradas');
-  assert.ok(/box-shadow: inset 0 1px 0 var\(--linea\);/.test(bar) && /background: var\(--vidrio\);/.test(bar), 'vidrio con su filete arriba, sin sombra flotante');
-  assert.ok(/html \{ scroll-padding-bottom: calc\(var\(--alto-barra-inferior\) \+ env\(safe-area-inset-bottom, 0px\) \+ var\(--space-6\)\); \}/.test(mobileFlat) && /\.ftr \{ padding-bottom: calc\(var\(--alto-barra-inferior\) \+ env\(safe-area-inset-bottom, 0px\) \+ var\(--space-8\)\); \}/.test(mobileFlat), 'el documento le deja su sitio: el foco por teclado queda 24 px sobre ella y el pie termina 32 px sobre ella');
+  assert.ok(/position: fixed; left: 50%; bottom: calc\(env\(safe-area-inset-bottom, 0px\) \+ var\(--space-2\)\);/.test(bar) && /translate: -50% 0;/.test(bar), 'flota centrada 8 px sobre el área segura');
+  assert.ok(/height: var\(--alto-barra-inferior\);/.test(bar) && /grid-template-columns: repeat\(3, var\(--tab-w\)\);/.test(bar) && /--tab-w: 76px;/.test(bar), '49 px de alto y tres casillas de 76 px (228 px: cabe a 320)');
+  assert.ok(/border-radius: var\(--radio-pildora\);/.test(bar) && /box-shadow: var\(--luz-vidrio\), var\(--sombra-flotante\);/.test(bar), 'cápsula de vidrio que flota');
   assert.ok(/\.tabbar a, \.tab-list \{[^}]*height: var\(--alto-barra-inferior\);/.test(mobileFlat), 'cada casilla ocupa el alto completo: objetivo de 76 × 49 sin huecos');
   assert.ok(/\.tabbar-pastilla \{[^}]*background: var\(--menta\);[^}]*translate: calc\(var\(--tab-i\) \* var\(--tab-w\)\) 0; transition: translate var\(--dur-base\) var\(--curva-resorte\)/.test(mobileFlat) && /\.tabbar:has\(> a:nth-of-type\(2\)\[aria-current\]\) \{ --tab-i: 1; \}/.test(mobileFlat), 'la pastilla se desliza con el resorte, solo con CSS');
   assert.ok(/\.tabbar:not\(:has\(\[aria-current\]\)\) \.tabbar-pastilla \{ opacity: 0; \}/.test(mobileFlat), 'sin destino actual (Eventos, Visita, pie) no hay pastilla');
   assert.ok(/\.tabbar a\[aria-current\] \.tab-ic \{ fill: currentColor; fill-opacity: 0\.18; stroke-width: 2\.1;/.test(mobileFlat) && /\.tabbar a\[aria-current\] \{ color: var\(--en-menta\); \}/.test(mobileFlat), 'lo actual no depende solo del color: icono relleno y trazo más grueso');
   assert.ok(!/\.tabbar a\[aria-current\][^{]*\{[^}]*(?<![-\w])(width|height|padding|margin|font)\s*:/.test(mobileFlat), 'la casilla actual no cambia de tamaño');
-  assert.ok(/html\.sheet-open \.tabbar \{ translate: 0 calc\(100% \+ var\(--space-2\)\); opacity: 0; \}/.test(mobileFlat), 'con una hoja abierta la barra baja y se oculta');
+  assert.ok(/html\.sheet-open \.tabbar \{ translate: -50% calc\(100% \+ var\(--space-6\)\); opacity: 0; \}/.test(mobileFlat), 'con una hoja abierta la barra baja y se oculta');
+  assert.ok(/html \{ scroll-padding-bottom: calc\(var\(--alto-barra-inferior\) \+ env\(safe-area-inset-bottom, 0px\) \+ var\(--space-6\)\); \}/.test(mobileFlat), 'mitigación de la cápsula (2026-11-19): el foco por teclado nunca queda bajo ella (scroll-padding-bottom = barra + área segura + 24)');
   assert.ok(/\.ftr \{ padding-bottom: calc\(var\(--alto-barra-inferior\) \+ env\(safe-area-inset-bottom, 0px\) \+ var\(--space-8\)\); \}/.test(mobileFlat), 'el final de la página deja libre la barra más el área segura');
   assert.ok(/\.tabbar \{ display: none; \}/.test(cssFlat) && /<link rel="stylesheet" href="mobile\.css" media="\(max-width: 760px\)">/.test(html), 'solo en el teléfono');
   assert.ok(/html:not\(\.js\) \.tabbar \{ display: none; \}/.test(mobileFlat), 'sin JavaScript no se muestra (Mi lista lo necesita)');
 });
 
-test('scroll-spy: Inicio abarca la entrada y La casa; cada capítulo marca su enlace y su fila; la barra inferior solo Inicio y Catálogo', async () => {
+test('scroll-spy: cada zona marca su enlace y su fila (La casa tiene la suya); la casilla Inicio de la barra inferior abarca también La casa; Catálogo marca el mismo destino desde todas las entradas', async () => {
   const app = await readFile(here('./app.js'), 'utf8');
-  assert.ok(/const zones = \[\['#inicio', '#casa'\], \['#libros'\], \['#cartelera'\], \['#novedades'\], \['#cafe'\], \['#visita'\]\]/.test(app), 'zonas en el orden de la página (con Café); Inicio abarca La casa');
+  assert.ok(/const zones = \[\['#inicio'\], \['#casa'\], \['#libros'\], \['#cartelera'\], \['#novedades'\], \['#cafe'\], \['#visita'\]\]/.test(app), 'zonas en el orden de la página (con Café); cada enlace marca la zona a la que lleva (2026-11-19: La casa ya no se funde con Inicio en el menú)');
+  assert.ok(/<a href="#inicio" aria-current="location" data-zona="#inicio #casa"/.test(html) && /\.split\(' '\)\.includes\(hash\)/.test(app), 'la casilla Inicio de la barra inferior, que no tiene casilla para La casa, abarca las dos zonas');
   assert.ok(/const navLinks = \$\$\('\.hdr-nav a, \.menu-row\[href\]'\);/.test(app) && /a\.setAttribute\('aria-current', 'true'\)/.test(app), 'la barra de escritorio y el menú marcan su destino');
   assert.ok(/const tabLinks = \$\$\('\.tabbar a'\);/.test(app) && /a\.setAttribute\('aria-current', 'location'\)/.test(app), 'la barra inferior marca con aria-current');
   assert.ok(/z\.from\.offsetHeight && z\.to\.offsetHeight/.test(app), 'una sección que no existe (Novedades sin entradas) no tiene zona');
@@ -2022,6 +2028,31 @@ test('Visita y pie: horario como lista agrupada con «Hoy», «Cómo llegar» de
   assert.ok(!/<section class="call"/.test(html) && /<h2 id="visit-title" class="h2">Visita <em>los libros se eligen mejor en persona<\/em><\/h2>/.test(visit), 'el llamado se fundió con el titular de Visita');
 });
 
+test('mapa de Visita con la Maps Embed API (2026-11-19): clave en un solo sitio (vacía hoy), URL de modo place, montaje diferido y el SVG como verdad sin JavaScript', async () => {
+  const sitio = JSON.parse(await readFile(here('./assets/data/sitio.json'), 'utf8'));
+  assert.equal(sitio.mapa.clave, '', 'la clave de Google la crea Aldo: el repositorio la trae VACÍA (nunca inventada ni secreta); se pega solo en assets/data/sitio.json → mapa.clave');
+  assert.equal(sitio.mapa.consulta, 'Librería Itinerante y Más, Mariano Matamoros Pte. 421, Centro, Monterrey', 'consulta de modo place');
+  assert.deepEqual(Object.keys(sitio.mapa).sort(), ['clave', 'consulta'], 'la configuración del mapa cabe en dos campos');
+  const claves = [...html.matchAll(/AIza[0-9A-Za-z_-]{35}/g)].length + [...readFileSync_('app.js').matchAll(/AIza[0-9A-Za-z_-]{35}/g)].length;
+  assert.equal(claves, 0, 'ninguna clave escrita en el HTML ni en el JS');
+  assert.equal(mapaUrl(sitio), null, 'sin clave no hay URL: no se carga nada de Google');
+  assert.equal(mapaUrl(null), null); assert.equal(mapaUrl({}), null); assert.equal(mapaUrl({ mapa: { clave: 'AIzaCORTA' } }), null, 'una clave con mala forma se trata como vacía');
+  assert.equal(mapaUrl({ mapa: { clave: 'AIza' + 'x'.repeat(35) + '&q=otra' } }), null, 'una clave con caracteres extra no se cuela en la URL');
+  const clave = 'AIzaSy' + 'A'.repeat(33);
+  const u = new URL(mapaUrl({ mapa: { clave, consulta: sitio.mapa.consulta } }));
+  assert.equal(u.origin + u.pathname, 'https://www.google.com/maps/embed/v1/place', 'Maps Embed API, modo place');
+  assert.deepEqual([...u.searchParams.keys()], ['key', 'q', 'language', 'region'], 'key, q y los dos opcionales de idioma y región');
+  assert.equal(u.searchParams.get('key'), clave); assert.equal(u.searchParams.get('q'), sitio.mapa.consulta); assert.equal(u.searchParams.get('language'), 'es');
+  assert.ok(new URL(mapaUrl({ mapa: { clave } })).searchParams.get('q') === MAPA_CONSULTA, 'sin consulta usa la de la librería');
+  const app = readFileSync_('app.js');
+  assert.ok(/nearby\(\$\('\.visit-map'\), \(\) => whenIdle\(async \(\) => \{/.test(app) && /fetch\('assets\/data\/sitio\.json'\)/.test(app) && /'700px 0px'\);/.test(app), 'se monta al acercarse (IntersectionObserver) y en reposo (whenIdle); la configuración se pide solo entonces');
+  assert.ok(/frame\.loading = 'lazy';/.test(app) && /frame\.referrerPolicy = 'strict-origin-when-cross-origin';/.test(app) && /frame\.title = 'Mapa de Google: /.test(app) && !/allow(fullscreen|=)/.test(app) && /\{ once: true \}\);\s*frame\.src = src;/.test(app), 'iframe con título, loading lazy y referrerpolicy; sin permisos extra; src después de enganchar load');
+  assert.ok(/if \(!src \|\| fig\.querySelector\('\.visit-map-embed'\)\) return;/.test(app) && /link\.hidden = true;/.test(app), 'se monta una sola vez y, al cargar, el SVG deja de verse');
+  assert.ok(/\.visit-map-embed \{ position: absolute; top: 0; left: 0; right: 0; height: 240px;[^}]*opacity: 0; pointer-events: none; \}/.test(cssFlat) && /\.visit-map\.has-google \.visit-map-embed \{ position: relative; opacity: 1; pointer-events: auto; \}/.test(cssFlat) && /\.visit-map-link\[hidden\] \{ display: none; \}/.test(cssFlat), 'la caja del iframe reserva el mismo alto que el SVG (240 en el teléfono) y toma su sitio al cargar: sin salto');
+  assert.ok(/@media \(min-width: 761px\) \{ \.visit-map-embed \{ height: 260px; \} \}/.test(cssFlat) && /\.visit-map-embed \{ height: auto; aspect-ratio: 2 \/ 1; \}/.test(cssFlat), 'la misma proporción que el SVG: 260 en tableta y 2:1 en la columna de la rejilla desde 1024');
+  assert.ok(/<svg class="mapa"/.test(html) && !/<iframe/i.test(html), 'sin JavaScript el SVG es el mapa: el HTML no trae iframe');
+});
+
 test('ronda de animaciones (2026-11-14): mapa de llegada, enfoque de La casa, brillo de portada y rejilla escalonada', () => {
   const catalogJs = readFileSync_('catalog.js');
   const visit = html.match(/<section id="visita"[\s\S]*?<\/section>/)[0];
@@ -2034,6 +2065,7 @@ test('ronda de animaciones (2026-11-14): mapa de llegada, enfoque de La casa, br
   assert.ok(/\.mapa-tierra \{ fill: var\(--mapa-tierra\); \}/.test(cssFlat) && /\.mapa-via \{ stroke: var\(--mapa-calle\); stroke-width: 11; \}/.test(cssFlat) && /\.mapa-ruta \{ stroke: var\(--primario\);/.test(cssFlat) && /\.visit-map-link \{[^}]*border-radius: var\(--radio-lg\);/.test(cssFlat), 'colores de los tokens y el radio de las fotos');
   assert.ok(/\.motion \.visit-map\[data-revelar="listo"\] \.mapa-ruta \{ stroke-dashoffset: 1; transition: stroke-dashoffset var\(--dur-lenta\) var\(--curva-salida\) var\(--dur-rapida\); \}/.test(cssFlat) && /el\.matches\('\.visit-map'\) \? mapIo : revealIo/.test(readFileSync_('app.js')), 'la ruta se dibuja una vez al entrar en la vista; sin movimiento, entera');
   assert.ok(prov.visitMap && /OpenStreetMap/.test(prov.visitMap.source) && /ODbL/.test(prov.visitMap.license) && /2026-11-14/.test(prov.visitMap.retrieved), 'el origen del mapa está registrado en provenance.json');
+  assert.ok(/respaldo/i.test(prov.visitMap.uso || '') && /Maps Embed API/.test(prov.visitMap.uso || ''), 'provenance.json dice que el SVG es el respaldo del mapa de Google');
   assert.ok(/@keyframes casa-enfoque \{ entry 0% \{ opacity: 0\.6; \} entry 100% \{ opacity: 1; \} exit 0% \{ opacity: 1; \} exit 100% \{ opacity: 0\.6; \} \}/.test(cssFlat) && /@supports \(animation-timeline: view\(\)\) \{\s*\.motion \.still-img \{ animation: casa-enfoque linear both; animation-timeline: view\(inline 0px\); animation-range: cover; \}/.test(css), 'La casa: la foto entera plena y la que asoma atenuada, con view(inline 0px) y respaldo; solo con movimiento');
   assert.ok(/@media \(hover: hover\) and \(pointer: fine\) \{\s*\.motion :is\(\.card, \.card-item\)\[data-inclina\] \.cover::after \{[^}]*radial-gradient\(circle at var\(--brillo-x, 50%\) var\(--brillo-y, 50%\), var\(--brillo-lamina\), transparent 60%\);/.test(css) && /el\.style\.setProperty\('--brillo-x'/.test(readFileSync_('carousel3d.js')), 'brillo de lámina: solo puntero fino y movimiento; variables por CSSOM');
   assert.ok(/\.motion \[data-inclina\]\.is-inclinada\.is-entrando \{ transition: transform var\(--dur-rapida\) var\(--curva-salida\),/.test(cssFlat) && /entra = setTimeout\(\(\) => mine\.classList\.remove\('is-entrando'\), DUR\('rapida'\)\)/.test(readFileSync_('carousel3d.js')), 'al llegar el cursor la pieza entra a su pose en dur-rapida, sin salto');

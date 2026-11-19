@@ -123,7 +123,7 @@ for (const nucleos of [8, 4]) {
 // ---- Teléfono con el almacenamiento bloqueado ----
 {
   const { browser, page } = await abrir('iphone', SIN_ALMACEN);
-  const t = await page.locator('.tabbar a[href="#colecciones"]').boundingBox();
+  const t = await page.locator('.tabbar a[href="#libros"]').boundingBox();
   await page.touchscreen.tap(t.x + t.width / 2, t.y + t.height / 2); await sleep(3000);
   const r = await page.evaluate(() => ({ oculto: document.querySelector('[data-rail]')?.hidden ?? true, chips: document.querySelectorAll('.rail-chip').length, central: Boolean(document.querySelector('.rail-item.is-centro')), y: Math.round(scrollY) }));
   ok('P1', !r.oculto && r.chips >= 1 && r.central && r.y > 0, `localStorage bloqueado: carrusel ${r.oculto ? 'oculto' : 'presente'}, ${r.chips} chips, pieza central: ${r.central}; «Catálogo» aterriza en y ${r.y}`);
