@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "nota": "Preguntas frecuentes de Visita (#visita), con solo respuestas que Aldo ha confirmado (docs/PENDIENTES-NEGOCIO.md lista lo que falta). Para cambiarlas se edita este archivo y se corre `npm run faq`: el HTML llega pintado en index.html (details/summary nativos, sin JavaScript). `respuesta` es texto con enlaces `[texto](#ancla)` solo a anclas de la propia página; sin otras marcas. Un tema no confirmado (pagos, factura, accesibilidad, estacionamiento, envíos, tarjetas de regalo, apartado, mascotas, edad) no entra aquí: scripts/build-faq.mjs lo rechaza."
+  },
+  "preguntas": [
+    {
+      "id": "libro",
+      "pregunta": "¿Tienen el libro que busco?",
+      "respuesta": "Búscalo en el [catálogo](#catalogo) y, en su ficha, toca «Consultar disponibilidad»: se abre WhatsApp con el mensaje ya escrito. Si no lo tenemos, te lo podemos pedir."
+    },
+    {
+      "id": "leer",
+      "pregunta": "¿Puedo quedarme a leer?",
+      "respuesta": "Sí. Con tu café, puedes quedarte a leer en la sala. Mira la [carta](#cafe)."
+    },
+    {
+      "id": "horario",
+      "pregunta": "¿A qué hora abren?",
+      "respuesta": "El [horario habitual](#horario) y si estamos abiertos hoy están más arriba, en esta misma sección."
+    },
+    {
+      "id": "festivos",
+      "pregunta": "¿Abren en días festivos?",
+      "respuesta": "Pregúntanos antes por WhatsApp: el enlace está en [Contacto](#contacto)."
+    }
+  ]
+}

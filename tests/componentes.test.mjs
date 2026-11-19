@@ -81,7 +81,7 @@ const isExported = (src, name) => new RegExp(`export\\s+(?:async\\s+)?(?:functio
 const isDeclared = (src, name) => new RegExp(`(?:function\\*?\\s+${esc(name)}\\s*\\(|(?:const|let)\\s+${esc(name)}\\s*=)`).test(src);
 const usesToken = (src, tok) => src.includes(`--${tok}`) || src.includes(`'${tok}'`) || (tok.startsWith('dur-') && src.includes(`DUR('${tok.slice(4)}')`));
 
-const HOY = '2026-11-18'; // fecha del último componente añadido (asa-hoja, 2026-11-18)
+const HOY = '2026-11-19'; // fecha del último componente añadido (PreguntasFrecuentes, 2026-11-19)
 const SITE_FILES = ['index.html', ...CSS_FILES];
 
 test('catálogo de componentes: forma y campos (nombre, descripcion, archivos, tokens, estados, aria, qa, desde)', () => {
@@ -152,7 +152,7 @@ const CONDICION = {
   deshabilitado: item => /:disabled|aria-disabled/.test(item),
   seleccionado: item => /aria-(checked|pressed|selected)|:checked|is-hojeada/.test(item),
   actual: item => /aria-current|is-centro/.test(item),
-  expandido: item => /aria-expanded|is-open/.test(item),
+  expandido: item => /aria-expanded|is-open|\[open\]/.test(item),
   ocupado: item => /aria-busy|card--sk|sk-/.test(item),
   movimiento_reducido: (item, r) => item.startsWith('.motion ') || inAt(r, /prefers-reduced-motion:\s*reduce/),
   tactil: (item, r) => inAt(r, /\(hover:\s*none\)/),

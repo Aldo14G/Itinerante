@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 34 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 35 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -46,6 +46,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | Esqueletos |  |  |  |  |  |  |  | sí |  |  | — |
 | CarruselNovedades | sí | sí | sí | sí |  |  | sí | sí | sí |  | sí |
 | IntroMarca | — | — |  |  |  | sí |  |  |  |  | sí |
+| PreguntasFrecuentes | sí | sí | sí |  |  |  | sí |  |  |  | sí |
 
 Estados propios de algún componente, fuera de la tabla: `oculto`, `tactil`, `plano`, `abriendo`, `abierto`, `colores_forzados`, `cerrado` (ver el detalle).
 
@@ -716,3 +717,21 @@ Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de
 - **foco: no aplica.** No recibe foco: el telón es aria-hidden y vacío; el primer Tab va a «Saltar al contenido» y termina la entrada.
 - **ARIA:** Decoración (aria-hidden); la marca sigue siendo el enlace de la barra (https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html) · `aria-hidden="true" (telón)` · **Teclado:** Cualquier tecla la termina; Tab sigue a lo de siempre.
 - **QA:** `tools/qa/intro.mjs` `tests/site.test.mjs`
+
+### PreguntasFrecuentes
+
+Preguntas frecuentes de Visita (2026-11-19): una lista agrupada (fondo, radio-md) de details/summary nativos, sin JavaScript. Cada pregunta es un summary de 56 con su chevron; la respuesta (lectura 17/24 en tinta-2, con enlaces solo a anclas de la propia página) se abre debajo. Pintada en index.html desde assets/data/faq.json (scripts/build-faq.mjs, npm run faq; faq:check y npm test fallan si no coinciden): llega en el primer render. Solo respuestas confirmadas por Aldo; lo que falta está en docs/PENDIENTES-NEGOCIO.md. El chevron gira y la respuesta entra con un fundido corto solo con movimiento; cerrar es inmediato. Va tras el mapa y la foto: titular (Title 3) en 1–6 y preguntas en 7–12 desde 1024 px; en el teléfono, a 32 de la foto.
+
+- **Tipo:** control · **desde** 2026-11-19 · DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19).
+- **style.css:** `.faq` `.faq-tit` `.faq-lista` `.faq-item` `.faq-preg` `.faq-chev` `.faq-resp` `.visit-faq`
+- **index.html:** `.faq` `.faq-item` `.faq-preg` `[data-faq]` `#faq-title` `#horario` `#contacto`
+- **scripts/build-faq.mjs:** exporta `faqHtml` `withFaq` `faqProblems` `respuestaHtml`
+- **assets/data/faq.json:** datos
+- **Tokens:** `fondo` `linea` `tinta` `tinta-2` `turquesa-texto` `radio-md` `radio-sm` `alto-lg` `t-titular` `t-lectura` `anillo-foco` `fondo-3-presionado` `primario-presionado` `dur-rapida` `curva-salida` `space-2` `space-3` `space-4` `space-6` `canal-rejilla`
+- **Estado hover:** `.faq-preg:hover > span`
+- **Estado foco:** `.faq-preg:focus-visible`
+- **Estado presionado:** `.faq-preg:active` — La fila se tiñe de fondo-3-presionado, también con movimiento reducido; sin escala.
+- **Estado expandido:** `.faq-item[open] > .faq-preg .faq-chev` — details[open] es el estado: el navegador lo expone a los lectores de pantalla; el chevron gira 180°.
+- **Estado movimiento_reducido:** `.motion .faq-item[open] > .faq-resp` — El fundido de la respuesta y el giro del chevron viven bajo .motion; sin movimiento, el cambio es inmediato.
+- **ARIA:** Disclosure (details y summary nativos) (https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/) · `details/summary nativos (el navegador expone abierto y cerrado)` `role=group con aria-labelledby (el titular «Preguntas frecuentes»)` `el chevron es aria-hidden` · **Teclado:** Tab entre preguntas; Enter o Espacio abre y cierra.
+- **QA:** `tests/contenido.test.mjs` `tools/qa/guias.mjs` `tools/qa/controles.mjs`

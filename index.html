@@ -50,6 +50,7 @@
     <symbol id="t-novedades" viewBox="0 0 24 24"><path d="M13 7.5h5.5A1.5 1.5 0 0 1 20 9v11.5h-7a1.5 1.5 0 0 1-1.5-1.5V9A1.5 1.5 0 0 1 13 7.5zM14.5 7.5v13"/><path d="M5.5 3c.35 2.1 1 2.75 3 3-2 .35-2.65 1-3 3-.35-2-1-2.65-3-3 2-.25 2.65-.9 3-3z"/></symbol>
     <symbol id="t-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15.5V4m-4 4 4-4 4 4M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="i-prev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
     <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
     <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M12 12.5v5M9.5 15h5"/></symbol>
@@ -513,7 +514,7 @@
           <span>Entre Juan Aldama e Ignacio Rayón</span>
         </address>
         <p class="visit-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-long>Lunes a sábado de 11:00 a 20:00</span></p>
-        <div class="visit-horario">
+        <div class="visit-horario" id="horario">
         <table class="hours">
           <caption>Horario habitual</caption>
           <tbody>
@@ -553,12 +554,36 @@
           <figcaption data-kind="real">Pasando el arco está la sala, con la barra del café.</figcaption>
         </figure>
       </div>
+      <!-- Preguntas frecuentes (2026-11-19): details/summary nativos pintados desde assets/data/faq.json con `npm run faq` (solo respuestas confirmadas por Aldo). -->
+      <!-- faq:inicio · generadas desde assets/data/faq.json con `npm run faq`; no se editan a mano -->
+      <div class="visit-faq faq" data-faq>
+        <h3 class="faq-tit" id="faq-title">Preguntas frecuentes</h3>
+        <div class="faq-lista" role="group" aria-labelledby="faq-title">
+          <details class="faq-item" id="faq-libro">
+            <summary class="faq-preg"><span>¿Tienen el libro que busco?</span><svg class="ic faq-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="faq-resp"><p>Búscalo en el <a href="#catalogo">catálogo</a> y, en su ficha, toca «Consultar disponibilidad»: se abre WhatsApp con el mensaje ya escrito. Si no lo tenemos, te lo podemos pedir.</p></div>
+          </details>
+          <details class="faq-item" id="faq-leer">
+            <summary class="faq-preg"><span>¿Puedo quedarme a leer?</span><svg class="ic faq-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="faq-resp"><p>Sí. Con tu café, puedes quedarte a leer en la sala. Mira la <a href="#cafe">carta</a>.</p></div>
+          </details>
+          <details class="faq-item" id="faq-horario">
+            <summary class="faq-preg"><span>¿A qué hora abren?</span><svg class="ic faq-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="faq-resp"><p>El <a href="#horario">horario habitual</a> y si estamos abiertos hoy están más arriba, en esta misma sección.</p></div>
+          </details>
+          <details class="faq-item" id="faq-festivos">
+            <summary class="faq-preg"><span>¿Abren en días festivos?</span><svg class="ic faq-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="faq-resp"><p>Pregúntanos antes por WhatsApp: el enlace está en <a href="#contacto">Contacto</a>.</p></div>
+          </details>
+        </div>
+      </div>
+      <!-- faq:fin -->
     </section>
   </main>
 
   <!-- Pie: el único lugar de la página con el contacto (decisión de Aldo, 2026-11-13). Las secciones no repiten llamados a WhatsApp; se quedan
        los que son la función de su objeto (ficha del libro, Mi lista, salida del estado vacío) y la fila del menú ☰. -->
-  <footer class="ftr" aria-labelledby="ftr-title">
+  <footer class="ftr" id="contacto" aria-labelledby="ftr-title">
     <div class="ftr-contacto">
       <div class="ftr-texto">
         <h2 id="ftr-title" class="ftr-title">Contacto</h2>

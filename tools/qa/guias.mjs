@@ -172,7 +172,10 @@ const SECCIONES = [
     ['titular', '#visit-title'], ['control', '.visit-actions .btn'], ['dato', '.visit address'], ['estado', '.visit-status'],
 ['rotulo', '.hours caption'], ['contenido', '.hours tbody'],
 ['contenido', '.visit-map-link', { fila: 'figuras' }], ['pie', '.visit-map figcaption'],
-['nota', '.visit-note'], ['contenido', '.visit-arrival .frame-clip', { fila: 'figuras' }], ['pie', '.visit-arrival figcaption'] ] },
+['nota', '.visit-note'], ['contenido', '.visit-arrival .frame-clip', { fila: 'figuras' }], ['pie', '.visit-arrival figcaption'],
+// 2026-11-19: Preguntas frecuentes, tras el mapa y la foto (bloque → bloque 32 / 48; titular → lista 24). El titular lleva el rol «titular» para el ritmo:
+// su aire es el de un bloque nuevo, no el de una capa con filete (que sería 64 / 96).
+['titular', '.faq-tit'], ['contenido', '.faq-lista'] ] },
   { id: 'contacto', sel: 'footer.ftr', piezas: [
     ['titular', '.ftr-title'], ['entradilla', '.ftr-lede'], ['contenido', '.ftr-links'], ['bloque', '.interruptor'] ] }
 ];
@@ -180,7 +183,7 @@ const SECCIONES = [
 const NIVELES = {
   'h1': ['.entry-title'],
   'titular de sección': ['#house-title', '#books-title', '#bill-title', '#cafe-title', '#visit-title', '#ftr-title'],
-  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ev-lado-tit', '.ct-grupo-tit'],
+  'subtitular': ['.layer-title', '.visit address', '.ev-sub', '.ev-lado-tit', '.ct-grupo-tit', '.faq-tit'],
   'entradilla y cuerpo': ['.house .sec-texto', '.bill .sec-texto', '.cafe .sec-texto', '.ftr-lede', '.books-foot p', '.ct-cierre p'],
   'párrafo de lectura': ['.ev-card-desc', '.ev-prox-desc'],   // tres renglones o más (≥ 120 caracteres): token `lectura` 17/24; la crítica (law-lineheight) pide ≥ 1.35
   'estado': ['.entry-status', '.visit-status'],
@@ -192,6 +195,7 @@ const NIVELES = {
   'valor de dato': ['.ev-dato dd'],
   'nombre de producto': ['.ct-nom', '.ct-gal-pie .ct-gal-nom'],      // Headline 17: la fila de la carta (1 / 2 columnas, 2026-11-17) lleva su nombre bajo el título del grupo, sin competir con él
   'texto de pieza': ['.cf-meta', '.ct-desc'],
+  'pregunta de la lista': ['.faq-preg'],   // Headline 17 semibold (FAQ, 2026-11-19): el mismo peso que el nombre de un producto, dentro de una lista agrupada
   'pie de figura': ['.visit-map figcaption', '.visit-arrival figcaption'],
   'rótulo de grupo': ['.hours caption', '.cat-search label', '.cat-filters legend'],
   'nota': ['.entry-address', '.rail-note', '.visit-note', '.visit address span', '.cat-status', '.ev-card-meta', '.ev-lado-txt', '.ev-pas-meta']

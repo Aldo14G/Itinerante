@@ -852,6 +852,30 @@
       "qa": ["tools/qa/intro.mjs", "tests/site.test.mjs"],
       "desde": "2026-11-18",
       "decision": "DESIGN.md, «Entrada de marca (IntroMarca)»."
+    },
+    {
+      "id": "preguntas-frecuentes",
+      "nombre": "PreguntasFrecuentes",
+      "tipo": "control",
+      "descripcion": "Preguntas frecuentes de Visita (2026-11-19): una lista agrupada (fondo, radio-md) de details/summary nativos, sin JavaScript. Cada pregunta es un summary de 56 con su chevron; la respuesta (lectura 17/24 en tinta-2, con enlaces solo a anclas de la propia página) se abre debajo. Pintada en index.html desde assets/data/faq.json (scripts/build-faq.mjs, npm run faq; faq:check y npm test fallan si no coinciden): llega en el primer render. Solo respuestas confirmadas por Aldo; lo que falta está en docs/PENDIENTES-NEGOCIO.md. El chevron gira y la respuesta entra con un fundido corto solo con movimiento; cerrar es inmediato. Va tras el mapa y la foto: titular (Title 3) en 1–6 y preguntas en 7–12 desde 1024 px; en el teléfono, a 32 de la foto.",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".faq", ".faq-tit", ".faq-lista", ".faq-item", ".faq-preg", ".faq-chev", ".faq-resp", ".visit-faq"] },
+        { "ruta": "index.html", "selectores": [".faq", ".faq-item", ".faq-preg", "[data-faq]", "#faq-title", "#horario", "#contacto"] },
+        { "ruta": "scripts/build-faq.mjs", "exporta": ["faqHtml", "withFaq", "faqProblems", "respuestaHtml"] },
+        { "ruta": "assets/data/faq.json" }
+      ],
+      "tokens": ["fondo", "linea", "tinta", "tinta-2", "turquesa-texto", "radio-md", "radio-sm", "alto-lg", "t-titular", "t-lectura", "anillo-foco", "fondo-3-presionado", "primario-presionado", "dur-rapida", "curva-salida", "space-2", "space-3", "space-4", "space-6", "canal-rejilla"],
+      "estados": {
+        "hover": { "css": [".faq-preg:hover > span"] },
+        "foco": { "css": [".faq-preg:focus-visible"] },
+        "presionado": { "css": [".faq-preg:active"], "nota": "La fila se tiñe de fondo-3-presionado, también con movimiento reducido; sin escala." },
+        "expandido": { "css": [".faq-item[open] > .faq-preg .faq-chev"], "nota": "details[open] es el estado: el navegador lo expone a los lectores de pantalla; el chevron gira 180°." },
+        "movimiento_reducido": { "css": [".motion .faq-item[open] > .faq-resp"], "nota": "El fundido de la respuesta y el giro del chevron viven bajo .motion; sin movimiento, el cambio es inmediato." }
+      },
+      "aria": { "patron": "Disclosure (details y summary nativos)", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/", "atributos": ["details/summary nativos (el navegador expone abierto y cerrado)", "role=group con aria-labelledby (el titular «Preguntas frecuentes»)", "el chevron es aria-hidden"], "teclado": "Tab entre preguntas; Enter o Espacio abre y cierra." },
+      "qa": ["tests/contenido.test.mjs", "tools/qa/guias.mjs", "tools/qa/controles.mjs"],
+      "desde": "2026-11-19",
+      "decision": "DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19)."
     }
   ],
   "contraste": [

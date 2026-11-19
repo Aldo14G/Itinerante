@@ -688,6 +688,34 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .visit-arrival { margin: var(--space-6) 0 0; }
 .visit-arrival .frame-clip { aspect-ratio: 16 / 9; }
 .visit-arrival figcaption { margin-top: var(--space-2); font: var(--t-nota-pie); color: var(--tinta-2); }
+/* Preguntas frecuentes (FAQ, 2026-11-19): details/summary nativos pintados desde assets/data/faq.json (scripts/build-faq.mjs). Una lista agrupada
+   como el horario y el pie (fondo, radio-md, filas separadas por un filete); cada pregunta es un summary de 56 con su chevron, que gira solo con
+   movimiento; la respuesta entra con un fundido corto solo con movimiento (cerrar es inmediato: details no anima su cierre). Bloque → bloque 32
+   sobre el titular (el gap de la sección), titular → lista 24. Los enlaces de la respuesta llevan el mismo objetivo de 44 que los de las entradillas. */
+.faq { margin: 0; }
+.faq-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; } /* Title 3, el subtitular de siempre (no .layer-title: guias.mjs la usa para el de Explorar) */
+.faq-lista { margin: var(--space-6) 0 0; padding: 0 var(--space-4); border-radius: var(--radio-md); background: var(--fondo); }
+.faq-item + .faq-item { border-top: 1px solid var(--linea); }
+.faq-preg {
+  display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-lg); margin-inline: calc(-1 * var(--space-2)); padding: var(--space-2);
+  border-radius: var(--radio-sm); font: var(--t-titular); letter-spacing: var(--ls-titular); cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent;
+}
+.faq-preg::-webkit-details-marker { display: none; }
+.faq-preg > span { flex: 1 1 auto; min-width: 0; text-wrap: balance; }
+.faq-chev { flex: none; width: 24px; height: 24px; color: var(--tinta-2); }
+.faq-item[open] > .faq-preg .faq-chev { transform: rotate(180deg); }
+.faq-preg:active { background: var(--fondo-3-presionado); }
+.faq-preg:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+@media (hover: hover) { .faq-preg:hover > span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; } }
+.faq-resp { padding: 0 0 var(--space-4); }
+.faq-resp p { margin: 0; max-width: 60ch; font: var(--t-lectura); letter-spacing: var(--ls-lectura); color: var(--tinta-2); }
+.faq-resp a { position: relative; color: var(--turquesa-texto); }
+.faq-resp a::after { content: ""; position: absolute; inset: calc(-1 * var(--space-3)) 0; }
+@media (hover: hover) { .faq-resp a:hover { color: var(--primario-presionado); text-decoration-thickness: 2px; } }
+@keyframes faq-entra { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.motion .faq-chev { transition: transform var(--dur-rapida) var(--curva-salida); }
+.motion .faq-item[open] > .faq-resp { animation: faq-entra var(--dur-rapida) var(--curva-salida); }
+@media (min-width: 761px) { .faq-lista { max-width: 640px; } }
 .frame-clip { position: relative; overflow: hidden; border-radius: var(--radio-lg); background: var(--fondo-3); }
 /* Mapa de llegada (2026-11-14; idea de mapcn, reescrita sin MapLibre ni teselas): SVG propio con las calles de OpenStreetMap (1 unidad = 1 m,
    norte arriba), recortado a su caja (slice: los anchos grandes ven más calles, los chicos la cuadra). Colores de los tokens en los dos temas:
@@ -742,6 +770,11 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .visit-datos > .visit-actions { margin-top: 0; }
   .visit-map { grid-column: 1 / span 6; grid-row: 3; margin: 0; }
   .visit-arrival { grid-column: 7 / -1; grid-row: 3; margin: 0; }
+  /* Preguntas frecuentes: una fila más, bajo el mapa y la foto, a 48 (bloque → bloque: 24 del gap de la sección + 24): el titular en 1–6 y las preguntas en
+     7–12, como el bloque «Contacto» del pie (misma división única, misma línea de arriba). */
+  .visit-faq { grid-column: 1 / -1; grid-row: 4; margin-top: var(--space-6); display: grid; grid-template-columns: subgrid; align-items: start; }
+  .visit-faq > .faq-tit { grid-column: 1 / span 6; }
+  .visit-faq > .faq-lista { grid-column: 7 / -1; margin: 0; max-width: none; }
   .mapa { height: auto; aspect-ratio: 2 / 1; }
   .visit-arrival .frame-clip { aspect-ratio: 2 / 1; }
   .visit-map-embed { height: auto; aspect-ratio: 2 / 1; }
