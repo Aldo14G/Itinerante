@@ -224,6 +224,28 @@ export function bookMessage(book) {
   return `Hola, ¿tienen «${book.t}»${by}${isbn}? Vi el título en su sitio.`;
 }
 
+// Explorar sin resultados (2026-11-19, iteración de lectura): dos casos con su salida, sin dar el mismo peso a las dos acciones.
+//  · Solo búsqueda (sin filtros): «No encontramos coincidencias para «…».» y, como la librería pide obras (dato de Aldo, 2026-11-18), «Si es el que
+//    buscas, te lo podemos pedir.» con «Preguntar por WhatsApp» (principal) y el mensaje ya escrito con lo buscado. Sin plazos ni promesas.
+//  · Con filtros: «Ningún título cumple todos los filtros.»; «Quitar filtros» (principal) conserva el texto buscado y dice cuántos quedarían; con
+//    texto buscado, WhatsApp va como secundaria.
+// `sinFiltros`: cuántos títulos da la búsqueda sola (para decir qué pasa al quitar los filtros).
+export function emptyPlan({ q = '', filtros = 0, sinFiltros = 0 } = {}) {
+  const busca = String(q).trim();
+  const wa = busca ? searchWaUrl(busca) : null;
+  if (!filtros) return { tit: `No encontramos coincidencias para «${busca}».`, txt: 'Si es el que buscas, te lo podemos pedir.', quitar: false, wa, waPrincipal: true };
+  const txt = !busca ? 'Quita alguno para ver más títulos.'
+    : sinFiltros ? `Sin filtros, «${busca}» tiene ${sinFiltros === 1 ? '1 resultado' : `${sinFiltros} resultados`}.`
+    : `Tampoco hay coincidencias para «${busca}» sin filtros; te lo podemos pedir.`;
+  return { tit: 'Ningún título cumple todos los filtros.', txt, quitar: true, wa, waPrincipal: false };
+}
+export function searchMessage(q) { return `Hola, busco «${String(q).trim()}» y no lo encontré en su catálogo. ¿Me pueden ayudar?`; }
+export function searchWaUrl(q) {
+  const url = new URL(`https://wa.me/${WA_NUMBER}`);
+  url.searchParams.set('text', searchMessage(q));
+  return url.href;
+}
+
 export function bookWaUrl(book) {
   const url = new URL(`https://wa.me/${WA_NUMBER}`);
   url.searchParams.set('text', bookMessage(book));
@@ -417,9 +439,27 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     grid.hidden = !results.length;
     // «41 títulos» / «N títulos»; sin resultados la frase visible es la del estado vacío y esta línea solo la anuncia (sr-only).
     const n = results.length;
-    status.textContent = !n ? 'No está en el catálogo, pero te lo podemos pedir.' : slice.length < n ? `Mostrando ${slice.length} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
+    const vacio = n ? null : renderEmpty();
+    status.textContent = vacio ? `${vacio.tit} ${vacio.txt}` : slice.length < n ? `Mostrando ${slice.length} de ${n} títulos.` : n === 1 ? '1 título' : `${n} títulos`;
     status.classList.toggle('sr-only', !n);
     return fresh;
+  }
+
+  // Estado vacío (emptyPlan): título, qué hacer y sus dos salidas con distinto peso. Va justo bajo el buscador y sus filtros puestos (chips),
+  // no al fondo de la hoja: con el teclado del teléfono abierto el mensaje y su primera acción siguen a la vista.
+  const emptyTit = $('[data-cat-empty-tit]', root), emptyTxt = $('[data-cat-empty-txt]', root);
+  const unfilterBtn = $('[data-cat-unfilter]', root), emptyWa = $('[data-cat-empty-wa]', root);
+  function renderEmpty() {
+    const filtros = state.k.size + state.g.size + state.f.size + state.p.size;
+    const sinFiltros = filtros && state.q ? filterBooks(books, { ...state, k: new Set(), g: new Set(), f: new Set(), p: new Set() }).length : 0;
+    const plan = emptyPlan({ q: state.q, filtros, sinFiltros });
+    emptyTit.textContent = plan.tit;
+    emptyTxt.textContent = plan.txt;
+    unfilterBtn.hidden = !plan.quitar;
+    emptyWa.hidden = !plan.wa;
+    if (plan.wa) emptyWa.href = plan.wa;
+    emptyWa.className = `btn ${plan.waPrincipal ? 'btn--secundario' : 'btn--contorno'}`;
+    return plan;
   }
 
   // Pliegue de la rejilla en línea (foldView): las columnas salen de la rejilla pintada, así dos filas son dos filas a cualquier ancho.
@@ -573,7 +613,8 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     filtersBtn.setAttribute('aria-expanded', String(open));
     root.classList.toggle('filters-open', open);
   });
-  $('[data-cat-reset]', root).addEventListener('click', clearAll);
+  // «Quitar filtros» (estado vacío): quita los filtros y conserva lo buscado; el foco va al estado de resultados.
+  unfilterBtn.addEventListener('click', () => { state.k.clear(); state.g.clear(); state.f.clear(); state.p.clear(); refresh(); restFocus(); });
   moreBtn.addEventListener('click', () => {
     state.shown += PAGE_SIZE;
     const before = grid.children.length;
@@ -590,7 +631,9 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     h.classList.toggle('is-long', titleSize(main, sub) === 'long');
   }
   function row(k, v) { return v ? [el('dt', {}, k), el('dd', {}, String(v))] : []; }
-  // Una sola ficha (el «modo redes» de Novedades se retiró el 2026-11-13): «Preguntar por WhatsApp», Guardar, Compartir y «Cómo llegar».
+  // Una sola ficha (el «modo redes» de Novedades se retiró el 2026-11-13): «Consultar disponibilidad» (2026-11-19: el WhatsApp de la librería con el
+  // mensaje ya escrito —título, autor e ISBN si lo hay—; antes «Preguntar por WhatsApp» más la nota «Antes de venir, te confirmamos si lo tenemos.»),
+  // Guardar, Compartir y «Cómo llegar» (secundaria). Que un libro esté en el catálogo no dice que haya ejemplar: ningún texto lo promete.
   function openBook(id, { trigger, tone } = {}) {
     const b = byId.get(id);
     if (!b) return false; // un enlace compartido a un libro que ya no está (app.js lo avisa)

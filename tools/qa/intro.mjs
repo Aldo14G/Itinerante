@@ -5,7 +5,7 @@
 //   rueda y scroll, ausencia con movimiento reducido, pausa, ahorro de datos, #ancla, #libro-<id>, segunda carga, «atrás» y almacenamiento que
 //   lanza, foco y lector, contraste del texto durante la entrada en claro y oscuro, y CLS). Sale con 1 si algo falla.
 //   --lcp=N: además, LCP, FCP y CLS con CPU 4× y 4G lenta (preset «Slow 4G» de DevTools: 562.5 ms, 1.44 Mbps), mediana de N corridas por perfil,
-//     con la entrada y sin ella (sessionStorage ya anotado), en iPhone 16 y 1440.
+//     con la entrada y sin ella (localStorage ya anotado), en iPhone 16 y 1440.
 //   --tiras: tira de fotogramas cada 80 ms (animaciones en pausa y llevadas a cada instante: fotogramas exactos) en iPhone 16 y 1440, claro y oscuro.
 //   --video: graba la entrada (recordVideo, .webm) en los mismos cuatro casos.
 //   --variante=b: la tira de la variante B propuesta (subrayado de 2 px y telón que se funde), inyectada sobre el CSS del sitio.
@@ -163,6 +163,7 @@ if (corre('ausencia')) {
     ['llegar con #visita', {}, [], '#visita'],
     ['llegar con #libro-<id>', {}, [], '#libro-no-existe'],
     ['sessionStorage y localStorage que lanzan', {}, [() => { for (const k of ['sessionStorage', 'localStorage']) Object.defineProperty(window, k, { configurable: true, get() { throw new DOMException('bloqueado', 'SecurityError'); } }); }], ''],
+    ['solo localStorage lanza (2026-11-19: la entrada se recuerda ahí)', {}, [() => { Object.defineProperty(window, 'localStorage', { configurable: true, get() { throw new DOMException('bloqueado', 'SecurityError'); } }); }], ''],
   ];
   for (const perfil of Object.keys(PERFILES)) {
     for (const [nombre, extra, init, hash] of casos) {
@@ -184,8 +185,14 @@ if (corre('ausencia')) {
     await sleep(1800);
     await page.reload({ waitUntil: 'commit' });
     await esperaT0(page);
-    check('ausencia', `${perfil}: segunda carga en la misma sesión: no aparece`, primera && !(await hayIntro(page)));
-    await page.evaluate(() => sessionStorage.removeItem('iti-intro')); // aislar «atrás» de la regla de una vez por sesión
+    check('ausencia', `${perfil}: segunda carga: no aparece`, primera && !(await hayIntro(page)));
+    // Solo la primera visita (decisión de Aldo, 2026-11-19): otra pestaña del mismo dispositivo (otra sesión, el mismo localStorage) tampoco la ve.
+    const otra = await ctx.newPage();
+    await otra.goto(URL_, { waitUntil: 'commit' });
+    await esperaT0(otra);
+    check('ausencia', `${perfil}: otra visita desde el mismo dispositivo (pestaña nueva, sesión nueva): no aparece`, !(await hayIntro(otra)), `localStorage iti-intro = ${await otra.evaluate(() => localStorage.getItem('iti-intro'))}`);
+    await otra.close();
+    await page.evaluate(() => localStorage.removeItem('iti-intro')); // aislar «atrás» de la regla de la primera visita
     await page.goto(new URL('robots.txt', URL_).href);
     await page.goBack({ waitUntil: 'commit' });
     await esperaT0(page).catch(() => {});
@@ -339,7 +346,7 @@ if (opt('lcp')) {
           new PerformanceObserver(l => { for (const e of l.getEntries()) if (e.name === 'first-contentful-paint') window.__m.fcp = e.startTime; }).observe({ type: 'paint', buffered: true });
           requestAnimationFrame(() => { window.__m.intro = document.documentElement.classList.contains('intro-marca'); });
         });
-        if (modo === 'sin entrada') await ctx.addInitScript(() => { try { sessionStorage.setItem('iti-intro', '1'); } catch {} });
+        if (modo === 'sin entrada') await ctx.addInitScript(() => { try { localStorage.setItem('iti-intro', '1'); } catch {} });
         const page = await ctx.newPage();
         const cdp = await ctx.newCDPSession(page);
         await cdp.send('Network.enable');

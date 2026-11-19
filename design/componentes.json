@@ -26,10 +26,10 @@
       "tipo": "control",
       "descripcion": "Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y en las barras, 56 (--lg) en las acciones principales y el pie de las hojas. Una sola primaria por vista.",
       "variantes": [
-        { "nombre": "primario", "selector": ".btn--primario", "uso": "La acción primaria de la vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»)." },
-        { "nombre": "secundario", "selector": ".btn--secundario", "uso": "Secundaria «tinted» en menta; alternado con aria-pressed toma el primario." },
+        { "nombre": "primario", "selector": ".btn--primario", "uso": "La acción primaria de la vista («Cómo llegar»; en la ficha, «Consultar disponibilidad», 2026-11-19). Una por vista." },
+        { "nombre": "secundario", "selector": ".btn--secundario", "uso": "Secundaria «tinted» en menta; alternado con aria-pressed toma el primario. También la salida principal de un estado vacío («Quitar filtros»; sin filtros, «Preguntar por WhatsApp»; 2026-11-19)." },
         { "nombre": "plano", "selector": ".btn--plano", "uso": "Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»)." },
-        { "nombre": "contorno", "selector": ".btn--contorno", "uso": "Sin relleno, borde de 1 px en linea-fuerte y texto en tinta (Eventos, 2026-11-16: «Registrarme» y «Añadir al calendario» de la lista y los iconos del destacado, para lo que no debe competir con la primaria). Mismas alturas (44) y estados que las demás." },
+        { "nombre": "contorno", "selector": ".btn--contorno", "uso": "Sin relleno, borde de 1 px en linea-fuerte y texto en tinta (Eventos, 2026-11-16: «Registrarme» y «Añadir al calendario» de la lista y los iconos del destacado, para lo que no debe competir con la primaria). Mismas alturas (44) y estados que las demás. Desde el 2026-11-19 también la salida secundaria del estado vacío de Explorar y los controles de la tira de La casa (44, icono)." },
         { "nombre": "vidrio", "selector": ".btn--vidrio", "uso": "Solo lo que flota: cerrar una hoja, flechas del Carrusel3D." },
         { "nombre": "icono", "selector": ".btn--icono", "uso": "Cuadrado del alto del botón, nombre en aria-label." },
         { "nombre": "chico", "selector": ".btn--sm", "uso": "44 px." },
@@ -164,7 +164,7 @@
       "id": "menu-hamburguesa",
       "nombre": "MenuHamburguesa",
       "tipo": "bloque",
-      "descripcion": "☰ de 44 cuyas líneas se cruzan en ×, y el diálogo modal con la hoja de vidrio: secciones en filas de 56 (la actual en menta), Mi lista, el horario de hoy, «Cómo llegar», WhatsApp e Instagram/Facebook. Detrás, el velo.",
+      "descripcion": "☰ de 44 cuyas líneas se cruzan en ×, y el diálogo modal con la hoja de vidrio: secciones en filas de 56 (la actual en menta), el horario de hoy, «Cómo llegar», WhatsApp e Instagram/Facebook. Detrás, el velo. Sin la fila «Mi lista» desde el 2026-11-19: vive en la barra inferior (teléfono) y en la cabecera (761–1100). La barra inferior lleva lo frecuente; el ☰, todas las secciones, el horario, el contacto y la pausa.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".menu-btn", ".menu-lines", ".menu", ".menu::backdrop", ".menu-hoja", ".menu-row", ".menu-close", ".menu-pie", ".menu-acciones", ".menu-redes"] },
         { "ruta": "index.html", "selectores": ["#menu", "[data-menu-open]", "[data-menu-close]", ".menu-row", ".menu-hoja"] },
@@ -189,13 +189,13 @@
       "id": "barra-inferior",
       "nombre": "BarraInferior",
       "tipo": "bloque",
-      "descripcion": "Solo ≤ 760 px: cápsula de vidrio de 49 × 228 con Inicio, Catálogo y Mi lista (botón con el conteo). La pastilla menta se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta.",
+      "descripcion": "Solo ≤ 760 px: barra anclada al borde inferior, a todo el ancho y con su espacio propio (iteración de lectura, 2026-11-19; antes una cápsula flotante de 49 × 228 a 8 px del borde que dejaba leer el texto a sus lados): 49 px de casillas más el área segura (env(safe-area-inset-bottom)), vidrio con filete arriba, tres casillas iguales (131 × 49 a 393; hasta 480 px de casillas centradas) con Inicio, Catálogo y Mi lista (botón con el conteo). La pastilla menta de 68 × 41 se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta. El documento le deja su sitio (html: scroll-padding-bottom de 49 + área + 24, para que el foco por teclado no quede debajo; .ftr: padding-bottom de 49 + área + 32). Ajusta: el alto al área segura. Estira: el ancho de la ventana (casillas en 1fr). Límites: casillas ≤ 480 px en total, 49 de alto útil.",
       "archivos": [
         { "ruta": "mobile.css", "selectores": [".tabbar", ".tabbar-pastilla", ".tabbar a", ".tab-list", ".tab-ic", ".tab-lb", ".tab-ic-box"] },
         { "ruta": "index.html", "selectores": [".tabbar", ".tabbar-pastilla", ".tab-list", ".tab-lb"] },
         { "ruta": "app.js", "ganchos": ["a.setAttribute('aria-current', 'location')"] }
       ],
-      "tokens": ["alto-barra-inferior", "vidrio", "filtro-vidrio", "luz-vidrio", "sombra-flotante", "menta", "en-menta", "tinta", "foco", "radio-pildora", "t-pestana", "space-1", "space-2", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "curva-resorte", "fondo-3-presionado", "menta-presionado"],
+      "tokens": ["alto-barra-inferior", "vidrio", "filtro-vidrio", "menta", "en-menta", "tinta", "foco", "radio-pildora", "t-pestana", "space-1", "space-2", "dur-instantanea", "dur-rapida", "dur-base", "curva-salida", "curva-resorte", "fondo-3-presionado", "menta-presionado", "linea", "radio-md", "space-5", "space-6", "space-8"],
       "estados": {
         "foco": { "css": [".tabbar a:focus-visible", ".tab-list:focus-visible"] },
         "presionado": { "css": [".tabbar a:active", ".tab-list:active", ".tabbar a[aria-current]:active"], "nota": "Escala 0.94 y color (fondo-3-presionado; la casilla actual, menta-presionado): con movimiento reducido el color es la respuesta." },
@@ -292,7 +292,7 @@
       "id": "lista-eventos",
       "nombre": "ListaEventos",
       "tipo": "bloque",
-      "descripcion": "Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un día por grupo (en el teléfono, un rótulo en versalitas «SÁB · 28 NOV» con una línea fina; desde 761 px, una columna de 96 a la izquierda con el día y el mes arriba y el número ligero debajo) y, al final, «Propuestas, aún sin fecha». Cada fila (TarjetaEvento) va entre líneas finas, sin relleno: hora y tipo como texto («17:00 · Juego»; o «tipo · Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 con radio-sm y anillo fino a la derecha; con fecha lleva la reserva de contorno (44) y el calendario plano (44); una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.",
+      "descripcion": "Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un día por grupo (en el teléfono, un rótulo en versalitas «SÁB · 28 NOV» con una línea fina; desde 761 px, una columna de 96 a la izquierda con el día y el mes arriba y el número ligero debajo) y, al final, «Propuestas, aún sin fecha». Cada fila (TarjetaEvento) va entre líneas finas, sin relleno: hora y tipo como texto («17:00 · Juego»; una propuesta, su tipo como texto y el rótulo de estado «Propuesta · sin fecha» como píldora de contorno —2026-11-19: antes texto del mismo renglón—), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 con radio-sm y anillo fino a la derecha; con fecha lleva la reserva de contorno (44) y el calendario plano (44); una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".ev", ".ev-despues", ".ev-lista", ".ev-sub", ".ev-dias", ".ev-dia", ".ev-dia-tit", ".ev-dia-vis", ".ev-dia-num", ".ev-filas", ".ev-card", ".ev-card-txt", ".ev-card-img", ".ev-card-tit", ".ev-card-meta", ".ev-card-desc", ".ev-card-acc", ".ev-hora", ".ev-estado", ".ev-lado", ".ev-lado-tit", ".ev-lado-txt", ".ev-espera"] },
         { "ruta": "index.html", "selectores": ["#cartelera", ".ev-lista", ".ev-propuestas", ".ev-filas", ".ev-fila", ".ev-card", ".ev-card-img", ".ev-card-desc", "[data-ev-when]"] },
@@ -456,7 +456,7 @@
       "id": "fila-producto",
       "nombre": "FilaProducto",
       "tipo": "bloque",
-      "descripcion": "Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17). Pintada en index.html desde assets/data/menu.json (scripts/build-carta.mjs, npm run carta; carta:check y npm test fallan si no coinciden): llega en el primer render, sin esqueleto, también sin JavaScript. Una columna en el teléfono y dos desde 761 (canal 32; en escritorio a todo el ancho del contenedor de Café, 1120), en el orden del marcado (izquierda a derecha, renglón por renglón), entre líneas finas de 1 px (linea) y con 12 de aire arriba y abajo, sin caja. El nombre en Headline (h4), el precio a 4 px (Subheadline 600 en tinta —antes turquesa-texto, el mismo valor que primario: competía con la acción principal—, «$NN MXN», con la unidad si la trae, data-fuente=\"carta\"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, sin cortar con «…»). Sin foto (.ct-prod--solo, todas hoy) el texto ocupa la fila entera. Con foto: cuadrada a la derecha, 96 en el teléfono y 120 desde 761, con el icono de su categoría debajo; si la foto falla, cafe.js la quita y queda el icono. Entre categorías hay más aire que entre filas (32 / 48 frente a 24). No es un control.",
+      "descripcion": "Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17). Pintada en index.html desde assets/data/menu.json (scripts/build-carta.mjs, npm run carta; carta:check y npm test fallan si no coinciden): llega en el primer render, sin esqueleto, también sin JavaScript. Una columna en el teléfono y dos desde 761 (canal 32; en escritorio a todo el ancho del contenedor de Café, 1120), en el orden del marcado (izquierda a derecha, renglón por renglón), entre líneas finas de 1 px (linea) y con 12 de aire arriba y abajo, sin caja. El nombre en Headline (h4), el precio a 4 px (Subheadline en tinta, de peso normal desde el 2026-11-19 —un solo renglón fuerte por fila, el nombre—; antes 600 —antes turquesa-texto, el mismo valor que primario: competía con la acción principal—, «$NN MXN», con la unidad si la trae, data-fuente=\"carta\"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, sin cortar con «…»). Sin foto (.ct-prod--solo, todas hoy) el texto ocupa la fila entera. Con foto: cuadrada a la derecha, 96 en el teléfono y 120 desde 761, con el icono de su categoría debajo; si la foto falla, cafe.js la quita y queda el icono. Entre categorías hay más aire que entre filas (32 / 48 frente a 24). No es un control.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".ct-lista", ".ct-rejilla", ".ct-prod", ".ct-foto", ".ct-ic", ".ct-txt", ".ct-nom", ".ct-desc", ".ct-precio", ".ct-prod--solo", ".ct-grupo-nota", ".ct-cierre", ".cafe-foto"] },
         { "ruta": "index.html", "selectores": ["[data-ct-lista]", ".ct-rejilla", ".ct-prod", ".ct-precio", ".ct-cierre", ".cafe-foto"] },
@@ -507,9 +507,9 @@
       "id": "ficha-libro",
       "nombre": "FichaLibro",
       "tipo": "bloque",
-      "descripcion": "Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el teléfono): portada, título, autor, ficha técnica, sinopsis, «Tu mensaje por WhatsApp», relacionados y, fijas al pie, «Preguntar por WhatsApp» (primaria a todo el ancho), Guardar, Compartir y «Cómo llegar».",
+      "descripcion": "Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el teléfono): portada, título, autor, ficha técnica, sinopsis, «Tu mensaje por WhatsApp», relacionados y, fijas al pie, «Consultar disponibilidad» (primaria a todo el ancho, al WhatsApp de la librería con título, autor e ISBN ya escritos; 2026-11-19, antes «Preguntar por WhatsApp» con la nota «Antes de venir, te confirmamos si lo tenemos.», que se retiró), Guardar, Compartir y «Cómo llegar» (secundaria). Ningún texto dice «disponible» ni «en existencia»: estar en el catálogo no es tener ejemplar.",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".drawer", ".drawer::backdrop", ".drawer-body", ".drawer-close", ".drawer-head", ".drawer-facts", ".drawer-synopsis", ".drawer-foot", ".drawer-actions", ".drawer-note", ".rel"] },
+        { "ruta": "style.css", "selectores": [".drawer", ".drawer::backdrop", ".drawer-body", ".drawer-close", ".drawer-head", ".drawer-facts", ".drawer-synopsis", ".drawer-foot", ".drawer-actions", ".rel"] },
         { "ruta": "mobile.css", "selectores": [".drawer"] },
         { "ruta": "index.html", "selectores": ["#cat-drawer", "[data-d-close]", "[data-d-cta]", "[data-d-save]", "[data-d-share]", "[data-d-visit]", "[data-d-scroll]"] },
         { "ruta": "catalog.js", "exporta": ["shareBook", "bookShareData", "bookMessage", "bookWaUrl", "relatedBooks"], "internas": ["openBook"] },
@@ -600,14 +600,14 @@
       "id": "explorar",
       "nombre": "Explorar",
       "tipo": "bloque",
-      "descripcion": "«Explora el catálogo»: los 41 títulos en una página con búsqueda y filtros (Género, Editorial; casillas de 24 con palomita; un grupo se pliega desde 8 opciones). Hoja a pantalla completa en el teléfono; en línea desde 761, donde sin búsqueda ni filtros la rejilla se pliega a dos filas con «Ver los 41 títulos» / «Ver menos». Filtros activos como chips y «Limpiar todo».",
+      "descripcion": "«Explora el catálogo»: los 41 títulos en una página con búsqueda y filtros (Género, Editorial; casillas de 24 con palomita; un grupo se pliega desde 8 opciones). Hoja a pantalla completa en el teléfono; en línea desde 761, donde sin búsqueda ni filtros la rejilla se pliega a dos filas con «Ver los 41 títulos» / «Ver menos». Filtros activos como chips y «Limpiar todo». Sin resultados (2026-11-19, emptyPlan): solo con búsqueda, «No encontramos coincidencias para «…».» y «Preguntar por WhatsApp» (principal, menta) con lo buscado ya escrito; con filtros, «Ningún título cumple todos los filtros.», «Quitar filtros» (principal; conserva lo buscado y dice cuántos quedarían) y WhatsApp de contorno si hay texto. El mensaje va justo bajo el buscador (8 de aire), a la vista con el teclado abierto.",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".explore-open", ".explorer", ".cat", ".cat-bar", ".cat-filters", ".cat-group", ".cat-opt", ".cat-more-facets", ".cat-status", ".cat-chips", ".cat-clear-all", ".cat-grid", ".cat-fold", ".cat-empty", ".cat-error"] },
+        { "ruta": "style.css", "selectores": [".explore-open", ".explorer", ".cat", ".cat-bar", ".cat-filters", ".cat-group", ".cat-opt", ".cat-more-facets", ".cat-status", ".cat-chips", ".cat-clear-all", ".cat-grid", ".cat-fold", ".cat-empty", ".cat-error", ".cat-empty-tit", ".cat-empty-txt", ".cat-empty-acc"] },
         { "ruta": "mobile.css", "selectores": [".explorer"] },
-        { "ruta": "index.html", "selectores": ["#catalogo", "#explorer", "[data-ex-open]", "[data-ex-close]", "[data-cat-form]", "[data-cat-filters]", "[data-cat-status]", "[data-cat-chips]", "[data-cat-grid]", "[data-cat-fold]", "[data-cat-empty]", "[data-cat-reset]"] },
-        { "ruta": "catalog.js", "exporta": ["initCatalog", "filterBooks", "sortBooks", "facetCounts", "foldView", "facetView", "FOLD_ROWS", "FACET_FOLD_AT", "FACET_LIMIT", "PAGE_SIZE", "GENRE_ES", "genreLabel"], "internas": ["renderFilters", "renderChips", "renderGrid", "applyFold", "staggerIn", "clearAll"], "ganchos": ["data-clear", "cat-clear-all"] }
+        { "ruta": "index.html", "selectores": ["#catalogo", "#explorer", "[data-ex-open]", "[data-ex-close]", "[data-cat-form]", "[data-cat-filters]", "[data-cat-status]", "[data-cat-chips]", "[data-cat-grid]", "[data-cat-fold]", "[data-cat-empty]", "[data-cat-unfilter]", "[data-cat-empty-wa]", "[data-cat-empty-tit]", "[data-cat-empty-txt]"] },
+        { "ruta": "catalog.js", "exporta": ["initCatalog", "filterBooks", "sortBooks", "facetCounts", "foldView", "facetView", "FOLD_ROWS", "FACET_FOLD_AT", "FACET_LIMIT", "PAGE_SIZE", "GENRE_ES", "genreLabel", "emptyPlan", "searchMessage", "searchWaUrl"], "internas": ["renderFilters", "renderChips", "renderGrid", "applyFold", "staggerIn", "clearAll", "renderEmpty"], "ganchos": ["data-clear", "cat-clear-all"] }
       ],
-      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida", "fondo-3-presionado", "curva-aceleracion"],
+      "tokens": ["alto-sm", "alto-md", "fondo-3", "fondo-2", "fondo", "tinta", "tinta-2", "linea", "linea-fuerte", "primario", "en-primario", "turquesa-texto", "foco", "anillo-foco", "radio-md", "radio-sm", "radio-portada", "radio-pildora", "t-campo", "t-subtitulo", "t-rotulo", "t-boton-chico", "t-titulo-3", "space-8", "dur-rapida", "dur-lenta", "escalon-linea", "curva-salida", "fondo-3-presionado", "curva-aceleracion", "t-cuerpo", "space-2", "space-3", "space-6", "space-12", "ls-titulo-3"],
       "estados": {
         "hover": { "css": [".explore-open:hover", ".cat-opt label:hover"] },
         "foco": { "css": [".cat-opt input:focus-visible + label", ".cat-clear-all:focus-visible", ":is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible"] },
@@ -615,7 +615,7 @@
         "seleccionado": { "css": [".cat-opt input:checked + label::before", ".cat-opt input:checked + label::after"] },
         "expandido": { "js": [{ "ruta": "catalog.js", "texto": "foldBtn.setAttribute('aria-expanded', String(!v.folded))" }], "html": ["[data-cat-fold][aria-expanded=\"false\"]"] },
         "ocupado": { "css": [".cat-grid[aria-busy=\"true\"]", ".cat-grid[aria-busy=\"true\"] .card--sk .cover"], "html": ["[data-cat-grid][aria-busy=\"true\"]"] },
-        "vacio": { "css": [".cat-empty"], "html": ["[data-cat-empty]", "[data-cat-reset]"] },
+        "vacio": { "css": [".cat-empty", ".cat-empty-acc .btn[hidden]"], "html": ["[data-cat-empty]", "[data-cat-unfilter]", "[data-cat-empty-wa]"], "nota": "Dos casos (emptyPlan): sin coincidencias para lo buscado (WhatsApp principal) o filtros demasiado restrictivos («Quitar filtros» principal, WhatsApp de contorno)." },
         "error": { "css": [".cat-error"] },
         "movimiento_reducido": { "js": [{ "ruta": "catalog.js", "texto": "if (!isMotion() || !items.length) return;" }] }
       },
@@ -669,18 +669,20 @@
       "id": "tira-casa",
       "nombre": "TiraCasa",
       "tipo": "bloque",
-      "descripcion": "La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve entera queda plena y la que asoma se atenúa hasta 0.6 (CSS con animation-timeline: view()).",
+      "descripcion": "La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve entera queda plena y la que asoma se atenúa hasta 0.6 (CSS con animation-timeline: view()). Desde el 2026-11-19 (iteración de lectura): filas compartidas con subgrid (la foto y el pie de todas las tarjetas en las mismas dos filas; el pie más alto da la altura, sin alturas fijas) y, bajo la tira, «Foto anterior» y «Foto siguiente» (contorno, 44, icono) en el margen izquierdo, aria-disabled en los extremos, sin avance automático (APG, carrusel). Ajusta: el pie a su texto. Estira: la fila del pie al pie más alto. Límites: tarjeta 78vw en el teléfono, 300–560 desde 761.",
       "archivos": [
-        { "ruta": "style.css", "selectores": [".house", ".house-track", ".still", ".still-img"] },
+        { "ruta": "style.css", "selectores": [".house", ".house-track", ".still", ".still-img", ".house-nav", ".still figure"] },
         { "ruta": "mobile.css", "selectores": [".still"] },
-        { "ruta": "index.html", "selectores": ["#casa", ".still-img"] }
+        { "ruta": "index.html", "selectores": ["#casa", ".still-img", "[data-house-nav]", "[data-house-prev]", "[data-house-next]", "#casa-fotos"] },
+        { "ruta": "app.js", "ganchos": ["data-house-prev", "data-house-next", "data-house-nav"] }
       ],
-      "tokens": ["fondo-2", "fondo-3", "radio-lg", "t-titular", "space-3", "space-4"],
+      "tokens": ["fondo-2", "fondo-3", "radio-lg", "t-titular", "space-3", "space-4", "space-2", "alto-sm", "linea-fuerte", "fondo-3-presionado"],
       "estados": {
-        "foco": { "css": [".house-track:focus-visible"] },
-        "movimiento_reducido": { "css": [".motion .still-img"] }
+        "foco": { "css": [".house-track:focus-visible", ".btn:focus-visible"] },
+        "movimiento_reducido": { "css": [".motion .still-img"] },
+        "deshabilitado": { "css": [".btn[aria-disabled=\"true\"]"], "js": [{ "ruta": "app.js", "texto": "prev.setAttribute('aria-disabled', String(track.scrollLeft <= 1));" }], "nota": "En los extremos de la tira: aria-disabled (no disabled), así el foco se queda en el botón." }
       },
-      "aria": { "patron": "Lista desplazable con foco", "apg": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/", "atributos": ["aria-labelledby"], "teclado": "La tira recibe foco y se desplaza con las flechas (nativo)." },
+      "aria": { "patron": "Carrusel (APG): lista desplazable con controles anterior/siguiente con nombre", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "atributos": ["aria-label (tira)", "aria-controls=casa-fotos", "aria-label=Foto anterior / Foto siguiente", "aria-disabled"], "teclado": "La tira recibe foco y se desplaza con las flechas (nativo); los dos botones con Tab, Enter o Espacio. Sin avance automático." },
       "qa": ["tools/qa/responsive.mjs", "tools/qa/motion.mjs"],
       "desde": "2026-11-14",
       "decision": "DESIGN.md, «Enfoque en La casa» (2026-11-14)."
@@ -758,7 +760,7 @@
       "id": "insignia",
       "nombre": "Insignia",
       "tipo": "bloque",
-      "descripcion": "Píldora de 24 en Caption 1: «Próximo» u «Hoy» en el destacado de Eventos (menta; el tipo, el ciclo y el estado de una propuesta son texto, no píldoras), «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).",
+      "descripcion": "Píldora de 24 en Caption 1: «Próximo» u «Hoy» en el destacado de Eventos (menta; el tipo y el ciclo son texto; el estado de una propuesta, «Propuesta · sin fecha», es una píldora de contorno sin relleno desde el 2026-11-19: .ev-rot > .ev-estado), «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).",
       "variantes": [
         { "nombre": "relleno suave", "selector": ".badge", "uso": "Menta con en-menta («Próximo», «Hoy»)." },
         { "nombre": "conteo", "selector": ".count-badge", "uso": "Disco primario; el número también en texto." },
@@ -832,7 +834,7 @@
       "id": "intro-marca",
       "nombre": "IntroMarca",
       "tipo": "bloque",
-      "descripcion": "Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de texto al iniciar, un resaltado y luego se despliega el contenido»). Un telón del color de la página (.intro-telon, aria-hidden, sin toques) tapa todo menos la barra; la marca de la barra (.hdr-brand, el elemento compartido) empieza en el centro óptico intro-escala veces más grande: el logo aparece, el nombre sube por su máscara y lo recorre un trazo de marcatextos (intro-resalte); desde intro-asentar (600 ms) vuelve en arco a su sitio en dur-base mientras el telón sube con la misma curva, la foto del inicio se abre (recorte del 6 % y 1.06 → 1) y el titular sube por líneas (app.js, introTitular). Telón fuera a los 1000 ms, todo quieto a los 1300. Solo con movimiento, sin #ancla, sin volver con «atrás» y una vez por sesión; se salta con cualquier toque, tecla, rueda o scroll.",
+      "descripcion": "Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de texto al iniciar, un resaltado y luego se despliega el contenido»). Un telón del color de la página (.intro-telon, aria-hidden, sin toques) tapa todo menos la barra; la marca de la barra (.hdr-brand, el elemento compartido) empieza en el centro óptico intro-escala veces más grande: el logo aparece, el nombre sube por su máscara y lo recorre un trazo de marcatextos (intro-resalte); desde intro-asentar (600 ms) vuelve en arco a su sitio en dur-base mientras el telón sube con la misma curva, la foto del inicio se abre (recorte del 6 % y 1.06 → 1) y el titular sube por líneas (app.js, introTitular). Telón fuera a los 1000 ms, todo quieto a los 1300. Solo con movimiento, sin #ancla, sin volver con «atrás» y solo en la primera visita (localStorage iti-intro; decisión de Aldo del 2026-11-19, antes una vez por sesión); se salta con cualquier toque, tecla, rueda o scroll.",
       "archivos": [
         { "ruta": "style.css", "selectores": [".intro-telon", ".hdr-brand", ".hdr-brand-nombre", ".entry-media", ".entry-poster"] },
         { "ruta": "index.html", "selectores": ["[data-intro]", ".intro-telon", ".hdr-brand-nombre"] },
@@ -843,7 +845,7 @@
       "tokens": ["intro-asentar", "intro-escala-chica", "intro-escala", "intro-escala-tableta", "intro-escala-amplia", "intro-centro", "intro-resalte", "fondo", "tinta", "dur-instantanea", "dur-rapida", "dur-base", "dur-lenta", "escalon-linea", "curva-salida", "curva-entrada-salida", "radio-lg", "alto-sm", "space-3"],
       "estados": {
         "movimiento_reducido": { "js": [{ "ruta": "assets/js/boot.js", "texto": "if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;" }], "nota": "Con «reducir movimiento», la pausa del pie o ahorro de datos boot.js no pone intro-marca: no hay telón y la página aparece como siempre. Las reglas viven además dentro de @media (prefers-reduced-motion: no-preference)." },
-        "actual": { "js": [{ "ruta": "assets/js/boot.js", "texto": "sessionStorage.setItem('iti-intro', '1')" }], "nota": "Una vez por sesión: se anota solo cuando se muestra." }
+        "actual": { "js": [{ "ruta": "assets/js/boot.js", "texto": "localStorage.setItem('iti-intro', '1')" }], "nota": "Solo la primera visita: se anota solo cuando se muestra; si el almacenamiento lanza, no se muestra." }
       },
       "no_aplica": { "hover": "No es un control.", "foco": "No recibe foco: el telón es aria-hidden y vacío; el primer Tab va a «Saltar al contenido» y termina la entrada." },
       "aria": { "patron": "Decoración (aria-hidden); la marca sigue siendo el enlace de la barra", "apg": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html", "atributos": ["aria-hidden=\"true\" (telón)"], "teclado": "Cualquier tecla la termina; Tab sigue a lo de siempre." },

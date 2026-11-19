@@ -38,7 +38,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | Explorar | sí | sí | sí |  | sí |  | sí | sí | sí | sí | sí |
 | Aviso | — | sí | sí |  |  |  |  |  |  |  |  |
 | EncabezadoSeccion | — | — |  |  |  |  |  |  |  |  | sí |
-| TiraCasa |  | sí |  |  |  |  |  |  |  |  | sí |
+| TiraCasa |  | sí |  | sí |  |  |  |  |  |  | sí |
 | MapaLlegada | — | sí |  |  |  |  |  |  |  |  | sí |
 | InterruptorMovimiento | sí | sí | sí | sí | sí |  |  |  |  |  | sí |
 | ContactoPie | sí | sí | sí |  |  |  |  |  |  |  |  |
@@ -118,7 +118,7 @@ Calculados desde `design/tokens.json`. Texto ≥ 4.5:1 (WCAG 1.4.3); borde de co
 Píldora con rótulo Headline. Alto 48 por omisión, 44 (--sm) solo en línea y en las barras, 56 (--lg) en las acciones principales y el pie de las hojas. Una sola primaria por vista.
 
 - **Tipo:** control · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Botón) y «Escala de controles».
-- **Variantes:** `.btn--primario` primario (La acción primaria de la vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»).); `.btn--secundario` secundario (Secundaria «tinted» en menta; alternado con aria-pressed toma el primario.); `.btn--plano` plano (Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»).); `.btn--contorno` contorno (Sin relleno, borde de 1 px en linea-fuerte y texto en tinta (Eventos, 2026-11-16: «Registrarme» y «Añadir al calendario» de la lista y los iconos del destacado, para lo que no debe competir con la primaria). Mismas alturas (44) y estados que las demás.); `.btn--vidrio` vidrio (Solo lo que flota: cerrar una hoja, flechas del Carrusel3D.); `.btn--icono` icono (Cuadrado del alto del botón, nombre en aria-label.); `.btn--sm` chico (44 px.); `.btn--lg` grande (56 px.); `.btn--ancho` ancho (A todo el ancho.)
+- **Variantes:** `.btn--primario` primario (La acción primaria de la vista («Cómo llegar»; en la ficha, «Consultar disponibilidad», 2026-11-19). Una por vista.); `.btn--secundario` secundario (Secundaria «tinted» en menta; alternado con aria-pressed toma el primario. También la salida principal de un estado vacío («Quitar filtros»; sin filtros, «Preguntar por WhatsApp»; 2026-11-19).); `.btn--plano` plano (Texto en turquesa-texto, sin relleno (Mi lista de la barra, redes del menú, «Ver todo»).); `.btn--contorno` contorno (Sin relleno, borde de 1 px en linea-fuerte y texto en tinta (Eventos, 2026-11-16: «Registrarme» y «Añadir al calendario» de la lista y los iconos del destacado, para lo que no debe competir con la primaria). Mismas alturas (44) y estados que las demás. Desde el 2026-11-19 también la salida secundaria del estado vacío de Explorar y los controles de la tira de La casa (44, icono).); `.btn--vidrio` vidrio (Solo lo que flota: cerrar una hoja, flechas del Carrusel3D.); `.btn--icono` icono (Cuadrado del alto del botón, nombre en aria-label.); `.btn--sm` chico (44 px.); `.btn--lg` grande (56 px.); `.btn--ancho` ancho (A todo el ancho.)
 - **style.css:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--contorno` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg` `.btn--ancho`
 - **index.html:** `.btn` `.btn--primario` `.btn--secundario` `.btn--plano` `.btn--vidrio` `.btn--icono` `.btn--sm` `.btn--lg`
 - **motion.js:** exporta `pickPop` `afterPaint` `confirmThen`
@@ -208,7 +208,7 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 
 ### MenuHamburguesa
 
-☰ de 44 cuyas líneas se cruzan en ×, y el diálogo modal con la hoja de vidrio: secciones en filas de 56 (la actual en menta), Mi lista, el horario de hoy, «Cómo llegar», WhatsApp e Instagram/Facebook. Detrás, el velo.
+☰ de 44 cuyas líneas se cruzan en ×, y el diálogo modal con la hoja de vidrio: secciones en filas de 56 (la actual en menta), el horario de hoy, «Cómo llegar», WhatsApp e Instagram/Facebook. Detrás, el velo. Sin la fila «Mi lista» desde el 2026-11-19: vive en la barra inferior (teléfono) y en la cabecera (761–1100). La barra inferior lleva lo frecuente; el ☰, todas las secciones, el horario, el contacto y la pausa.
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Menú ☰).
 - **style.css:** `.menu-btn` `.menu-lines` `.menu` `.menu::backdrop` `.menu-hoja` `.menu-row` `.menu-close` `.menu-pie` `.menu-acciones` `.menu-redes`
@@ -227,13 +227,13 @@ Barra pegada arriba, de vidrio, de 44 px más el área segura (64 desde 761): ma
 
 ### BarraInferior
 
-Solo ≤ 760 px: cápsula de vidrio de 49 × 228 con Inicio, Catálogo y Mi lista (botón con el conteo). La pastilla menta se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta.
+Solo ≤ 760 px: barra anclada al borde inferior, a todo el ancho y con su espacio propio (iteración de lectura, 2026-11-19; antes una cápsula flotante de 49 × 228 a 8 px del borde que dejaba leer el texto a sus lados): 49 px de casillas más el área segura (env(safe-area-inset-bottom)), vidrio con filete arriba, tres casillas iguales (131 × 49 a 393; hasta 480 px de casillas centradas) con Inicio, Catálogo y Mi lista (botón con el conteo). La pastilla menta de 68 × 41 se desliza a la casilla con aria-current; con una hoja abierta baja y se oculta. El documento le deja su sitio (html: scroll-padding-bottom de 49 + área + 24, para que el foco por teclado no quede debajo; .ftr: padding-bottom de 49 + área + 32). Ajusta: el alto al área segura. Estira: el ancho de la ventana (casillas en 1fr). Límites: casillas ≤ 480 px en total, 49 de alto útil.
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Barra inferior).
 - **mobile.css:** `.tabbar` `.tabbar-pastilla` `.tabbar a` `.tab-list` `.tab-ic` `.tab-lb` `.tab-ic-box`
 - **index.html:** `.tabbar` `.tabbar-pastilla` `.tab-list` `.tab-lb`
 - **app.js:** ganchos `a.setAttribute('aria-current', 'location')`
-- **Tokens:** `alto-barra-inferior` `vidrio` `filtro-vidrio` `luz-vidrio` `sombra-flotante` `menta` `en-menta` `tinta` `foco` `radio-pildora` `t-pestana` `space-1` `space-2` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado`
+- **Tokens:** `alto-barra-inferior` `vidrio` `filtro-vidrio` `menta` `en-menta` `tinta` `foco` `radio-pildora` `t-pestana` `space-1` `space-2` `dur-instantanea` `dur-rapida` `dur-base` `curva-salida` `curva-resorte` `fondo-3-presionado` `menta-presionado` `linea` `radio-md` `space-5` `space-6` `space-8`
 - **Estado foco:** `.tabbar a:focus-visible`, `.tab-list:focus-visible`
 - **Estado presionado:** `.tabbar a:active`, `.tab-list:active`, `.tabbar a[aria-current]:active` — Escala 0.94 y color (fondo-3-presionado; la casilla actual, menta-presionado): con movimiento reducido el color es la respuesta.
 - **Estado actual:** `.tabbar a[aria-current]`, `.tabbar a[aria-current] .tab-ic`
@@ -299,7 +299,7 @@ El próximo evento con fecha (feed.js, datos en assets/data/eventos.json): panel
 
 ### ListaEventos
 
-Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un día por grupo (en el teléfono, un rótulo en versalitas «SÁB · 28 NOV» con una línea fina; desde 761 px, una columna de 96 a la izquierda con el día y el mes arriba y el número ligero debajo) y, al final, «Propuestas, aún sin fecha». Cada fila (TarjetaEvento) va entre líneas finas, sin relleno: hora y tipo como texto («17:00 · Juego»; o «tipo · Propuesta · sin fecha»), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 con radio-sm y anillo fino a la derecha; con fecha lleva la reserva de contorno (44) y el calendario plano (44); una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.
+Lista estática de Eventos (estructura tomada de Luma como referencia): «Después» con un día por grupo (en el teléfono, un rótulo en versalitas «SÁB · 28 NOV» con una línea fina; desde 761 px, una columna de 96 a la izquierda con el día y el mes arriba y el número ligero debajo) y, al final, «Propuestas, aún sin fecha». Cada fila (TarjetaEvento) va entre líneas finas, sin relleno: hora y tipo como texto («17:00 · Juego»; una propuesta, su tipo como texto y el rótulo de estado «Propuesta · sin fecha» como píldora de contorno —2026-11-19: antes texto del mismo renglón—), título (Title 3), quién, el primer renglón del costo y la portada cuadrada de 88 / 120 con radio-sm y anillo fino a la derecha; con fecha lleva la reserva de contorno (44) y el calendario plano (44); una propuesta lleva su descripción y ninguna acción. Desde 1024 px la lista va en las columnas 1–8 y la nota lateral («¿Cómo me registro?», fija al desplazar) en 9–12; solo con propuestas, tres por fila con la portada arriba. Sin JavaScript, index.html trae las propuestas.
 
 - **Tipo:** bloque · **desde** 2026-11-16 · DESIGN.md, «Eventos: destacado y lista por fecha; carta en parrilla» (2026-11-16).
 - **style.css:** `.ev` `.ev-despues` `.ev-lista` `.ev-sub` `.ev-dias` `.ev-dia` `.ev-dia-tit` `.ev-dia-vis` `.ev-dia-num` `.ev-filas` `.ev-card` `.ev-card-txt` `.ev-card-img` `.ev-card-tit` `.ev-card-meta` `.ev-card-desc` `.ev-card-acc` `.ev-hora` `.ev-estado` `.ev-lado` `.ev-lado-tit` `.ev-lado-txt` `.ev-espera`
@@ -419,7 +419,7 @@ Barra de categorías de la carta (Café y té; recomposición del 2026-11-17, su
 
 ### FilaProducto
 
-Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17). Pintada en index.html desde assets/data/menu.json (scripts/build-carta.mjs, npm run carta; carta:check y npm test fallan si no coinciden): llega en el primer render, sin esqueleto, también sin JavaScript. Una columna en el teléfono y dos desde 761 (canal 32; en escritorio a todo el ancho del contenedor de Café, 1120), en el orden del marcado (izquierda a derecha, renglón por renglón), entre líneas finas de 1 px (linea) y con 12 de aire arriba y abajo, sin caja. El nombre en Headline (h4), el precio a 4 px (Subheadline 600 en tinta —antes turquesa-texto, el mismo valor que primario: competía con la acción principal—, «$NN MXN», con la unidad si la trae, data-fuente="carta"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, sin cortar con «…»). Sin foto (.ct-prod--solo, todas hoy) el texto ocupa la fila entera. Con foto: cuadrada a la derecha, 96 en el teléfono y 120 desde 761, con el icono de su categoría debajo; si la foto falla, cafe.js la quita y queda el icono. Entre categorías hay más aire que entre filas (32 / 48 frente a 24). No es un control.
+Producto de la carta como fila, al modo de las apps de comida (Uber Eats, DiDi Food; 2026-11-17). Pintada en index.html desde assets/data/menu.json (scripts/build-carta.mjs, npm run carta; carta:check y npm test fallan si no coinciden): llega en el primer render, sin esqueleto, también sin JavaScript. Una columna en el teléfono y dos desde 761 (canal 32; en escritorio a todo el ancho del contenedor de Café, 1120), en el orden del marcado (izquierda a derecha, renglón por renglón), entre líneas finas de 1 px (linea) y con 12 de aire arriba y abajo, sin caja. El nombre en Headline (h4), el precio a 4 px (Subheadline en tinta, de peso normal desde el 2026-11-19 —un solo renglón fuerte por fila, el nombre—; antes 600 —antes turquesa-texto, el mismo valor que primario: competía con la acción principal—, «$NN MXN», con la unidad si la trae, data-fuente="carta"; con precio null no se imprime nada, ni «$0» ni «por confirmar») y luego la descripción (Subheadline en tinta-2, sin cortar con «…»). Sin foto (.ct-prod--solo, todas hoy) el texto ocupa la fila entera. Con foto: cuadrada a la derecha, 96 en el teléfono y 120 desde 761, con el icono de su categoría debajo; si la foto falla, cafe.js la quita y queda el icono. Entre categorías hay más aire que entre filas (32 / 48 frente a 24). No es un control.
 
 - **Tipo:** bloque · **desde** 2026-11-17 · DESIGN.md, «Café: una cuadrícula» (2026-11-17), sobre «Carta al modo de las apps de comida» (2026-11-17).
 - **style.css:** `.ct-lista` `.ct-rejilla` `.ct-prod` `.ct-foto` `.ct-ic` `.ct-txt` `.ct-nom` `.ct-desc` `.ct-precio` `.ct-prod--solo` `.ct-grupo-nota` `.ct-cierre` `.cafe-foto`
@@ -458,10 +458,10 @@ Un solo botón con la portada 2:3 (real o tipográfica), el título (Subheadline
 
 ### FichaLibro
 
-Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el teléfono): portada, título, autor, ficha técnica, sinopsis, «Tu mensaje por WhatsApp», relacionados y, fijas al pie, «Preguntar por WhatsApp» (primaria a todo el ancho), Guardar, Compartir y «Cómo llegar».
+Hoja única del libro (diálogo de 680 en escritorio; sube desde abajo en el teléfono): portada, título, autor, ficha técnica, sinopsis, «Tu mensaje por WhatsApp», relacionados y, fijas al pie, «Consultar disponibilidad» (primaria a todo el ancho, al WhatsApp de la librería con título, autor e ISBN ya escritos; 2026-11-19, antes «Preguntar por WhatsApp» con la nota «Antes de venir, te confirmamos si lo tenemos.», que se retiró), Guardar, Compartir y «Cómo llegar» (secundaria). Ningún texto dice «disponible» ni «en existencia»: estar en el catálogo no es tener ejemplar.
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Componentes» (Hojas, FichaLibro).
-- **style.css:** `.drawer` `.drawer::backdrop` `.drawer-body` `.drawer-close` `.drawer-head` `.drawer-facts` `.drawer-synopsis` `.drawer-foot` `.drawer-actions` `.drawer-note` `.rel`
+- **style.css:** `.drawer` `.drawer::backdrop` `.drawer-body` `.drawer-close` `.drawer-head` `.drawer-facts` `.drawer-synopsis` `.drawer-foot` `.drawer-actions` `.rel`
 - **mobile.css:** `.drawer`
 - **index.html:** `#cat-drawer` `[data-d-close]` `[data-d-cta]` `[data-d-save]` `[data-d-share]` `[data-d-visit]` `[data-d-scroll]`
 - **catalog.js:** exporta `shareBook` `bookShareData` `bookMessage` `bookWaUrl` `relatedBooks` · internas `openBook`
@@ -529,21 +529,21 @@ Píldora de 48 en fondo-3 con letra de 17 (iOS no acerca la página); con foco, 
 
 ### Explorar
 
-«Explora el catálogo»: los 41 títulos en una página con búsqueda y filtros (Género, Editorial; casillas de 24 con palomita; un grupo se pliega desde 8 opciones). Hoja a pantalla completa en el teléfono; en línea desde 761, donde sin búsqueda ni filtros la rejilla se pliega a dos filas con «Ver los 41 títulos» / «Ver menos». Filtros activos como chips y «Limpiar todo».
+«Explora el catálogo»: los 41 títulos en una página con búsqueda y filtros (Género, Editorial; casillas de 24 con palomita; un grupo se pliega desde 8 opciones). Hoja a pantalla completa en el teléfono; en línea desde 761, donde sin búsqueda ni filtros la rejilla se pliega a dos filas con «Ver los 41 títulos» / «Ver menos». Filtros activos como chips y «Limpiar todo». Sin resultados (2026-11-19, emptyPlan): solo con búsqueda, «No encontramos coincidencias para «…».» y «Preguntar por WhatsApp» (principal, menta) con lo buscado ya escrito; con filtros, «Ningún título cumple todos los filtros.», «Quitar filtros» (principal; conserva lo buscado y dice cuántos quedarían) y WhatsApp de contorno si hay texto. El mensaje va justo bajo el buscador (8 de aire), a la vista con el teclado abierto.
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Rejilla en línea plegada» y AGENTS.md (catalog.js).
-- **style.css:** `.explore-open` `.explorer` `.cat` `.cat-bar` `.cat-filters` `.cat-group` `.cat-opt` `.cat-more-facets` `.cat-status` `.cat-chips` `.cat-clear-all` `.cat-grid` `.cat-fold` `.cat-empty` `.cat-error`
+- **style.css:** `.explore-open` `.explorer` `.cat` `.cat-bar` `.cat-filters` `.cat-group` `.cat-opt` `.cat-more-facets` `.cat-status` `.cat-chips` `.cat-clear-all` `.cat-grid` `.cat-fold` `.cat-empty` `.cat-error` `.cat-empty-tit` `.cat-empty-txt` `.cat-empty-acc`
 - **mobile.css:** `.explorer`
-- **index.html:** `#catalogo` `#explorer` `[data-ex-open]` `[data-ex-close]` `[data-cat-form]` `[data-cat-filters]` `[data-cat-status]` `[data-cat-chips]` `[data-cat-grid]` `[data-cat-fold]` `[data-cat-empty]` `[data-cat-reset]`
-- **catalog.js:** exporta `initCatalog` `filterBooks` `sortBooks` `facetCounts` `foldView` `facetView` `FOLD_ROWS` `FACET_FOLD_AT` `FACET_LIMIT` `PAGE_SIZE` `GENRE_ES` `genreLabel` · internas `renderFilters` `renderChips` `renderGrid` `applyFold` `staggerIn` `clearAll` · ganchos `data-clear` `cat-clear-all`
-- **Tokens:** `alto-sm` `alto-md` `fondo-3` `fondo-2` `fondo` `tinta` `tinta-2` `linea` `linea-fuerte` `primario` `en-primario` `turquesa-texto` `foco` `anillo-foco` `radio-md` `radio-sm` `radio-portada` `radio-pildora` `t-campo` `t-subtitulo` `t-rotulo` `t-boton-chico` `t-titulo-3` `space-8` `dur-rapida` `dur-lenta` `escalon-linea` `curva-salida` `fondo-3-presionado` `curva-aceleracion`
+- **index.html:** `#catalogo` `#explorer` `[data-ex-open]` `[data-ex-close]` `[data-cat-form]` `[data-cat-filters]` `[data-cat-status]` `[data-cat-chips]` `[data-cat-grid]` `[data-cat-fold]` `[data-cat-empty]` `[data-cat-unfilter]` `[data-cat-empty-wa]` `[data-cat-empty-tit]` `[data-cat-empty-txt]`
+- **catalog.js:** exporta `initCatalog` `filterBooks` `sortBooks` `facetCounts` `foldView` `facetView` `FOLD_ROWS` `FACET_FOLD_AT` `FACET_LIMIT` `PAGE_SIZE` `GENRE_ES` `genreLabel` `emptyPlan` `searchMessage` `searchWaUrl` · internas `renderFilters` `renderChips` `renderGrid` `applyFold` `staggerIn` `clearAll` `renderEmpty` · ganchos `data-clear` `cat-clear-all`
+- **Tokens:** `alto-sm` `alto-md` `fondo-3` `fondo-2` `fondo` `tinta` `tinta-2` `linea` `linea-fuerte` `primario` `en-primario` `turquesa-texto` `foco` `anillo-foco` `radio-md` `radio-sm` `radio-portada` `radio-pildora` `t-campo` `t-subtitulo` `t-rotulo` `t-boton-chico` `t-titulo-3` `space-8` `dur-rapida` `dur-lenta` `escalon-linea` `curva-salida` `fondo-3-presionado` `curva-aceleracion` `t-cuerpo` `space-2` `space-3` `space-6` `space-12` `ls-titulo-3`
 - **Estado hover:** `.explore-open:hover`, `.cat-opt label:hover`
 - **Estado foco:** `.cat-opt input:focus-visible + label`, `.cat-clear-all:focus-visible`, `:is(.chip, .cat-filters-btn, .cat-chip, .save, .explore-open, .rel, .card):focus-visible`
 - **Estado presionado:** `.explore-open:active`, `.explore-open[data-opening]`
 - **Estado seleccionado:** `.cat-opt input:checked + label::before`, `.cat-opt input:checked + label::after`
 - **Estado expandido:** HTML `[data-cat-fold][aria-expanded="false"]`, catalog.js `foldBtn.setAttribute('aria-expanded', String(!v.folded))`
 - **Estado ocupado:** `.cat-grid[aria-busy="true"]`, `.cat-grid[aria-busy="true"] .card--sk .cover`, HTML `[data-cat-grid][aria-busy="true"]`
-- **Estado vacio:** `.cat-empty`, HTML `[data-cat-empty]`, HTML `[data-cat-reset]`
+- **Estado vacio:** `.cat-empty`, `.cat-empty-acc .btn[hidden]`, HTML `[data-cat-empty]`, HTML `[data-cat-unfilter]`, HTML `[data-cat-empty-wa]` — Dos casos (emptyPlan): sin coincidencias para lo buscado (WhatsApp principal) o filtros demasiado restrictivos («Quitar filtros» principal, WhatsApp de contorno).
 - **Estado error:** `.cat-error`
 - **Estado movimiento_reducido:** catalog.js `if (!isMotion() \|\| !items.length) return;`
 - **ARIA:** Dialog (teléfono) + Checkbox + Disclosure (https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/) · `role=region` `role=search` `role=group` `role=status` `aria-busy` `aria-expanded` `aria-controls` · **Teclado:** Casillas nativas (Espacio); «Ver los 41 títulos» despliega en su sitio y el foco se queda en el botón; Escape cierra la hoja del teléfono.
@@ -581,16 +581,18 @@ Titular .h2 (Title 1, crece hasta 40 desde 761) con el patrón «Nombre *frase*�
 
 ### TiraCasa
 
-La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve entera queda plena y la que asoma se atenúa hasta 0.6 (CSS con animation-timeline: view()).
+La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve entera queda plena y la que asoma se atenúa hasta 0.6 (CSS con animation-timeline: view()). Desde el 2026-11-19 (iteración de lectura): filas compartidas con subgrid (la foto y el pie de todas las tarjetas en las mismas dos filas; el pie más alto da la altura, sin alturas fijas) y, bajo la tira, «Foto anterior» y «Foto siguiente» (contorno, 44, icono) en el margen izquierdo, aria-disabled en los extremos, sin avance automático (APG, carrusel). Ajusta: el pie a su texto. Estira: la fila del pie al pie más alto. Límites: tarjeta 78vw en el teléfono, 300–560 desde 761.
 
 - **Tipo:** bloque · **desde** 2026-11-14 · DESIGN.md, «Enfoque en La casa» (2026-11-14).
-- **style.css:** `.house` `.house-track` `.still` `.still-img`
+- **style.css:** `.house` `.house-track` `.still` `.still-img` `.house-nav` `.still figure`
 - **mobile.css:** `.still`
-- **index.html:** `#casa` `.still-img`
-- **Tokens:** `fondo-2` `fondo-3` `radio-lg` `t-titular` `space-3` `space-4`
-- **Estado foco:** `.house-track:focus-visible`
+- **index.html:** `#casa` `.still-img` `[data-house-nav]` `[data-house-prev]` `[data-house-next]` `#casa-fotos`
+- **app.js:** ganchos `data-house-prev` `data-house-next` `data-house-nav`
+- **Tokens:** `fondo-2` `fondo-3` `radio-lg` `t-titular` `space-3` `space-4` `space-2` `alto-sm` `linea-fuerte` `fondo-3-presionado`
+- **Estado foco:** `.house-track:focus-visible`, `.btn:focus-visible`
 - **Estado movimiento_reducido:** `.motion .still-img`
-- **ARIA:** Lista desplazable con foco (https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/) · `aria-labelledby` · **Teclado:** La tira recibe foco y se desplaza con las flechas (nativo).
+- **Estado deshabilitado:** `.btn[aria-disabled="true"]`, app.js `prev.setAttribute('aria-disabled', String(track.scrollLeft <= 1));` — En los extremos de la tira: aria-disabled (no disabled), así el foco se queda en el botón.
+- **ARIA:** Carrusel (APG): lista desplazable con controles anterior/siguiente con nombre (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-label (tira)` `aria-controls=casa-fotos` `aria-label=Foto anterior / Foto siguiente` `aria-disabled` · **Teclado:** La tira recibe foco y se desplaza con las flechas (nativo); los dos botones con Tab, Enter o Espacio. Sin avance automático.
 - **QA:** `tools/qa/responsive.mjs` `tools/qa/motion.mjs`
 
 ### MapaLlegada
@@ -646,7 +648,7 @@ El pie es el único lugar con el contacto: titular «Contacto» (titular de secc
 
 ### Insignia
 
-Píldora de 24 en Caption 1: «Próximo» u «Hoy» en el destacado de Eventos (menta; el tipo, el ciclo y el estado de una propuesta son texto, no píldoras), «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).
+Píldora de 24 en Caption 1: «Próximo» u «Hoy» en el destacado de Eventos (menta; el tipo y el ciclo son texto; el estado de una propuesta, «Propuesta · sin fecha», es una píldora de contorno sin relleno desde el 2026-11-19: .ev-rot > .ev-estado), «Nuevo»; disco de conteo de Mi lista (primario); punto de Abierto/Cerrado (cerrado es un aro hueco: forma además de color).
 
 - **Tipo:** bloque · **desde** 2026-11-13 · DESIGN.md, «Tokens» (abierto, cerrado) y «Accesibilidad» (estados con forma además del color).
 - **Variantes:** `.badge` relleno suave (Menta con en-menta («Próximo», «Hoy»).); `.count-badge` conteo (Disco primario; el número también en texto.); `.status-dot` estado (Abierto / Cerrado, siempre con la palabra.)
@@ -699,7 +701,7 @@ Solo existe con llegadas registradas en assets/data/collections.json (hoy la lis
 
 ### IntroMarca
 
-Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de texto al iniciar, un resaltado y luego se despliega el contenido»). Un telón del color de la página (.intro-telon, aria-hidden, sin toques) tapa todo menos la barra; la marca de la barra (.hdr-brand, el elemento compartido) empieza en el centro óptico intro-escala veces más grande: el logo aparece, el nombre sube por su máscara y lo recorre un trazo de marcatextos (intro-resalte); desde intro-asentar (600 ms) vuelve en arco a su sitio en dur-base mientras el telón sube con la misma curva, la foto del inicio se abre (recorte del 6 % y 1.06 → 1) y el titular sube por líneas (app.js, introTitular). Telón fuera a los 1000 ms, todo quieto a los 1300. Solo con movimiento, sin #ancla, sin volver con «atrás» y una vez por sesión; se salta con cualquier toque, tecla, rueda o scroll.
+Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de texto al iniciar, un resaltado y luego se despliega el contenido»). Un telón del color de la página (.intro-telon, aria-hidden, sin toques) tapa todo menos la barra; la marca de la barra (.hdr-brand, el elemento compartido) empieza en el centro óptico intro-escala veces más grande: el logo aparece, el nombre sube por su máscara y lo recorre un trazo de marcatextos (intro-resalte); desde intro-asentar (600 ms) vuelve en arco a su sitio en dur-base mientras el telón sube con la misma curva, la foto del inicio se abre (recorte del 6 % y 1.06 → 1) y el titular sube por líneas (app.js, introTitular). Telón fuera a los 1000 ms, todo quieto a los 1300. Solo con movimiento, sin #ancla, sin volver con «atrás» y solo en la primera visita (localStorage iti-intro; decisión de Aldo del 2026-11-19, antes una vez por sesión); se salta con cualquier toque, tecla, rueda o scroll.
 
 - **Tipo:** bloque · **desde** 2026-11-18 · DESIGN.md, «Entrada de marca (IntroMarca)».
 - **style.css:** `.intro-telon` `.hdr-brand` `.hdr-brand-nombre` `.entry-media` `.entry-poster`
@@ -709,7 +711,7 @@ Entrada de marca al abrir el sitio (2026-11-18, encargo de Aldo: «movimiento de
 - **motion.js:** ganchos `'intro-asentar'`
 - **Tokens:** `intro-asentar` `intro-escala-chica` `intro-escala` `intro-escala-tableta` `intro-escala-amplia` `intro-centro` `intro-resalte` `fondo` `tinta` `dur-instantanea` `dur-rapida` `dur-base` `dur-lenta` `escalon-linea` `curva-salida` `curva-entrada-salida` `radio-lg` `alto-sm` `space-3`
 - **Estado movimiento_reducido:** assets/js/boot.js `if (off \|\| saveData \|\| matchMedia('(prefers-reduced-motion: reduce)').matches) return;` — Con «reducir movimiento», la pausa del pie o ahorro de datos boot.js no pone intro-marca: no hay telón y la página aparece como siempre. Las reglas viven además dentro de @media (prefers-reduced-motion: no-preference).
-- **Estado actual:** assets/js/boot.js `sessionStorage.setItem('iti-intro', '1')` — Una vez por sesión: se anota solo cuando se muestra.
+- **Estado actual:** assets/js/boot.js `localStorage.setItem('iti-intro', '1')` — Solo la primera visita: se anota solo cuando se muestra; si el almacenamiento lanza, no se muestra.
 - **hover: no aplica.** No es un control.
 - **foco: no aplica.** No recibe foco: el telón es aria-hidden y vacío; el primer Tab va a «Saltar al contenido» y termina la entrada.
 - **ARIA:** Decoración (aria-hidden); la marca sigue siendo el enlace de la barra (https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html) · `aria-hidden="true" (telón)` · **Teclado:** Cualquier tecla la termina; Tab sigue a lo de siempre.

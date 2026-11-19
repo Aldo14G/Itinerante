@@ -82,7 +82,8 @@
     </div>
   </header>
 
-  <!-- Menú (hoja de vidrio): todas las secciones, el horario de hoy, «Cómo llegar», WhatsApp y redes. Se abre como diálogo modal (foco atrapado, Escape, «atrás»). -->
+  <!-- Menú (hoja de vidrio): todas las secciones, el horario de hoy, «Cómo llegar», WhatsApp, redes y la pausa. Se abre como diálogo modal (foco atrapado, Escape, «atrás»).
+       Mi lista no va aquí (2026-11-19): vive en la barra inferior (teléfono) y en la cabecera (761–1100); el menú no repite lo que ya está a un toque. -->
   <dialog class="menu" id="menu" aria-labelledby="menu-title">
     <div class="menu-top"><button class="menu-btn menu-close" type="button" data-menu-close aria-expanded="true" aria-label="Cerrar menú"><span class="menu-lines" aria-hidden="true"><span></span><span></span><span></span></span></button></div>
     <div class="menu-hoja">
@@ -96,7 +97,6 @@
           <li><a class="menu-row" href="#cafe"><span>Café y té</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#casa"><span>La casa</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
           <li><a class="menu-row" href="#visita"><span>Visita</span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></a></li>
-          <li><button class="menu-row" type="button" data-open-mylist><span>Mi lista<span class="sr-only">, <span data-saved-count>Vacía</span></span></span><span class="count-badge" data-saved-dot hidden aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#t-chevron"/></svg></button></li>
         </ul>
       </nav>
       <div class="menu-pie">
@@ -146,15 +146,15 @@
   </nav>
 
   <main id="contenido">
-    <!-- Inicio: nombre, estado de hoy, «Cómo llegar» y la fotografía de la sala. -->
+    <!-- Inicio: nombre, entradilla, «Cómo llegar» y, como su nota, el lugar (estado de hoy y dirección juntos: 2026-11-19), y la fotografía de la sala. -->
     <section id="inicio" class="entry" aria-labelledby="entry-title">
       <div class="entry-copy">
         <h1 id="entry-title" class="entry-title">Librería Itinerante <span class="entry-title-mas">y Más</span></h1>
-        <p class="entry-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></p>
         <p class="entry-lede">Libros de editoriales independientes, café, eventos y talleres en el centro.</p>
         <div class="entry-actions">
           <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
         </div>
+        <p class="entry-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-text>Lun–sáb · 11:00–20:00</span></p>
         <p class="entry-address"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mariano Matamoros Pte.&nbsp;421&nbsp;·&nbsp;Centro</p>
         <a class="entry-ev" href="#cartelera" data-ev-cta hidden><svg class="ic" aria-hidden="true"><use href="#t-cartelera"/></svg><span class="entry-ev-txt" data-ev-cta-text></span><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
         <a class="btn btn--secundario entry-news" href="#novedades" data-news-cta hidden><span class="entry-news-dot" aria-hidden="true"></span><span data-news-cta-text></span> <svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
@@ -170,14 +170,20 @@
         <h2 id="house-title" class="h2">La casa <em>no es una tienda de paso</em></h2>
         <p class="sec-texto">Es una casa para hojear sin prisa, preguntar en voz alta y salir con el libro que no sabías que buscabas.</p>
       </header>
-      <ol class="house-track" data-house-track tabindex="0" aria-label="Fotografías de la casa, desplázate para ver más">
-        <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/01-entrada-pasillo-800.webp" srcset="assets/img/01-entrada-pasillo-800.webp 800w, assets/img/01-entrada-pasillo.webp 1212w" sizes="(max-width: 760px) 78vw, 40vw" width="1212" height="682" alt="Pasillo de entrada con muros de piedra, cuadros, mesas de libros y un librero alto; al fondo, la puerta al patio" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>El pasillo</b><span>Los libros empiezan aquí, antes de llegar a la sala.</span></figcaption></figure></li>
+      <ol class="house-track" id="casa-fotos" data-house-track tabindex="0" aria-label="Fotografías de la casa, desplázate para ver más">
+        <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/01-entrada-pasillo-800.webp" srcset="assets/img/01-entrada-pasillo-800.webp 800w, assets/img/01-entrada-pasillo.webp 1212w" sizes="(max-width: 760px) 78vw, 40vw" width="1212" height="682" alt="Libros a ambos lados: una mesa y estantes bajos a la izquierda, un librero alto a la derecha y cuadros en los muros; al fondo, una puerta abierta" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>El pasillo</b><span>Los libros empiezan aquí, antes de llegar a la sala.</span></figcaption></figure></li>
         <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/casa-globo-800.webp" srcset="assets/img/casa-globo-800.webp 800w, assets/img/casa-globo.webp 1080w" sizes="(max-width: 760px) 78vw, 40vw" width="1080" height="810" alt="Globo terráqueo antiguo junto a un librero, con luz de sol sobre la pared de madera" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>El globo terráqueo</b></figcaption></figure></li>
         <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/oficial-rincon-800.webp" srcset="assets/img/oficial-rincon-800.webp 800w, assets/img/oficial-rincon-1600.webp 1600w" sizes="(max-width: 760px) 78vw, 40vw" width="1600" height="1200" alt="Muro de piedra con una foto en blanco y negro de una camioneta cargada y una estrella; a los lados, libreros de madera y un banco tapizado" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>El rincón de lectura</b><span>Lee las primeras páginas aquí antes de decidirte.</span></figcaption></figure></li>
         <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/04-experiencia-libreros-800.webp" srcset="assets/img/04-experiencia-libreros-800.webp 800w, assets/img/04-experiencia-libreros.webp 1080w" sizes="(max-width: 760px) 78vw, 40vw" width="1080" height="608" alt="Libreros de piso a techo llenos de libros junto a una ventana y una mesa con sillas turquesa" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>Los libreros</b><span>Recorre los lomos; si no alcanzas uno, pide ayuda.</span></figcaption></figure></li>
-        <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/05-talleres-ajedrez-800.webp" srcset="assets/img/05-talleres-ajedrez-800.webp 800w, assets/img/05-talleres-ajedrez.webp 1080w" sizes="(max-width: 760px) 78vw, 40vw" width="1080" height="608" alt="Tablero de ajedrez con piezas sobre un mantel rojo, entre dos sillas, junto a un muro descascarado" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>La mesa de ajedrez</b><span>Proponemos tardes de partidas abiertas.</span></figcaption></figure></li>
+        <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/05-talleres-ajedrez-800.webp" srcset="assets/img/05-talleres-ajedrez-800.webp 800w, assets/img/05-talleres-ajedrez.webp 1080w" sizes="(max-width: 760px) 78vw, 40vw" width="1080" height="608" alt="Tablero de ajedrez con piezas sobre un mantel rojo, entre dos sillas, junto a un muro descascarado" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>Ajedrez</b></figcaption></figure></li>
         <li class="still"><figure><div class="still-img" data-revelar><img src="assets/img/06-comunidad-sonido-800.webp" srcset="assets/img/06-comunidad-sonido-800.webp 800w, assets/img/06-comunidad-sonido.webp 1080w" sizes="(max-width: 760px) 78vw, 40vw" width="1080" height="608" alt="Gong grande en primer plano y libreros llenos de libros al fondo" loading="lazy" decoding="async"></div><figcaption data-kind="real"><b>La sala del gong</b></figcaption></figure></li>
       </ol>
+      <!-- Bajo la tira (2026-11-19): además del gesto, «Foto anterior» y «Foto siguiente» visibles (APG, carrusel: controles con nombre, sin avance
+           automático), deshabilitados en los extremos; app.js (initCasa) los cablea. Sin JavaScript no se muestran: la tira se desplaza sola. -->
+      <div class="house-nav" data-house-nav hidden>
+        <button class="btn btn--contorno btn--sm btn--icono house-nav-btn" type="button" data-house-prev aria-controls="casa-fotos" aria-label="Foto anterior" aria-disabled="true"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button class="btn btn--contorno btn--sm btn--icono house-nav-btn" type="button" data-house-next aria-controls="casa-fotos" aria-label="Foto siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+      </div>
     </section>
 
     <!-- Catálogo (el id sigue siendo #libros): titular → «Buscar en el catálogo» → chips de colección → carrusel 3D (el contacto vive en el pie).
@@ -288,10 +294,15 @@
               <li class="card-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="card-t">&nbsp;</span><span class="card-m">&nbsp;</span></span></li>
               <li class="card-item card--sk" aria-hidden="true"><span class="card"><span class="cover"></span><span class="card-t">&nbsp;</span><span class="card-m">&nbsp;</span></span></li>
             </ul>
+            <!-- Sin resultados (2026-11-19): «No encontramos coincidencias…» con WhatsApp (lo buscado ya escrito) o, con filtros, «Quitar filtros»
+                 (principal; conserva lo buscado) y WhatsApp de contorno. catalog.js (emptyPlan) escribe el texto y decide qué salidas se ven. -->
             <div class="cat-empty" data-cat-empty hidden>
-              <p>No está en el catálogo, pero te lo podemos pedir.</p>
-              <button type="button" class="btn btn--secundario" data-cat-reset><span>Limpiar búsqueda y filtros</span></button>
-              <a class="btn btn--secundario" href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20que%20no%20encuentro%20en%20su%20sitio." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+              <p class="cat-empty-tit" data-cat-empty-tit>No encontramos coincidencias.</p>
+              <p class="cat-empty-txt" data-cat-empty-txt>Si es el que buscas, te lo podemos pedir.</p>
+              <div class="cat-empty-acc">
+                <button type="button" class="btn btn--secundario" data-cat-unfilter hidden><span>Quitar filtros</span></button>
+                <a class="btn btn--secundario" data-cat-empty-wa href="https://wa.me/528180875940?text=Hola%2C%20estoy%20buscando%20un%20libro%20que%20no%20encuentro%20en%20su%20sitio." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+              </div>
             </div>
             <!-- En línea (desde 761 px) y sin búsqueda ni filtros, la rejilla muestra dos filas; este botón despliega el resto en su sitio (catalog.js, foldView). -->
             <button type="button" class="btn btn--secundario cat-fold" data-cat-fold aria-expanded="false" aria-controls="cat-grid" hidden></button>
@@ -325,12 +336,11 @@
         </div>
         <div class="drawer-foot">
           <div class="drawer-actions">
-            <a class="btn btn--primario btn--lg" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
+            <a class="btn btn--primario btn--lg" data-d-cta href="https://wa.me/528180875940" target="_blank" rel="noopener noreferrer"><span>Consultar disponibilidad</span> <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg></a>
             <button type="button" class="save save--wide save--icono" data-d-save aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mark"/><path class="save-chk" pathLength="1" d="m9 10.3 2.2 2.2 4-4.4"/></svg><span data-save-label>Guardar en mi lista</span></button>
             <button type="button" class="btn btn--secundario btn--lg btn--icono" data-d-share aria-label="Compartir este libro"><svg class="ic" aria-hidden="true"><use href="#i-share"/></svg></button>
             <a class="btn btn--secundario btn--lg" data-d-visit href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
           </div>
-          <p class="drawer-note">Antes de venir, te confirmamos si lo tenemos.</p>
         </div>
       </dialog>
     </div>
@@ -490,16 +500,27 @@
         <header class="sec-head" data-revelar>
           <h2 id="visit-title" class="h2">Visita <em>los libros se eligen mejor en persona</em></h2>
         </header>
-        <!-- .visit-datos y .visit-horario (2026-11-15): las dos celdas de la primera fila de Visita en escritorio (Sistema de guías). -->
+        <!-- .visit-datos (2026-11-19, iteración de lectura; al modo de una ficha de lugar de Mapas): «Cómo llegar» bajo el titular y, debajo, los datos
+             del lugar juntos: dirección, estado de hoy y horario habitual con su nota. En escritorio el horario va en 7–12, en la misma fila. -->
         <div class="visit-datos">
+        <div class="visit-actions">
+          <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+        </div>
         <address>
           Mariano Matamoros Pte. 421<br>
           Centro, Monterrey, Nuevo León<br>
           <span>Entre Juan Aldama e Ignacio Rayón</span>
         </address>
         <p class="visit-status" data-status><span class="status-dot" aria-hidden="true"></span><span data-status-long>Lunes a sábado de 11:00 a 20:00</span></p>
-        <div class="visit-actions">
-          <a class="btn btn--primario btn--lg" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener noreferrer"><span>Cómo llegar</span> <svg class="ic" aria-hidden="true"><use href="#i-ne"/></svg></a>
+        <div class="visit-horario">
+        <table class="hours">
+          <caption>Horario habitual</caption>
+          <tbody>
+            <tr data-days="1 2 3 4 5 6"><th scope="row">Lunes a sábado</th><td>11:00–20:00</td></tr>
+            <tr data-days="0"><th scope="row">Domingo</th><td>Cerrado</td></tr>
+          </tbody>
+        </table>
+        <p class="visit-note">¿Vienes en día festivo? Pregúntanos antes por WhatsApp.</p>
         </div>
         </div>
         <!-- Mapa de llegada (2026-11-14, idea de mapcn; sin JS ni servicios externos): calles de OpenStreetMap proyectadas a SVG (consulta y
@@ -526,16 +547,6 @@
         </figure>
       </div>
       <div class="visit-side">
-        <div class="visit-horario">
-        <table class="hours">
-          <caption>Horario habitual</caption>
-          <tbody>
-            <tr data-days="1 2 3 4 5 6"><th scope="row">Lunes a sábado</th><td>11:00–20:00</td></tr>
-            <tr data-days="0"><th scope="row">Domingo</th><td>Cerrado</td></tr>
-          </tbody>
-        </table>
-        <p class="visit-note">¿Vienes en día festivo? Pregúntanos antes por WhatsApp.</p>
-        </div>
         <figure class="visit-arrival">
           <div class="frame-clip" data-revelar><img src="assets/img/llegada-sala.webp" width="1280" height="720" alt="La sala central vista desde el arco de entrada: mesa redonda, sillas turquesa, libreros y ventana al fondo" loading="lazy" decoding="async"></div>
           <figcaption data-kind="real">Pasando el arco está la sala, con la barra del café.</figcaption>

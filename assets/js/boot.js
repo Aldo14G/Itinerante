@@ -33,14 +33,14 @@
   r.classList.add('motion');
   // Entrada de marca (IntroMarca, 2026-11-18; DESIGN.md, «Entrada de marca»): la marca de la barra sale del centro con su trazo de marcatextos y
   // vuelve a su sitio mientras el telón sube (todo en style.css; el titular, en app.js). Solo con movimiento (arriba), con la página arriba del
-  // todo, sin #ancla (un enlace directo, también #libro-<id>), sin volver con «atrás» (bfcache o historial) y una vez por sesión (sessionStorage,
-  // iti-intro, que se anota solo cuando se muestra). Si el almacenamiento lanza no se puede recordar que ya se vio, así que no se muestra: mejor
-  // nunca que en cada carga.
+  // todo, sin #ancla (un enlace directo, también #libro-<id>), sin volver con «atrás» (bfcache o historial) y solo en la primera visita
+  // (localStorage, iti-intro, que se anota solo cuando se muestra; decisión de Aldo del 2026-11-19: antes una vez por sesión, con sessionStorage).
+  // Si el almacenamiento lanza no se puede recordar que ya se vio, así que no se muestra: mejor nunca que en cada visita.
   var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
   if (scrollY || location.hash || (nav && nav.type === 'back_forward') || document.visibilityState === 'hidden') return;
   try {
-    if (sessionStorage.getItem('iti-intro') === '1') return;
-    sessionStorage.setItem('iti-intro', '1');
+    if (localStorage.getItem('iti-intro') === '1') return;
+    localStorage.setItem('iti-intro', '1');
   } catch (e) { return; /* almacenamiento bloqueado */ }
   r.classList.add('intro-marca');
   // Se salta con cualquier toque, tecla, rueda o scroll (el telón no recibe toques: el toque llega a lo de debajo). Termina sola al acabar el

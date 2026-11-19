@@ -471,6 +471,34 @@ async function boot() {
   };
   nearby($('[data-ev]'), () => loadFeed().then(m => m.initEventos({ isMotion })).catch(() => {}));
 
+  // ---------- La casa: «Foto anterior» y «Foto siguiente» bajo la tira (2026-11-19, iteración de lectura; APG, carrusel) ----------
+  // Además del gesto y del teclado sobre la tira: dos botones con nombre que llevan a la foto vecina (suave solo con movimiento) y quedan
+  // aria-disabled en los extremos (no disabled: el foco se queda en el botón). Sin avance automático. Sin JavaScript no se muestran.
+  (() => {
+    const track = $('[data-house-track]'), nav = $('[data-house-nav]');
+    if (!track || !nav) return;
+    const prev = $('[data-house-prev]', nav), next = $('[data-house-next]', nav);
+    const sync = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      prev.setAttribute('aria-disabled', String(track.scrollLeft <= 1));
+      next.setAttribute('aria-disabled', String(track.scrollLeft >= max - 1));
+    };
+    const go = dir => {
+      if ((dir < 0 ? prev : next).getAttribute('aria-disabled') === 'true') return;
+      const x0 = track.getBoundingClientRect().left + (parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0);
+      const lefts = [...track.children].map(li => li.getBoundingClientRect().left - x0);
+      const d = dir > 0 ? lefts.find(v => v > 2) : lefts.filter(v => v < -2).pop();
+      if (d !== undefined) track.scrollBy({ left: d, behavior: isMotion() ? 'smooth' : 'auto' });
+    };
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    let raf = 0;
+    track.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; sync(); }); }, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(sync).observe(track);
+    nav.hidden = false;
+    sync();
+  })();
+
   // ---------- Café y té: la carta (filas por categorías, cafe.js) se pide al acercarse y también en reposo (ver «Start») ----------
   const bootCafe = () => import('./cafe.js').then(m => m.initCafe({ isMotion })).catch(() => {});
   nearby($('[data-cafe]'), bootCafe);

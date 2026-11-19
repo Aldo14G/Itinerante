@@ -2,7 +2,8 @@
    Aquí vive lo que solo existe en el teléfono: la barra inferior de vidrio (Inicio, Catálogo, Mi lista), las hojas que suben desde abajo
    (ficha, Mi lista) y Explorar a pantalla completa, y la tira de La casa. El Carrusel3D de portadas es de style.css. La piel de cada pieza es la de style.css. */
 
-/* El final de la página deja libre el alto de la barra más el área segura y 16 px. */
+/* El final de la página deja libre el alto de la barra más el área segura: el foco que entra por teclado queda 24 px sobre la barra
+   (scroll-padding-bottom, WCAG 2.4.11) y el último control del pie, 32 (2026-11-19: la barra va anclada; antes se descontaban 8 de aire bajo la cápsula). */
 html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-6)); }
 .ftr { padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px) + var(--space-8)); }
 
@@ -10,19 +11,25 @@ html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-in
 .hdr-list, .hdr-cta { display: none; }
 
 /* ---------- Barra inferior (BarraInferior) ---------- */
-/* Cápsula de vidrio de 49 px que flota 8 px sobre el área segura, centrada. Tres casillas de 76 px a todo el alto: sin huecos entre objetivos.
-   La casilla actual lleva aria-current (scroll-spy de app.js): una pastilla menta con 4 px de aire se desliza hasta ella con el resorte;
-   el nombre y el icono pasan a en-menta y el icono se rellena al 18 % con trazo más grueso (no depende solo del color). */
+/* Anclada al borde inferior, a todo el ancho y con su espacio propio (iteración de lectura, 2026-11-19; antes una cápsula flotante de 228 px a
+   8 px del borde, que dejaba leer el texto a sus lados: 422 cruces en un barrido de la página a 393 px, 0 ahora). Alto = 49 + el área segura
+   (env(safe-area-inset-bottom), 34 en un iPhone a pantalla completa): las casillas viven en los 49 de arriba y el área segura queda libre.
+   Tres casillas iguales a todo el ancho (131 × 49 a 393; antes 76 × 49); hasta 480 px de casillas centradas en ventanas anchas. Vidrio con su
+   filete arriba; el contenido termina sobre ella (html: scroll-padding-bottom; .ftr: padding-bottom). La casilla actual lleva aria-current
+   (scroll-spy de app.js): la pastilla menta (68 × 41) se desliza hasta ella con el resorte; el nombre y el icono pasan a en-menta y el icono se
+   rellena al 18 % con trazo más grueso (no depende solo del color). */
 .tabbar {
-  --tab-w: 76px; --tab-i: 0;
-  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-2)); z-index: 48; translate: -50% 0;
-  display: grid; grid-template-columns: repeat(3, var(--tab-w)); height: var(--alto-barra-inferior);
-  border-radius: var(--radio-pildora);
-  background: var(--vidrio); -webkit-backdrop-filter: var(--filtro-vidrio); backdrop-filter: var(--filtro-vidrio); box-shadow: var(--luz-vidrio), var(--sombra-flotante);
+  --pad-x: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px), (100% - 480px) / 2); --tab-i: 0;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 48; container-type: inline-size;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  height: calc(var(--alto-barra-inferior) + env(safe-area-inset-bottom, 0px)); padding: 0 var(--pad-x) env(safe-area-inset-bottom, 0px);
+  background: var(--vidrio); -webkit-backdrop-filter: var(--filtro-vidrio); backdrop-filter: var(--filtro-vidrio); box-shadow: inset 0 1px 0 var(--linea);
   transition: translate var(--dur-base) var(--curva-salida), opacity var(--dur-rapida) var(--curva-salida);
 }
 .tabbar-pastilla {
-  position: absolute; top: var(--space-1); bottom: var(--space-1); left: var(--space-1); width: calc(var(--tab-w) - var(--space-2));
+  --tab-w: calc(100cqw / 3); --pastilla-w: calc(var(--alto-barra-inferior) + var(--space-5)); /* 68: la de siempre */
+  position: absolute; top: var(--space-1); left: calc(var(--pad-x) + (var(--tab-w) - var(--pastilla-w)) / 2); width: var(--pastilla-w);
+  height: calc(var(--alto-barra-inferior) - var(--space-2));
   border-radius: var(--radio-pildora); background: var(--menta); pointer-events: none;
   translate: calc(var(--tab-i) * var(--tab-w)) 0; transition: translate var(--dur-base) var(--curva-resorte), opacity var(--dur-rapida) var(--curva-salida);
 }
@@ -31,7 +38,7 @@ html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-in
 .tabbar a, .tab-list {
   position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-width: 0; height: var(--alto-barra-inferior); margin: 0; padding: 0;
-  border: 0; border-radius: var(--radio-pildora); background: none; color: var(--tinta);
+  border: 0; border-radius: var(--radio-md); background: none; color: var(--tinta);
   font: var(--t-pestana); text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
   transition: color var(--dur-rapida) var(--curva-salida), background-color var(--dur-rapida) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida);
 }
@@ -45,23 +52,23 @@ html { scroll-padding-bottom: calc(var(--alto-barra-inferior) + env(safe-area-in
 .tab-ic-box { position: relative; display: grid; place-items: center; }
 .tab-ic-box .count-badge { position: absolute; top: calc(-1 * var(--space-1)); left: calc(100% - var(--space-2)); box-shadow: 0 0 0 2px var(--fondo); }
 /* Mientras una hoja ocupa la pantalla, la barra baja y se oculta. */
-html.sheet-open .tabbar { translate: -50% calc(100% + var(--space-6)); opacity: 0; }
+html.sheet-open .tabbar { translate: 0 calc(100% + var(--space-2)); opacity: 0; }
 html:not(.js) .tabbar { display: none; }
 @media (forced-colors: active) { .tabbar a[aria-current] { outline: 2px solid Highlight; outline-offset: -4px; } }
 
 /* ---------- Inicio en el teléfono (variante A, patrón Uber; aprobada por Aldo el 2026-11-14) ---------- */
 /* Posiciones fijas, iguales en todos los iPhone (solo cambia el ancho): titular de dos renglones fijos («Librería Itinerante» / «y Más») a 24 px
-   bajo la barra (y 68–150 con la barra de 44), estado, entradilla, «Cómo llegar» de 56 (y 256–312) y la dirección; debajo, la foto real de la
-   sala en 3:2, con alto = mín(ancho / 1.5, lo que queda hasta 16 px sobre la barra inferior) y nunca menos de 160: termina antes de la barra.
-   --entrada-arriba es lo que hay de la barra a la foto: 24 + titular 2 × 41 + 8 + estado 22 + 8 + entradilla 2 × 22 + 24 + botón 56 + 12 +
-   dirección 20 + 24 = 324 px. --reserva-inferior: la barra inferior (49), su aire al borde (8), 16 de respiro y el área segura (73 + área). */
+   bajo la barra (y 68–150 con la barra de 44), entradilla, «Cómo llegar» de 56 (y 226–282) y, como su nota, el lugar: estado de hoy y
+   dirección juntos (iteración de lectura, 2026-11-19: antes el estado iba entre el titular y la entradilla, lejos de la dirección); debajo,
+   la foto real de la sala en 3:2, con alto = mín(ancho / 1.5, lo que queda hasta 16 px sobre la barra inferior) y nunca menos de 160.
+   --entrada-arriba es lo que hay de la barra a la foto: 24 + titular 2 × 41 + 8 + entradilla 2 × 22 + 24 + botón 56 + 12 + estado 22 + 8 +
+   dirección 20 + 24 = 324 px (el mismo total). --reserva-inferior: la barra inferior anclada (49), 16 de respiro y el área segura (65 + área). */
 .entry {
-  --entrada-arriba: calc(var(--space-6) + 82px + var(--space-2) + 22px + var(--space-2) + 44px + var(--space-6) + var(--alto-lg) + var(--space-3) + 20px + var(--space-6));
-  --reserva-inferior: calc(var(--alto-barra-inferior) + var(--space-2) + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  --entrada-arriba: calc(var(--space-6) + 82px + var(--space-2) + 44px + var(--space-6) + var(--alto-lg) + var(--space-3) + 22px + var(--space-2) + 20px + var(--space-6));
+  --reserva-inferior: calc(var(--alto-barra-inferior) + var(--space-4) + env(safe-area-inset-bottom, 0px));
   gap: var(--space-6); padding-top: var(--space-6);
 }
 .entry-title-mas { display: block; } /* dos renglones fijos en todo teléfono: el bloque no salta de 2 a 1 renglón entre modelos */
-.entry-status { margin-top: var(--space-2); } /* titular → estado 8 (posición fija); entradilla a 8 y dirección a 12 son ya la base de style.css */
 .entry-media { aspect-ratio: auto; height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); }
 .news-hint .entry-media { height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--space-4) - var(--alto-md) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); } /* con el control de novedades reservado */
 .entry-poster { object-position: 50% 62%; } /* si la foto queda más baja que 3:2, se recorta arriba: la ventana y la mesa siguen al centro */
@@ -103,6 +110,7 @@ html:not(.js) .tabbar { display: none; }
 @media (min-width: 520px) { .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 680px) { .cat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .cat-more { width: 100%; }
+.cat-empty-acc { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; } /* las salidas del estado vacío, a todo el ancho */
 /* Carrusel 3D: el foco de la portada del centro se dibuja en la portada (el botón no lleva sombra propia). */
 .rail-item .card:focus-visible { box-shadow: none; }
 .rail-item .card:focus-visible .cover { outline: 2px solid var(--foco); outline-offset: 2px; }
@@ -185,7 +193,6 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
   /* Teléfono en horizontal: como en iOS, el título grande se recoge (Title 2) y el texto va a la izquierda de la foto, para que el párrafo y «Cómo llegar» quepan entre las dos barras. */
   .entry { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; gap: var(--space-6); }
   .entry-title { font: var(--t-titulo-2); letter-spacing: var(--ls-titulo-2); }
-  .entry-status { margin-top: var(--space-2); }
   .entry-lede { margin-top: var(--space-2); }
   .entry-actions { grid-template-columns: repeat(2, minmax(0, max-content)); margin-top: var(--space-4); }
   .entry-media { aspect-ratio: 4 / 3; height: auto; max-height: calc(100svh - var(--hdr-h) - var(--space-12)); }

@@ -402,10 +402,13 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .entry { display: grid; gap: var(--space-8); padding: var(--space-4) var(--margen) calc(var(--sec) / 2); }
 .entry-copy { display: grid; justify-items: start; align-content: start; }
 .entry-title { margin: 0; font: var(--t-titulo-grande); letter-spacing: var(--ls-titulo-grande); text-wrap: balance; }
+/* El lugar (2026-11-19, iteración de lectura): bajo «Cómo llegar», como su nota (12), el estado de hoy y la dirección juntos (texto → texto 8):
+   se leen como datos de un mismo sitio. El punto del estado ocupa la caja de 20 del pin: los dos textos empiezan en la misma x. */
 .entry-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); font-variant-numeric: tabular-nums; }
+.entry-status .status-dot { margin-inline: calc(var(--space-1) * 1.25); } /* 5 + 10 + 5 = 20, la caja del pin */
 .entry-lede { max-width: 40ch; margin: var(--space-2) 0 0; font: var(--t-cuerpo); color: var(--tinta-2); } /* texto → texto 8 */
 .entry-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); width: 100%; margin-top: var(--space-6); }
-.entry-address { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); } /* control → su nota 12 */
+.entry-address { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); } /* texto → texto 8: con el estado, la nota del botón */
 .entry-address .ic { width: 20px; height: 20px; color: var(--turquesa-texto); }
 /* Control de novedades: solo con llegadas sin ver. Su renglón se reserva antes del primer render (news-hint, boot.js) para que nada se mueva. */
 .entry-news { display: none; margin-top: var(--space-4); }
@@ -465,9 +468,20 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--margen); scrollbar-width: none;
 }
 .house-track::-webkit-scrollbar { display: none; }
+/* Controles de la tira (2026-11-19): dos botones de contorno de 44 en el margen izquierdo, a 24 del pie de las fotos (16 + los 8 que la tira
+   reserva para el foco), 12 entre ellos. Con ellos la sección cierra con su mitad de --sec completa. */
+.house-nav { display: flex; gap: var(--space-3); margin-top: var(--space-4); padding: 0 var(--margen); }
+.house-nav[hidden] { display: none; }
+.house:has(> .house-nav:not([hidden])) { padding-bottom: calc(var(--sec) / 2); }
 .house-track:focus-visible { outline-offset: -4px; }
 .still { flex: 0 0 auto; width: clamp(300px, 40vw, 560px); scroll-snap-align: start; }
 .still figure { margin: 0; }
+/* Filas compartidas (2026-11-19): con subgrid, la foto y el pie de todas las tarjetas viven en las mismas dos filas de la tira; el pie más alto
+   (nombre y su línea) da la altura de la fila y el nombre de cada cuarto empieza a la misma altura, lleve línea o no. Sin alturas fijas. */
+@supports (grid-template-rows: subgrid) {
+  .house-track { display: grid; grid-auto-flow: column; grid-template-rows: auto auto; column-gap: var(--space-4); }
+  .still, .still figure { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+}
 .still-img { position: relative; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--radio-lg); background: var(--fondo-3); }
 .still-img img { width: 100%; height: 100%; object-fit: cover; }
 /* Pie de foto: solo el nombre del cuarto (lo demás lo dice la foto y, para lectores de pantalla, su alt). */
@@ -523,6 +537,11 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .ev-rot > .badge { margin-inline-end: var(--space-2); font: var(--t-rotulo); letter-spacing: var(--ls-rotulo); } /* «Próximo» a 13, como los demás rótulos de la sección (≤ 6 tamaños por sección) */
 .ev-hora { font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; }
 .ev-tipo, .ev-estado { min-width: 0; }
+/* Estado de una propuesta (2026-11-19, iteración de lectura): rótulo de estado, no texto del rótulo. Píldora de contorno de 24 (sin relleno: el
+   único relleno de la sección sigue siendo «Próximo»), Footnote semibold, a 8 del tipo; dice que no es una actividad confirmada. */
+.ev-rot > .ev-estado { display: inline-flex; align-items: center; min-height: 24px; margin-inline-start: var(--space-2); padding: 0 var(--space-2); border-radius: var(--radio-pildora); box-shadow: inset 0 0 0 1px var(--linea-fuerte); font: var(--t-rotulo); letter-spacing: var(--ls-rotulo); color: var(--tinta-2); white-space: nowrap; }
+.ev-rot > .ev-estado::before { content: none; }
+.ev-rot > .ev-estado:first-child { margin-inline-start: 0; }
 .ev-card-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
 .ev-prox-tit { margin: var(--space-2) 0 0; font: var(--t-titulo-1); letter-spacing: var(--ls-titulo-1); text-wrap: balance; } /* el destacado: Title 1, máximo dos renglones en el teléfono */
 .ev-card-meta { margin: var(--space-1) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: pretty; }
@@ -645,8 +664,13 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .visit-status { display: flex; align-items: flex-start; gap: var(--space-2); margin: var(--space-2) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); font-variant-numeric: tabular-nums; }
 .visit-status .status-dot { margin-top: calc(0.5lh - var(--space-1) - 1px); } /* punto en el centro del primer renglón (2026-11-18) */ /* texto → texto 8; el mismo estilo que el estado del inicio */
 .visit-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+.visit-actions + address { margin-top: var(--space-6); }
 .visit-side { display: grid; align-content: start; }
-/* .visit-datos (dirección, estado y «Cómo llegar») y .visit-horario (horario y su nota) son las dos celdas de la primera fila en escritorio. */
+/* .visit-datos (2026-11-19, iteración de lectura; al modo de la ficha de un lugar en Mapas): «Cómo llegar» bajo el titular (24) y, debajo, los
+   datos del lugar en un solo bloque: dirección (24 del botón), estado de hoy (8) y horario habitual con su nota (24). Antes, en el teléfono, el
+   horario iba después del mapa, a ~330 px del estado. En escritorio la misma pieza reparte sus hijos en la rejilla (subgrid): botón, dirección y
+   estado en 1–6; el horario en 7–12, en la misma fila. */
+.visit-horario { margin-top: var(--space-6); }
 /* Horario: lista agrupada (fondo-2, radio-md), una fila por renglón; hoy lleva la insignia «Hoy». */
 .hours { width: 100%; padding: 0 var(--space-4); border-collapse: separate; border-spacing: 0; border-radius: var(--radio-md); background: var(--fondo); font-variant-numeric: tabular-nums; }
 .hours caption { padding: 0 0 var(--space-2); text-align: left; font: var(--t-rotulo); color: var(--tinta-2); }
@@ -702,9 +726,10 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .visit { grid-template-columns: var(--rejilla); gap: var(--space-6) var(--canal-rejilla); align-items: start; }
   .visit-main, .visit-side { display: contents; }
   .visit .sec-head { grid-column: 1 / -1; max-width: none; }
-  .visit-datos { grid-column: 1 / span 6; grid-row: 2; }
-  .visit-horario { grid-column: 7 / -1; grid-row: 2; }
-  .visit-datos address { margin-top: 0; }
+  .visit-datos { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: subgrid; grid-template-rows: auto auto 1fr; align-items: start; }
+  .visit-datos > :not(.visit-horario) { grid-column: 1 / span 6; }
+  .visit-horario { grid-column: 7 / -1; grid-row: 1 / span 3; margin: 0; } /* el 1fr de la tercera fila absorbe lo que el horario mida de más */
+  .visit-datos > .visit-actions { margin-top: 0; }
   .visit-map { grid-column: 1 / span 6; grid-row: 3; margin: 0; }
   .visit-arrival { grid-column: 7 / -1; grid-row: 3; margin: 0; }
   .mapa { height: auto; aspect-ratio: 2 / 1; }
@@ -925,9 +950,15 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .cat-grid[aria-busy="true"] { grid-template-rows: auto auto; grid-auto-rows: 0; row-gap: 0; overflow: clip; margin-bottom: var(--alto-md); }
   .cat-grid[aria-busy="true"] > .card--sk { margin-bottom: var(--space-8); }
 }
-.cat-empty { display: grid; gap: var(--space-5); justify-items: start; padding: var(--space-12) 0; }
+/* Sin resultados (2026-11-19, iteración de lectura): justo bajo el buscador y los filtros puestos (antes 48 px de aire arriba y abajo: con el
+   teclado del teléfono abierto el mensaje quedaba bajo el teclado). Título (Title 3) → qué hacer 8 → salidas 24; la principal primero
+   (relleno menta) y la otra de contorno; en el teléfono, las dos a todo el ancho. */
+.cat-empty { display: grid; justify-items: start; padding: var(--space-2) 0 var(--space-12); }
 .cat-empty[hidden] { display: none; }
-.cat-empty p { margin: 0; font: var(--t-titulo-3); text-wrap: balance; } /* sin «te lo» colgado al final del renglón (2026-11-18) */
+.cat-empty-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
+.cat-empty-txt { margin: var(--space-2) 0 0; font: var(--t-cuerpo); color: var(--tinta-2); text-wrap: pretty; }
+.cat-empty-acc { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+.cat-empty-acc .btn[hidden] { display: none; }
 .cat-noscript { margin: var(--space-6) 0 0; color: var(--tinta-2); }
 .cat-error { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: 0 0 var(--space-6); }
 .cat [hidden] { display: none !important; }
@@ -1052,7 +1083,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .rel:active .cover { transform: scale(0.98); }
 @media (hover: hover) { .rel:hover span { text-decoration: underline; } }
 .drawer-foot { flex: none; padding: var(--space-4) var(--space-8) var(--space-6); border-top: 1px solid var(--linea); }
-/* «Preguntar por WhatsApp» (primaria) a todo el ancho; debajo Guardar y Compartir (iconos de 56) y «Cómo llegar», que ocupa el resto. El orden visual es el del documento. */
+/* «Consultar disponibilidad» (primaria, 2026-11-19) a todo el ancho; debajo Guardar y Compartir (iconos de 56) y «Cómo llegar» (secundaria), que ocupa el resto. El orden visual es el del documento. */
 .drawer-actions { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: var(--space-3); }
 .drawer-actions [data-d-cta] { grid-column: 1 / -1; }
 .drawer-actions [data-d-visit] { white-space: nowrap; } /* «Cómo llegar» no se parte; a menos de 360 px va sin su flecha y con 16 de relleno */
@@ -1061,7 +1092,6 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .save--icono { width: var(--alto-lg); min-height: var(--alto-lg); padding: 0; justify-content: center; }
 .save--icono .ic { width: 24px; height: 24px; }
 .save--icono [data-save-label] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.drawer-note { margin: var(--space-2) 0 0; font: var(--t-nota-pie); color: var(--tinta-2); text-align: center; }
 
 /* Mi lista: hoja de vidrio (diálogo en escritorio, hoja inferior en móvil) con las acciones fijas al pie. */
 .mylist {
@@ -1274,7 +1304,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
    Aire por rol: texto → control 24 (16 + los 8 de la barra) · cabecera → contenido 24 (de la barra al primer grupo) · título de grupo → sus
    filas 12 · fila 12 + 12 entre líneas · grupo → grupo 32 / 48 (más que entre filas) · bloque → bloque 32 / 48. */
 .cafe { --ct-barra: calc(var(--alto-sm) + var(--space-2)); display: grid; grid-template-columns: minmax(0, 1fr); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
-.cafe > .sec-head { margin-bottom: var(--space-4); }
+.cafe:has(.ct-gal) > .sec-head { margin-bottom: var(--space-4); } /* con la galería de la carta, entradilla → pieza como antes */
+.cafe > .sec-head { margin-bottom: 0; } /* entradilla → categorías: los 8 de la barra hasta su caja y ~22 hasta su tinta (texto → control, 2026-11-19; antes 24 + 8 a la caja, 38 a la tinta) */
 .ct { order: 1; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .cafe-foto { order: 2; margin: var(--space-8) 0 0; }
 .cafe-foto .frame-clip { aspect-ratio: 4 / 3; }
@@ -1314,7 +1345,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .ct-txt { grid-column: 1; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-1); }
 .ct-nom { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; overflow-wrap: anywhere; }
 .ct-desc { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; } /* renglones parejos, sin palabra viuda; nunca se corta con «…»: si hace falta, tres renglones */
-.ct-precio { margin: 0; font: var(--t-subtitulo); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--tinta); } /* en tinta: el verde (turquesa-texto = primario) competía con «Cómo llegar» */
+.ct-precio { margin: 0; font: var(--t-subtitulo); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--tinta); } /* en tinta: el verde (turquesa-texto = primario) competía con «Cómo llegar». Peso normal (2026-11-19): un solo renglón fuerte por fila, el nombre; antes nombre y precio en semibold se repetían fila tras fila */
 .ct-prod--solo { grid-template-columns: minmax(0, 1fr); } /* sin foto la fila no reserva su columna */
 .ct-cierre[hidden] { display: none; }
 @media (min-width: 761px) {
@@ -1448,7 +1479,7 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .cafe > .sec-head { grid-column: 1 / span 8; grid-row: 1; margin: 0; }
   .cafe-foto { order: 0; grid-column: 9 / -1; grid-row: 1; margin: 0; }
   .cafe-foto .frame-clip { aspect-ratio: 5 / 2; } /* 347 × 139 a 1440: del alto del bloque de titular y entradilla (130–139), sin hueco bajo el texto */
-  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; margin-top: calc(var(--space-12) - var(--space-2)); } /* bloque → bloque 48 hasta los enlaces (la barra lleva 8 arriba) */
+  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; margin-top: var(--space-2); } /* cabecera → sus categorías 16 hasta la caja de los enlaces (la barra lleva 8 arriba; ~30 a su tinta). 2026-11-19: antes 48, bloque → bloque; las categorías son el control de la carta y van con su introducción */
   .ct-nav { margin-inline: calc(-1 * var(--space-2)); padding-inline: 0; box-shadow: none; }
   .ct-nav::after { content: ""; position: absolute; left: var(--space-2); right: var(--space-2); bottom: 0; border-bottom: 1px solid var(--linea); } /* el filete, del ancho de la carta */
   .ct-lista { gap: var(--space-12); }
