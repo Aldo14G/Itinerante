@@ -151,6 +151,7 @@ a, button, summary, label, select, input { -webkit-tap-highlight-color: transpar
 .btn--contorno:active { background: var(--fondo-3-presionado); }
 .btn--vidrio:active { background: var(--fondo-3-presionado) !important; } /* !important: los respaldos opacos del vidrio fijan su fondo; el presionado se nota también ahí */
 .btn:disabled, .btn[aria-disabled="true"] { background: var(--fondo-3); color: var(--deshabilitado); box-shadow: none; cursor: not-allowed; transform: none; } /* deshabilitado: tinta al 38 % (2026-11-18) */
+.btn[aria-disabled="true"]:focus-visible { box-shadow: var(--anillo-foco); } /* aria-disabled conserva el foco (la tira de La casa en sus extremos): su anillo se ve (WCAG 2.4.7; 2026-11-19) */
 
 /* Presionado (:active, 2026-11-16): un tono por familia en los tokens (primario-pulsado, menta-presionado, fondo-3-presionado), un paso más allá del
    hover y declarado después de él (mismo peso, gana el último): el toque siempre pasa al cursor. Es el color el que responde al toque y por eso

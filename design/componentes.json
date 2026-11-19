@@ -678,7 +678,7 @@
       ],
       "tokens": ["fondo-2", "fondo-3", "radio-lg", "t-titular", "space-3", "space-4", "space-2", "alto-sm", "linea-fuerte", "fondo-3-presionado"],
       "estados": {
-        "foco": { "css": [".house-track:focus-visible", ".btn:focus-visible"] },
+        "foco": { "css": [".house-track:focus-visible", ".btn:focus-visible", ".btn[aria-disabled=\"true\"]:focus-visible"], "nota": "Un control en aria-disabled conserva el foco y su anillo (2026-11-19)." },
         "movimiento_reducido": { "css": [".motion .still-img"] },
         "deshabilitado": { "css": [".btn[aria-disabled=\"true\"]"], "js": [{ "ruta": "app.js", "texto": "prev.setAttribute('aria-disabled', String(track.scrollLeft <= 1));" }], "nota": "En los extremos de la tira: aria-disabled (no disabled), así el foco se queda en el botón." }
       },

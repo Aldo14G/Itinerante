@@ -31,10 +31,10 @@ Después de cada cambio visual, antes de pedir commit. Nadie juzga una página q
 2. **Firma:** algo memorable y nuestro. Aquí: la foto real de la casa con radio grande, el turquesa del logo, el vidrio de las barras, el Carrusel3D (portadas, eventos y la carta de Café y té) y el recorrido ligero de colecciones (los chips Narrativa · Poesía · Ensayo como paradas, con conector y «N de 3 paradas hojeadas»; se retiró con la crítica minimalista y volvió ligero el mismo 2026-11-13).
 3. **Tipografía:** la del sistema de Apple (Inter de respaldo) en la escala de Apple HIG: Large Title solo en el h1, Title 1 en secciones, Body 17/22 en el texto; nada de lectura bajo 15 px; como máximo 6 tamaños por pantalla.
 4. **Composición:** el texto y sus acciones juntos (proximidad), bordes alineados, recorrido de la vista titular → mensaje → acción. Nada huérfano.
-5. **Color y luz:** `fondo`/`fondo-2` alternos, `tinta`, `tinta-2` y un acento (turquesa). Un solo primario por vista («Cómo llegar»; en la ficha, «Preguntar por WhatsApp»); el secundario es menta. Sombras solo en lo que flota. Los dos temas se ven igual de cuidados.
+5. **Color y luz:** `fondo`/`fondo-2` alternos, `tinta`, `tinta-2` y un acento (turquesa). Un solo primario por vista («Cómo llegar»; en la ficha, «Consultar disponibilidad», 2026-11-19); el secundario es menta. Sombras solo en lo que flota. Los dos temas se ven igual de cuidados.
 6. **Foto:** encuadrada a propósito (`object-position`), sin chocar con el texto.
 7. **Movimiento:** respuesta, no decoración (titulares por línea, revelado de imagen, escala al toque, pastilla con resorte). Duraciones de tokens y nada con «reducir movimiento».
-8. **Móvil:** primero el teléfono: márgenes 16/20, acciones a todo el ancho, objetivos de 48 (44 en línea y barras, 56 los principales), barra inferior de vidrio que no tapa nada y la firma sigue presente.
+8. **Móvil:** primero el teléfono: márgenes 16/20, acciones a todo el ancho, objetivos de 48 (44 en línea y barras, 56 los principales), barra inferior de vidrio anclada con su espacio propio (2026-11-19), que no tapa nada ni deja leer texto a sus lados y la firma sigue presente.
 9. **Texto:** concreto y verdadero. Verbo al frente en las acciones.
 10. **Pulido:** anillo de foco del sistema, radios 12/20/28/píldora consistentes, sin saltos al cargar fuentes o datos.
 

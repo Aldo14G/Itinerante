@@ -589,7 +589,7 @@ La casa: seis fotos reales en una tira que se pasa con el dedo; la que se ve ent
 - **index.html:** `#casa` `.still-img` `[data-house-nav]` `[data-house-prev]` `[data-house-next]` `#casa-fotos`
 - **app.js:** ganchos `data-house-prev` `data-house-next` `data-house-nav`
 - **Tokens:** `fondo-2` `fondo-3` `radio-lg` `t-titular` `space-3` `space-4` `space-2` `alto-sm` `linea-fuerte` `fondo-3-presionado`
-- **Estado foco:** `.house-track:focus-visible`, `.btn:focus-visible`
+- **Estado foco:** `.house-track:focus-visible`, `.btn:focus-visible`, `.btn[aria-disabled="true"]:focus-visible` — Un control en aria-disabled conserva el foco y su anillo (2026-11-19).
 - **Estado movimiento_reducido:** `.motion .still-img`
 - **Estado deshabilitado:** `.btn[aria-disabled="true"]`, app.js `prev.setAttribute('aria-disabled', String(track.scrollLeft <= 1));` — En los extremos de la tira: aria-disabled (no disabled), así el foco se queda en el botón.
 - **ARIA:** Carrusel (APG): lista desplazable con controles anterior/siguiente con nombre (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) · `aria-label (tira)` `aria-controls=casa-fotos` `aria-label=Foto anterior / Foto siguiente` `aria-disabled` · **Teclado:** La tira recibe foco y se desplaza con las flechas (nativo); los dos botones con Tab, Enter o Espacio. Sin avance automático.
