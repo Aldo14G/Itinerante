@@ -8,6 +8,8 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { validMerch, merchProblems, merchMessage, merchWaUrl, precioMerch, validFotoMerch, merchCard, merchSection, MERCH_URL } from '../merch.js';
 import { problemasDisco as merchDisco } from '../scripts/check-merch.mjs';
+import { origenDe, aplicar as aplicarDominio, diferencias as difDominio, cabecera as cabeceraDominio, robotsTxt, sitemapXml, INICIO as DOM_INICIO, FIN as DOM_FIN, NOINDEX, IMAGEN } from '../scripts/set-dominio.mjs';
+import { openingStatus } from '../app.js';
 import { editorialesDe, editorialesPlan, editorialesNota, editorialKey, titulosLabel, EDITORIALES_MIN, filterBooks } from '../catalog.js';
 import { editorialesHtml, withEditoriales, VISIBLES, INICIO as ED_INICIO, FIN as ED_FIN } from '../scripts/build-editoriales.mjs';
 import { faqProblems, faqHtml, withFaq, respuestaHtml, anclasDe, idsDe, FAQ_MAX, INICIO as FAQ_INICIO, FIN as FAQ_FIN } from '../scripts/build-faq.mjs';
@@ -275,4 +277,175 @@ test('docs/MERCH.md: plantilla de columnas y comandos', () => {
   for (const col of ['Nombre', 'Tipo', 'Precio', 'Foto', 'Texto alternativo', 'Disponibilidad', 'Notas']) assert.ok(md.includes(`**${col}`), `columna ${col}`);
   for (const cmd of ['scripts/foto-merch.py', 'npm run merch:check', 'tools/preview-site.mjs']) assert.ok(md.includes(cmd), cmd);
   assert.ok(/nunca afirma que haya existencias/.test(md));
+});
+
+// ---------------------------------------------------------------- 4. Marca y SEO listos para el dominio (sin dominio)
+const repoPath = new URL('.', repo).pathname;
+const ldOf = h => JSON.parse(h.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+const cabezaDe = h => h.slice(0, h.indexOf('</head>'));
+const jpegSize = buf => { let i = 2; while (i < buf.length) { if (buf[i] !== 0xff) { i++; continue; } const m = buf[i + 1]; if (m >= 0xc0 && m <= 0xc3) return [buf.readUInt16BE(i + 7), buf.readUInt16BE(i + 5)]; i += 2 + buf.readUInt16BE(i + 2); } return null; };
+const pngSize = buf => [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+
+test('Dominio: el repositorio está SIN dominio y con noindex (no se retira hasta --indexar); canonical, og:url, og:image y sitemap no existen todavía', () => {
+  const head = cabezaDe(html);
+  assert.ok(head.includes(NOINDEX), 'noindex,nofollow presente');
+  assert.ok(!/rel="canonical"|og:url|og:image|twitter:card/.test(head), 'nada que exija un dominio absoluto');
+  assert.ok(!existsSync(new URL('sitemap.xml', repo)), 'sin sitemap.xml');
+  assert.ok(!/^Sitemap:/mi.test(read('robots.txt')) && /^User-agent: \*$/m.test(read('robots.txt')) && /^Allow: \/$/m.test(read('robots.txt')) && /^Disallow: \/api\/$/m.test(read('robots.txt')));
+  assert.deepEqual(difDominio(repoPath, {}), [], 'index.html, robots.txt y sitemap.xml son el estado sin dominio (npm run dominio:check)');
+  assert.ok(html.includes(DOM_INICIO) && html.includes(DOM_FIN));
+  assert.ok(/"dominio:check": "node scripts\/set-dominio\.mjs --check"/.test(read('package.json')));
+  assert.ok(!('url' in ldOf(html)) && !('image' in ldOf(html)), 'el JSON-LD no trae url ni image sin dominio');
+});
+
+test('Dominio: origenDe acepta solo el origen https de un dominio público y rechaza lo demás con su razón', () => {
+  assert.equal(origenDe('https://libreria.mx'), 'https://libreria.mx'); assert.equal(origenDe('https://WWW.Libreria.MX/'), 'https://www.libreria.mx');
+  for (const [bad, re] of [['http://libreria.mx', /https/], ['libreria.mx', /no es una URL/], ['https://libreria.mx/inicio', /sin ruta/], ['https://libreria.mx/#casa', /sin ruta/], ['https://libreria.mx/?a=1', /sin ruta/], ['https://libreria.mx:8443', /puerto/],
+    ['https://user:pw@libreria.mx', /usuario/], ['https://localhost', /dominio público/], ['https://127.0.0.1', /dominio público/], ['https://libreria', /dominio público/], ['https://app.local', /dominio público/], ['', /no es una URL/]]) {
+    assert.throws(() => origenDe(bad), re, bad);
+  }
+});
+
+test('Dominio: aplicar escribe canonical, og:url, og:image absoluta, twitter:card, Sitemap, una sola URL en sitemap.xml y url/image del JSON-LD; noindex solo se retira con indexar; idempotente y reversible', () => {
+  const dom = 'https://www.ejemplo-libreria.mx';
+  const base = { html, robots: read('robots.txt') };
+  const a = aplicarDominio(base, { origen: dom });
+  const head = cabezaDe(a.html);
+  assert.ok(head.includes(NOINDEX), 'con dominio y sin indexar, sigue el noindex');
+  for (const l of [`<link rel="canonical" href="${dom}/">`, `<meta property="og:url" content="${dom}/">`, `<meta property="og:image" content="${dom}/${IMAGEN}">`, '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="630">', '<meta name="twitter:card" content="summary_large_image">']) assert.ok(head.includes(l), l);
+  assert.match(head, /<meta property="og:image:alt" content="[^"]{30,}">/);
+  assert.equal((head.match(/rel="canonical"/g) || []).length, 1);
+  assert.match(a.robots, new RegExp(`^Sitemap: ${dom.replace(/\./g, '\\.')}/sitemap\\.xml$`, 'm'));
+  assert.equal(a.sitemap, sitemapXml(dom)); assert.equal((a.sitemap.match(/<loc>/g) || []).length, 1); assert.ok(!/#/.test(a.sitemap), 'una sola URL, sin #secciones');
+  const ld = ldOf(a.html);
+  assert.deepEqual([ld.url, ld.image], [`${dom}/`, `${dom}/${IMAGEN}`]); assert.deepEqual(Object.keys(ld).slice(0, 5), ['@context', '@type', 'name', 'url', 'image'], 'url e image van tras name');
+  assert.deepEqual(aplicarDominio({ html: a.html }, { origen: dom }), a, 'idempotente');
+  const otro = aplicarDominio({ html: a.html }, { origen: 'https://otro.mx' });
+  assert.ok(!otro.html.includes('ejemplo-libreria') && (otro.html.match(/rel="canonical"/g) || []).length === 1 && !otro.sitemap.includes('ejemplo'), 'cambiar de dominio sustituye el anterior');
+  const ind = aplicarDominio({ html: a.html }, { origen: dom, indexar: true });
+  assert.ok(!cabezaDe(ind.html).includes('name="robots"'), '--indexar retira el noindex');
+  const volver = aplicarDominio({ html: ind.html }, {});
+  assert.equal(volver.html, html, 'sin dominio y sin indexar vuelve exactamente al estado del repositorio'); assert.equal(volver.robots, read('robots.txt')); assert.equal(volver.sitemap, null);
+  assert.equal(cabeceraDominio(null, false, '  '), `  ${DOM_INICIO}\n  ${NOINDEX}\n  ${DOM_FIN}`);
+  assert.ok(robotsTxt(null) === read('robots.txt') && !/^Sitemap:/m.test(robotsTxt(null)));
+});
+
+test('Dominio: el CLI (en una copia temporal) escribe, comprueba con --check, exige --indexar para retirar el noindex y --reset deja el estado original', () => {
+  const tmp = mkdtempSync(join(tmpdir(), 'iti-dominio-'));
+  try {
+    copyFileSync(new URL('index.html', repo), join(tmp, 'index.html')); copyFileSync(new URL('robots.txt', repo), join(tmp, 'robots.txt'));
+    const run = (...a) => spawnSync('node', [new URL('scripts/set-dominio.mjs', repo).pathname, ...a, '--root', tmp], { encoding: 'utf8' });
+    const dom = 'https://libreria-prueba.mx';
+    assert.equal(run('--check').status, 0, 'copia limpia: sin dominio al día');
+    assert.equal(run(dom, '--check').status, 1, 'antes de escribir, --check con dominio falla');
+    assert.equal(run('--indexar').status, 2, '--indexar sin dominio es un error de uso'); assert.equal(run('http://x.mx').status, 2); assert.equal(run('https://x.mx/ruta').status, 2);
+    const w = run(dom); assert.equal(w.status, 0, w.stderr); assert.match(w.stdout, /sigue con noindex,nofollow/);
+    assert.equal(run(dom, '--check').status, 0); assert.equal(run('--check').status, 1, 'ya hay dominio: el estado sin dominio no coincide');
+    assert.ok(readFileSync(join(tmp, 'index.html'), 'utf8').includes(NOINDEX), 'sin --indexar no se retira el noindex');
+    assert.ok(existsSync(join(tmp, 'sitemap.xml')));
+    const i = run(dom, '--indexar'); assert.equal(i.status, 0); assert.match(i.stdout, /noindex RETIRADO/);
+    assert.ok(!cabezaDe(readFileSync(join(tmp, 'index.html'), 'utf8')).includes('name="robots"')); assert.equal(run(dom, '--indexar', '--check').status, 0); assert.equal(run(dom, '--check').status, 1, 'indexable no es lo mismo que con noindex');
+    assert.equal(run('--reset').status, 0);
+    assert.equal(readFileSync(join(tmp, 'index.html'), 'utf8'), html); assert.equal(readFileSync(join(tmp, 'robots.txt'), 'utf8'), read('robots.txt')); assert.ok(!existsSync(join(tmp, 'sitemap.xml')));
+  } finally { rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('JSON-LD: BookStore y CafeOrCoffeeShop con solo hechos publicados (nombre, dirección, WhatsApp, correo, horario, redes, mapa); sin reseñas ni calificaciones', () => {
+  const ld = ldOf(html);
+  assert.deepEqual(ld['@type'], ['BookStore', 'CafeOrCoffeeShop']); assert.equal(ld['@context'], 'https://schema.org');
+  assert.equal(ld.name, 'Librería Itinerante y Más');
+  assert.deepEqual(ld.address, { '@type': 'PostalAddress', streetAddress: 'Mariano Matamoros Pte. 421', addressLocality: 'Monterrey', addressRegion: 'Nuevo León', addressCountry: 'MX' });
+  assert.ok(/Mariano Matamoros Pte\. 421<br>\s*Centro, Monterrey, Nuevo León/.test(html), 'la dirección del marcado visible es la del JSON-LD');
+  assert.ok(html.includes('href="https://wa.me/528180875940"') && ld.telephone === '+528180875940', 'el teléfono es el WhatsApp ya publicado');
+  assert.ok(html.includes('href="mailto:libreriaitineranteymasmty@gmail.com"') && ld.email === 'libreriaitineranteymasmty@gmail.com');
+  const redes = [...html.matchAll(/<a class="ftr-link" href="(https:\/\/www\.(?:instagram|facebook)\.com\/[^"]+)"/g)].map(m => m[1]);
+  assert.deepEqual(ld.sameAs, redes, 'sameAs son las redes del pie');
+  assert.ok(/^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=/.test(ld.hasMap) && decodeURIComponent(ld.hasMap).includes('Mariano Matamoros Pte. 421'), 'hasMap al mapa de la dirección');
+  assert.equal(ld.description, html.match(/<meta property="og:description" content="([^"]+)"/)[1]);
+  const txt = JSON.stringify(ld);
+  assert.ok(!/aggregateRating|review|ratingValue|priceRange|servesCuisine|menu|postalCode|geo\b|foundingDate|slogan/i.test(txt), 'nada que Aldo no haya confirmado: sin calificaciones, reseñas, precios, cocina, código postal ni fechas');
+});
+
+test('JSON-LD: openingHoursSpecification dice lo mismo que el horario del sitio (tabla de Visita y estado de apertura) en cada minuto de la semana', () => {
+  const ld = ldOf(html);
+  const filas = [...html.matchAll(/<tr data-days="([\d ]+)"><th scope="row">([^<]+)<\/th><td>([^<]+)<\/td><\/tr>/g)].map(m => ({ dias: m[1].split(' ').map(Number), nombre: m[2], horas: m[3] }));
+  assert.deepEqual(filas.map(f => [f.nombre, f.horas]), [['Lunes a sábado', '11:00–20:00'], ['Domingo', 'Cerrado']]);
+  const NUM = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+  const abiertoLd = (day, mins) => ld.openingHoursSpecification.some(h => (Array.isArray(h.dayOfWeek) ? h.dayOfWeek : [h.dayOfWeek]).map(d => NUM[d.replace('https://schema.org/', '')]).includes(day) && mins >= toMin(h.opens) && mins < toMin(h.closes));
+  const toMin = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  const [lunSab] = filas, [ab, ce] = lunSab.horas.split('–');
+  assert.deepEqual(ld.openingHoursSpecification.map(h => [h.opens, h.closes]), [[ab, ce]], 'una sola franja: la de la tabla');
+  for (let day = 0; day < 7; day++) for (let mins = 0; mins < 1440; mins++) {
+    const fila = filas.find(f => f.dias.includes(day)), hs = fila && /^(\d\d:\d\d)–(\d\d:\d\d)$/.exec(fila.horas);
+    const sitio = openingStatus({ day, mins }).open, tabla = hs ? mins >= toMin(hs[1]) && mins < toMin(hs[2]) : false;
+    assert.equal(abiertoLd(day, mins), sitio, `día ${day} ${mins} min: JSON-LD y estado de apertura`);
+    assert.equal(tabla, sitio, `día ${day} ${mins} min: tabla y estado de apertura`);
+  }
+  assert.equal(lunSab.dias.join(','), '1,2,3,4,5,6');
+});
+
+test('Imagen para compartir e iconos: compartir.jpg 1200×630 con el logo y una foto real de la casa, iconos 192 y 512, todo registrado en provenance.json', () => {
+  const j = readFileSync(new URL('assets/img/compartir.jpg', repo));
+  assert.deepEqual(jpegSize(j), [1200, 630]); assert.ok(j.length < 400 * 1024, `pesa ${j.length} B (< 400 KB: se descarga rápido en un chat)`);
+  assert.equal(IMAGEN, 'assets/img/compartir.jpg');
+  assert.deepEqual(pngSize(readFileSync(new URL('assets/img/icono-192.png', repo))), [192, 192]); assert.deepEqual(pngSize(readFileSync(new URL('assets/img/icono-512.png', repo))), [512, 512]);
+  const prov = json('assets/provenance.json');
+  const c = prov.real.find(f => f.file === 'img/compartir.jpg');
+  assert.ok(c && c.derivedFrom.includes('Logo.webp') && c.derivedFrom.includes('img/inicio-sala-5x4.webp') && /1200x630/.test(c.origin) && c.sha256 && c.sourceSha256 && c.date, 'registrada con su origen, fecha y huellas');
+  assert.ok(prov.real.some(f => f.file === 'img/inicio-sala-5x4.webp'), 'la foto de la sala es una foto real registrada');
+  for (const l of [192, 512]) assert.ok(prov.brand.some(f => f.file === `img/icono-${l}.png` && f.sha256), `icono ${l} registrado`);
+  assert.ok(existsSync(new URL('scripts/marca-imagenes.py', repo)));
+  const og = { title: html.match(/<meta property="og:title" content="([^"]+)"/)[1], desc: html.match(/<meta property="og:description" content="([^"]+)"/)[1] };
+  assert.equal(og.title, 'Librería Itinerante y Más · Centro de Monterrey'); assert.ok(/editoriales independientes, café, eventos y talleres en el centro de Monterrey/.test(og.desc) && og.desc.length <= 120, 'og:description: hechos confirmados, corta, sin adjetivos');
+  assert.ok(!/descubre|sumérgete|experiencia|único|ideal|increíble|mejor|gratis|rústic|piedra|Barrio Antiguo|viaj/i.test(`${og.title} ${og.desc}`), 'guía de voz: sin muletillas ni lo que no se dice');
+});
+
+test('manifest.webmanifest: nombre, idioma, iconos 192 y 512 existentes y colores de los tokens (fondo claro); theme-color por tema también de tokens', () => {
+  const m = json('manifest.webmanifest');
+  const tk = read('tokens.css');
+  const fondoClaro = tk.match(/--fondo: (#[0-9a-f]{3,6});/)[1].replace(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/, '#$1$1$2$2$3$3'), fondoOscuro = tk.match(/@media \(prefers-color-scheme: dark\)[\s\S]*?--fondo: (#[0-9a-f]{6});/)[1];
+  assert.equal(m.name, 'Librería Itinerante y Más'); assert.equal(m.lang, 'es-MX'); assert.equal(m.start_url, '/'); assert.equal(m.scope, '/');
+  assert.equal(m.theme_color, fondoClaro); assert.equal(m.background_color, fondoClaro);
+  assert.ok(html.includes(`<meta name="theme-color" content="${fondoClaro}" media="(prefers-color-scheme: light)">`) && html.includes(`<meta name="theme-color" content="${fondoOscuro}" media="(prefers-color-scheme: dark)">`), 'theme-color claro y oscuro = --fondo de cada tema');
+  assert.deepEqual(m.icons.map(i => [i.sizes, i.type]), [['192x192', 'image/png'], ['512x512', 'image/png']]);
+  for (const i of m.icons) { assert.ok(existsSync(new URL(i.src, repo)), i.src); assert.ok(!i.src.startsWith('/') && !/^https?:/.test(i.src)); }
+  assert.ok(/Libros de editoriales independientes, café, eventos y talleres en el centro de Monterrey/.test(m.description));
+});
+
+test('404.html: página mínima del sistema (un h1, inicio y WhatsApp, noindex, CSP estricta, referencias desde la raíz) y la regla de Workers Static Assets', () => {
+  const f = read('404.html');
+  assert.match(f, /^<!doctype html>\s*<html lang="es-MX">/i); assert.equal(f.match(/<h1\b/g).length, 1);
+  assert.match(f, /<meta name="robots" content="noindex,nofollow">/);
+  const csp = f.match(/Content-Security-Policy" content="([^"]+)"/)[1];
+  assert.ok(/default-src 'self'/.test(csp) && /script-src 'none'/.test(csp) && !/unsafe|\*|https?:/.test(csp), csp);
+  assert.ok(!/<script\b|\sstyle=|\son[a-z]+=/i.test(f), 'sin scripts ni estilos en línea');
+  assert.ok(/<a class="btn btn--primario btn--lg" href="\/">/.test(f) && /href="https:\/\/wa\.me\/528180875940\?text=[^"]+" target="_blank" rel="noopener noreferrer"/.test(f), 'enlace al inicio y a WhatsApp');
+  for (const m of f.matchAll(/(?:href|src)="(\/[^"]*)"/g)) assert.ok(m[1] === '/' || existsSync(new URL(`.${m[1]}`, repo)), `la 404 se ve desde cualquier ruta: ${m[1]} existe y va desde la raíz`);
+  assert.ok(!/(?:href|src)="(?!\/|https:|#)/.test(f), 'ninguna referencia relativa');
+  const css = read('404.css'); assert.ok(!/#[0-9a-f]{3,8}\b|\b\d+ms\b|rgba?\(/i.test(css), '404.css sin colores ni duraciones a mano (tokens)');
+  assert.ok(!/(?:width|height|min-height|padding|margin)\s*:\s*[^;]*\d+px/.test(css.replace(/@media \([^)]*\)/g, '').replace(/width: 40px; height: 40px;/, '')), '404.css: medidas de los tokens');
+  const wr = read('wrangler.jsonc').replace(/^\s*\/\/.*$/gm, '');
+  assert.match(wr, /"not_found_handling": "404-page"/); assert.match(wr, /"run_worker_first": \["\/api\/\*"\]/, 'la API sigue pasando por el Worker');
+  const pub = read('scripts/prepare-public.mjs'); for (const n of ['"404.html"', '"404.css"', '"manifest.webmanifest"']) assert.ok(pub.includes(n), n);
+  assert.ok(read('worker/_headers').includes('/404.html\n  Cache-Control: public, max-age=0, must-revalidate'));
+});
+
+test('Revisión de la página: un solo h1, jerarquía sin saltos, alt en toda imagen, lang es-MX y la CSP de index.html no se afloja', () => {
+  assert.match(html, /<html lang="es-MX">/); assert.equal(html.match(/<h1\b/g).length, 1);
+  const niveles = [...html.matchAll(/<h([1-6])\b/g)].map(m => Number(m[1]));
+  const i1 = niveles.indexOf(1); let prev = 1;
+  for (const n of niveles.slice(i1 + 1)) { assert.ok(n <= prev + 1, `salto de h${prev} a h${n}`); prev = n; }
+  const imgs = [...html.matchAll(/<img\b[^>]*>/g)].map(m => m[0]);
+  assert.ok(imgs.length > 10 && imgs.every(t => /\salt="/.test(t)), 'toda imagen trae alt (vacío solo si es decorativa)');
+  const informativas = imgs.filter(t => !/\salt=""/.test(t)); assert.ok(informativas.length >= 8 && informativas.every(t => /\salt="[^"]{12,}"/.test(t)), 'las informativas llevan un alt que describe lo que se ve');
+  const csp = html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
+  assert.equal(csp, "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'none'", 'la CSP de la página es la de siempre (solo frame-src de Google para el mapa)');
+  assert.ok(!/unsafe-inline|unsafe-eval/.test(csp + read('worker/_headers')));
+  assert.ok(!/<script(?![^>]*(?:src=|type="application\/ld\+json"))[^>]*>/.test(html) && !/\sstyle="/.test(html) && !/\son[a-z]+="/.test(html), 'sin scripts ni estilos en línea (el JSON-LD es datos)');
+});
+
+test('docs/DOMINIO.md: el flujo completo (comandos, Cloudflare, redirección, Search Console y Bing, Google Business Profile con los mismos NAP) sin ejecutar nada externo', () => {
+  const d = read('docs/DOMINIO.md');
+  for (const t of ['scripts/set-dominio.mjs', '--indexar', '--check', '--reset', 'Cloudflare', 'DNS', 'redirección', 'Search Console', 'Bing', 'Google Business Profile', 'NAP', 'Mariano Matamoros Pte. 421', '11:00', '528180875940', 'npm run cf:deploy', 'noindex']) assert.ok(d.includes(t), `DOMINIO.md menciona ${t}`);
+  assert.ok(/no se compra ni se registra/i.test(d) || /No se compra ni se registra/.test(d), 'dice que no se compra ni registra nada desde aquí');
 });

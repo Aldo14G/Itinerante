@@ -11,6 +11,8 @@
     // lo ejecutan antes de wrangler y se abortan si falla, asi que nunca se publica un public/ viejo.
     "directory": "./public",
     "binding": "ASSETS",
+    // Una ruta que no existe se sirve con 404.html y estado 404 (404.html se publica con el resto de la raíz; ver scripts/prepare-public.mjs).
+    "not_found_handling": "404-page",
     // Solo /api/* pasa por el Worker; todo lo demás se sirve como asset sin invocar código.
     "run_worker_first": ["/api/*"]
   },

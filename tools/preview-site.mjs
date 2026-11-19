@@ -12,16 +12,25 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const defaultPort = Number(process.env.PORT || 8094);
 const types = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2'
+  '.json': 'application/json; charset=utf-8', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2',
+  '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8', '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
 const gz = new Map();
-export const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/mobile.css', '/app.js', '/catalog.js', '/motion.js', '/rail.js', '/carousel3d.js', '/cafe.js', '/feed.js', '/news.js', '/merch.js', '/sample.js', '/tag.js','/saved.js', '/sheets.js', '/Logo.png', '/Logo.webp']);
+export const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/mobile.css', '/app.js', '/catalog.js', '/motion.js', '/rail.js', '/carousel3d.js', '/cafe.js', '/feed.js', '/news.js', '/merch.js', '/sample.js', '/tag.js','/saved.js', '/sheets.js', '/404.html', '/404.css', '/manifest.webmanifest', '/robots.txt', '/sitemap.xml', '/Logo.png', '/Logo.webp']);
 const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'";
 export const allowed = path => !/[\\\0]/.test(path) && (PAGES.has(path) || (path.startsWith('/assets/') && !path.endsWith('provenance.json') && !path.endsWith('sources.json') && extname(path) in types && !path.endsWith('.txt')));
 
 export function createSiteServer() {
   return createServer(async (req, res) => {
     const fail = (code, msg) => { res.writeHead(code, { 'Content-Type': 'text/plain; charset=utf-8' }).end(msg); };
+    // Como Cloudflare con assets.not_found_handling = "404-page" (wrangler.jsonc): una ruta que no existe se contesta con 404.html y estado 404.
+    const notFound = () => {
+      try {
+        const body = readFileSync(resolve(root, '404.html'));
+        res.writeHead(404, { 'Content-Type': types['.html'], 'Content-Length': body.length, 'Cache-Control': 'no-cache', 'Content-Security-Policy': CSP, 'X-Content-Type-Options': 'nosniff' });
+        res.end(req.method === 'HEAD' ? undefined : body);
+      } catch { fail(404, 'No encontrado'); }
+    };
     if (req.method !== 'GET' && req.method !== 'HEAD') return fail(405, 'Método no permitido');
     let path;
     try {
@@ -29,10 +38,10 @@ export function createSiteServer() {
     } catch { return fail(400, 'Solicitud inválida'); }
     if (path.endsWith('/')) path += 'index.html';
     const file = resolve(root, `.${path}`);
-    if (!allowed(path) || !file.startsWith(root + sep)) return fail(404, 'No encontrado');
+    if (!allowed(path) || !file.startsWith(root + sep)) return notFound();
     try {
       const info = await stat(file);
-      if (!info.isFile()) return fail(404, 'No encontrado');
+      if (!info.isFile()) return notFound();
       const headers = {
         'Content-Type': types[extname(file)], 'Content-Length': info.size, 'Cache-Control': 'no-cache',
         'Content-Security-Policy': CSP, 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin'
@@ -48,7 +57,7 @@ export function createSiteServer() {
       res.writeHead(200, headers);
       if (req.method === 'HEAD') return res.end();
       createReadStream(file).on('error', () => res.destroy()).pipe(res);
-    } catch { fail(404, 'No encontrado'); }
+    } catch { notFound(); }
   });
 }
 

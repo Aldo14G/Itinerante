@@ -32,6 +32,9 @@ export const ROOT_FILES = [
   "Logo.png",
   "Logo.webp",
   "robots.txt",
+  "404.html",
+  "404.css",
+  "manifest.webmanifest",
 ];
 // Se publican solo si existen (sitemap.xml exige dominio verificado y todavia no se crea).
 export const OPTIONAL_ROOT_FILES = ["sitemap.xml"];

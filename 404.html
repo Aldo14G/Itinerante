@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Página 404 (2026-11-19): Cloudflare la sirve con estado 404 para cualquier ruta que no existe (wrangler.jsonc: assets.not_found_handling = "404-page"). Como se ve
+       desde rutas de cualquier profundidad, todas sus referencias van desde la raíz (/style.css…). Sin JavaScript. Misma CSP estricta que el sitio, sin frames. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1d1b" media="(prefers-color-scheme: dark)">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Página no encontrada · Librería Itinerante y Más</title>
+  <link rel="icon" href="/Logo.png" type="image/png" sizes="256x256">
+  <link rel="preload" href="/assets/fonts/inter-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/fonts/fonts.css">
+  <link rel="stylesheet" href="/tokens.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/404.css">
+</head>
+<body>
+  <main class="fof" id="contenido">
+    <a class="fof-marca" href="/" aria-label="Librería Itinerante y Más, inicio"><img src="/assets/img/logo-96.webp" width="48" height="48" alt=""><span>Itinerante <span class="fof-mas">y Más</span></span></a>
+    <h1 class="fof-tit">No encontramos esa página</h1>
+    <p class="fof-txt">Puede que la dirección tenga un error o que el enlace ya no exista. Empieza por el inicio: ahí están los libros, los eventos y el café.</p>
+    <div class="fof-acciones">
+      <a class="btn btn--primario btn--lg" href="/"><span>Ir al inicio</span></a>
+      <a class="btn btn--secundario btn--lg" href="https://wa.me/528180875940?text=Hola%2C%20no%20encontr%C3%A9%20una%20p%C3%A1gina%20del%20sitio." target="_blank" rel="noopener noreferrer"><span>Preguntar por WhatsApp</span></a>
+    </div>
+  </main>
+</body>
+</html>

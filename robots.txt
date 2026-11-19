@@ -1,4 +1,5 @@
-# Todo el sitio es publico. Sin linea Sitemap: aun no hay dominio de produccion verificado en el repo.
+# Generado por scripts/set-dominio.mjs (docs/DOMINIO.md); no se edita a mano.
+# Se permite rastrear todo el sitio (menos /api/); mientras index.html lleve <meta name="robots" content="noindex,nofollow">, los buscadores lo leen y no lo indexan.
 User-agent: *
 Allow: /
 Disallow: /api/

@@ -47,6 +47,12 @@
 /assets/seq-m/*
   Cache-Control: public, max-age=604800
 
+/404.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400
+
 /Logo.png
   Cache-Control: public, max-age=604800
 

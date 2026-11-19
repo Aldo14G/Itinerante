@@ -258,6 +258,19 @@
       "account": "@libreriaitineranteymasmty",
       "date": "2026-11-18",
       "sha256": "1587fa63613751b3bc3fb176c0681f0e54a753af8dd3c8ac6c925b5b17602b5a"
+    },
+    {
+      "file": "img/compartir.jpg",
+      "origin": "imagen para compartir 1200x630 (og:image): el logo (Logo.webp, 768x768) reducido a 630x630 a la izquierda y un recorte centrado de 782x864 de la foto real de la sala (img/inicio-sala-5x4.webp) reducido a 570x630 a la derecha; Pillow, LANCZOS, JPEG calidad 88; scripts/marca-imagenes.py",
+      "derivedFrom": [
+        "Logo.webp",
+        "img/inicio-sala-5x4.webp"
+      ],
+      "author": "logo de la librería y foto de la casa ya registrada (img/inicio-sala-5x4.webp)",
+      "date": "2026-11-19",
+      "sourceSha256": "4a3fb8e27f4f6bc2ba1a7e24e82bf02ba9eed638e569176de358a11e7201d424",
+      "logoSha256": "1c6beb8f418b0321294098f4533ba18283a4de2207784853c16c5ed0b815d888",
+      "sha256": "4c03b164e08685d7b06616c7866be0e55a32d4364ef8bf723730f793849be49b"
     }
   ],
   "aiRecreation": [],
@@ -272,6 +285,20 @@
       "derivedFrom": "Logo.webp",
       "date": "2026-11-18",
       "sha256": "7bf5f0fd5e4b021b1ba580bd70cd7d2d4a43d9b5a95b8ff502be77ab3d9409bc"
+    },
+    {
+      "file": "img/icono-192.png",
+      "origin": "Logo.webp (768 x 768) reducido a 192 x 192 (Pillow, LANCZOS, PNG); icono del manifiesto web (manifest.webmanifest); scripts/marca-imagenes.py",
+      "derivedFrom": "Logo.webp",
+      "date": "2026-11-19",
+      "sha256": "1299707c085082fd5ebfadbf1930f7840618a19a07bdb26b4a80a322aa155451"
+    },
+    {
+      "file": "img/icono-512.png",
+      "origin": "Logo.webp (768 x 768) reducido a 512 x 512 (Pillow, LANCZOS, PNG); icono del manifiesto web (manifest.webmanifest); scripts/marca-imagenes.py",
+      "derivedFrom": "Logo.webp",
+      "date": "2026-11-19",
+      "sha256": "82f05ae4b8ec45e1b503a5487233ffc64b23a7295c3719f1019e1682953c54ba"
     }
   ],
   "fonts": "fonts/sources.json (Inter variable, de Fontsource; licencia OFL incluida)",

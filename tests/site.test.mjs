@@ -489,7 +489,8 @@ test('Eventos: cada propuesta lleva su foto real registrada (con alt y medidas) 
 });
 test('el sitio raíz es el único: no hay otro *.html en la raíz y el sitio anterior no se publica', async () => {
   const pages = (await readdir(repo)).filter(f => /\.html?$/i.test(f));
-  assert.deepEqual(pages, ['index.html'], 'un solo HTML en la raíz');
+  assert.deepEqual(pages.sort(), ['404.html', 'index.html'], 'una sola página: index.html; 404.html (2026-11-19) es la página de error del mismo sitio, noindex, no una segunda home');
+  assert.ok(/<meta name="robots" content="noindex,nofollow">/.test(await readFile(here('./404.html'), 'utf8')) && /<h1\b/.test(await readFile(here('./404.html'), 'utf8')) && !/<section\b/.test(await readFile(here('./404.html'), 'utf8')), '404.html: sin secciones del sitio y noindex');
   assert.ok(!/higgsfield-site|assets\/css\/|assets\/js\/(?!boot\.js)|images\//.test(html), 'index.html no referencia recursos del sitio anterior');
   // Ni la lista de permitidos de Cloudflare/Firebase ni el servidor de vista previa incluyen el archivo histórico.
   const gitignore = await readFile(here('./.gitignore'), 'utf8');

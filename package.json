@@ -49,6 +49,7 @@
     "editoriales": "node scripts/build-editoriales.mjs",
     "editoriales:check": "node scripts/build-editoriales.mjs --check",
     "merch:check": "node scripts/check-merch.mjs",
+    "dominio:check": "node scripts/set-dominio.mjs --check",
     "critique": "node scripts/critique.mjs",
     "critique:static": "node scripts/critique.mjs --static-only",
     "test:site": "node --test tests/site.test.mjs",

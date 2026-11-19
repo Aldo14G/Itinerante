@@ -61,15 +61,18 @@ test("la CSP del HTML no abre origenes externos salvo frame-src de Google (mapa 
   assert.match(csp, /default-src 'self'/);
 });
 
-test("cabecera de index.html: indexable, color de la barra por tema (claro y oscuro), sin dominio inventado", async () => {
+test("cabecera de index.html: con noindex hasta que haya dominio (set-dominio --indexar), color de la barra por tema (claro y oscuro), sin dominio inventado", async () => {
   const html = await readFile(join(out, "index.html"), "utf8");
   const head = html.slice(0, html.indexOf("</head>"));
-  assert.ok(!/noindex|nofollow/i.test(head), "el sitio debe ser indexable");
+  // El dominio de produccion no esta decidido (2026-11-19): el sitio no se indexa a proposito; solo `scripts/set-dominio.mjs <dominio> --indexar` retira la marca.
+  assert.match(head, /<meta name="robots" content="noindex,nofollow">/, "el sitio sigue con noindex,nofollow hasta tener dominio");
   assert.match(head, /<meta name="theme-color" content="#ffffff" media="\(prefers-color-scheme: light\)">/);
   assert.match(head, /<meta name="theme-color" content="#0b1d1b" media="\(prefers-color-scheme: dark\)">/);
   assert.match(head, /<link rel="icon" href="Logo\.png"/);
+  assert.match(head, /<link rel="manifest" href="manifest\.webmanifest">/);
   assert.match(head, /<title>[^<]+<\/title>/);
   assert.match(head, /<meta name="description" content="[^"]{40,}"/);
+  assert.match(html, /^<!doctype html>\s*<html lang="es-MX">/i);
   // Sin dominio verificado no hay canonical, og:url ni og:image (exigen URL absoluta).
   assert.ok(!/rel="canonical"|og:url|og:image/.test(head), "no agregues canonical/og:url/og:image sin dominio verificado");
 });
@@ -77,7 +80,7 @@ test("cabecera de index.html: indexable, color de la barra por tema (claro y osc
 test("JSON-LD: direccion y horario lunes a sabado 11:00-20:00", async () => {
   const html = await readFile(join(out, "index.html"), "utf8");
   const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
-  assert.equal(ld["@type"], "BookStore");
+  assert.deepEqual(ld["@type"], ["BookStore", "CafeOrCoffeeShop"]);
   assert.equal(ld.address.streetAddress, "Mariano Matamoros Pte. 421");
   assert.equal(ld.address.addressLocality, "Monterrey");
   const [h] = ld.openingHoursSpecification;

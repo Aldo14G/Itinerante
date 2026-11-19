@@ -1,0 +1,10 @@
+/* Página 404 (2026-11-19): solo lo que style.css no trae. Todo valor sale de tokens.css. Un eje izquierdo: marca, titular, texto y acciones empiezan en el margen. */
+.fof { min-height: 100vh; min-height: 100svh; display: grid; align-content: center; justify-items: start; padding: var(--space-12) var(--margen); }
+.fof-marca { display: inline-flex; align-items: center; gap: var(--space-3); min-height: var(--alto-md); border-radius: var(--radio-sm); color: var(--tinta); font: var(--t-titular); letter-spacing: var(--ls-titular); text-decoration: none; }
+.fof-marca img { width: 40px; height: 40px; border-radius: var(--radio-md); }
+.fof-mas { color: var(--tinta-2); }
+.fof-marca:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); }
+.fof-tit { margin: var(--space-8) 0 0; max-width: 16ch; font: var(--t-titulo-1); letter-spacing: var(--ls-titulo-1); text-wrap: balance; }
+.fof-txt { margin: var(--space-3) 0 0; max-width: 60ch; font: var(--t-cuerpo); color: var(--tinta-2); }
+.fof-acciones { display: grid; gap: var(--space-4); width: 100%; margin-top: var(--space-6); }
+@media (min-width: 761px) { .fof-acciones { display: flex; width: auto; } }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,6 +11,7 @@
   <title>Librería Itinerante y Más · Centro de Monterrey</title>
   <link rel="icon" href="Logo.png" type="image/png" sizes="256x256">
   <link rel="apple-touch-icon" href="Logo.png">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="preload" href="assets/fonts/inter-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/img/03-home-sala-central.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 761px) and (max-width: 1023px)">
   <link rel="preload" href="assets/img/inicio-sala-5x4.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)">
@@ -19,13 +20,17 @@
   <meta property="og:description" content="Libros de editoriales independientes, café, eventos y talleres en el centro de Monterrey.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Librería Itinerante y Más">
+  <!-- dominio:inicio · lo escribe scripts/set-dominio.mjs (docs/DOMINIO.md): sin dominio, el sitio no se indexa -->
+  <meta name="robots" content="noindex,nofollow">
+  <!-- dominio:fin -->
   <script src="assets/js/boot.js"></script>
   <link rel="stylesheet" href="assets/fonts/fonts.css">
   <link rel="stylesheet" href="tokens.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="mobile.css" media="(max-width: 760px)">
   <script type="module" src="app.js"></script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BookStore","name":"Librería Itinerante y Más","address":{"@type":"PostalAddress","streetAddress":"Mariano Matamoros Pte. 421","addressLocality":"Monterrey","addressRegion":"Nuevo León","addressCountry":"MX"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"20:00"}],"sameAs":["https://www.instagram.com/libreriaitineranteymasmty/"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["BookStore","CafeOrCoffeeShop"],"name":"Librería Itinerante y Más","description":"Libros de editoriales independientes, café, eventos y talleres en el centro de Monterrey.","address":{"@type":"PostalAddress","streetAddress":"Mariano Matamoros Pte. 421","addressLocality":"Monterrey","addressRegion":"Nuevo León","addressCountry":"MX"},"telephone":"+528180875940","email":"libreriaitineranteymasmty@gmail.com","openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"20:00"}],"hasMap":"https://www.google.com/maps/search/?api=1&query=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey","sameAs":["https://www.instagram.com/libreriaitineranteymasmty/","https://www.facebook.com/profile.php?id=100095548961064"]}</script>
 </head>
 <body>
   <!-- Entrada de marca (IntroMarca, 2026-11-18): un telón del color de la página, encima de todo menos de la barra, que solo existe con
