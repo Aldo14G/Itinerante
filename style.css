@@ -405,7 +405,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* El lugar (2026-11-19, iteración de lectura): bajo «Cómo llegar», como su nota (12), el estado de hoy y la dirección juntos (texto → texto 8):
    se leen como datos de un mismo sitio. El punto del estado ocupa la caja de 20 del pin: los dos textos empiezan en la misma x. */
 .entry-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-3) 0 0; font: var(--t-titular); letter-spacing: var(--ls-titular); font-variant-numeric: tabular-nums; }
-.entry-status .status-dot { margin-inline: calc(var(--space-1) * 1.25); } /* 5 + 10 + 5 = 20, la caja del pin */
+.entry-status .status-dot { margin-inline-end: calc(var(--space-1) * 2.5); } /* 10 + 10 = 20, la caja del pin: el punto empieza en el margen y los dos textos en la misma x */
 .entry-lede { max-width: 40ch; margin: var(--space-2) 0 0; font: var(--t-cuerpo); color: var(--tinta-2); } /* texto → texto 8 */
 .entry-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); width: 100%; margin-top: var(--space-6); }
 .entry-address { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); } /* texto → texto 8: con el estado, la nota del botón */
@@ -441,6 +441,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .entry-poster { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 @media (min-width: 761px) {
   .entry { padding-top: var(--space-8); }
+  .entry-lede { margin-top: var(--space-3); } /* titular → texto 12 (en el teléfono, 8: posiciones fijas) */
   .entry-actions { display: flex; flex-wrap: wrap; width: auto; }
   .entry-media { aspect-ratio: 16 / 9; }
   .entry-title { font: var(--t-titulo-grande); letter-spacing: var(--ls-titulo-grande); } /* tableta: Large Title (2026-11-18; antes clamp) */
@@ -471,6 +472,7 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 /* Controles de la tira (2026-11-19): dos botones de contorno de 44 en el margen izquierdo, a 24 del pie de las fotos (16 + los 8 que la tira
    reserva para el foco), 12 entre ellos. Con ellos la sección cierra con su mitad de --sec completa. */
 .house-nav { display: flex; gap: var(--space-3); margin-top: var(--space-4); padding: 0 var(--margen); }
+@media (min-width: 761px) { .house-nav { margin-top: var(--space-6); } } /* contenido → su acción 32 desde 761 */
 .house-nav[hidden] { display: none; }
 .house:has(> .house-nav:not([hidden])) { padding-bottom: calc(var(--sec) / 2); }
 .house-track:focus-visible { outline-offset: -4px; }
@@ -1304,8 +1306,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
    Aire por rol: texto → control 24 (16 + los 8 de la barra) · cabecera → contenido 24 (de la barra al primer grupo) · título de grupo → sus
    filas 12 · fila 12 + 12 entre líneas · grupo → grupo 32 / 48 (más que entre filas) · bloque → bloque 32 / 48. */
 .cafe { --ct-barra: calc(var(--alto-sm) + var(--space-2)); display: grid; grid-template-columns: minmax(0, 1fr); padding: calc(var(--sec) / 2) var(--margen); background: var(--fondo); }
-.cafe:has(.ct-gal) > .sec-head { margin-bottom: var(--space-4); } /* con la galería de la carta, entradilla → pieza como antes */
-.cafe > .sec-head { margin-bottom: 0; } /* entradilla → categorías: los 8 de la barra hasta su caja y ~22 hasta su tinta (texto → control, 2026-11-19; antes 24 + 8 a la caja, 38 a la tinta) */
+@media (max-width: 1023px) { .cafe:has(.ct-gal) > .sec-head { margin-bottom: var(--space-4); } } /* con la galería de la carta, entradilla → pieza como antes (en escritorio la da .ct) */
+.cafe > .sec-head { margin-bottom: var(--space-1); } /* entradilla → categorías: texto → control 24 hasta la tinta del primer enlace (4 + los 8 de la barra + 12 dentro de su objetivo de 44; 2026-11-19, antes 36) */
 .ct { order: 1; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .cafe-foto { order: 2; margin: var(--space-8) 0 0; }
 .cafe-foto .frame-clip { aspect-ratio: 4 / 3; }
@@ -1478,8 +1480,11 @@ html:not(.js) .hdr-nav { display: flex; order: 3; flex-basis: 100%; margin: 0; o
   .cafe { display: grid; grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); align-items: start; }
   .cafe > .sec-head { grid-column: 1 / span 8; grid-row: 1; margin: 0; }
   .cafe-foto { order: 0; grid-column: 9 / -1; grid-row: 1; margin: 0; }
-  .cafe-foto .frame-clip { aspect-ratio: 5 / 2; } /* 347 × 139 a 1440: del alto del bloque de titular y entradilla (130–139), sin hueco bajo el texto */
-  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; margin-top: var(--space-2); } /* cabecera → sus categorías 16 hasta la caja de los enlaces (la barra lleva 8 arriba; ~30 a su tinta). 2026-11-19: antes 48, bloque → bloque; las categorías son el control de la carta y van con su introducción */
+  /* La foto toma exactamente el alto del titular y la entradilla (2026-11-19: estirada en su fila, sin aportar altura; antes 5:2, que a 1440
+     medía 139 y bajaba 21 px la barra de categorías bajo la entradilla). Sin alto fijo: la imagen cubre su caja (object-fit). */
+  .cafe-foto { position: relative; align-self: stretch; }
+  .cafe-foto .frame-clip { position: absolute; inset: 0; aspect-ratio: auto; }
+  .ct { order: 0; grid-column: 1 / -1; grid-row: 2; margin-top: var(--space-1); } /* entradilla → categorías: texto → control 24 hasta su tinta, como en el teléfono (2026-11-19; antes 48, bloque → bloque: las categorías van con su introducción) */
   .ct-nav { margin-inline: calc(-1 * var(--space-2)); padding-inline: 0; box-shadow: none; }
   .ct-nav::after { content: ""; position: absolute; left: var(--space-2); right: var(--space-2); bottom: 0; border-bottom: 1px solid var(--linea); } /* el filete, del ancho de la carta */
   .ct-lista { gap: var(--space-12); }

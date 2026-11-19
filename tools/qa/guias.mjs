@@ -114,7 +114,7 @@ const SISTEMA = {
     'Inicio del teléfono: posiciones fijas aprobadas (variante A, 2026-11-14): sus roles llevan el prefijo «inicio·» y sus propios valores.',
     'Inicio de escritorio: el bloque de texto se centra en el alto de la foto (texto en 1–5, foto en 7–12): no se le exige compartir tope (G4) ni un valor de barra → titular.',
     'Una fila de dos columnas: la más corta absorbe la diferencia al final de su celda; de cada fila cuenta el hueco menor (piezas con `fila`).',
-    'Café en escritorio: la barra de categorías es el control de la carta, no del encabezado: abre un bloque nuevo a todo el ancho, así que su aire es bloque → bloque (48) y se mide desde lo más bajo que tiene encima (la foto de 9–12, del alto del encabezado o un poco más), no desde la entradilla (pieza con `bloque`); en teléfono y tableta, texto → control (24). Lo mismo el cierre de la carta: su texto abre un bloque nuevo y su aire es bloque → bloque (48) desde la carta.',
+    'Café (2026-11-19, iteración de lectura; antes, en escritorio, bloque → bloque 48 desde la foto): las categorías van con su introducción: texto → control (24) hasta la tinta del primer enlace (son enlaces sin fondo, como se alinean). El cierre de la carta: su texto abre un bloque nuevo y su aire es bloque → bloque (48) desde la carta.',
     'Barra de categorías de la carta: cuenta como un solo control (la unión de sus enlaces), no enlace por enlace.',
     'Pie del libro: el aire hacia abajo se cuenta desde la reserva (--cf-reserva), no desde la última letra: con un título de un renglón se ve más.',
     'Tira de La casa y ventana del carrusel: van a sangre; de la tira se mide su primera pieza y del carrusel, la pieza central.',
@@ -148,11 +148,12 @@ const REF = ['iphone16', 'd1440'];
 // Secciones y sus piezas con rol (para el ritmo). [rol, selector, { c3d }] — con c3d, la pieza central de ese carrusel.
 const SECCIONES = [
   { id: 'inicio', sel: '#inicio', piezas: [
-    ['titular', '.entry-title'], ['estado', '.entry-status'], ['entradilla', '.entry-lede'], ['control', '.entry-actions .btn'],
-    ['nota', '.entry-address'], ['dato', '.entry-ev'], ['contenido', '.entry-media'] ] },
+    // 2026-11-19: el lugar (estado de hoy y dirección) va junto, como la nota de «Cómo llegar»: control → estado 12, estado → dirección 8.
+    ['titular', '.entry-title'], ['entradilla', '.entry-lede'], ['control', '.entry-actions .btn'],
+    ['nota', '.entry-status'], ['dato', '.entry-address'], ['dato', '.entry-ev'], ['contenido', '.entry-media'] ] },
   { id: 'casa', sel: '#casa', piezas: [
     ['titular', '#house-title'], ['entradilla', '.house .sec-texto'], ['contenido', '.house-track .still:first-child .still-img'],
-    ['pie', '.house-track .still:first-child figcaption'] ] },
+    ['pie', '.house-track .still:first-child figcaption'], ['accion', '.house-nav'] ] },
   { id: 'catalogo', sel: '#libros', piezas: [
     ['titular', '#books-title'], ['control', '.explore-open'], ['control', '.rail-chips'], ['nota', '.rail-note'], ['dato', '.rail-progreso'],
     ['escenario', '.c3d--portada', { c3d: true }], ['pie-escenario', '.cf-texto'],
@@ -164,11 +165,13 @@ const SECCIONES = [
     ['rotulo', '.ev-anteriores > .ev-sub'], ['contenido', '.ev-pasados'], ['accion', '.ev-fold'] ] },
   { id: 'cafe', sel: '#cafe', piezas: [
     ['titular', '#cafe-title'], ['entradilla', '.cafe .sec-texto'], ['escenario', '.c3d--galeria', { c3d: true }], ['pie-escenario', '.ct-gal-pie .cf-texto'],
-    ['control', '.ct-nav', { bloque: true }], ['contenido', '.ct-lista'],
+    ['control', '.ct-nav'], ['contenido', '.ct-lista'],
     ['contenido', '.cafe-foto'], ['texto', '.ct-cierre p', { bloque: true }], ['control', '.ct-cierre .btn'] ] },
   { id: 'visita', sel: '#visita', piezas: [
-    ['titular', '#visit-title'], ['subtitular', '.visit address'], ['estado', '.visit-status'], ['control', '.visit-actions .btn'],
-['contenido', '.visit-map-link', { fila: 'figuras' }], ['pie', '.visit-map figcaption'], ['rotulo', '.hours caption'], ['contenido', '.hours tbody'],
+    // 2026-11-19: «Cómo llegar» bajo el titular y, debajo, los datos del lugar (dirección, estado, horario) en un solo bloque.
+    ['titular', '#visit-title'], ['control', '.visit-actions .btn'], ['dato', '.visit address'], ['estado', '.visit-status'],
+['rotulo', '.hours caption'], ['contenido', '.hours tbody'],
+['contenido', '.visit-map-link', { fila: 'figuras' }], ['pie', '.visit-map figcaption'],
 ['nota', '.visit-note'], ['contenido', '.visit-arrival .frame-clip', { fila: 'figuras' }], ['pie', '.visit-arrival figcaption'] ] },
   { id: 'contacto', sel: 'footer.ftr', piezas: [
     ['titular', '.ftr-title'], ['entradilla', '.ftr-lede'], ['contenido', '.ftr-links'], ['bloque', '.interruptor'] ] }
@@ -299,6 +302,7 @@ function enPagina(cfg) {
         if (h.matches('.c3d')) { c3d(h, sup); continue; }
         if (h.matches('[role="radiogroup"]')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
         if (h.matches('.ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // enlaces sin fondo: la tinta del primero
+        if (h.matches('.house-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }   // «Foto anterior» y «Foto siguiente» (2026-11-19): un grupo que empieza en el margen
         if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ev-pasados, .ct-rejilla')) {
           const id = empuja(h, 'rejilla', sup);
           let i = 0;
@@ -329,7 +333,9 @@ function enPagina(cfg) {
         for (const li of c.querySelectorAll('.c3d-track > li')) { const r = li.getBoundingClientRect(); if (!r.width) continue; const dd = Math.abs(r.left + r.width / 2 - cx); if (dd < d) { d = dd; e = li.querySelector('.cover, .ct-gal-foto') || li; } }
       } else e = [...document.querySelectorAll(sel)].find(visible) || null;
       if (!e) continue;
-      const p = { rol, sel, fila: (o && o.fila) || null, bloque: !!(o && o.bloque), caja: e.matches('[role="radiogroup"], .ct-nav') ? union(e) : B(e.getBoundingClientRect()), txt: texto(e) };
+      const p = { rol, sel, fila: (o && o.fila) || null, bloque: !!(o && o.bloque), caja: e.matches('[role="radiogroup"], .ct-nav, .house-nav') ? union(e) : B(e.getBoundingClientRect()), txt: texto(e) };
+      // Barra de categorías (2026-11-19): enlaces sin fondo; su aire de arriba se cuenta hasta la tinta del primer enlace, no hasta su caja de toque.
+      if (e.matches('.ct-nav')) { const t0 = tinta([...e.querySelectorAll('.ct-tab')].find(visible)); if (t0) { p.cajaCss = p.caja; p.caja = { ...p.caja, t: t0.t, h: rd(p.caja.b - t0.t) }; } }
       const ecs = getComputedStyle(e);
       const sinFondo = rol === 'control' && !(alpha(ecs.backgroundColor) > 0.03 || ecs.boxShadow !== 'none' || parseFloat(ecs.borderTopWidth) > 0) && !e.matches('[role="radiogroup"], .ct-nav, .cat-combo');
       if (/titular|entradilla|estado|nota|dato|pie|rotulo|texto|subtitular/.test(rol) || sinFondo) {
@@ -420,6 +426,9 @@ function parRol(a, b) {
   if (b === 'subtitular') return 'capa→capa';
   if (a === 'subtitular' && b === 'rotulo') return 'texto→control';
   if (a === 'nota' && b === 'dato') return 'texto→texto';
+  if (a === 'dato' && ['dato', 'estado'].includes(b)) return 'texto→texto';   // datos de un mismo lugar (2026-11-19): dirección, estado, aviso
+  if (a === 'control' && b === 'dato') return 'cabecera→contenido';            // Visita: «Cómo llegar» → los datos del lugar, 24
+  if (a === 'estado' && b === 'rotulo') return 'cabecera→contenido';           // Visita: el estado de hoy → su horario habitual, 24
   if (a === 'titular' && [...txt, 'nota'].includes(b)) return 'titular→texto';
   if (b === 'control' && ['titular', ...txt, 'nota', 'dato'].includes(a)) return 'texto→control';
   if (a === 'control' && b === 'control') return 'control→control';

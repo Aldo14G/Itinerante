@@ -121,13 +121,26 @@ await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`doc
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(1000);
 ck('móvil: el botón cerrar también cierra', (await ev(`!document.getElementById('explorer').open && location.hash === ''`)));
 
-// Estado vacío: una sola frase visible (la línea de estado solo la anuncia a lectores de pantalla).
+// Estado vacío (2026-11-19): dos casos con su salida. Solo búsqueda: «No encontramos coincidencias…» y WhatsApp (principal, lo buscado ya escrito);
+// con filtros: «Ninguno cumple…», «Quitar filtros» (principal, conserva lo buscado) y WhatsApp de contorno. La línea de estado solo lo anuncia.
 await ev(`document.querySelector('[data-ex-open]').click()`); await waitFor(`document.getElementById('explorer').open`); await sleep(900);
 const vacio = await ev(`(async () => { const ex = document.getElementById('explorer'); const q = ex.querySelector('[data-cat-q]'); q.value = 'zzzxqv'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 600));
   const st = ex.querySelector('[data-cat-status]'); const e = ex.querySelector('[data-cat-empty]'); const vis = el => { const r = el.getBoundingClientRect(); return r.width > 1 && r.height > 1; };
-  const out = { status: st.textContent, statusSeen: vis(st), empty: !e.hidden && vis(e), phrase: e.querySelector('p').textContent, actions: [...e.querySelectorAll('.btn')].map(b => b.textContent.trim()) };
-  q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 400)); out.reset = st.textContent; return out; })()`);
-ck('móvil: sin resultados se ve una sola frase («No está en el catálogo, pero te lo podemos pedir.») con sus dos salidas; el estado solo la anuncia', vacio.empty && !vacio.statusSeen && vacio.status === vacio.phrase && vacio.phrase === 'No está en el catálogo, pero te lo podemos pedir.' && JSON.stringify(vacio.actions) === '["Limpiar búsqueda y filtros","Preguntar por WhatsApp"]' && vacio.reset === '41 títulos', JSON.stringify(vacio));
+  const acts = () => [...e.querySelectorAll('.btn')].filter(vis).map(b => [b.textContent.trim(), b.classList.contains('btn--secundario') ? 'principal' : 'secundaria']);
+  const wa = () => decodeURIComponent(e.querySelector('[data-cat-empty-wa]').href);
+  const out = { status: st.textContent, statusSeen: vis(st), empty: !e.hidden && vis(e), phrase: e.querySelector('[data-cat-empty-tit]').textContent, actions: acts(), wa: wa() };
+  // con un filtro que no deja nada: «Quitar filtros» principal
+  q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 500)); // sin búsqueda, los filtros vuelven a tener opciones
+  ex.querySelector('[data-cat-filters-btn]').click(); await new Promise(r => setTimeout(r, 300));
+  const g = [...ex.querySelectorAll('[data-dim="g"]')].pop(); g.click(); await new Promise(r => setTimeout(r, 400));
+  q.value = 'Robles'; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 600));
+  out.filtro = { phrase: e.querySelector('[data-cat-empty-tit]').textContent, txt: e.querySelector('[data-cat-empty-txt]').textContent, actions: !e.hidden ? acts() : null, hidden: e.hidden };
+  if (!e.hidden) { e.querySelector('[data-cat-unfilter]').click(); await new Promise(r => setTimeout(r, 500)); out.trasQuitar = { q: q.value, status: st.textContent, empty: !e.hidden }; }
+  q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 400));
+  ex.querySelectorAll('[data-dim]:checked').forEach(c => c.click()); await new Promise(r => setTimeout(r, 400)); out.reset = st.textContent; return out; })()`);
+if (!vacio?.actions) console.log('EVAL vacío:', errs.slice(-2).join(' / '));
+ck('móvil: sin coincidencias se ve «No encontramos coincidencias para «…».» con «Preguntar por WhatsApp» (lo buscado ya escrito) como única salida; el estado solo lo anuncia', vacio.empty && !vacio.statusSeen && vacio.status.startsWith(vacio.phrase) && vacio.phrase === 'No encontramos coincidencias para «zzzxqv».' && JSON.stringify(vacio.actions) === '[["Preguntar por WhatsApp","principal"]]' && /busco.«zzzxqv»/.test(vacio.wa) && vacio.reset === '41 títulos', JSON.stringify(vacio));
+ck('móvil: con un filtro que no deja nada, «Quitar filtros» es la principal y WhatsApp la secundaria; quitar filtros conserva lo buscado', vacio?.filtro && (vacio.filtro.hidden || (vacio.filtro.phrase === 'Ningún título cumple todos los filtros.' && JSON.stringify(vacio.filtro.actions) === '[["Quitar filtros","principal"],["Preguntar por WhatsApp","secundaria"]]' && vacio.trasQuitar.q === 'Robles' && !vacio.trasQuitar.empty)), JSON.stringify(vacio?.filtro) + JSON.stringify(vacio?.trasQuitar));
 await ev(`document.querySelector('[data-ex-close]').click()`); await sleep(900);
 // «Buscar en el catálogo», arriba del capítulo, abre la hoja (el antiguo «Ver todo el catálogo» bajo el carrusel se retiró).
 await ev(`scrollTo(0, document.getElementById('libros').getBoundingClientRect().top + scrollY)`); await sleep(1500);

@@ -46,7 +46,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['escritorio', 1
     const b = [...document.querySelectorAll('[data-rail] .save')];
     const shown = b.filter(x => getComputedStyle(x).visibility !== 'hidden');
     const small = shown.filter(x => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length;
-    return { n: b.length, shown: shown.length, centro: !!shown[0]?.closest('.rail-item.is-centro'), pressed: b.filter(x => x.getAttribute('aria-pressed') === 'true').length, label: b[0]?.getAttribute('aria-label'), small, menuCount: document.querySelector('#menu [data-saved-count]')?.textContent, badgeHidden: document.querySelector('${ENTRY} [data-saved-dot]')?.hidden };
+    return { n: b.length, shown: shown.length, centro: !!shown[0]?.closest('.rail-item.is-centro'), pressed: b.filter(x => x.getAttribute('aria-pressed') === 'true').length, label: b[0]?.getAttribute('aria-label'), small, menuCount: document.querySelector('${ENTRY} [data-saved-count]')?.textContent, badgeHidden: document.querySelector('${ENTRY} [data-saved-dot]')?.hidden };
   })()`);
   ck(name + ': cada libro del carrusel tiene botón de guardar de 44px con nombre; a la vista, solo el de la portada del centro', st.n === 12 && st.shown === 1 && st.centro && st.pressed === 0 && /^Guardar «/.test(st.label) && st.small === 0, JSON.stringify(st));
   ck(name + ': lista vacía al inicio', st.menuCount === 'Vacía' && st.badgeHidden === true, JSON.stringify(st));
@@ -59,7 +59,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['escritorio', 1
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
     await sleep(500);
   }
-  const sv = await ev(`(() => ({ ls: JSON.parse(localStorage.getItem('iti-saved-v1') || '[]').length, pressed: document.querySelectorAll('[data-rail] .save[aria-pressed=true]').length, label: document.querySelector('[data-rail] .save[aria-pressed=true]')?.getAttribute('aria-label'), toast: document.querySelector('.toast')?.matches(':popover-open'), toastText: document.querySelector('.toast')?.textContent, count: document.querySelector('#menu [data-saved-count]')?.textContent, badge: !document.querySelector('${ENTRY} [data-saved-dot]').hidden }))()`);
+  const sv = await ev(`(() => ({ ls: JSON.parse(localStorage.getItem('iti-saved-v1') || '[]').length, pressed: document.querySelectorAll('[data-rail] .save[aria-pressed=true]').length, label: document.querySelector('[data-rail] .save[aria-pressed=true]')?.getAttribute('aria-label'), toast: document.querySelector('.toast')?.matches(':popover-open'), toastText: document.querySelector('.toast')?.textContent, count: document.querySelector('${ENTRY} [data-saved-count]')?.textContent, badge: !document.querySelector('${ENTRY} [data-saved-dot]').hidden }))()`);
   ck(name + ': guardar persiste en el dispositivo y actualiza etiquetas, aviso y conteo', sv.ls === 2 && sv.pressed === 2 && /^Quitar «/.test(sv.label) && sv.toast === true && /Ver mi lista/.test(sv.toastText) && sv.count === '2 libros', JSON.stringify(sv));
   ck(name + ': Mi lista muestra el conteo en su disco', sv.badge === true && (await ev(`document.querySelector('${ENTRY} [data-saved-dot]').textContent`)) === '2');
 
@@ -78,7 +78,7 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['escritorio', 1
   // persistencia al recargar
   await send('Page.navigate', { url: URL_ });
   await sleep(4500);
-  ck(name + ': la lista sobrevive a recargar', (await ev(`JSON.parse(localStorage.getItem('iti-saved-v1') || '[]').length`)) === 2 && (await ev(`document.querySelector('#menu [data-saved-count]')?.textContent`)) === '2 libros');
+  ck(name + ': la lista sobrevive a recargar', (await ev(`JSON.parse(localStorage.getItem('iti-saved-v1') || '[]').length`)) === 2 && (await ev(`document.querySelector('${ENTRY} [data-saved-count]')?.textContent`)) === '2 libros');
 
   // Mi lista abre su hoja con un clic real, Escape la cierra y devuelve el foco a quien la abrió
   const chipPos = await ev(`(() => { const r = document.querySelector('${ENTRY}').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
@@ -104,9 +104,8 @@ for (const [name, w, h, mobile] of [['móvil', 393, 659, true], ['escritorio', 1
     await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: true }); await sleep(900);
   }
 
-  // abrir Mi lista desde el aviso o el menú
-  if (mobile) { await ev(`document.querySelector('[data-menu-open]').click()`); await sleep(800); await ev(`document.querySelector('#menu [data-open-mylist]').click()`); }
-  else { await ev(`document.querySelector('.hdr-list').click()`); }
+  // abrir Mi lista desde su entrada (barra inferior en el teléfono, cabecera en escritorio; el menú ☰ ya no la repite desde el 2026-11-19)
+  await ev(`document.querySelector('${ENTRY}').click()`);
   await sleep(1500);
   const ml = await ev(`(() => {
     const d = document.getElementById('mylist');

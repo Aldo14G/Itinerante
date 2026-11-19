@@ -101,7 +101,7 @@ if (corre('duracion') || corre('cls')) {
       const plan = await page.evaluate(() => window.__intro.plan());
       await page.waitForFunction(() => window.__intro.tFin !== null, null, { timeout: 5000 }).catch(() => {});
       await sleep(1200);
-      const s = await page.evaluate(() => ({ ...window.__intro, plan: undefined, quedan: document.getAnimations().filter(a => a.playState === 'running').length, clase: document.documentElement.className, sesion: sessionStorage.getItem('iti-intro'), telon: getComputedStyle(document.querySelector('[data-intro]')).display, marca: getComputedStyle(document.querySelector('.hdr-brand')).transform, titular: document.querySelector('.entry-title').innerHTML }));
+      const s = await page.evaluate(() => ({ ...window.__intro, plan: undefined, quedan: document.getAnimations().filter(a => a.playState === 'running').length, clase: document.documentElement.className, sesion: localStorage.getItem('iti-intro'), telon: getComputedStyle(document.querySelector('[data-intro]')).display, marca: getComputedStyle(document.querySelector('.hdr-brand')).transform, titular: document.querySelector('.entry-title').innerHTML }));
       const tag = `${perfil} ${esquema === 'light' ? 'claro' : 'oscuro'}`;
       const ultimo = plan ? Math.max(...plan.lista.map(a => a.fin)) : NaN;
       const telonFin = plan ? Math.max(...plan.lista.filter(a => a.nombre === 'intro-telon').map(a => a.fin)) : NaN;

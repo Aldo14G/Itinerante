@@ -8,7 +8,8 @@
 // 440×763, 16 Pro a pantalla completa 402×874 con áreas seguras 62/34 y 320×640 (Zoom de pantalla). UA de iPhone, toque, dpr del aparato.
 //
 // Para cada perfil comprueba, como lo haría una persona (toque real en la barra inferior o en el menú ☰, no scrollIntoView):
-//  · Inicio sin desplazar: titular a 24 px (± 2) bajo la cabecera y de dos renglones; «Cómo llegar» a 212 px (± 2) bajo la cabecera (y 256–312
+//  · Inicio sin desplazar: titular a 24 px (± 2) bajo la cabecera y de dos renglones; «Cómo llegar» a 182 px (± 2) bajo la cabecera (y 226–282
+//    con la barra de 44; 2026-11-19: el estado de hoy pasó bajo el botón, junto a la dirección; antes 212 y 256–312
 //    con la barra de 44); la foto ≥ 160 px de alto, con proporción ≤ 3:2 y entera sobre la barra inferior (≥ 8 px de aire);
 //  · al llegar a cada sección por su enlace (barra inferior: Catálogo; menú ☰: La casa, Catálogo, Eventos, Café y Visita): el titular a 24 px
 //    (± 4) bajo la cabecera y, entre la cabecera y la barra inferior (≥ 8 px de aire con la barra), lo que importa en esa sección:
@@ -144,7 +145,7 @@ for (const [key, nombre, w, h, dpr, top, bottom] of PERFILES) {
   fila.fotoAire = band.b - e.foto.b;
   check(key, 'inicio: titular a 24 px bajo la cabecera (± 2)', Math.abs(e.titular.t - band.t - 24) <= 2, `${e.titular.t - band.t}`);
   check(key, 'inicio: titular de dos renglones (82 ± 2 px)', w <= 359 || Math.abs(e.titular.h - 82) <= 2, `${e.titular.h}`);
-  check(key, 'inicio: «Cómo llegar» a 212 px bajo la cabecera (± 2): y 256–312 con la barra de 44', w <= 359 || Math.abs(e.cta.t - band.t - 212) <= 2, `${e.cta.t - band.t}`);
+  check(key, 'inicio: «Cómo llegar» a 182 px bajo la cabecera (± 2): y 226–282 con la barra de 44 (2026-11-19: el lugar —estado y dirección— va debajo, como su nota)', w <= 359 || Math.abs(e.cta.t - band.t - 182) <= 2, `${e.cta.t - band.t}`);
   check(key, 'inicio: la foto ≥ 160 px de alto y ≤ 3:2', e.foto.h >= 160 && e.foto.w / e.foto.h >= 1.49, `${e.foto.w}×${e.foto.h}`);
   check(key, `inicio: la foto entera sobre la barra inferior (≥ ${AIRE} px)`, w <= 359 || band.b - e.foto.b >= AIRE, `${band.b - e.foto.b} px`);
   if (AVISO) {
