@@ -121,7 +121,6 @@ export function franjaHtml(books, cfg, ind = '        ') {
     `${ind}<section class="franja" aria-labelledby="franja-rotulo" data-franja>`,
     `${ind}  <div class="franja-cab">`,
     `${ind}    <p class="franja-rotulo" id="franja-rotulo">${ROTULO}</p>`,
-    `${ind}    <button class="btn btn--contorno btn--sm btn--icono franja-ctl" type="button" data-franja-ctl aria-label="Pausar el movimiento de las editoriales" hidden><svg class="ic franja-ic-pausa" aria-hidden="true"><use href="#i-pausa"/></svg><svg class="ic franja-ic-reanuda" aria-hidden="true"><use href="#i-reanuda"/></svg></button>`,
     `${ind}  </div>`,
     `${ind}  <div class="franja-escena" data-franja-escena>`,
     `${ind}    <div class="franja-ventana">`,

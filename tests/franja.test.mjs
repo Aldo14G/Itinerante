@@ -62,7 +62,7 @@ test('Franja: lista con rótulo, sin enlaces dentro del carril, copias aria-hidd
   assert.ok(eco.length >= 3 && eco.every(m => /aria-hidden="true" inert/.test(m[1])), 'cada copia de ayuda, aria-hidden e inert');
   assert.match(f, new RegExp(`<a class="btn btn--plano btn--sm franja-ver" href="#editoriales"><span>${VER}</span>`));
   assert.ok(html.includes('id="editoriales"'), 'el enlace lleva a un bloque que existe');
-  assert.match(f, /<button class="btn btn--contorno btn--sm btn--icono franja-ctl" type="button" data-franja-ctl aria-label="Pausar el movimiento de las editoriales" hidden>/, 'botón de pausa de 44, oculto hasta que franja.js lo cablea');
+  assert.ok(!/<button|franja-ctl|data-franja-ctl/.test(f), 'sin botón propio: la persona no maneja la franja (decisión de Aldo, 2026-11-19)');
   assert.ok(!/aliad|socia|oficial|distribuid|asociad|partner|patrocin|respald/i.test(sinTexto(f)), 'el sitio no dice «aliadas», «socias», «oficiales» ni «distribuidores»: no se sabe el vínculo');
   assert.ok(!/gratis|disponible|existencia/i.test(sinTexto(f)));
   assert.ok(ROTULO !== sinTexto(html.match(/<p class="entry-lede">([^<]*)</)[1]) && !/Libros de editoriales independientes/.test(ROTULO), 'no repite el texto del hero');
@@ -195,16 +195,16 @@ Image.new('RGB', (900, 400), (255, 255, 255)).save(${JSON.stringify(opaco)})`]).
   assert.ok(!existsSync(new URL('assets/img/editoriales/', repo).pathname), 'el repositorio no recibió logos de prueba');
 });
 
-test('Franja: movimiento solo con html.motion y sin pausa, solo con transform, a la velocidad del token; sin milisegundos a mano ni estilos en línea', () => {
+test('Franja: movimiento solo con html.motion, solo con transform, a la velocidad del token; sin milisegundos a mano ni estilos en línea', () => {
   const bloque = css.slice(css.indexOf('/* ---------- Franja de editoriales'), css.indexOf(CSS_FIN));
   const animaciones = [...bloque.matchAll(/^(.*?)\{[^}]*\banimation\s*:(?!\s*none)/gm)].map(m => m[1].trim());
   assert.ok(animaciones.length === 1 && /^\.motion \.franja\[data-listo\] \.franja-carril/.test(animaciones[0]), `la única animación va bajo .motion y data-listo (${animaciones})`);
-  assert.match(bloque, /html\.franja-quieta \.franja\[data-listo\] \.franja-carril \{ animation: none;/, 'la pausa de la franja la apaga');
+  assert.ok(!/franja-quieta|franja-ctl|franja-ic-/.test(bloque), 'sin pausa propia ni su estado en el CSS');
   assert.match(bloque, /@keyframes franja-corre \{ to \{ transform: translate3d\(-50%, 0, 0\); \} \}/, 'solo transform, -50 % del carril (dos grupos idénticos)');
   assert.ok(!/@keyframes franja-corre[^}]*(left|margin|width|opacity)/.test(bloque));
   assert.ok(/animation: franja-corre var\(--franja-dur, 40s\) linear infinite/.test(bloque), 'lineal, sin saltos al cerrar');
   assert.ok(/:hover \.franja-carril \{ animation-play-state: paused/.test(bloque) && /:active \.franja-carril/.test(bloque) && /\.franja:focus-within \.franja-carril/.test(bloque) && /:not\(\[data-en-vista\]\)/.test(bloque), 'pausa con el cursor, al presionar, al enfocar dentro y fuera de la vista');
-  assert.ok(/@media \(hover: hover\) \{ html\.motion:not\(\.franja-quieta\) \.franja-escena:hover/.test(bloque), 'el hover solo con puntero que lo tiene');
+  assert.ok(/@media \(hover: hover\) \{ html\.motion \.franja-escena:hover/.test(bloque), 'el hover solo con puntero que lo tiene');
   assert.ok(/mask-image: linear-gradient\(90deg, transparent, var\(--tinta\) var\(--franja-desvanece\), var\(--tinta\) calc\(100% - var\(--franja-desvanece\)\), transparent\)/.test(bloque) && /-webkit-mask-image/.test(bloque), 'bordes desvanecidos con máscara (solo cuenta su opacidad: sin color visible)');
   assert.ok(!/#[0-9a-f]{3,8}\b(?!\))/i.test(bloque) && !/\b\d+ms\b/.test(bloque), 'colores y duraciones de los tokens');
   assert.ok(/color: var\(--tinta-2\)/.test(bloque) && /\.franja-escena:hover \.franja-item \{ color: var\(--tinta\);/.test(bloque) && /\.franja:focus-within \.franja-item \{ color: var\(--tinta\)/.test(bloque), 'tinta-2 y tinta al pasar el cursor o con el foco dentro');
@@ -218,17 +218,17 @@ test('Franja: movimiento solo con html.motion y sin pausa, solo con transform, a
   const app = read('app.js'); assert.match(app, /import\('\.\/franja\.js'\)\.then\(m => m\.initFranja\(\)\)/);
   assert.ok(read('scripts/prepare-public.mjs').includes('"franja.js"') && read('tools/preview-site.mjs').includes("'/franja.js'"), 'franja.js se publica y la vista previa lo sirve');
   assert.ok(!/franja-datos/.test(read('scripts/prepare-public.mjs')), 'la lógica del generador no se publica');
-  const boot = read('assets/js/boot.js'); assert.match(boot, /iti-franja/); assert.match(boot, /franja-quieta/);
+  const boot = read('assets/js/boot.js'); assert.ok(!/iti-franja|franja-quieta/.test(boot), 'boot.js ya no recuerda ninguna pausa de la franja');
+  assert.ok(!/franja-quieta|iti-franja|data-franja-ctl/.test(read('franja.js')), 'franja.js sin pausa propia');
 });
 
-test('Franja: sin movimiento se ve quieta, una sola vez y se acomoda en renglones; el botón de pausa solo existe con movimiento; el logo sirve en modo de contraste forzado', () => {
+test('Franja: sin movimiento se ve quieta, una sola vez y se acomoda en renglones; sin botón de pausa; el logo sirve en modo de contraste forzado', () => {
   const bloque = css.slice(css.indexOf('/* ---------- Franja de editoriales'), css.indexOf(CSS_FIN));
   assert.match(bloque, /\.franja-lista \{ display: flex; flex-wrap: wrap; justify-content: center;/, 'base quieta: renglones centrados');
   assert.match(bloque, /\.franja-lista\.franja-lista--eco, \.franja-item\.franja-eco \{ display: none; \}/, 'base quieta: sin copias');
-  assert.match(bloque, /\.franja-ctl \{ display: none; flex: none; \}/); assert.match(bloque, /html\.motion \.franja-ctl:not\(\[hidden\]\) \{ display: inline-flex; \}/);
-  assert.ok(!/\.franja-carril \{[^}]*width: max-content/.test(bloque.replace(/html\.motion:not\(\.franja-quieta\) \.franja-carril \{[^}]*\}/, '')), 'el carril ancho solo con movimiento');
+  assert.ok(!/\.franja-carril \{[^}]*width: max-content/.test(bloque.replace(/html\.motion \.franja-carril \{[^}]*\}/, '')), 'el carril ancho solo con movimiento');
   assert.match(bloque, /forced-colors: active/);
-  assert.ok(read('franja.js').includes("root.classList.contains('motion') && !root.classList.contains('franja-quieta')"));
+  assert.ok(read('franja.js').includes("root.classList.contains('motion')"));
 });
 
 test('docs/EDITORIALES-LOGOS.md y PENDIENTES: pasos del logo con permiso, qué pedir a cada editorial, y los pendientes de Aldo sobre el vínculo y la lista completa', () => {

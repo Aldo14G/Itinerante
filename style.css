@@ -462,19 +462,14 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 @media (min-width: 1280px) { .entry-title { font: var(--t-display); letter-spacing: var(--ls-display); } }
 
 /* ---------- Franja de editoriales (Inicio, 2026-11-19; DESIGN.md, «Franja de editoriales») ----------
-   Una capa más del Inicio, bajo la foto (capa → capa 80 en el teléfono y la tableta, 96 en escritorio): rótulo y pausa, la franja y un enlace estático al bloque Editoriales del Catálogo. Transparente: sin caja ni
+   Una capa más del Inicio, bajo la foto (capa → capa 80 en el teléfono y la tableta, 96 en escritorio): rótulo, la franja y un enlace estático al bloque Editoriales del Catálogo. Transparente: sin caja ni
    relleno, la tinta suave (tinta-2) y los bordes desvanecidos. La base es la versión QUIETA (cada nombre una sola vez, centrado, en los renglones que haga falta): es lo que se ve sin
-   JavaScript, con «reducir movimiento», con la pausa del pie, con ahorro de datos y con la pausa de la propia franja (html.franja-quieta). El bucle solo existe con
-   html.motion y sin franja-quieta: dos grupos idénticos (cada uno llena la ventana) y el carril se desplaza -50 % con transform, a franja-velocidad px/s; franja.js mide el
+   JavaScript, con «reducir movimiento», con la pausa del pie y con ahorro de datos. La persona no la controla: no lleva botón propio (2026-11-19, decisión de Aldo; «Pausar el movimiento» del pie y del ☰ la detiene como a todo). El bucle solo existe con
+   html.motion: dos grupos idénticos (cada uno llena la ventana) y el carril se desplaza -50 % con transform, a franja-velocidad px/s; franja.js mide el
    grupo, pone la duración (--franja-dur) y marca data-listo (hasta entonces nada se mueve, y empezar en 0 no se nota). Se detiene con el cursor encima, con el foco dentro de la franja
-   (el control de pausa o el enlace), al presionar y fuera de la vista. Los elementos no son enlaces. */
+   (el enlace), al presionar y fuera de la vista. Los elementos no son enlaces. */
 .franja { grid-column: 1 / -1; min-width: 0; margin-top: var(--space-12); } /* 32 de la rejilla del Inicio + 48 = capa → capa 80 en el teléfono y la tableta: la franja queda bajo el primer pliegue en 393×659, 375×629 y 320×640 */
-.franja-cab { display: flex; align-items: center; gap: var(--space-2); min-height: var(--alto-sm); }
 .franja-rotulo { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); }
-.franja-ctl { display: none; flex: none; }
-html.motion .franja-ctl:not([hidden]) { display: inline-flex; }
-.franja-ic-reanuda, html.franja-quieta .franja-ic-pausa { display: none; }
-html.franja-quieta .franja-ic-reanuda { display: block; }
 .franja-escena { margin-top: var(--space-2); } /* rótulo → grupo 8 */
 .franja-ventana { overflow: hidden; }
 .franja-carril { display: block; }
@@ -491,16 +486,15 @@ html.franja-quieta .franja-ic-reanuda { display: block; }
 .franja-ver { margin-top: var(--space-6); margin-inline-start: calc(-1 * var(--space-4)); } /* contenido → su acción 24; la tinta del enlace en el margen, no su caja */
 @media (min-width: 761px) { .franja-ver { margin-top: var(--space-8); } } /* 32 desde 761 */
 @media (min-width: 1024px) { .franja { margin-top: var(--space-24); } } /* sin gap de fila en la rejilla de 12: capa → capa 96 (cabe en el primer pliegue de 1440 × 900) */
-html.motion:not(.franja-quieta) .franja-ventana { -webkit-mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); }
-html.motion:not(.franja-quieta) .franja-carril { display: flex; width: max-content; }
-html.motion:not(.franja-quieta) .franja-lista { flex: none; flex-wrap: nowrap; justify-content: flex-start; gap: 0; }
-html.motion:not(.franja-quieta) .franja-lista.franja-lista--eco { display: flex; }
-html.motion:not(.franja-quieta) .franja-item.franja-eco { display: flex; }
-html.motion:not(.franja-quieta) .franja-item { flex: none; min-height: var(--alto-lg); padding-inline-end: var(--space-16); } /* el hueco va como relleno: cada grupo mide lo mismo que su vuelta */
+html.motion .franja-ventana { -webkit-mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); }
+html.motion .franja-carril { display: flex; width: max-content; }
+html.motion .franja-lista { flex: none; flex-wrap: nowrap; justify-content: flex-start; gap: 0; }
+html.motion .franja-lista.franja-lista--eco { display: flex; }
+html.motion .franja-item.franja-eco { display: flex; }
+html.motion .franja-item { flex: none; min-height: var(--alto-lg); padding-inline-end: var(--space-16); } /* el hueco va como relleno: cada grupo mide lo mismo que su vuelta */
 .motion .franja[data-listo] .franja-carril { animation: franja-corre var(--franja-dur, 40s) linear infinite; will-change: transform; }
-html.franja-quieta .franja[data-listo] .franja-carril { animation: none; will-change: auto; } /* la pausa de la propia franja: vuelve a la versión quieta */
-html.motion:not(.franja-quieta) .franja:not([data-en-vista]) .franja-carril, html.motion:not(.franja-quieta) .franja-escena:active .franja-carril, html.motion:not(.franja-quieta) .franja:focus-within .franja-carril { animation-play-state: paused; }
-@media (hover: hover) { html.motion:not(.franja-quieta) .franja-escena:hover .franja-carril { animation-play-state: paused; } }
+html.motion .franja:not([data-en-vista]) .franja-carril, html.motion .franja-escena:active .franja-carril, html.motion .franja:focus-within .franja-carril { animation-play-state: paused; }
+@media (hover: hover) { html.motion .franja-escena:hover .franja-carril { animation-play-state: paused; } }
 @keyframes franja-corre { to { transform: translate3d(-50%, 0, 0); } }
 /* Los logos de la franja (generado por `npm run editoriales` desde assets/data/editoriales.json: la CSP no permite `style` en línea; vacío mientras no haya logos autorizados). */
 /* franja-logos:inicio · generado por `npm run editoriales` desde assets/data/editoriales.json; no se edita a mano */

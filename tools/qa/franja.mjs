@@ -4,16 +4,16 @@
 //  B · Bucle (320, 393, 1101, 1440; con movimiento): cada grupo llena la ventana, la vuelta cierra sin salto (el segundo grupo llega a la posición del primero al terminar: ≤ 0.1 px), el
 //      carril mide el doble de un grupo (el −50 % es exacto), la velocidad es la del token (40 px/s ± 2) y en ningún momento de la vuelta queda un hueco en la ventana; informa cómo se ve
 //      con 3 nombres (qué nombres caben a la vez y si se repiten a la vista).
-//  P · Pausas: cursor encima, foco dentro (control), presionar, fuera de la vista, el botón (pausa y reanuda, recordado en localStorage y desde el primer render) y «Pausar el movimiento»
-//      del sitio (pie y ☰): quieta y única; el control de la franja solo existe con movimiento.
-//  Q · Quieta: con «reducir movimiento», con ahorro de datos, con la pausa del sitio y con la pausa de la franja: sin animación, cada nombre una sola vez, centrado, en renglones si no
+//  P · Pausas: cursor encima, foco dentro (el enlace «Ver los libros por editorial»), presionar, fuera de la vista y «Pausar el movimiento» del sitio (pie y ☰): quieta y única.
+//      La franja no lleva botón propio (decisión de Aldo, 2026-11-19: la persona solo elige libros, productos y talleres).
+//  Q · Quieta: con «reducir movimiento», con ahorro de datos, con la pausa del sitio: sin animación, cada nombre una sola vez, centrado, en renglones si no
 //      cabe, sin desborde horizontal, sin copias visibles y sin control.
 //  C · Contraste del texto (tinta-2 sobre el fondo ≥ 4.5:1; el enlace y el rótulo también), bordes desvanecidos (máscara degradada de 48 px) y objetivos de 44.
 //  T · Posiciones del inicio sin cambios en 393×659, 375×629, 440×763 y 402×874 (áreas 62/34): titular, entradilla, «Cómo llegar», estado, dirección y foto; la franja bajo la foto (a 64) y,
 //      en el teléfono, cuánto asoma en el primer pliegue.
 //  L · Modo logo de PRUEBA (siluetas genéricas generadas aquí, servidas por intercepción de red; no son marcas de nadie y nunca están en el repositorio): máscara con el color del texto, alto
 //      de 28, proporción, role=img con alt, claro y oscuro, el bucle cierra igual.
-//  I · INP con CPU 4×: clic en el control de pausa y en el interruptor del pie ≤ 200 ms.
+//  I · INP con CPU 4×: clic en el interruptor del pie ≤ 200 ms.
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
@@ -44,14 +44,14 @@ const ok = (regla, cond, texto) => { res.push({ regla, ok: Boolean(cond), texto 
 const info = (regla, texto) => console.log(`· ${regla} ${texto}`);
 const r1 = n => Math.round(n * 10) / 10;
 
-async function abrir(perfil, { js = true, reducido = false, oscuro = false, pausa = false, quieta = false, saveData = false, hash = '', antes = null, rutas = null, espera = 2400 } = {}) {
+async function abrir(perfil, { js = true, reducido = false, oscuro = false, pausa = false, saveData = false, hash = '', antes = null, rutas = null, espera = 2400 } = {}) {
   const browser = await pw.chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--hide-scrollbars'] });
   const context = await browser.newContext({ ...PERFILES[perfil], javaScriptEnabled: js, locale: 'es-MX', timezoneId: 'America/Monterrey', colorScheme: (oscuro || opt.oscuro) ? 'dark' : 'light', reducedMotion: reducido ? 'reduce' : 'no-preference' });
-  await context.addInitScript(([p, q, sd]) => {
-    try { localStorage.setItem('iti-intro', '1'); if (p) localStorage.setItem('iti-b4-motion', 'off'); if (q) localStorage.setItem('iti-franja', 'off'); } catch {}
+  await context.addInitScript(([p, sd]) => {
+    try { localStorage.setItem('iti-intro', '1'); if (p) localStorage.setItem('iti-b4-motion', 'off'); } catch {}
     if (sd) Object.defineProperty(navigator, 'connection', { value: { saveData: true }, configurable: true });
     window.__cls = 0; new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });
-  }, [pausa, quieta, saveData]);
+  }, [pausa, saveData]);
   await context.route(/wa\.me|instagram\.com|facebook\.com|openstreetmap\.org|lu\.ma|google\.com/, r => r.abort());
   if (rutas) await rutas(context);
   const errores = [];
@@ -87,8 +87,8 @@ const estado = page => ev(page, () => {
     v: { l: v.left, r: v.right, w: v.width, t: v.top, b: v.bottom }, carrilW: ca.width, aW: A.getBoundingClientRect().width, bW: B ? B.getBoundingClientRect().width : 0, bLeft: B ? B.getBoundingClientRect().left - ca.left : 0,
     anim: a ? { dur: a.effect.getTiming().duration, estado: a.playState, t: a.currentTime } : null, playState: getComputedStyle(c).animationPlayState, animName: getComputedStyle(c).animationName,
     dur: getComputedStyle(f).getPropertyValue('--franja-dur'), listo: f.hasAttribute('data-listo'), enVista: f.hasAttribute('data-en-vista'),
-    motion: document.documentElement.classList.contains('motion'), quieta: document.documentElement.classList.contains('franja-quieta'),
-    li, ctl: (() => { const b = q('[data-franja-ctl]'); const r = b.getBoundingClientRect(); return { w: r.width, h: r.height, vis: r.width > 0 && getComputedStyle(b).display !== 'none', label: b.getAttribute('aria-label'), hidden: b.hidden }; })()
+    motion: document.documentElement.classList.contains('motion'),
+    li, botones: f.querySelectorAll('button').length
   };
 });
 /** Pone el bucle en el instante t (ms) sin dejar que corra, y lee las cajas. */
@@ -107,24 +107,24 @@ async function estructura() {
         enfocables: carril.querySelectorAll('a, button, [tabindex], input').length, eco: [...f.querySelectorAll('.franja-eco')].every(e => e.getAttribute('aria-hidden') === 'true' && e.hasAttribute('inert')),
         grupoB: (() => { const b = f.querySelector('.franja-lista--eco'); return b.getAttribute('aria-hidden') === 'true' && b.hasAttribute('inert'); })(),
         ver: (() => { const a = f.querySelector('a.franja-ver'); const r = a.getBoundingClientRect(); return { href: a.getAttribute('href'), h: r.height, w: r.width, destino: !!document.querySelector(a.getAttribute('href')) }; })(),
-        padre: f.parentElement.id };
+        botones: f.querySelectorAll('button, [data-franja-ctl]').length, padre: f.parentElement.id };
     });
     ok('E1', d && d.sec === 'SECTION' && d.padre === 'inicio' && d.lista && d.rotulo === 'Editoriales en el catálogo', `${perfil}: sección con nombre dentro de #inicio, lista con su rótulo «${d?.rotulo}»`);
     ok('E1', d.reales.length === 3 && d.reales.join('|') === 'Abismos Casa Editorial|Capítulo Siete|Iridiscencias', `${perfil}: tres elementos reales (${d.reales.join(' · ')}); «Libro Objeto» no`);
     ok('E2', d.enfocables === 0 && d.eco && d.grupoB, `${perfil}: nada enfocable dentro del carril; copias y grupo duplicado aria-hidden + inert`);
     ok('E3', d.ver.href === '#editoriales' && d.ver.destino && d.ver.h >= 44 - 0.5, `${perfil}: enlace estático «Ver los libros por editorial» a #editoriales (alto ${r1(d.ver.h)})`);
     const e = await estado(page);
-    ok('E4', e.ctl.vis && e.ctl.w >= 44 - 0.5 && e.ctl.h >= 44 - 0.5 && /Pausar/.test(e.ctl.label), `${perfil}: control de pausa visible de ${r1(e.ctl.w)}×${r1(e.ctl.h)} («${e.ctl.label}»)`);
+    ok('E4', d.botones === 0 && e.botones === 0, `${perfil}: sin botón de pausa propio ni ningún control dentro de la franja (botones ${d.botones})`);
     ok('E5', errores.length === 0, `${perfil}: sin errores de consola${errores.length ? ': ' + errores.join(' | ') : ''}`);
     ok('E6', await sinDesborde(page), `${perfil}: sin desborde horizontal`);
     const cls = await ev(page, () => window.__cls);
     ok('E7', cls === 0, `${perfil}: CLS ${cls} (franja pregenerada: sin saltos al cargar ni al empezar el bucle)`);
     await browser.close();
   }
-  // sin JavaScript: pregenerada, quieta y sin control
+  // sin JavaScript: pregenerada y quieta
   const { browser, page } = await abrir('393', { js: false });
-  const d = await ev(page, () => ({ visibles: [...document.querySelectorAll('.franja-item')].filter(e => e.getBoundingClientRect().width > 0 && getComputedStyle(e).display !== 'none').map(e => e.textContent.trim()), ctl: getComputedStyle(document.querySelector('[data-franja-ctl]')).display, anim: document.querySelector('.franja-carril').getAnimations().length }));
-  ok('E8', d.visibles.length === 3 && d.ctl === 'none' && d.anim === 0, `393 sin JavaScript: la franja se ve (${d.visibles.length} nombres, una vez), quieta y sin control`);
+  const d = await ev(page, () => ({ visibles: [...document.querySelectorAll('.franja-item')].filter(e => e.getBoundingClientRect().width > 0 && getComputedStyle(e).display !== 'none').map(e => e.textContent.trim()), anim: document.querySelector('.franja-carril').getAnimations().length }));
+  ok('E8', d.visibles.length === 3 && d.anim === 0, `393 sin JavaScript: la franja se ve (${d.visibles.length} nombres, una vez) y quieta`);
   await browser.close();
 }
 
@@ -135,7 +135,7 @@ async function bucle() {
     await ev(page, () => document.querySelector('[data-franja]').scrollIntoView({ block: 'center' }));
     await sleep(300);
     const e = await estado(page);
-    ok('B0', e.motion && !e.quieta && e.listo && e.anim && e.anim.dur > 0, `${perfil}: con movimiento y listo (data-listo); duración de la vuelta ${e.anim ? r1(e.anim.dur / 1000) : '?'} s`);
+    ok('B0', e.motion && e.listo && e.anim && e.anim.dur > 0, `${perfil}: con movimiento y listo (data-listo); duración de la vuelta ${e.anim ? r1(e.anim.dur / 1000) : '?'} s`);
     ok('B1', e.aW >= e.v.w - 0.5 && e.bW >= e.v.w - 0.5, `${perfil}: cada grupo llena la ventana (grupo ${r1(e.aW)} y ${r1(e.bW)} ≥ ventana ${r1(e.v.w)})`);
     ok('B2', Math.abs(e.carrilW / 2 - e.aW) <= 0.1 && Math.abs(e.bLeft - e.aW) <= 0.1 && Math.abs(e.aW - e.bW) <= 0.1, `${perfil}: el carril mide el doble de un grupo (${r1(e.carrilW)} = 2 × ${r1(e.aW)}); el segundo grupo empieza donde acaba el primero (${r1(e.bLeft)})`);
     const velocidad = e.aW / (e.anim.dur / 1000);
@@ -190,36 +190,18 @@ async function pausas() {
     await page.mouse.move(caja.l + caja.w / 2, (caja.t + caja.b) / 2); await page.mouse.down(); await sleep(200);
     ok('P2', (await estado(page)).playState === 'paused', '1440: al presionar se detiene');
     await page.mouse.up(); await page.mouse.move(5, 5); await sleep(300);
-    // foco dentro: el control
-    await page.keyboard.press('Tab'); // hasta llegar al control de la franja
-    for (let i = 0; i < 40 && !(await ev(page, () => document.activeElement?.matches('[data-franja-ctl]'))); i++) await page.keyboard.press('Tab');
-    const enfocado = await ev(page, () => document.activeElement?.matches('[data-franja-ctl]'));
+    // foco dentro: el enlace «Ver los libros por editorial»
+    await ev(page, () => document.querySelector('[data-franja]').scrollIntoView({ block: 'center' })); await sleep(300);
+    await ev(page, () => document.querySelector('.franja-ver').focus({ preventScroll: true })); await sleep(250);
+    const enfocado = await ev(page, () => document.activeElement?.matches('.franja-ver'));
     const ef = await estado(page);
-    ok('P3', enfocado && ef.playState === 'paused', `1440: con el foco en el control (Tab) la franja se detiene (${ef.playState})`);
+    ok('P3', enfocado && ef.playState === 'paused', `1440: con el foco en el enlace de la franja se detiene (${ef.playState})`);
     const anillo = await ev(page, () => getComputedStyle(document.activeElement).boxShadow);
     ok('P3', anillo && anillo !== 'none', `1440: el foco se ve (anillo ${anillo.slice(0, 36)}…)`);
-    // Enter pausa del todo; Espacio reanuda
-    await page.keyboard.press('Enter'); await sleep(200);
-    let q = await estado(page);
-    ok('P4', q.quieta && q.ctl.label === 'Reanudar el movimiento de las editoriales' && !q.anim && q.li.filter(x => x.vis).length === 3, `1440: Enter en el control la deja quieta (nombres a la vista: ${q.li.filter(x => x.vis).length}) y el botón pasa a «${q.ctl.label}»`);
-    ok('P4', await ev(page, () => localStorage.getItem('iti-franja')) === 'off', '1440: la pausa se recuerda (localStorage iti-franja = off)');
-    if (DIR) await captura(page, 'P-1440-pausada-por-boton');
-    await page.keyboard.press('Space'); await sleep(400);
-    q = await estado(page);
-    ok('P4', !q.quieta && q.motion && q.anim && q.listo && q.ctl.label.startsWith('Pausar'), '1440: Espacio la reanuda (vuelve el bucle y «Pausar»)');
-    ok('P4', await ev(page, () => localStorage.getItem('iti-franja')) === 'on', '1440: y lo recuerda (on)');
     // fuera de la vista no corre
     await ev(page, () => window.scrollTo(0, document.body.scrollHeight)); await sleep(500);
     const fuera = await estado(page);
     ok('P5', !fuera.enVista && fuera.playState === 'paused', `1440: fuera de la vista no corre (data-en-vista ausente, ${fuera.playState})`);
-    await browser.close();
-  }
-  // recordada desde el primer render: sin salto de diseño
-  {
-    const { browser, page } = await abrir('393', { quieta: true });
-    const e = await estado(page);
-    ok('P6', e.quieta && !e.anim && e.li.filter(x => x.vis).length === 3 && e.ctl.label.startsWith('Reanudar'), '393: pausada por la persona en una visita anterior: llega quieta (una sola vez) y con «Reanudar»');
-    ok('P6', (await ev(page, () => window.__cls)) === 0, '393: sin salto de diseño al llegar pausada (boot.js la recuerda antes del primer render)');
     await browser.close();
   }
   // «Pausar el movimiento» del sitio: pie y ☰
@@ -228,10 +210,10 @@ async function pausas() {
     await ev(page, () => document.querySelector('.ftr [data-motion-toggle]').scrollIntoView({ block: 'center' })); await sleep(300);
     await page.locator('.ftr [data-motion-toggle]').click(); await sleep(400);
     const q = await estado(page);
-    ok('P7', !q.motion && !q.anim && q.li.filter(x => x.vis).length === 3 && !q.ctl.vis, `${perfil}: el interruptor del pie deja la franja quieta, única y sin control (nombres ${q.li.filter(x => x.vis).length}, control ${q.ctl.vis ? 'visible' : 'oculto'})`);
+    ok('P7', !q.motion && !q.anim && q.li.filter(x => x.vis).length === 3, `${perfil}: el interruptor del pie deja la franja quieta y única (nombres ${q.li.filter(x => x.vis).length})`);
     await page.locator('.ftr [data-motion-toggle]').click(); await sleep(500);
     const r = await estado(page);
-    ok('P7', r.motion && r.anim && r.listo && r.ctl.vis, `${perfil}: al reanudar el movimiento del sitio vuelve el bucle y el control`);
+    ok('P7', r.motion && r.anim && r.listo, `${perfil}: al reanudar el movimiento del sitio vuelve el bucle`);
     if (perfil === '393') {
       // y el del menú ☰
       await ev(page, () => window.scrollTo(0, 0)); await sleep(200);
@@ -250,7 +232,7 @@ async function pausas() {
 // ---------------------------------------------------------------- Q · Quieta
 async function quieta() {
   const variantes = [
-    ['reducir movimiento', { reducido: true }], ['ahorro de datos', { saveData: true }], ['pausa del sitio', { pausa: true }], ['pausa de la franja', { quieta: true }]
+    ['reducir movimiento', { reducido: true }], ['ahorro de datos', { saveData: true }], ['pausa del sitio', { pausa: true }]
   ];
   for (const perfil of ['320', '393', '1440']) for (const [nombre, o] of variantes) {
     const { browser, page } = await abrir(perfil, o);
@@ -265,8 +247,7 @@ async function quieta() {
     const porFila = new Map(); visibles.forEach(x => { const k = Math.round(x.t); porFila.set(k, [...(porFila.get(k) ?? []), x]); });
     const desv = Math.max(...[...porFila.values()].map(fila => Math.abs((Math.min(...fila.map(x => x.l)) + Math.max(...fila.map(x => x.r))) / 2 - (e.v.l + e.v.r) / 2)));
     ok('Q3', desv <= 1.5, `${perfil} · ${nombre}: centrada (${filas} renglón${filas === 1 ? '' : 'es'}; desvío de cada renglón contra la ventana ≤ ${r1(desv)} px)`);
-    if (nombre === 'pausa de la franja') ok('Q4', e.ctl.vis && /^Reanudar/.test(e.ctl.label), `${perfil} · ${nombre}: el control sigue (para reanudar): «${e.ctl.label}»`);
-    else ok('Q4', !e.ctl.vis, `${perfil} · ${nombre}: sin el control de pausa (no hay movimiento que pausar)`);
+    ok('Q4', e.botones === 0, `${perfil} · ${nombre}: sin botón de pausa (la franja no lleva controles)`);
     ok('Q5', await sinDesborde(page) && visibles.every(x => x.l >= e.v.l - 0.5 && x.r <= e.v.r + 0.5), `${perfil} · ${nombre}: sin desborde; cada nombre dentro de la ventana`);
     const sinMascara = await ev(page, () => { const s = getComputedStyle(document.querySelector('.franja-ventana')); return (s.maskImage || s.webkitMaskImage || 'none'); });
     ok('Q6', sinMascara === 'none', `${perfil} · ${nombre}: sin bordes desvanecidos (nada se corta, nada se mueve)`);
@@ -302,8 +283,8 @@ async function contrasteYMedidas() {
       ok('C3', col === tintaCol, `1440 ${t}: con el cursor encima, el nombre pasa de tinta-2 a tinta (${col} = ${tintaCol})`);
       await page.mouse.move(2, 2);
     }
-    const m = await ev(page, () => { const b = document.querySelector('[data-franja-ctl]').getBoundingClientRect(), a = document.querySelector('.franja-ver').getBoundingClientRect(), r = document.querySelector('.franja-rotulo').getBoundingClientRect(); return { cw: b.width, ch: b.height, ah: a.height, sep: b.left - r.right, rotuloTop: r.top, ctlTop: b.top }; });
-    ok('C4', m.cw >= 44 - 0.5 && m.ch >= 44 - 0.5 && m.ah >= 44 - 0.5 && m.sep >= 8 - 0.5, `${perfil} ${t}: objetivos de 44 (control ${r1(m.cw)}×${r1(m.ch)}, enlace de ${r1(m.ah)}); 8 px entre el rótulo y el control (${r1(m.sep)})`);
+    const m = await ev(page, () => ({ ah: document.querySelector('.franja-ver').getBoundingClientRect().height, rotuloH: document.querySelector('.franja-rotulo').getBoundingClientRect().height }));
+    ok('C4', m.ah >= 44 - 0.5, `${perfil} ${t}: el enlace de la franja mide ${r1(m.ah)} de alto (objetivo de 44)`);
     if (DIR) await captura(page, `C-${perfil}-${t}`);
     await browser.close();
   }
@@ -327,7 +308,7 @@ async function posiciones() {
     const aire = d.cabTop - (d.foto[1] + d.foto[3]);
     ok('T2', Math.abs(aire - 80) <= 0.5, `${perfil}: de la foto a la franja 80 px (capa → capa; medido ${r1(aire)})`);
     const asoma = d.vh - d.cabTop;
-    info('T3', `${perfil}: la franja empieza en y = ${r1(d.cabTop)} y la ventana mide ${d.vh}: ${asoma <= 0 ? 'queda toda bajo el primer pliegue' : `asoma ${r1(asoma)} px de su fila de rótulo y pausa (en este teléfono la foto deja sitio: la franja entra al primer pliegue)`}`);
+    info('T3', `${perfil}: la franja empieza en y = ${r1(d.cabTop)} y la ventana mide ${d.vh}: ${asoma <= 0 ? 'queda toda bajo el primer pliegue' : `asoma ${r1(asoma)} px de su rótulo (en este teléfono la foto deja sitio: la franja entra al primer pliegue)`}`);
     if (['393', '375', '320'].includes(perfil)) ok('T3', d.cabTop >= d.vh, `${perfil}: la franja entera queda bajo el primer pliegue en el teléfono de referencia (empieza en y ${r1(d.cabTop)} ≥ ${d.vh})`);
     await browser.close();
   }
@@ -394,13 +375,11 @@ async function inp() {
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await ev(page, () => { window.__ev = []; new PerformanceObserver(l => { for (const e of l.getEntries()) if (e.interactionId) window.__ev.push(e.duration); }).observe({ type: 'event', durationThreshold: 16, buffered: true }); document.querySelector('[data-franja]').scrollIntoView({ block: 'center' }); });
   await sleep(500);
-  const ctl = page.locator('[data-franja-ctl]');
-  for (let i = 0; i < 4; i++) { await ctl.click(); await sleep(350); }
   await ev(page, () => document.querySelector('.ftr [data-motion-toggle]').scrollIntoView({ block: 'center' })); await sleep(400);
   for (let i = 0; i < 2; i++) { await page.locator('.ftr [data-motion-toggle]').click(); await sleep(450); }
   const dur = await ev(page, () => window.__ev);
   const peor = Math.max(0, ...dur);
-  ok('I1', peor <= 200, `393 con CPU 4×: peor interacción ${r1(peor)} ms en ${dur.length} medidas (pausa de la franja ×4 y pausa del sitio ×2; ≤ 200)`);
+  ok('I1', peor <= 200, `393 con CPU 4×: peor interacción ${r1(peor)} ms en ${dur.length} medidas (pausa del sitio ×2; ≤ 200)`);
   await browser.close();
 }
 

@@ -29,10 +29,6 @@
   if (ev && /^\d{4}-\d{2}-\d{2}$/.test(ev)) {
     if (ev >= hoy) r.classList.add('ev-hint');
   }
-  // La pausa de la franja de editoriales del Inicio (franja.js): si la persona la pausó, se recuerda aquí para que no haya un salto de diseño entre el bucle y la franja quieta.
-  var fq = null;
-  try { fq = localStorage.getItem('iti-franja'); } catch (e) { /* almacenamiento bloqueado */ }
-  if (fq === 'off') r.classList.add('franja-quieta');
   if (off || saveData || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   r.classList.add('motion');
   // Entrada de marca (IntroMarca, 2026-11-18; DESIGN.md, «Entrada de marca»): la marca de la barra sale del centro con su trazo de marcatextos y
