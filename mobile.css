@@ -111,6 +111,10 @@ html:not(.js) .tabbar { display: none; }
 @media (min-width: 680px) { .cat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .cat-more { width: 100%; }
 .cat-empty-acc { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; } /* las salidas del estado vacío, a todo el ancho */
+/* En la hoja, sin resultados, el mensaje empieza a 24 del filete del buscador (sin los 16 de la rejilla) y, con el teclado abierto, catalog.js
+   (keepEmptyInView) le da a la hoja el recorrido justo para subir su primera salida sobre el teclado (--ex-holgura, por CSSOM). */
+.explorer .cat-layout:has(.cat-empty:not([hidden])) { padding-top: 0; }
+.explorer .cat-empty { padding-bottom: calc(var(--space-12) + var(--ex-holgura, 0px)); }
 /* Carrusel 3D: el foco de la portada del centro se dibuja en la portada (el botón no lleva sombra propia). */
 .rail-item .card:focus-visible { box-shadow: none; }
 .rail-item .card:focus-visible .cover { outline: 2px solid var(--foco); outline-offset: 2px; }

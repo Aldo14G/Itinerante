@@ -375,7 +375,10 @@ export async function initCatalog({ isMotion = () => false } = {}) {
 
   function renderChips() {
     const chips = [];
-    if (state.q) chips.push(['q', state.q, `Búsqueda: ${state.q}`]);
+    // La búsqueda solo va como chip junto a filtros (para quitarla sin borrar el campo); sola repetía el campo, que ya trae su ×, y en el
+    // teléfono empujaba el estado vacío bajo el teclado (2026-11-19).
+    const nf = state.k.size + state.g.size + state.f.size + state.p.size;
+    if (state.q && nf) chips.push(['q', state.q, `Búsqueda: ${state.q}`]);
     for (const dim of ['k', 'g', 'f', 'p']) for (const v of state[dim]) chips.push([dim, v, names[dim](v)]);
     chipsEl.replaceChildren(...chips.map(([dim, v, label]) =>
       el('li', {}, el('button', { type: 'button', class: 'cat-chip', 'data-chip-dim': dim, 'data-chip-value': v, 'aria-label': `Quitar filtro ${label}` }, label, el('span', { 'aria-hidden': 'true' }, '×')))));
@@ -459,8 +462,29 @@ export async function initCatalog({ isMotion = () => false } = {}) {
     emptyWa.hidden = !plan.wa;
     if (plan.wa) emptyWa.href = plan.wa;
     emptyWa.className = `btn ${plan.waPrincipal ? 'btn--secundario' : 'btn--contorno'}`;
+    requestAnimationFrame(keepEmptyInView);
     return plan;
   }
+  // Con el teclado del teléfono abierto (visualViewport más bajo que la ventana), la primera salida del estado vacío queda sobre el teclado:
+  // la hoja sube lo justo, sin esconder el campo bajo su barra de arriba (iOS lo necesita a la vista mientras se escribe).
+  function keepEmptyInView() {
+    const vv = window.visualViewport, sheet = input.closest('dialog');
+    if (!vv || !sheet) return;
+    const abierto = !emptyEl.hidden && sheet.open && sheetQuery.matches && vv.height <= innerHeight - 120;
+    if (!abierto) { emptyEl.style.removeProperty('--ex-holgura'); return; }
+    const act = [...emptyEl.querySelectorAll('.btn')].find(b => !b.hidden);
+    if (!act) return;
+    const falta = act.getBoundingClientRect().bottom - (vv.offsetTop + vv.height - 8);
+    const top = sheet.querySelector('.ex-top')?.getBoundingClientRect().bottom ?? 0;
+    const sube = Math.min(falta, input.getBoundingClientRect().top - top - 8); // el campo no se esconde bajo la barra de la hoja
+    if (sube <= 0) return;
+    // Una lista vacía es más corta que la hoja: se le da el recorrido que falte (CSSOM, no un estilo en línea).
+    const fin = sheet.scrollTop + emptyEl.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top + parseFloat(getComputedStyle(sheet).paddingBottom);
+    const falta2 = sheet.clientHeight + sheet.scrollTop + sube - fin;
+    if (falta2 > 0) emptyEl.style.setProperty('--ex-holgura', `${Math.ceil(falta2 + (parseFloat(emptyEl.style.getPropertyValue('--ex-holgura')) || 0))}px`);
+    sheet.scrollBy(0, sube);
+  }
+  window.visualViewport?.addEventListener('resize', () => requestAnimationFrame(keepEmptyInView));
 
   // Pliegue de la rejilla en línea (foldView): las columnas salen de la rejilla pintada, así dos filas son dos filas a cualquier ancho.
   const filtering = () => Boolean(state.q || state.k.size || state.g.size || state.f.size || state.p.size);

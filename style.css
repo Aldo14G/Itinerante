@@ -953,11 +953,11 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
   .cat-grid[aria-busy="true"] > .card--sk { margin-bottom: var(--space-8); }
 }
 /* Sin resultados (2026-11-19, iteración de lectura): justo bajo el buscador y los filtros puestos (antes 48 px de aire arriba y abajo: con el
-   teclado del teléfono abierto el mensaje quedaba bajo el teclado). Título (Title 3) → qué hacer 8 → salidas 24; la principal primero
+   teclado del teléfono abierto el mensaje quedaba bajo el teclado). Título (Headline) → qué hacer 8 → salidas 24; la principal primero
    (relleno menta) y la otra de contorno; en el teléfono, las dos a todo el ancho. */
-.cat-empty { display: grid; justify-items: start; padding: var(--space-2) 0 var(--space-12); }
+.cat-empty { display: grid; justify-items: start; padding: 0 0 var(--space-12); }
 .cat-empty[hidden] { display: none; }
-.cat-empty-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; }
+.cat-empty-tit { margin: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; } /* Headline: es un mensaje, no un subtitular; cabe con su salida sobre el teclado */
 .cat-empty-txt { margin: var(--space-2) 0 0; font: var(--t-cuerpo); color: var(--tinta-2); text-wrap: pretty; }
 .cat-empty-acc { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .cat-empty-acc .btn[hidden] { display: none; }

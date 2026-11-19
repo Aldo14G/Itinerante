@@ -12,7 +12,7 @@ import { openingStatus, monterreyNow } from '../app.js';
 import { newsPlan, newsEntries, isNew, validDay, statusLine, hintLine, isoDay, addDays, NEWS_SIZE, NEW_DAYS, NEWS_DAYS } from '../news.js';
 import { shareName, calName, registroName, reservaName, eventBadge, NO_DATE, validEventos, eventosProblems, eventosPlan, validRegistro, validTelefono, validReserva, reservaUrl, reservaMessage, notaCopy, quienLine, avisoLine, fechaBloque, fechaLarga, horario, icsOf, mtyToUtc, shareData, LUGAR, ICS_BLOQUE_MIN, shiftMonths, fechaPasada, foldAnteriores, ANTERIORES_MESES, ANTERIORES_VISIBLES, PROXIMOS_MESES } from '../feed.js';
 import { KINDS, validKind } from '../tag.js';
-import { PAGE_SIZE, TONES, GENRE_ES, genreLabel, CARD_SIZES, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
+import { emptyPlan, searchMessage, searchWaUrl, PAGE_SIZE, TONES, GENRE_ES, genreLabel, CARD_SIZES, imageCover, coverFallback, priceLabel, splitTitle, titleSize, bookShareData, shareBook, coverTone, coverTones, coverLayout, COVER_LAYOUTS, score, filterBooks, sortBooks, facetCounts, facetView, FACET_LIMIT, FACET_FOLD_AT, foldView, FOLD_ROWS, suggest, relatedBooks, bookMessage, bookWaUrl, norm } from '../catalog.js';
 
 const repo = new URL('../', import.meta.url);
 const here = p => new URL(p, repo);
@@ -2323,4 +2323,22 @@ test('entrada de marca (IntroMarca, 2026-11-18): solo con movimiento, sin #ancla
   // El logo grande está registrado.
   assert.ok(prov.brand.some(b => b.file === 'img/logo-240.webp' && b.derivedFrom === 'Logo.webp'), 'logo de 240 px con procedencia');
   assert.ok(existsSync(new URL('./assets/img/logo-240.webp', repo)), 'logo de 240 px en assets/img');
+});
+
+test('Explorar sin resultados (2026-11-19, emptyPlan): sin coincidencias o filtros demasiado restrictivos, con su salida y distinto peso', async () => {
+  const a = emptyPlan({ q: 'Pedro Páramo', filtros: 0 });
+  assert.equal(a.tit, 'No encontramos coincidencias para «Pedro Páramo».');
+  assert.ok(/te lo podemos pedir/.test(a.txt) && !/conseguimos|en \d+ días|garantiz|disponible/i.test(a.txt), 'ofrece el pedido (dato de Aldo, 2026-11-18) sin prometer ejemplar ni plazos');
+  assert.ok(!a.quitar && a.wa && a.waPrincipal, 'sin filtros, la única salida es WhatsApp, como principal');
+  assert.equal(searchMessage(' Pedro Páramo '), 'Hola, busco «Pedro Páramo» y no lo encontré en su catálogo. ¿Me pueden ayudar?');
+  assert.equal(new URL(searchWaUrl('Pedro Páramo')).searchParams.get('text'), searchMessage('Pedro Páramo'));
+  assert.ok(searchWaUrl('x').startsWith('https://wa.me/528180875940?text='), 'el WhatsApp real de la librería');
+  const b = emptyPlan({ q: 'Robles', filtros: 1, sinFiltros: 1 });
+  assert.ok(b.tit === 'Ningún título cumple todos los filtros.' && b.quitar && !b.waPrincipal && b.wa && /Sin filtros, «Robles» tiene 1 resultado\./.test(b.txt), 'con filtros: «Quitar filtros» principal, WhatsApp secundaria y cuántos quedarían');
+  assert.ok(/Tampoco hay coincidencias para «Robles» sin filtros; te lo podemos pedir\./.test(emptyPlan({ q: 'Robles', filtros: 2, sinFiltros: 0 }).txt));
+  const c = emptyPlan({ q: '', filtros: 2 });
+  assert.ok(c.quitar && c.wa === null && c.txt === 'Quita alguno para ver más títulos.', 'sin texto buscado no hay nada que preguntar por WhatsApp');
+  const cat = readFileSync_('catalog.js');
+  assert.ok(/unfilterBtn\.addEventListener\('click', \(\) => \{ state\.k\.clear\(\); state\.g\.clear\(\); state\.f\.clear\(\); state\.p\.clear\(\); refresh\(\); restFocus\(\); \}\);/.test(cat), '«Quitar filtros» conserva lo buscado (state.q no se toca) y deja el foco en el estado');
+  assert.ok(/window\.visualViewport\?\.addEventListener\('resize'/.test(cat) && /--ex-holgura/.test(cat), 'con el teclado abierto, la primera salida sube sobre el teclado (visualViewport)');
 });
