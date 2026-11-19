@@ -90,7 +90,9 @@ let offTotal = 0;
 for (const r of results) {
   console.log('\n=== ' + r.name);
   console.log('eventos disparados (' + r.rows.length + ' tipos):', r.rows.slice(0, 14).map(([k, n]) => `${k}×${n}`).join(' · '));
-  const off = r.dur.filter(([d]) => !TOKENS.has(d) && d > 1 && !(r.name.includes('reducido') && d <= 1));
+  // Excepción escrita (2026-11-19): la vuelta de la franja de editoriales (franja-corre) dura ancho del grupo ÷ franja-velocidad (token, 40 px/s): no es una duración fija.
+  const derivada = ex => ex.length && ex.every(e => /franja-corre/.test(e));
+  const off = r.dur.filter(([d, , ex]) => !TOKENS.has(d) && d > 1 && !(r.name.includes('reducido') && d <= 1) && !derivada(ex));
   offTotal += off.length;
   console.log(`animaciones infinitas vivas: ${r.infinitas.length}${r.infinitas.length ? ' (' + r.infinitas.join(', ') + ')' : ''}`);
   if (r.name.includes('reducido') && r.infinitas.length) { offTotal += r.infinitas.length; console.log('  FALLA: con movimiento reducido no puede quedar ningún bucle'); }

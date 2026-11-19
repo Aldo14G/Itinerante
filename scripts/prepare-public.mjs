@@ -25,6 +25,7 @@ export const ROOT_FILES = [
   "feed.js",
   "news.js",
   "merch.js",
+  "franja.js",
   "sample.js",
   "tag.js",
   "saved.js",

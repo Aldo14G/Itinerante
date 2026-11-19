@@ -88,3 +88,19 @@ Cada una con la redacción propuesta de la pregunta (como aparecería en Visita)
 ### B6. Aviso de privacidad (mapa de Google)
 - **Falta:** el texto del aviso de privacidad antes de encender la clave del mapa de Google (ver `docs/MAPA-GOOGLE.md` y `PRODUCT.md`).
 - **Respuesta de Aldo:**
+
+### B7. Franja de editoriales del Inicio: lista completa, vínculo y logos (2026-11-19)
+- **Qué se ve:** en el Inicio, bajo la foto, una franja con las editoriales del catálogo: hoy **Abismos Casa Editorial, Capítulo Siete e Iridiscencias**, con su nombre en tipografía
+  (rótulo «Editoriales en el catálogo»; debajo, «Ver los libros por editorial»). «Libro Objeto» no aparece hasta que se resuelva B1. Con menos de 3 editoriales la franja no se pinta.
+  El sitio **no dice «aliadas», «socias», «oficiales» ni «distribuidores»**: solo que hay libros de esas editoriales en el catálogo.
+- **Falta saber, 1: la lista completa.** ¿Con qué otras editoriales trabaja la librería además de las de los 41 títulos? Una franja de 3 nombres repetidos en bucle se ve corta; con 6 a 8
+  nombres reales se ve como una franja de verdad. Se añaden importando sus libros a la hoja (`python3 scripts/import-inventario.py`) y corriendo `npm run editoriales`: la franja crece sola.
+  Mientras no estén sus libros en el catálogo, no aparecen (la franja solo muestra editoriales con libros en `catalog.json`).
+  - **Lista de editoriales con las que trabaja la librería:**
+- **Falta saber, 2: qué vínculo se puede decir con verdad.** Para cada editorial: ¿la librería les compra directo, es distribuidora, consigna, o las consigue por un tercero? ¿Qué palabra
+  aprueban ellas y Aldo («disponemos de sus libros», «trabajamos con», «distribuimos»…)? Mientras no se confirme, el rótulo se queda en «Editoriales en el catálogo».
+  - **Vínculo que se puede decir (por editorial):**
+- **Falta saber, 3: logos con permiso.** Para cada editorial, un logo en SVG (o PNG con fondo transparente) **y su permiso por escrito** para mostrarlo en el sitio. Qué pedirles y cómo cargarlo:
+  `docs/EDITORIALES-LOGOS.md` (`python3 scripts/logo-editorial.py … --permiso "…"`, que registra quién lo autorizó). Sin permiso, el sitio sigue con el nombre en tipografía; nunca se copia un logo de internet.
+  - **Logos con permiso (editorial · archivo · quién lo autorizó y cuándo):**
+- **Respuesta de Aldo:**

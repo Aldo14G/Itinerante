@@ -1058,7 +1058,9 @@ test('ritmo y movimiento: relleno de secciones con la escala de 4 px y movimient
     assert.ok(/var\(--(sec|space-\d+)\)/.test(r) && !/clamp\([^)]*vh/.test(r), `.${sel} usa el ritmo de la escala y no el alto de la pantalla`);
   }
   assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\*, \*::before, \*::after, ::backdrop \{ transition-duration: 0\.01ms !important/.test(css), 'regla general de movimiento reducido (incluye el velo de las hojas)');
-  assert.ok(!/animation:[^;]*infinite/.test(css + mobileCss), 'nada anima en reposo para siempre (el punto «abierto» ya no late)');
+  // Única excepción, por encargo de Aldo (2026-11-19): la franja de editoriales del Inicio (franja-corre, solo transform, solo con movimiento, con su pausa: WCAG 2.2.2).
+  assert.ok(!/animation:(?![^;]*franja-corre)[^;]*infinite/.test(css + mobileCss), 'nada anima en reposo para siempre (el punto «abierto» ya no late); salvo la franja de editoriales, con su pausa');
+  assert.equal((css.match(/animation:[^;]*franja-corre[^;]*infinite/g) || []).length, 1, 'la franja es la única animación infinita');
 });
 test('Mi lista: guardar, quitar, tope y mensaje de WhatsApp informativo', () => {
   clearSaved();

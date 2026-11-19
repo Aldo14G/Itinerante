@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 37 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 38 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -48,6 +48,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | IntroMarca | — | — |  |  |  | sí |  |  |  |  | sí |
 | PreguntasFrecuentes | sí | sí | sí |  |  |  | sí |  |  |  | sí |
 | Editoriales | sí | sí | sí |  |  |  | sí |  | sí |  |  |
+| FranjaEditoriales | sí | sí | sí |  |  |  |  |  | sí |  | sí |
 | TarjetaMerch | sí | sí | sí |  |  |  |  |  | sí | sí | sí |
 
 Estados propios de algún componente, fuera de la tabla: `oculto`, `tactil`, `plano`, `abriendo`, `abierto`, `colores_forzados`, `cerrado` (ver el detalle).
@@ -756,6 +757,29 @@ Bloque «Editoriales» del Catálogo (2026-11-19), después de Explorar y antes 
 - **Estado expandido:** `.edit-resto[open] .edit-resto-cerrar` — Solo con más de 7 editoriales: details[open] muestra el resto.
 - **ARIA:** Lista de enlaces (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `ul con aria-labelledby (el subtitular)` `cada fila es un enlace a #catalogo; su nombre es «editorial, N títulos» (coma en sr-only)` `el chevron es aria-hidden` · **Teclado:** Tab entre filas; Enter abre Explorar con el filtro; al cerrar la hoja el foco vuelve a la fila.
 - **QA:** `tests/contenido.test.mjs` `tools/qa/guias.mjs` `tools/qa/contenido.mjs`
+
+### FranjaEditoriales
+
+Franja de editoriales del Inicio (2026-11-19, encargo de Aldo; al modo de la franja de marcas de Vercel): una capa bajo la foto, dentro de #inicio, con las editoriales del catálogo (assets/data/catalog.json, menos las que assets/data/editoriales.json excluye; hoy «Libro Objeto») escritas con su nombre en tipografía, en tinta suave y sin cajas, que corren en bucle lento con los bordes desvanecidos. Pintada en index.html por scripts/build-editoriales.mjs (marcas franja:inicio y franja:fin; editoriales:check y npm test fallan si no coincide); con menos de 3 editoriales no se pinta nada. Rótulo «Editoriales en el catálogo» con el botón de pausa de 44, la franja (lista con rótulo; los elementos no son enlaces) y un enlace estático «Ver los libros por editorial» a #editoriales. El bucle es CSS (transform −50 % de dos grupos idénticos; franja-velocidad px/s; franja.js mide el grupo y fija la duración) y solo existe con movimiento activo; se detiene con el cursor, el foco dentro, al presionar, fuera de la vista y con su botón (WCAG 2.2.2). Sin movimiento: quieta, centrada, cada nombre una vez, en renglones. Con logos autorizados (scripts/logo-editorial.py, docs/EDITORIALES-LOGOS.md) cada logo se pinta como silueta monocroma con mask-image. Capa → capa 80 (96 en escritorio).
+
+- **Tipo:** bloque · **desde** 2026-11-19 · DESIGN.md, «Franja de editoriales» (2026-11-19).
+- **style.css:** `.franja` `.franja-cab` `.franja-rotulo` `.franja-ctl` `.franja-escena` `.franja-ventana` `.franja-carril` `.franja-lista` `.franja-item` `.franja-nombre` `.franja-logo` `.franja-ver`
+- **mobile.css:** `.franja`
+- **index.html:** `[data-franja]` `[data-franja-ctl]` `[data-franja-escena]` `.franja-ver` `#franja-rotulo`
+- **franja.js:** exporta `initFranja`
+- **app.js:** ganchos `franja.js` `initFranja`
+- **assets/js/boot.js:** ganchos `iti-franja` `franja-quieta`
+- **motion.js:** exporta `num`
+- **scripts/franja-datos.mjs:** exporta `franjaPlan` `franjaHtml` `withFranja` `leerConfig` `editorialesLogosProblems` `logosCss`
+- **scripts/build-editoriales.mjs:** exporta `leerEditorialesJson` `problemasLogosDisco`
+- **Tokens:** `franja-velocidad` `franja-desvanece` `franja-logo-alto` `tinta` `tinta-2` `turquesa-texto` `alto-sm` `alto-lg` `space-2` `space-3` `space-6` `space-8` `space-12` `space-16` `space-24` `t-titulo-3` `t-subtitulo` `dur-rapida` `curva-salida` `anillo-foco`
+- **Estado hover:** `.franja-escena:hover .franja-item` — Con puntero que flota, el cursor sobre la franja la detiene y los nombres pasan de tinta-2 a tinta (las copias del bucle son inertes: la franja entera reacciona, no cada nombre).
+- **Estado foco:** `.btn:focus-visible` — El foco vive en el botón de pausa y en el enlace estático (anillo-foco); con el foco dentro, la franja se detiene (.franja:focus-within) y los nombres pasan a tinta.
+- **Estado presionado:** `html.motion:not(.franja-quieta) .franja-escena:active .franja-carril` — Al presionar la franja se detiene (con toque, mientras el dedo está encima).
+- **Estado vacio:** scripts/franja-datos.mjs `if (!plan.mostrar)` — Con menos de 3 editoriales (o con editoriales.json vacío, ausente o torcido) no se pinta nada: ni hueco ni encabezado.
+- **Estado movimiento_reducido:** franja.js `root.classList.contains('motion') && !root.classList.contains('franja-quieta')` — Sin html.motion (reducir movimiento, ahorro de datos, «Pausar el movimiento» del sitio) o con html.franja-quieta (la pausa de la propia franja, recordada en localStorage iti-franja y por boot.js desde el primer render) la franja es la base CSS: quieta, centrada, cada nombre una vez, sin copias ni bordes desvanecidos, y el botón de pausa no se muestra (si la pausa es la de la franja, queda para reanudar).
+- **ARIA:** Lista con rótulo y control de pausa (WCAG 2.2.2) (https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html) · `section con aria-labelledby (el rótulo)` `ul aria-labelledby con los elementos reales; el grupo duplicado y las copias de relleno, aria-hidden e inert` `los elementos no son enlaces ni se enfocan (un objetivo en movimiento es inaccesible)` `el botón de pausa cambia su nombre: «Pausar el movimiento de las editoriales» / «Reanudar …»` `el logo, cuando exista, es role=img con aria-label (el alt de editoriales.json)` · **Teclado:** Tab llega al botón de pausa (la franja se detiene con el foco dentro); Enter o Espacio pausan y reanudan; Tab sigue al enlace «Ver los libros por editorial».
+- **QA:** `tests/franja.test.mjs` `tools/qa/franja.mjs` `tools/qa/guias.mjs`
 
 ### TarjetaMerch
 

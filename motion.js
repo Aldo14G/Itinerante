@@ -27,6 +27,12 @@ export function ms(name) {
 
 export const DUR = name => ms(`dur-${name}`);
 
+/** Un token numérico sin unidad (--franja-velocidad: px por segundo); `fallback` si falta el CSS. */
+export function num(name, fallback = 0) {
+  const value = parseFloat(token(name));
+  return Number.isFinite(value) ? value : fallback;
+}
+
 /**
  * Trabajo en reposo: corre `fn` cuando el navegador está libre (requestIdleCallback, con su `timeout` como tope) o, donde no existe (Safari), tras el
  * retraso `fallback` (un token de reposo: reposo-corto, reposo, reposo-largo). Una sola forma de pedirlo, sin milisegundos escritos en cada sitio.

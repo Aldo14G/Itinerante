@@ -903,6 +903,170 @@
       "decision": "DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19)."
     },
     {
+      "id": "franja-editoriales",
+      "nombre": "FranjaEditoriales",
+      "tipo": "bloque",
+      "descripcion": "Franja de editoriales del Inicio (2026-11-19, encargo de Aldo; al modo de la franja de marcas de Vercel): una capa bajo la foto, dentro de #inicio, con las editoriales del catálogo (assets/data/catalog.json, menos las que assets/data/editoriales.json excluye; hoy «Libro Objeto») escritas con su nombre en tipografía, en tinta suave y sin cajas, que corren en bucle lento con los bordes desvanecidos. Pintada en index.html por scripts/build-editoriales.mjs (marcas franja:inicio y franja:fin; editoriales:check y npm test fallan si no coincide); con menos de 3 editoriales no se pinta nada. Rótulo «Editoriales en el catálogo» con el botón de pausa de 44, la franja (lista con rótulo; los elementos no son enlaces) y un enlace estático «Ver los libros por editorial» a #editoriales. El bucle es CSS (transform −50 % de dos grupos idénticos; franja-velocidad px/s; franja.js mide el grupo y fija la duración) y solo existe con movimiento activo; se detiene con el cursor, el foco dentro, al presionar, fuera de la vista y con su botón (WCAG 2.2.2). Sin movimiento: quieta, centrada, cada nombre una vez, en renglones. Con logos autorizados (scripts/logo-editorial.py, docs/EDITORIALES-LOGOS.md) cada logo se pinta como silueta monocroma con mask-image. Capa → capa 80 (96 en escritorio).",
+      "archivos": [
+        {
+          "ruta": "style.css",
+          "selectores": [
+            ".franja",
+            ".franja-cab",
+            ".franja-rotulo",
+            ".franja-ctl",
+            ".franja-escena",
+            ".franja-ventana",
+            ".franja-carril",
+            ".franja-lista",
+            ".franja-item",
+            ".franja-nombre",
+            ".franja-logo",
+            ".franja-ver"
+          ]
+        },
+        {
+          "ruta": "mobile.css",
+          "selectores": [
+            ".franja"
+          ]
+        },
+        {
+          "ruta": "index.html",
+          "selectores": [
+            "[data-franja]",
+            "[data-franja-ctl]",
+            "[data-franja-escena]",
+            ".franja-ver",
+            "#franja-rotulo"
+          ]
+        },
+        {
+          "ruta": "franja.js",
+          "exporta": [
+            "initFranja"
+          ]
+        },
+        {
+          "ruta": "app.js",
+          "ganchos": [
+            "franja.js",
+            "initFranja"
+          ]
+        },
+        {
+          "ruta": "assets/js/boot.js",
+          "ganchos": [
+            "iti-franja",
+            "franja-quieta"
+          ]
+        },
+        {
+          "ruta": "motion.js",
+          "exporta": [
+            "num"
+          ]
+        },
+        {
+          "ruta": "scripts/franja-datos.mjs",
+          "exporta": [
+            "franjaPlan",
+            "franjaHtml",
+            "withFranja",
+            "leerConfig",
+            "editorialesLogosProblems",
+            "logosCss"
+          ]
+        },
+        {
+          "ruta": "scripts/build-editoriales.mjs",
+          "exporta": [
+            "leerEditorialesJson",
+            "problemasLogosDisco"
+          ]
+        }
+      ],
+      "tokens": [
+        "franja-velocidad",
+        "franja-desvanece",
+        "franja-logo-alto",
+        "tinta",
+        "tinta-2",
+        "turquesa-texto",
+        "alto-sm",
+        "alto-lg",
+        "space-2",
+        "space-3",
+        "space-6",
+        "space-8",
+        "space-12",
+        "space-16",
+        "space-24",
+        "t-titulo-3",
+        "t-subtitulo",
+        "dur-rapida",
+        "curva-salida",
+        "anillo-foco"
+      ],
+      "estados": {
+        "hover": {
+          "css": [
+            ".franja-escena:hover .franja-item"
+          ],
+          "nota": "Con puntero que flota, el cursor sobre la franja la detiene y los nombres pasan de tinta-2 a tinta (las copias del bucle son inertes: la franja entera reacciona, no cada nombre)."
+        },
+        "foco": {
+          "css": [
+            ".btn:focus-visible"
+          ],
+          "nota": "El foco vive en el botón de pausa y en el enlace estático (anillo-foco); con el foco dentro, la franja se detiene (.franja:focus-within) y los nombres pasan a tinta."
+        },
+        "presionado": {
+          "css": [
+            "html.motion:not(.franja-quieta) .franja-escena:active .franja-carril"
+          ],
+          "nota": "Al presionar la franja se detiene (con toque, mientras el dedo está encima)."
+        },
+        "vacio": {
+          "js": [
+            {
+              "ruta": "scripts/franja-datos.mjs",
+              "texto": "if (!plan.mostrar)"
+            }
+          ],
+          "nota": "Con menos de 3 editoriales (o con editoriales.json vacío, ausente o torcido) no se pinta nada: ni hueco ni encabezado."
+        },
+        "movimiento_reducido": {
+          "js": [
+            {
+              "ruta": "franja.js",
+              "texto": "root.classList.contains('motion') && !root.classList.contains('franja-quieta')"
+            }
+          ],
+          "nota": "Sin html.motion (reducir movimiento, ahorro de datos, «Pausar el movimiento» del sitio) o con html.franja-quieta (la pausa de la propia franja, recordada en localStorage iti-franja y por boot.js desde el primer render) la franja es la base CSS: quieta, centrada, cada nombre una vez, sin copias ni bordes desvanecidos, y el botón de pausa no se muestra (si la pausa es la de la franja, queda para reanudar)."
+        }
+      },
+      "aria": {
+        "patron": "Lista con rótulo y control de pausa (WCAG 2.2.2)",
+        "apg": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html",
+        "atributos": [
+          "section con aria-labelledby (el rótulo)",
+          "ul aria-labelledby con los elementos reales; el grupo duplicado y las copias de relleno, aria-hidden e inert",
+          "los elementos no son enlaces ni se enfocan (un objetivo en movimiento es inaccesible)",
+          "el botón de pausa cambia su nombre: «Pausar el movimiento de las editoriales» / «Reanudar …»",
+          "el logo, cuando exista, es role=img con aria-label (el alt de editoriales.json)"
+        ],
+        "teclado": "Tab llega al botón de pausa (la franja se detiene con el foco dentro); Enter o Espacio pausan y reanudan; Tab sigue al enlace «Ver los libros por editorial»."
+      },
+      "qa": [
+        "tests/franja.test.mjs",
+        "tools/qa/franja.mjs",
+        "tools/qa/guias.mjs"
+      ],
+      "desde": "2026-11-19",
+      "decision": "DESIGN.md, «Franja de editoriales» (2026-11-19)."
+    },
+    {
       "id": "tarjeta-merch",
       "nombre": "TarjetaMerch",
       "tipo": "control",

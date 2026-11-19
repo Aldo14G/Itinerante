@@ -56,7 +56,7 @@ const SONDA = () => {
   s.plan = () => {
     const telon = document.querySelector('[data-intro]')?.getAnimations().find(a => a.animationName === 'intro-telon');
     if (!telon || telon.startTime === null) return null;
-    const lista = document.getAnimations().filter(a => a.effect?.target && (a.effect.target.closest?.('.hdr, .entry, .intro-telon'))).map(a => ({
+    const lista = document.getAnimations().filter(a => a.effect?.target && a.animationName !== 'franja-corre' && (a.effect.target.closest?.('.hdr, .entry, .intro-telon'))).map(a => ({
       nombre: a.animationName || `titular:${a.effect.target.textContent.trim().slice(0, 12)}`,
       fin: Math.round((a.startTime ?? telon.startTime) + a.effect.getComputedTiming().endTime - telon.startTime),
     }));
@@ -101,7 +101,7 @@ if (corre('duracion') || corre('cls')) {
       const plan = await page.evaluate(() => window.__intro.plan());
       await page.waitForFunction(() => window.__intro.tFin !== null, null, { timeout: 5000 }).catch(() => {});
       await sleep(1200);
-      const s = await page.evaluate(() => ({ ...window.__intro, plan: undefined, quedan: document.getAnimations().filter(a => a.playState === 'running').length, clase: document.documentElement.className, sesion: localStorage.getItem('iti-intro'), telon: getComputedStyle(document.querySelector('[data-intro]')).display, marca: getComputedStyle(document.querySelector('.hdr-brand')).transform, titular: document.querySelector('.entry-title').innerHTML }));
+      const s = await page.evaluate(() => ({ ...window.__intro, plan: undefined, quedan: document.getAnimations().filter(a => a.playState === 'running' && a.animationName !== 'franja-corre').length, clase: document.documentElement.className, sesion: localStorage.getItem('iti-intro'), telon: getComputedStyle(document.querySelector('[data-intro]')).display, marca: getComputedStyle(document.querySelector('.hdr-brand')).transform, titular: document.querySelector('.entry-title').innerHTML }));
       const tag = `${perfil} ${esquema === 'light' ? 'claro' : 'oscuro'}`;
       const ultimo = plan ? Math.max(...plan.lista.map(a => a.fin)) : NaN;
       const telonFin = plan ? Math.max(...plan.lista.filter(a => a.nombre === 'intro-telon').map(a => a.fin)) : NaN;
@@ -144,7 +144,7 @@ if (corre('salto')) {
     const t1 = await page.evaluate(() => performance.now());
     await accion(page);
     await page.waitForFunction(() => !document.documentElement.classList.contains('intro-marca'), null, { timeout: 2000 }).catch(() => {});
-    const s = await page.evaluate(t => ({ dt: Math.round((window.__intro.tFin ?? Infinity) - t), url: location.href, telon: getComputedStyle(document.querySelector('[data-intro]')).display, marca: getComputedStyle(document.querySelector('.hdr-brand')).transform, vivas: document.getAnimations().filter(a => a.playState === 'running' && a.effect?.target?.closest?.('.hdr, .entry') && !(a instanceof CSSTransition)).map(a => a.animationName || 'titular').join(' ') }), t1);
+    const s = await page.evaluate(t => ({ dt: Math.round((window.__intro.tFin ?? Infinity) - t), url: location.href, telon: getComputedStyle(document.querySelector('[data-intro]')).display, marca: getComputedStyle(document.querySelector('.hdr-brand')).transform, vivas: document.getAnimations().filter(a => a.playState === 'running' && a.animationName !== 'franja-corre' && a.effect?.target?.closest?.('.hdr, .entry') && !(a instanceof CSSTransition)).map(a => a.animationName || 'titular').join(' ') }), t1);
     await sleep(100);
     const lineas = await page.evaluate(() => document.querySelectorAll('.entry-title .linea').length);
     check('salto', `${perfil}: ${nombre} la termina al momento y deja todo en su sitio`, antes && s.dt <= 100 && s.telon === 'none' && s.marca === 'none' && !s.vivas && lineas === 0, `${s.dt} ms tras la acción · telón ${s.telon} · animaciones de la entrada vivas: ${s.vivas || 'ninguna'}`);

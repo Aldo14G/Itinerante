@@ -5,10 +5,11 @@
 // editorialesDe, editorialesPlan). Llega pintado: sin JavaScript cada editorial es un enlace a #catalogo; con JavaScript, app.js abre Explorar con el
 // filtro de esa editorial ya aplicado. Con menos de EDITORIALES_MIN editoriales (hoy hay 4) no se pinta nada: ni hueco ni encabezado.
 // Para actualizarlo: se corrige la hoja de la librería, se reimporta (python3 scripts/import-inventario.py) y se corre `npm run editoriales`.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { editorialesPlan, editorialesNota, titulosLabel } from '../catalog.js';
+import { editorialesLogosProblems, franjaPlan, leerConfig, withFranja, withLogosCss } from './franja-datos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const INDEX_PATH = join(root, 'index.html');
@@ -65,16 +66,38 @@ export function withEditoriales(html, books) {
   return html.slice(0, lineStart) + editorialesHtml(books, ind) + html.slice(b + FIN.length);
 }
 
+// La franja de editoriales del Inicio (2026-11-19) se pinta con el mismo comando: scripts/franja-datos.mjs tiene su lógica y assets/data/editoriales.json lo que Aldo
+// decide (excluir una editorial dudosa y, cuando haya permiso, el logo de cada una). Las reglas CSS de los logos van en style.css entre sus marcas.
+export const EDITORIALES_PATH = join(root, 'assets/data/editoriales.json');
+export const STYLE_PATH = join(root, 'style.css');
+export const PROVENANCE_PATH = join(root, 'assets/provenance.json');
+export const leerEditorialesJson = () => (existsSync(EDITORIALES_PATH) ? JSON.parse(readFileSync(EDITORIALES_PATH, 'utf8')) : undefined);
+/** editoriales.json con el disco: el archivo de cada logo existe y está registrado en provenance.json con su permiso. */
+export function problemasLogosDisco(raw) {
+  const prov = JSON.parse(readFileSync(PROVENANCE_PATH, 'utf8'));
+  const registro = new Map((prov.logos || []).map(l => [`assets/${l.file}`, l]));
+  return editorialesLogosProblems(raw, { existe: ruta => existsSync(join(root, ruta)), registro: ruta => registro.get(ruta) ?? null });
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const html = readFileSync(INDEX_PATH, 'utf8');
+  const css = readFileSync(STYLE_PATH, 'utf8');
   const { books } = JSON.parse(readFileSync(CATALOG_PATH, 'utf8'));
-  const next = withEditoriales(html, books);
+  const raw = leerEditorialesJson();
+  const problemas = problemasLogosDisco(raw);
+  if (problemas.length) { console.error(`assets/data/editoriales.json no pasa la revisión:\n  · ${problemas.join('\n  · ')}`); process.exit(1); }
+  const cfg = leerConfig(raw);
+  const nextHtml = withFranja(withEditoriales(html, books), books, cfg);
+  const nextCss = withLogosCss(css, books, cfg);
   if (process.argv.includes('--check')) {
-    if (next !== html) { console.error('El bloque Editoriales de index.html no coincide con assets/data/catalog.json. Ejecuta "npm run editoriales".'); process.exit(1); }
-    console.log('editoriales al día');
+    if (nextHtml !== html) { console.error('El bloque Editoriales o la franja de index.html no coinciden con assets/data/catalog.json y assets/data/editoriales.json. Ejecuta "npm run editoriales".'); process.exit(1); }
+    if (nextCss !== css) { console.error('Las reglas de los logos de style.css no coinciden con assets/data/editoriales.json. Ejecuta "npm run editoriales".'); process.exit(1); }
+    console.log('editoriales y franja al día');
   } else {
-    writeFileSync(INDEX_PATH, next);
-    const plan = editorialesPlan(books);
+    writeFileSync(INDEX_PATH, nextHtml);
+    writeFileSync(STYLE_PATH, nextCss);
+    const plan = editorialesPlan(books), fr = franjaPlan(books, cfg);
     console.log(plan.mostrar ? `editoriales pintadas en index.html (${plan.lista.length}; ${editorialesNota(plan)})` : `menos de 3 editoriales (${plan.lista.length}): el bloque no se pinta`);
+    console.log(fr.mostrar ? `franja del inicio pintada (${fr.lista.length} editoriales${fr.lista.some(e => e.logo) ? `, ${fr.lista.filter(e => e.logo).length} con logo` : ', con el nombre en tipografía'})` : `franja: menos de 3 editoriales (${fr.lista.length}): no se pinta`);
   }
 }

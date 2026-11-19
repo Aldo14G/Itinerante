@@ -597,6 +597,8 @@ async function boot() {
     loadNews().then(m => m.initNewsCount()).catch(() => {});
     // Merch: se pide en reposo; sin productos válidos (hoy) no monta nada ni toca la barra, el ☰ ni el destino actual.
     whenIdle(() => import('./merch.js').then(m => m.initMerch()).catch(() => {}), { timeout: 3000 });
+    // Franja de editoriales del Inicio (2026-11-19): mide su grupo, fija la duración del bucle y cablea su pausa. Hasta entonces está quieta (CSS), así que no mueve nada.
+    whenIdle(() => import('./franja.js').then(m => m.initFranja()).catch(() => {}), { timeout: 3000 });
     // Aviso del próximo evento (renglón del inicio y punto de «Eventos»): mismo momento y mismo mecanismo; su sitio también está reservado.
     loadFeed().then(m => m.initEventosAviso()).catch(() => {});
     // Eventos se arma también en reposo, no solo al acercarse: al llegar por un enlace (☰, barra) la sección ya está armada y no salta (2026-11-16;

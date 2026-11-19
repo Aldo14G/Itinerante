@@ -107,7 +107,11 @@ const SISTEMA = {
     'inicio·texto→texto': [8, 8, 8],
     'inicio·texto→control': [24, 24, 24],
     'inicio·control→nota': [12, 12, 12],
-    'inicio·cabecera→contenido': [24, 32, null]
+    'inicio·cabecera→contenido': [24, 32, null],
+    // Franja de editoriales (2026-11-19): capa del Inicio bajo la foto. 80 en el teléfono y la tableta (la franja queda bajo el primer pliegue en 393×659, 375×629 y 320×640), 96 en escritorio.
+    'inicio·capa→capa': [80, 80, 96],
+    'inicio·rótulo→contenido': [8, 8, 8],
+    'inicio·contenido→acción': [24, 32, 32]
   },
 
   // Botones: [variante-tamaño]: ancho en el teléfono / desde 761 px
@@ -132,7 +136,8 @@ const SISTEMA = {
     'Editoriales (2026-11-19): una capa del Catálogo con su propio filete que repite la división 1–6 | 7–12 (subtitular y nota a la izquierda, lista a la derecha, misma línea de arriba): se mide aparte (`filasAparte`) y no cuenta como columna derecha de la fila del titular del Catálogo.',
     'Merch (2026-11-19): la rejilla de tarjetas es una pieza de primer nivel a todo el ancho (como .cat-grid y .news-list); sus tarjetas se miden contra ella (2 columnas con canal 16 en el teléfono, 3 en tableta, 4 de 3 columnas desde 1024: contenido.mjs M2 comprueba que cada una empiece en una línea de la rejilla). Solo existe con productos: `--merch=N`.',
     'Café desde 1024 px (2026-11-17): el contenedor de la página (1152), como las demás; la foto de la cabecera va en 9–12 (`laterales`, como la nota de Eventos): titular y entradilla en 1–8, la foto en un tercio, con su tope en el del titular. Con la galería de la carta la foto no se pinta y no hay columna derecha.',
-    'Barra de categorías de la carta (2026-11-17): enlaces sin fondo (texto con objetivo de 44): se alinea por la tinta de su primer enlace, no por la caja de toque.'
+    'Barra de categorías de la carta (2026-11-17): enlaces sin fondo (texto con objetivo de 44): se alinea por la tinta de su primer enlace, no por la caja de toque.',
+    'Franja de editoriales del Inicio (2026-11-19): lo que se mueve no es una pieza de la rejilla: del carril se mide su ventana (`.franja-escena`, de margen a margen) y el rótulo con su pausa cuenta como un grupo (`.franja-cab`, la tinta del rótulo en el margen). Sin movimiento los nombres van centrados en renglones (decisión del encargo: es un escenario, como el del carrusel).'
   ]
 };
 
@@ -156,7 +161,9 @@ const SECCIONES = [
   { id: 'inicio', sel: '#inicio', piezas: [
     // 2026-11-19: el lugar (estado de hoy y dirección) va junto, como la nota de «Cómo llegar»: control → estado 12, estado → dirección 8.
     ['titular', '.entry-title'], ['entradilla', '.entry-lede'], ['control', '.entry-actions .btn'],
-    ['nota', '.entry-status'], ['dato', '.entry-address'], ['dato', '.entry-ev'], ['contenido', '.entry-media'] ] },
+    ['nota', '.entry-status'], ['dato', '.entry-address'], ['dato', '.entry-ev'], ['contenido', '.entry-media'],
+    // 2026-11-19: la franja de editoriales, una capa más del Inicio bajo la foto: rótulo con su pausa (franja-cab), la ventana de la franja (sus elementos se mueven: no son piezas) y el enlace estático.
+    ['franja-cab', '.franja-cab'], ['contenido', '.franja-escena'], ['accion', '.franja-ver'] ] },
   { id: 'casa', sel: '#casa', piezas: [
     ['titular', '#house-title'], ['entradilla', '.house .sec-texto'], ['contenido', '.house-track .still:first-child .still-img'],
     ['pie', '.house-track .still:first-child figcaption'], ['accion', '.house-nav'] ] },
@@ -319,6 +326,8 @@ function enPagina(cfg) {
         if (h.matches('.c3d')) { c3d(h, sup); continue; }
         if (h.matches('[role="radiogroup"]')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
         if (h.matches('.ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // enlaces sin fondo: la tinta del primero
+        if (h.matches('.franja-escena')) { empuja(h, 'rejilla', sup); continue; }   // la franja de editoriales (2026-11-19): se mide su ventana; los elementos se mueven y no son piezas
+        if (h.matches('.franja-cab')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // rótulo + pausa: un grupo que empieza en el margen
         if (h.matches('.house-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }   // «Foto anterior» y «Foto siguiente» (2026-11-19): un grupo que empieza en el margen
         if (h.matches('.house-track, .news-list, .cat-grid, .ev-filas, .ev-pasados, .ct-rejilla, .merch-grid')) {
           const id = empuja(h, 'rejilla', sup);
@@ -437,6 +446,8 @@ const r0 = v => Math.round(v);
 
 function parRol(a, b) {
   const txt = ['entradilla', 'estado', 'texto', 'subtitular'];
+  if (b === 'franja-cab') return 'capa→capa';                                  // la franja de editoriales (2026-11-19): una capa del Inicio bajo la foto
+  if (a === 'franja-cab') return 'rótulo→contenido';                           // su rótulo con la pausa → la ventana de la franja, 8
   if (a === 'titular' && ['subtitular', 'rotulo'].includes(b)) return 'cabecera→contenido';
   if (b === 'accion') return 'contenido→acción';
   if (a === 'control' && b === 'rotulo') return 'filete';

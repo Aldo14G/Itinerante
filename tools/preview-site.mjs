@@ -16,7 +16,7 @@ const types = {
   '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8', '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
 const gz = new Map();
-export const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/mobile.css', '/app.js', '/catalog.js', '/motion.js', '/rail.js', '/carousel3d.js', '/cafe.js', '/feed.js', '/news.js', '/merch.js', '/sample.js', '/tag.js','/saved.js', '/sheets.js', '/404.html', '/404.css', '/manifest.webmanifest', '/robots.txt', '/sitemap.xml', '/Logo.png', '/Logo.webp']);
+export const PAGES = new Set(['/index.html', '/tokens.css', '/style.css', '/mobile.css', '/app.js', '/catalog.js', '/motion.js', '/rail.js', '/carousel3d.js', '/cafe.js', '/feed.js', '/news.js', '/franja.js', '/merch.js', '/sample.js', '/tag.js','/saved.js', '/sheets.js', '/404.html', '/404.css', '/manifest.webmanifest', '/robots.txt', '/sitemap.xml', '/Logo.png', '/Logo.webp']);
 const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self'; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'";
 export const allowed = path => !/[\\\0]/.test(path) && (PAGES.has(path) || (path.startsWith('/assets/') && !path.endsWith('provenance.json') && !path.endsWith('sources.json') && extname(path) in types && !path.endsWith('.txt')));
 

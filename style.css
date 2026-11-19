@@ -461,6 +461,51 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 
 @media (min-width: 1280px) { .entry-title { font: var(--t-display); letter-spacing: var(--ls-display); } }
 
+/* ---------- Franja de editoriales (Inicio, 2026-11-19; DESIGN.md, «Franja de editoriales») ----------
+   Una capa más del Inicio, bajo la foto (capa → capa 80 en el teléfono y la tableta, 96 en escritorio): rótulo y pausa, la franja y un enlace estático al bloque Editoriales del Catálogo. Transparente: sin caja ni
+   relleno, la tinta suave (tinta-2) y los bordes desvanecidos. La base es la versión QUIETA (cada nombre una sola vez, centrado, en los renglones que haga falta): es lo que se ve sin
+   JavaScript, con «reducir movimiento», con la pausa del pie, con ahorro de datos y con la pausa de la propia franja (html.franja-quieta). El bucle solo existe con
+   html.motion y sin franja-quieta: dos grupos idénticos (cada uno llena la ventana) y el carril se desplaza -50 % con transform, a franja-velocidad px/s; franja.js mide el
+   grupo, pone la duración (--franja-dur) y marca data-listo (hasta entonces nada se mueve, y empezar en 0 no se nota). Se detiene con el cursor encima, con el foco dentro de la franja
+   (el control de pausa o el enlace), al presionar y fuera de la vista. Los elementos no son enlaces. */
+.franja { grid-column: 1 / -1; min-width: 0; margin-top: var(--space-12); } /* 32 de la rejilla del Inicio + 48 = capa → capa 80 en el teléfono y la tableta: la franja queda bajo el primer pliegue en 393×659, 375×629 y 320×640 */
+.franja-cab { display: flex; align-items: center; gap: var(--space-2); min-height: var(--alto-sm); }
+.franja-rotulo { margin: 0; font: var(--t-subtitulo); color: var(--tinta-2); }
+.franja-ctl { display: none; flex: none; }
+html.motion .franja-ctl:not([hidden]) { display: inline-flex; }
+.franja-ic-reanuda, html.franja-quieta .franja-ic-pausa { display: none; }
+html.franja-quieta .franja-ic-reanuda { display: block; }
+.franja-escena { margin-top: var(--space-2); } /* rótulo → grupo 8 */
+.franja-ventana { overflow: hidden; }
+.franja-carril { display: block; }
+.franja-lista { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-3) var(--space-8); margin: 0; padding: 0; list-style: none; }
+.franja-item { display: flex; align-items: center; color: var(--tinta-2); transition: color var(--dur-rapida) var(--curva-salida); }
+.franja-nombre { font: var(--t-titulo-3); letter-spacing: 0; white-space: nowrap; }
+/* El logo, cuando exista (con permiso de la editorial): silueta monocroma con su máscara; el color es el del texto, así sirve en claro y en oscuro sin versiones por tema. */
+.franja-logo { display: block; flex: none; height: var(--franja-logo-alto); background-color: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; }
+.franja-lista.franja-lista--eco, .franja-item.franja-eco { display: none; } /* la versión quieta muestra cada nombre una sola vez: sin las copias del bucle */
+@media (forced-colors: active) { .franja-logo { forced-color-adjust: none; background-color: CanvasText; } }
+/* Al pasar el cursor por la franja (o con el foco dentro) los nombres pasan a tinta, a la vez que se detiene: las copias del bucle son inertes y no reciben :hover una por una. */
+@media (hover: hover) { .franja-escena:hover .franja-item { color: var(--tinta); } }
+.franja:focus-within .franja-item { color: var(--tinta); }
+.franja-ver { margin-top: var(--space-6); margin-inline-start: calc(-1 * var(--space-4)); } /* contenido → su acción 24; la tinta del enlace en el margen, no su caja */
+@media (min-width: 761px) { .franja-ver { margin-top: var(--space-8); } } /* 32 desde 761 */
+@media (min-width: 1024px) { .franja { margin-top: var(--space-24); } } /* sin gap de fila en la rejilla de 12: capa → capa 96 (cabe en el primer pliegue de 1440 × 900) */
+html.motion:not(.franja-quieta) .franja-ventana { -webkit-mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); }
+html.motion:not(.franja-quieta) .franja-carril { display: flex; width: max-content; }
+html.motion:not(.franja-quieta) .franja-lista { flex: none; flex-wrap: nowrap; justify-content: flex-start; gap: 0; }
+html.motion:not(.franja-quieta) .franja-lista.franja-lista--eco { display: flex; }
+html.motion:not(.franja-quieta) .franja-item.franja-eco { display: flex; }
+html.motion:not(.franja-quieta) .franja-item { flex: none; min-height: var(--alto-lg); padding-inline-end: var(--space-16); } /* el hueco va como relleno: cada grupo mide lo mismo que su vuelta */
+.motion .franja[data-listo] .franja-carril { animation: franja-corre var(--franja-dur, 40s) linear infinite; will-change: transform; }
+html.franja-quieta .franja[data-listo] .franja-carril { animation: none; will-change: auto; } /* la pausa de la propia franja: vuelve a la versión quieta */
+html.motion:not(.franja-quieta) .franja:not([data-en-vista]) .franja-carril, html.motion:not(.franja-quieta) .franja-escena:active .franja-carril, html.motion:not(.franja-quieta) .franja:focus-within .franja-carril { animation-play-state: paused; }
+@media (hover: hover) { html.motion:not(.franja-quieta) .franja-escena:hover .franja-carril { animation-play-state: paused; } }
+@keyframes franja-corre { to { transform: translate3d(-50%, 0, 0); } }
+/* Los logos de la franja (generado por `npm run editoriales` desde assets/data/editoriales.json: la CSP no permite `style` en línea; vacío mientras no haya logos autorizados). */
+/* franja-logos:inicio · generado por `npm run editoriales` desde assets/data/editoriales.json; no se edita a mano */
+/* franja-logos:fin */
+
 /* ---------- La casa ---------- */
 
 .house { padding: calc(var(--sec) / 2) 0 calc(var(--sec) / 2 - var(--space-2)); background: var(--fondo-2); } /* la tira reserva 8 px bajo los pies de foto (el foco): sección → sección exacto */
@@ -936,7 +981,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
    index.html desde catalog.json (scripts/build-editoriales.mjs). Subtitular Title 3 («Editoriales / independientes, una por una»), su nota con los hechos
    reales y una lista agrupada de filas de 56 —nombre, número de títulos y chevron—, como el pie y el horario. En el teléfono, a 32 del carrusel (bloque →
    bloque); desde 761, una capa con su filete, como Explorar (capa → capa 32 + 32 / 48 + 48). Titular → nota 8; nota → lista 24. */
-.edit { margin-top: var(--space-8); }
+.edit { margin-top: var(--space-8); scroll-margin-top: calc(var(--space-6) - var(--space-2)); } /* «Ver los libros por editorial» (la franja del Inicio) llega con el subtitular a 24 px bajo la cabecera */
 .edit-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; } /* Title 3, el subtitular de siempre (no .layer-title: guias.mjs la usa para el de Explorar) */
 .edit-tit em { display: block; font-style: normal; color: var(--tinta-2); }
 .edit-nota { margin: var(--space-2) 0 0; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; }

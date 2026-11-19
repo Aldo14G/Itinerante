@@ -64,6 +64,7 @@ html:not(.js) .tabbar { display: none; }
   --reserva-inferior: calc(var(--alto-barra-inferior) + var(--space-2) + var(--space-4) + env(safe-area-inset-bottom, 0px));
   gap: var(--space-6); padding-top: var(--space-6);
 }
+.franja { margin-top: calc(var(--space-12) + var(--space-2)); } /* franja de editoriales: 24 de la rejilla del Inicio en el teléfono + 56 = capa → capa 80 (en tableta, 32 + 48; style.css) */
 .entry-title-mas { display: block; } /* dos renglones fijos en todo teléfono: el bloque no salta de 2 a 1 renglón entre modelos */
 .entry-media { aspect-ratio: auto; height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); }
 .news-hint .entry-media { height: clamp(160px, calc(100svh - var(--hdr-h) - var(--entrada-arriba) - var(--space-4) - var(--alto-md) - var(--reserva-inferior)), calc((100vw - 2 * var(--margen)) / 1.5)); } /* con el control de novedades reservado */

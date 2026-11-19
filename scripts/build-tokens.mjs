@@ -44,6 +44,7 @@ export function renderSite(tokens) {
   group('Movimiento', [...own(s.duration), ...own(s.easing)]);
   group('Tiempos de JavaScript (no son transiciones)', own(s.tiempo));
   group('Entrada de marca (IntroMarca): tamaño de la marca al empezar y su centro', own(s.intro ?? {}));
+  group('Franja de editoriales del Inicio (velocidad en px/s, alto del logo y borde desvanecido)', own(s.franja ?? {}));
   group('Objetivos y medida', [['target-fine', `${s.target.fine}px`], ['target-coarse', `${s.target.coarse}px`], ['measure-max', `${s.measure.max}ch`]]);
   own(t.root).forEach(([k, v]) => light.push(`  ${k}: ${v};`));
   const print = own(t.print ?? {}).map(([k, v]) => `    --${k}: ${v};`).join('\n');

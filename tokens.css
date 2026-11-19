@@ -208,6 +208,11 @@
   --intro-escala-amplia: 3;
   --intro-centro: 42svh;
 
+  /* Franja de editoriales del Inicio (velocidad en px/s, alto del logo y borde desvanecido) */
+  --franja-velocidad: 40;
+  --franja-logo-alto: 28px;
+  --franja-desvanece: 48px;
+
   /* Objetivos y medida */
   --target-fine: 24px;
   --target-coarse: 44px;

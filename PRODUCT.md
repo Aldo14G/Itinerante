@@ -242,6 +242,10 @@ Hechos confirmados por Aldo hasta hoy —**lo único que puede decir el sitio**�
 3. **Merch** preparado y oculto hasta tener productos; el sitio nunca afirma existencias.
 4. **Marca y SEO listos para el dominio, sin dominio**: el sitio sigue con `noindex,nofollow` a propósito; `scripts/set-dominio.mjs` lo retira solo con `--indexar`; no se compra ni se registra ningún dominio desde el repositorio (`docs/DOMINIO.md`).
 
+### Decisión del 2026-11-19 (cuarta tanda, Aldo): franja de editoriales en el Inicio
+
+Aldo pidió una franja de las editoriales asociadas a Itinerante que fluya en transparente por el Inicio (al modo de la franja de marcas del sitio de Vercel). **Sin logos todavía: nombres en tipografía.** Lo que puede decir el sitio: «Editoriales en el catálogo» y los nombres de las editoriales de `catalog.json` (hoy Abismos Casa Editorial, Capítulo Siete e Iridiscencias; «Libro Objeto» queda fuera hasta que Aldo confirme que es una editorial). **No dice «aliadas», «socias», «oficiales» ni «distribuidores»**: no se sabe el vínculo con cada una. Los logos de terceras marcas no se descargan ni se copian de internet: entran solo con el permiso por escrito de la editorial (`docs/EDITORIALES-LOGOS.md`). Pendientes de Aldo en `docs/PENDIENTES-NEGOCIO.md`, B7 (lista completa de editoriales, vínculo que se puede decir y logos con permiso).
+
 ## Evidence on Hand
 
 - Fotografías reales de la casa en `assets/img/` (lote oficial, cuenta oficial de Instagram y
