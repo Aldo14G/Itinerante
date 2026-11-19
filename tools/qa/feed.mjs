@@ -384,7 +384,9 @@ overrideEventos = null;
   const real0 = await leer();
   await send('Emulation.setScriptExecutionDisabled', { value: true });
   await send('Page.navigate', { url: URL_ }); await sleep(1500);
-  const estatico = await ev(`Math.round(document.querySelector('#cartelera').getBoundingClientRect().height)`);
+  // Se mide con content-visibility forzado a visible (2026-11-19): en el teléfono la sección usa `content-visibility: auto` y, fuera de la ventana, su alto es la
+  // estimación y no el real; qué tan lejos queda de la ventana depende de lo que haya encima (con las Editoriales, más lejos), no de lo que se comprueba aquí.
+  const estatico = await ev(`(() => { const s = document.querySelector('#cartelera'); s.style.contentVisibility = 'visible'; return Math.round(s.getBoundingClientRect().height); })()`);
   await send('Emulation.setScriptExecutionDisabled', { value: false });
   check('anteriores', 'lista real (hoy, sin eventos pasados): no existe el apartado ni su botón ni su encabezado, y la sección mide lo mismo que el HTML estático (sin hueco)', !real0.ap && real0.n === 0 && !real0.fold && !real0.sub.includes('Eventos anteriores') && real0.secH === estatico, JSON.stringify([real0.ap, real0.n, real0.secH, estatico]));
   // (2) datos de prueba en el teléfono y en escritorio

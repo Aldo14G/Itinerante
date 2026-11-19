@@ -1,13 +1,15 @@
 // Contenido nuevo del 2026-11-19 en el navegador: Preguntas frecuentes (Visita), Editoriales (Catálogo) y Merch (oculto hasta tener productos).
-// Uso: node tools/qa/contenido.mjs URL [DIR] [--solo=F,E,M]   (Playwright como guias.mjs; DIR: capturas). Sale con 1 si algo falla.
+// Uso: node tools/qa/contenido.mjs URL [DIR] [--solo=F,E,M,A]   (Playwright como guias.mjs; DIR: capturas). Sale con 1 si algo falla.
 //  F · FAQ: details/summary nativos (4, cerrados, 56 de alto o más), teclado (Enter y Espacio abren y cierran), foco visible, el chevron gira solo con movimiento, la respuesta
 //      no anima con movimiento reducido, los enlaces de las respuestas llevan a su sitio (#horario, #contacto) y #catalogo abre Explorar en el teléfono, sin desbordes.
 //  E · Editoriales: el bloque, sus filas (≥ 56) y sus conteos; el clic abre Explorar con el filtro de esa editorial (teléfono: hoja y el foco vuelve a la fila al cerrar;
 //      escritorio: baja a la rejilla en línea); cada editorial muestra exactamente sus títulos; sin entrada en la barra, el ☰ ni la barra inferior; sin JavaScript, enlaces a #catalogo.
+//  A · axe-core (WCAG 2.x A/AA, 2.2 AA y buenas prácticas, con contraste) sobre el inicio con las preguntas frecuentes abiertas, Editoriales y Merch de prueba, y sobre la 404, en 393 y 1440, claro y oscuro: sin violaciones.
 //  M · Merch: con el merch.json real (vacío) NO existe nada (ni sección, ni enlaces, ni clase, ni zona); con productos DE PRUEBA (solo en este arnés: se sirven por
 //      intercepción de red, nunca están en el repositorio; las fotos son sustitutas) aparece entre Café y Visita con 1, 3 y 12 productos, con foto rota y sin precio, con su
 //      entrada en la barra (cabe a 1101 px, también con Novedades) y en el ☰, marca el destino actual y las bandas de fondo alternan.
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join, dirname } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
@@ -21,7 +23,7 @@ const pos = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const opt = Object.fromEntries(process.argv.slice(2).filter(a => a.startsWith('--')).map(a => { const [k, v] = a.slice(2).split('='); return [k, v ?? true]; }));
 const URL_ = pos[0] || 'http://127.0.0.1:8094/';
 const DIR = pos[1] || null; if (DIR) mkdirSync(DIR, { recursive: true });
-const SOLO = new Set(String(opt.solo || 'F,E,M').split(','));
+const SOLO = new Set(String(opt.solo || 'F,E,M,A').split(','));
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
@@ -90,7 +92,7 @@ async function faq() {
   // movimiento: con él, el chevron tiene transición y la respuesta entra con animación; con «reducir movimiento», ninguna de las dos
   for (const reducido of [false, true]) {
     const { browser, page } = await abrir('393', { reducido });
-    await page.evaluate(() => { document.querySelector('.faq-item').open = true; });
+    await page.evaluate(() => { document.querySelector('.faq-item').scrollIntoView(); document.querySelector('.faq-item').open = true; }); // a la vista: en el teléfono Visita usa content-visibility y fuera de ella no recalcula estilos
     await page.waitForFunction(() => /matrix\(-1, 0, 0, -1/.test(getComputedStyle(document.querySelector('.faq-chev')).transform), null, { timeout: 4000 }).catch(() => {}); // la transición del chevron (dur-rapida) termina
     const m = await ev(page, () => { const it = document.querySelector('.faq-item'); const c = getComputedStyle(it.querySelector('.faq-chev')), r = getComputedStyle(it.querySelector('.faq-resp')); return { motion: document.documentElement.classList.contains('motion'), tc: c.transitionDuration, an: r.animationName, giro: c.transform }; });
     if (!reducido) ok('F5', m.motion && m.tc !== '0s' && m.an === 'faq-entra', `con movimiento: el chevron transiciona (${m.tc}) y la respuesta entra (${m.an})`);
@@ -310,9 +312,28 @@ async function merch() {
   }
 }
 
+// ---------------------------------------------------------------- A · axe-core
+async function axeNuevo() {
+  const axeSource = readFileSync(createRequire(join(root, 'package.json')).resolve('axe-core/axe.min.js'), 'utf8');
+  const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
+  for (const perfil of ['393', '1440']) for (const oscuro of [false, true]) for (const caso of ['inicio', '404']) {
+    const { browser, context, page } = await abrir(perfil, { merch: caso === 'inicio' ? productosDePrueba(12) : null, oscuro });
+    if (caso === '404') await page.goto(new URL('/no/existe/ruta', URL_).href);
+    else {
+      await page.evaluate(() => { for (const e of document.querySelectorAll('*')) if (getComputedStyle(e).contentVisibility !== 'visible') e.style.contentVisibility = 'visible'; document.querySelectorAll('.faq-item').forEach(d => { d.open = true; }); document.querySelectorAll('.merch-card').forEach(a => a.scrollIntoView({ block: 'center' })); });
+      await sleep(1500);
+    }
+    await page.evaluate(axeSource);
+    const v = await page.evaluate(tags => axe.run({ include: [['body']] }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] }).then(r => r.violations.map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, el: x.nodes.slice(0, 2).map(n => n.target.join(' ')) }))), TAGS);
+    ok('A1', v.length === 0, `${caso} · ${perfil} · ${oscuro ? 'oscuro' : 'claro'}: axe ${v.length ? JSON.stringify(v) : 'sin violaciones'}`);
+    await context.close(); await browser.close();
+  }
+}
+
 if (SOLO.has('F')) await faq();
 if (SOLO.has('E')) await editoriales();
 if (SOLO.has('M')) await merch();
+if (SOLO.has('A')) await axeNuevo();
 const fallos = res.filter(r => !r.ok);
 console.log(`\n${res.length - fallos.length}/${res.length} comprobaciones en verde${fallos.length ? `; FALLAN ${fallos.length}: ${[...new Set(fallos.map(f => f.regla))].join(', ')}` : ''}`);
 process.exit(fallos.length ? 1 : 0);

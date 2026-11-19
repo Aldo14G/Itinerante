@@ -695,6 +695,7 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .faq { margin: 0; }
 .faq-tit { margin: 0; font: var(--t-titulo-3); letter-spacing: var(--ls-titulo-3); text-wrap: balance; } /* Title 3, el subtitular de siempre (no .layer-title: guias.mjs la usa para el de Explorar) */
 .faq-lista { margin: var(--space-6) 0 0; padding: 0 var(--space-4); border-radius: var(--radio-md); background: var(--fondo); }
+.faq-item { padding-block: var(--space-1); } /* fila de 64: pregunta de 56 y 4 arriba y abajo; entre dos preguntas quedan 9 px (≥ 8 entre vecinos, como las filas del pie) */
 .faq-item + .faq-item { border-top: 1px solid var(--linea); }
 .faq-preg {
   display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-lg); margin-inline: calc(-1 * var(--space-2)); padding: var(--space-2);
@@ -942,8 +943,8 @@ ul.ev-costo { display: grid; gap: var(--space-1); }
 .edit-lista { margin: var(--space-6) 0 0; padding: 0 var(--space-4); list-style: none; border-radius: var(--radio-md); background: var(--fondo-2); }
 .edit-lista li + li, .edit-resto .edit-lista { border-top: 1px solid var(--linea); }
 .edit-lista--resto { margin: 0; padding: 0; border-radius: 0; background: none; }
-.edit-lista li { padding-block: var(--space-1); } /* fila de 56: enlace de 48 y 4 px arriba y abajo, como las del pie */
-.edit-fila { display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-md); margin-inline: calc(-1 * var(--space-2)); padding: var(--space-1) var(--space-2); border-radius: var(--radio-sm); color: var(--tinta); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.edit-lista li { padding-block: var(--space-1); } /* fila de 64: enlace de 56 (un nombre largo que baja de renglón, 52, no sale de la escala) y 4 px arriba y abajo; entre dos filas quedan 9 px (≥ 8 entre vecinos) */
+.edit-fila { display: flex; align-items: center; gap: var(--space-3); min-height: var(--alto-lg); margin-inline: calc(-1 * var(--space-2)); padding: var(--space-1) var(--space-2); border-radius: var(--radio-sm); color: var(--tinta); text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .edit-nom { flex: 1 1 auto; min-width: 0; font: var(--t-titular); letter-spacing: var(--ls-titular); text-wrap: balance; }
 .edit-n { flex: none; font: var(--t-subtitulo); color: var(--tinta-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .edit-ir { flex: none; width: 20px; height: 20px; color: var(--tinta-2); }

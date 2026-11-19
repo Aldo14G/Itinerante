@@ -122,6 +122,13 @@ genérico.
 - El precio de la hoja de la librería se muestra en la ficha, bajo el carrusel 3D del Catálogo
   y bajo cada tarjeta de la rejilla («autor · $250 MXN»); va marcado como dato de la hoja
   (`data-fuente="hoja"`) y la existencia se sigue confirmando por WhatsApp.
+- **Preguntas frecuentes, Editoriales y Merch (2026-11-19; aprobado por Aldo).** *Preguntas frecuentes* (en Visita, tras el mapa y la foto): solo respuestas
+  confirmadas —quedarse a leer con el café (sin «gratis»), pedir la obra que no está (sin plazos ni promesa de ejemplar), el horario y los festivos que ya publica
+  el sitio—; lo que falta (pagos, factura, accesibilidad, estacionamiento, envíos, tarjetas de regalo, apartado, mascotas, edad) está en
+  `docs/PENDIENTES-NEGOCIO.md` con su redacción propuesta y un campo vacío para la respuesta de Aldo. *Editoriales* (dentro del Catálogo, sin entrada en la barra):
+  las editoriales reales del inventario con su número de títulos; cada una abre Explorar con su filtro. *Merch* (**oculto hasta tener productos**): artículos de la
+  librería con la misma regla de verdad del catálogo —nunca se afirma existencia: «Consultar disponibilidad» por WhatsApp con el producto y su precio ya escritos—;
+  sin productos válidos no existen ni la sección ni sus enlaces (`docs/MERCH.md`).
 - El catálogo es el inventario real de la librería (41 libros) con búsqueda local;
   no depende de ningún servicio para funcionar.
 - El recorrido audiovisual acompaña la entrada y las secciones de la casa; la
@@ -225,6 +232,15 @@ Inventario y tabla de cambios de la curaduría: `DESIGN.md`, «Curaduría de tex
 
 5. Barra inferior: vuelve la cápsula flotante (la anclada se retiró). Catálogo lleva al mismo sitio (`#libros`) desde todas las entradas.
 6. Mapa de Visita con Google (Maps Embed API, modo `place`) cuando Aldo cree la clave; mientras tanto, el mapa SVG de OpenStreetMap. **Qué implica para quien visita:** con la clave puesta, al llegar a Visita el navegador carga una página de Google dentro del sitio; Google puede recibir la IP y el agente del navegador y guardar cookies propias (de terceros). El sitio no guarda nada de eso. **Pendiente de negocio: un aviso de privacidad** que lo diga antes de encender la clave (qué se carga, de quién y que la dirección y «Cómo llegar» no dependen de ello). Pasos de la clave: `docs/MAPA-GOOGLE.md`.
+
+### Decisiones del 2026-11-19 (tercera tanda, Aldo)
+
+Hechos confirmados por Aldo hasta hoy —**lo único que puede decir el sitio**—: (a) con el consumo del café se puede quedar uno a leer en la sala; (b) si alguien busca una obra que no está, la librería puede pedirla (sin prometer ejemplar ni plazos); (c) el horario habitual y la dirección ya publicados; (d) el contacto es WhatsApp, Instagram, Facebook y correo; (e) los 41 libros son de editoriales independientes. Nada más sobre pagos, factura, accesibilidad, estacionamiento, festivos (el sitio ya dice «¿Vienes en día festivo? Pregúntanos antes por WhatsApp.»), envíos, merch o tarjetas de regalo.
+
+1. **Preguntas frecuentes** dentro de Visita (`details/summary` nativos, desde `assets/data/faq.json`), solo con respuestas verdaderas; lo no confirmado queda como pendiente documentado (`docs/PENDIENTES-NEGOCIO.md`), nunca como texto del sitio.
+2. **Editoriales** dentro del Catálogo (sin entrada en la barra, el ☰ ni la barra inferior), con datos reales de `catalog.json`; con menos de 3 editoriales no se pinta.
+3. **Merch** preparado y oculto hasta tener productos; el sitio nunca afirma existencias.
+4. **Marca y SEO listos para el dominio, sin dominio**: el sitio sigue con `noindex,nofollow` a propósito; `scripts/set-dominio.mjs` lo retira solo con `--indexar`; no se compra ni se registra ningún dominio desde el repositorio (`docs/DOMINIO.md`).
 
 ## Evidence on Hand
 

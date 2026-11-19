@@ -183,11 +183,11 @@ html.sheet-open .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--s
 /* Primer pintado: bajo el inicio nada se maqueta hasta acercarse; el navegador recuerda la altura real (auto). Cifras medidas a 360–414 px. */
 .house { content-visibility: auto; contain-intrinsic-size: auto 520px; }
 .bill { content-visibility: auto; contain-intrinsic-size: auto 760px; }
-.books { content-visibility: auto; contain-intrinsic-size: auto 1076px; }
+.books { content-visibility: auto; contain-intrinsic-size: auto 1469px; } /* 2026-11-19: + el bloque Editoriales (+393 px: 361 del bloque y 32 de aire; el Catálogo mide 1 309–1 350 de 320 a 393, antes 916–957) */
 .news { content-visibility: auto; contain-intrinsic-size: auto 420px; }
 .cafe { content-visibility: auto; contain-intrinsic-size: auto 2312px; } /* 2026-11-17, recomposición (filas de 12, barra de 44 y la carta en el HTML): la sección mide 2 357–2 392 de 360 a 414 (2 376 a 393); la reserva es del contenido, sin los 32 + 32 de la banda: 2 312 (antes 2 548, que con la banda reservaba 2 612) */
 .cafe:has(.ct-gal) { contain-intrinsic-size: auto 2568px; } /* con la galería de la carta (2026-11-17): +255–257 medidos a 375 y 393 (pieza, pie y aire, sin la foto de la cabecera) */
-.visit { content-visibility: auto; contain-intrinsic-size: auto 1430px; } /* 2026-11-14: + el mapa de llegada (+290 px: 266 del mapa y su atribución y 24 de aire). 2026-11-19: + las preguntas frecuentes cerradas (+308 px: Visita mide 1 467–1 517 de 320 a 414) */
+.visit { content-visibility: auto; contain-intrinsic-size: auto 1462px; } /* 2026-11-14: + el mapa de llegada (+290 px: 266 del mapa y su atribución y 24 de aire). 2026-11-19: + las preguntas frecuentes cerradas (+340 px: Visita mide 1 499–1 549 de 320 a 393) */
 .ftr { content-visibility: auto; contain-intrinsic-size: auto 567px; } /* 2026-11-13, contacto en el pie: el Catálogo −124, Café −52, Visita −68 y el pie +247 px (medido de 360 a 414) */
 
 /* ---------- Ventanas bajas: teléfono en horizontal (≤ 500 px de alto) ---------- */

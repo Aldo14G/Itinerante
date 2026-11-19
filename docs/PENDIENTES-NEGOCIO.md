@@ -82,7 +82,7 @@ Cada una con la redacción propuesta de la pregunta (como aparecería en Visita)
 - **Respuesta de Aldo:**
 
 ### B5. Ficha de Google Business Profile
-- **Falta:** que Aldo (o quien administre la ficha) verifique que nombre, dirección y horario coinciden letra por letra con el sitio (ver «NAP» en `docs/DOMINIO.md`) y que decida si publica el teléfono de WhatsApp en la ficha.
+- **Falta:** que Aldo (o quien administre la ficha) verifique que nombre, dirección y horario coinciden letra por letra con el sitio (ver «NAP» en `docs/DOMINIO.md`) y que decida si publica el teléfono de WhatsApp en la ficha. Falta también el **enlace de la ficha en Google Maps** (hoy el JSON-LD usa una búsqueda por nombre y dirección en `hasMap`; con el enlace de la ficha se sustituye) y si el WhatsApp es además el teléfono de voz de la librería (el JSON-LD lo publica como `telephone`, porque es el único número publicado).
 - **Respuesta de Aldo:**
 
 ### B6. Aviso de privacidad (mapa de Google)
