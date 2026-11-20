@@ -4,8 +4,8 @@
 Uso:  python3 scripts/logo-editorial.py RUTA/logo.svg|png "Nombre de la editorial" --permiso "quién lo autorizó y cuándo" [--alt "…"] [--fecha AAAA-MM-DD] [--autor "…"]
       después:  npm run editoriales   (pinta la franja y las reglas de los logos)  y  npm test
 
-- «Nombre de la editorial» es el que trae el catálogo (assets/data/catalog.json, campo `p`; mayúsculas y acentos no importan). La franja solo muestra editoriales
-  que están en el catálogo: si ninguna coincide, el script falla.
+- «Nombre de la editorial» es el que trae el catálogo (assets/data/catalog.json, campo `p`) o el de una entrada de `colaboran` en assets/data/editoriales.json
+  (mayúsculas y acentos no importan). La franja solo muestra esas: si ninguna coincide, el script falla.
 - --permiso es OBLIGATORIO y no puede ir vacío: quién de la editorial (o de quién tenga sus derechos) autorizó que el logo aparezca en el sitio, y cuándo
   (p. ej. «correo de Fulana, editora, 2026-12-03»). Los logos de terceras marcas NO se descargan ni se copian de internet. Sin permiso, el script falla y no escribe nada.
 - Entrada: SVG (se revisa que no traiga scripts, eventos ni referencias externas y que tenga viewBox; se guarda tal cual, así que pide el SVG ya recortado al logo, sin
@@ -102,8 +102,13 @@ def main():
         falla('el nombre de la editorial va vacío')
     libros = lee_json(CATALOGO).get('books', [])
     registradas = {clave(b.get('p', '')): re.sub(r'\s+', ' ', b.get('p', '')).strip() for b in libros if isinstance(b.get('p'), str) and b.get('p').strip()}
+    if k not in registradas and os.path.isfile(EDITORIALES):  # 2026-11-20: también las editoriales y espacios de `colaboran` (assets/data/editoriales.json)
+        for c in lee_json(EDITORIALES).get('colaboran', []):
+            n = re.sub(r'\s+', ' ', c.get('nombre', '')).strip() if isinstance(c, dict) and isinstance(c.get('nombre'), str) else ''
+            if n and clave(n) == k:
+                registradas[k] = n
     if k not in registradas:
-        falla(f'«{nombre}» no es una editorial de assets/data/catalog.json: la franja solo muestra editoriales del catálogo. Las que hay: {", ".join(sorted(registradas.values()))}')
+        falla(f'«{nombre}» no es una editorial de assets/data/catalog.json ni de `colaboran` en assets/data/editoriales.json: la franja solo muestra esas. Las que hay: {", ".join(sorted(registradas.values()))}')
     nombre = registradas[k]
     alt = (a.alt or f'Logotipo de {nombre}').strip()
     if not alt or len(alt) > 120:

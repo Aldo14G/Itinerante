@@ -246,6 +246,10 @@ Hechos confirmados por Aldo hasta hoy —**lo único que puede decir el sitio**�
 
 Aldo pidió una franja de las editoriales asociadas a Itinerante que fluya en transparente por el Inicio (al modo de la franja de marcas del sitio de Vercel). **Sin logos todavía: nombres en tipografía.** Lo que puede decir el sitio: «Editoriales en el catálogo» y los nombres de las editoriales de `catalog.json` (hoy Abismos Casa Editorial, Capítulo Siete e Iridiscencias; «Libro Objeto» queda fuera hasta que Aldo confirme que es una editorial). **No dice «aliadas», «socias», «oficiales» ni «distribuidores»**: no se sabe el vínculo con cada una. Los logos de terceras marcas no se descargan ni se copian de internet: entran solo con el permiso por escrito de la editorial (`docs/EDITORIALES-LOGOS.md`). Pendientes de Aldo en `docs/PENDIENTES-NEGOCIO.md`, B7 (lista completa de editoriales, vínculo que se puede decir y logos con permiso).
 
+### Decisión del 2026-11-20 (Aldo): colaboraciones en la franja de editoriales
+
+Aldo pidió sumar a la franja las asociaciones de la marca (Ediciones Tres Caminos, Liminal y las cafeterías con las que hay evento conjunto). **Solo entra lo que consta:** *Ediciones Tres Caminos* (su página pública de Facebook agradece a quienes llenaron la librería para «Tarde de Letras VII») y *Liminal* (lo nombra Aldo; sin evento conjunto confirmado en fuentes públicas). **No hay ninguna cafetería**: Instagram no se pudo leer y no se inventó ninguna; Aldo debe dar nombre exacto, evento y fecha o publicación de origen (`docs/PENDIENTES-NEGOCIO.md`, B8). Con colaboraciones el rótulo deja de decir «en el catálogo» y dice **«Editoriales y espacios con los que compartimos libros y eventos»** (sin cifra; redacción **pendiente de aprobación de Aldo**); sin ellas vuelve «Editoriales en el catálogo». No se dice «aliadas», «socias», «oficiales», «distribuidoras», «asociadas», «patrocinadores» ni «gratis». Los datos viven en `assets/data/editoriales.json` → `colaboran`.
+
 ## Evidence on Hand
 
 - Fotografías reales de la casa en `assets/img/` (lote oficial, cuenta oficial de Instagram y

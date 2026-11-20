@@ -83,6 +83,9 @@ Cada una con la redacción propuesta de la pregunta (como aparecería en Visita)
 
 ### B5. Ficha de Google Business Profile
 - **Falta:** que Aldo (o quien administre la ficha) verifique que nombre, dirección y horario coinciden letra por letra con el sitio (ver «NAP» en `docs/DOMINIO.md`) y que decida si publica el teléfono de WhatsApp en la ficha. Falta también el **enlace de la ficha en Google Maps** (hoy el JSON-LD usa una búsqueda por nombre y dirección en `hasMap`; con el enlace de la ficha se sustituye) y si el WhatsApp es además el teléfono de voz de la librería (el JSON-LD lo publica como `telephone`, porque es el único número publicado).
+- **Dirección distinta en los listados públicos (2026-11-20):** el sitio dice **Mariano Matamoros 421** (confirmado por Aldo con su enlace de Maps), pero los listados públicos de **Google, Waze y Facebook** y la ficha de **Capítulo Siete** todavía muestran **«Padre Mier 836A Pte.»**
+  (la dirección anterior; la carta impresa de Café Itinerante también la trae). Hay que **unificar el NAP** (nombre, dirección, teléfono) en todos esos sitios con la dirección de Matamoros 421: Google Business Profile, Waze, la página de Facebook y, con Capítulo Siete, pedirles que corrijan su ficha. Mientras
+  no coincidan, el sitio y los listados se contradicen y se debilita la ficha de Google. Esto lo hace quien administra cada ficha: no se corrige desde el repositorio. Dirección actual y NAP: `docs/DOMINIO.md`.
 - **Respuesta de Aldo:**
 
 ### B6. Aviso de privacidad (mapa de Google)
@@ -90,8 +93,8 @@ Cada una con la redacción propuesta de la pregunta (como aparecería en Visita)
 - **Respuesta de Aldo:**
 
 ### B7. Franja de editoriales del Inicio: lista completa, vínculo y logos (2026-11-19)
-- **Qué se ve:** en el Inicio, bajo la foto, una franja con las editoriales del catálogo: hoy **Abismos Casa Editorial, Capítulo Siete e Iridiscencias**, con su nombre en tipografía
-  (rótulo «Editoriales en el catálogo»; debajo, «Ver los libros por editorial»). «Libro Objeto» no aparece hasta que se resuelva B1. Con menos de 3 editoriales la franja no se pinta.
+- **Qué se ve:** en el Inicio, bajo la foto, una franja con las editoriales del catálogo: **Abismos Casa Editorial, Capítulo Siete e Iridiscencias**, con su nombre en tipografía
+  (desde el 2026-11-20 se suman las colaboraciones de B8 y el rótulo es el de B8; sin colaboraciones sería «Editoriales en el catálogo»; debajo, «Ver los libros por editorial»). «Libro Objeto» no aparece hasta que se resuelva B1. Con menos de 3 editoriales la franja no se pinta.
   El sitio **no dice «aliadas», «socias», «oficiales» ni «distribuidores»**: solo que hay libros de esas editoriales en el catálogo.
 - **Falta saber, 1: la lista completa.** ¿Con qué otras editoriales trabaja la librería además de las de los 41 títulos? Una franja de 3 nombres repetidos en bucle se ve corta; con 6 a 8
   nombres reales se ve como una franja de verdad. Se añaden importando sus libros a la hoja (`python3 scripts/import-inventario.py`) y corriendo `npm run editoriales`: la franja crece sola.
@@ -103,4 +106,22 @@ Cada una con la redacción propuesta de la pregunta (como aparecería en Visita)
 - **Falta saber, 3: logos con permiso.** Para cada editorial, un logo en SVG (o PNG con fondo transparente) **y su permiso por escrito** para mostrarlo en el sitio. Qué pedirles y cómo cargarlo:
   `docs/EDITORIALES-LOGOS.md` (`python3 scripts/logo-editorial.py … --permiso "…"`, que registra quién lo autorizó). Sin permiso, el sitio sigue con el nombre en tipografía; nunca se copia un logo de internet.
   - **Logos con permiso (editorial · archivo · quién lo autorizó y cuándo):**
+- **Respuesta de Aldo:**
+
+### B8. Colaboraciones en la franja: cafeterías y espacios con evento conjunto, Liminal y el rótulo (2026-11-20)
+- **Encargo de Aldo:** «Investiga a partir de Instagram las asociaciones que tiene la marca. Una era Tres Caminos, edición Tres Caminos, Liminal, todas las cafeterías con las que también tienen evento conjunto, y a partir de ello ponerlas como en el carrusel.»
+- **Lo que NO se pudo verificar:** **Instagram no se pudo leer** (pide iniciar sesión y el acceso fue denegado; no se intentó saltarlo), así que **no hay ninguna cafetería en la franja**: no se inventó ninguna. Tampoco se pudo confirmar a Liminal por una fuente pública (ver abajo).
+- **Qué se ve hoy** (en `assets/data/editoriales.json` → `colaboran`; la franja = editoriales del catálogo + `colaboran`, en ese orden):
+  - **Ediciones Tres Caminos** (editorial): consta en público. Su página de Facebook (https://www.facebook.com/EdicionesTresCaminos/) agradece a quienes llenaron la Librería Itinerante y más el sábado 19 de julio para «Tarde de Letras VII» (evento conjunto). Esa publicación es la `fuente` (no se imprime).
+  - **Liminal** (espacio: café-librería en el centro de Monterrey): lo nombra Aldo como colaboración; **no hay evento conjunto confirmado en fuentes públicas**, así que va **sin `fuente`**. Una nota de Telediario lo describe como librería con literatura japonesa y café, pero no habla de la colaboración.
+  - Cada nombre, en tipografía (sin logos de terceros; el pipeline con `--permiso` sigue igual y ahora también admite los de `colaboran`). No son enlaces.
+- **Redacción nueva, pendiente de aprobación de Aldo:** el rótulo de la franja con colaboraciones es **«Editoriales y espacios con los que compartimos libros y eventos»** (sin cifra; sin «aliadas», «socias», «oficiales», «distribuidoras», «asociadas», «patrocinadores» ni «gratis»; «en el catálogo» ya no era cierto de Liminal). Sin colaboraciones a la vista el rótulo vuelve a «Editoriales en el catálogo». Si Aldo prefiere otra redacción, se cambia `ROTULO_COLABORA` en `scripts/franja-datos.mjs` y se corre `npm run editoriales`.
+- **Falta saber, 1: la lista de cafeterías y espacios con evento conjunto.** Para cada una: **nombre exacto** (como lo escriben en público), **cuál fue el evento** y **su fecha o la publicación de origen** (enlace de Instagram, Facebook o Luma). Se añaden como un objeto más a `colaboran` (`{ "nombre": "…", "tipo": "espacio", "fuente": "https://…" }`) y se corre `npm run editoriales`: no se toca HTML ni JS. Sin ese dato no se publica ninguna.
+  - **Cafeterías y espacios (nombre · evento · fecha o enlace de la publicación):**
+- **Falta saber, 2: confirmar Liminal.** ¿Hubo o hay evento conjunto, o es otro tipo de colaboración? ¿Está bien nombrarlo «Liminal» (nombre exacto) y con qué publicación se puede respaldar? Mientras no se confirme, el sitio lo nombra solo porque Aldo lo pidió; el rótulo no promete más que «compartimos libros y eventos».
+  - **Liminal (qué se puede decir y dónde consta):**
+- **Falta saber, 3: «Tres Caminos» y «edición Tres Caminos».** Aldo escribió «Tres Caminos, edición Tres Caminos». Se entendió como **Ediciones Tres Caminos** (la editorial). Si «Tres Caminos» es además otro espacio (por ejemplo un café), hay que decirlo y dar su nombre exacto; si es una sola, queda como está.
+  - **Aclaración:**
+- **Falta saber, 4: el rótulo.** Confirmar «Editoriales y espacios con los que compartimos libros y eventos» o dar otra redacción; y, para cada nombre, si se puede decir un vínculo más preciso (ver B7).
+  - **Rótulo aprobado:**
 - **Respuesta de Aldo:**

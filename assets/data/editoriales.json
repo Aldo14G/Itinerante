@@ -1,5 +1,16 @@
 {
-  "$comentario": "Franja de editoriales del Inicio (2026-11-19). Las editoriales salen de assets/data/catalog.json (campo `p`); aquí solo se decide lo que los datos no dicen. `excluir`: nombres que NO aparecen en la franja hasta que Aldo confirme que son editoriales («Libro Objeto» puede ser un formato). `logos`: clave = nombre normalizado (minúsculas, sin acentos) → { logo, alt, ancho, alto }; VACÍO mientras no haya un logo con permiso de la editorial. Un logo se añade con `python3 scripts/logo-editorial.py` (exige --permiso y lo registra en assets/provenance.json); a mano no se edita. Pasos: docs/EDITORIALES-LOGOS.md. Después, `npm run editoriales`.",
+  "$comentario": "Franja de editoriales del Inicio (2026-11-19; colaboraciones 2026-11-20). Las editoriales salen de assets/data/catalog.json (campo `p`); aquí solo se decide lo que los datos no dicen. `excluir`: nombres que NO aparecen en la franja hasta que Aldo confirme que son editoriales («Libro Objeto» puede ser un formato). `colaboran`: editoriales y espacios (cafeterías, librerías…) con los que la librería comparte libros y eventos y que NO están en el catálogo; van después de las del catálogo, en este orden. Cada entrada: { nombre (como se escribe en público), tipo: \"editorial\" | \"espacio\", fuente?: enlace https de la publicación que lo confirma (no se imprime) }. Sumar una cafetería es añadir un objeto aquí y correr `npm run editoriales`: no se toca HTML ni JS. Solo entra lo que Aldo confirma o consta en una publicación pública; sin fuente pública va sin el campo `fuente` y se anota en docs/PENDIENTES-NEGOCIO.md (B8). `logos`: clave = nombre normalizado (minúsculas, sin acentos) → { logo, alt, ancho, alto }; VACÍO mientras no haya un logo con permiso de la editorial o el espacio. Un logo se añade con `python3 scripts/logo-editorial.py` (exige --permiso y lo registra en assets/provenance.json); a mano no se edita. Pasos: docs/EDITORIALES-LOGOS.md. Después, `npm run editoriales`.",
   "excluir": ["Libro Objeto"],
+  "colaboran": [
+    {
+      "nombre": "Ediciones Tres Caminos",
+      "tipo": "editorial",
+      "fuente": "https://www.facebook.com/EdicionesTresCaminos/"
+    },
+    {
+      "nombre": "Liminal",
+      "tipo": "espacio"
+    }
+  ],
   "logos": {}
 }

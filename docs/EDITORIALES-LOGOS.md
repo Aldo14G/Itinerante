@@ -2,14 +2,15 @@
 
 Creado el 2026-11-19 (encargo de Aldo: una franja de editoriales en el Inicio al modo de la franja de marcas de Vercel).
 
-**Estado hoy: sin logos.** La franja usa el **nombre de cada editorial en tipografía** (Inter / letra del sistema, peso 600), que es un dato verdadero:
-sale de `assets/data/catalog.json` (campo `p`). Los logos son marcas de terceros: **no se descargan ni se copian de internet** y no hay ninguno autorizado.
+**Estado hoy: sin logos.** La franja usa el **nombre de cada editorial o espacio en tipografía** (Inter / letra del sistema, peso 600), que es un dato verdadero:
+sale de `assets/data/catalog.json` (campo `p`) y, desde el 2026-11-20, de `colaboran` en `assets/data/editoriales.json`. Los logos son marcas de terceros: **no se descargan ni se copian de internet** y no hay ninguno autorizado.
 
 ## Qué dice y qué no dice el sitio
 
-- Dice: «Editoriales en el catálogo» y los nombres; debajo, «Ver los libros por editorial», que lleva al bloque «Editoriales» del Catálogo.
-- **No dice «aliadas», «socias», «oficiales» ni «distribuidores»**: no sabemos el vínculo exacto con cada editorial. Aparecer en la franja significa una sola cosa:
-  hay libros de esa editorial en el catálogo.
+- Dice, con colaboraciones (hoy), «Editoriales y espacios con los que compartimos libros y eventos» (sin cifra; redacción **pendiente de aprobación de Aldo**, `docs/PENDIENTES-NEGOCIO.md`, B8) y los nombres;
+  sin colaboraciones, «Editoriales en el catálogo». Debajo, «Ver los libros por editorial», que lleva al bloque «Editoriales» del Catálogo.
+- **No dice «aliadas», «socias», «oficiales», «distribuidoras», «asociadas», «patrocinadores» ni «gratis»**: no sabemos el vínculo exacto con cada nombre. Aparecer en la franja significa
+  una de dos cosas: hay libros de esa editorial en el catálogo, o la librería la nombra como colaboración (`colaboran`).
 - Cuando Aldo confirme el vínculo, se pregunta si se puede decir y cómo (ver `docs/PENDIENTES-NEGOCIO.md`, B7) antes de tocar el rótulo.
 
 ## Qué editoriales aparecen
@@ -17,6 +18,18 @@ sale de `assets/data/catalog.json` (campo `p`). Los logos son marcas de terceros
 Las del catálogo, derivadas por `editorialesDe` (`catalog.js`), **menos** las de `excluir` en `assets/data/editoriales.json`. Hoy se excluye «Libro Objeto»:
 puede ser un formato y no una editorial (pendiente B1). La franja crece sola cuando se importan más libros (`python3 scripts/import-inventario.py`, después
 `npm run editoriales`). Con menos de 3 editoriales no se pinta nada.
+
+## Colaboraciones: editoriales y espacios fuera del catálogo (2026-11-20)
+
+`assets/data/editoriales.json` → `colaboran`: lista de `{ "nombre", "tipo": "editorial" | "espacio", "fuente"?: "https://…" }`. Van **después** de las del catálogo, en el orden del archivo.
+
+- **Añadir una cafetería u otro espacio** = añadir un objeto y correr `npm run editoriales`: no se toca HTML ni JS. Ejemplo: `{ "nombre": "Nombre exacto", "tipo": "espacio", "fuente": "https://…" }`.
+- **Solo entra lo que Aldo confirma o consta en una publicación pública.** La `fuente` (no se imprime) es esa publicación; sin fuente pública va sin el campo y se anota en `docs/PENDIENTES-NEGOCIO.md` (B8). Instagram pide sesión: lo que solo se vea ahí lo trae Aldo.
+- Hoy: **Ediciones Tres Caminos** (editorial; fuente: su página de Facebook, que agradece a quienes llenaron la librería el sábado 19 de julio para «Tarde de Letras VII») y **Liminal** (espacio; sin fuente pública).
+- Postel: una entrada torcida (sin nombre, `tipo` distinto, no es objeto) se ignora; una `fuente` que no sea https se pierde pero la entrada se queda; un nombre repetido (mayúsculas, acentos y espacios no distinguen) cuenta una vez;
+  una que ya es editorial del catálogo no se repite; las de `excluir` no aparecen. `editorialesLogosProblems` (y `npm run editoriales`) le dice a quien edita qué está torcido.
+- Con colaboraciones a la vista, el rótulo es «Editoriales y espacios con los que compartimos libros y eventos»; sin ellas, «Editoriales en el catálogo». El mínimo de 3 cuenta lo que se ve.
+- Un logo de una colaboración se carga igual (`logo-editorial.py` acepta su nombre) y **con permiso del espacio o la editorial**.
 
 ## Qué pedir a cada editorial (para tener un logo con permiso)
 
@@ -37,7 +50,7 @@ npm run editoriales
 npm test
 ```
 
-- El nombre es el del catálogo (mayúsculas y acentos no importan). Si no coincide con ninguna editorial de `catalog.json`, el script falla y lista las que hay.
+- El nombre es el del catálogo o el de una entrada de `colaboran` (mayúsculas y acentos no importan). Si no coincide con ninguna, el script falla y lista las que hay.
 - **`--permiso` es obligatorio.** Sin él (o vacío) el script falla y no escribe nada.
 - El script guarda `assets/img/editoriales/<clave>.svg` (o `.webp`, recortado a lo visible y reducido a una silueta de hasta 168 px de alto), añade la entrada a
   `assets/data/editoriales.json` (`logos`: clave normalizada → `{ logo, alt, ancho, alto }`) y registra el archivo en `assets/provenance.json` → `logos` con

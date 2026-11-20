@@ -8,8 +8,8 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { editorialesDe, EDITORIALES_MIN } from '../catalog.js';
 import {
-  leerConfig, franjaPlan, franjaHtml, withFranja, logosCss, withLogosCss, editorialesLogosProblems, slugEditorial, copiasPorGrupo, anchoEstimado,
-  INICIO, FIN, CSS_INICIO, CSS_FIN, ROTULO, VER, ANCHO_LLENAR
+  leerConfig, franjaPlan, franjaHtml, withFranja, logosCss, withLogosCss, editorialesLogosProblems, slugEditorial, copiasPorGrupo, anchoEstimado, validColabora, rotuloDe,
+  INICIO, FIN, CSS_INICIO, CSS_FIN, ROTULO, ROTULO_COLABORA, VER, ANCHO_LLENAR
 } from '../scripts/franja-datos.mjs';
 import { problemasLogosDisco, leerEditorialesJson } from '../scripts/build-editoriales.mjs';
 
@@ -24,6 +24,7 @@ const libro = (id, p) => ({ id, p });
 const tres = [libro('a', 'Uno Ediciones'), libro('b', 'Dos Casa Editorial'), libro('c', 'Tres Libros')];
 const LOGO_OK = { logo: 'assets/img/editoriales/uno-ediciones.svg', alt: 'Logotipo de Uno Ediciones', ancho: 300, alto: 60 };
 const sinTexto = s => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+const f0 = () => franjaDe(html);
 const franjaDe = h => h.slice(h.indexOf(INICIO), h.indexOf(FIN) + FIN.length);
 
 test('Franja: index.html es lo que pinta build-editoriales (npm run editoriales) y style.css trae sus marcas de logos', () => {
@@ -35,14 +36,23 @@ test('Franja: index.html es lo que pinta build-editoriales (npm run editoriales)
   assert.ok(/"editoriales": "node scripts\/build-editoriales\.mjs"/.test(pkg) && /tests\/franja\.test\.mjs/.test(pkg), 'npm run editoriales y esta prueba dentro de npm test');
 });
 
-test('Franja: sus editoriales son las del catálogo menos las excluidas; hoy tres (Abismos, Capítulo Siete, Iridiscencias) y «Libro Objeto» no aparece', () => {
+test('Franja: sus nombres son las editoriales del catálogo menos las excluidas y, después, las que colaboran; hoy cinco y «Libro Objeto» no aparece', () => {
   const cfg = leerConfig(raw);
   const plan = franjaPlan(catalogo.books, cfg);
   const todas = editorialesDe(catalogo.books);
   assert.deepEqual(raw.excluir, ['Libro Objeto'], 'Aldo no ha confirmado que «Libro Objeto» sea una editorial');
-  assert.deepEqual(plan.lista.map(e => e.nombre), todas.filter(e => e.nombre !== 'Libro Objeto').map(e => e.nombre));
-  assert.deepEqual(plan.lista.map(e => e.nombre).sort(), ['Abismos Casa Editorial', 'Capítulo Siete', 'Iridiscencias']);
-  assert.equal(plan.mostrar, true);
+  assert.deepEqual(plan.lista.slice(0, 3).map(e => e.nombre), todas.filter(e => e.nombre !== 'Libro Objeto').map(e => e.nombre), 'primero las del catálogo, en su orden');
+  assert.deepEqual(plan.lista.slice(0, 3).map(e => e.nombre).sort(), ['Abismos Casa Editorial', 'Capítulo Siete', 'Iridiscencias']);
+  assert.deepEqual(plan.lista.slice(3).map(e => [e.nombre, e.tipo, e.origen]), [['Ediciones Tres Caminos', 'editorial', 'colaboran'], ['Liminal', 'espacio', 'colaboran']], 'después, las de `colaboran`, en el orden del JSON');
+  assert.equal(plan.lista.length, 5); assert.equal(plan.colaboran, true); assert.equal(plan.mostrar, true);
+  // fuentes (2026-11-20): Tres Caminos consta en su página pública de Facebook; Liminal no tiene fuente pública (Aldo la nombra; pendiente B8) y no se inventa una
+  assert.equal(raw.colaboran.length, 2);
+  assert.deepEqual(raw.colaboran[0], { nombre: 'Ediciones Tres Caminos', tipo: 'editorial', fuente: 'https://www.facebook.com/EdicionesTresCaminos/' });
+  assert.deepEqual(raw.colaboran[1], { nombre: 'Liminal', tipo: 'espacio' }, 'sin fuente pública: sin el campo');
+  assert.ok(!/instagram/i.test(JSON.stringify(raw.colaboran)), 'Instagram no se pudo leer: ninguna fuente de Instagram se inventa');
+  const carrilHtml = f0().slice(f0().indexOf('class="franja-carril"'), f0().indexOf('<a class="btn btn--plano btn--sm franja-ver"'));
+  assert.ok(!/<a\b/.test(carrilHtml), 'las colaboraciones no son enlaces');
+  assert.ok(!franjaDe(html).includes('facebook.com'), 'la fuente no se imprime');
   const f = franjaDe(html);
   const reales = [...f.matchAll(/<li class="franja-item"><span class="franja-nombre">([^<]+)<\/span><\/li>/g)].map(m => m[1]);
   assert.deepEqual(reales, plan.lista.map(e => e.nombre), 'los elementos reales de la franja (los que lee un lector de pantalla) son esas editoriales, en su orden');
@@ -53,7 +63,9 @@ test('Franja: sus editoriales son las del catálogo menos las excluidas; hoy tre
 test('Franja: lista con rótulo, sin enlaces dentro del carril, copias aria-hidden e inert, enlace estático al bloque Editoriales y sin palabras de vínculo', () => {
   const f = franjaDe(html);
   assert.match(f, /<section class="franja" aria-labelledby="franja-rotulo" data-franja>/);
-  assert.match(f, new RegExp(`<p class="franja-rotulo" id="franja-rotulo">${ROTULO}</p>`));
+  const plan0 = franjaPlan(catalogo.books, leerConfig(raw));
+  assert.match(f, new RegExp(`<p class="franja-rotulo" id="franja-rotulo">${rotuloDe(plan0)}</p>`), 'con colaboraciones, el rótulo de las colaboraciones');
+  assert.equal(rotuloDe(plan0), ROTULO_COLABORA);
   assert.match(f, /<ul class="franja-lista" aria-labelledby="franja-rotulo">/);
   const carril = f.slice(f.indexOf('class="franja-carril"'), f.indexOf('<a class="btn btn--plano btn--sm franja-ver"'));
   assert.ok(!/<a\b|<button\b|tabindex/.test(carril), 'un objetivo en movimiento es inaccesible: nada enfocable dentro del carril');
@@ -63,8 +75,12 @@ test('Franja: lista con rótulo, sin enlaces dentro del carril, copias aria-hidd
   assert.match(f, new RegExp(`<a class="btn btn--plano btn--sm franja-ver" href="#editoriales"><span>${VER}</span>`));
   assert.ok(html.includes('id="editoriales"'), 'el enlace lleva a un bloque que existe');
   assert.ok(!/<button|franja-ctl|data-franja-ctl/.test(f), 'sin botón propio: la persona no maneja la franja (decisión de Aldo, 2026-11-19)');
-  assert.ok(!/aliad|socia|oficial|distribuid|asociad|partner|patrocin|respald/i.test(sinTexto(f)), 'el sitio no dice «aliadas», «socias», «oficiales» ni «distribuidores»: no se sabe el vínculo');
-  assert.ok(!/gratis|disponible|existencia/i.test(sinTexto(f)));
+  const PROHIBIDO = /aliad|socia|oficial|distribuid|asociad|patrocin|partner|respald|gratis|disponible|existencia/i;
+  assert.ok(!PROHIBIDO.test(sinTexto(f)), 'el sitio no dice «aliadas», «socias», «oficiales», «distribuidoras», «asociadas», «patrocinadores» ni «gratis»: no se sabe el vínculo');
+  for (const r of [ROTULO, ROTULO_COLABORA]) assert.ok(!PROHIBIDO.test(r) && !/\d/.test(r), `el rótulo «${r}» no nombra un vínculo ni lleva cifra`);
+  assert.equal(ROTULO_COLABORA, 'Editoriales y espacios con los que compartimos libros y eventos');
+  assert.equal(rotuloDe({ colaboran: false }), ROTULO, 'sin colaboraciones, el rótulo de siempre');
+  assert.ok(ROTULO_COLABORA !== ROTULO && !/en el catálogo/.test(ROTULO_COLABORA), '«en el catálogo» ya no es cierto de Liminal: el rótulo con colaboraciones no lo dice');
   assert.ok(ROTULO !== sinTexto(html.match(/<p class="entry-lede">([^<]*)</)[1]) && !/Libros de editoriales independientes/.test(ROTULO), 'no repite el texto del hero');
   // las copias del bucle: un grupo llena la ventana más ancha (1152) según la estimación del generador
   const plan = franjaPlan(catalogo.books, leerConfig(raw));
@@ -97,7 +113,7 @@ test('Franja: con menos de 3 editoriales no se pinta nada (ni hueco ni encabezad
 test('Franja: editoriales.json vacío, ausente o torcido no rompe (Postel): se toma como sin exclusiones y sin logos', () => {
   for (const crudo of [undefined, null, {}, [], 'x', 3, { excluir: 'Libro Objeto' }, { logos: [] }, { logos: 'x', excluir: [1, null, ''] }, { logos: { 'Uno Ediciones': { logo: 'http://x/y.svg' } } }]) {
     const cfg = leerConfig(crudo);
-    assert.equal(cfg.excluir.size, 0); assert.equal(cfg.logos.size, 0);
+    assert.equal(cfg.excluir.size, 0); assert.equal(cfg.logos.size, 0); assert.equal(cfg.colaboran.length, 0);
     const plan = franjaPlan(tres, cfg);
     assert.equal(plan.lista.length, 3); assert.ok(plan.lista.every(e => e.logo === null)); assert.equal(plan.mostrar, true);
     assert.ok(franjaHtml(tres, cfg, '  ').includes('franja-nombre'));
@@ -105,10 +121,55 @@ test('Franja: editoriales.json vacío, ausente o torcido no rompe (Postel): se t
   assert.deepEqual(editorialesLogosProblems(undefined), [], 'sin archivo no hay nada que revisar');
   assert.deepEqual(editorialesLogosProblems({}), []);
   assert.deepEqual(editorialesLogosProblems({ excluir: [], logos: {} }), []);
+  assert.deepEqual(editorialesLogosProblems({ excluir: [], colaboran: [], logos: {} }), []);
   assert.ok(editorialesLogosProblems([]).length === 1 && editorialesLogosProblems('x').length === 1, 'un archivo que no es objeto se reporta');
   assert.deepEqual(problemasLogosDisco(leerEditorialesJson()), [], 'el editoriales.json real pasa la revisión con el disco');
   assert.deepEqual(raw.logos, {}, 'hoy no hay ningún logo autorizado');
   assert.deepEqual(json('assets/provenance.json').logos, [], 'ni registrado');
+});
+
+test('Franja: `colaboran` (editoriales y espacios que no están en el catálogo): Postel, deduplicación, excluir, orden, mínimo de 3 y rótulo', () => {
+  const uno = { nombre: 'Café Prueba', tipo: 'espacio' };
+  // entradas torcidas se ignoran (sin romper nada) y una fuente torcida solo se pierde
+  for (const torcido of ['x', 3, null, {}, [], { nombre: 'A' }, { nombre: 'A', tipo: 'cafe' }, { nombre: '', tipo: 'espacio' }, { nombre: 'x'.repeat(61), tipo: 'espacio' }, { nombre: 3, tipo: 'espacio' }, [uno]]) {
+    assert.equal(validColabora(torcido), null, JSON.stringify(torcido));
+    assert.equal(leerConfig({ colaboran: [torcido] }).colaboran.length, 0);
+  }
+  assert.equal(leerConfig({ colaboran: 'x' }).colaboran.length, 0); assert.equal(leerConfig({ colaboran: { nombre: 'A', tipo: 'espacio' } }).colaboran.length, 0);
+  assert.deepEqual(validColabora({ ...uno, nombre: '  Café   Prueba ', fuente: 'javascript:alert(1)' }), { nombre: 'Café Prueba', clave: 'cafe prueba', tipo: 'espacio', fuente: null }, 'espacios simples; una fuente que no es https se pierde, la entrada se queda');
+  assert.equal(validColabora({ ...uno, fuente: 'http://x.test/a' }).fuente, null, 'solo https');
+  assert.equal(validColabora({ ...uno, fuente: 'https://www.facebook.com/x/' }).fuente, 'https://www.facebook.com/x/');
+  const cfg = leerConfig({ excluir: ['Libro Objeto'], colaboran: [{ nombre: 'Basura' }, uno, { nombre: 'café  PRUEBA', tipo: 'editorial' }, { nombre: 'Dos Casa Editorial', tipo: 'editorial' }, { nombre: 'LIBRO OBJETO', tipo: 'editorial' }, { nombre: 'Otra Casa', tipo: 'editorial', fuente: 'https://example.org/p' }] });
+  assert.deepEqual(cfg.colaboran.map(c => c.nombre), ['Café Prueba', 'Dos Casa Editorial', 'LIBRO OBJETO', 'Otra Casa'], 'una repetida (cualquier grafía) cuenta una vez, la primera');
+  const libros = [...tres, libro('d', 'Libro Objeto')];
+  const plan = franjaPlan(libros, cfg);
+  assert.deepEqual(plan.lista.map(e => e.nombre), ['Dos Casa Editorial', 'Tres Libros', 'Uno Ediciones', 'Café Prueba', 'Otra Casa'], 'catálogo primero, luego colaboran; sin duplicar una del catálogo («Dos Casa Editorial») ni una excluida («LIBRO OBJETO», con cualquier grafía)');
+  assert.ok(plan.lista.slice(0, 3).every(e => e.origen === 'catalogo') && plan.lista.slice(3).every(e => e.origen === 'colaboran'));
+  assert.equal(plan.colaboran, true); assert.equal(rotuloDe(plan), ROTULO_COLABORA);
+  // sin colaboraciones a la vista (todas repetidas o excluidas): el rótulo de siempre
+  const sin = franjaPlan(libros, leerConfig({ excluir: ['Libro Objeto'], colaboran: [{ nombre: 'DOS casa editorial', tipo: 'editorial' }, { nombre: 'libro objeto', tipo: 'editorial' }] }));
+  assert.equal(sin.colaboran, false); assert.equal(rotuloDe(sin), ROTULO);
+  assert.ok(franjaHtml(libros, leerConfig({ excluir: ['Libro Objeto'] }), '  ').includes(`>${ROTULO}<`));
+  // el mínimo cuenta lo que se ve: dos del catálogo + una colaboración = tres → se pinta; dos + ninguna → nada
+  const dos = [libro('a', 'Una'), libro('b', 'Dos')];
+  assert.ok(franjaHtml(dos, leerConfig({ colaboran: [uno] }), '  ').includes('class="franja"'), '2 + 1 = 3: sí');
+  assert.equal(franjaHtml(dos, leerConfig({}), '  '), '  ' + INICIO + '\n  ' + FIN, '2: no');
+  assert.equal(franjaPlan(dos, leerConfig({ colaboran: [uno] })).mostrar, true);
+  // añadir una cafetería futura = un objeto más en el JSON; la franja la pinta como nombre en tipografía, sin enlace y sin la fuente
+  const html2 = franjaHtml(tres, leerConfig({ colaboran: [uno, { nombre: 'Otra Cafetería', tipo: 'espacio', fuente: 'https://example.org/evento' }] }), '  ');
+  assert.ok(/franja-nombre">Café Prueba</.test(html2) && /franja-nombre">Otra Cafetería</.test(html2) && !/<a\b|example\.org/.test(html2.slice(0, html2.indexOf('<a class="btn btn--plano btn--sm franja-ver"'))));
+  assert.ok(html2.includes(`>${ROTULO_COLABORA}<`) && !html2.includes(`>${ROTULO}<`), 'con colaboraciones, solo el rótulo nuevo');
+  // las colaboraciones también pueden llevar logo (con permiso): la clave es el nombre normalizado
+  const conLogo = franjaPlan(tres, leerConfig({ colaboran: [uno], logos: { 'cafe prueba': { logo: 'assets/img/editoriales/cafe-prueba.svg', alt: 'Logotipo de Café Prueba', ancho: 200, alto: 50 } } }));
+  assert.equal(conLogo.lista.at(-1).logo?.ancho, 200);
+  // la revisión del archivo le avisa a quien lo edita
+  assert.deepEqual(editorialesLogosProblems({ colaboran: [uno, { nombre: 'Otra', tipo: 'editorial', fuente: 'https://example.org/p' }, { nombre: 'Sin fuente', tipo: 'espacio', fuente: null }] }), []);
+  const mal = editorialesLogosProblems({ colaboran: ['x', { nombre: 'A' }, { nombre: 'B', tipo: 'cafe' }, { nombre: 'Café', tipo: 'espacio', fuente: 'http://x.test' }, { nombre: 'café', tipo: 'espacio' }, { nombre: 'Café', tipo: 'espacio' }] }).join(' | ');
+  for (const t of ['colaboran[0]: no es un objeto', 'colaboran[1]: `tipo`', 'colaboran[2]: `tipo`', 'colaboran[3]: `fuente`', 'está repetida']) assert.ok(mal.includes(t), `${t} ← ${mal}`);
+  assert.match(editorialesLogosProblems({ colaboran: 'x' }).join(), /`colaboran` es una lista/);
+  // la estimación de copias sigue llenando la ventana con cinco nombres reales
+  const real = franjaPlan(catalogo.books, leerConfig(raw)).lista;
+  assert.ok(copiasPorGrupo(real) * anchoEstimado(real) >= ANCHO_LLENAR && copiasPorGrupo(real) >= 1);
 });
 
 test('Franja: un logo sin archivo, sin registrar o sin permiso explícito falla; con las tres cosas pasa', () => {
@@ -188,6 +249,13 @@ Image.new('RGB', (900, 400), (255, 255, 255)).save(${JSON.stringify(opaco)})`]).
     const d2 = JSON.parse(readFileSync(join(tmp, 'assets/data/editoriales.json'), 'utf8'));
     assert.equal(d2.logos.iridiscencias.logo, 'assets/img/editoriales/iridiscencias.svg'); assert.equal(d2.logos.iridiscencias.alt, 'Logotipo de Iridiscencias');
     assert.ok(d2.logos.iridiscencias.ancho / d2.logos.iridiscencias.alto === 4);
+    // 2026-11-20: también se puede cargar el logo de una editorial o un espacio de `colaboran` (con permiso, igual)
+    assert.equal(run(svg, 'LIMINAL', '--permiso', 'mensaje de Liminal, 2026-12-05').status, 0, 'un espacio de colaboran admite logo con permiso');
+    const d3 = JSON.parse(readFileSync(join(tmp, 'assets/data/editoriales.json'), 'utf8'));
+    assert.equal(d3.logos.liminal.logo, 'assets/img/editoriales/liminal.svg'); assert.equal(d3.colaboran.length, 2, 'las colaboraciones se conservan');
+    const fl = franjaHtml(catalogo.books, leerConfig(d3), '  ');
+    assert.ok(/data-logo="liminal"/.test(fl) && /franja-nombre">Ediciones Tres Caminos/.test(fl), 'Liminal con su silueta y Ediciones Tres Caminos con su nombre en la misma franja');
+    assert.notEqual(run(svg, 'Una Cafetería Inventada', '--permiso', 'mensaje, 2026-12-05').status, 0, 'lo que no está ni en el catálogo ni en colaboran sigue fallando');
     // y una franja pintada con esa configuración usa las dos siluetas
     const f = franjaHtml(catalogo.books, leerConfig(d2), '  ');
     assert.ok(/data-logo="capitulo-siete"/.test(f) && /data-logo="iridiscencias"/.test(f) && /franja-nombre">Abismos Casa Editorial/.test(f));
@@ -236,4 +304,7 @@ test('docs/EDITORIALES-LOGOS.md y PENDIENTES: pasos del logo con permiso, qué p
   for (const t of ['scripts/logo-editorial.py', '--permiso', 'npm run editoriales', 'assets/data/editoriales.json', 'provenance.json', 'silueta monocroma', 'no se descargan ni se copian de internet', 'aliadas', 'Libro Objeto', 'SVG']) assert.ok(md.includes(t), t);
   const pend = read('docs/PENDIENTES-NEGOCIO.md');
   for (const t of ['B7', 'vínculo', 'logo', 'permiso', 'Libro Objeto']) assert.ok(pend.includes(t), `PENDIENTES: ${t}`);
+  // 2026-11-20: colaboraciones (Ediciones Tres Caminos, Liminal) y rótulo nuevo, con lo que no se pudo verificar
+  for (const t of ['B8', 'Liminal', 'Ediciones Tres Caminos', ROTULO_COLABORA, 'Instagram', 'cafeterías', 'evento conjunto', 'pendiente de aprobación', 'Padre Mier 836A Pte.']) assert.ok(pend.includes(t), `PENDIENTES: ${t}`);
+  assert.ok(md.includes('colaboran') && md.includes(ROTULO_COLABORA), 'docs/EDITORIALES-LOGOS.md explica `colaboran` y el rótulo');
 });

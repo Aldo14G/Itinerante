@@ -1,9 +1,9 @@
 // Franja de editoriales del Inicio (2026-11-19, encargo de Aldo; DESIGN.md, «Franja de editoriales»), en el navegador.
 // Uso: node tools/qa/franja.mjs URL [DIR] [--solo=E,B,P,Q,C,T,L,I] [--oscuro]   (Playwright como guias.mjs; DIR: capturas). Sale con 1 si algo falla.
-//  E · Estructura: lista con rótulo, tres elementos reales, nada enfocable dentro del carril, copias aria-hidden e inert, control de 44, enlace estático a #editoriales, sin consola con errores, CLS 0.
+//  E · Estructura: lista con rótulo (el de las colaboraciones si las hay), los elementos reales de assets/data (catálogo + `colaboran`; hoy cinco), nada enfocable dentro del carril, copias aria-hidden e inert, control de 44, enlace estático a #editoriales, sin consola con errores, CLS 0.
 //  B · Bucle (320, 393, 1101, 1440; con movimiento): cada grupo llena la ventana, la vuelta cierra sin salto (el segundo grupo llega a la posición del primero al terminar: ≤ 0.1 px), el
 //      carril mide el doble de un grupo (el −50 % es exacto), la velocidad es la del token (40 px/s ± 2) y en ningún momento de la vuelta queda un hueco en la ventana; informa cómo se ve
-//      con 3 nombres (qué nombres caben a la vez y si se repiten a la vista).
+//      con los nombres de hoy (cuáles caben a la vez y cuántas veces se repite un mismo nombre a la vista: con cualquier píxel y con la mitad o más del nombre).
 //  P · Pausas: cursor encima, foco dentro (el enlace «Ver los libros por editorial»), presionar, fuera de la vista y «Pausar el movimiento» del sitio (pie y ☰): quieta y única.
 //      La franja no lleva botón propio (decisión de Aldo, 2026-11-19: la persona solo elige libros, productos y talleres).
 //  Q · Quieta: con «reducir movimiento», con ahorro de datos, con la pausa del sitio: sin animación, cada nombre una sola vez, centrado, en renglones si no
@@ -30,6 +30,13 @@ const URL_ = pos[0] || 'http://127.0.0.1:8094/';
 const DIR = pos[1] || null; if (DIR) mkdirSync(DIR, { recursive: true });
 const SOLO = new Set(String(opt.solo || 'E,B,P,Q,C,T,L,I').split(','));
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+// Lo que la franja debe mostrar hoy, de los mismos datos que la pintan (2026-11-20: editoriales del catálogo + `colaboran`): no se escribe a mano.
+const { franjaPlan: _plan, leerConfig: _cfg, rotuloDe: _rotuloDe } = await import(pathToFileURL(join(root, 'scripts/franja-datos.mjs')).href);
+const EDIT_RAW = JSON.parse(readFileSync(join(root, 'assets/data/editoriales.json'), 'utf8'));
+const PLAN = _plan(JSON.parse(readFileSync(join(root, 'assets/data/catalog.json'), 'utf8')).books, _cfg(EDIT_RAW));
+const NOMBRES = PLAN.lista.map(e => e.nombre), N = NOMBRES.length, ROTULO_ESPERADO = _rotuloDe(PLAN);
+const DESVANECE = 48; // franja-desvanece (px por lado)
+const N_LOGOS = 3; // los de prueba (modo L): las tres editoriales del catálogo; lo demás sigue con su nombre
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 const mov = (w, h, dpr = 2) => ({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, isMobile: true, hasTouch: true, userAgent: UA });
@@ -40,6 +47,7 @@ const PERFILES = {
   '1440': { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }
 };
 const res = [];
+const informe = [];
 const ok = (regla, cond, texto) => { res.push({ regla, ok: Boolean(cond), texto }); console.log(`${cond ? '✓' : '✗'} ${regla} ${texto}`); };
 const info = (regla, texto) => console.log(`· ${regla} ${texto}`);
 const r1 = n => Math.round(n * 10) / 10;
@@ -109,8 +117,8 @@ async function estructura() {
         ver: (() => { const a = f.querySelector('a.franja-ver'); const r = a.getBoundingClientRect(); return { href: a.getAttribute('href'), h: r.height, w: r.width, destino: !!document.querySelector(a.getAttribute('href')) }; })(),
         botones: f.querySelectorAll('button, [data-franja-ctl]').length, padre: f.parentElement.id };
     });
-    ok('E1', d && d.sec === 'SECTION' && d.padre === 'inicio' && d.lista && d.rotulo === 'Editoriales en el catálogo', `${perfil}: sección con nombre dentro de #inicio, lista con su rótulo «${d?.rotulo}»`);
-    ok('E1', d.reales.length === 3 && d.reales.join('|') === 'Abismos Casa Editorial|Capítulo Siete|Iridiscencias', `${perfil}: tres elementos reales (${d.reales.join(' · ')}); «Libro Objeto» no`);
+    ok('E1', d && d.sec === 'SECTION' && d.padre === 'inicio' && d.lista && d.rotulo === ROTULO_ESPERADO, `${perfil}: sección con nombre dentro de #inicio, lista con su rótulo «${d?.rotulo}»`);
+    ok('E1', d.reales.length === N && d.reales.join('|') === NOMBRES.join('|'), `${perfil}: ${N} elementos reales (${d.reales.join(' · ')}); «Libro Objeto» no`);
     ok('E2', d.enfocables === 0 && d.eco && d.grupoB, `${perfil}: nada enfocable dentro del carril; copias y grupo duplicado aria-hidden + inert`);
     ok('E3', d.ver.href === '#editoriales' && d.ver.destino && d.ver.h >= 44 - 0.5, `${perfil}: enlace estático «Ver los libros por editorial» a #editoriales (alto ${r1(d.ver.h)})`);
     const e = await estado(page);
@@ -124,7 +132,7 @@ async function estructura() {
   // sin JavaScript: pregenerada y quieta
   const { browser, page } = await abrir('393', { js: false });
   const d = await ev(page, () => ({ visibles: [...document.querySelectorAll('.franja-item')].filter(e => e.getBoundingClientRect().width > 0 && getComputedStyle(e).display !== 'none').map(e => e.textContent.trim()), anim: document.querySelector('.franja-carril').getAnimations().length }));
-  ok('E8', d.visibles.length === 3 && d.anim === 0, `393 sin JavaScript: la franja se ve (${d.visibles.length} nombres, una vez) y quieta`);
+  ok('E8', d.visibles.length === N && d.anim === 0, `393 sin JavaScript: la franja se ve (${d.visibles.length} nombres, una vez) y quieta`);
   await browser.close();
 }
 
@@ -149,10 +157,10 @@ async function bucle() {
     const difCierre = Math.abs(liB[0] - primero0);
     ok('B4', difCierre <= 0.1, `${perfil}: al cerrar la vuelta (t = duración − 1 ms) el primer elemento del segundo grupo está a ${r1(difCierre * 100) / 100} px de donde empezó el primero: sin salto`);
     // sin huecos en ninguna fase: los elementos (con su hueco como relleno) cubren la ventana
-    let peor = 0, repetidos = 0, vistos = [], hueco = 0;
-    const N = 48;
-    for (let i = 0; i < N; i++) {
-      const s = await enInstante(page, (e.anim.dur * i) / N);
+    let peor = 0, repetidos = 0, vistos = [], hueco = 0, maxMismoPx = 0, maxMismoMitad = 0, repMitad = 0, repPleno = 0;
+    const N48 = 48;
+    for (let i = 0; i < N48; i++) {
+      const s = await enInstante(page, (e.anim.dur * i) / N48);
       const cajas = s.li.filter(x => x.vis).sort((a, b) => a.l - b.l);
       const dentro = cajas.filter(x => x.r > s.v.l && x.l < s.v.r);
       const primeroL = dentro[0].l, ultimoR = dentro[dentro.length - 1].r;
@@ -160,10 +168,17 @@ async function bucle() {
       for (let k = 1; k < dentro.length; k++) hueco = Math.max(hueco, dentro[k].l - dentro[k - 1].r);
       const nom = nombresVisibles(s); vistos.push(nom);
       if (new Set(nom).size < nom.length) repetidos++;
+      // cuántas veces se ve un mismo nombre a la vez: con cualquier píxel (>1 px) y con la mitad o más de su ancho dentro de la ventana
+      const porNombre = new Map();
+      for (const x of dentro) { const w = Math.min(x.r, s.v.r) - Math.max(x.l, s.v.l); if (w > 1) { const m = porNombre.get(x.txt) ?? { px: 0, mitad: 0, pleno: 0 }; m.px++; if (w >= x.w / 2) m.mitad++; const nitido = Math.min(x.r, s.v.r - DESVANECE) - Math.max(x.l, s.v.l + DESVANECE); if (nitido >= x.w / 2) m.pleno++; porNombre.set(x.txt, m); } }
+      for (const m of porNombre.values()) { maxMismoPx = Math.max(maxMismoPx, m.px); maxMismoMitad = Math.max(maxMismoMitad, m.mitad); if (m.mitad > 1) repMitad++; if (m.pleno > 1) repPleno++; }
     }
     ok('B5', peor <= 0.5 && hueco <= 0.5, `${perfil}: en 48 instantes de la vuelta nunca queda un hueco en la ventana (borde sin cubrir ≤ ${r1(peor)} px; hueco entre elementos ≤ ${r1(hueco)} px)`);
     const maxVis = Math.max(...vistos.map(v => new Set(v).size)), maxElem = Math.max(...vistos.map(v => v.length));
-    info('B6', `${perfil}: con 3 nombres, a la vez se ven hasta ${maxElem} elementos (${maxVis} distintos); en ${repetidos} de ${N} instantes se ve el mismo nombre dos veces a la vez`);
+    info('B6', `${perfil}: con ${NOMBRES.length} nombres, a la vez se ven hasta ${maxElem} elementos (${maxVis} distintos); en ${repetidos} de ${N48} instantes se ve algún nombre dos veces a la vez (con cualquier píxel; como mucho ${maxMismoPx} veces el mismo)`);
+    info('B6', `${perfil}: contando solo los nombres con la mitad o más dentro de la ventana: ${repMitad} de ${N48} instantes con un nombre repetido (como mucho ${maxMismoMitad} veces el mismo)`);
+    info('B6', `${perfil}: y contando solo los nombres con la mitad o más FUERA de los 48 px desvanecidos de cada borde (legibles a plena tinta): ${repPleno} de ${N48} instantes con un nombre repetido`);
+    informe.push({ instantesConRepeticionNitida: repPleno,  perfil, ventana: r1(e.v.w), grupo: r1(e.aW), vuelta: r1(e.anim.dur / 1000), maxElem, maxVis, instantesConRepeticionCualquierPixel: repetidos, instantesConRepeticionMitad: repMitad, maxMismoNombrePx: maxMismoPx, maxMismoNombreMitad: maxMismoMitad, instantes: N48 });
     if (DIR && ['320', '393', '1440'].includes(perfil)) { await enInstante(page, 0); await captura(page, `B-${perfil}-t0`); await enInstante(page, e.anim.dur * 0.5); await captura(page, `B-${perfil}-t50`); }
     await browser.close();
   }
@@ -210,7 +225,7 @@ async function pausas() {
     await ev(page, () => document.querySelector('.ftr [data-motion-toggle]').scrollIntoView({ block: 'center' })); await sleep(300);
     await page.locator('.ftr [data-motion-toggle]').click(); await sleep(400);
     const q = await estado(page);
-    ok('P7', !q.motion && !q.anim && q.li.filter(x => x.vis).length === 3, `${perfil}: el interruptor del pie deja la franja quieta y única (nombres ${q.li.filter(x => x.vis).length})`);
+    ok('P7', !q.motion && !q.anim && q.li.filter(x => x.vis).length === N, `${perfil}: el interruptor del pie deja la franja quieta y única (nombres ${q.li.filter(x => x.vis).length})`);
     await page.locator('.ftr [data-motion-toggle]').click(); await sleep(500);
     const r = await estado(page);
     ok('P7', r.motion && r.anim && r.listo, `${perfil}: al reanudar el movimiento del sitio vuelve el bucle`);
@@ -241,7 +256,7 @@ async function quieta() {
     const visibles = e.li.filter(x => x.vis);
     const unicos = new Set(visibles.map(x => x.txt));
     ok('Q1', !e.anim && e.animName === 'none', `${perfil} · ${nombre}: sin animación (animation-name ${e.animName})`);
-    ok('Q2', visibles.length === 3 && unicos.size === 3 && visibles.every(x => !x.eco), `${perfil} · ${nombre}: cada nombre una sola vez (${visibles.length} elementos, ${unicos.size} distintos, sin copias)`);
+    ok('Q2', visibles.length === N && unicos.size === N && visibles.every(x => !x.eco), `${perfil} · ${nombre}: cada nombre una sola vez (${visibles.length} elementos, ${unicos.size} distintos, sin copias)`);
     const filas = [...new Set(visibles.map(x => Math.round(x.t)))].length;
     // centrado: el centro del conjunto de cada renglón contra el centro de la ventana
     const porFila = new Map(); visibles.forEach(x => { const k = Math.round(x.t); porFila.set(k, [...(porFila.get(k) ?? []), x]); });
@@ -330,7 +345,7 @@ const SILUETAS = { // genéricas, generadas aquí: NO son marcas de nadie
 export const rutearLogos = async context => {
   const { franjaHtml, leerConfig, logosCss, withLogosCss } = await import(pathToFileURL(join(root, 'scripts/franja-datos.mjs')).href);
   const cat = JSON.parse(readFileSync(join(root, 'assets/data/catalog.json'), 'utf8'));
-  const cfg = leerConfig({ excluir: ['Libro Objeto'], logos: Object.fromEntries(Object.entries(SILUETAS).map(([slug, s]) => [slug.replace(/-/g, ' '), { logo: `assets/img/editoriales/${slug}.svg`, alt: `Logotipo de prueba ${slug}`, ancho: s.ancho, alto: s.alto }])) });
+  const cfg = leerConfig({ excluir: ['Libro Objeto'], colaboran: EDIT_RAW.colaboran, logos: Object.fromEntries(Object.entries(SILUETAS).map(([slug, s]) => [slug.replace(/-/g, ' '), { logo: `assets/img/editoriales/${slug}.svg`, alt: `Logotipo de prueba ${slug}`, ancho: s.ancho, alto: s.alto }])) });
   const { withEditoriales } = await import(pathToFileURL(join(root, 'scripts/build-editoriales.mjs')).href);
   const { withFranja } = await import(pathToFileURL(join(root, 'scripts/franja-datos.mjs')).href);
   const indexHtml = withFranja(readFileSync(join(root, 'index.html'), 'utf8'), cat.books, cfg);
@@ -345,10 +360,10 @@ async function logos() {
     const t = oscuro ? 'oscuro' : 'claro';
     const d = await ev(page, () => [...document.querySelectorAll('.franja-item:not(.franja-eco) .franja-logo')].map(e => { const b = e.getBoundingClientRect(), s = getComputedStyle(e); return { h: b.height, w: b.width, ratio: b.width / b.height, bg: s.backgroundColor, mask: s.maskImage || s.webkitMaskImage, role: e.getAttribute('role'), label: e.getAttribute('aria-label') }; }));
     const tinta2 = await ev(page, () => { const e = document.createElement('i'); e.style.color = 'var(--tinta-2)'; document.body.append(e); const c = getComputedStyle(e).color; e.remove(); return c; });
-    ok('L1', d.length === 3 && d.every(x => Math.abs(x.h - 28) <= 0.5 && /url\(/.test(x.mask) && x.role === 'img' && /Logotipo de prueba/.test(x.label)), `${perfil} ${t}: 3 logos de prueba de 28 px de alto con máscara, role=img y alt (${d.map(x => `${r1(x.w)}×${r1(x.h)}`).join(', ')})`);
+    ok('L1', d.length === N_LOGOS && d.every(x => Math.abs(x.h - 28) <= 0.5 && /url\(/.test(x.mask) && x.role === 'img' && /Logotipo de prueba/.test(x.label)), `${perfil} ${t}: ${N_LOGOS} logos de prueba de 28 px de alto con máscara, role=img y alt (${d.map(x => `${r1(x.w)}×${r1(x.h)}`).join(', ')})`);
     ok('L2', d.every((x, i) => Math.abs(x.ratio - Object.values(SILUETAS)[i].ancho / Object.values(SILUETAS)[i].alto) < 0.05), `${perfil} ${t}: la proporción de cada logo se conserva (${d.map(x => r1(x.ratio)).join(', ')})`);
     ok('L3', d.every(x => x.bg === tinta2), `${perfil} ${t}: el logo toma el color de tinta-2 del tema (${d[0].bg}): una sola silueta sirve en claro y en oscuro`);
-    ok('L4', (await ev(page, () => document.querySelectorAll('.franja-nombre').length)) === 0, `${perfil} ${t}: con logo no se pinta el nombre`);
+    ok('L4', (await ev(page, () => [...document.querySelectorAll('.franja-lista:not(.franja-lista--eco) > .franja-item:not(.franja-eco) .franja-nombre')].map(x => x.textContent.trim()))).join('|') === NOMBRES.slice(N_LOGOS).join('|'), `${perfil} ${t}: con logo no se pinta el nombre; solo conservan el suyo las que no tienen logo (${NOMBRES.slice(N_LOGOS).join(', ')})`);
     ok('L5', errores.length === 0, `${perfil} ${t}: sin errores de consola`);
     // el bucle cierra igual con logos
     await ev(page, () => document.querySelector('[data-franja]').scrollIntoView({ block: 'center' })); await sleep(400);
@@ -363,7 +378,7 @@ async function logos() {
   // quieto con logos
   const { browser, page } = await abrir('393', { reducido: true, rutas: rutearLogos });
   const d = await ev(page, () => [...document.querySelectorAll('.franja-item')].filter(e => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0).length);
-  ok('L7', d === 3, `393 reducir movimiento con logos: tres logos, una sola vez (${d})`);
+  ok('L7', d === N, `393 reducir movimiento con logos: ${N_LOGOS} logos y ${N - N_LOGOS} nombres, una sola vez (${d} elementos)`);
   if (DIR) await captura(page, 'L-393-reducido');
   await browser.close();
 }
@@ -385,6 +400,7 @@ async function inp() {
 
 const orden = [['E', estructura], ['B', bucle], ['P', pausas], ['Q', quieta], ['C', contrasteYMedidas], ['T', posiciones], ['L', logos], ['I', inp]];
 for (const [k, fn] of orden) if (SOLO.has(k)) { console.log(`\n== ${k} ==`); try { await fn(); } catch (e) { ok(k, false, `la comprobación lanzó: ${e.message}`); } }
+if (informe.length && DIR) { const { writeFileSync } = await import('node:fs'); writeFileSync(join(DIR, 'franja-bucle.json'), JSON.stringify(informe, null, 2)); }
 const mal = res.filter(r => !r.ok);
 console.log(`\n${res.length - mal.length}/${res.length} comprobaciones en verde${mal.length ? `; fallan: ${mal.map(m => m.regla).join(', ')}` : ''}`);
 process.exit(mal.length ? 1 : 0);
