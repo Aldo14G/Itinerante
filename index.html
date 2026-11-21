@@ -211,11 +211,20 @@
         <a class="btn btn--plano btn--sm franja-ver" href="#editoriales"><span>Ver los libros por editorial</span><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></a>
       </section>
       <!-- franja:fin -->
-      <!-- Atajos del inicio (2026-11-20): café, eventos y el catálogo, a un toque, sin cifras. El texto de Eventos sale de eventos.json (sin fecha: «Aún sin fecha»); con un evento vigente, feed.js oculta este enlace porque el aviso del inicio ya lo dice. -->
-      <nav class="atajos" aria-label="Café, eventos y el catálogo">
-        <a class="btn btn--plano btn--sm" href="#cafe"><span>Café y té · En la sala</span></a>
-        <a class="btn btn--plano btn--sm" href="#cartelera" data-atajo-eventos><span>Eventos · <span data-atajo-eventos-txt>Aún sin fecha</span></span></a>
-        <a class="btn btn--plano btn--sm" href="#libros"><span>Ver el catálogo</span><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></a>
+      <!-- Capítulos del inicio (2026-11-20): la estructura de las dos referencias (dos piezas grandes y, debajo, el tercero a todo el ancho), con las secciones y la pieza de La casa (foto 4:3, radio lg, nombre y una línea). Sin cifras, sin texto sobre la foto y sin segunda primaria: «Cómo llegar» sigue siendo la única. El texto de Eventos sale de eventos.json (sin fecha: «Aún sin fecha»); con un evento vigente, feed.js oculta esa pieza porque el aviso del inicio ya lo dice. -->
+      <nav class="capitulos" aria-label="Catálogo, café y eventos">
+        <a class="capitulo" href="#libros">
+          <span class="capitulo-foto"><img src="assets/img/libro-ensayo.webp" width="900" height="720" alt="" loading="lazy" decoding="async"></span>
+          <span class="capitulo-txt"><span class="capitulo-nom">Catálogo</span><span class="capitulo-frase">Por dónde empezar</span></span>
+        </a>
+        <a class="capitulo" href="#cafe">
+          <span class="capitulo-foto"><img src="assets/img/llegada-sala.webp" width="1280" height="720" alt="" loading="lazy" decoding="async"></span>
+          <span class="capitulo-txt"><span class="capitulo-nom">Café y té</span><span class="capitulo-frase">Para quedarse un rato</span></span>
+        </a>
+        <a class="capitulo capitulo--evento" href="#cartelera" data-atajo-eventos>
+          <span class="capitulo-foto"><img src="assets/img/cartelera-1.webp" width="720" height="900" alt="" loading="lazy" decoding="async"></span>
+          <span class="capitulo-txt"><span class="capitulo-nom">Eventos y talleres</span><span class="capitulo-frase">En la casa · <span data-atajo-eventos-txt>Aún sin fecha</span></span></span>
+        </a>
       </nav>
     </section>
 

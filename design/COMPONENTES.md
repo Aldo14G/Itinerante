@@ -2,7 +2,7 @@
 
 # Componentes del sitio · «Itinerante Líquido»
 
-Catálogo de 38 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
+Catálogo de 39 componentes (versión 2026-11-16). La fuente es `design/componentes.json` (formato plano inspirado en `registry-item.json` de shadcn/ui, MIT; origen en `docs/ux/FUENTES.md`). `tests/componentes.test.mjs` comprueba que existe todo lo que nombra (archivos, selectores, funciones, tokens y herramientas), que cada estado declarado está en el CSS o el JS con su condición (hover solo dentro de `@media (hover: hover)`, foco con `:focus-visible`, movimiento solo bajo `.motion` o neutralizado con `prefers-reduced-motion`…) y el contraste de cada par en claro y oscuro.
 
 Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = gancho de JavaScript** (DESIGN.md).
 
@@ -50,6 +50,7 @@ Regla de atributos: **clase = parte o variante, `aria-*` = estado, `data-*` = ga
 | Editoriales | sí | sí | sí |  |  |  | sí |  | sí |  |  |
 | FranjaEditoriales | sí | sí | sí |  |  |  |  |  | sí |  | sí |
 | TarjetaMerch | sí | sí | sí |  |  |  |  |  | sí | sí | sí |
+| CapitulosInicio | sí | sí | sí |  |  |  |  |  | sí |  | sí |
 
 Estados propios de algún componente, fuera de la tabla: `oculto`, `tactil`, `plano`, `abriendo`, `abierto`, `colores_forzados`, `cerrado` (ver el detalle).
 
@@ -799,3 +800,20 @@ Tarjeta de un artículo de Merch (2026-11-19), la TarjetaLibro adaptada: un enla
 - **Estado movimiento_reducido:** `.motion .merch-card:active .merch-foto`
 - **ARIA:** Link (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `la tarjeta es un enlace (target=_blank con rel=noopener noreferrer); su nombre es el texto de la tarjeta` `ul con aria-label «Artículos de la librería»` `alt en la foto; el icono es aria-hidden` · **Teclado:** Tab entre tarjetas; Enter abre WhatsApp en otra pestaña.
 - **QA:** `tests/contenido.test.mjs` `tools/qa/contenido.mjs` `tools/qa/guias.mjs`
+
+### CapitulosInicio
+
+Capítulos del Inicio (2026-11-20), bajo la franja de editoriales y antes de La casa. Sustituye a los tres enlaces planos. Dos piezas grandes —Catálogo («Por dónde empezar», libros sobre la mesa) y Café y té («Para quedarse un rato», la sala desde el arco)— y, debajo, Eventos y talleres a todo el ancho («En la casa · Aún sin fecha», la sala con sillas). Ninguna repite la foto propia de Café. Cada una es un enlace a su sección (#libros, #cafe, #cartelera). La pieza es la de La casa: foto 4:3 con radio lg, nombre en Headline y una línea en Subheadline, sin texto sobre la foto. Desde 1024 las dos primeras ocupan 1–6 y 7–12; Eventos sigue en fila, con la foto a 280 px. Sin cifras. Con un evento vigente feed.js oculta el de Eventos. La primaria del inicio sigue siendo «Cómo llegar».
+
+- **Tipo:** control · **desde** 2026-11-20 · DESIGN.md, «Franja de editoriales del Inicio» (2026-11-20, capítulos).
+- **style.css:** `.capitulos` `.capitulo` `.capitulo-foto` `.capitulo-txt` `.capitulo-nom` `.capitulo-frase` `.capitulo--evento`
+- **index.html:** `.capitulos` `.capitulo` `[data-atajo-eventos]`
+- **feed.js:** ganchos `data-atajo-eventos` `atajoEv.hidden = on`
+- **Tokens:** `radio-lg` `radio-md` `fondo-3` `tinta-2` `primario` `primario-presionado` `t-titular` `ls-titular` `t-subtitulo` `anillo-foco` `dur-rapida` `curva-salida` `space-1` `space-2` `space-4` `space-6` `space-8` `space-12` `canal-rejilla`
+- **Estado hover:** `.capitulo:hover .capitulo-nom`
+- **Estado foco:** `.capitulo:focus-visible`
+- **Estado presionado:** `.capitulo:active .capitulo-nom` — El nombre pasa a primario-presionado, también con movimiento reducido; la foto no cambia de tamaño.
+- **Estado movimiento_reducido:** `.motion .capitulo-foto img` — El acercamiento de la foto (escala 1.04) solo existe con movimiento y puntero fino.
+- **Estado vacio:** feed.js `atajoEv.hidden = on` — Con un evento vigente el capítulo de Eventos se oculta: el aviso del inicio ya lo dice.
+- **ARIA:** Navegación de enlaces (https://www.w3.org/WAI/ARIA/apg/patterns/link/) · `nav con aria-label «Catálogo, café y eventos»` `cada capítulo es un enlace a su sección` `la foto es decorativa (alt vacío): el nombre del enlace dice el destino` · **Teclado:** Tab entre capítulos; Enter sigue el enlace. Con un evento vigente el de Eventos no está en el orden.
+- **QA:** `tests/site.test.mjs` `tools/qa/guias.mjs`

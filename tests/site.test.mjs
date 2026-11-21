@@ -2299,13 +2299,13 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   const [cat, saved, app] = await Promise.all(['catalog.js', 'saved.js', 'app.js'].map(f => readFile(here('./' + f), 'utf8')));
   // P13: la entradilla del inicio, a la mitad.
   assert.ok(/<p class="entry-lede">Libros de editoriales independientes, café, eventos y talleres en el centro\.<\/p>/.test(html), 'entradilla del inicio de una frase: lo que se hace aquí, en el centro (curaduría de textos, 2026-11-18)');
-  const atajos = html.match(/<nav class="atajos"[\s\S]*?<\/nav>/);
-  assert.ok(atajos, 'el inicio trae los atajos de café, eventos y catálogo');
-  assert.ok(!/\d/.test(atajos[0]), 'los atajos no llevan cifras (ni «3 editoriales» ni un conteo del catálogo)');
-  assert.ok(/href="#cafe"><span>Café y té · En la sala<\/span>/.test(atajos[0]) && /href="#libros"><span>Ver el catálogo<\/span>/.test(atajos[0]), 'café apunta a la carta y «Ver el catálogo» al capítulo, sin repetir el bloque de editoriales');
+  const capitulos = html.match(/<nav class="capitulos"[\s\S]*?<\/nav>/);
+  assert.ok(capitulos, 'el inicio trae los capítulos de catálogo, café y eventos');
+  assert.ok(!/editoriales|títulos|\b41\b|\b3 editoriales/.test(capitulos[0]), 'los capítulos no llevan cifras (ni «3 editoriales» ni un conteo del catálogo)');
+  assert.ok(/href="#cafe"[\s\S]*Café y té[\s\S]*Para quedarse un rato/.test(capitulos[0]) && /href="#libros"[\s\S]*Catálogo[\s\S]*Por dónde empezar/.test(capitulos[0]), 'café y catálogo apuntan a sus capítulos, con la frase del titular, sin repetir el bloque de editoriales');
   const evs = JSON.parse(readFileSync_('assets/data/eventos.json')).eventos.filter(e => !e.origen);
   assert.equal(evs.every(e => !e.fecha), true, 'hoy ninguna propuesta trae fecha');
-  assert.ok(/data-atajo-eventos[\s\S]*Aún sin fecha/.test(atajos[0]) && /atajoEv\.hidden = on/.test(readFileSync_('feed.js')), 'sin fecha el atajo dice «Aún sin fecha»; con un evento vigente se oculta porque el aviso del inicio ya lo dice');
+  assert.ok(/data-atajo-eventos[\s\S]*Aún sin fecha/.test(capitulos[0]) && /atajoEv\.hidden = on/.test(readFileSync_('feed.js')), 'sin fecha el capítulo de Eventos dice «Aún sin fecha»; con un evento vigente se oculta porque el aviso del inicio ya lo dice');
   assert.ok(!/casa de piedra|Barrio Antiguo|almas viajeras/i.test(html), 'la página habla del negocio: ni la casa de piedra, ni el barrio, ni viajes (decisión de Aldo, 2026-11-18)');
   // P14: Explora sin entradilla; una sola forma de nombrar la búsqueda (el ISBN sigue funcionando sin anunciarse).
   assert.ok(/<label for="cat-q">Título, autor o editorial<\/label>/.test(html) && /placeholder="Ej\.: Lomelí"/.test(html) && !/cat-lede|Buscar título, autor o ISBN/.test(html), 'botón «Buscar en el catálogo», etiqueta «Título, autor o editorial», ejemplo «Ej.: Lomelí»');

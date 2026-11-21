@@ -485,12 +485,36 @@ html[data-glass="lite"] :is(.hdr, .tabbar, .menu-hoja, .btn--vidrio, .drawer, .m
 .franja:focus-within .franja-item { color: var(--tinta); }
 .franja-ver { margin-top: var(--space-6); margin-inline-start: calc(-1 * var(--space-4)); } /* contenido → su acción 24; la tinta del enlace en el margen, no su caja */
 @media (min-width: 761px) { .franja-ver { margin-top: var(--space-8); } } /* 32 desde 761 */
-/* Atajos bajo la franja (2026-11-20): tres enlaces planos, los mismos que el de la franja, sin caja ni cifra. En el teléfono el hueco lo da el gap de .entry (24); desde 1024 la rejilla no tiene gap de fila y el margen es 48. */
-.atajos { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); min-width: 0; }
-.atajos .btn { margin-inline-start: calc(-1 * var(--space-4)); } /* la tinta en el margen, igual que «Ver los libros por editorial» */
-.atajos .btn[hidden] { display: none; }
-@media (min-width: 761px) { .atajos { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); } }
-@media (min-width: 1024px) { .atajos { margin-top: var(--space-12); } } /* 48: bloque → bloque, con el gap de fila de .entry en 0 */
+/* Capítulos bajo la franja (2026-11-20): dos piezas 4:3 (Catálogo y Café) y Eventos a todo el ancho.
+   Misma pieza que La casa: foto con radio lg, nombre en Headline y una línea en Subheadline, 8 bajo la foto.
+   El texto va debajo de la foto, en tinta sólida: nada de mezcla sobre la imagen. Una sola primaria en el inicio («Cómo llegar»); estas son navegación.
+   En el teléfono el hueco hasta la franja lo da el gap de .entry (24); desde 1024 la rejilla no tiene gap de fila y el margen es 48.
+   El acercamiento de la foto solo existe con movimiento y puntero fino. Con un evento vigente, feed.js oculta la pieza de Eventos. */
+.capitulos { grid-column: 1 / -1; display: grid; gap: var(--space-6); min-width: 0; }
+.capitulo { display: grid; gap: var(--space-2); min-width: 0; color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.capitulo-foto { display: block; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--radio-lg); background: var(--fondo-3); }
+.capitulo-foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.capitulo-txt { display: grid; gap: var(--space-1); }
+.capitulo-nom { font: var(--t-titular); letter-spacing: var(--ls-titular); transition: color var(--dur-rapida) var(--curva-salida); }
+.capitulo-frase { font: var(--t-subtitulo); color: var(--tinta-2); text-wrap: balance; }
+.capitulo--evento { grid-template-columns: 88px minmax(0, 1fr); gap: var(--space-4); align-items: center; }
+.capitulo--evento .capitulo-foto { aspect-ratio: 1; border-radius: var(--radio-md); }
+.capitulo[hidden] { display: none; }
+.capitulo:focus-visible { outline: 2px solid transparent; box-shadow: var(--anillo-foco); border-radius: var(--radio-lg); }
+.capitulo:active .capitulo-nom { color: var(--primario-presionado); }
+@media (hover: hover) { .capitulo:hover .capitulo-nom { color: var(--primario); } }
+.motion .capitulo-foto img { transition: transform var(--dur-rapida) var(--curva-salida); }
+@media (hover: hover) { .motion .capitulo:hover .capitulo-foto img { transform: scale(1.04); } }
+@media (min-width: 761px) {
+  .capitulos { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+  .capitulo--evento { grid-column: 1 / -1; grid-template-columns: 160px minmax(0, 1fr); }
+}
+@media (min-width: 1024px) {
+  .capitulos { grid-template-columns: var(--rejilla); column-gap: var(--canal-rejilla); row-gap: var(--space-12); margin-top: var(--space-12); } /* 48: bloque → bloque, con el gap de fila de .entry en 0 */
+  .capitulo:not(.capitulo--evento) { grid-column: span 6; }
+  .capitulo--evento { grid-column: 1 / -1; grid-template-columns: 280px minmax(0, 1fr); gap: var(--space-8); align-items: center; }
+  .capitulo--evento .capitulo-foto { width: 280px; aspect-ratio: 4 / 3; border-radius: var(--radio-lg); }
+}
 @media (min-width: 1024px) { .franja { margin-top: var(--space-24); } } /* sin gap de fila en la rejilla de 12: capa → capa 96 (cabe en el primer pliegue de 1440 × 900) */
 html.motion .franja-ventana { -webkit-mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); mask-image: linear-gradient(90deg, transparent, var(--tinta) var(--franja-desvanece), var(--tinta) calc(100% - var(--franja-desvanece)), transparent); }
 html.motion .franja-carril { display: flex; width: max-content; }
