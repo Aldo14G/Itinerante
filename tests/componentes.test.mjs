@@ -81,7 +81,7 @@ const isExported = (src, name) => new RegExp(`export\\s+(?:async\\s+)?(?:functio
 const isDeclared = (src, name) => new RegExp(`(?:function\\*?\\s+${esc(name)}\\s*\\(|(?:const|let)\\s+${esc(name)}\\s*=)`).test(src);
 const usesToken = (src, tok) => src.includes(`--${tok}`) || src.includes(`'${tok}'`) || (tok.startsWith('dur-') && src.includes(`DUR('${tok.slice(4)}')`));
 
-const HOY = '2026-11-19'; // fecha del último componente añadido (PreguntasFrecuentes, 2026-11-19)
+const HOY = '2026-11-20'; // fecha del último componente añadido (CapitulosInicio, 2026-11-20)
 const SITE_FILES = ['index.html', ...CSS_FILES];
 
 test('catálogo de componentes: forma y campos (nombre, descripcion, archivos, tokens, estados, aria, qa, desde)', () => {

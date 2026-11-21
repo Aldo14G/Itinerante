@@ -1080,6 +1080,29 @@
       "qa": ["tests/contenido.test.mjs", "tools/qa/contenido.mjs", "tools/qa/guias.mjs"],
       "desde": "2026-11-19",
       "decision": "DESIGN.md, «Preguntas frecuentes, Editoriales, Merch y marca para el dominio» (2026-11-19)."
+    },
+    {
+      "id": "capitulos-inicio",
+      "nombre": "CapitulosInicio",
+      "tipo": "control",
+      "descripcion": "Capítulos del Inicio (2026-11-20), bajo la franja de editoriales y antes de La casa. Sustituye a los tres enlaces planos. Dos piezas grandes —Catálogo («Por dónde empezar», libros sobre la mesa) y Café y té («Para quedarse un rato», la sala desde el arco)— y, debajo, Eventos y talleres a todo el ancho («En la casa · Aún sin fecha», la sala con sillas). Ninguna repite la foto propia de Café. Cada una es un enlace a su sección (#libros, #cafe, #cartelera). La pieza es la de La casa: foto 4:3 con radio lg, nombre en Headline y una línea en Subheadline, sin texto sobre la foto. Desde 1024 las dos primeras ocupan 1–6 y 7–12; Eventos sigue en fila, con la foto a 280 px. Sin cifras. Con un evento vigente feed.js oculta el de Eventos. La primaria del inicio sigue siendo «Cómo llegar».",
+      "archivos": [
+        { "ruta": "style.css", "selectores": [".capitulos", ".capitulo", ".capitulo-foto", ".capitulo-txt", ".capitulo-nom", ".capitulo-frase", ".capitulo--evento"] },
+        { "ruta": "index.html", "selectores": [".capitulos", ".capitulo", "[data-atajo-eventos]"] },
+        { "ruta": "feed.js", "ganchos": ["data-atajo-eventos", "atajoEv.hidden = on"] }
+      ],
+      "tokens": ["radio-lg", "radio-md", "fondo-3", "tinta-2", "primario", "primario-presionado", "t-titular", "ls-titular", "t-subtitulo", "anillo-foco", "dur-rapida", "curva-salida", "space-1", "space-2", "space-4", "space-6", "space-8", "space-12", "canal-rejilla"],
+      "estados": {
+        "hover": { "css": [".capitulo:hover .capitulo-nom"] },
+        "foco": { "css": [".capitulo:focus-visible"] },
+        "presionado": { "css": [".capitulo:active .capitulo-nom"], "nota": "El nombre pasa a primario-presionado, también con movimiento reducido; la foto no cambia de tamaño." },
+        "movimiento_reducido": { "css": [".motion .capitulo-foto img"], "nota": "El acercamiento de la foto (escala 1.04) solo existe con movimiento y puntero fino." },
+        "vacio": { "js": [{ "ruta": "feed.js", "texto": "atajoEv.hidden = on" }], "nota": "Con un evento vigente el capítulo de Eventos se oculta: el aviso del inicio ya lo dice." }
+      },
+      "aria": { "patron": "Navegación de enlaces", "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "atributos": ["nav con aria-label «Catálogo, café y eventos»", "cada capítulo es un enlace a su sección", "la foto es decorativa (alt vacío): el nombre del enlace dice el destino"], "teclado": "Tab entre capítulos; Enter sigue el enlace. Con un evento vigente el de Eventos no está en el orden." },
+      "qa": ["tests/site.test.mjs", "tools/qa/guias.mjs"],
+      "desde": "2026-11-20",
+      "decision": "DESIGN.md, «Franja de editoriales del Inicio» (2026-11-20, capítulos)."
     }
   ],
   "contraste": [

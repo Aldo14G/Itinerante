@@ -1,3 +1,15 @@
+# Continuidad de Itinerante — 2026-11-20 (capítulos del inicio: catálogo, café y eventos)
+
+- **Hecho:** los tres enlaces planos (`.atajos`) se sustituyen por `.capitulos`. Catálogo y Café y té son dos piezas 4:3 (la misma pieza que La casa: foto, nombre, una línea) en 1–6 | 7–12 desde 1024; Eventos y talleres va debajo, en fila (miniatura de 88, 160 y 280). Frases tomadas de los titulares («Por dónde empezar», «Para quedarse un rato», «En la casa · Aún sin fecha»). Sin cifras, sin texto sobre la foto, sin segunda primaria. Con un evento vigente, `applyAviso` sigue ocultando el de Eventos.
+- **Qué se descartó de las dos referencias:** texto con `mix-blend`, tipo a 23 vw, navegación de 10 px, carrito, ruido, manos flotando, logotipos inventados y el desfase vertical de las dos tarjetas (rompe el tope compartido de las guías).
+- **Pendiente (Aldo):** B8 (Liminal y el rótulo), B1 («Libro Objeto») y la lista de festivos que cierran.
+
+# Continuidad de Itinerante — 2026-11-20 (atajos de café, eventos y catálogo bajo la franja)
+
+- **Base:** `bf69f66`. La ronda A/B vetó la variante que añadía una fila de cifras («3 editoriales») y rompía dos pruebas de la sincronización con la hoja. Lo que sí se toma es responder café y eventos antes, sin alargar la página con secciones duplicadas.
+- **Hecho:** en `#inicio`, bajo la franja, tres enlaces planos (`.atajos`): «Café y té · En la sala», «Eventos · Aún sin fecha» y «Ver el catálogo». Sin cifras. Con un evento vigente, `applyAviso` oculta el de Eventos. El rótulo de la franja, Liminal, «Libro Objeto» y el horario de festivos quedan como estaban.
+- **Pendiente (Aldo):** B8 (Liminal y el rótulo), B1 («Libro Objeto») y la lista de festivos que cierran.
+
 # Continuidad de Itinerante — 2026-11-20 (colaboraciones en la franja de editoriales; rama `claude/cool-turing-37uiqt`)
 
 - **Hecho:** `assets/data/editoriales.json` → `colaboran` (lista opcional de `{ nombre, tipo: "editorial"|"espacio", fuente? }`; `validColabora`, `leerConfig`, `franjaPlan` en `scripts/franja-datos.mjs`). La franja = editoriales del catálogo (menos `excluir`) + `colaboran`, con Postel y deduplicación por `editorialKey`. Sembrado: *Ediciones Tres Caminos* (editorial, fuente: su Facebook público, «Tarde de Letras VII») y *Liminal* (espacio, sin fuente pública); **ninguna cafetería** (Instagram no se pudo leer). Rótulo «Editoriales y espacios con los que compartimos libros y eventos» con colaboraciones (`ROTULO_COLABORA`, `rotuloDe`), el de antes sin ellas. `logo-editorial.py` admite los nombres de `colaboran`. Docs: `AGENTS.md`, `DESIGN.md`, `PRODUCT.md`, `CONTEXT.md`, `docs/EDITORIALES-LOGOS.md`, `design/componentes.json`.

@@ -111,7 +111,9 @@ const SISTEMA = {
     // Franja de editoriales (2026-11-19): capa del Inicio bajo la foto. 80 en el teléfono y la tableta (la franja queda bajo el primer pliegue en 393×659, 375×629 y 320×640), 96 en escritorio.
     'inicio·capa→capa': [80, 80, 96],
     'inicio·rótulo→contenido': [8, 8, 8],
-    'inicio·contenido→acción': [24, 32, 32]
+    'inicio·contenido→acción': [24, 32, 32],
+    // Capítulos del inicio (2026-11-20): bajo la franja, antes de La casa. 24 lo da el gap de .entry en el teléfono; 32 en tableta; 48 desde 1024, donde ese gap de fila es 0.
+    'inicio·bloque→bloque': [24, 32, 48]
   },
 
   // Botones: [variante-tamaño]: ancho en el teléfono / desde 761 px
@@ -163,7 +165,9 @@ const SECCIONES = [
     ['titular', '.entry-title'], ['entradilla', '.entry-lede'], ['control', '.entry-actions .btn'],
     ['nota', '.entry-status'], ['dato', '.entry-address'], ['dato', '.entry-ev'], ['contenido', '.entry-media'],
     // 2026-11-19: la franja de editoriales, una capa más del Inicio bajo la foto: rótulo con su pausa (franja-cab), la ventana de la franja (sus elementos se mueven: no son piezas) y el enlace estático.
-    ['franja-cab', '.franja-cab'], ['contenido', '.franja-escena'], ['accion', '.franja-ver'] ] },
+    ['franja-cab', '.franja-cab'], ['contenido', '.franja-escena'], ['accion', '.franja-ver'],
+    // 2026-11-20: capítulos (Catálogo, Café y Eventos), un grupo bajo la franja. Sin cifras.
+    ['control', '.capitulos'] ] },
   { id: 'casa', sel: '#casa', piezas: [
     ['titular', '#house-title'], ['entradilla', '.house .sec-texto'], ['contenido', '.house-track .still:first-child .still-img'],
     ['pie', '.house-track .still:first-child figcaption'], ['accion', '.house-nav'] ] },
@@ -325,7 +329,7 @@ function enPagina(cfg) {
         if (!visible(h)) continue;
         if (h.matches('.c3d')) { c3d(h, sup); continue; }
         if (h.matches('[role="radiogroup"]')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }
-        if (h.matches('.ct-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // enlaces sin fondo: la tinta del primero
+        if (h.matches('.ct-nav, .capitulos')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // enlaces sin fondo: la tinta del primero; .capitulos es un solo grupo (2026-11-20)
         if (h.matches('.franja-escena')) { empuja(h, 'rejilla', sup); continue; }   // la franja de editoriales (2026-11-19): se mide su ventana; los elementos se mueven y no son piezas
         if (h.matches('.franja-cab')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: false }); atomos[id].caja = union(h); continue; }   // rótulo + pausa: un grupo que empieza en el margen
         if (h.matches('.house-nav')) { const id = empuja(h, 'control', sup, { grupo: true, fondo: true }); atomos[id].caja = union(h); continue; }   // «Foto anterior» y «Foto siguiente» (2026-11-19): un grupo que empieza en el margen
@@ -363,7 +367,7 @@ function enPagina(cfg) {
       // Barra de categorías (2026-11-19): enlaces sin fondo; su aire de arriba se cuenta hasta la tinta del primer enlace, no hasta su caja de toque.
       if (e.matches('.ct-nav')) { const t0 = tinta([...e.querySelectorAll('.ct-tab')].find(visible)); if (t0) { p.cajaCss = p.caja; p.caja = { ...p.caja, t: t0.t, h: rd(p.caja.b - t0.t) }; } }
       const ecs = getComputedStyle(e);
-      const sinFondo = rol === 'control' && !(alpha(ecs.backgroundColor) > 0.03 || ecs.boxShadow !== 'none' || parseFloat(ecs.borderTopWidth) > 0) && !e.matches('[role="radiogroup"], .ct-nav, .cat-combo');
+      const sinFondo = rol === 'control' && !(alpha(ecs.backgroundColor) > 0.03 || ecs.boxShadow !== 'none' || parseFloat(ecs.borderTopWidth) > 0) && !e.matches('[role="radiogroup"], .ct-nav, .cat-combo, .capitulos');
       if (/titular|entradilla|estado|nota|dato|pie|rotulo|texto|subtitular/.test(rol) || sinFondo) {
         p.letra = letra(e); p.tinta = tinta(e);
         if (p.tinta) {   // de renglón a renglón (lo que se ve): la caja de contenido, salvo que el texto no la llene (objetivo de toque, alto mínimo)

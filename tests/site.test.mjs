@@ -1886,7 +1886,7 @@ test('barra inferior (BarraInferior): cápsula de vidrio de 49 px con Inicio, Ca
   assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)"/g)].map(m => m[1]), ['inicio', 'libros'], 'dos destinos de la página: «Catálogo» lleva a #libros, el mismo sitio que el menú ☰ y la barra de escritorio (2026-11-19)');
   assert.ok(/<a href="#libros"><svg class="tab-ic"/.test(nav) && /<a href="#inicio" aria-current="location" data-zona="#inicio #casa">/.test(nav) && !/#colecciones/.test(nav) && /<div class="rail" id="colecciones" data-rail/.test(html) && /\.rail \{ scroll-margin-top: var\(--space-6\); \}/.test(mobileFlat) && /\(a\.dataset\.zona \|\| a\.getAttribute\('href'\)\)\.split\(' '\)\.includes\(hash\)/.test(readFileSync_('app.js')), '«Catálogo» lleva al capítulo (#libros), como el menú ☰ y la barra de escritorio; «Inicio» abarca también La casa (data-zona)');
   const hrefsCatalogo = [...html.matchAll(/<a [^>]*href="#(libros|colecciones)"[^>]*>/g)].map(m => m[1]);
-  assert.ok(hrefsCatalogo.length === 3 && hrefsCatalogo.every(h => h === 'libros'), 'barra de escritorio, menú ☰ y barra inferior: los tres «Catálogo» llevan a #libros (2026-11-19); ningún enlace va a #colecciones');
+  assert.ok(hrefsCatalogo.length === 4 && hrefsCatalogo.every(h => h === 'libros'), 'barra de escritorio, menú ☰, barra inferior y el atajo «Ver el catálogo» llevan a #libros (2026-11-19 y 2026-11-20); ningún enlace va a #colecciones');
   assert.deepEqual([...nav.matchAll(/<span class="tab-lb">([^<]+)/g)].map(m => m[1]), ['Inicio', 'Catálogo', 'Mi lista'], 'tres casillas con nombre siempre visible');
   assert.ok(/<button class="tab-list" type="button" data-open-mylist><span class="tab-ic-box"><svg class="tab-ic" aria-hidden="true"><use href="#i-mark"\/><\/svg><span class="count-badge" data-saved-dot hidden aria-hidden="true"><\/span><\/span><span class="tab-lb">Mi lista<span class="sr-only">, <span data-saved-count>Vacía<\/span><\/span><\/span><\/button>/.test(nav), 'Mi lista abre su hoja y lleva el conteo (en texto para lectores de pantalla)');
   assert.deepEqual([...nav.matchAll(/<a href="#([a-z]+)" aria-current="location"/g)].map(m => m[1]), ['inicio'], 'la página carga en Inicio; el scroll-spy corrige');
@@ -2299,6 +2299,13 @@ test('crítica minimalista (2026-11-13): textos cortos y un solo rótulo por cos
   const [cat, saved, app] = await Promise.all(['catalog.js', 'saved.js', 'app.js'].map(f => readFile(here('./' + f), 'utf8')));
   // P13: la entradilla del inicio, a la mitad.
   assert.ok(/<p class="entry-lede">Libros de editoriales independientes, café, eventos y talleres en el centro\.<\/p>/.test(html), 'entradilla del inicio de una frase: lo que se hace aquí, en el centro (curaduría de textos, 2026-11-18)');
+  const capitulos = html.match(/<nav class="capitulos"[\s\S]*?<\/nav>/);
+  assert.ok(capitulos, 'el inicio trae los capítulos de catálogo, café y eventos');
+  assert.ok(!/editoriales|títulos|\b41\b|\b3 editoriales/.test(capitulos[0]), 'los capítulos no llevan cifras (ni «3 editoriales» ni un conteo del catálogo)');
+  assert.ok(/href="#cafe"[\s\S]*Café y té[\s\S]*Para quedarse un rato/.test(capitulos[0]) && /href="#libros"[\s\S]*Catálogo[\s\S]*Por dónde empezar/.test(capitulos[0]), 'café y catálogo apuntan a sus capítulos, con la frase del titular, sin repetir el bloque de editoriales');
+  const evs = JSON.parse(readFileSync_('assets/data/eventos.json')).eventos.filter(e => !e.origen);
+  assert.equal(evs.every(e => !e.fecha), true, 'hoy ninguna propuesta trae fecha');
+  assert.ok(/data-atajo-eventos[\s\S]*Aún sin fecha/.test(capitulos[0]) && /atajoEv\.hidden = on/.test(readFileSync_('feed.js')), 'sin fecha el capítulo de Eventos dice «Aún sin fecha»; con un evento vigente se oculta porque el aviso del inicio ya lo dice');
   assert.ok(!/casa de piedra|Barrio Antiguo|almas viajeras/i.test(html), 'la página habla del negocio: ni la casa de piedra, ni el barrio, ni viajes (decisión de Aldo, 2026-11-18)');
   // P14: Explora sin entradilla; una sola forma de nombrar la búsqueda (el ISBN sigue funcionando sin anunciarse).
   assert.ok(/<label for="cat-q">Título, autor o editorial<\/label>/.test(html) && /placeholder="Ej\.: Lomelí"/.test(html) && !/cat-lede|Buscar título, autor o ISBN/.test(html), 'botón «Buscar en el catálogo», etiqueta «Título, autor o editorial», ejemplo «Ej.: Lomelí»');
