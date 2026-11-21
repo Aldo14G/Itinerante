@@ -1,3 +1,9 @@
+# Continuidad de Itinerante — 2026-11-20 (atajos de café, eventos y catálogo bajo la franja)
+
+- **Base:** `bf69f66`. La ronda A/B vetó la variante que añadía una fila de cifras («3 editoriales») y rompía dos pruebas de la sincronización con la hoja. Lo que sí se toma es responder café y eventos antes, sin alargar la página con secciones duplicadas.
+- **Hecho:** en `#inicio`, bajo la franja, tres enlaces planos (`.atajos`): «Café y té · En la sala», «Eventos · Aún sin fecha» y «Ver el catálogo». Sin cifras. Con un evento vigente, `applyAviso` oculta el de Eventos. El rótulo de la franja, Liminal, «Libro Objeto» y el horario de festivos quedan como estaban.
+- **Pendiente (Aldo):** B8 (Liminal y el rótulo), B1 («Libro Objeto») y la lista de festivos que cierran.
+
 # Continuidad de Itinerante — 2026-11-20 (colaboraciones en la franja de editoriales; rama `claude/cool-turing-37uiqt`)
 
 - **Hecho:** `assets/data/editoriales.json` → `colaboran` (lista opcional de `{ nombre, tipo: "editorial"|"espacio", fuente? }`; `validColabora`, `leerConfig`, `franjaPlan` en `scripts/franja-datos.mjs`). La franja = editoriales del catálogo (menos `excluir`) + `colaboran`, con Postel y deduplicación por `editorialKey`. Sembrado: *Ediciones Tres Caminos* (editorial, fuente: su Facebook público, «Tarde de Letras VII») y *Liminal* (espacio, sin fuente pública); **ninguna cafetería** (Instagram no se pudo leer). Rótulo «Editoriales y espacios con los que compartimos libros y eventos» con colaboraciones (`ROTULO_COLABORA`, `rotuloDe`), el de antes sin ellas. `logo-editorial.py` admite los nombres de `colaboran`. Docs: `AGENTS.md`, `DESIGN.md`, `PRODUCT.md`, `CONTEXT.md`, `docs/EDITORIALES-LOGOS.md`, `design/componentes.json`.

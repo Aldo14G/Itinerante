@@ -394,6 +394,9 @@ function applyAviso(plan) {
     if (on) cta.querySelector('[data-ev-cta-text]').textContent = plan.aviso;
     cta.hidden = !on;
   }
+  // El atajo «Eventos · Aún sin fecha» dice lo que el JSON dice cuando no hay fecha. Con un evento vigente el aviso del inicio ya lo dice: se oculta para no repetirlo.
+  const atajoEv = document.querySelector('[data-atajo-eventos]');
+  if (atajoEv) atajoEv.hidden = on;
   settleHint(on);
   writeHasta(plan.hasta);
 }
