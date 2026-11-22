@@ -112,18 +112,23 @@ export function editorialesConFiltro(libros = LIBROS): Array<{ nombre: string; n
 
 export type TipoTienda = { id: 'libros' | 'merch' | 'talleres'; nombre: string; n: number };
 
-/**
- * Fila Todo · Libros · Merch · Talleres. Un tipo con 0 productos no existe.
- * La fila solo se imprime si hay al menos dos tipos (hoy solo Libros, así que no hay fila).
- * `extra` sirve al test: un producto de merch de ejemplo, sin meterlo en la UI.
- */
+/** Libros, Merch y Talleres se muestran siempre. Un tipo con 0 productos no se inventa: la página dice «Próximamente». */
 export function tiposDeTienda(extra?: { libros?: number; merch?: number; talleres?: number }): TipoTienda[] {
-  const tipos = [
-    { id: 'libros' as const, nombre: 'Libros', n: extra?.libros ?? LIBROS.length },
-    { id: 'merch' as const, nombre: 'Merch', n: extra?.merch ?? MERCH.length },
-    { id: 'talleres' as const, nombre: 'Talleres', n: extra?.talleres ?? TALLERES.length },
-  ].filter((t) => t.n >= 1);
-  return tipos.length >= 2 ? tipos : [];
+  return [
+    { id: 'libros', nombre: 'Libros', n: extra?.libros ?? LIBROS.length },
+    { id: 'merch', nombre: 'Merch', n: extra?.merch ?? MERCH.length },
+    { id: 'talleres', nombre: 'Talleres', n: extra?.talleres ?? TALLERES.length },
+  ];
+}
+
+/** Géneros con al menos 2 libros: un chip por género, igual que las editoriales. */
+export function generosConFiltro(libros = LIBROS): Array<{ nombre: string; n: number }> {
+  const cuenta = new Map<string, number>();
+  for (const l of libros) if (l.genero) cuenta.set(l.genero, (cuenta.get(l.genero) ?? 0) + 1);
+  return [...cuenta]
+    .filter(([, n]) => n >= MINIMO_FILTRO)
+    .map(([nombre, n]) => ({ nombre, n }))
+    .sort((a, b) => b.n - a.n || a.nombre.localeCompare(b.nombre, 'es'));
 }
 
 /** El ítem del menú de la tienda dice «Libros» mientras no haya merch (S-18). */

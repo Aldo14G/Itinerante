@@ -15,6 +15,7 @@ import {
   RECURRENTES,
   TALLERES,
   editorialesConFiltro,
+  generosConFiltro,
   fechaCorta,
   filasDeCategoria,
   precioMXN,
@@ -95,6 +96,7 @@ function TarjetaLibro({ l, i }: { l: Libro; i: number }) {
       id={`libro-${l.id}`}
       data-tipo="libros"
       data-ed={l.editorial ? idEditorial(l.editorial) : undefined}
+      data-gen={l.genero ? idEditorial(l.genero) : undefined}
       data-busca={normalizar([l.titulo, l.autor, l.editorial, l.genero].filter(Boolean).join(' '))}
       data-wa={whatsapp(mensajeLibro(l))}
     >
@@ -299,16 +301,14 @@ function Novedades() {
 }
 
 export function FilaTipos({ tipos }: { tipos: TipoTienda[] }) {
-  if (tipos.length < 2) return null;
   return (
-    <fieldset className="filtros">
+    <fieldset className="filtros filtros-tipo">
       <legend>Tipo</legend>
-      <label>
-        <input type="radio" name="tipo" value="" defaultChecked /> Todo
-      </label>
       {tipos.map((t) => (
         <label key={t.id}>
-          <input type="radio" name="tipo" value={t.id} /> {t.nombre}
+          <input type="radio" name="tipo" value={t.id} defaultChecked={t.id === 'libros'} />
+          <span>{t.nombre}</span>
+          {t.n === 0 ? <span className="chip-luego">Próximamente</span> : null}
         </label>
       ))}
     </fieldset>
@@ -358,6 +358,7 @@ function TarjetaTaller({ t }: { t: TallerTienda }) {
 
 function Tienda() {
   const editoriales = editorialesConFiltro();
+  const generos = generosConFiltro();
   const tipos = tiposDeTienda();
   return (
     <section id="tienda" className="seccion tienda" aria-labelledby="tienda-t">
@@ -372,6 +373,19 @@ function Tienda() {
           <input id="buscar" type="search" placeholder="Título, autor o editorial" autoComplete="off" />
         </p>
         <FilaTipos tipos={tipos} />
+        {generos.length >= 2 ? (
+          <fieldset className="filtros">
+            <legend>Género</legend>
+            <label>
+              <input type="radio" name="genero" value="" defaultChecked /> Todos
+            </label>
+            {generos.map((g) => (
+              <label key={g.nombre}>
+                <input type="radio" name="genero" value={idEditorial(g.nombre)} /> {g.nombre}
+              </label>
+            ))}
+          </fieldset>
+        ) : null}
         {editoriales.length >= 2 ? (
           <fieldset className="filtros">
             <legend>Editorial</legend>
@@ -389,6 +403,7 @@ function Tienda() {
           {LIBROS.length} libros
         </p>
       </div>
+      <p className="proximamente">Próximamente</p>
       <ul className="rejilla">
         {LIBROS.map((l, i) => (
           <TarjetaLibro key={l.id} l={l} i={i} />
@@ -589,6 +604,7 @@ export function Pagina({ css, js }: { css: string; js: string }) {
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="icon" href="/Logo.png" />
         <link rel="preload" href="/assets/fonts/inter-latin-opsz-normal.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd()).replace(/</g, '\\u003c') }} />
       </head>

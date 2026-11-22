@@ -1,5 +1,5 @@
-/* Estilos de /nuevo (SPEC v2). Colores y foco salen de las variables del tema Astryx «itinerante» (tema-itinerante.css, que va antes).
-   Movimiento: solo transiciones de hover/foco de 150 ms o menos y la apertura de la ficha; con prefers-reduced-motion, nada. */
+/* Estilos de /nuevo. Colores y foco salen del tema Astryx «itinerante» (tema-itinerante.css, que va antes).
+   Movimiento: tokens del catálogo anterior. Con prefers-reduced-motion solo hay fundidos cortos, sin transform. */
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -19,6 +19,14 @@
   --cab: 64px;
   --ancho: 1200px;
   --margen: clamp(16px, 4vw, 40px);
+  --dur-instantanea: 120ms;
+  --dur-rapida: 240ms;
+  --dur-base: 400ms;
+  --dur-lenta: 700ms;
+  --escalon-linea: 60ms;
+  --curva-salida: cubic-bezier(0.16, 1, 0.3, 1);
+  --curva-resorte: linear(0, 0.42 8%, 0.86 16%, 1.04 26%, 1.05 32%, 0.99 46%, 1.002 62%, 1);
+  --c3d-w: min(210px, 62vw);
   color-scheme: light;
 }
 fecha-hasta, fecha-desde { display: contents; }
@@ -61,10 +69,14 @@ ul { padding: 0; list-style: none; }
 
 main { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen); }
 .seccion { padding: 56px 0; border-top: 1px solid var(--linea); }
-.h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -0.02em; font-weight: 750; margin-bottom: 24px; }
+.h2 { font-size: clamp(36px, 5vw, 56px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 760; margin-bottom: 28px; }
+.h2::after { content: ''; display: block; width: 48px; height: 3px; margin-top: 14px; border-radius: 2px; background: var(--tinta); }
 .h3 { font-size: 20px; font-weight: 700; margin: 28px 0 12px; }
 
-.boton { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px; border-radius: 10px; font: inherit; font-size: 16px; font-weight: 650; text-decoration: none; cursor: pointer; border: 2px solid transparent; transition: background-color 120ms, color 120ms; }
+.boton { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px; border-radius: 10px; font: inherit; font-size: 16px; font-weight: 650; text-decoration: none; cursor: pointer; border: 2px solid transparent; transition: background-color var(--dur-instantanea) var(--curva-salida), color var(--dur-instantanea) var(--curva-salida), transform var(--dur-instantanea) var(--curva-salida); }
+@media (prefers-reduced-motion: no-preference) {
+  .boton:active { transform: scale(0.97); }
+}
 .boton-primario { background: var(--tinta); color: #fff; }
 .boton-primario:hover { background: var(--hollin); color: #fff; }
 .boton-secundario { background: transparent; color: var(--tinta); border-color: var(--tinta); }
@@ -98,6 +110,23 @@ main { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen); }
 .ev .boton { width: 100%; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+/* Carrusel 3D de portadas. Sin JS no existe: lo arma cliente.js encima de la cuadrícula. */
+.c3d { position: relative; margin: 4px 0 36px; }
+.c3d-viewport { position: relative; height: calc(var(--c3d-w) * 1.62); perspective: 1100px; overflow: hidden; touch-action: pan-y; cursor: grab; }
+.c3d-viewport:active { cursor: grabbing; }
+.c3d-track { position: absolute; inset: 0; transform-style: preserve-3d; }
+.c3d-item { position: absolute; top: 0; left: 50%; width: var(--c3d-w); margin-left: calc(var(--c3d-w) / -2); }
+.cf-pose { display: block; transform-style: preserve-3d; will-change: transform, opacity; }
+.c3d-porta { display: block; width: 100%; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 8px; }
+.c3d-porta img { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 8px; box-shadow: 0 16px 32px rgba(29, 20, 17, 0.18); }
+.c3d-item.is-centro .c3d-porta img { box-shadow: 0 22px 44px rgba(29, 20, 17, 0.28); }
+.c3d-flecha { position: absolute; z-index: 4; top: calc(var(--c3d-w) * 0.72); width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--linea); background: var(--papel); color: var(--hollin); font-size: 28px; line-height: 1; cursor: pointer; }
+.c3d-flecha--prev { left: 0; }
+.c3d-flecha--next { right: 0; }
+.c3d-flecha:disabled { opacity: 0.35; }
+.c3d-pie { margin: 14px 0 0; text-align: center; font-weight: 650; min-height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 900px) { :root { --c3d-w: 240px; } }
+
 /* Bloque de atributos con títulos en versalitas (MonteCoyote). */
 .atributos { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; }
 .atributos div { display: grid; grid-template-columns: 7.5em 1fr; gap: 8px; }
@@ -111,12 +140,30 @@ main { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen); }
 .buscador input { font: inherit; min-height: 48px; padding: 0 14px; border: 1px solid var(--piedra); border-radius: 10px; background: #fff; color: var(--hollin); }
 .filtros { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .filtros legend { font-weight: 650; font-size: 15px; margin-bottom: 6px; padding: 0; }
-.filtros label { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--piedra); cursor: pointer; font-size: 15px; transition: background-color 120ms; }
+.filtros label { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--piedra); cursor: pointer; font-size: 15px; transition: background-color var(--dur-instantanea) var(--curva-salida); }
+.filtros-tipo label { min-height: 56px; align-items: flex-start; flex-direction: column; justify-content: center; padding: 8px 18px; border-radius: 14px; }
+.chip-luego { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--piedra); }
+.proximamente { display: none; margin: 8px 0 28px; font-size: clamp(28px, 4vw, 40px); font-weight: 720; letter-spacing: -0.03em; }
+.tienda:has(input[name="tipo"][value="merch"]:checked):not(:has(.rejilla > [data-tipo="merch"])) .proximamente,
+.tienda:has(input[name="tipo"][value="talleres"]:checked):not(:has(.rejilla > [data-tipo="talleres"])) .proximamente { display: block; }
+.tienda:has(input[name="tipo"][value="merch"]:checked) .cuenta,
+.tienda:has(input[name="tipo"][value="talleres"]:checked) .cuenta,
+.tienda:has(input[name="tipo"][value="merch"]:checked) .buscador,
+.tienda:has(input[name="tipo"][value="talleres"]:checked) .buscador { display: none; }
 .filtros input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .filtros label:has(input:checked) { background: var(--hollin); border-color: var(--hollin); color: var(--papel); }
 .filtros label:has(input:focus-visible) { outline: 3px solid var(--tinta); outline-offset: 2px; }
 .cuenta { font-size: 15px; color: var(--piedra); }
 .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 32px 24px; }
+@media (prefers-reduced-motion: no-preference) {
+  html.js .rejilla .libro, html.js .ev { opacity: 0; transform: translateY(8px); }
+  html.js .rejilla .libro.is-visible, html.js .ev.is-visible { opacity: 1; transform: none; transition: opacity var(--dur-rapida) var(--curva-salida), transform var(--dur-rapida) var(--curva-salida); }
+  html.js .libro-portada { transition: transform var(--dur-rapida) var(--curva-resorte); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .rejilla .libro, html.js .ev { opacity: 0; transform: none; }
+  html.js .rejilla .libro.is-visible, html.js .ev.is-visible { opacity: 1; transform: none; transition: opacity var(--dur-instantanea) var(--curva-salida); }
+}
 .libro { position: relative; display: grid; grid-template-rows: auto 1fr; gap: 14px; }
 .libro[hidden] { display: none; }
 .libro-portada { aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: var(--cal); }
@@ -136,8 +183,14 @@ main { max-width: var(--ancho); margin: 0 auto; padding: 0 var(--margen); }
 /* Ficha (dialog nativo: Esc, foco atrapado y devuelto). */
 .ficha { width: min(860px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 16px; background: var(--papel); color: var(--hollin); }
 .ficha::backdrop { background: rgba(29, 20, 17, 0.55); }
-.ficha[open] { animation: ficha-entra 140ms ease-out; }
-@keyframes ficha-entra { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .ficha[open] { animation: ficha-entra var(--dur-rapida) var(--curva-salida); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ficha[open] { animation: ficha-funde var(--dur-instantanea) var(--curva-salida); }
+}
+@keyframes ficha-entra { from { opacity: 0; transform: translateY(12px); } }
+@keyframes ficha-funde { from { opacity: 0; } }
 .ficha-in { display: grid; grid-template-columns: minmax(0, 300px) 1fr; gap: 28px; padding: 28px; position: relative; }
 .ficha-cerrar { position: absolute; top: 16px; right: 16px; }
 .ficha-portada { aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: var(--cal); }
@@ -196,5 +249,6 @@ address .secundario { font-size: 16px; font-weight: 400; }
 .pie { max-width: var(--ancho); margin: 0 auto; padding: 32px var(--margen) 48px; border-top: 1px solid var(--linea); font-size: 14px; color: var(--piedra); }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: var(--dur-instantanea) !important; transition-duration: var(--dur-instantanea) !important; }
+  .boton:active, .c3d-item, .cf-pose, .libro, .libro-portada, .ev, .ficha, .c3d-porta { transform: none !important; }
 }

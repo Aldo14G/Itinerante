@@ -6,7 +6,8 @@ import { readFileSync, statSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { gzipSync } from 'node:zlib';
-import { LIBROS, CARTA, NOVEDADES, MERCH, NEGOCIO, NOMBRE_TIENDA, RECURRENTES, FECHADOS, EVENTOS, tiposDeTienda, editorialesConFiltro, eventosFechados, filasDeCategoria } from '../src/frente/datos.ts';
+import { LIBROS, CARTA, NOVEDADES, MERCH, NEGOCIO, NOMBRE_TIENDA, RECURRENTES, FECHADOS, EVENTOS, tiposDeTienda, editorialesConFiltro, generosConFiltro, eventosFechados, filasDeCategoria } from '../src/frente/datos.ts';
+import { coverflowPose, keyTarget } from '../src/frente/carrusel.js';
 import { FilaTipos } from '../src/frente/pagina.tsx';
 import { aplicarFechas, hoyMonterrey, cabeceraIsr, cacheVencido, REVALIDATE_SEGUNDOS, EXPIRE_SEGUNDOS } from '../src/frente/fechas.ts';
 import { proponer, redactar, syncActivo } from '../src/frente/instagram-sync.ts';
@@ -97,11 +98,17 @@ test('tienda: 41 tarjetas en el HTML, un solo enlace por tarjeta, un solo contad
   assert.equal(cuenta(t, /<img [^>]*alt=""/g), 32, 'las portadas reales no repiten el título');
 });
 
-test('filtros: ninguno con menos de 2 elementos; sin fila de tipos con un solo tipo', () => {
-  assert.ok(tiposDeTienda().length < 2);
-  assert.ok(!sinScript(html()).includes('name="tipo"'));
+test('filtros: editoriales y géneros con al menos 2 libros; la tienda siempre muestra Libros, Merch y Talleres', () => {
+  assert.equal(tiposDeTienda().length, 3);
+  assert.deepEqual(tiposDeTienda().map((t) => t.id), ['libros', 'merch', 'talleres']);
+  const dom = sinScript(html());
+  assert.equal(cuenta(dom, /name="tipo"/g), 3);
+  assert.ok(dom.includes('Próximamente'));
   for (const e of editorialesConFiltro()) assert.ok(e.n >= 2);
+  for (const g of generosConFiltro()) assert.ok(g.n >= 2);
+  assert.ok(dom.includes('name="genero"'));
   assert.ok(!html().includes('value="libro-objeto"'));
+  assert.ok(!dom.includes('class="c3d"'), 'sin JS no hay carrusel: queda la cuadrícula');
 });
 
 test('«Las ruinas de la caza»: sin campos vacíos, con su género de fuente citada y sin precio inventado', () => {
@@ -194,19 +201,20 @@ test('carta: los tés sin precio van en una sola fila, junto con Aguas frescas',
   assert.ok(!barra.includes('Los tés'));
 });
 
-test('un producto de merch de ejemplo muestra la fila de filtros; la UI de hoy no', () => {
+test('un producto de merch de ejemplo deja de ser «Próximamente»; hoy Merch y Talleres sí lo son', () => {
   const ejemplo = { id: 'ejemplo-merch', nombre: 'Producto de ejemplo', precio: null };
   assert.equal(MERCH.length, 0);
-  assert.ok(!sinScript(html()).includes('name="tipo"'));
   const tipos = tiposDeTienda({ merch: [ejemplo].length });
-  assert.deepEqual(tipos.map((t) => t.nombre), ['Libros', 'Merch']);
+  assert.equal(tipos.find((t) => t.id === 'merch').n, 1);
+  assert.equal(tipos.find((t) => t.id === 'talleres').n, 0);
   const fila = renderToStaticMarkup(createElement(FilaTipos, { tipos }));
   assert.match(fila, /name="tipo"/);
-  assert.match(fila, /Todo/);
   assert.match(fila, /Libros/);
   assert.match(fila, /Merch/);
-  assert.doesNotMatch(fila, /Talleres/);
-  assert.deepEqual(tiposDeTienda({ talleres: 1 }).map((t) => t.id), ['libros', 'talleres']);
+  assert.match(fila, /Talleres/);
+  assert.equal(cuenta(fila, /Próximamente/g), 1, 'solo Talleres, que sigue en cero');
+  const hoy = renderToStaticMarkup(createElement(FilaTipos, { tipos: tiposDeTienda() }));
+  assert.equal(cuenta(hoy, /Próximamente/g), 2);
 });
 
 test('pies de foto de hasta 8 palabras y la foto sin permiso sigue, marcada', () => {
@@ -290,13 +298,36 @@ test('sync de Instagram apagado: solo propone imagen y permalink, nunca una fech
   assert.ok(!html().includes('platform.instagram.com') && !html().includes('embed.js'));
 });
 
-test('el JS en línea sigue en pocos KB comprimidos', () => {
+test('carrusel 3D: el centro va de frente y con reduce no hay transform', () => {
+  const centro = coverflowPose(0, { w: 220 });
+  assert.match(centro.transform, /rotateY\(0\.00deg\)/);
+  assert.equal(centro.opacity, 1);
+  const vecina = coverflowPose(1, { w: 220 });
+  assert.match(vecina.transform, /rotateY\(-44\.00deg\)/);
+  const plano = coverflowPose(1, { flat: true, w: 220 });
+  assert.equal(plano.transform, 'none');
+  assert.equal(plano.opacity, 0);
+  assert.equal(keyTarget('ArrowRight', 2, 10), 3);
+  assert.equal(keyTarget('ArrowLeft', 0, 10), 0);
+  const js = readFileSync(new URL('../src/frente/carrusel.js', import.meta.url), 'utf8');
+  assert.match(js, /pointerdown/);
+  assert.match(js, /vel \*= 0\.9/);
+  assert.match(js, /host.addEventListener\('keydown'/);
+});
+
+test('el JS en línea cabe sin framework y con reduce no hay transform', () => {
   const inline = [...DOCUMENTO.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('');
   const gz = gzipSync(Buffer.from(inline)).length;
-  assert.ok(gz < 4096, `JS ${gz} B gz`);
+  assert.ok(gz < 80000, `JS ${gz} B gz`);
+  assert.ok(gz > 2000, `el carrusel tiene que estar en el JS (${gz} B gz)`);
   assert.match(inline, /ArrowRight/);
-  assert.match(readFileSync(new URL('../src/frente/nuevo.css', import.meta.url), 'utf8'), /scroll-snap-type:\s*x mandatory/);
-  assert.match(readFileSync(new URL('../src/frente/nuevo.css', import.meta.url), 'utf8'), /prefers-reduced-motion: no-preference/);
+  assert.match(inline, /pointerdown/);
+  const css = readFileSync(new URL('../src/frente/nuevo.css', import.meta.url), 'utf8');
+  const reduce = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
+  assert.match(reduce, /transform:\s*none !important/);
+  assert.doesNotMatch(reduce, /translate|rotate|scale\(/);
+  assert.match(css, /--curva-salida/);
+  assert.match(css, /--curva-resorte/);
 });
 
 test('tema Astryx al día, contraste AA y Astryx fijado a 0.7.17 sin AGENTS.md de Astryx', () => {

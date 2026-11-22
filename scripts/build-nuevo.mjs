@@ -6,9 +6,9 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { transform } from 'esbuild';
+import { build, transform } from 'esbuild';
 import { Pagina, idEditorial } from '../src/frente/pagina.tsx';
-import { editorialesConFiltro, tiposDeTienda } from '../src/frente/datos.ts';
+import { editorialesConFiltro, generosConFiltro, tiposDeTienda } from '../src/frente/datos.ts';
 
 const raiz = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url));
 const SALIDA = raiz('src/app/nuevo/documento.generado.ts');
@@ -16,6 +16,10 @@ const SALIDA = raiz('src/app/nuevo/documento.generado.ts');
 // Filtros por editorial sin JS: un radio marcado oculta las tarjetas de otras editoriales.
 const filtrosCSS = [
   ...tiposDeTienda().map((t) => `.tienda:has(input[name="tipo"][value="${t.id}"]:checked) .rejilla > li:not([data-tipo="${t.id}"]){display:none}`),
+  ...generosConFiltro().map((g) => {
+    const id = idEditorial(g.nombre);
+    return `.tienda:has(input[name="genero"][value="${id}"]:checked) .rejilla .libro:not([data-gen="${id}"]){display:none}`;
+  }),
   ...editorialesConFiltro().map((e) => {
     const id = idEditorial(e.nombre);
     return `.tienda:has(input[name="editorial"][value="${id}"]:checked) .rejilla .libro:not([data-ed="${id}"]){display:none}`;
@@ -25,7 +29,17 @@ const filtrosCSS = [
 const tema = await readFile(raiz('src/frente/tema-itinerante.css'), 'utf8');
 const propio = await readFile(raiz('src/frente/nuevo.css'), 'utf8');
 const css = (await transform(`${tema}\n${propio}\n${filtrosCSS}`, { loader: 'css', minify: true, target: ['chrome111', 'safari16.4', 'firefox128'] })).code.trim();
-const js = (await transform(await readFile(raiz('src/frente/cliente.js'), 'utf8'), { loader: 'js', minify: true, target: 'es2019' })).code.trim();
+const empaquetado = await build({
+  absWorkingDir: raiz('.'),
+  entryPoints: [raiz('src/frente/cliente.js')],
+  bundle: true,
+  format: 'iife',
+  minify: true,
+  write: false,
+  legalComments: 'none',
+  target: 'es2019',
+});
+const js = empaquetado.outputFiles[0].text.trim();
 
 const html = '<!doctype html>' + renderToStaticMarkup(createElement(Pagina, { css, js }));
 const salida = [
