@@ -8,18 +8,19 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { transform } from 'esbuild';
 import { Pagina, idEditorial } from '../src/frente/pagina.tsx';
-import { editorialesConFiltro } from '../src/frente/datos.ts';
+import { editorialesConFiltro, tiposDeTienda } from '../src/frente/datos.ts';
 
 const raiz = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url));
 const SALIDA = raiz('src/app/nuevo/documento.generado.ts');
 
 // Filtros por editorial sin JS: un radio marcado oculta las tarjetas de otras editoriales.
-const filtrosCSS = editorialesConFiltro()
-  .map((e) => {
+const filtrosCSS = [
+  ...tiposDeTienda().map((t) => `.tienda:has(input[name="tipo"][value="${t.id}"]:checked) .rejilla > li:not([data-tipo="${t.id}"]){display:none}`),
+  ...editorialesConFiltro().map((e) => {
     const id = idEditorial(e.nombre);
     return `.tienda:has(input[name="editorial"][value="${id}"]:checked) .rejilla .libro:not([data-ed="${id}"]){display:none}`;
-  })
-  .join('\n');
+  }),
+].join('\n');
 
 const tema = await readFile(raiz('src/frente/tema-itinerante.css'), 'utf8');
 const propio = await readFile(raiz('src/frente/nuevo.css'), 'utf8');

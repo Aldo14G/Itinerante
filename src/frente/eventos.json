@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "nota": "Fuente de verdad de Eventos en /nuevo, revisada el 2026-11-22 con los posts oficiales de @libreriaitineranteymasmty. No se inventan eventos, fechas, precios ni imágenes. `fecha` ISO (hora de Monterrey) o null si es recurrente sin próxima fecha: un evento con fecha anterior a hoy se oculta solo (servidor y navegador). `hora` null se imprime «Hora por anunciar». `lugar` visible es «En la librería»: la dirección vive solo en Visita. `registroUrl` (https, Luma o formulario del evento) cambia el botón a «Registrarme»; si no hay, el botón es «Ver en Instagram» hacia `instagramUrl`. `imagen` es una ruta local bajo /assets/ o null (no se descarga el cartel: el sync de Instagram solo propone). El registro de renta de espacio (https://forms.gle/RDaEfgVitEFbDnyU7) no es un evento. El taller Skribh queda fuera hasta que el dueño lo autorice. El nombre de Santiago González sale de la revisión oficial del post del Club."
+  },
+  "eventos": [
+    {
+      "id": "aniversario-6",
+      "titulo": "6.º Aniversario",
+      "fecha": "2026-11-27",
+      "hora": null,
+      "lugar": "En la librería",
+      "organizador": null,
+      "imagen": null,
+      "registroUrl": null,
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/",
+      "recurrencia": null,
+      "costo": null,
+      "incluye": null
+    },
+    {
+      "id": "club-dibujo-pintura",
+      "titulo": "Club de Dibujo y Pintura",
+      "fecha": null,
+      "hora": "14:00–16:00",
+      "lugar": "En la librería",
+      "organizador": "Santiago González",
+      "imagen": null,
+      "registroUrl": null,
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DfYBKN-oZea/",
+      "recurrencia": "Sábados cada 15 días",
+      "costo": "$150 MXN",
+      "incluye": "Material"
+    }
+  ]
+}

@@ -4,20 +4,28 @@
 // lo poco interactivo (buscador, ficha, scroll-spy, fechas) va en src/frente/cliente.js. Todo el contenido se lee sin JavaScript.
 import {
   CARTA,
-  FECHADOS,
+  EVENTOS,
   LIBROS,
+  MERCH,
   NEGOCIO,
   NOMBRE_TIENDA,
   NOVEDADES,
+  PORTADA_SIZES,
   PREGUNTAS,
   RECURRENTES,
+  TALLERES,
   editorialesConFiltro,
   fechaCorta,
+  filasDeCategoria,
   precioMXN,
   tiposDeTienda,
   ultimoDiaConEventos,
   whatsapp,
+  type Evento,
   type Libro,
+  type MerchItem,
+  type TallerTienda,
+  type TipoTienda,
 } from './datos';
 import { diaSiguiente } from './fechas';
 import type { ReactNode } from 'react';
@@ -85,13 +93,23 @@ function TarjetaLibro({ l, i }: { l: Libro; i: number }) {
     <li
       className="libro"
       id={`libro-${l.id}`}
+      data-tipo="libros"
       data-ed={l.editorial ? idEditorial(l.editorial) : undefined}
       data-busca={normalizar([l.titulo, l.autor, l.editorial, l.genero].filter(Boolean).join(' '))}
       data-wa={whatsapp(mensajeLibro(l))}
     >
       <div className="libro-portada">
         {l.portada ? (
-          <img src={l.portada.src} width={l.portada.ancho} height={l.portada.alto} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" />
+          <img
+            src={l.portada.src}
+            srcSet={l.portada.srcset ?? undefined}
+            sizes={l.portada.srcset ? PORTADA_SIZES : undefined}
+            width={l.portada.ancho}
+            height={l.portada.alto}
+            alt=""
+            loading={i < 4 ? 'eager' : 'lazy'}
+            decoding="async"
+          />
         ) : (
           <div className="portada-tipografica" aria-hidden="true">
             <span>{l.titulo}</span>
@@ -124,7 +142,7 @@ function Cabecera() {
         </a>
         <nav aria-label="Secciones">
           <ul className="menu">
-            {FECHADOS.length || RECURRENTES.length ? (
+            {EVENTOS.length ? (
               <li>
                 <a href="#eventos">
                   <SegunEventos con="Eventos" sin="Actividades" />
@@ -152,7 +170,9 @@ function Cabecera() {
 function Portada() {
   return (
     <section id="portada" className="portada" aria-labelledby="portada-t">
-      <h1 id="portada-t">{NEGOCIO.nombre}</h1>
+      <h1 id="portada-t">
+        <span className="h1-q">Librería Itinerante</span> <span className="h1-q">y{'\u00a0'}Más</span>
+      </h1>
       <p className="portada-linea">{NEGOCIO.linea}</p>
       <p className="acciones">
         <SegunEventos
@@ -172,72 +192,89 @@ function Portada() {
   );
 }
 
+function CtaEvento({ e }: { e: Evento }) {
+  if (e.registroUrl) {
+    return (
+      <a className="boton boton-primario" href={e.registroUrl} target="_blank" rel="noopener noreferrer">
+        Registrarme
+      </a>
+    );
+  }
+  return (
+    <a className="boton boton-primario" href={e.instagramUrl} target="_blank" rel="noopener noreferrer">
+      Ver en {IG}
+    </a>
+  );
+}
+
+function TarjetaEvento({ e }: { e: Evento }) {
+  const f = e.fecha ? fechaCorta(e.fecha) : null;
+  const hora = e.hora ?? (e.fecha ? 'Hora por anunciar' : null);
+  return (
+    <article className="carrusel-pieza ev" aria-labelledby={`ev-${e.id}`}>
+      <div className={e.imagen ? 'ev-portada' : 'ev-portada ev-portada-fecha'}>
+        {e.imagen ? <img src={e.imagen} alt="" /> : null}
+        <p className="ev-fecha" aria-hidden="true">
+          {f ? (
+            <>
+              <span>{f.dia}</span>
+              <b>{f.numero}</b>
+              <span>{f.mes}</span>
+            </>
+          ) : (
+            <>
+              <span>Recurrente</span>
+              <b>{e.recurrencia ? e.recurrencia.split(' ')[0] : e.titulo}</b>
+            </>
+          )}
+        </p>
+      </div>
+      <div className="ev-cuerpo">
+        <h3 id={`ev-${e.id}`}>
+          {e.titulo}
+          {f ? (
+            <span className="sr-only">
+              , <time dateTime={e.fecha!}>{f.larga}</time>
+            </span>
+          ) : null}
+        </h3>
+        <ul className="ev-meta">
+          {e.recurrencia ? <li>{e.recurrencia}</li> : null}
+          {hora ? <li>{hora}</li> : null}
+          {e.lugar ? <li>{e.lugar}</li> : null}
+          {e.organizador ? <li>{e.organizador}</li> : null}
+          {e.costo ? <li>{e.costo}</li> : null}
+          {e.incluye ? <li>{e.incluye}</li> : null}
+        </ul>
+        <p className="acciones">
+          <CtaEvento e={e} />
+        </p>
+      </div>
+    </article>
+  );
+}
+
 function Eventos() {
-  if (!FECHADOS.length && !RECURRENTES.length) return null;
+  if (!EVENTOS.length) return null;
+  const piezas = EVENTOS.map((e) => {
+    const pieza = <TarjetaEvento key={e.id} e={e} />;
+    return e.fecha ? (
+      <Hasta key={e.id} d={e.fecha}>
+        {pieza}
+      </Hasta>
+    ) : (
+      pieza
+    );
+  });
   const seccion = (
     <section id="eventos" className="seccion" aria-labelledby="eventos-t">
       <span id="cartelera" className="ancla-vieja" />
       <h2 id="eventos-t" className="h2">
         <SegunEventos con="Eventos" sin="Actividades" />
       </h2>
-      {FECHADOS.map((e) => {
-        const f = fechaCorta(e.fecha);
-        return (
-          <Hasta key={e.id} d={e.fecha}>
-            <article className="evento-destacado" aria-labelledby={`ev-${e.id}`}>
-              <p className="fecha-bloque" aria-hidden="true">
-                <span>{f.dia}</span>
-                <b>{f.numero}</b>
-                <span>{f.mes}</span>
-              </p>
-              <div className="evento-cuerpo">
-                <h3 id={`ev-${e.id}`}>{e.titulo}</h3>
-                <ul className="evento-datos">
-                  <li>
-                    <time dateTime={e.fecha}>{f.larga}</time>
-                  </li>
-                  <li>{e.hora ?? 'Hora por anunciar'}</li>
-                  <li>En la librería</li>
-                </ul>
-                {e.descripcion ? <p>{e.descripcion}</p> : null}
-                <p className="acciones">
-                  <a className="boton boton-primario" href={e.fuente} target="_blank" rel="noopener noreferrer">
-                    Ver anuncio en {IG}
-                  </a>
-                </p>
-              </div>
-            </article>
-          </Hasta>
-        );
-      })}
-      {RECURRENTES.map((r) => (
-        <article key={r.id} className="evento-recurrente" aria-labelledby={`ev-${r.id}`}>
-          <p className="insignia">Recurrente</p>
-          <h3 id={`ev-${r.id}`}>{r.titulo}</h3>
-          <dl className="atributos">
-            {(
-              [
-                ['Cuándo', r.cuando],
-                ['Horario', r.horario],
-                ['Costo', r.costo],
-                ['Incluye', r.incluye],
-              ] as Array<[string, string | null]>
-            )
-              .filter(([, v]) => v)
-              .map(([k, v]) => (
-                <div key={k}>
-                  <dt>{k}</dt>
-                  <dd>{v}</dd>
-                </div>
-              ))}
-          </dl>
-          <p className="acciones">
-            <a className="boton boton-secundario" href={r.fuente} target="_blank" rel="noopener noreferrer">
-              Ver publicación en {IG}
-            </a>
-          </p>
-        </article>
-      ))}
+      <div className="carrusel" role="region" aria-roledescription="carrusel" aria-label="Eventos por comenzar" tabIndex={0}>
+        <div className="carrusel-pista">{piezas}</div>
+      </div>
     </section>
   );
   if (RECURRENTES.length) return seccion;
@@ -261,6 +298,64 @@ function Novedades() {
   );
 }
 
+export function FilaTipos({ tipos }: { tipos: TipoTienda[] }) {
+  if (tipos.length < 2) return null;
+  return (
+    <fieldset className="filtros">
+      <legend>Tipo</legend>
+      <label>
+        <input type="radio" name="tipo" value="" defaultChecked /> Todo
+      </label>
+      {tipos.map((t) => (
+        <label key={t.id}>
+          <input type="radio" name="tipo" value={t.id} /> {t.nombre}
+        </label>
+      ))}
+    </fieldset>
+  );
+}
+
+function mensajeMerch(m: MerchItem): string {
+  return `Hola, quiero consultar la disponibilidad de «${m.nombre}»${m.precio != null ? ` (${precioMXN(m.precio)})` : ''}.`;
+}
+
+function TarjetaMerch({ m }: { m: MerchItem }) {
+  return (
+    <li className="merch" data-tipo="merch" data-busca={normalizar([m.nombre, m.tipo, m.descripcion].filter(Boolean).join(' '))}>
+      {m.foto ? (
+        <div className="merch-foto">
+          <img src={m.foto.src.startsWith('/') ? m.foto.src : `/${m.foto.src}`} alt={m.foto.alt} />
+        </div>
+      ) : null}
+      <h3 className="libro-t">{m.nombre}</h3>
+      {m.precio != null ? <p className="libro-precio">{precioMXN(m.precio)}</p> : null}
+      {m.tipo ? (
+        <dl className="atributos">
+          <div>
+            <dt>Tipo</dt>
+            <dd>{m.tipo}</dd>
+          </div>
+        </dl>
+      ) : null}
+      {m.descripcion ? <p className="libro-sinopsis">{m.descripcion}</p> : null}
+      <p className="acciones">
+        <a className="boton boton-primario" href={whatsapp(mensajeMerch(m))} target="_blank" rel="noopener noreferrer">
+          Consultar disponibilidad por WhatsApp
+        </a>
+      </p>
+    </li>
+  );
+}
+
+function TarjetaTaller({ t }: { t: TallerTienda }) {
+  return (
+    <li className="taller" data-tipo="talleres" data-busca={normalizar(t.titulo)}>
+      <h3 className="libro-t">{t.titulo}</h3>
+      {t.precio != null ? <p className="libro-precio">{precioMXN(t.precio)}</p> : null}
+    </li>
+  );
+}
+
 function Tienda() {
   const editoriales = editorialesConFiltro();
   const tipos = tiposDeTienda();
@@ -276,19 +371,7 @@ function Tienda() {
           <label htmlFor="buscar">Buscar</label>
           <input id="buscar" type="search" placeholder="Título, autor o editorial" autoComplete="off" />
         </p>
-        {tipos.length >= 2 ? (
-          <fieldset className="filtros">
-            <legend>Tipo</legend>
-            <label>
-              <input type="radio" name="tipo" value="" defaultChecked /> Todo
-            </label>
-            {tipos.map((t) => (
-              <label key={t.id}>
-                <input type="radio" name="tipo" value={t.id} /> {t.nombre}
-              </label>
-            ))}
-          </fieldset>
-        ) : null}
+        <FilaTipos tipos={tipos} />
         {editoriales.length >= 2 ? (
           <fieldset className="filtros">
             <legend>Editorial</legend>
@@ -309,6 +392,12 @@ function Tienda() {
       <ul className="rejilla">
         {LIBROS.map((l, i) => (
           <TarjetaLibro key={l.id} l={l} i={i} />
+        ))}
+        {MERCH.map((m) => (
+          <TarjetaMerch key={m.id} m={m} />
+        ))}
+        {TALLERES.map((t) => (
+          <TarjetaTaller key={t.id} t={t} />
         ))}
       </ul>
       <div className="vacio" hidden>
@@ -379,7 +468,7 @@ function Visita() {
               WhatsApp
             </a>
           </p>
-          <p>
+          <p className="visita-tel">
             Tel. <a href={`tel:+${NEGOCIO.telefono}`}>{NEGOCIO.telefonoVisible}</a>
           </p>
           <h3 className="h3" id="contacto">
@@ -409,13 +498,18 @@ function Visita() {
             <details key={c.id} className="barra-grupo" open>
               <summary>{c.nombre}</summary>
               <ul>
-                {c.productos.map((p) => (
-                  <li key={p.id}>
+                {filasDeCategoria(c.productos).map((fila) => (
+                  <li key={fila.id}>
                     <span className="barra-nombre">
-                      {p.nombre}
-                      {p.descripcion ? <span className="secundario"> {p.descripcion}</span> : null}
+                      {fila.nombre}
+                      {fila.detalle ? <span className="secundario"> {fila.detalle}</span> : null}
+                      {fila.lineas.map((linea) => (
+                        <span key={linea} className="barra-linea">
+                          {linea}
+                        </span>
+                      ))}
                     </span>
-                    {p.precio != null ? <span className="barra-precio">{precioMXN(p.precio)}</span> : null}
+                    {fila.precio != null ? <span className="barra-precio">{precioMXN(fila.precio)}</span> : null}
                   </li>
                 ))}
               </ul>
@@ -428,7 +522,7 @@ function Visita() {
           {NEGOCIO.fotos.slice(0, 3).map((f) => (
             <li key={f.src}>
               <figure>
-                <img src={f.src} srcSet={f.srcset} sizes="(max-width: 767px) 100vw, 50vw" width={f.ancho} height={f.alto} alt="" loading="lazy" decoding="async" />
+                <img src={f.src} srcSet={f.srcset} sizes="(max-width: 879px) 92vw, 540px" width={f.ancho} height={f.alto} alt={f.alt} loading="lazy" decoding="async" />
                 <figcaption>
                   {f.pie} <span className="secundario">Foto: {f.credito}.</span>
                 </figcaption>

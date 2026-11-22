@@ -207,12 +207,18 @@ test('catálogo: es el inventario de la librería (41 títulos), sin repetidos, 
     assert.deepEqual(webpSize(await readFile(here(`./${b.c}`))), [b.cw, b.ch], `${b.id}: cw/ch son las medidas del archivo`);
     assert.ok(Math.max(b.cw, b.ch) <= 1200 && b.ch / b.cw > 1 && b.ch / b.cw < 2, `${b.id}: portada vertical de 1200 px de lado mayor como máximo (${b.cw}×${b.ch}; antes 600 de ancho, 2026-11-18)`);
     const v600 = here(`./assets/img/portadas/${b.id}-600.webp`);
-    if (b.cw > 600) assert.deepEqual(webpSize(await readFile(v600)), [600, Math.round(b.ch * 600 / b.cw)], `${b.id}: variante de 600 de ancho para el srcset`);
-    else assert.ok(!existsSync(v600), `${b.id}: sin variante si la portada no pasa de 600 (nunca se amplía)`);
+    const v360 = here(`./assets/img/portadas/${b.id}-360.webp`);
+    if (b.cw > 600) {
+      assert.deepEqual(webpSize(await readFile(v600)), [600, Math.round(b.ch * 600 / b.cw)], `${b.id}: variante de 600 de ancho para el srcset`);
+      assert.deepEqual(webpSize(await readFile(v360)), [360, Math.round(b.ch * 360 / b.cw)], `${b.id}: variante de 360 de ancho para el teléfono`);
+    } else {
+      assert.ok(!existsSync(v600), `${b.id}: sin variante de 600 si la portada no pasa de 600 (nunca se amplía)`);
+      assert.ok(!existsSync(v360), `${b.id}: sin variante de 360 si la portada no pasa de 600`);
+    }
   }
   for (const b of data.books.filter(x => !x.c)) assert.ok(b.cw === null && b.ch === null && !portadas[b.id], `${b.id}: sin portada no hay medidas ni registro`);
   const files = await readdir(here('./assets/img/portadas'));
-  assert.deepEqual(files.sort(), conPortada.flatMap(b => (b.cw > 600 ? [`${b.id}.webp`, `${b.id}-600.webp`] : [`${b.id}.webp`])).sort(), 'ninguna portada huérfana en assets/img/portadas (la portada y, si mide más de 600, su variante)');
+  assert.deepEqual(files.sort(), conPortada.flatMap(b => (b.cw > 600 ? [`${b.id}.webp`, `${b.id}-360.webp`, `${b.id}-600.webp`] : [`${b.id}.webp`])).sort(), 'ninguna portada huérfana en assets/img/portadas (la portada y, si mide más de 600, sus variantes de 360 y de 600)');
   assert.deepEqual(Object.keys(portadas).sort(), conPortada.map(b => b.id).sort(), 'data/portadas.json no registra libros que no estén en el catálogo');
   // Nada del catálogo de prueba (CSV de Amazon) queda en lo que carga el sitio.
   const titles = new Set(data.books.map(b => b.t));

@@ -2,14 +2,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
-import { LIBROS, CARTA, NOVEDADES, MERCH, NEGOCIO, NOMBRE_TIENDA, RECURRENTES, FECHADOS, tiposDeTienda, editorialesConFiltro, eventosFechados } from '../src/frente/datos.ts';
-import { aplicarFechas, hoyMonterrey } from '../src/frente/fechas.ts';
+import { readFileSync, statSync } from 'node:fs';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { gzipSync } from 'node:zlib';
+import { LIBROS, CARTA, NOVEDADES, MERCH, NEGOCIO, NOMBRE_TIENDA, RECURRENTES, FECHADOS, EVENTOS, tiposDeTienda, editorialesConFiltro, eventosFechados, filasDeCategoria } from '../src/frente/datos.ts';
+import { FilaTipos } from '../src/frente/pagina.tsx';
+import { aplicarFechas, hoyMonterrey, cabeceraIsr, cacheVencido, REVALIDATE_SEGUNDOS, EXPIRE_SEGUNDOS } from '../src/frente/fechas.ts';
+import { proponer, redactar, syncActivo } from '../src/frente/instagram-sync.ts';
 import { DOCUMENTO } from '../src/app/nuevo/documento.generado.ts';
 
 const vetadas = JSON.parse(readFileSync(new URL('../src/frente/frases-vetadas.json', import.meta.url), 'utf8'));
 const HOY = '2026-11-22';
 const html = (hoy = HOY) => aplicarFechas(DOCUMENTO, hoy);
+const sinScript = (h) => h.replace(/<script[\s\S]*?<\/script>/g, '');
 const sinOcultos = (h) => h.replace(/<fecha-desde[^>]*hidden=""[^>]*>[\s\S]*?<\/fecha-desde>/g, '');
 const sinAcentos = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 function textoVisible(h) {
@@ -93,7 +99,7 @@ test('tienda: 41 tarjetas en el HTML, un solo enlace por tarjeta, un solo contad
 
 test('filtros: ninguno con menos de 2 elementos; sin fila de tipos con un solo tipo', () => {
   assert.ok(tiposDeTienda().length < 2);
-  assert.ok(!html().includes('name="tipo"'));
+  assert.ok(!sinScript(html()).includes('name="tipo"'));
   for (const e of editorialesConFiltro()) assert.ok(e.n >= 2);
   assert.ok(!html().includes('value="libro-objeto"'));
 });
@@ -118,7 +124,9 @@ test('el Club de Dibujo sale una sola vez, en Eventos, con su fuente oficial', (
   const h = html();
   assert.equal(cuenta(textoVisible(h), /Club de Dibujo y Pintura/g), 1);
   assert.ok(seccion(h, 'eventos').includes('Club de Dibujo y Pintura'));
-  for (const e of [...FECHADOS, ...RECURRENTES]) assert.match(e.fuente, /^https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/p\//);
+  for (const e of [...FECHADOS, ...RECURRENTES]) assert.match(e.instagramUrl, /^https:\/\/www\.instagram\.com\/libreriaitineranteymasmty\/p\//);
+  assert.equal(cuenta(html(), /Registrarme/g), 0);
+  assert.equal(cuenta(html(), /Ver en Instagram/g), 2);
 });
 
 test('fecha: el 27 nov se ve el Aniversario y el CTA «Ver eventos»; desde el 28 se va y el CTA lleva a la tienda', () => {
@@ -148,6 +156,147 @@ test('sin personalización: menú de 3 ítems sin «Inicio» y sin switch', () =
   const nav = html().match(/<ul class="menu">([\s\S]*?)<\/ul>/)[1];
   assert.equal(cuenta(nav, /<a /g), 3);
   assert.ok(!/Inicio/.test(nav));
+});
+
+test('carrusel de eventos: orden por fecha, fecha larga solo para el lector, sin datos ajenos', () => {
+  const h = html();
+  const ev = seccion(h, 'eventos');
+  assert.ok(ev.includes('aria-roledescription="carrusel"') && ev.includes('tabindex="0"'));
+  assert.ok(ev.indexOf('6.º Aniversario') < ev.indexOf('Club de Dibujo y Pintura'));
+  assert.ok(ev.includes('<span class="sr-only">'));
+  const sinLector = ev.replace(/<span class="sr-only">[\s\S]*?<\/span>/g, '');
+  assert.ok(!sinLector.includes('noviembre'), 'la fecha larga no se ve');
+  assert.ok(ev.includes('viernes, 27 de noviembre de 2026'));
+  assert.ok(ev.includes('Hora por anunciar') && ev.includes('Santiago González') && ev.includes('$150 MXN'));
+  assert.ok(!h.includes('forms.gle') && !h.includes('Skribh') && !/piel de los recuerdos/i.test(h));
+  assert.equal(EVENTOS.filter((e) => e.registroUrl).length, 0);
+  assert.ok(EVENTOS.every((e) => e.imagen == null || e.imagen.startsWith('/assets/')));
+});
+
+test('carta: los tés sin precio van en una sola fila, junto con Aguas frescas', () => {
+  const sin = CARTA.find((c) => c.id === 'sin-cafe');
+  const filas = filasDeCategoria(sin.productos);
+  const sinPrecio = filas.filter((f) => f.precio == null);
+  assert.equal(sinPrecio.length, 1);
+  assert.equal(sinPrecio[0].nombre, 'Tés');
+  assert.match(sinPrecio[0].detalle, /Hierbabuena/);
+  assert.match(sinPrecio[0].detalle, /Té verde/);
+  assert.deepEqual(sinPrecio[0].lineas, ['Aguas frescas']);
+  let racha = 0;
+  let max = 0;
+  for (const f of filas) {
+    racha = f.precio == null ? racha + 1 : 0;
+    max = Math.max(max, racha);
+  }
+  assert.ok(max <= 1);
+  const barra = seccion(html(), 'visita');
+  assert.ok(!barra.includes('>Hierbabuena<') && barra.includes('Tés') && barra.includes('Aguas frescas'));
+  assert.ok(!barra.includes('Los tés'));
+});
+
+test('un producto de merch de ejemplo muestra la fila de filtros; la UI de hoy no', () => {
+  const ejemplo = { id: 'ejemplo-merch', nombre: 'Producto de ejemplo', precio: null };
+  assert.equal(MERCH.length, 0);
+  assert.ok(!sinScript(html()).includes('name="tipo"'));
+  const tipos = tiposDeTienda({ merch: [ejemplo].length });
+  assert.deepEqual(tipos.map((t) => t.nombre), ['Libros', 'Merch']);
+  const fila = renderToStaticMarkup(createElement(FilaTipos, { tipos }));
+  assert.match(fila, /name="tipo"/);
+  assert.match(fila, /Todo/);
+  assert.match(fila, /Libros/);
+  assert.match(fila, /Merch/);
+  assert.doesNotMatch(fila, /Talleres/);
+  assert.deepEqual(tiposDeTienda({ talleres: 1 }).map((t) => t.id), ['libros', 'talleres']);
+});
+
+test('pies de foto de hasta 8 palabras y la foto sin permiso sigue, marcada', () => {
+  for (const f of NEGOCIO.fotos) assert.ok(f.pie.trim().split(/\s+/).length <= 8, f.pie);
+  assert.equal(NEGOCIO.fotos[0].permisoRegistrado, false);
+  assert.equal(NEGOCIO.fotos[1].permisoRegistrado, true);
+  const h = html();
+  assert.ok(h.includes('/assets/img/oficial-rincon-800.webp'));
+  assert.ok(h.includes('alt="Muro de piedra'));
+  assert.ok(seccion(h, 'visita').includes('La sala'));
+  const prov = JSON.parse(readFileSync(new URL('../assets/provenance.json', import.meta.url), 'utf8'));
+  const reg = prov.real.find((f) => f.file === 'img/oficial-rincon-800.webp');
+  assert.equal(reg.permiso, false);
+});
+
+test('portadas con srcset y la página a 390 px transfiere como mucho 700 KB de imágenes', () => {
+  const ancha = LIBROS.find((l) => l.portada && l.portada.ancho > 600);
+  assert.match(ancha.portada.srcset, /-360\.webp 360w/);
+  assert.match(ancha.portada.srcset, /-600\.webp 600w/);
+  const corta = LIBROS.find((l) => l.portada && l.portada.ancho <= 600);
+  assert.equal(corta.portada.srcset, null);
+  const elegido = (srcset, slot) => {
+    const cands = srcset.split(',').map((s) => {
+      const partes = s.trim().split(/\s+/);
+      return { url: partes[0], w: parseInt(partes[1], 10) };
+    }).sort((a, b) => a.w - b.w);
+    return (cands.find((c) => c.w >= slot) || cands[cands.length - 1]).url;
+  };
+  const peso = (url) => statSync(new URL(`..${url.startsWith('/') ? '' : '/'}${url}`, import.meta.url)).size;
+  let total = peso('/assets/img/logo-96.webp');
+  for (const l of LIBROS) {
+    if (!l.portada) continue;
+    const slot = Math.ceil(390 * 0.46);
+    total += peso(l.portada.srcset ? elegido(l.portada.srcset, slot * 2) : l.portada.src);
+  }
+  for (const f of NEGOCIO.fotos) total += peso(elegido(f.srcset, Math.ceil(390 * 0.92 * 2)));
+  assert.ok(total <= 700 * 1024, `imágenes a 390 px y dpr 2: ${Math.round(total / 1024)} KB`);
+});
+
+test('caché: stale-while-revalidate de 3600 y, tras dos horas, el 28 ya no trae el Aniversario', () => {
+  assert.equal(REVALIDATE_SEGUNDOS, 3600);
+  assert.equal(EXPIRE_SEGUNDOS, 7200);
+  assert.equal(cabeceraIsr(), 's-maxage=3600, stale-while-revalidate=3600');
+  const cfg = readFileSync(new URL('../next.config.ts', import.meta.url), 'utf8');
+  assert.match(cfg, /expireTime:\s*7200/);
+  assert.match(readFileSync(new URL('../src/app/nuevo/route.ts', import.meta.url), 'utf8'), /export const revalidate = 3600/);
+  const generado = new Date('2026-11-28T04:00:00Z');
+  const pedido = new Date('2026-11-28T06:05:00Z');
+  assert.equal(hoyMonterrey(generado), '2026-11-27');
+  assert.equal(hoyMonterrey(pedido), '2026-11-28');
+  assert.equal(cacheVencido(generado, pedido), true);
+  assert.ok(!html('2026-11-28').includes('6.º Aniversario'));
+});
+
+test('sync de Instagram apagado: solo propone imagen y permalink, nunca una fecha', () => {
+  assert.equal(syncActivo({}), false);
+  assert.equal(syncActivo({ INSTAGRAM_SYNC: '1', INSTAGRAM_USER_ID: '1' }), false);
+  const token = 'IGQVJsecreto-de-prueba-que-no-es-real-1234567890';
+  assert.equal(redactar(`falló access_token=${token}&fields=id`), 'falló access_token=REDACTED&fields=id');
+  const eventos = [{ id: 'aniversario-6', instagramUrl: 'https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/', imagen: null, fecha: '2026-11-27' }];
+  const media = [{
+    id: '1',
+    caption: 'Nos vemos el 2030-01-01',
+    permalink: 'https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/?img_index=1',
+    timestamp: '2030-01-01T00:00:00+0000',
+    media_type: 'IMAGE',
+    thumbnail_url: 'https://cdn.example/thumb.jpg',
+    media_url: 'https://cdn.example/full.jpg',
+  }];
+  const propuestas = proponer(eventos, media);
+  assert.equal(propuestas.length, 1);
+  assert.equal(propuestas[0].imagen, 'https://cdn.example/thumb.jpg');
+  assert.equal(propuestas[0].origenImagen, 'thumbnail_url');
+  assert.equal(eventos[0].fecha, '2026-11-27');
+  assert.ok(!JSON.stringify(propuestas).includes('2030'));
+  assert.ok(!('fecha' in propuestas[0]));
+  const soloUrl = proponer(eventos, [{ permalink: eventos[0].instagramUrl, media_url: 'https://cdn.example/full.jpg' }]);
+  assert.equal(soloUrl[0].origenImagen, 'media_url');
+  const conLocal = proponer([{ ...eventos[0], imagen: '/assets/img/x.webp' }], media);
+  assert.equal(conLocal[0].imagen, null);
+  assert.ok(!html().includes('platform.instagram.com') && !html().includes('embed.js'));
+});
+
+test('el JS en línea sigue en pocos KB comprimidos', () => {
+  const inline = [...DOCUMENTO.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('');
+  const gz = gzipSync(Buffer.from(inline)).length;
+  assert.ok(gz < 4096, `JS ${gz} B gz`);
+  assert.match(inline, /ArrowRight/);
+  assert.match(readFileSync(new URL('../src/frente/nuevo.css', import.meta.url), 'utf8'), /scroll-snap-type:\s*x mandatory/);
+  assert.match(readFileSync(new URL('../src/frente/nuevo.css', import.meta.url), 'utf8'), /prefers-reduced-motion: no-preference/);
 });
 
 test('tema Astryx al día, contraste AA y Astryx fijado a 0.7.17 sin AGENTS.md de Astryx', () => {

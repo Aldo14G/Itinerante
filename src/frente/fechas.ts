@@ -14,6 +14,25 @@ export function aplicarFechas(html: string, hoy: string): string {
     .replace(/<fecha-desde d="(\d{4}-\d{2}-\d{2})">/g, (etiqueta: string, d: string) => (hoy >= d ? etiqueta : `<fecha-desde d="${d}" hidden="">`));
 }
 
+/**
+ * Caché de /nuevo. `revalidate` (route.ts) es el s-maxage. `expireTime` en next.config
+ * es el tope: el swr que arma Next es expireTime − revalidate. Con 3600 y 7200 queda
+ * stale-while-revalidate=3600. Pasado ese tope, la primera respuesta ya es HTML nuevo.
+ */
+export const REVALIDATE_SEGUNDOS = 3600;
+export const EXPIRE_SEGUNDOS = 7200;
+
+export function cabeceraIsr(revalidate = REVALIDATE_SEGUNDOS, expire = EXPIRE_SEGUNDOS): string {
+  if (!(expire > revalidate)) return `s-maxage=${revalidate}`;
+  return `s-maxage=${revalidate}, stale-while-revalidate=${expire - revalidate}`;
+}
+
+/** True si la edad ya pasó s-maxage + swr: el CDN tiene que revalidar antes de responder. */
+export function cacheVencido(generado: Date, pedido: Date, revalidate = REVALIDATE_SEGUNDOS, expire = EXPIRE_SEGUNDOS): boolean {
+  const tope = expire > revalidate ? expire : revalidate;
+  return (pedido.getTime() - generado.getTime()) / 1000 > tope;
+}
+
 /** El día siguiente a `iso` (AAAA-MM-DD). */
 export function diaSiguiente(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);

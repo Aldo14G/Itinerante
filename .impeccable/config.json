@@ -1,3 +1,15 @@
 {
-  "buildPath": "code"
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-11-22T20:47:11.569Z",
+        "reason": "La landing ya usa Inter como subconjunto latino de respaldo de la pila del sistema; no es una cara nueva."
+      }
+    ]
+  }
 }

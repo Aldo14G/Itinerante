@@ -5,7 +5,7 @@ import colecciones from '../../assets/data/collections.json';
 import carta from '../../assets/data/menu.json';
 import faq from '../../assets/data/faq.json';
 import merch from '../../assets/data/merch.json';
-import eventosOficiales from './eventos-oficiales.json';
+import eventosCurados from './eventos.json';
 import negocio from './negocio.json';
 import correcciones from './correcciones.json';
 import { hoyMonterrey } from './fechas';
@@ -29,7 +29,7 @@ export type Libro = {
   autor: string | null;
   editorial: string | null;
   genero: string | null;
-  portada: { src: string; ancho: number; alto: number } | null;
+  portada: { src: string; srcset: string | null; ancho: number; alto: number } | null;
   sinopsis: string | null;
   precio: number | null;
   anio: number | null;
@@ -53,7 +53,7 @@ function aLibro(b: LibroCrudo): Libro {
     autor: b.a ?? null,
     editorial: b.p ?? null,
     genero: generoVisible(g),
-    portada: b.c && b.cw && b.ch ? { src: `/${b.c}`, ancho: b.cw, alto: b.ch } : null,
+    portada: b.c && b.cw && b.ch ? portadaDe(`/${b.c}`, b.cw, b.ch) : null,
     sinopsis: b.s ?? null,
     precio: typeof b.pr === 'number' ? b.pr : null,
     anio: (b.y as number | null) ?? null,
@@ -68,10 +68,37 @@ export const NOVEDADES: Libro[] = (colecciones.novedades.entradas as Array<{ id:
   .map((e) => LIBROS.find((l) => l.id === e.id))
   .filter((l): l is Libro => l != null);
 
-/** Merch válido (nombre y foto); hoy merch.json está vacío y el tipo Merch no existe en la tienda. */
-export const MERCH = (merch.productos as Array<{ id: string; nombre: string; precio: number | null; foto: unknown }>).filter((m) => m.nombre && m.foto);
+/** Lo que el navegador pide en la rejilla. A 390 px (≈46 vw, dpr 1 o 2) elige la de 360; la de 600 y la grande quedan para pantallas mayores. */
+export const PORTADA_SIZES = '(max-width: 479px) 46vw, (max-width: 879px) 31vw, 240px';
 
-/** Ningún filtro con menos de 2 elementos (SPEC v2 §9 S-19). */
+function portadaDe(src: string, ancho: number, alto: number): { src: string; srcset: string | null; ancho: number; alto: number } {
+  if (ancho <= 600) return { src, srcset: null, ancho, alto };
+  const base = src.replace(/\.webp$/, '');
+  return { src, srcset: `${base}-360.webp 360w, ${base}-600.webp 600w, ${src} ${ancho}w`, ancho, alto };
+}
+
+export type MerchItem = {
+  id: string;
+  nombre: string;
+  precio: number | null;
+  descripcion: string | null;
+  tipo: string | null;
+  foto: { src: string; alt: string } | null;
+};
+
+type MerchCrudo = { id?: string; nombre?: string; precio?: number | null; descripcion?: string | null; tipo?: string | null; foto?: { src?: string; alt?: string } | null };
+
+/** Merch válido (nombre y foto). Hoy merch.json está vacío: la tarjeta existe en el código y no se imprime. */
+export const MERCH: MerchItem[] = (merch.productos as MerchCrudo[]).flatMap((m) => {
+  if (!m?.id || !m.nombre || !m.foto?.src || !m.foto.alt) return [];
+  return [{ id: m.id, nombre: m.nombre, precio: typeof m.precio === 'number' ? m.precio : null, descripcion: m.descripcion ?? null, tipo: m.tipo ?? null, foto: { src: m.foto.src, alt: m.foto.alt } }];
+});
+
+/** Talleres vendibles de la tienda. Hoy ninguno: el Club de Dibujo vive solo en Eventos. */
+export type TallerTienda = { id: string; titulo: string; precio: number | null };
+export const TALLERES: TallerTienda[] = [];
+
+/** Editoriales: un filtro con menos de 2 libros no se imprime. */
 export const MINIMO_FILTRO = 2;
 
 export function editorialesConFiltro(libros = LIBROS): Array<{ nombre: string; n: number }> {
@@ -83,12 +110,20 @@ export function editorialesConFiltro(libros = LIBROS): Array<{ nombre: string; n
     .sort((a, b) => b.n - a.n || a.nombre.localeCompare(b.nombre, 'es'));
 }
 
-/** Tipos de la tienda con al menos 2 productos. Con un solo tipo (hoy, Libros) no hay fila de tipos: «Todo» y «Libros» serían lo mismo. */
-export function tiposDeTienda(): Array<{ id: 'libros' | 'merch'; nombre: string; n: number }> {
-  return [
-    { id: 'libros' as const, nombre: 'Libros', n: LIBROS.length },
-    { id: 'merch' as const, nombre: 'Merch', n: MERCH.length },
-  ].filter((t) => t.n >= MINIMO_FILTRO);
+export type TipoTienda = { id: 'libros' | 'merch' | 'talleres'; nombre: string; n: number };
+
+/**
+ * Fila Todo · Libros · Merch · Talleres. Un tipo con 0 productos no existe.
+ * La fila solo se imprime si hay al menos dos tipos (hoy solo Libros, así que no hay fila).
+ * `extra` sirve al test: un producto de merch de ejemplo, sin meterlo en la UI.
+ */
+export function tiposDeTienda(extra?: { libros?: number; merch?: number; talleres?: number }): TipoTienda[] {
+  const tipos = [
+    { id: 'libros' as const, nombre: 'Libros', n: extra?.libros ?? LIBROS.length },
+    { id: 'merch' as const, nombre: 'Merch', n: extra?.merch ?? MERCH.length },
+    { id: 'talleres' as const, nombre: 'Talleres', n: extra?.talleres ?? TALLERES.length },
+  ].filter((t) => t.n >= 1);
+  return tipos.length >= 2 ? tipos : [];
 }
 
 /** El ítem del menú de la tienda dice «Libros» mientras no haya merch (S-18). */
@@ -97,7 +132,7 @@ export const NOMBRE_TIENDA = MERCH.length ? 'Tienda' : 'Libros';
 export type Producto = { id: string; nombre: string; descripcion: string | null; precio: number | null };
 export type CategoriaCarta = { id: string; nombre: string; productos: Producto[] };
 
-/** Carta «En la barra»: categorías y productos de menu.json; sin precio, la fila va sin precio (S-15). Las notas no se imprimen (S-6). */
+/** Carta «En la barra»: categorías y productos de menu.json. Las notas no se imprimen (S-6). */
 export const CARTA: CategoriaCarta[] = carta.categorias.map((c) => ({
   id: c.id,
   nombre: c.nombre,
@@ -108,6 +143,47 @@ export const CARTA: CategoriaCarta[] = carta.categorias.map((c) => ({
     precio: typeof p.precio === 'number' ? p.precio : null,
   })),
 }));
+
+export type FilaCarta = { id: string; nombre: string; detalle: string | null; lineas: string[]; precio: number | null };
+
+const TES = new Set(['hierbabuena', 'manzanilla', '7 azahares', 'limon', 'jamaica', 'te verde']);
+
+function sinAcento(s: string): string {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+/** Une una racha de productos sin precio en una sola fila, para que ninguna columna quede con precios vacíos seguidos. */
+function colapsarSinPrecio(grupo: Producto[]): FilaCarta {
+  if (grupo.length === 1) return { id: grupo[0].id, nombre: grupo[0].nombre, detalle: grupo[0].descripcion, lineas: [], precio: null };
+  const aguas = grupo.filter((p) => sinAcento(p.nombre) === 'aguas frescas');
+  const resto = grupo.filter((p) => sinAcento(p.nombre) !== 'aguas frescas');
+  const esTes = resto.length > 1 && resto.every((p) => TES.has(sinAcento(p.nombre)));
+  return {
+    id: grupo.map((p) => p.id).join('-'),
+    nombre: esTes ? 'Tés' : (resto[0]?.nombre ?? aguas[0].nombre),
+    detalle: esTes ? resto.map((p) => p.nombre).join(', ') : resto.slice(1).map((p) => p.nombre).join(', ') || null,
+    lineas: aguas.map((a) => a.nombre),
+    precio: null,
+  };
+}
+
+export function filasDeCategoria(productos: Producto[]): FilaCarta[] {
+  const filas: FilaCarta[] = [];
+  let sin: Producto[] = [];
+  const volcar = () => {
+    if (sin.length) filas.push(colapsarSinPrecio(sin));
+    sin = [];
+  };
+  for (const p of productos) {
+    if (p.precio == null) sin.push(p);
+    else {
+      volcar();
+      filas.push({ id: p.id, nombre: p.nombre, detalle: p.descripcion, lineas: [], precio: p.precio });
+    }
+  }
+  volcar();
+  return filas;
+}
 
 /**
  * Preguntas (S-11): solo las dos que no remiten a otra sección, con la respuesta de faq.json recortada a lo confirmado
@@ -122,15 +198,71 @@ export const PREGUNTAS: Array<{ id: string; pregunta: string; respuesta: string 
   return { id: r.id, pregunta: q.pregunta, respuesta: r.respuesta };
 });
 
-export type EventoFechado = { id: string; titulo: string; fecha: string; hora: string | null; descripcion: string | null; fuente: string };
-export type ActividadRecurrente = { id: string; titulo: string; cuando: string; horario: string | null; costo: string | null; incluye: string | null; fuente: string };
+export type Evento = {
+  id: string;
+  titulo: string;
+  fecha: string | null;
+  hora: string | null;
+  lugar: string | null;
+  organizador: string | null;
+  imagen: string | null;
+  registroUrl: string | null;
+  instagramUrl: string;
+  recurrencia: string | null;
+  costo: string | null;
+  incluye: string | null;
+};
 
-export const FECHADOS = (eventosOficiales.fechados as EventoFechado[]).slice().sort((a, b) => a.fecha.localeCompare(b.fecha));
-export const RECURRENTES = eventosOficiales.recurrentes as ActividadRecurrente[];
+type EventoCrudo = {
+  id: string;
+  titulo: string;
+  fecha?: string | null;
+  hora?: string | null;
+  lugar?: string | null;
+  organizador?: string | null;
+  imagen?: string | null;
+  registroUrl?: string | null;
+  instagramUrl: string;
+  recurrencia?: string | null;
+  costo?: string | null;
+  incluye?: string | null;
+};
+
+function aEvento(e: EventoCrudo): Evento {
+  const imagen = e.imagen && e.imagen.startsWith('/assets/') ? e.imagen : null;
+  const registro = e.registroUrl && /^https:\/\//.test(e.registroUrl) ? e.registroUrl : null;
+  return {
+    id: e.id,
+    titulo: e.titulo,
+    fecha: e.fecha ?? null,
+    hora: e.hora ?? null,
+    lugar: e.lugar ?? null,
+    organizador: e.organizador ?? null,
+    imagen,
+    registroUrl: registro,
+    instagramUrl: e.instagramUrl,
+    recurrencia: e.recurrencia ?? null,
+    costo: e.costo ?? null,
+    incluye: e.incluye ?? null,
+  };
+}
+
+/** Fechados primero, por fecha; después los recurrentes (sin próxima fecha, no se ocultan). */
+export const EVENTOS: Evento[] = (eventosCurados.eventos as EventoCrudo[])
+  .map(aEvento)
+  .sort((a, b) => {
+    if (a.fecha && b.fecha) return a.fecha.localeCompare(b.fecha) || a.titulo.localeCompare(b.titulo, 'es');
+    if (a.fecha) return -1;
+    if (b.fecha) return 1;
+    return a.titulo.localeCompare(b.titulo, 'es');
+  });
+
+export const FECHADOS = EVENTOS.filter((e): e is Evento & { fecha: string } => e.fecha != null);
+export const RECURRENTES = EVENTOS.filter((e) => e.fecha == null);
 
 
 /** Eventos con fecha que siguen vigentes `hoy` (el día del evento todavía cuenta). */
-export function eventosFechados(hoy = hoyMonterrey()): EventoFechado[] {
+export function eventosFechados(hoy = hoyMonterrey()): Array<Evento & { fecha: string }> {
   return FECHADOS.filter((e) => e.fecha >= hoy);
 }
 

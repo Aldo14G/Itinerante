@@ -7,6 +7,7 @@ tmp/
 *.log
 .env
 .env.*
+src/frente/instagram-propuestas.json
 *.local
 *-firebase-adminsdk-*.json
 libreria-itineranteymas-*.json

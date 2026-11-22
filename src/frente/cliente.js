@@ -22,13 +22,32 @@
   addEventListener('resize', espiar);
   espiar();
 
+  // Carrusel: Tab llega a cada enlace; flechas izquierda/derecha mueven la pieza. Sin este script el contenedor igual se desliza (scroll-snap).
+  var carrusel = d.querySelector('.carrusel');
+  if (carrusel) {
+    var piezas = [].slice.call(carrusel.querySelectorAll('.carrusel-pieza'));
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    carrusel.addEventListener('keydown', function (e) {
+      if ((e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') || !piezas.length) return;
+      var i = -1;
+      for (var k = 0; k < piezas.length; k++) if (piezas[k].contains(d.activeElement)) i = k;
+      if (i < 0 && d.activeElement === carrusel) i = e.key === 'ArrowRight' ? -1 : piezas.length;
+      var n = e.key === 'ArrowRight' ? Math.min(piezas.length - 1, i + 1) : Math.max(0, i - 1);
+      if (n === i || n < 0) return;
+      var destino = piezas[n].querySelector('a');
+      e.preventDefault();
+      if (destino) destino.focus({ preventScroll: true });
+      piezas[n].scrollIntoView({ inline: 'start', block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+
   // Carta: en el teléfono cada grupo plegado salvo el primero (sin JS van todos abiertos).
   if (matchMedia('(max-width: 719px)').matches) d.querySelectorAll('.barra-grupo').forEach(function (g, i) { if (i) g.open = false; });
 
   // Tienda: buscador + contador único («N libros») que también sigue a los filtros de CSS.
   var tienda = d.getElementById('tienda');
   if (!tienda) return;
-  var libros = [].slice.call(tienda.querySelectorAll('.rejilla .libro'));
+  var libros = [].slice.call(tienda.querySelectorAll('.rejilla > li'));
   var buscador = tienda.querySelector('.buscador');
   var campo = d.getElementById('buscar');
   var cuenta = tienda.querySelector('.cuenta');
@@ -39,9 +58,11 @@
     var q = campo ? normalizar(campo.value) : '';
     var ed = tienda.querySelector('input[name="editorial"]:checked');
     ed = ed ? ed.value : '';
+    var tipo = tienda.querySelector('input[name="tipo"]:checked');
+    tipo = tipo ? tipo.value : '';
     var n = 0;
     libros.forEach(function (l) {
-      var ok = (!q || l.dataset.busca.indexOf(q) >= 0) && (!ed || l.dataset.ed === ed);
+      var ok = (!q || (l.dataset.busca || '').indexOf(q) >= 0) && (!ed || l.dataset.ed === ed) && (!tipo || l.dataset.tipo === tipo);
       l.hidden = !ok;
       if (ok) n++;
     });

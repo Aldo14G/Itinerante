@@ -42,18 +42,22 @@
       "srcset": "/assets/img/oficial-rincon-800.webp 800w, /assets/img/oficial-rincon-1600.webp 1600w",
       "ancho": 1600,
       "alto": 1200,
-      "pie": "Muro de piedra con una foto en blanco y negro de una camioneta cargada; a los lados, libreros de madera y un banco tapizado.",
+      "pie": "La sala",
+      "alt": "Muro de piedra con una foto en blanco y negro de una camioneta cargada; a los lados, libreros de madera y un banco tapizado.",
       "credito": "Librería Itinerante y Más",
-      "permiso": "lote oficial entregado por Aldo el 2026-10-27 (assets/provenance.json)"
+      "permisoRegistrado": false,
+      "permisoNota": "El lote del 2026-10-27 no trae permiso de uso en assets/provenance.json (permiso: false). Se deja la foto, marcada como pendiente, hasta que Aldo registre el permiso o la cambie por una suya. No se sustituye por una imagen inventada."
     },
     {
       "src": "/assets/img/01-entrada-pasillo-800.webp",
       "srcset": "/assets/img/01-entrada-pasillo-800.webp 800w, /assets/img/01-entrada-pasillo.webp 1212w",
       "ancho": 1212,
       "alto": 682,
-      "pie": "El pasillo de entrada: una mesa y estantes bajos a la izquierda, un librero alto a la derecha y cuadros en los muros.",
+      "pie": "El pasillo de entrada",
+      "alt": "Una mesa y estantes bajos a la izquierda, un librero alto a la derecha y cuadros en los muros.",
       "credito": "Aldo G. Pineda",
-      "permiso": "foto de Aldo, 2026-11-10 (assets/provenance.json)"
+      "permisoRegistrado": true,
+      "permisoNota": "Foto de Aldo, autor, 2026-11-10 (assets/provenance.json)."
     }
   ]
 }
