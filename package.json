@@ -12,7 +12,7 @@
     "backend:dev:emulator": "node tools/dev-with-dataconnect.mjs",
     "backend:build": "next build",
     "backend:start": "next start",
-    "test": "node --test tests/site.test.mjs tests/sync.test.mjs tests/componentes.test.mjs tests/sheets.test.mjs tests/publish.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/contenido.test.mjs tests/franja.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs && node --test tests/critique.test.mjs",
+    "test": "node --test tests/site.test.mjs tests/sync.test.mjs tests/componentes.test.mjs tests/sheets.test.mjs tests/publish.test.mjs tests/dataconnect.test.mjs tests/iti-ia.test.mjs tests/runtime.test.mjs tests/taxonomy.test.mjs tests/reference-search.test.mjs tests/search-quality.test.mjs tests/contenido.test.mjs tests/franja.test.mjs && node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs tests/worker.test.mjs tests/frente.test.mjs && node --test tests/critique.test.mjs",
     "harness": "npm run test",
     "reference:check": "node --test tests/reference-search.test.mjs",
     "filters:test": "node --import tsx/esm --test tests/query-filters.test.mjs tests/api-guard.test.mjs",
@@ -54,12 +54,18 @@
     "critique:static": "node scripts/critique.mjs --static-only",
     "test:site": "node --test tests/site.test.mjs",
     "test:design": "node --test tests/critique.test.mjs tests/site.test.mjs tests/componentes.test.mjs",
-    "test:browser": "node tools/qa/run.mjs"
+    "test:browser": "node tools/qa/run.mjs",
+    "tema:astryx": "node scripts/build-tema-astryx.mjs",
+    "textos:astryx": "node scripts/build-textos-astryx.mjs",
+    "contraste": "node scripts/check-contraste.mjs",
+    "test:frente": "node --import tsx/esm --test tests/frente.test.mjs"
   },
   "dependencies": {
+    "@astryxdesign/core": "0.7.17",
     "@genkit-ai/google-genai": "1.41.0",
     "@genkit-ai/next": "1.41.0",
     "@itinerante/data": "file:generated/data",
+    "@stylexjs/stylex": "0.19.2",
     "firebase": "12.11.0",
     "firebase-admin": "^13.2.0",
     "genkit": "1.41.0",
