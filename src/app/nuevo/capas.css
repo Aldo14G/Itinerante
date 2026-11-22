@@ -1,2 +1,0 @@
-/* Orden de capas: va antes de astryx.css. La base propia queda por debajo de los componentes de Astryx. */
-@layer reset, itinerante-base, astryx-base, astryx-theme;

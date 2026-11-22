@@ -11,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" data-astryx-theme="itinerante" data-theme="light">
+    <html lang="es">
       <body>{children}</body>
     </html>
   );

@@ -1,5 +1,5 @@
 // Tema Astryx «Itinerante» (SPEC-MIGRACION-ASTRYX §1). Variables CSS sobre la paleta B; no se usa theme-neutral.
-// Lo compila a CSS scripts/build-tema-astryx.mjs (src/app/nuevo/tema-itinerante.css), así el HTML del servidor ya trae el tema
+// Lo compila a CSS scripts/build-tema-astryx.mjs (src/frente/tema-itinerante.css), así el HTML del servidor ya trae el tema
 // y la página se lee igual sin JavaScript.
 import { defineTheme } from '@astryxdesign/core/theme';
 import { PALETA as P } from './paleta.mjs';

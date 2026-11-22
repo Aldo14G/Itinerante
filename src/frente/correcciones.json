@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "nota": "Datos que faltan en catalog.json (la hoja de la librería) y que el frente nuevo toma de una fuente pública citada. No sustituye la confirmación de Roberto: cuando la hoja traiga el dato, se borra el renglón. El precio nunca sale de aquí."
+  },
+  "libros": {
+    "las-ruinas-de-la-caza-alfredo-leal": {
+      "g": "narrativa",
+      "fuente": "https://www.elem.mx/obra/datos/236048",
+      "nota": "Enciclopedia de la Literatura en México: «Género: Narrativa - Novela». Editorial (UNAM / Casa Editorial Abismos) y precio [pendiente] de Roberto."
+    }
+  }
+}

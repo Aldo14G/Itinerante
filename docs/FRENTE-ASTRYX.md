@@ -1,37 +1,27 @@
-# Frente en React 19 + Astryx (oleada 1)
+# Frente nuevo en /nuevo (SPEC v2)
 
-La landing nueva vive en `/nuevo` (App Router, `src/app/nuevo/`). La landing estática anterior sigue en `/` hasta llegar a paridad; la API no cambia.
+La landing nueva vive en `/nuevo`. La landing estática anterior sigue en `/` hasta llegar a paridad; la API no cambia.
 
-## Cómo correrla
+## Cómo está hecha
+
+- `src/frente/pagina.tsx`: la página en React 19. `scripts/build-nuevo.mjs` la renderiza a HTML estático (`renderToStaticMarkup`) con el CSS y el JS en línea, y escribe `src/app/nuevo/documento.generado.ts`.
+- `src/app/nuevo/route.ts`: sirve ese HTML como estático con regeneración cada hora (ISR). En cada regeneración resuelve los bloques fechados (`<fecha-hasta>` / `<fecha-desde>`) con el día de Monterrey (`src/frente/fechas.ts`). El navegador repite la regla (`src/frente/cliente.js`) por si el HTML viene de caché.
+- El navegador no descarga React ni Next: unos 3 KB de JS en línea (fechas, scroll-spy, buscador y contador, ficha con `<dialog>`, carta plegada en el teléfono). Sin JS se lee todo y el filtro por editorial funciona con CSS.
+- Astryx 0.7.17 (fijo, solo en devDependencies): `defineTheme` → `src/frente/tema-itinerante.css` (`npm run tema:astryx`). No se usan componentes de Astryx en el navegador porque su JS rompía el presupuesto de peso (SPEC v2 §6.2).
+
+## Datos
+
+- `src/frente/negocio.json`: dirección, teléfono, redes, `horario` (con `confirmado`; en false no se imprime ni va al JSON-LD) y fotos de Visita con crédito y permiso.
+- `src/frente/eventos-oficiales.json`: eventos con post oficial; `src/frente/correcciones.json`: datos de catálogo de fuente pública citada (nunca precios).
+- `assets/data/*.json`: catálogo, carta, colecciones (`novedades.entradas`), merch y preguntas, compartidos con la landing anterior.
+- `src/frente/frases-vetadas.json`: frases que `tests/frente.test.mjs` prohíbe en el HTML.
+
+## Comandos
 
 ```bash
 npm ci --ignore-scripts
-node scripts/prepare-public.mjs   # genera public/ (gitignored) para la landing anterior y los assets
-npx next build
-npx next start -p 3100            # http://localhost:3100/nuevo  (la anterior en /)
-npm test                          # incluye tests/frente.test.mjs
+npm run nuevo            # regenera documento.generado.ts tras cambiar datos, pagina.tsx, nuevo.css o cliente.js
+node scripts/prepare-public.mjs && npx next build && npx next start -p 3100
+# http://localhost:3100/nuevo  (la anterior en /)
+npm test                 # incluye tests/frente.test.mjs (HTML al día, conteos, frases vetadas, fechas)
 ```
-
-## Piezas
-
-- `src/frente/datos.ts`: datos reales (41 títulos, 21 productos de la carta, colecciones de `collections.json`, eventos de `src/frente/eventos-oficiales.json`). Lo desconocido queda `null`/`[pendiente]` en datos y notas, nunca en la interfaz.
-- `src/frente/paleta.mjs` + `scripts/check-contraste.mjs` (`npm run contraste`): pares de color AA.
-- `src/frente/tema.mjs` + `scripts/build-tema-astryx.mjs` (`npm run tema:astryx`): el tema `itinerante` se precompila a `src/app/nuevo/tema-itinerante.css`; `<html>` lleva `data-astryx-theme="itinerante"`. No se usa `<Theme>` en tiempo de ejecución (metía el generador de temas en el bundle).
-- `scripts/build-textos-astryx.mjs` (`npm run textos:astryx`): recorta el catálogo es-ES de Astryx a las claves que se usan.
-- `src/app/nuevo/capas.css`: orden de capas; la base propia queda por debajo de los componentes de Astryx.
-- Astryx fijado a `0.7.17` exacto.
-
-## Reglas que hay que mantener
-
-- Contenido en el HTML del servidor (SSG con `revalidate = 3600`), legible sin JS.
-- Novedades no se pinta (ni su enlace) mientras `NOVEDADES` esté vacío.
-- La tarjeta del 6.º Aniversario se oculta desde el 2026-11-28 (America/Monterrey): filtro en el render (ISR) y `SoloHasta` en cliente para el HTML ya cacheado.
-- Sin estado «Abierto/Cerrado» (no hay horario oficial).
-- Interruptor de movimiento compartido con la landing anterior (`localStorage['iti-b4-motion']`).
-
-## Desviaciones conocidas de la spec
-
-- Ficha: `Dialog` a pantalla completa en móvil en lugar de `BottomSheet`.
-- Carta: listas propias en lugar de `MetadataList` (menos JS).
-- Movimiento reducido forzado: `reducedMotion: 'always'` no es público en 0.7.17; se usa `html[data-movimiento='quieto']` y la propiedad `--_astryx-reduced-motion`.
-- Tipografía: se mantiene Inter (sin Fraunces). Sin modo oscuro.

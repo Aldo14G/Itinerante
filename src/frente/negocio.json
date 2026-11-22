@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "nota": "Datos de la librería que lee el frente nuevo (/nuevo). Un solo campo de horario: si `horario.confirmado` es false, no se imprime en Visita ni en el JSON-LD y Visita dice «Confírmalo por WhatsApp antes de venir» (SPEC v2 S-12/S-16). Abierto/Cerrado en vivo no se muestra nunca. Dirección, teléfono y Facebook tal como los publica la librería."
+  },
+  "nombre": "Librería Itinerante y Más",
+  "linea": "Libros de editoriales independientes y café en el Centro de Monterrey.",
+  "direccion": "Matamoros 421 Pte., Centro, Monterrey",
+  "entreCalles": "Entre Juan Aldama e Ignacio Rayón",
+  "postal": { "calle": "Mariano Matamoros Pte. 421", "colonia": "Centro", "ciudad": "Monterrey", "estado": "Nuevo León", "pais": "MX" },
+  "telefonoVisible": "81 8087 5940",
+  "telefono": "528180875940",
+  "correo": "libreriaitineranteymasmty@gmail.com",
+  "instagram": "https://www.instagram.com/libreriaitineranteymasmty/",
+  "facebook": "https://www.facebook.com/people/Librer%C3%ADa-Itinerante-y-m%C3%A1s/100095548961064/",
+  "comoLlegar": "https://www.google.com/maps/dir/?api=1&destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey",
+  "horario": {
+    "confirmado": false,
+    "fuente": "docs/PENDIENTES-NEGOCIO.md (c), a la espera de que Aldo lo confirme para este sitio",
+    "filas": [
+      { "dias": "Lunes a sábado", "horas": "11:00–20:00" },
+      { "dias": "Domingo", "horas": "Cerrado" }
+    ],
+    "openingHours": ["Mo-Sa 11:00-20:00"]
+  },
+  "fotos": [
+    {
+      "src": "/assets/img/oficial-rincon-800.webp",
+      "srcset": "/assets/img/oficial-rincon-800.webp 800w, /assets/img/oficial-rincon-1600.webp 1600w",
+      "ancho": 1600,
+      "alto": 1200,
+      "pie": "Muro de piedra con una foto en blanco y negro de una camioneta cargada; a los lados, libreros de madera y un banco tapizado.",
+      "credito": "Librería Itinerante y Más",
+      "permiso": "lote oficial entregado por Aldo el 2026-10-27 (assets/provenance.json)"
+    },
+    {
+      "src": "/assets/img/01-entrada-pasillo-800.webp",
+      "srcset": "/assets/img/01-entrada-pasillo-800.webp 800w, /assets/img/01-entrada-pasillo.webp 1212w",
+      "ancho": 1212,
+      "alto": 682,
+      "pie": "El pasillo de entrada: una mesa y estantes bajos a la izquierda, un librero alto a la derecha y cuadros en los muros.",
+      "credito": "Aldo G. Pineda",
+      "permiso": "foto de Aldo, 2026-11-10 (assets/provenance.json)"
+    }
+  ]
+}

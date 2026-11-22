@@ -1,6 +1,6 @@
 {
   "meta": {
-    "nota": "Eventos con fuente oficial de la librería (Instagram @libreriaitineranteymasmty), revisados el 2026-11-22. Solo el frente nuevo (/nuevo) los lee. `fechados`: tarjeta con fecha real; se oculta sola pasado `fecha` (hora de Monterrey). `hora` null = [pendiente] (no se ve en la publicación). `recurrentes`: actividad sin próxima fecha. Fuentes de socios (p. ej. Skribh) no entran sin OK de Aldo."
+    "nota": "Eventos con fuente oficial de la librería (Instagram @libreriaitineranteymasmty), revisados el 2026-11-22. Solo el frente nuevo (/nuevo) los lee. `fechados`: tarjeta con fecha real; se oculta sola pasado `fecha` (hora de Monterrey). `hora` null = [pendiente] (no se ve en la publicación). `recurrentes`: actividad sin próxima fecha. Fuentes de socios (p. ej. Skribh) no entran sin OK de Aldo. `descripcion`: solo texto citado del post oficial; null = la tarjeta no lleva descripción (SPEC v2 S-6). La tarjeta dice «En la librería»: la dirección vive solo en Visita."
   },
   "fechados": [
     {
@@ -9,7 +9,7 @@
       "fecha": "2026-11-27",
       "hora": null,
       "lugar": "Matamoros 421 Pte., Centro, Monterrey",
-      "descripcion": "Café, música, lectura y más, y sorpresas.",
+      "descripcion": null,
       "fuente": "https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/"
     }
   ],
@@ -17,8 +17,10 @@
     {
       "id": "club-dibujo-pintura",
       "titulo": "Club de Dibujo y Pintura",
-      "cuando": "Sábados cada 15 días, 14:00–16:00",
-      "costo": "$150 MXN con material",
+      "cuando": "Sábados cada 15 días",
+      "horario": "14:00–16:00",
+      "costo": "$150 MXN",
+      "incluye": "Material",
       "fuente": "https://www.instagram.com/libreriaitineranteymasmty/p/DfYBKN-oZea/"
     }
   ]

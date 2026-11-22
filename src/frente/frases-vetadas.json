@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "nota": "Frases que no pueden salir en /nuevo (SPEC v2 §4 S-1 a S-15 y §9 S-16 a S-23): copy de relleno, instrucciones inventadas, subtítulos de plantilla, sustitutos de precio, personalización y «apartar» (la política de apartado A7 sigue sin respuesta). tests/frente.test.mjs las busca en el texto visible del HTML generado, sin distinguir mayúsculas ni acentos; «apartar» se busca en todo el HTML, JS incluido. `fueraDeSinopsis`: palabras vetadas en la interfaz que sí pueden salir dentro de la sinopsis de un libro."
+  },
+  "texto": [
+    "Si quieres que te cuenten una historia",
+    "Si tienes poco tiempo y ganas de detenerte",
+    "Si traes una pregunta y quieres pensarla",
+    "Recomendados por colección",
+    "Editoriales y espacios con los que compartimos",
+    "Recorre los lomos",
+    "si no alcanzas uno, pide ayuda",
+    "Los libros empiezan aquí",
+    "el libro que no sabías que buscabas",
+    "Lee las primeras páginas aquí",
+    "no es una tienda de paso",
+    "alrededor de la mesa",
+    "para quedarse un rato",
+    "independientes, una por una",
+    "por dónde empezar",
+    "y más, y sorpresas",
+    "Los libros se eligen mejor en persona",
+    "Algo de tomar mientras hojeas",
+    "Pasando el arco está la sala",
+    "Los tés, fríos o calientes",
+    "Propuesta · sin fecha",
+    "Círculo de lectura",
+    "Ajedrez en la casa",
+    "Taller de escritura",
+    "Aún sin fecha",
+    "Fecha por confirmar",
+    "Fechas en Instagram",
+    "está más arriba",
+    "Precio en la librería",
+    "Precio en barra",
+    "Catálogo completo",
+    "Mi lista",
+    "Pausar el movimiento",
+    "Tu sistema pide movimiento reducido",
+    "Vista previa del sitio nuevo",
+    "abre mañana",
+    "[pendiente]",
+    "Apartar"
+  ],
+  "html": [
+    "apartar",
+    "role=\"switch\"",
+    "localStorage"
+  ],
+  "fueraDeSinopsis": [
+    "movimiento",
+    "abierto"
+  ]
+}

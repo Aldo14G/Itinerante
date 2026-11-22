@@ -56,16 +56,15 @@
     "test:design": "node --test tests/critique.test.mjs tests/site.test.mjs tests/componentes.test.mjs",
     "test:browser": "node tools/qa/run.mjs",
     "tema:astryx": "node scripts/build-tema-astryx.mjs",
-    "textos:astryx": "node scripts/build-textos-astryx.mjs",
     "contraste": "node scripts/check-contraste.mjs",
-    "test:frente": "node --import tsx/esm --test tests/frente.test.mjs"
+    "test:frente": "node --import tsx/esm --test tests/frente.test.mjs",
+    "nuevo": "node --import tsx/esm scripts/build-nuevo.mjs",
+    "nuevo:check": "node --import tsx/esm scripts/build-nuevo.mjs --check"
   },
   "dependencies": {
-    "@astryxdesign/core": "0.7.17",
     "@genkit-ai/google-genai": "1.41.0",
     "@genkit-ai/next": "1.41.0",
     "@itinerante/data": "file:generated/data",
-    "@stylexjs/stylex": "0.19.2",
     "firebase": "12.11.0",
     "firebase-admin": "^13.2.0",
     "genkit": "1.41.0",
@@ -74,10 +73,13 @@
     "react-dom": "19.2.5"
   },
   "devDependencies": {
+    "@astryxdesign/core": "0.7.17",
+    "@stylexjs/stylex": "0.19.2",
     "@types/node": "^22.13.5",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "axe-core": "^4.14.0",
+    "esbuild": "0.28.2",
     "firebase-tools": "15.28.1",
     "genkit-cli": "1.41.0",
     "tsx": "^4.19.3",

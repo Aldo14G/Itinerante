@@ -1,11 +1,11 @@
-// Compila el tema Astryx de Itinerante a CSS estático: src/app/nuevo/tema-itinerante.css.
+// Compila el tema Astryx de Itinerante a CSS estático: src/frente/tema-itinerante.css.
 // Uso: node scripts/build-tema-astryx.mjs [--check]. Con --check sale con 1 si el archivo no coincide con el tema.
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { generateThemeCSS } from '@astryxdesign/core/theme';
 import { temaItinerante } from '../src/frente/tema.mjs';
 
-const SALIDA = fileURLToPath(new URL('../src/app/nuevo/tema-itinerante.css', import.meta.url));
+const SALIDA = fileURLToPath(new URL('../src/frente/tema-itinerante.css', import.meta.url));
 const avisos = [];
 const { prose, component } = generateThemeCSS(temaItinerante, avisos);
 const css = [
