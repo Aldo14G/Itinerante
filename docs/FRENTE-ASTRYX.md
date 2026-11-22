@@ -11,7 +11,7 @@ La landing nueva vive en `/nuevo`. La landing estática anterior sigue en `/` ha
 
 ## Datos
 
-- `src/frente/negocio.json`: dirección, teléfono, redes, `horario` (con `confirmado`; en false no se imprime ni va al JSON-LD) y fotos de Visita con crédito y permiso.
+- `src/frente/negocio.json`: dirección, teléfono, redes, `horario` (con `confirmado`: en true sale una vez en Visita y en el JSON-LD; en false no se imprime) y fotos de Visita con crédito y permiso.
 - `src/frente/eventos-oficiales.json`: eventos con post oficial; `src/frente/correcciones.json`: datos de catálogo de fuente pública citada (nunca precios).
 - `assets/data/*.json`: catálogo, carta, colecciones (`novedades.entradas`), merch y preguntas, compartidos con la landing anterior.
 - `src/frente/frases-vetadas.json`: frases que `tests/frente.test.mjs` prohíbe en el HTML.

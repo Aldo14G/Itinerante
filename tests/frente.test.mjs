@@ -68,13 +68,17 @@ test('Visita concentra el contacto: «Matamoros» 1 vez, 1 enlace a Maps, teléf
   assert.ok(!/<footer[\s\S]*Matamoros[\s\S]*<\/footer>/.test(h));
 });
 
-test('horario sin confirmar: no se imprime ni va al JSON-LD; nunca Abierto/Cerrado', () => {
-  assert.equal(NEGOCIO.horario.confirmado, false);
+test('horario confirmado: un solo campo, una vez en Visita y en el JSON-LD; nunca Abierto/Cerrado en vivo', () => {
+  assert.equal(NEGOCIO.horario.confirmado, true);
   const h = html();
   const visible = textoVisible(h);
-  assert.ok(visible.includes('Confírmalo por WhatsApp antes de venir'));
-  assert.ok(!/11:00/.test(visible) && !/Cerrado/i.test(visible));
-  assert.ok(!h.includes('openingHours'));
+  assert.equal(cuenta(visible, /11:00–20:00/g), 1);
+  assert.ok(seccion(h, 'visita').includes('11:00–20:00'));
+  assert.ok(!visible.includes('Confírmalo por WhatsApp'));
+  const interfaz = textoVisible(h.replace(/<p class="libro-sinopsis">[\s\S]*?<\/p>/g, ' '));
+  assert.ok(!/abierto|abre (hoy|mañana)|cerrado ahora|cierra (hoy|en)/i.test(interfaz));
+  const ld = JSON.parse(h.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  assert.deepEqual(ld.openingHours, NEGOCIO.horario.openingHours);
 });
 
 test('tienda: 41 tarjetas en el HTML, un solo enlace por tarjeta, un solo contador «41 libros»', () => {

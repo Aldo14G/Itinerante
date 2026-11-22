@@ -375,7 +375,7 @@ function Visita() {
             <a className="boton boton-primario" href={NEGOCIO.comoLlegar} target="_blank" rel="noopener noreferrer">
               Cómo llegar
             </a>
-            <a className="boton boton-secundario" href={whatsapp('Hola, quiero confirmar el horario antes de ir a la librería.')} target="_blank" rel="noopener noreferrer">
+            <a className="boton boton-secundario" href={whatsapp('Hola.')} target="_blank" rel="noopener noreferrer">
               WhatsApp
             </a>
           </p>
