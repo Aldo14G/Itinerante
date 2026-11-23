@@ -6,12 +6,14 @@ import { readFileSync, statSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { gzipSync } from 'node:zlib';
-import { LIBROS, CARTA, NOVEDADES, MERCH, NEGOCIO, NOMBRE_TIENDA, RECURRENTES, FECHADOS, EVENTOS, tiposDeTienda, editorialesConFiltro, generosConFiltro, eventosFechados, filasDeCategoria } from '../src/frente/datos.ts';
-import { coverflowPose, keyTarget } from '../src/frente/carrusel.js';
-import { FilaTipos } from '../src/frente/pagina.tsx';
+import { LIBROS, CARTA, NOVEDADES, MERCH, NEGOCIO, NOMBRE_TIENDA, RECURRENTES, FECHADOS, EVENTOS, DESTACADOS, editorialesCatalogo, generosColeccion, eventosFechados, filasDeCategoria, planTienda } from '../src/frente/datos.ts';
+import { poseVitrina, transformVitrina, destinoGesto, teclaVitrina, anchoPieza, pasoVitrina } from '../src/frente/vitrina.js';
+import { BloqueTienda } from '../src/frente/pagina.tsx';
+import { librosConsulta, parseConsulta } from '../src/frente/consulta.ts';
 import { aplicarFechas, hoyMonterrey, cabeceraIsr, cacheVencido, REVALIDATE_SEGUNDOS, EXPIRE_SEGUNDOS } from '../src/frente/fechas.ts';
 import { proponer, redactar, syncActivo } from '../src/frente/instagram-sync.ts';
 import { DOCUMENTO } from '../src/app/nuevo/documento.generado.ts';
+import { GET } from '../src/app/nuevo/route.ts';
 
 const vetadas = JSON.parse(readFileSync(new URL('../src/frente/frases-vetadas.json', import.meta.url), 'utf8'));
 const HOY = '2026-11-22';
@@ -23,7 +25,7 @@ function textoVisible(h) {
   return sinOcultos(h)
     .replace(/<script[\s\S]*?<\/script>/g, ' ')
     .replace(/<style[\s\S]*?<\/style>/g, ' ')
-    .replace(/<[^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/(div|p|span)>/g, ' ')
+    .replace(/<(svg|i)[^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/\1>/g, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/\s+/g, ' ');
@@ -88,42 +90,48 @@ test('horario confirmado: un solo campo, una vez en Visita y en el JSON-LD; nunc
   assert.deepEqual(ld.openingHours, NEGOCIO.horario.openingHours);
 });
 
-test('tienda: 41 tarjetas en el HTML, un solo enlace por tarjeta, un solo contador «41 libros»', () => {
-  const t = seccion(html(), 'tienda');
-  const tarjetas = t.split('<li class="libro"').slice(1);
+test('catálogo: 41 libros en el HTML, un enlace por tarjeta, placeholders sin título', () => {
+  const t = seccion(html(), 'libros');
+  const tarjetas = t.split('<article class="libro"').slice(1);
   assert.equal(tarjetas.length, 41);
-  for (const c of tarjetas) assert.equal(cuenta(c.split('</li>')[0], /<a /g), 1);
-  assert.equal(cuenta(textoVisible(html()), /\b41 (libros|títulos)\b/g), 1);
-  assert.equal(cuenta(t, /class="portada-tipografica" aria-hidden="true"/g), 9, '9 libros sin portada, placeholder oculto al lector');
+  for (const c of tarjetas) assert.equal(cuenta(c.split('</article>')[0], /<a /g), 1);
+  assert.ok(cuenta(textoVisible(html()), /\b41 libros\b/g) >= 1);
+  assert.equal(cuenta(t, /class="sin-portada" aria-hidden="true"/g), 9, '9 libros sin portada, placeholder oculto al lector');
   assert.equal(cuenta(t, /<img [^>]*alt=""/g), 32, 'las portadas reales no repiten el título');
+  const primero = t.split('<article class="libro"')[1];
+  assert.ok(primero.includes('<img '), 'la primera tarjeta trae portada real');
+  const sin = t.split('class="sin-portada"')[1].split('</div>')[0];
+  assert.ok(!LIBROS.filter((l) => !l.portada).some((l) => sin.includes(l.titulo)), 'el placeholder no repite el título');
 });
 
-test('filtros: editoriales y géneros con al menos 2 libros; la tienda siempre muestra Libros, Merch y Talleres', () => {
-  assert.equal(tiposDeTienda().length, 3);
-  assert.deepEqual(tiposDeTienda().map((t) => t.id), ['libros', 'merch', 'talleres']);
+test('filtros: colecciones reales y todas las editoriales, incluida la de un libro', () => {
+  const g = generosColeccion();
+  assert.deepEqual(g.map((x) => [x.id, x.n]), [['narrativa', 26], ['poesia', 8], ['ensayo', 9]]);
+  const eds = editorialesCatalogo();
+  assert.equal(eds.length, 4);
+  assert.equal(eds.find((e) => e.nombre === 'Libro Objeto').n, 1);
+  assert.equal(LIBROS.filter((l) => !l.editorial).length, 1);
   const dom = sinScript(html());
-  assert.equal(cuenta(dom, /name="tipo"/g), 3);
   assert.ok(dom.includes('Próximamente'));
-  for (const e of editorialesConFiltro()) assert.ok(e.n >= 2);
-  for (const g of generosConFiltro()) assert.ok(g.n >= 2);
-  assert.ok(dom.includes('name="genero"'));
-  assert.ok(!html().includes('value="libro-objeto"'));
-  assert.ok(!dom.includes('class="c3d"'), 'sin JS no hay carrusel: queda la cuadrícula');
+  assert.ok(dom.includes('data-v="poesia"') && dom.includes('data-v="Libro Objeto"'));
+  assert.ok(!dom.includes('class="c3d"'));
 });
 
 test('«Las ruinas de la caza»: sin campos vacíos, con su género de fuente citada y sin precio inventado', () => {
   const l = LIBROS.find((x) => x.id === 'las-ruinas-de-la-caza-alfredo-leal');
   assert.equal(l.genero, 'Narrativa');
   assert.equal(l.precio, null);
-  const c = html().split('id="libro-las-ruinas-de-la-caza-alfredo-leal"')[1].split('</li>')[0];
-  assert.ok(!c.includes('libro-precio') && !c.includes('Editorial') && c.includes('Narrativa'));
+  assert.equal(l.editorial, null);
+  const c = html().split('id="libros"')[1].split('data-id="las-ruinas-de-la-caza-alfredo-leal"')[1].split('</li>')[0];
+  assert.ok(!c.includes('class="precio"') && !c.includes('>Editorial<') && !c.includes('Precio en tienda'));
   assert.ok(!/<dd>\s*<\/dd>/.test(html()));
+  assert.equal(cuenta(html(), /Precio en tienda/g), 0);
 });
 
 test('las anclas viejas aterrizan en su bloque nuevo', () => {
   const h = html();
   assert.ok(seccion(h, 'eventos').includes('id="cartelera"'));
-  assert.ok(seccion(h, 'tienda').includes('id="libros"'));
+  assert.ok(seccion(h, 'libros').includes('id="catalogo"'));
   assert.ok(seccion(h, 'visita').includes('id="cafe"'));
 });
 
@@ -139,16 +147,16 @@ test('el Club de Dibujo sale una sola vez, en Eventos, con su fuente oficial', (
 test('fecha: el 27 nov se ve el Aniversario y el CTA «Ver eventos»; desde el 28 se va y el CTA lleva a la tienda', () => {
   const dia27 = html('2026-11-27');
   assert.ok(dia27.includes('6.º Aniversario') && dia27.includes('Hora por anunciar') && dia27.includes('En la librería'));
-  assert.match(dia27, /<a class="boton boton-primario" href="#eventos">Ver eventos<\/a>/);
+  assert.match(dia27, /<a class="boton boton--tinta cta-portada" href="#eventos">Ver eventos /);
   assert.ok(!dia27.includes('add-to-calendar') && !dia27.includes('.ics'));
   assert.ok(!textoVisible(dia27.replace(/<fecha-desde[^>]*hidden=""[^>]*>[\s\S]*?<\/fecha-desde>/g, '')).includes('Ver libros'), 'el CTA del día 28 va oculto');
   assert.match(dia27, /<fecha-desde d="2026-11-28" hidden="">/, 'y listo para el navegador si este HTML sigue en caché');
   const dia28 = html('2026-11-28');
   assert.ok(!dia28.includes('6.º Aniversario'));
-  assert.match(dia28, /<a class="boton boton-primario" href="#tienda">Ver libros<\/a>/);
+  assert.match(dia28, /<a class="boton boton--tinta cta-portada" href="#destacados">Ver libros /);
   assert.ok(!dia28.includes('Ver eventos'));
-  const nav28 = textoVisible(dia28.match(/<ul class="menu">([\s\S]*?)<\/ul>/)[1]).trim();
-  assert.equal(nav28, 'Actividades Libros Visita', 'solo con recurrentes, Eventos se llama «Actividades»');
+  const nav28 = textoVisible(dia28.match(/<nav aria-label="Secciones">([\s\S]*?)<\/nav>/)[1]).replace(/\s+/g, ' ').trim();
+  assert.equal(nav28, 'Eventos Libros Visita');
   assert.ok(!textoVisible(html('2026-11-27')).includes('Actividades'));
   assert.equal(eventosFechados('2026-11-27').length, 1);
   assert.equal(eventosFechados('2026-11-28').length, 0);
@@ -160,22 +168,24 @@ test('hoyMonterrey usa la hora de Monterrey (UTC−6), no la del servidor', () =
 });
 
 test('sin personalización: menú de 3 ítems sin «Inicio» y sin switch', () => {
-  const nav = html().match(/<ul class="menu">([\s\S]*?)<\/ul>/)[1];
+  const nav = html().match(/<nav aria-label="Secciones">([\s\S]*?)<\/nav>/)[1];
   assert.equal(cuenta(nav, /<a /g), 3);
-  assert.ok(!/Inicio/.test(nav));
+  assert.ok(!/>Inicio</.test(nav));
 });
 
-test('carrusel de eventos: orden por fecha, fecha larga solo para el lector, sin datos ajenos', () => {
+test('eventos: orden por fecha, fecha larga solo para el lector, sin datos ajenos', () => {
   const h = html();
   const ev = seccion(h, 'eventos');
-  assert.ok(ev.includes('aria-roledescription="carrusel"') && ev.includes('tabindex="0"'));
+  assert.ok(seccion(h, 'destacados').includes('aria-roledescription="carrusel"'));
   assert.ok(ev.indexOf('6.º Aniversario') < ev.indexOf('Club de Dibujo y Pintura'));
-  assert.ok(ev.includes('<span class="sr-only">'));
-  const sinLector = ev.replace(/<span class="sr-only">[\s\S]*?<\/span>/g, '');
+  assert.ok(ev.includes('class="sr"'));
+  const sinLector = ev.replace(/<span class="sr">[\s\S]*?<\/span>/g, '');
   assert.ok(!sinLector.includes('noviembre'), 'la fecha larga no se ve');
   assert.ok(ev.includes('viernes, 27 de noviembre de 2026'));
   assert.ok(ev.includes('Hora por anunciar') && ev.includes('Santiago González') && ev.includes('$150 MXN'));
-  assert.ok(!h.includes('forms.gle') && !h.includes('Skribh') && !/piel de los recuerdos/i.test(h));
+  assert.equal(cuenta(h, /forms\.gle/g), 1, 'el formulario de renta vive una vez, en Visita');
+  assert.ok(seccion(h, 'visita').includes('forms.gle') && !ev.includes('forms.gle'));
+  assert.ok(!h.includes('Skribh') && !/piel de los recuerdos/i.test(h));
   assert.equal(EVENTOS.filter((e) => e.registroUrl).length, 0);
   assert.ok(EVENTOS.every((e) => e.imagen == null || e.imagen.startsWith('/assets/')));
 });
@@ -197,24 +207,38 @@ test('carta: los tés sin precio van en una sola fila, junto con Aguas frescas',
   }
   assert.ok(max <= 1);
   const barra = seccion(html(), 'visita');
-  assert.ok(!barra.includes('>Hierbabuena<') && barra.includes('Tés') && barra.includes('Aguas frescas'));
+  assert.ok(barra.includes('Hierbabuena') && barra.includes('Té verde') && barra.includes('Aguas frescas'));
   assert.ok(!barra.includes('Los tés'));
+  assert.equal(cuenta(barra, /class="precio"|\$0 MXN/g), 0);
 });
 
-test('un producto de merch de ejemplo deja de ser «Próximamente»; hoy Merch y Talleres sí lo son', () => {
-  const ejemplo = { id: 'ejemplo-merch', nombre: 'Producto de ejemplo', precio: null };
+test('con dos productos de un tipo el hueco se vuelve tarjetas y la línea deja de nombrarlo', () => {
   assert.equal(MERCH.length, 0);
-  const tipos = tiposDeTienda({ merch: [ejemplo].length });
-  assert.equal(tipos.find((t) => t.id === 'merch').n, 1);
-  assert.equal(tipos.find((t) => t.id === 'talleres').n, 0);
-  const fila = renderToStaticMarkup(createElement(FilaTipos, { tipos }));
-  assert.match(fila, /name="tipo"/);
-  assert.match(fila, /Libros/);
-  assert.match(fila, /Merch/);
-  assert.match(fila, /Talleres/);
-  assert.equal(cuenta(fila, /Próximamente/g), 1, 'solo Talleres, que sigue en cero');
-  const hoy = renderToStaticMarkup(createElement(FilaTipos, { tipos: tiposDeTienda() }));
-  assert.equal(cuenta(hoy, /Próximamente/g), 2);
+  const hoy = planTienda([]);
+  assert.equal(hoy.linea, 'Merch y talleres: próximamente.');
+  assert.equal(hoy.sello, true);
+  assert.ok(hoy.huecos.every((h) => h.tarjetas == null));
+  const muestra = [
+    { id: 'm1', nombre: 'Producto de muestra 1', tipo: 'merch', precio: 80 },
+    { id: 'm2', nombre: 'Producto de muestra 2', tipo: 'merch', precio: null },
+  ];
+  const plan = planTienda(muestra);
+  assert.equal(plan.huecos.find((h) => h.id === 'merch').tarjetas.length, 2);
+  assert.equal(plan.huecos.find((h) => h.id === 'talleres').tarjetas, null);
+  assert.equal(plan.linea, 'Talleres: próximamente.');
+  assert.ok(!plan.linea.includes('Merch'));
+  const htmlPlan = renderToStaticMarkup(createElement(BloqueTienda, { plan }));
+  assert.match(htmlPlan, /Producto de muestra 1/);
+  assert.match(htmlPlan, /\$80 MXN/);
+  assert.ok(!htmlPlan.includes('Producto de muestra 2</h3></li>') || !htmlPlan.includes('class="precio">'));
+  assert.equal(cuenta(htmlPlan.split('Producto de muestra 2')[1] || '', /class="precio"/g), 0);
+  assert.ok(!/Merch y talleres/.test(htmlPlan));
+  const vacio = renderToStaticMarkup(createElement(BloqueTienda, { plan: hoy }));
+  assert.equal(cuenta(vacio, /próximamente/gi), 2);
+  const tienda = seccion(html(), 'tienda');
+  assert.equal(cuenta(tienda, /<img /g), 0);
+  assert.equal(cuenta(tienda, /\$\d+/g), 0);
+  assert.equal(cuenta(tienda, /<a |<button/g), 0);
 });
 
 test('pies de foto de hasta 8 palabras y la foto sin permiso sigue, marcada', () => {
@@ -222,9 +246,9 @@ test('pies de foto de hasta 8 palabras y la foto sin permiso sigue, marcada', ()
   assert.equal(NEGOCIO.fotos[0].permisoRegistrado, false);
   assert.equal(NEGOCIO.fotos[1].permisoRegistrado, true);
   const h = html();
-  assert.ok(h.includes('/assets/img/oficial-rincon-800.webp'));
-  assert.ok(h.includes('alt="Muro de piedra'));
-  assert.ok(seccion(h, 'visita').includes('La sala'));
+  assert.ok(!h.includes('oficial-rincon'), 'sin permiso no entra a la página');
+  assert.ok(h.includes('/assets/img/01-entrada-pasillo-800.webp'));
+  assert.ok(seccion(h, 'visita').includes('El pasillo de entrada'));
   const prov = JSON.parse(readFileSync(new URL('../assets/provenance.json', import.meta.url), 'utf8'));
   const reg = prov.real.find((f) => f.file === 'img/oficial-rincon-800.webp');
   assert.equal(reg.permiso, false);
@@ -298,21 +322,31 @@ test('sync de Instagram apagado: solo propone imagen y permalink, nunca una fech
   assert.ok(!html().includes('platform.instagram.com') && !html().includes('embed.js'));
 });
 
-test('carrusel 3D: el centro va de frente y con reduce no hay transform', () => {
-  const centro = coverflowPose(0, { w: 220 });
-  assert.match(centro.transform, /rotateY\(0\.00deg\)/);
-  assert.equal(centro.opacity, 1);
-  const vecina = coverflowPose(1, { w: 220 });
-  assert.match(vecina.transform, /rotateY\(-44\.00deg\)/);
-  const plano = coverflowPose(1, { flat: true, w: 220 });
-  assert.equal(plano.transform, 'none');
-  assert.equal(plano.opacity, 0);
-  assert.equal(keyTarget('ArrowRight', 2, 10), 3);
-  assert.equal(keyTarget('ArrowLeft', 0, 10), 0);
-  const js = readFileSync(new URL('../src/frente/carrusel.js', import.meta.url), 'utf8');
+test('vitrina: el centro va de frente y con reduce no hay giro ni profundidad', () => {
+  const w = anchoPieza(1440);
+  const centro = poseVitrina(0, { w });
+  assert.ok(centro.ry === 0 && centro.z === 0);
+  const vecina = poseVitrina(1, { w });
+  assert.equal(vecina.ry, -42);
+  assert.ok(vecina.z < 0);
+  assert.match(transformVitrina(vecina), /rotateY\(-42\.00deg\)/);
+  const plana = poseVitrina(1, { w, flat: true });
+  assert.equal(plana.ry, 0);
+  assert.equal(plana.z, 0);
+  assert.doesNotMatch(transformVitrina(plana), /rotateY|translateZ|translate3d/);
+  assert.equal(teclaVitrina('ArrowRight', 2, 8), 3);
+  assert.equal(teclaVitrina('ArrowLeft', 0, 8), 0);
+  assert.equal(teclaVitrina('Home', 4, 8), 0);
+  assert.equal(teclaVitrina('End', 4, 8), 7);
+  const paso = pasoVitrina(w);
+  assert.equal(destinoGesto(180, paso, 5), 4, '180 px con el paso de escritorio avanza 1');
+  const pasoMovil = pasoVitrina(anchoPieza(390));
+  assert.equal(destinoGesto(-180, pasoMovil, 6), 7, '180 px en 390 avanza 1');
+  assert.equal(destinoGesto(10, paso, 3), 3, 'menos de 24 px vuelve');
+  const js = readFileSync(new URL('../src/frente/cliente.js', import.meta.url), 'utf8');
   assert.match(js, /pointerdown/);
-  assert.match(js, /vel \*= 0\.9/);
-  assert.match(js, /host.addEventListener\('keydown'/);
+  assert.match(js, /keydown/);
+  assert.doesNotMatch(js, /addEventListener\('wheel'/);
 });
 
 test('el JS en línea cabe sin framework y con reduce no hay transform', () => {
@@ -323,11 +357,31 @@ test('el JS en línea cabe sin framework y con reduce no hay transform', () => {
   assert.match(inline, /ArrowRight/);
   assert.match(inline, /pointerdown/);
   const css = readFileSync(new URL('../src/frente/nuevo.css', import.meta.url), 'utf8');
-  const reduce = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
-  assert.match(reduce, /transform:\s*none !important/);
-  assert.doesNotMatch(reduce, /translate|rotate|scale\(/);
-  assert.match(css, /--curva-salida/);
-  assert.match(css, /--curva-resorte/);
+  assert.match(css, /cubic-bezier\(\.16,1,\.3,1\)/);
+  assert.doesNotMatch(css, /fonts\.googleapis|jsdelivr|animation:\s*[^;]*infinite/);
+  assert.ok(!/Inter/.test(css), 'Barlow reemplaza a Inter');
+  assert.match(inline, /ArrowRight/);
+  assert.match(inline, /pointerdown/);
+  assert.match(inline, /Flip/);
+});
+
+test('sin JS, ?q y ?genero los resuelve el servidor', async () => {
+  const res = await GET(new Request('http://itinerante.test/nuevo?q=los&genero=poesia'));
+  const body = await res.text();
+  const catalogo = body.split('id="libros"')[1].split('id="tienda"')[0];
+  const lis = [...catalogo.matchAll(/<li data-id="([^"]+)"([^>]*)>/g)];
+  const visibles = lis.filter((m) => !/\shidden=/.test(m[2])).map((m) => m[1]);
+  const ocultos = lis.filter((m) => /\shidden=/.test(m[2])).map((m) => m[1]);
+  const esperados = librosConsulta(parseConsulta(new URLSearchParams('q=los&genero=poesia'))).map((l) => l.id);
+  assert.deepEqual(visibles.sort(), esperados.sort());
+  assert.equal(visibles.length + ocultos.length, 41);
+  assert.ok(visibles.length > 0 && visibles.length < 41);
+  assert.ok(body.includes('value="los"'));
+  const ficha = await GET(new Request('http://itinerante.test/nuevo?libro=amigos-rodrigo-garnica'));
+  const fichaHtml = await ficha.text();
+  assert.match(fichaHtml, /id="hoja"[^>]*class="hoja abierta"|class="hoja abierta"/);
+  assert.match(fichaHtml, /Consultar disponibilidad por WhatsApp/);
+  assert.match(fichaHtml, /Amigos/);
 });
 
 test('tema Astryx al día, contraste AA y Astryx fijado a 0.7.17 sin AGENTS.md de Astryx', () => {

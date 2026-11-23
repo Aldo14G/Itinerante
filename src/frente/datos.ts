@@ -8,6 +8,7 @@ import merch from '../../assets/data/merch.json';
 import eventosCurados from './eventos.json';
 import negocio from './negocio.json';
 import correcciones from './correcciones.json';
+import destacadosCurados from './destacados.json';
 import { hoyMonterrey } from './fechas';
 
 export { hoyMonterrey };
@@ -29,39 +30,82 @@ export type Libro = {
   autor: string | null;
   editorial: string | null;
   genero: string | null;
-  portada: { src: string; srcset: string | null; ancho: number; alto: number } | null;
+  generoId: string | null;
+  colecciones: string[];
+  isbn: string | null;
+  portada: { src: string; srcChica: string; srcset: string | null; ancho: number; alto: number } | null;
   sinopsis: string | null;
   precio: number | null;
   anio: number | null;
   paginas: number | null;
+  /** Índice en el orden de presentación (portada primero). Lo usa el cliente para volver a ese orden. */
+  ordenPortada: number;
 };
 
 type LibroCrudo = (typeof catalogo.books)[number];
 const subgeneros = catalogo.subgenres as Record<string, { n: string; c: string }>;
 const arreglos = correcciones.libros as Record<string, { g?: string }>;
+const COLECCIONES = colecciones.collections as Array<{ id: string; titulo: string; filtro: { g: string[] } }>;
+
+export function coleccionesDe(generoId: string | null): string[] {
+  if (!generoId) return [];
+  return COLECCIONES.filter((c) => c.filtro.g.includes(generoId)).map((c) => c.id);
+}
 
 /** GÉNERO visible: el nombre del subgénero tal como lo trae catalog.json (Narrativa, Poesía, Ensayo, Divulgación, Ensayo y poesía…). */
 export function generoVisible(g: string | null): string | null {
   return g ? (subgeneros[g]?.n ?? null) : null;
 }
 
-function aLibro(b: LibroCrudo): Libro {
+function aLibro(b: LibroCrudo, ordenPortada = 0): Libro {
   const g = b.g ?? arreglos[b.id]?.g ?? null;
+  const isbn = typeof b.n === 'string' && b.n ? b.n : null;
   return {
     id: b.id,
     titulo: b.t,
     autor: b.a ?? null,
     editorial: b.p ?? null,
     genero: generoVisible(g),
+    generoId: g,
+    colecciones: coleccionesDe(g),
+    isbn,
     portada: b.c && b.cw && b.ch ? portadaDe(`/${b.c}`, b.cw, b.ch) : null,
     sinopsis: b.s ?? null,
     precio: typeof b.pr === 'number' ? b.pr : null,
     anio: (b.y as number | null) ?? null,
     paginas: (b.pg as number | null) ?? null,
+    ordenPortada,
   };
 }
 
-export const LIBROS: Libro[] = catalogo.books.map(aLibro).sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
+function portadaPrimero(a: Libro, b: Libro): number {
+  const ac = a.portada ? 0 : 1;
+  const bc = b.portada ? 0 : 1;
+  if (ac !== bc) return ac - bc;
+  const ae = a.editorial ? 0 : 1;
+  const be = b.editorial ? 0 : 1;
+  if (ae !== be) return ae - be;
+  const pe = (a.editorial ?? '').localeCompare(b.editorial ?? '', 'es');
+  if (pe) return pe;
+  return a.titulo.localeCompare(b.titulo, 'es');
+}
+
+/** Orden del inventario (catalog.json), sin reordenar. */
+const INVENTARIO: Libro[] = catalogo.books.map((b) => aLibro(b));
+
+/** Orden de presentación del catálogo: con portada primero, luego editorial y título. No es curaduría. */
+export const LIBROS: Libro[] = [...INVENTARIO].sort(portadaPrimero).map((l, i) => ({ ...l, ordenPortada: i }));
+
+const porId = new Map(LIBROS.map((l) => [l.id, l]));
+
+/**
+ * Vitrina Destacados. Solo los ids de destacados.json que existen y tienen portada.
+ * Vacío o ausente: la sección no se pinta (no se inventa una selección en el código).
+ */
+export const DESTACADOS: Libro[] = (destacadosCurados.ids as string[])
+  .map((id) => porId.get(id))
+  .filter((l): l is Libro => l != null && l.portada != null)
+  .slice(0, 10);
 
 /** Novedades reales: collections.json › novedades.entradas ({ id, llegada }). Hoy está vacía, así que la sección no existe. */
 export const NOVEDADES: Libro[] = (colecciones.novedades.entradas as Array<{ id: string; llegada: string }>)
@@ -71,10 +115,11 @@ export const NOVEDADES: Libro[] = (colecciones.novedades.entradas as Array<{ id:
 /** Lo que el navegador pide en la rejilla. A 390 px (≈46 vw, dpr 1 o 2) elige la de 360; la de 600 y la grande quedan para pantallas mayores. */
 export const PORTADA_SIZES = '(max-width: 479px) 46vw, (max-width: 879px) 31vw, 240px';
 
-function portadaDe(src: string, ancho: number, alto: number): { src: string; srcset: string | null; ancho: number; alto: number } {
-  if (ancho <= 600) return { src, srcset: null, ancho, alto };
+function portadaDe(src: string, ancho: number, alto: number): { src: string; srcChica: string; srcset: string | null; ancho: number; alto: number } {
+  if (ancho <= 600) return { src, srcChica: src, srcset: null, ancho, alto };
   const base = src.replace(/\.webp$/, '');
-  return { src, srcset: `${base}-360.webp 360w, ${base}-600.webp 600w, ${src} ${ancho}w`, ancho, alto };
+  const srcChica = `${base}-360.webp`;
+  return { src, srcChica, srcset: `${srcChica} 360w, ${base}-600.webp 600w, ${src} ${ancho}w`, ancho, alto };
 }
 
 export type MerchItem = {
@@ -98,6 +143,73 @@ export const MERCH: MerchItem[] = (merch.productos as MerchCrudo[]).flatMap((m) 
 export type TallerTienda = { id: string; titulo: string; precio: number | null };
 export const TALLERES: TallerTienda[] = [];
 
+export type HuecoId = 'libros' | 'merch' | 'talleres';
+
+export type ProductoTienda = {
+  id: string;
+  nombre: string;
+  precio: number | null;
+  descripcion: string | null;
+  tipo: HuecoId;
+  foto: { src: string; alt: string } | null;
+};
+
+/** Un tipo se ilustra con tarjetas reales a partir de 2 productos (S-19). Por debajo, el hueco sigue vacío. */
+export const MIN_TARJETAS_TIPO = 2;
+
+function tipoHueco(tipo: string | null | undefined): HuecoId {
+  const t = (tipo ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (t.includes('taller')) return 'talleres';
+  if (t.includes('libro')) return 'libros';
+  return 'merch';
+}
+
+export function productosTienda(lista: unknown = merch.productos): ProductoTienda[] {
+  if (!Array.isArray(lista)) return [];
+  const out: ProductoTienda[] = [];
+  for (const crudo of lista) {
+    const m = crudo as MerchCrudo;
+    if (!m?.id || !m.nombre) continue;
+    const foto = m.foto?.src && m.foto.alt ? { src: m.foto.src.startsWith('/') ? m.foto.src : `/${m.foto.src}`, alt: m.foto.alt } : null;
+    out.push({
+      id: m.id,
+      nombre: m.nombre,
+      precio: typeof m.precio === 'number' ? m.precio : null,
+      descripcion: m.descripcion ?? null,
+      tipo: tipoHueco(m.tipo),
+      foto,
+    });
+  }
+  return out;
+}
+
+export type HuecoTienda = { id: HuecoId; nombre: string; tarjetas: ProductoTienda[] | null };
+export type PlanTienda = { huecos: HuecoTienda[]; linea: string | null; sello: boolean };
+
+const NOMBRES_HUECO: Record<HuecoId, string> = { libros: 'Libros', merch: 'Merch', talleres: 'Talleres' };
+
+/**
+ * Esqueleto de la Tienda. Con menos de 2 productos de un tipo, su hueco queda vacío.
+ * La línea deja de nombrar el tipo que ya tiene tarjetas. Sin huecos vacíos, no hay sello ni línea.
+ */
+export function planTienda(lista: unknown = merch.productos): PlanTienda {
+  const grupos: Record<HuecoId, ProductoTienda[]> = { libros: [], merch: [], talleres: [] };
+  for (const p of productosTienda(lista)) grupos[p.tipo].push(p);
+  const huecos: HuecoTienda[] = (['libros', 'merch', 'talleres'] as const).map((id) => ({
+    id,
+    nombre: NOMBRES_HUECO[id],
+    tarjetas: grupos[id].length >= MIN_TARJETAS_TIPO ? grupos[id] : null,
+  }));
+  const pendientes: string[] = [];
+  if (grupos.merch.length < MIN_TARJETAS_TIPO) pendientes.push('Merch');
+  if (grupos.talleres.length < MIN_TARJETAS_TIPO) pendientes.push('Talleres');
+  const hayHueco = huecos.some((h) => h.tarjetas == null);
+  let linea: string | null = null;
+  if (hayHueco && pendientes.length === 2) linea = 'Merch y talleres: próximamente.';
+  else if (hayHueco && pendientes.length === 1) linea = `${pendientes[0]}: próximamente.`;
+  return { huecos, linea, sello: hayHueco };
+}
+
 /** Editoriales: un filtro con menos de 2 libros no se imprime. */
 export const MINIMO_FILTRO = 2;
 
@@ -119,6 +231,24 @@ export function tiposDeTienda(extra?: { libros?: number; merch?: number; tallere
     { id: 'merch', nombre: 'Merch', n: extra?.merch ?? MERCH.length },
     { id: 'talleres', nombre: 'Talleres', n: extra?.talleres ?? TALLERES.length },
   ];
+}
+
+/** Editoriales del catálogo, también las de un solo libro. El libro sin editorial no genera filtro. */
+export function editorialesCatalogo(libros = LIBROS): Array<{ nombre: string; rotulo: string; n: number }> {
+  const cuenta = new Map<string, number>();
+  for (const l of libros) if (l.editorial) cuenta.set(l.editorial, (cuenta.get(l.editorial) ?? 0) + 1);
+  return [...cuenta]
+    .map(([nombre, n]) => ({ nombre, rotulo: nombre.replace(/ Casa Editorial$/, ''), n }))
+    .sort((a, b) => a.rotulo.localeCompare(b.rotulo, 'es'));
+}
+
+/** Géneros de filtro: las colecciones reales (un libro puede estar en dos). */
+export function generosColeccion(libros = LIBROS): Array<{ id: string; nombre: string; n: number }> {
+  return COLECCIONES.map((c) => ({
+    id: c.id,
+    nombre: c.titulo,
+    n: libros.filter((l) => l.colecciones.includes(c.id)).length,
+  })).filter((g) => g.n > 0);
 }
 
 /** Géneros con al menos 2 libros: un chip por género, igual que las editoriales. */
@@ -195,7 +325,7 @@ export function filasDeCategoria(productos: Producto[]): FilaCarta[] {
  * (PENDIENTES-NEGOCIO (b) y (d)). faq.json lo sigue usando la landing anterior tal cual.
  */
 export const PREGUNTAS: Array<{ id: string; pregunta: string; respuesta: string }> = [
-  { id: 'libro', respuesta: 'Si no lo tenemos, te lo podemos pedir. Pregúntanos por WhatsApp.' },
+  { id: 'libro', respuesta: 'Búscalo en el catálogo y, en su ficha, toca «Consultar disponibilidad por WhatsApp»: se abre WhatsApp con el mensaje ya escrito. Si no lo tenemos, te lo podemos pedir.' },
   { id: 'festivos', respuesta: 'Pregúntanos antes por WhatsApp.' },
 ].map((r) => {
   const q = faq.preguntas.find((p) => p.id === r.id);

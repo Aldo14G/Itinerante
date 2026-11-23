@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "nota": "Ids de la vitrina Destacados: de 6 a 10 libros con portada, elegidos por la librería. Esta lista es provisional y mecánica (los 8 primeros con portada, en el orden del inventario). No es curaduría. Si ids queda vacío, la sección no se pinta y el catálogo sigue."
+  },
+  "ids": [
+    "las-hojas-de-fabre-jesus-ferreiro",
+    "lo-que-el-doc-quiso-decir-antonio-zamudio",
+    "acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h",
+    "amigos-rodrigo-garnica",
+    "rito-de-iniciacion-diego-uribe",
+    "perorata-luis-felipe-lomeli",
+    "los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla",
+    "las-ruinas-de-la-caza-alfredo-leal"
+  ]
+}

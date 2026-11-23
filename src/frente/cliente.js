@@ -1,209 +1,509 @@
-// JS de /nuevo (va en línea). Sin él, la página se lee completa: cuadrícula, filtros por CSS y carta.
-// Con él: carrusel 3D de portadas, tilt, revelado y la ficha. El movimiento se apaga solo con prefers-reduced-motion.
-import { montarVitrina } from './carrusel.js';
+// Mejora de /nuevo. El HTML ya trae el contenido: esto anima, hojea la vitrina y hace instantáneos los filtros.
+// GSAP entra por el bundle (npm). Nada de CDN. prefers-reduced-motion suaviza; no apaga los estados.
+import { gsap } from 'gsap';
+import { Flip } from 'gsap/Flip';
+import { anchoPieza, poseVitrina, transformVitrina, destinoGesto } from './vitrina.js';
 
-(function () {
-  var d = document;
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-  d.querySelectorAll('fecha-hasta').forEach(function (e) { if (hoy > e.getAttribute('d')) e.remove(); });
-  d.querySelectorAll('fecha-desde').forEach(function (e) { if (hoy < e.getAttribute('d')) e.remove(); else e.hidden = false; });
+gsap.registerPlugin(Flip);
 
-  // Scroll-spy: la sección activa es la última cuyo inicio pasó la línea a ~35 % del alto visible bajo la cabecera.
-  var cab = d.querySelector('.cabecera');
-  var enlaces = [].slice.call(d.querySelectorAll('.menu a'));
-  var secciones = enlaces.map(function (a) { return d.getElementById(a.hash.slice(1)); });
-  function espiar() {
-    var alto = cab ? cab.offsetHeight : 0;
-    var linea = alto + (innerHeight - alto) * 0.35;
-    var activa = -1;
-    secciones.forEach(function (s, i) { if (s && s.getBoundingClientRect().top <= linea) activa = i; });
-    if (innerHeight + scrollY >= d.documentElement.scrollHeight - 2) activa = secciones.length - 1;
-    enlaces.forEach(function (a, i) { if (i === activa) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
-  }
-  addEventListener('scroll', espiar, { passive: true });
-  addEventListener('resize', espiar);
-  espiar();
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const E_OUT = 'expo.out';
+const libros = JSON.parse($('#datos-libros').textContent);
+const porId = Object.fromEntries(libros.map((b) => [b.id, b]));
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const precio = (n) => (n == null ? '' : `$${n} MXN`);
+const scrollYa = (y) => window.scrollTo({ top: y, behavior: 'instant' });
 
-  // Carrusel: Tab llega a cada enlace; flechas izquierda/derecha mueven la pieza. Sin este script el contenedor igual se desliza (scroll-snap).
-  var carrusel = d.querySelector('.carrusel');
-  if (carrusel) {
-    var piezas = [].slice.call(carrusel.querySelectorAll('.carrusel-pieza'));
-    carrusel.addEventListener('keydown', function (e) {
-      if ((e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') || !piezas.length) return;
-      var i = -1;
-      for (var k = 0; k < piezas.length; k++) if (piezas[k].contains(d.activeElement)) i = k;
-      if (i < 0 && d.activeElement === carrusel) i = e.key === 'ArrowRight' ? -1 : piezas.length;
-      var n = e.key === 'ArrowRight' ? Math.min(piezas.length - 1, i + 1) : Math.max(0, i - 1);
-      if (n === i || n < 0) return;
-      var destino = piezas[n].querySelector('a');
-      e.preventDefault();
-      if (destino) destino.focus({ preventScroll: true });
-      piezas[n].scrollIntoView({ inline: 'start', block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-    });
-  }
-
-  // Carta: en el teléfono cada grupo plegado salvo el primero (sin JS van todos abiertos).
-  if (matchMedia('(max-width: 719px)').matches) d.querySelectorAll('.barra-grupo').forEach(function (g, i) { if (i) g.open = false; });
-
-  // Tienda: buscador + contador único («N libros») que también sigue a los filtros de CSS.
-  var tienda = d.getElementById('tienda');
-  if (!tienda) return;
-  var libros = [].slice.call(tienda.querySelectorAll('.rejilla > li'));
-  var rejilla = tienda.querySelector('.rejilla');
-  var luego = tienda.querySelector('.proximamente');
-  var vitrina = montarVitrina(rejilla, {
-    reduce: reduce,
-    abrir: function (id) {
-      var tarjeta = d.getElementById('libro-' + id);
-      var enlace = tarjeta && tarjeta.querySelector('.libro-enlace');
-      if (enlace) enlace.click();
-    },
+// Fechas (hora de Monterrey): el mismo criterio que el servidor, por si el HTML sigue en caché el día 28.
+const hoyISO = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+$$('fecha-hasta').forEach((e) => { if (hoyISO > e.getAttribute('d')) e.remove(); });
+$$('fecha-desde').forEach((e) => { if (hoyISO < e.getAttribute('d')) e.remove(); else e.hidden = false; });
+$$('.parada[data-fecha]').forEach((p) => { if (p.dataset.fecha && p.dataset.fecha < hoyISO) p.remove(); });
+if (!$$('.parada').some((p) => p.dataset.fecha)) {
+  const destino = $('#destacados') ? '#destacados' : '#libros';
+  $$('a.cta-portada').forEach((a) => {
+    if (a.closest('[hidden]')) return;
+    a.setAttribute('href', destino);
+    if (a.firstChild && a.firstChild.nodeType === 3) a.firstChild.textContent = 'Ver libros ';
   });
-  var tituloTienda = tienda.querySelector('h2');
-  if (vitrina && tituloTienda) tituloTienda.after(vitrina);
-  var buscador = tienda.querySelector('.buscador');
-  var campo = d.getElementById('buscar');
-  var cuenta = tienda.querySelector('.cuenta');
-  var vacio = tienda.querySelector('.vacio');
-  if (buscador) buscador.hidden = false;
-  function normalizar(s) { return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
-  function aplicarFiltro() {
-    var q = campo ? normalizar(campo.value) : '';
-    var ed = tienda.querySelector('input[name="editorial"]:checked');
-    ed = ed ? ed.value : '';
-    var gen = tienda.querySelector('input[name="genero"]:checked');
-    gen = gen ? gen.value : '';
-    var tipo = tienda.querySelector('input[name="tipo"]:checked');
-    tipo = tipo ? tipo.value : 'libros';
-    var n = 0;
-    libros.forEach(function (l) {
-      var ok = l.dataset.tipo === tipo && (!q || (l.dataset.busca || '').indexOf(q) >= 0) && (!ed || l.dataset.ed === ed) && (!gen || l.dataset.gen === gen);
-      l.hidden = !ok;
-      if (ok) n++;
-    });
-    var vacioTipo = tipo !== 'libros' && !libros.some(function (l) { return l.dataset.tipo === tipo; });
-    if (luego) luego.hidden = !vacioTipo;
-    cuenta.hidden = vacioTipo;
-    cuenta.textContent = n === 1 ? '1 libro' : n + ' libros';
-    vacio.hidden = vacioTipo || n > 0;
-  }
-  function filtrar() {
-    if (reduce || typeof rejilla.getAnimations !== 'function') { aplicarFiltro(); return; }
-    var antes = new Map();
-    libros.forEach(function (l) { if (!l.hidden) antes.set(l, l.getBoundingClientRect()); });
-    aplicarFiltro();
-    libros.forEach(function (l) {
-      var a = antes.get(l);
-      if (!a || l.hidden) return;
-      var b = l.getBoundingClientRect();
-      var dx = a.left - b.left;
-      var dy = a.top - b.top;
-      if (!dx && !dy) return;
-      l.style.transition = 'none';
-      l.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-      requestAnimationFrame(function () {
-        l.style.transition = 'transform var(--dur-base) var(--curva-salida)';
-        l.style.transform = '';
-      });
-    });
-  }
-  tienda.addEventListener('input', filtrar);
-  tienda.addEventListener('change', filtrar);
-  tienda.querySelector('[data-limpiar]').addEventListener('click', function () {
-    if (campo) campo.value = '';
-    var todas = tienda.querySelector('input[name="editorial"][value=""]');
-    if (todas) todas.checked = true;
-    var todos = tienda.querySelector('input[name="genero"][value=""]');
-    if (todos) todos.checked = true;
-    filtrar();
-    if (campo) campo.focus();
-  });
+}
 
-  // Ficha: dialog nativo (Esc y foco atrapado los da el navegador); al cerrar, el foco vuelve a la tarjeta.
-  var ficha = d.getElementById('ficha');
-  var origen = null;
-  function abrir(l, enlace) {
-    origen = enlace;
-    var img = l.querySelector('.libro-portada img');
-    var portada = ficha.querySelector('.ficha-portada');
-    portada.innerHTML = '';
-    if (img) { var c = img.cloneNode(); c.loading = 'eager'; portada.appendChild(c); portada.hidden = false; } else portada.hidden = true;
-    ficha.querySelector('#ficha-t').textContent = enlace.textContent;
-    var precio = l.querySelector('.libro-precio');
-    var p = ficha.querySelector('.libro-precio');
-    p.textContent = precio ? precio.textContent : '';
-    p.hidden = !precio;
-    var at = l.querySelector('.atributos');
-    ficha.querySelector('.ficha-atributos').innerHTML = at ? at.outerHTML : '';
-    var sin = l.querySelector('.libro-sinopsis');
-    var s = ficha.querySelector('.ficha-sinopsis');
-    s.textContent = sin ? sin.textContent : '';
-    s.hidden = !sin;
-    ficha.querySelector('[data-wa]').href = l.dataset.wa;
-    ficha.showModal();
-    if (location.hash !== '#' + l.id) history.replaceState(null, '', '#' + l.id);
-  }
-  tienda.addEventListener('click', function (e) {
-    var a = e.target.closest('.libro-enlace');
-    if (!a) return;
-    e.preventDefault();
-    abrir(a.closest('.libro'), a);
-  });
-  ficha.querySelector('[data-cerrar]').addEventListener('click', function () { ficha.close(); });
-  ficha.addEventListener('click', function (e) { if (e.target === ficha) ficha.close(); });
-  ficha.addEventListener('close', function () {
-    if (location.hash.indexOf('#libro-') === 0) history.replaceState(null, '', location.pathname + location.search);
-    if (origen) origen.focus();
-  });
-  var inicial = location.hash.indexOf('#libro-') === 0 && d.getElementById(location.hash.slice(1));
-  if (inicial) abrir(inicial, inicial.querySelector('.libro-enlace'));
+// Portada: la camioneta llega una sola vez y termina centrada. El título y el llamado no se animan.
+if (!reducir) {
+  const tl = gsap.timeline({ delay: 0.15 });
+  tl.from('.camion', { xPercent: -38, duration: 1.1, ease: E_OUT })
+    .from('.camion .trazo', { clipPath: 'inset(0 100% 0 0)', duration: 0.9, ease: 'power3.out' }, 0)
+    .from('#carga img', { y: -70, opacity: 0, rotation: (i, el) => +el.dataset.r - 14, duration: 0.7, ease: E_OUT, stagger: 0.08 }, 0.55);
+}
 
-  // Revelado escalonado. Sin JS las tarjetas ya están visibles (no llevan la clase js).
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        en.target.classList.add('is-visible');
-        io.unobserve(en.target);
-      });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
-    d.querySelectorAll('.rejilla .libro, .ev').forEach(function (el, i) {
-      if (!reduce) el.style.transitionDelay = (i % 8) * 60 + 'ms';
-      io.observe(el);
-    });
-  } else {
-    d.querySelectorAll('.rejilla .libro, .ev').forEach(function (el) { el.classList.add('is-visible'); });
-  }
+// Eventos: flechas solo cuando la ruta desborda.
+const ruta = $('#ruta');
+const rutaCtl = $('#ruta-controles');
+if (ruta && rutaCtl) {
+  const revisaRuta = () => {
+    rutaCtl.hidden = !(ruta.scrollWidth > ruta.clientWidth + 48);
+    $('#ruta-ant').disabled = ruta.scrollLeft < 4;
+    $('#ruta-sig').disabled = ruta.scrollLeft + ruta.clientWidth > ruta.scrollWidth - 4;
+  };
+  ruta.addEventListener('scroll', revisaRuta, { passive: true });
+  addEventListener('resize', revisaRuta);
+  revisaRuta();
+  const pasoRuta = (dir) => {
+    const p = ruta.querySelector('.parada');
+    if (p) ruta.scrollBy({ left: dir * p.offsetWidth, behavior: reducir ? 'auto' : 'smooth' });
+  };
+  $('#ruta-ant').onclick = () => pasoRuta(-1);
+  $('#ruta-sig').onclick = () => pasoRuta(1);
+}
 
-  // Tilt de la portada, solo con puntero fino y con movimiento.
-  if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    var inclina = null;
-    var marco = 0;
-    var px = 0.5;
-    var py = 0.5;
-    function soltar() {
-      if (!inclina) return;
-      inclina.style.transform = '';
-      inclina = null;
+// Vitrina.
+const vit = $('#vitrina');
+if (vit) {
+  const piezas = $$('#escenario .pieza');
+  const destacados = piezas.map((p) => porId[p.dataset.id]);
+  const st = { pos: Math.min(3, destacados.length - 1) };
+  let W = 0;
+  const paso = () => W * 0.74;
+  const limita = (v) => Math.max(0, Math.min(destacados.length - 1, v));
+  function cargaCerca(c) {
+    for (let i = Math.max(0, c - 3); i <= Math.min(piezas.length - 1, c + 3); i++) {
+      const im = piezas[i].querySelector('img');
+      if (im && im.dataset.src) { im.src = im.dataset.src; delete im.dataset.src; }
     }
-    function pintarTilt() {
-      marco = 0;
-      if (!inclina) return;
-      var ry = Math.max(-6, Math.min(6, (px - 0.5) * 12));
-      var rx = Math.max(-6, Math.min(6, (0.5 - py) * 12));
-      inclina.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateZ(12px)';
-    }
-    tienda.addEventListener('pointermove', function (e) {
-      if (e.pointerType !== 'mouse') { soltar(); return; }
-      var porta = e.target.closest('.libro-portada');
-      if (!porta || porta.closest('.libro[hidden]')) { soltar(); return; }
-      if (porta !== inclina) { soltar(); inclina = porta; }
-      var r = porta.getBoundingClientRect();
-      px = (e.clientX - r.left) / r.width;
-      py = (e.clientY - r.top) / r.height;
-      if (!marco) marco = requestAnimationFrame(pintarTilt);
-    });
-    tienda.addEventListener('pointerleave', soltar);
   }
-})();
+  let centroPrevio = -1;
+  function controles(i) {
+    $('#v-cont').textContent = `${i + 1} de ${destacados.length}`;
+    $('#v-ant').disabled = i === 0;
+    $('#v-sig').disabled = i === destacados.length - 1;
+  }
+  function fichaVitrina(i) {
+    const b = destacados[i];
+    const f = $('#ficha-vitrina');
+    f.innerHTML = `<h3>${esc(b.t)}</h3><p>${esc(b.a)}${b.p ? ` · ${esc(b.p)}` : ''}${b.pr != null ? ` · <span class="precio">${precio(b.pr)}</span>` : ''}</p>`;
+    controles(i);
+    gsap.fromTo(f, { opacity: 0, y: reducir ? 0 : 8, filter: reducir ? 'none' : 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: reducir ? 0.15 : 0.38, ease: E_OUT });
+  }
+  function pinta() {
+    vit.style.perspective = `${W * 4}px`;
+    piezas.forEach((p, i) => {
+      const d = i - st.pos;
+      const k = poseVitrina(d, { w: W, flat: reducir, movil: innerWidth < 700 });
+      p.style.transform = transformVitrina(k);
+      p.style.opacity = k.op;
+      p.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
+      p.style.visibility = k.op <= 0 ? 'hidden' : 'visible';
+      p.firstChild.style.filter = `brightness(${(1 - Math.min(k.dim, 1) * 0.38).toFixed(3)})`;
+    });
+    const c = Math.round(st.pos);
+    if (c !== centroPrevio) {
+      const primera = centroPrevio < 0;
+      centroPrevio = c;
+      piezas.forEach((p, i) => p.classList.toggle('centro', i === c));
+      cargaCerca(c);
+      if (!primera) fichaVitrina(c);
+      else controles(c);
+    }
+  }
+  function ir(i, dur) {
+    i = limita(i);
+    if (reducir) { st.pos = i; pinta(); return; }
+    gsap.to(st, { pos: i, duration: dur ?? 0.75, ease: E_OUT, onUpdate: pinta, overwrite: true });
+  }
+  function medir() { W = anchoPieza(innerWidth); piezas.forEach((p) => p.style.setProperty('--w', `${W}px`)); pinta(); }
+  addEventListener('resize', medir);
+  medir();
+  $('#v-ant').onclick = () => ir(Math.round(st.pos) - 1);
+  $('#v-sig').onclick = () => ir(Math.round(st.pos) + 1);
+  vit.addEventListener('keydown', (e) => {
+    const c = Math.round(st.pos);
+    if (e.key === 'ArrowRight') { ir(c + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { ir(c - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { ir(0); e.preventDefault(); }
+    else if (e.key === 'End') { ir(destacados.length - 1); e.preventDefault(); }
+    else if (e.key === 'Enter' || e.key === ' ') { abrirFicha(destacados[c], piezas[c].querySelector('img')); e.preventDefault(); }
+  });
+  {
+    let x0 = 0; let y0 = 0; let p0 = 0; let id = null; let horizontal = false; let movido = false;
+    vit.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      id = e.pointerId; x0 = e.clientX; y0 = e.clientY; p0 = st.pos; horizontal = false; movido = false;
+    });
+    vit.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== id) return;
+      const dx = e.clientX - x0; const dy = e.clientY - y0;
+      if (!horizontal) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+        horizontal = true; movido = true; vit.setPointerCapture(id); gsap.killTweensOf(st);
+      }
+      st.pos = limita(p0 - dx / paso());
+      pinta();
+    });
+    const suelta = (e) => {
+      if (e.pointerId !== id) return;
+      id = null;
+      if (!horizontal) return;
+      const dx = e.clientX - x0;
+      ir(destinoGesto(dx, paso(), p0), Math.abs(dx) < 24 ? 0.4 : Math.abs(dx / paso()) < 2 ? 0.5 : 0.6);
+    };
+    vit.addEventListener('pointerup', suelta);
+    vit.addEventListener('pointercancel', (e) => { if (e.pointerId === id) { id = null; ir(Math.round(st.pos), 0.4); } });
+    vit.addEventListener('click', (e) => {
+      if (movido) { movido = false; return; }
+      const p = e.target.closest('.pieza');
+      if (!p) return;
+      const i = +p.dataset.i;
+      if (i === Math.round(st.pos)) abrirFicha(destacados[i], p.querySelector('img'));
+      else ir(i);
+    });
+    vit.addEventListener('dragstart', (e) => e.preventDefault());
+  }
+  if (matchMedia('(pointer:fine)').matches && !reducir) {
+    vit.addEventListener('pointermove', (e) => {
+      const c = piezas[Math.round(st.pos)]?.firstChild;
+      if (!c) return;
+      const r = c.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+      const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) { c.style.transform = 'translateY(-50%)'; return; }
+      c.style.transform = `translateY(-50%) translateZ(30px) rotateY(${(dx * 10).toFixed(2)}deg) rotateX(${(-dy * 8).toFixed(2)}deg)`;
+    });
+    vit.addEventListener('pointerleave', () => piezas.forEach((p) => { p.firstChild.style.transform = ''; }));
+  }
+}
+
+// Catálogo.
+const cat = { q: '', genero: new Set(), editorial: new Set(), orden: 'portada', vista: 'rejilla', mostrados: 0 };
+const rejilla = $('#rejilla');
+const resultados = $('#resultados');
+const items = $$('#rejilla > li').map((li) => {
+  const a = li.querySelector('h3 a');
+  const meta = li.querySelector('.meta');
+  li.hidden = false;
+  return {
+    li, b: porId[li.dataset.id], a, meta,
+    t0: a.textContent, m0: meta.textContent,
+    g: (li.dataset.genero || '').split(' ').filter(Boolean),
+    p: li.dataset.editorial,
+    i: Number(li.dataset.i),
+  };
+});
+const norm = (s) => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const tokens = (q) => norm(q).split(/\s+/).filter(Boolean);
+function resalta(texto, toks) {
+  if (!toks.length) return esc(texto);
+  let n = ''; const mapa = [];
+  for (let i = 0; i < texto.length; i++) for (const ch of norm(texto[i])) { n += ch; mapa.push(i); }
+  mapa.push(texto.length);
+  const marcas = [];
+  for (const t of toks) { let k = n.indexOf(t); while (k >= 0) { marcas.push([mapa[k], mapa[k + t.length]]); k = n.indexOf(t, k + t.length); } }
+  if (!marcas.length) return esc(texto);
+  marcas.sort((x, y) => x[0] - y[0]);
+  let out = ''; let c = 0;
+  for (const [a, b] of marcas) { if (a < c) continue; out += `${esc(texto.slice(c, a))}<mark>${esc(texto.slice(a, b))}</mark>`; c = b; }
+  return out + esc(texto.slice(c));
+}
+const ORDEN = {
+  portada: (x, y) => x.i - y.i,
+  titulo: (x, y) => norm(x.b.t).localeCompare(norm(y.b.t), 'es'),
+  autor: (x, y) => norm(x.b.a).localeCompare(norm(y.b.a), 'es'),
+  'precio-asc': (x, y) => (x.b.pr ?? 1e9) - (y.b.pr ?? 1e9) || x.i - y.i,
+  'precio-desc': (x, y) => (y.b.pr ?? -1) - (x.b.pr ?? -1) || x.i - y.i,
+};
+const tamPagina = () => (innerWidth >= 1024 ? 20 : innerWidth >= 768 ? 12 : 10);
+const hayFiltros = () => cat.genero.size > 0 || cat.editorial.size > 0;
+function pasa(it) {
+  if (cat.genero.size && !it.g.some((g) => cat.genero.has(g))) return false;
+  if (cat.editorial.size && !cat.editorial.has(it.p)) return false;
+  const toks = tokens(cat.q);
+  if (toks.length) {
+    const h = norm(`${it.b.t} ${it.b.a} ${it.b.p || ''}`);
+    if (!toks.every((t) => h.includes(t))) return false;
+  }
+  return true;
+}
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+const nombrePill = (campo, v) => $(`.pildora[data-campo="${campo}"][data-v="${CSS.escape(v)}"] span`)?.textContent || v;
+function escribeUrl() {
+  const u = new URL(location.href);
+  const p = u.searchParams;
+  const libro = p.get('libro');
+  ['q', 'genero', 'editorial', 'orden', 'vista', 'pagina'].forEach((k) => p.delete(k));
+  if (cat.q) p.set('q', cat.q);
+  if (cat.genero.size) p.set('genero', [...cat.genero].sort().join(','));
+  if (cat.editorial.size) p.set('editorial', [...cat.editorial].sort().join(','));
+  if (cat.orden !== 'portada') p.set('orden', cat.orden);
+  if (cat.vista !== 'rejilla') p.set('vista', cat.vista);
+  if (libro) p.set('libro', libro);
+  history.replaceState(history.state, '', u.pathname + (p.toString() ? `?${p}` : '') + u.hash);
+}
+function leeUrl() {
+  const p = new URLSearchParams(location.search);
+  cat.q = p.get('q') || '';
+  cat.genero = new Set((p.get('genero') || '').split(',').filter(Boolean));
+  cat.editorial = new Set((p.get('editorial') || '').split(',').filter(Boolean));
+  cat.orden = ORDEN[p.get('orden')] ? p.get('orden') : 'portada';
+  cat.vista = p.get('vista') === 'lista' ? 'lista' : 'rejilla';
+  const pag = Number(p.get('pagina') || 0);
+  if (pag > 1) cat.mostrados = pag * tamPagina();
+}
+function pintaCat(opciones = {}) {
+  const toks = tokens(cat.q);
+  const orden = [...items].sort(ORDEN[cat.orden]);
+  orden.forEach((it) => rejilla.appendChild(it.li));
+  const coinciden = orden.filter(pasa);
+  if (!cat.mostrados) cat.mostrados = tamPagina();
+  const visibles = new Set(coinciden.slice(0, cat.mostrados));
+  items.forEach((it) => {
+    it.li.classList.toggle('fuera', !visibles.has(it));
+    it.li.hidden = false;
+    it.a.innerHTML = resalta(it.t0, toks);
+    it.meta.innerHTML = resalta(it.m0, toks);
+  });
+  const n = coinciden.length;
+  const mostrados = Math.min(n, cat.mostrados);
+  $('#conteo').textContent = n ? plural(n, 'libro', 'libros') : 'Sin resultados';
+  const restantes = n - mostrados;
+  $('#mas').hidden = restantes <= 0;
+  $('#mas-boton').textContent = `Mostrar más (${restantes} ${restantes === 1 ? 'restante' : 'restantes'})`;
+  $('#mas-estado').textContent = n ? `Mostrando ${mostrados} de ${n} libros` : '';
+  const vacio = $('#vacio');
+  vacio.hidden = n > 0;
+  const q = cat.q.trim();
+  $('#vacio-t').textContent = q && hayFiltros() ? `No encontramos libros para «${q}» con estos filtros` : q ? `No encontramos libros para «${q}»` : 'Ningún libro cumple con estos filtros';
+  $('#vacio-borrar').hidden = !q;
+  $('#vacio-quitar').hidden = !hayFiltros();
+  $('#q-borrar').hidden = !cat.q;
+  const chips = [...[...cat.genero].map((v) => ['genero', v]), ...[...cat.editorial].map((v) => ['editorial', v])];
+  const ap = $('#aplicados');
+  ap.hidden = !chips.length;
+  ap.innerHTML = chips.map(([campo, v]) => `<li><button type="button" data-campo="${campo}" data-v="${esc(v)}" aria-label="Quitar filtro ${esc(nombrePill(campo, v))}">${esc(nombrePill(campo, v))}<svg aria-hidden="true"><use href="#i-cerrar"/></svg></button></li>`).join('') + (chips.length ? '<li><button type="button" class="quitar-todo">Quitar filtros</button></li>' : '');
+  const activos = chips.length;
+  $('#limpiar').hidden = !activos;
+  $('#hf-limpiar').hidden = !activos;
+  const ins = $('#n-activos');
+  ins.hidden = !activos;
+  ins.textContent = activos;
+  ins.setAttribute('aria-label', activos === 1 ? '1 activo' : `${activos} activos`);
+  $('#hf-ver').textContent = n ? `Ver ${plural(n, 'libro', 'libros')}` : 'Ver resultados';
+  $$('.pildora').forEach((pl) => pl.setAttribute('aria-pressed', (pl.dataset.campo === 'genero' ? cat.genero : cat.editorial).has(pl.dataset.v)));
+  rejilla.classList.toggle('lista', cat.vista === 'lista');
+  $('#vista-rejilla').setAttribute('aria-pressed', cat.vista === 'rejilla');
+  $('#vista-lista').setAttribute('aria-pressed', cat.vista === 'lista');
+  $('#orden').value = cat.orden;
+  if (!opciones.sinUrl) escribeUrl();
+}
+let animando = null;
+function aplicar(cambio, opciones = {}) {
+  const top0 = resultados.getBoundingClientRect().top;
+  const h0 = rejilla.offsetHeight;
+  const anima = !reducir;
+  const lis = items.map((it) => it.li);
+  const estado = anima ? Flip.getState(lis) : null;
+  if (animando) { animando.progress(1); animando = null; }
+  if (opciones.reinicia !== false) cat.mostrados = tamPagina();
+  if (cambio) cambio();
+  pintaCat();
+  const fija = () => {
+    const t = resultados.getBoundingClientRect().top;
+    if (top0 >= 0) { if (Math.abs(t - top0) > 0.5) scrollYa(scrollY + t - top0); return; }
+    if (t < 84) scrollYa(scrollY + t - 96);
+  };
+  fija();
+  if (!anima) return;
+  resultados.classList.add('recortando');
+  rejilla.style.minHeight = `${h0}px`;
+  animando = Flip.from(estado, {
+    targets: lis, duration: 0.5, ease: E_OUT, absolute: true, scale: !!opciones.vista, stagger: { amount: 0.1 },
+    onEnter: (x) => gsap.fromTo(x, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.4, ease: E_OUT }),
+    onLeave: (x) => gsap.to(x, { opacity: 0, scale: 0.94, duration: 0.2 }),
+    onComplete: () => { rejilla.style.minHeight = ''; resultados.classList.remove('recortando'); animando = null; fija(); },
+  });
+}
+leeUrl();
+pintaCat({ sinUrl: true });
+$('#q').value = cat.q;
+$$('.pildora').forEach((pl) => pl.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  aplicar(() => {
+    const s = pl.dataset.campo === 'genero' ? cat.genero : cat.editorial;
+    if (s.has(pl.dataset.v)) s.delete(pl.dataset.v); else s.add(pl.dataset.v);
+  });
+}));
+$('#aplicados').addEventListener('click', (e) => {
+  const b = e.target.closest('button, a');
+  if (!b || !$('#aplicados').contains(b)) return;
+  e.preventDefault();
+  const botones = [...$('#aplicados').querySelectorAll('button, a')];
+  const i = botones.indexOf(b);
+  if (b.classList.contains('quitar-todo')) aplicar(() => { cat.genero.clear(); cat.editorial.clear(); });
+  else aplicar(() => (b.dataset.campo === 'genero' ? cat.genero : cat.editorial).delete(b.dataset.v));
+  const restos = $('#aplicados').querySelectorAll('button, a');
+  (restos[Math.min(i, restos.length - 2)] || $('#q')).focus({ preventScroll: true });
+});
+const limpiar = (ev) => { ev.preventDefault(); aplicar(() => { cat.genero.clear(); cat.editorial.clear(); }); };
+$('#limpiar').addEventListener('click', (ev) => { limpiar(ev); $('#t-filtros').focus(); });
+$('#hf-limpiar').addEventListener('click', (ev) => { limpiar(ev); $('#hf-t').focus(); });
+$('#vacio-quitar').addEventListener('click', (ev) => { limpiar(ev); $('#q').focus(); });
+$('#vacio-borrar').addEventListener('click', (ev) => { ev.preventDefault(); $('#q').value = ''; aplicar(() => { cat.q = ''; }); $('#q').focus(); });
+let tq;
+$('#q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => aplicar(() => { cat.q = e.target.value.trim(); }), 160); });
+$('#busqueda').addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(tq); aplicar(() => { cat.q = $('#q').value.trim(); }); });
+$('#q-borrar').addEventListener('click', (ev) => { ev.preventDefault(); $('#q').value = ''; aplicar(() => { cat.q = ''; }); $('#q').focus(); });
+addEventListener('keydown', (e) => {
+  if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+  const t = e.target;
+  if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+  e.preventDefault();
+  $('#q').focus();
+});
+$('#orden').addEventListener('change', (e) => aplicar(() => { cat.orden = e.target.value; }, { reinicia: false }));
+$('#vista-rejilla').addEventListener('click', (ev) => { if (cat.vista === 'rejilla') return; ev.preventDefault(); aplicar(() => { cat.vista = 'rejilla'; }, { reinicia: false, vista: true }); });
+$('#vista-lista').addEventListener('click', (ev) => { if (cat.vista === 'lista') return; ev.preventDefault(); aplicar(() => { cat.vista = 'lista'; }, { reinicia: false, vista: true }); });
+$('#mas-boton').onclick = () => {
+  const antes = items.filter((it) => !it.li.classList.contains('fuera')).map((it) => it.li);
+  cat.mostrados += tamPagina();
+  pintaCat();
+  const nuevos = [...rejilla.children].filter((li) => !li.classList.contains('fuera') && !antes.includes(li));
+  if (nuevos[0]) nuevos[0].querySelector('h3 a').focus({ preventScroll: true });
+  if (!reducir) gsap.from(nuevos, { y: 20, opacity: 0, duration: 0.6, ease: E_OUT, stagger: { amount: 0.25 }, clearProps: 'transform,opacity' });
+};
+addEventListener('resize', () => { const t = tamPagina(); if (cat.mostrados < t) { cat.mostrados = t; pintaCat({ sinUrl: true }); } });
+items.forEach((it) => {
+  it.a.addEventListener('click', (ev) => {
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button) return;
+    ev.preventDefault();
+    abrirFicha(it.b, it.li.querySelector('.portada-libro img, .portada-libro .sin-portada'));
+  });
+  if (matchMedia('(pointer:fine)').matches && !reducir) {
+    const pl = it.li.querySelector('.portada-libro');
+    const art = it.li.firstElementChild;
+    art.addEventListener('pointermove', (e) => {
+      if (cat.vista === 'lista') return;
+      const r = art.getBoundingClientRect();
+      pl.style.setProperty('--ry', `${((e.clientX - r.left) / r.width - 0.5) * 12}deg`);
+      pl.style.setProperty('--rx', `${-((e.clientY - r.top) / r.height - 0.5) * 8}deg`);
+    });
+    art.addEventListener('pointerleave', () => { pl.style.setProperty('--ry', '0deg'); pl.style.setProperty('--rx', '0deg'); });
+  }
+});
+
+const hf = $('#hoja-filtros');
+const panelCuerpo = $('#panel-cuerpo');
+$('#abrir-filtros').onclick = () => {
+  $('#hf-cuerpo').appendChild(panelCuerpo);
+  hf.showModal();
+  $('#hf-t').focus();
+  if (!reducir) gsap.fromTo(hf.querySelector('.lamina'), { yPercent: 100 }, { yPercent: 0, duration: 0.45, ease: E_OUT });
+};
+const cierraHf = () => {
+  const fin = () => hf.close();
+  if (!reducir) gsap.to(hf.querySelector('.lamina'), { yPercent: 100, duration: 0.25, ease: 'power3.in', onComplete: fin });
+  else fin();
+};
+hf.addEventListener('close', () => { $('#panel').appendChild(panelCuerpo); $('#abrir-filtros').focus({ preventScroll: true }); });
+hf.addEventListener('cancel', (e) => { e.preventDefault(); cierraHf(); });
+hf.addEventListener('click', (e) => { if (e.target === hf) cierraHf(); });
+$('#hf-cerrar').onclick = cierraHf;
+$('#hf-ver').onclick = cierraHf;
+
+if (!reducir && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver(([en]) => {
+    if (!en.isIntersecting) return;
+    io.disconnect();
+    gsap.from(items.filter((it) => !it.li.classList.contains('fuera')).slice(0, 8).map((it) => it.li), { y: 24, opacity: 0, duration: 0.7, ease: E_OUT, stagger: { amount: 0.3 }, clearProps: 'transform,opacity' });
+  }, { threshold: 0.05 });
+  io.observe(rejilla);
+}
+
+// Ficha.
+const hoja = $('#hoja');
+const velo = $('#velo');
+const sinPortada = (b) => `<div class="sin-portada" aria-hidden="true"><span>${esc(b.p || '')}</span><svg><use href="#camioneta"/></svg></div>`;
+const esconde = () => gsap.set(hoja, innerWidth <= 900 ? { xPercent: 0, yPercent: 100 } : { yPercent: 0, xPercent: 100 });
+if (!hoja.classList.contains('abierta')) esconde();
+let foco = null;
+function abrirFicha(b, fuente) {
+  foco = document.activeElement;
+  const u = new URL(location.href);
+  u.searchParams.set('libro', b.id);
+  history.replaceState(history.state, '', u);
+  const attrs = [['Autor', b.a], ['Editorial', b.p], ['Género', b.gn], ['ISBN', b.isbn]].filter(([, v]) => v);
+  const msg = `Hola, ¿tienen disponible «${b.t}» de ${b.a}${b.pr != null ? ` (${precio(b.pr)})` : ''}?`;
+  const baseWa = ($('a[href^="https://wa.me/"]')?.href || 'https://wa.me/').split('?')[0];
+  $('#hoja-cuerpo').innerHTML = `
+    <div class="portada-hoja">${b.c ? `<img src="${esc(b.c)}" alt="Portada de ${esc(b.t)}">` : sinPortada(b)}</div>
+    <h2 id="hoja-t">${esc(b.t)}</h2>
+    ${b.pr != null ? `<p class="precio">${precio(b.pr)}</p>` : ''}
+    <dl class="atributos">${attrs.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+    ${b.s ? `<p class="sinopsis">${esc(b.s)}</p>` : ''}
+    <a class="boton boton--tinta" href="${baseWa}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Consultar disponibilidad por WhatsApp <svg aria-hidden="true"><use href="#i-sale"/></svg></a>`;
+  hoja.hidden = false;
+  hoja.style.visibility = 'visible';
+  hoja.dataset.id = b.id;
+  velo.classList.add('abierto');
+  document.body.style.overflow = 'hidden';
+  const movil = innerWidth <= 900;
+  const destino = hoja.querySelector('.portada-hoja');
+  if (reducir) { gsap.set(hoja, { xPercent: 0, yPercent: 0 }); gsap.from(hoja, { opacity: 0, duration: 0.15 }); $('#hoja-cerrar').focus(); return; }
+  gsap.fromTo(hoja, movil ? { yPercent: 100, xPercent: 0 } : { xPercent: 100 }, { xPercent: 0, yPercent: 0, duration: 0.5, ease: E_OUT });
+  if (fuente) {
+    const r0 = fuente.getBoundingClientRect();
+    gsap.set(destino, { opacity: 0 });
+    requestAnimationFrame(() => {
+      gsap.set(hoja, { xPercent: 0, yPercent: 0 });
+      const r1 = destino.getBoundingClientRect();
+      gsap.set(hoja, movil ? { yPercent: 100 } : { xPercent: 100 });
+      gsap.to(hoja, { xPercent: 0, yPercent: 0, duration: 0.5, ease: E_OUT, overwrite: true });
+      const clon = document.createElement('div');
+      clon.className = 'clon';
+      clon.innerHTML = destino.innerHTML;
+      Object.assign(clon.style, { left: `${r0.left}px`, top: `${r0.top}px`, width: `${r0.width}px`, height: `${r0.height}px` });
+      document.body.appendChild(clon);
+      gsap.to(clon, { left: r1.left, top: r1.top, width: r1.width, height: r1.height, duration: 0.55, ease: E_OUT, onComplete: () => { gsap.set(destino, { opacity: 1 }); clon.remove(); } });
+    });
+  }
+  $('#hoja-cerrar').focus({ preventScroll: true });
+}
+function cerrarFicha() {
+  const u = new URL(location.href);
+  u.searchParams.delete('libro');
+  history.replaceState(history.state, '', u);
+  const fin = () => { hoja.style.visibility = 'hidden'; hoja.hidden = true; document.body.style.overflow = ''; if (foco) foco.focus({ preventScroll: true }); };
+  velo.classList.remove('abierto');
+  if (reducir) { esconde(); fin(); return; }
+  gsap.to(hoja, innerWidth <= 900 ? { yPercent: 100, duration: 0.3, ease: 'power3.in', onComplete: fin } : { xPercent: 100, duration: 0.3, ease: 'power3.in', onComplete: fin });
+}
+$('#hoja-cerrar').addEventListener('click', (ev) => { ev.preventDefault(); cerrarFicha(); });
+velo.addEventListener('click', cerrarFicha);
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && velo.classList.contains('abierto')) cerrarFicha(); });
+
+// Cabecera: sigue el suelo. Destacados y Catálogo marcan «Libros».
+const cab = $('.cab');
+const secciones = $$('main [data-suelo]');
+const navs = $$('.cab nav a');
+function suelo() {
+  const y = 80;
+  let actual = secciones[0];
+  for (const s of secciones) {
+    const r = s.getBoundingClientRect();
+    if (r.top <= y && r.bottom > y) actual = s;
+  }
+  cab.dataset.suelo = actual.dataset.suelo;
+  const id = actual.id === 'libros' || actual.id === 'destacados' ? 'destacados' : actual.id;
+  navs.forEach((a) => {
+    const href = a.getAttribute('href');
+    const marca = href === `#${id}` || (id === 'destacados' && (href === '#destacados' || href === '#libros') && actual.id !== 'inicio' && actual.id !== 'eventos' && actual.id !== 'visita' && actual.id !== 'tienda');
+    if (marca && (href === '#destacados' || href === '#libros') && (actual.id === 'libros' || actual.id === 'destacados')) a.setAttribute('aria-current', 'true');
+    else if (href === `#${actual.id}`) a.setAttribute('aria-current', 'true');
+    else a.removeAttribute('aria-current');
+  });
+}
+addEventListener('scroll', suelo, { passive: true });
+suelo();
+
+const idLibro = new URLSearchParams(location.search).get('libro');
+if (idLibro && porId[idLibro] && hoja.dataset.id !== idLibro) abrirFicha(porId[idLibro], null);
+else if (idLibro && hoja.classList.contains('abierta')) $('#hoja-cerrar').focus({ preventScroll: true });
