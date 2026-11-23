@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Librería Itinerante y Más · prototipo de diseño v2 (no producción)</title>
+<script>document.documentElement.classList.add('js')</script>
+<link rel="icon" href="data:,">
+<link rel="preload" href="fuentes/BarlowCondensed-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/Barlow-400.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+{{CSS}}</style>
+</head>
+<body>
+<a class="saltar" href="#contenido">Ir al contenido</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-izq" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-der" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sale" viewBox="0 0 24 24"><path d="M8 16 17 7m-8 0h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lugar" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.4" fill="currentColor"/></symbol>
+  <symbol id="i-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-persona" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-buscar" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-msj" viewBox="0 0 24 24"><path d="M4 19.5 5.3 15A8 8 0 1 1 9 18.7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tel" viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.3a10 10 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-correo" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-camara" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="7" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-pagina" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13.5 20v-7h3m-3 0v-2.5a2 2 0 0 1 2-2H17" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-embudo" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-rejilla" viewBox="0 0 24 24"><path d="M4.5 4.5h6v6h-6zm9 0h6v6h-6zm-9 9h6v6h-6zm9 0h6v6h-6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lista" viewBox="0 0 24 24"><path d="M4 6h3m3 0h10M4 12h3m3 0h10M4 18h3m3 0h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-forma" viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v12.5H7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 12h6m-6 4h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="camioneta" viewBox="__VB__"><path fill="currentColor" fill-rule="evenodd" d="__D__"/></symbol>
+</svg>
+
+<header class="cab" data-suelo="menta">
+  <div class="envoltura">
+    <a class="marca" href="#inicio" aria-label="Librería Itinerante y Más, inicio"><svg aria-hidden="true"><use href="#camioneta"/></svg><span>Itinerante y Más</span></a>
+    <nav aria-label="Secciones"><a href="#eventos">Eventos</a><a href="#destacados">Libros</a><a href="#visita">Visita</a></nav>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+<section class="portada" id="inicio" data-suelo="menta">
+  <div class="portada-arriba">
+    <h1>Librería Itinerante y&nbsp;Más</h1>
+  </div>
+  <div class="camion" aria-hidden="true">
+    <div class="carga" id="carga">{{CARGA}}</div>
+    <svg class="trazo" viewBox="{{VB}}"><use href="#camioneta"/></svg>
+  </div>
+  <div class="portada-abajo">
+    <p id="linea">{{LINEA}}</p>
+    {{CTA}}
+  </div>
+</section>
+
+<section class="eventos" id="eventos" data-suelo="papel" aria-labelledby="t-eventos">
+  <div class="envoltura">
+    <div class="cabeza-seccion">
+      <h2 class="h2" id="t-eventos">Eventos</h2>
+      <div class="controles" id="ruta-controles" hidden>
+        <button class="flecha" id="ruta-ant" aria-label="Eventos anteriores"><svg aria-hidden="true"><use href="#i-izq"/></svg></button>
+        <button class="flecha" id="ruta-sig" aria-label="Eventos siguientes"><svg aria-hidden="true"><use href="#i-der"/></svg></button>
+      </div>
+    </div>
+    <div class="ruta" id="ruta">{{EVENTOS}}</div>
+  </div>
+</section>
+
+<section class="destacados oscuro" id="destacados" data-suelo="vitrina" aria-labelledby="t-destacados">
+  <div class="envoltura">
+    <div class="cabeza-seccion">
+      <div>
+        <h2 class="h2" id="t-destacados">Destacados</h2>
+        <p class="resumen">{{ND}} libros de la selección. Los {{N}} están abajo, en el catálogo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="vitrina" id="vitrina" tabindex="0" role="group" aria-roledescription="carrusel" aria-label="Destacados: {{ND}} libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.">
+    <p class="pista" aria-hidden="true"><kbd><svg><use href="#i-izq"/></svg></kbd><kbd><svg><use href="#i-der"/></svg></kbd>para hojear</p>
+    <div class="lampara"></div><div class="piso"></div>
+    <div class="escenario" id="escenario">{{PIEZAS}}</div>
+  </div>
+  <div class="envoltura vitrina-pie">
+    <div class="ficha-vitrina" id="ficha-vitrina" aria-live="polite">{{FICHA_V}}</div>
+    <div class="vitrina-controles">
+      <button class="flecha" id="v-ant" aria-label="Libro anterior"><svg aria-hidden="true"><use href="#i-izq"/></svg></button>
+      <span class="contador" id="v-cont">{{CONT}}</span>
+      <button class="flecha" id="v-sig" aria-label="Libro siguiente"><svg aria-hidden="true"><use href="#i-der"/></svg></button>
+    </div>
+    <a class="al-estante" href="#libros">Ver el catálogo completo <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+  </div>
+</section>
+
+<section class="catalogo" id="libros" data-suelo="papel" aria-labelledby="t-libros">
+  <div class="envoltura">
+    <div class="cat-cabeza">
+      <h2 class="h2" id="t-libros" tabindex="-1">Catálogo</h2>
+      <p class="cat-resumen">{{N}} libros · {{NED}} editoriales</p>
+      <form class="busqueda" role="search" id="busqueda" action="#libros" onsubmit="return false">
+        <label for="q" class="sr">Buscar en el catálogo</label>
+        <svg class="lupa" aria-hidden="true"><use href="#i-buscar"/></svg>
+        <input id="q" type="search" placeholder="Título, autor o editorial" autocomplete="off" enterkeyhint="search" aria-describedby="q-atajo">
+        <button type="button" class="borrar" id="q-borrar" aria-label="Borrar búsqueda" hidden><svg aria-hidden="true"><use href="#i-cerrar"/></svg></button>
+        <kbd class="atajo" id="q-atajo" title="Atajo de teclado"><span class="sr">Atajo: </span>/</kbd>
+      </form>
+    </div>
+    <div class="cat-cuerpo">
+      <aside class="panel" id="panel" aria-labelledby="t-filtros">
+        <div class="panel-cabeza"><h3 id="t-filtros" tabindex="-1">Filtros</h3><button type="button" class="limpiar" id="limpiar" hidden>Limpiar</button></div>
+        <div class="panel-cuerpo" id="panel-cuerpo">
+          <div class="grupo"><h4 id="g-genero">Género</h4><div class="pildoras" role="group" aria-labelledby="g-genero" data-campo="genero">{{PILL_G}}</div></div>
+          <div class="grupo"><h4 id="g-editorial">Editorial</h4><div class="pildoras" role="group" aria-labelledby="g-editorial" data-campo="editorial">{{PILL_P}}</div></div>
+        </div>
+      </aside>
+      <div class="resultados-col">
+        <div class="barra-res">
+          <button type="button" class="boton-filtros" id="abrir-filtros" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-embudo"/></svg>Filtros<span class="insignia" id="n-activos" hidden></span></button>
+          <p class="conteo" id="conteo" role="status" aria-live="polite">{{N}} libros</p>
+          <label class="orden"><span>Ordenar</span>
+            <select id="orden">
+              <option value="portada">Con portada primero</option>
+              <option value="titulo">Título (A–Z)</option>
+              <option value="autor">Autor (A–Z)</option>
+              <option value="precio-asc">Precio (menor a mayor)</option>
+              <option value="precio-desc">Precio (mayor a menor)</option>
+            </select>
+          </label>
+          <div class="vistas" role="group" aria-label="Vista de resultados">
+            <button type="button" id="vista-rejilla" aria-pressed="true" aria-label="Vista de cuadrícula"><svg aria-hidden="true"><use href="#i-rejilla"/></svg></button>
+            <button type="button" id="vista-lista" aria-pressed="false" aria-label="Vista de lista"><svg aria-hidden="true"><use href="#i-lista"/></svg></button>
+          </div>
+        </div>
+        <ul class="aplicados" id="aplicados" aria-label="Filtros aplicados" hidden></ul>
+        <div id="resultados" tabindex="-1">
+          <h3 class="sr">Resultados</h3>
+          <ul class="rejilla" id="rejilla" role="list">{{ESTANTE}}</ul>
+          <div class="vacio-cat" id="vacio" hidden>
+            <h3 id="vacio-t">Ningún libro cumple con estos filtros</h3>
+            <p>Prueba con menos palabras o revisa la ortografía.</p>
+            <div class="vacio-acciones"><button type="button" class="boton boton--borde" id="vacio-borrar" hidden>Borrar búsqueda</button><button type="button" class="boton boton--borde" id="vacio-quitar" hidden>Quitar filtros</button></div>
+            <p class="vacio-pedir">Si no lo tenemos, te lo podemos pedir. <a href="https://wa.me/{{TEL}}?text={{BUSCO}}" target="_blank" rel="noopener">Pregúntanos por WhatsApp</a>.</p>
+          </div>
+          <div class="mas" id="mas" hidden><p class="sr" role="status" id="mas-estado"></p><button type="button" class="boton boton--borde" id="mas-boton"></button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dialog class="hoja-filtros" id="hoja-filtros" aria-labelledby="hf-t">
+    <div class="lamina">
+      <div class="lamina-cabeza"><h3 id="hf-t" tabindex="-1">Filtros</h3><button type="button" class="limpiar" id="hf-limpiar" hidden>Limpiar</button><button type="button" class="cerrar-hf" id="hf-cerrar" aria-label="Cerrar filtros"><svg aria-hidden="true"><use href="#i-cerrar"/></svg></button></div>
+      <div class="lamina-cuerpo" id="hf-cuerpo"></div>
+      <div class="lamina-pie"><button type="button" class="boton boton--tinta" id="hf-ver">Ver {{N}} libros</button></div>
+    </div>
+  </dialog>
+</section>
+
+<section class="tienda" id="tienda" data-suelo="papel2" aria-labelledby="t-tienda">
+  <div class="envoltura">
+    <div class="tienda-cabeza">
+      <h2 id="t-tienda">Tienda</h2><span class="sello">Próximamente</span>
+    </div>
+    <p class="proximo">Merch y talleres: próximamente.</p>
+    <ul class="esqueleto" aria-label="Lo que se subirá a la tienda">
+      <li class="hueco"><div class="hueco-img" aria-hidden="true"><svg><use href="#camioneta"/></svg></div><span class="hueco-cat">Libros</span><span class="barra-g" aria-hidden="true"></span><span class="barra-g corta" aria-hidden="true"></span></li>
+      <li class="hueco"><div class="hueco-img" aria-hidden="true"><svg><use href="#camioneta"/></svg></div><span class="hueco-cat">Merch</span><span class="barra-g" aria-hidden="true"></span><span class="barra-g corta" aria-hidden="true"></span></li>
+      <li class="hueco"><div class="hueco-img" aria-hidden="true"><svg><use href="#camioneta"/></svg></div><span class="hueco-cat">Talleres</span><span class="barra-g" aria-hidden="true"></span><span class="barra-g corta" aria-hidden="true"></span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="visita" id="visita" data-suelo="menta" aria-labelledby="t-visita">
+  <div class="envoltura">
+    <div class="visita-reticula">
+      <div class="datos">
+        <h2 class="h2" id="t-visita">Visita</h2>
+        <p class="direccion">{{DIRECCION}}</p>
+        <p class="entre">{{ENTRE}}</p>
+        <dl class="horario">{{HORARIO}}</dl>
+        <a class="boton boton--tinta" href="{{MAPS}}" target="_blank" rel="noopener">Cómo llegar <svg aria-hidden="true"><use href="#i-sale"/></svg></a>
+        <ul class="contacto">{{CONTACTO}}</ul>
+      </div>
+      <figure class="foto">
+        <img src="../assets/img/01-entrada-pasillo-800.webp" srcset="../assets/img/01-entrada-pasillo-800.webp 800w, ../assets/img/01-entrada-pasillo.webp 1212w" sizes="(max-width:900px) 92vw, 50vw" alt="El pasillo de entrada: una mesa y estantes bajos a la izquierda, un librero alto a la derecha y cuadros en los muros." width="1212" height="682" loading="lazy">
+        <figcaption>El pasillo de entrada · Foto: Aldo G. Pineda</figcaption>
+      </figure>
+    </div>
+    <div class="barra" id="cafe">
+      <h3>En la barra</h3>
+      <div class="carta">{{CARTA}}</div>
+    </div>
+    <div class="preguntas">
+      <details><summary>¿Tienen el libro que busco?</summary><p>Búscalo en el <a href="#libros">catálogo</a> y, en su ficha, toca «Consultar disponibilidad por WhatsApp»: se abre WhatsApp con el mensaje ya escrito. Si no lo tenemos, te lo podemos pedir.</p></details>
+      <details><summary>¿Abren en días festivos?</summary><p>Pregúntanos antes por WhatsApp.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="pie-pagina">
+  <div class="envoltura"><strong>Librería Itinerante y Más</strong><span>© 2026 · Fotos: Aldo G. Pineda. Portadas: sus editoriales.</span></div>
+</footer>
+
+<div class="velo" id="velo"></div>
+<div class="hoja" id="hoja" role="dialog" aria-modal="true" aria-labelledby="hoja-t">
+  <button class="cerrar" id="hoja-cerrar" aria-label="Cerrar ficha"><svg aria-hidden="true"><use href="#i-cerrar"/></svg></button>
+  <div id="hoja-cuerpo"></div>
+</div>
+
+<script src="datos.js" defer></script>
+<script src="vendor/gsap.min.js" defer></script>
+<script src="vendor/Flip.min.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

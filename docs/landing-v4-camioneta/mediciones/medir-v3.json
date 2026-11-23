@@ -1,0 +1,696 @@
+{
+ "1440-no-preference": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 474231,
+   "Document": 104093,
+   "Image": 129968,
+   "Font": 78028,
+   "Script": 162142
+  },
+  "pesoTrasRecorrer": 794905,
+  "axe": [],
+  "dom": {
+   "proximamente": 2,
+   "proxDonde": [
+    {
+     "tag": "SPAN",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Próximamente"
+    },
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "",
+   "visitaTop": 6245,
+   "docH": 8213,
+   "librosVisibles": 20,
+   "mas": "Mostrar más (21 restantes)",
+   "heroCentro": {
+    "dx": 0,
+    "dy": 0,
+    "anchoCamion": 620,
+    "h1Abajo": 205,
+    "camionArriba": 229,
+    "cargaArriba": 352,
+    "ctaArriba": 671,
+    "camionAbajo": 671
+   },
+   "carrusel": {
+    "seccion": "destacados",
+    "h2": "Destacados",
+    "ariaLabel": "Destacados: 8 libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.",
+    "tiendaEnSeccion": false,
+    "navLibros": "Libros"
+   },
+   "contador": "4 de 8",
+   "alCatalogo": "#libros",
+   "tiendaEsqueleto": {
+    "huecos": [
+     "Libros",
+     "Merch",
+     "Talleres"
+    ],
+    "imgs": 0,
+    "precios": 0,
+    "interactivos": 0
+   },
+   "h": [
+    "H1:Librería Itinerante y Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Destacados",
+    "H3:Amigos",
+    "H2:Catálogo",
+    "H3:Filtros",
+    "H3:Resultados",
+    "H3:Amanecer de California",
+    "H3:Amigos",
+    "H3:Cartografías del pensamiento",
+    "H3:Demonios",
+    "H3:El lugar de la noche",
+    "H3:La sombra del Guerrero",
+    "H3:La voz vertical",
+    "H3:Las funciones del placer",
+    "H3:Los que se fueron, los que l",
+    "H3:María Zambrano: Lo trágico, ",
+    "H3:Maurice Blanchot: la fuerza ",
+    "H3:Otra vez el Crepúsculo",
+    "H3:Pensamiento e ideología en A",
+    "H3:Perlas de obsidiana",
+    "H3:Perorata",
+    "H3:Polvo",
+    "H3:Rito de iniciación",
+    "H3:Yita y el arcoíris",
+    "H3:Antología Gris",
+    "H3:¿Cuánto ha visto el hombre?",
+    "H2:Tienda",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [
+    [
+     158,
+     0,
+     "NAV"
+    ]
+   ],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 3559
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 9,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "5 de 8"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía (activar)",
+    "frames": 69,
+    "fueraRect": 39,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 8
+   },
+   {
+    "texto": "Poesía (quitar)",
+    "frames": 69,
+    "fueraRect": 443,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 20
+   }
+  ],
+  "gestos": {
+   "inicio": 5,
+   "tras180": 6,
+   "ruedaScrollY": [
+    1756,
+    2356
+   ]
+  }
+ },
+ "1440-reduce": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 474231,
+   "Image": 129968,
+   "Font": 78028,
+   "Document": 104093,
+   "Script": 162142
+  },
+  "pesoTrasRecorrer": 794905,
+  "axe": [],
+  "dom": {
+   "proximamente": 2,
+   "proxDonde": [
+    {
+     "tag": "SPAN",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Próximamente"
+    },
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "",
+   "visitaTop": 6245,
+   "docH": 8213,
+   "librosVisibles": 20,
+   "mas": "Mostrar más (21 restantes)",
+   "heroCentro": {
+    "dx": 0,
+    "dy": 0,
+    "anchoCamion": 620,
+    "h1Abajo": 205,
+    "camionArriba": 229,
+    "cargaArriba": 352,
+    "ctaArriba": 671,
+    "camionAbajo": 671
+   },
+   "carrusel": {
+    "seccion": "destacados",
+    "h2": "Destacados",
+    "ariaLabel": "Destacados: 8 libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.",
+    "tiendaEnSeccion": false,
+    "navLibros": "Libros"
+   },
+   "contador": "4 de 8",
+   "alCatalogo": "#libros",
+   "tiendaEsqueleto": {
+    "huecos": [
+     "Libros",
+     "Merch",
+     "Talleres"
+    ],
+    "imgs": 0,
+    "precios": 0,
+    "interactivos": 0
+   },
+   "h": [
+    "H1:Librería Itinerante y Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Destacados",
+    "H3:Amigos",
+    "H2:Catálogo",
+    "H3:Filtros",
+    "H3:Resultados",
+    "H3:Amanecer de California",
+    "H3:Amigos",
+    "H3:Cartografías del pensamiento",
+    "H3:Demonios",
+    "H3:El lugar de la noche",
+    "H3:La sombra del Guerrero",
+    "H3:La voz vertical",
+    "H3:Las funciones del placer",
+    "H3:Los que se fueron, los que l",
+    "H3:María Zambrano: Lo trágico, ",
+    "H3:Maurice Blanchot: la fuerza ",
+    "H3:Otra vez el Crepúsculo",
+    "H3:Pensamiento e ideología en A",
+    "H3:Perlas de obsidiana",
+    "H3:Perorata",
+    "H3:Polvo",
+    "H3:Rito de iniciación",
+    "H3:Yita y el arcoíris",
+    "H3:Antología Gris",
+    "H3:¿Cuánto ha visto el hombre?",
+    "H2:Tienda",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [
+    [
+     83,
+     0,
+     "NAV"
+    ]
+   ],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 3559
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 9,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "5 de 8"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía (activar)",
+    "frames": 68,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 8
+   },
+   {
+    "texto": "Poesía (quitar)",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 20
+   }
+  ],
+  "gestos": {
+   "inicio": 5,
+   "tras180": 6,
+   "ruedaScrollY": [
+    1756,
+    2356
+   ]
+  }
+ },
+ "390-no-preference": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 474231,
+   "Font": 78028,
+   "Document": 104093,
+   "Image": 129968,
+   "Script": 162142
+  },
+  "pesoTrasRecorrer": 737187,
+  "axe": [],
+  "dom": {
+   "proximamente": 2,
+   "proxDonde": [
+    {
+     "tag": "SPAN",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Próximamente"
+    },
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "",
+   "visitaTop": 5549,
+   "docH": 8926,
+   "librosVisibles": 10,
+   "mas": "Mostrar más (31 restantes)",
+   "heroCentro": {
+    "dx": 0,
+    "dy": 0,
+    "anchoCamion": 312,
+    "h1Abajo": 287,
+    "camionArriba": 309,
+    "cargaArriba": 373,
+    "ctaArriba": 535,
+    "camionAbajo": 535
+   },
+   "carrusel": {
+    "seccion": "destacados",
+    "h2": "Destacados",
+    "ariaLabel": "Destacados: 8 libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.",
+    "tiendaEnSeccion": false,
+    "navLibros": "Libros"
+   },
+   "contador": "4 de 8",
+   "alCatalogo": "#libros",
+   "tiendaEsqueleto": {
+    "huecos": [
+     "Libros",
+     "Merch",
+     "Talleres"
+    ],
+    "imgs": 0,
+    "precios": 0,
+    "interactivos": 0
+   },
+   "h": [
+    "H1:Librería Itinerante y Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Destacados",
+    "H3:Amigos",
+    "H2:Catálogo",
+    "H3:Resultados",
+    "H3:Amanecer de California",
+    "H3:Amigos",
+    "H3:Cartografías del pensamiento",
+    "H3:Demonios",
+    "H3:El lugar de la noche",
+    "H3:La sombra del Guerrero",
+    "H3:La voz vertical",
+    "H3:Las funciones del placer",
+    "H3:Los que se fueron, los que l",
+    "H3:María Zambrano: Lo trágico, ",
+    "H2:Tienda",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 2660
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 10,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "5 de 8"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía (activar)",
+    "frames": 68,
+    "fueraRect": 36,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 8
+   },
+   {
+    "texto": "Poesía (quitar)",
+    "frames": 69,
+    "fueraRect": 92,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 10
+   }
+  ],
+  "gestos": {
+   "inicio": 5,
+   "tras180": 6,
+   "tras180rapido": 7,
+   "verticalScrollY": [
+    1757,
+    2284
+   ]
+  }
+ },
+ "390-reduce": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 474231,
+   "Document": 104093,
+   "Image": 129968,
+   "Font": 78028,
+   "Script": 162142
+  },
+  "pesoTrasRecorrer": 737187,
+  "axe": [],
+  "dom": {
+   "proximamente": 2,
+   "proxDonde": [
+    {
+     "tag": "SPAN",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Próximamente"
+    },
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "",
+   "visitaTop": 5549,
+   "docH": 8926,
+   "librosVisibles": 10,
+   "mas": "Mostrar más (31 restantes)",
+   "heroCentro": {
+    "dx": 0,
+    "dy": 0,
+    "anchoCamion": 312,
+    "h1Abajo": 287,
+    "camionArriba": 309,
+    "cargaArriba": 373,
+    "ctaArriba": 535,
+    "camionAbajo": 535
+   },
+   "carrusel": {
+    "seccion": "destacados",
+    "h2": "Destacados",
+    "ariaLabel": "Destacados: 8 libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.",
+    "tiendaEnSeccion": false,
+    "navLibros": "Libros"
+   },
+   "contador": "4 de 8",
+   "alCatalogo": "#libros",
+   "tiendaEsqueleto": {
+    "huecos": [
+     "Libros",
+     "Merch",
+     "Talleres"
+    ],
+    "imgs": 0,
+    "precios": 0,
+    "interactivos": 0
+   },
+   "h": [
+    "H1:Librería Itinerante y Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Destacados",
+    "H3:Amigos",
+    "H2:Catálogo",
+    "H3:Resultados",
+    "H3:Amanecer de California",
+    "H3:Amigos",
+    "H3:Cartografías del pensamiento",
+    "H3:Demonios",
+    "H3:El lugar de la noche",
+    "H3:La sombra del Guerrero",
+    "H3:La voz vertical",
+    "H3:Las funciones del placer",
+    "H3:Los que se fueron, los que l",
+    "H3:María Zambrano: Lo trágico, ",
+    "H2:Tienda",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 2660
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 10,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "5 de 8"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía (activar)",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 8
+   },
+   {
+    "texto": "Poesía (quitar)",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 10
+   }
+  ],
+  "gestos": {
+   "inicio": 5,
+   "tras180": 6,
+   "tras180rapido": 7,
+   "verticalScrollY": [
+    1757,
+    2290
+   ]
+  }
+ },
+ "nojs-1440": {
+  "texto": 5023,
+  "libros": 41,
+  "librosVisibles": 41,
+  "uiFiltrosVisible": 0,
+  "destacados": 8,
+  "enlacesLibroWa": 41,
+  "eventos": 2,
+  "carta": 21,
+  "direccion": true,
+  "proximamente": 2,
+  "docH": 11272
+ },
+ "nojs-390": {
+  "texto": 5006,
+  "libros": 41,
+  "librosVisibles": 41,
+  "uiFiltrosVisible": 0,
+  "destacados": 8,
+  "enlacesLibroWa": 41,
+  "eventos": 2,
+  "carta": 21,
+  "direccion": true,
+  "proximamente": 2,
+  "docH": 14623
+ }
+}

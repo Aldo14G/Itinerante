@@ -1,6 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "git": {
+    "deploymentEnabled": {
+      "agent/claude/landing-v4-camioneta": false
+    }
+  },
   "buildCommand": "node scripts/prepare-public.mjs && next build",
   "headers": [
     {

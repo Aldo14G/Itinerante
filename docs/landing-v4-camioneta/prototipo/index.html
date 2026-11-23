@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Librería Itinerante y Más · prototipo de diseño v2 (no producción)</title>
+<script>document.documentElement.classList.add('js')</script>
+<link rel="icon" href="data:,">
+<link rel="preload" href="fuentes/BarlowCondensed-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/Barlow-400.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;font-display:swap;src:url(fuentes/BarlowCondensed-600.woff2) format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;font-display:swap;src:url(fuentes/BarlowCondensed-700.woff2) format("woff2")}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:400;font-display:swap;src:url(fuentes/Barlow-400.woff2) format("woff2")}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:600;font-display:swap;src:url(fuentes/Barlow-600.woff2) format("woff2")}
+
+:root{
+  --menta:#5dc4b4; --menta-2:#7fd3c5; --menta-claro:#dcf1ec;
+  --sala:#0d4a45; --vitrina:#082724; --noche:#061a18;
+  --papel:#f1f5f2; --papel-2:#e4ece8; --linea:#c9d8d2;
+  --ambar:#e8a020; --tinta-2:#2f4f4a;
+  --f-disp:"Barlow Condensed","BC respaldo","Arial Narrow",sans-serif;
+  --f-text:"Barlow","B respaldo",Arial,sans-serif;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s6:24px;--s8:32px;--s12:48px;--s16:64px;--s24:96px;--s32:128px;
+  --margen:clamp(20px,4vw,56px); --ancho:1320px;
+  --e-out:cubic-bezier(.16,1,.3,1); --e-in:cubic-bezier(.7,0,.84,0);
+  --r-portada:3px; --r-ui:999px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:72px;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;font:400 17px/1.55 var(--f-text);color:var(--noche);background:var(--papel);font-variant-numeric:tabular-nums}
+::selection{background:var(--ambar);color:var(--noche)}
+input{caret-color:var(--sala)}
+html{scrollbar-color:var(--sala) var(--papel-2)}
+a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1.5px}
+:focus-visible{outline:3px solid var(--noche);outline-offset:3px;border-radius:4px}
+.oscuro :focus-visible{outline-color:var(--ambar)}
+img{display:block;max-width:100%}
+.envoltura{max-width:var(--ancho);margin:0 auto;padding:0 var(--margen)}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.h2{font-size:clamp(48px,6.2vw,88px);line-height:.9}
+.versal{font:600 12.5px/1.3 var(--f-text);letter-spacing:.09em;text-transform:uppercase}
+.boton{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;min-height:52px;padding:0 26px;border-radius:var(--r-ui);font:600 17px/1 var(--f-text);text-decoration:none;border:0;cursor:pointer;transition:background-color .2s var(--e-out),transform .12s var(--e-out)}
+.boton:active{transform:scale(.97)}
+.boton svg{width:18px;height:18px;transition:transform .25s var(--e-out)}
+.boton:hover svg{transform:translateX(3px)}
+.boton--tinta{background:var(--noche);color:#fff}.boton--tinta:hover{background:var(--sala)}
+.boton--menta{background:var(--menta);color:var(--noche)}.boton--menta:hover{background:var(--menta-2)}
+.boton--borde{background:transparent;color:var(--noche);box-shadow:inset 0 0 0 2px var(--noche)}.boton--borde:hover{background:rgba(6,26,24,.07)}
+
+/* Cabecera */
+.cab{position:fixed;inset:0 0 auto;z-index:40;transition:background-color .24s var(--e-out),color .24s var(--e-out),box-shadow .24s}
+.cab .envoltura{display:flex;align-items:center;justify-content:space-between;height:68px}
+.cab .marca{min-height:44px;display:flex;align-items:center;gap:10px;text-decoration:none;font:700 22px/1 var(--f-disp);letter-spacing:-.005em}
+.cab .marca svg{width:44px;height:31px}
+.cab nav{display:flex;gap:4px}
+.cab nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:var(--r-ui);text-decoration:none;font:600 16px/1 var(--f-text);position:relative}
+.cab nav a::after{content:"";position:absolute;left:14px;right:14px;bottom:9px;height:2px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .3s var(--e-out)}
+.cab nav a:hover::after,.cab nav a[aria-current="true"]::after{transform:scaleX(1)}
+.cab[data-suelo="menta"]{background:var(--menta);color:var(--noche)}
+.cab[data-suelo="papel"]{background:rgba(241,245,242,.94);color:var(--noche);box-shadow:0 1px 0 var(--linea)}
+.cab[data-suelo="vitrina"]{background:rgba(8,39,36,.94);color:#eaf6f3;box-shadow:0 1px 0 rgba(255,255,255,.08)}
+
+/* Portada */
+.camion .trazo{position:relative;z-index:2;filter:drop-shadow(0 6px 0 rgba(6,26,24,.10))}
+.carga{position:absolute;left:13%;right:31%;top:12%;height:44%;z-index:1}
+.carga img{position:absolute;bottom:0;width:23%;height:auto;aspect-ratio:2/3;object-fit:cover;border-radius:var(--r-portada);box-shadow:0 10px 22px -8px rgba(6,26,24,.45)}
+
+/* Eventos */
+.eventos{padding:var(--s24) 0 var(--s32);background:var(--papel)}
+.cabeza-seccion{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:var(--s12)}
+.cabeza-seccion .controles{display:flex;gap:8px}
+.flecha{width:48px;height:48px;border-radius:50%;border:2px solid currentColor;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer;transition:background-color .2s,color .2s,opacity .2s}
+.flecha:hover{background:var(--noche);color:#fff}
+.oscuro .flecha:hover{background:var(--menta);color:var(--noche);border-color:var(--menta)}
+.flecha[disabled]{opacity:.28;cursor:default}
+.flecha svg{width:20px;height:20px}
+.ruta{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(300px,1fr);gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--margen);padding:0 var(--margen) 12px;margin:0 calc(var(--margen) * -1);scrollbar-width:none}
+.ruta::-webkit-scrollbar{display:none}
+.ruta::before{content:"";position:absolute;left:var(--margen);right:var(--margen);top:15px;border-top:2px dashed var(--sala);opacity:.45}
+.parada{scroll-snap-align:start;display:flex;flex-direction:column;gap:14px;min-width:0}
+.parada.destacada{grid-column:span 1}
+ .parada .fecha{position:relative;z-index:1;width:max-content;background:var(--papel);padding-right:14px;display:flex;align-items:center;gap:12px;height:32px;font:700 20px/1 var(--f-disp);letter-spacing:.01em;text-transform:uppercase}
+.parada .fecha i{width:14px;height:14px;border-radius:50%;background:var(--sala);box-shadow:0 0 0 5px var(--papel);flex:none}
+.parada .fecha small{font:400 16px/1 var(--f-text);text-transform:none;color:var(--tinta-2);letter-spacing:0}
+.tarjeta-evento{display:grid;grid-template-columns:1fr auto;gap:20px;background:#fff;border-radius:18px;padding:22px;box-shadow:0 1px 2px rgba(6,26,24,.06),0 12px 28px -18px rgba(6,26,24,.25);flex:1;position:relative;transition:box-shadow .3s var(--e-out)}
+.tarjeta-evento:hover{box-shadow:0 1px 2px rgba(6,26,24,.06),0 22px 40px -20px rgba(6,26,24,.35)}
+.tarjeta-evento h3{font-size:34px;line-height:.95;margin:0 0 12px}
+.tarjeta-evento .dato{display:flex;gap:8px;align-items:center;font-size:15px;line-height:1.35;color:var(--tinta-2);margin:4px 0}
+.tarjeta-evento .dato svg{width:16px;height:16px;flex:none;color:var(--sala)}
+.tarjeta-evento .acciones{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;border-top:1px solid var(--papel-2);padding-top:16px}
+.tarjeta-evento .precio{font:600 16px/1 var(--f-text);white-space:nowrap}
+.cartel{width:148px;aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;justify-content:space-between;padding:14px;font-family:var(--f-disp);overflow:hidden;position:relative}
+.cartel--menta{background:var(--menta);color:var(--noche)}
+.cartel--noche{background:var(--sala);color:#eaf6f3}
+.cartel svg{position:absolute;left:12%;right:12%;top:50%;width:76%;transform:translateY(-50%);opacity:.9}
+.cartel--menta svg{color:#fff}.cartel--noche svg{color:var(--menta)}
+.destacada .tarjeta-evento h3{font-size:44px}
+.destacada .cartel{width:200px}
+
+/* Tienda / Vitrina */
+.oscuro{background:var(--vitrina);color:#eaf6f3}
+.destacados{padding:var(--s16) 0 var(--s16);overflow:hidden}
+.destacados .h2{color:var(--menta)}
+.destacados .resumen{font-size:17px;color:#b9d2cd;margin:10px 0 0}
+.vitrina{position:relative;height:clamp(400px,36vw,500px);margin-top:8px;touch-action:pan-y;cursor:grab;user-select:none}
+.vitrina:active{cursor:grabbing}
+.vitrina .escenario{position:absolute;inset:0;transform-style:preserve-3d}
+.lampara{position:absolute;left:50%;bottom:4%;width:min(64vw,760px);height:46%;transform:translateX(-50%);background:radial-gradient(50% 60% at 50% 100%,rgba(232,160,32,.22),rgba(232,160,32,0) 70%);pointer-events:none}
+.piso{position:absolute;left:0;right:0;bottom:9%;height:1px;background:linear-gradient(90deg,transparent,rgba(127,211,197,.25),transparent)}
+.pieza{position:absolute;left:50%;top:46%;width:var(--w);aspect-ratio:2/3;margin-left:calc(var(--w)/-2);transform-style:preserve-3d;will-change:transform}
+.pieza .cara{position:absolute;inset:0;transform:translateY(-50%);border-radius:var(--r-portada);overflow:hidden;box-shadow:0 30px 50px -24px rgba(0,0,0,.65);transition:transform .45s var(--e-out),filter .3s}
+.pieza img{width:100%;height:100%;object-fit:cover}
+.pieza.centro .cara{box-shadow:0 40px 60px -26px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06)}
+.ficha-vitrina{text-align:center;min-height:118px;margin-top:8px}
+.ficha-vitrina h3{font-size:clamp(28px,2.6vw,38px);line-height:1;color:#fff}
+.ficha-vitrina p{margin:8px 0 0;color:#b9d2cd;font-size:16px}
+.ficha-vitrina .precio{color:var(--menta);font-weight:600}
+.vitrina-controles{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:18px}
+.vitrina-controles .boton{min-height:48px}
+.contador{font:600 15px/1 var(--f-text);color:#b9d2cd;min-width:74px;text-align:center}
+
+/* Catálogo */
+.libro .portada-libro{aspect-ratio:2/3;border-radius:var(--r-portada);overflow:hidden;box-shadow:0 2px 4px rgba(6,26,24,.10),0 18px 30px -22px rgba(6,26,24,.5);transition:transform .45s var(--e-out),box-shadow .45s var(--e-out);transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0))}
+.libro:hover .portada-libro{--ty:-6px;box-shadow:0 2px 4px rgba(6,26,24,.10),0 30px 40px -22px rgba(6,26,24,.55)}
+.libro .portada-libro img{width:100%;height:100%;object-fit:cover}
+.sin-portada{width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:16px;font-family:var(--f-disp);background:var(--papel-2);color:var(--noche);box-shadow:inset 0 0 0 1px var(--linea);position:relative}
+.sin-portada svg{width:64%;height:auto;aspect-ratio:1388/974;color:var(--sala);opacity:.5;align-self:center}
+.sin-portada span{font:600 11px/1.2 var(--f-text);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+
+/* Ficha */
+.velo{position:fixed;inset:0;background:rgba(6,26,24,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity .3s var(--e-out)}
+.velo.abierto{opacity:1;pointer-events:auto}
+.hoja{position:fixed;z-index:61;top:0;right:0;bottom:0;width:min(560px,100vw);background:var(--papel);overflow:auto;padding:28px 40px 40px;box-shadow:-30px 0 60px -30px rgba(0,0,0,.4);visibility:hidden}
+.hoja .cerrar{position:sticky;top:0;margin-left:auto;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:0;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(6,26,24,.15)}
+.hoja .cerrar svg{width:20px;height:20px}
+.hoja .portada-hoja{width:min(260px,60%);aspect-ratio:2/3;border-radius:var(--r-portada);overflow:hidden;margin:4px 0 28px;box-shadow:0 30px 50px -26px rgba(6,26,24,.6)}
+.hoja .portada-hoja img{width:100%;height:100%;object-fit:cover}
+.hoja h2{font-size:44px;line-height:.95}
+.hoja .precio{font:600 22px/1 var(--f-text);margin:14px 0 24px}
+.atributos{display:grid;grid-template-columns:auto 1fr;gap:10px 24px;margin:0 0 24px;padding:20px 0;border-block:1px solid var(--linea)}
+.atributos dt{font:600 12.5px/1.6 var(--f-text);letter-spacing:.09em;text-transform:uppercase;color:var(--tinta-2)}
+.atributos dd{margin:0;font-size:16px}
+.hoja .sinopsis{font-size:17px;line-height:1.6;max-width:62ch;margin:0 0 28px}
+.clon{position:fixed;z-index:70;border-radius:var(--r-portada);overflow:hidden;pointer-events:none}
+.clon img{width:100%;height:100%;object-fit:cover}
+
+/* Visita */
+.visita{background:var(--menta);padding:var(--s24) 0 var(--s24)}
+.visita-reticula{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.visita .datos{grid-column:1/6}
+.visita .foto{grid-column:7/13;margin:0}
+.visita .foto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px}
+.visita .foto figcaption{font-size:14px;margin-top:10px;color:var(--sala)}
+.direccion{font:600 clamp(30px,3vw,40px)/1.02 var(--f-disp);margin:28px 0 6px}
+.entre{color:var(--sala);margin:0 0 28px}
+.horario{display:grid;grid-template-columns:auto auto;justify-content:start;gap:6px 32px;margin:0 0 32px;font-size:18px}
+.horario dt{font-weight:600}
+.horario dd{margin:0}
+.contacto{list-style:none;padding:0;margin:40px 0 0;display:grid;gap:2px}
+.contacto a{display:flex;align-items:center;gap:12px;min-height:44px;text-decoration:none;font-weight:400;border-bottom:1px solid rgba(6,26,24,.18)}
+.contacto a:hover{text-decoration:underline}
+.contacto svg{width:18px;height:18px;flex:none}
+.barra{margin-top:var(--s16);padding-top:var(--s12);border-top:2px solid var(--noche)}
+.barra h3{font-size:44px;line-height:1;margin-bottom:28px}
+.carta{display:grid;grid-template-columns:repeat(2,1fr);gap:32px 64px}
+.carta h4{font:600 12.5px/1 var(--f-text);letter-spacing:.09em;text-transform:uppercase;margin:0 0 12px;color:var(--sala)}
+.carta ul{list-style:none;margin:0;padding:0}
+.carta li{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding:10px 0;border-bottom:1px solid rgba(6,26,24,.16)}
+.carta li .d{grid-column:1/-1;font-size:14.5px;color:var(--sala)}
+.carta li b{font-weight:600}
+.preguntas{margin-top:var(--s16);display:grid;grid-template-columns:repeat(2,1fr);gap:24px 64px}
+.preguntas details{border-top:2px solid var(--noche);padding-top:14px}
+.preguntas summary{font:600 24px/1.1 var(--f-disp);cursor:pointer;min-height:44px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.preguntas summary::after{content:"+";font:400 26px/1 var(--f-text)}
+.preguntas details[open] summary::after{content:"–"}
+.preguntas p{margin:8px 0 0;max-width:52ch}
+.pie-pagina{background:var(--noche);color:#b9d2cd;padding:40px 0;font-size:14px}
+.pie-pagina .envoltura{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+.pie-pagina strong{color:#fff;font:700 22px/1 var(--f-disp)}
+
+@media (max-width:900px){
+  .cab .marca span{display:none}
+  .cab nav a{padding:0 11px;font-size:15px}
+  .ruta{grid-auto-columns:86%}
+  .tarjeta-evento{grid-template-columns:1fr;padding:18px}
+  .cartel,.destacada .cartel{width:100%;aspect-ratio:3/1;order:-1}
+  .cartel svg{left:30%;right:30%;width:40%}
+  .tarjeta-evento h3,.destacada .tarjeta-evento h3{font-size:32px}
+  .visita .datos,.visita .foto{grid-column:1/-1}
+  .carta,.preguntas{grid-template-columns:1fr}
+  .hoja{top:auto;height:92svh;width:100vw;border-radius:20px 20px 0 0;padding:16px 20px 32px}
+  .hoja h2{font-size:36px}
+}
+
+/* v2 · correcciones de la crítica (la crítica de diseño y la segunda crítica de diseño, 22 nov) */
+.saltar{position:absolute;left:12px;top:-60px;z-index:100;background:var(--noche);color:#fff;padding:12px 18px;border-radius:var(--r-ui);font-weight:600;text-decoration:none}
+.saltar:focus{top:12px}
+main:focus{outline:none}
+.vitrina:focus-visible{outline:3px solid var(--ambar);outline-offset:-6px;border-radius:14px}
+.pista{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:200;display:flex;align-items:center;gap:8px;margin:0;padding:8px 14px;border-radius:var(--r-ui);background:var(--noche);color:#fff;font:600 15px/1 var(--f-text);opacity:0;pointer-events:none;transition:opacity .2s var(--e-out)}
+.pista kbd{display:inline-grid;place-items:center;width:28px;height:26px;border-radius:6px;border:1.5px solid rgba(255,255,255,.55);font:inherit}
+.pista svg{width:15px;height:15px}
+.vitrina:focus-visible .pista{opacity:1}
+.al-estante{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:10px;color:var(--menta);font-weight:600}
+.al-estante svg{width:16px;height:16px;transform:rotate(90deg)}
+.vitrina-pie{text-align:center}
+.preguntas p a{display:inline-block;padding:4px 0}
+.tarjeta-evento .dato.hora-dato{color:var(--noche);font-weight:600}
+html:not(.js) .vitrina,html:not(.js) .vitrina-controles,html:not(.js) .ficha-vitrina{display:none}
+@font-face{font-family:"B respaldo";src:local("Arial");size-adjust:97%;ascent-override:103%;descent-override:21%;line-gap-override:0%}
+@font-face{font-family:"BC respaldo";src:local("Arial Narrow"),local("Arial");size-adjust:82%;ascent-override:122%;descent-override:24%;line-gap-override:0%}
+@media (max-width:900px){.pista{top:8px}}
+
+/* v4.2 · Portada centrada (la camioneta en el centro óptico del viewport) */
+.portada{background:var(--menta);min-height:max(620px,100svh);display:grid;grid-template-rows:1fr auto 1fr;justify-items:center;text-align:center;padding:0 var(--margen);position:relative;overflow:hidden}
+.portada-arriba{align-self:end;padding:88px 0 clamp(16px,2.6vh,32px)}
+.portada h1{font-size:clamp(52px,7.4vw,116px);line-height:.88;letter-spacing:-.02em;max-width:none;margin:0 auto}
+.camion{position:relative;width:min(44vw,620px,calc((100svh - 420px) * 1.42));color:#fff;pointer-events:none}
+.portada-abajo{align-self:start;display:flex;flex-direction:column;align-items:center;gap:22px;padding:clamp(16px,2.6vh,32px) 0 40px}
+.portada-abajo p{margin:0;font-size:20px;line-height:1.4;max-width:40ch;color:var(--noche)}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* v4.2 · Catálogo (estructura de la plantilla del catálogo de la biblioteca, con la marca de Itinerante) */
+.catalogo{padding:var(--s16) 0 var(--s24);background:var(--papel)}
+.cat-resumen{margin:10px 0 0;color:var(--tinta-2);font-size:17px}
+.busqueda{position:relative;max-width:672px;margin-top:24px}
+.busqueda input{width:100%;height:56px;border-radius:14px;border:1.5px solid #6a847e;background:#fff;padding:0 96px 0 52px;font:400 18px var(--f-text);color:var(--noche)}
+.busqueda input::placeholder{color:#5d7570}
+.busqueda input:focus{border-color:var(--noche)}
+.busqueda input:focus-visible{outline:3px solid var(--noche);outline-offset:2px}
+.busqueda input::-webkit-search-cancel-button{display:none}
+.busqueda .lupa{position:absolute;left:18px;top:18px;width:20px;height:20px;color:var(--tinta-2)}
+.busqueda .borrar{position:absolute;right:52px;top:6px;width:44px;height:44px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--tinta-2)}
+.busqueda .borrar svg{width:18px;height:18px}
+.busqueda .atajo{position:absolute;right:14px;top:15px;width:26px;height:26px;display:grid;place-items:center;border:1.5px solid var(--linea);border-radius:6px;font:600 14px/1 var(--f-text);color:var(--tinta-2);background:var(--papel)}
+.cat-cuerpo{display:grid;grid-template-columns:256px minmax(0,1fr);gap:32px;margin-top:36px;align-items:start}
+.panel{position:sticky;top:84px;max-height:calc(100dvh - 100px);overflow:auto;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:18px}
+.panel-cabeza,.lamina-cabeza{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.panel h3,.lamina h3{font:700 24px/1 var(--f-disp);outline:none}
+.limpiar{min-height:44px;padding:0 6px;border:0;background:none;font:400 16px var(--f-text);color:var(--tinta-2);text-decoration:underline;cursor:pointer}
+.grupo{padding:16px 0;border-top:1px solid var(--linea)}
+.grupo:first-child{border-top:0}
+.grupo h4{margin:0 0 12px;font:600 12.5px/1 var(--f-text);letter-spacing:.09em;text-transform:uppercase;color:var(--tinta-2)}
+.pildoras{display:flex;flex-wrap:wrap;gap:8px}
+.pildora{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:var(--r-ui);border:1.5px solid #6a847e;background:#fff;font:400 16px/1.1 var(--f-text);color:var(--noche);cursor:pointer;text-align:left;transition:background-color .15s var(--e-out),border-color .15s,color .15s}
+.pildora small{font-size:13px;color:var(--tinta-2)}
+.pildora:hover{background:var(--papel)}
+.pildora[aria-pressed="true"]{background:var(--noche);border-color:var(--noche);color:#fff}
+.pildora[aria-pressed="true"] small{color:#b9d2cd}
+.barra-res{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-bottom:16px}
+.conteo{margin:0 auto 0 0;font:600 16px var(--f-text);color:var(--tinta-2)}
+.orden{display:inline-flex;align-items:center;gap:8px;font-size:15px;color:var(--tinta-2)}
+.orden select{min-height:44px;border-radius:10px;border:1.5px solid #6a847e;background:#fff;padding:0 12px;font:400 16px var(--f-text);color:var(--noche)}
+.vistas{display:flex;gap:6px}
+.vistas button,.boton-filtros{min-height:44px;min-width:44px;border-radius:10px;border:1.5px solid #6a847e;background:#fff;color:var(--noche);display:inline-grid;place-items:center;cursor:pointer;transition:background-color .15s,color .15s}
+.vistas button[aria-pressed="true"]{background:var(--noche);border-color:var(--noche);color:#fff}
+.vistas svg,.boton-filtros svg{width:20px;height:20px}
+.boton-filtros{display:none;grid-auto-flow:column;gap:8px;padding:0 14px;font:600 16px var(--f-text)}
+.insignia{min-width:22px;height:22px;border-radius:11px;background:var(--noche);color:#fff;font:600 13px/22px var(--f-text);text-align:center;padding:0 6px}
+.aplicados{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.aplicados button{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 12px 0 16px;border-radius:var(--r-ui);border:0;background:var(--menta-claro);color:var(--noche);font:400 15px var(--f-text);cursor:pointer}
+.aplicados button svg{width:14px;height:14px}
+.aplicados .quitar-todo{background:none;text-decoration:underline;color:var(--tinta-2);padding:0 6px;min-height:44px}
+#resultados{outline:none;position:relative}
+#resultados.recortando{overflow:clip}
+.rejilla{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:44px 24px}
+.rejilla > li{min-width:0}
+.rejilla > li.fuera{display:none}
+.libro{position:relative;display:flex;flex-direction:column;gap:10px}
+.libro .portada-libro{aspect-ratio:2/3;border-radius:var(--r-portada);overflow:hidden;box-shadow:0 2px 4px rgba(6,26,24,.10),0 18px 30px -22px rgba(6,26,24,.5);transition:transform .45s var(--e-out),box-shadow .45s var(--e-out);transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0))}
+.libro:hover .portada-libro{--ty:-6px;box-shadow:0 2px 4px rgba(6,26,24,.10),0 30px 40px -22px rgba(6,26,24,.55)}
+.libro .portada-libro img{width:100%;height:100%;object-fit:cover}
+.libro h3{margin:0;font:600 21px/1.04 var(--f-disp);letter-spacing:-.01em;text-wrap:balance}
+.libro h3 a{text-decoration:underline;text-decoration-color:transparent;text-decoration-thickness:1.5px;transition:text-decoration-color .15s}
+.libro:hover h3 a{text-decoration-color:currentColor}
+.libro h3 a::after{content:"";position:absolute;inset:0;border-radius:6px}
+.libro h3 a:focus-visible{outline:none}
+.libro h3 a:focus-visible::after{outline:3px solid var(--noche);outline-offset:6px}
+.libro .meta{margin:-4px 0 0;font-size:15px;line-height:1.3;color:var(--tinta-2)}
+.libro .precio{margin:0;font:600 16px/1 var(--f-text)}
+.libro mark{background:var(--menta-claro);color:inherit;border-radius:2px;padding:0 1px}
+.sin-portada{width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:16px;font-family:var(--f-disp);background:var(--papel-2);color:var(--noche);box-shadow:inset 0 0 0 1px var(--linea);position:relative}
+.sin-portada svg{width:64%;height:auto;aspect-ratio:1388/974;color:var(--sala);opacity:.5;align-self:center}
+.sin-portada span{font:600 11px/1.2 var(--f-text);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+/* Vista de lista: fila compacta para escanear */
+.rejilla.lista{grid-template-columns:1fr;gap:8px}
+.rejilla.lista .libro{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:4px 16px;padding:10px 14px;border:1px solid var(--linea);border-radius:12px;background:#fff}
+.rejilla.lista .libro:hover{background:var(--papel)}
+.rejilla.lista .portada-libro{grid-row:1/3;width:56px;box-shadow:0 1px 3px rgba(6,26,24,.2)}
+.rejilla.lista .libro:hover .portada-libro{--ty:0}
+.rejilla.lista .sin-portada{padding:4px}.rejilla.lista .sin-portada span{display:none}
+.rejilla.lista h3{font-size:20px;grid-column:2}
+.rejilla.lista .meta{grid-column:2;margin:0}
+.rejilla.lista .precio{grid-column:3;grid-row:1/3}
+.vacio-cat{text-align:center;max-width:560px;margin:0 auto;padding:48px 16px}
+.vacio-cat h3{font:700 30px/1.05 var(--f-disp)}
+.vacio-cat p{color:var(--tinta-2)}
+.vacio-acciones{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:18px 0}
+.mas{display:flex;justify-content:center;margin-top:44px}
+html:not(.js) .panel,html:not(.js) .barra-res,html:not(.js) .busqueda{display:none}
+html:not(.js) .cat-cuerpo{grid-template-columns:1fr}
+/* Hoja de filtros (móvil): <dialog> nativo, como la plantilla */
+.hoja-filtros{position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:none;border:0;padding:0;background:transparent;color:var(--noche)}
+.hoja-filtros::backdrop{background:rgba(6,26,24,.5)}
+.lamina{background:var(--papel);border-radius:20px 20px 0 0;max-height:90dvh;display:flex;flex-direction:column;overflow:hidden}
+.lamina-cabeza{padding:10px 8px 10px 20px;border-bottom:1px solid var(--linea);margin:0}
+.lamina-cabeza h3{flex:1}
+.cerrar-hf{width:44px;height:44px;border:0;background:none;display:grid;place-items:center;cursor:pointer}
+.cerrar-hf svg{width:20px;height:20px}
+.lamina-cuerpo{overflow:auto;overscroll-behavior:contain;padding:8px 20px 20px}
+.lamina-pie{padding:12px 20px max(12px,env(safe-area-inset-bottom));border-top:1px solid var(--linea)}
+.lamina-pie .boton{width:100%;justify-content:center}
+/* v4.2 · Tienda: esqueleto honesto (estructura de la tienda, sin productos) */
+.tienda{background:var(--papel-2);padding:var(--s16) 0}
+.tienda-cabeza{display:flex;align-items:center;flex-wrap:wrap;gap:12px 16px}
+.tienda h2{font-size:clamp(36px,3.6vw,52px);line-height:.95}
+.sello{display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:var(--r-ui);border:1.5px dashed var(--sala);color:var(--sala);font:600 13px/1 var(--f-text);letter-spacing:.09em;text-transform:uppercase}
+.tienda .proximo{margin:12px 0 0;font-size:18px;color:var(--noche)}
+.esqueleto{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.hueco{display:flex;flex-direction:column;gap:10px}
+.hueco-img{aspect-ratio:4/3;border-radius:12px;border:1.5px dashed #6a847e;background:var(--papel);display:grid;place-items:center}
+.hueco-img svg{width:34%;aspect-ratio:1388/974;color:var(--sala);opacity:.22}
+.hueco-cat{font:600 20px/1 var(--f-disp);color:var(--noche)}
+.barra-g{display:block;height:10px;width:72%;border-radius:5px;background:#cfdcd7}
+.barra-g.corta{width:30%}
+@media (max-width:1023px){
+  .cat-cuerpo{grid-template-columns:1fr;margin-top:24px}
+  .panel{display:none}
+  .boton-filtros{display:inline-grid}
+  .rejilla{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .portada h1{font-size:clamp(46px,13.4vw,84px);max-width:9ch}
+  .camion{width:min(80vw,400px,calc((100svh - 400px) * 1.42))}
+  .portada-abajo p{font-size:18px}
+}
+@media (max-width:767px){
+  .rejilla{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 16px}
+  .libro h3{font-size:19px}
+  .orden span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .barra-res .orden{flex:1 1 auto;min-width:0}
+  .barra-res .orden select{width:100%}
+  .barra-res .conteo{order:5;flex:1 0 60%}
+  .barra-res .vistas{order:6}
+  .esqueleto{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:24px}
+  .hueco-img{aspect-ratio:1}
+}
+</style>
+</head>
+<body>
+<a class="saltar" href="#contenido">Ir al contenido</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-izq" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-der" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sale" viewBox="0 0 24 24"><path d="M8 16 17 7m-8 0h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lugar" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.4" fill="currentColor"/></symbol>
+  <symbol id="i-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-persona" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-buscar" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-msj" viewBox="0 0 24 24"><path d="M4 19.5 5.3 15A8 8 0 1 1 9 18.7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tel" viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.3a10 10 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-correo" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-camara" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="7" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-pagina" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13.5 20v-7h3m-3 0v-2.5a2 2 0 0 1 2-2H17" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-embudo" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-rejilla" viewBox="0 0 24 24"><path d="M4.5 4.5h6v6h-6zm9 0h6v6h-6zm-9 9h6v6h-6zm9 0h6v6h-6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lista" viewBox="0 0 24 24"><path d="M4 6h3m3 0h10M4 12h3m3 0h10M4 18h3m3 0h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-forma" viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v12.5H7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 12h6m-6 4h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="camioneta" viewBox="0 0 1396 982"><path fill="currentColor" fill-rule="evenodd" d="M396.5 975.2C377.3 968.3 370.7 963.8 352.0 944.7C335.4 927.6 332.1 922.6 331.0 913.3C330.6 909.5 329.5 904.9 328.5 903.1C323.3 892.9 319.2 877.5 318.0 863.5C315.8 838.3 315.7 836.0 317.0 831.6C318.0 827.9 317.9 826.3 316.5 821.5C314.7 815.1 315.3 795.7 317.4 794.2C318.0 793.8 321.2 792.6 324.5 791.6C328.4 790.4 332.0 788.4 334.6 786.0C343.0 778.3 359.6 774.7 367.8 778.9C370.1 780.1 373.2 781.0 374.8 781.0C377.8 781.0 385.7 776.0 386.6 773.5C387.5 771.2 397.2 765.2 403.4 763.0C408.2 761.4 410.0 761.2 412.9 762.1C414.9 762.6 420.7 763.5 425.7 764.0C440.2 765.3 447.8 770.1 456.3 783.5C460.3 789.7 462.8 791.0 471.5 791.0C482.5 791.1 488.6 794.9 506.7 812.9C514.8 821.0 519.7 826.7 523.0 832.4C526.1 837.5 530.6 843.1 535.4 847.7C543.3 855.2 551.3 865.3 553.4 870.5C554.1 872.1 555.3 877.2 556.0 881.7L557.3 889.9L554.1 896.0C552.4 899.4 550.3 904.7 549.5 907.7C547.9 913.7 546.0 916.4 542.0 918.5C537.6 920.8 528.3 931.2 521.9 940.9C517.4 947.8 515.0 950.5 512.4 951.6C510.6 952.4 506.6 954.8 503.8 957.0C500.9 959.2 496.0 961.9 493.0 963.1C490.0 964.2 485.5 966.4 483.0 968.0C474.9 973.2 471.8 974.0 460.6 974.0C454.9 974.0 446.6 974.7 442.3 975.5C438.0 976.4 427.8 977.3 419.5 977.5C404.9 978.0 404.3 977.9 396.5 975.2ZM785.0 970.4C782.5 969.6 775.5 968.7 769.5 968.4C763.5 968.1 757.4 967.5 756.0 967.0C738.0 961.0 715.6 946.6 701.7 932.3C696.7 927.0 690.1 921.2 687.2 919.3C681.0 915.3 678.7 911.9 675.9 902.7C674.8 899.0 672.4 892.7 670.5 888.8C666.0 879.5 666.1 878.8 671.9 873.1C675.7 869.4 677.2 866.9 679.3 861.0C685.5 842.9 692.5 826.3 695.6 822.2C697.4 819.8 699.2 816.1 699.5 814.1C699.8 812.1 701.5 807.6 703.4 804.0C705.2 800.4 707.1 795.6 707.5 793.3C708.4 787.8 714.2 782.3 720.1 781.4C722.9 780.9 726.1 779.2 729.9 776.2C735.4 771.6 746.0 765.9 751.2 764.6C752.7 764.3 755.5 762.6 757.4 761.0C765.9 753.5 793.9 750.0 818.5 753.4C845.2 757.1 848.4 758.1 851.6 763.4C852.6 765.1 855.3 768.5 857.6 771.0C859.8 773.5 863.5 778.6 865.8 782.5C872.3 793.6 875.8 797.8 880.3 800.1C884.1 802.0 891.0 808.0 903.8 820.4C910.4 826.8 915.1 834.2 915.7 839.1C916.0 841.5 917.5 846.2 919.1 849.6C925.4 863.2 923.3 886.5 914.4 901.0C913.6 902.4 911.8 905.8 910.5 908.6C907.6 914.9 897.3 928.7 893.4 931.6C891.8 932.8 886.8 936.9 882.3 940.7C871.3 950.3 863.5 955.5 856.4 957.8C853.2 958.9 848.9 960.5 846.9 961.4C844.9 962.2 840.2 963.6 836.4 964.4C832.6 965.3 824.5 967.3 818.5 968.9C806.0 972.3 792.9 972.9 785.0 970.4ZM496.4 905.1C500.8 897.6 505.1 881.9 505.7 871.5C506.2 862.3 506.0 860.6 503.1 850.6C501.4 844.6 499.2 838.8 498.2 837.7C494.6 833.6 483.5 825.9 481.6 826.2C478.3 826.7 477.4 829.4 478.8 834.2C479.6 836.6 481.2 843.0 482.5 848.5C483.8 854.0 485.9 862.3 487.2 867.0C489.0 873.9 489.5 878.4 489.6 891.5C489.7 900.3 489.8 907.9 489.9 908.3C490.2 910.4 494.6 908.2 496.4 905.1ZM765.4 905.0C767.2 904.3 768.0 903.3 768.0 901.6C768.0 898.9 763.0 896.5 750.5 893.4C746.8 892.5 742.4 890.5 740.4 889.0C731.7 882.0 727.1 879.8 720.5 879.2C714.4 878.8 714.0 878.9 712.9 881.2C711.4 884.5 713.6 888.7 719.8 894.7C726.2 901.0 728.1 902.1 736.3 904.1C744.3 906.0 761.3 906.6 765.4 905.0ZM435.5 895.0C437.9 892.4 437.1 875.2 434.1 864.0C432.9 859.9 432.0 855.1 432.0 853.3C432.0 849.5 428.1 836.9 423.4 825.1C416.0 806.7 409.5 801.6 404.6 810.2C403.5 812.0 399.0 818.5 394.4 824.5C385.0 837.1 381.0 844.1 381.0 848.0C381.0 853.4 394.9 877.8 399.1 879.5C405.5 882.2 424.5 892.5 427.8 895.0C430.9 897.5 433.2 897.5 435.5 895.0ZM805.1 893.9C806.2 893.4 807.5 891.8 808.0 890.4C809.1 887.6 810.5 887.4 814.9 889.6C818.7 891.5 821.8 890.9 827.7 887.2C829.9 885.7 833.2 883.8 834.8 882.8C840.1 879.9 841.5 876.6 841.2 867.7C841.1 863.3 840.3 857.5 839.5 854.7C838.7 851.9 838.0 848.4 838.0 847.0C838.0 843.5 834.8 840.6 831.8 841.4C827.6 842.5 820.2 848.9 816.1 854.8C810.4 863.2 808.1 863.6 806.7 856.2C806.3 854.4 805.0 851.6 803.8 849.9C801.6 847.0 801.5 846.0 801.5 829.5C801.5 808.2 802.0 809.1 788.3 807.7C770.6 805.9 770.7 805.9 754.5 822.4C738.7 838.5 734.2 845.0 733.4 853.1C733.1 856.1 732.1 860.4 731.3 862.7C730.5 864.9 730.1 867.6 730.4 868.7C731.7 872.7 745.8 880.9 751.6 881.0C752.8 881.0 756.9 882.0 760.6 883.2C764.4 884.3 770.6 885.7 774.5 886.1C786.6 887.5 793.4 889.3 796.9 892.2C800.4 895.2 802.1 895.6 805.1 893.9ZM896.9 866.1C897.6 864.9 897.7 859.7 897.2 851.9C896.5 839.9 896.4 839.5 894.1 839.2C890.3 838.6 890.0 839.9 891.0 851.7C892.3 866.6 894.2 871.2 896.9 866.1ZM966.5 847.9C958.1 845.2 956.0 842.6 956.0 834.6C956.0 830.5 955.5 827.8 954.7 827.1C953.3 826.0 943.1 822.7 937.5 821.6C935.8 821.2 933.3 820.2 931.9 819.2C928.1 816.6 917.0 804.2 917.0 802.6C917.0 801.7 918.4 799.5 920.0 797.7C923.8 793.3 923.8 791.6 919.6 785.1C917.7 782.2 915.8 777.9 915.4 775.6C915.1 773.4 913.5 769.7 912.0 767.5C910.0 764.7 909.0 761.8 908.7 757.8C908.2 752.7 907.3 750.9 899.5 739.5C889.2 724.5 887.6 721.1 888.5 715.9C889.4 710.8 888.2 709.0 880.3 703.4C870.9 696.7 860.0 691.3 854.3 690.5C851.7 690.1 844.5 688.2 838.5 686.3C831.2 684.1 824.1 682.6 817.5 682.0C812.0 681.6 806.2 680.7 804.7 680.1C803.1 679.5 795.4 679.0 787.1 679.0C770.5 679.0 770.2 678.9 769.3 672.1C768.8 668.6 769.1 667.7 771.8 665.0C775.2 661.7 777.4 661.4 786.3 663.1C794.7 664.8 813.0 663.4 813.0 661.1C813.0 656.8 800.0 654.8 770.9 654.8C752.4 654.7 749.7 654.9 744.9 656.8C741.9 657.9 736.9 659.6 733.7 660.5C729.9 661.6 726.2 663.6 722.7 666.6C719.8 669.0 715.1 672.4 712.2 674.1C706.4 677.5 706.4 677.6 708.6 680.8C711.6 685.1 710.2 687.1 700.0 692.8C694.8 695.7 688.7 698.5 686.5 699.0C661.1 705.3 657.7 706.7 655.1 711.8C652.4 717.1 645.5 740.7 643.5 751.5C642.6 756.5 640.5 764.5 638.9 769.4C637.3 774.3 636.0 779.4 636.0 780.9C636.0 786.3 634.7 788.2 628.7 792.1C619.8 797.9 615.6 797.6 608.6 791.0C604.0 786.6 602.8 786.0 599.1 786.0C591.3 786.0 585.0 775.6 585.0 762.6C585.0 757.6 584.5 755.7 582.8 753.5C580.9 751.1 580.8 750.3 581.7 746.7C583.4 740.4 580.4 736.9 570.5 733.6C563.5 731.3 559.2 728.5 557.2 724.9C556.3 723.2 554.0 720.0 552.2 717.8C548.3 713.0 548.2 710.6 551.5 704.4C552.9 701.8 554.0 699.2 554.0 698.5C554.0 694.8 545.7 692.5 528.5 691.5C523.0 691.1 516.8 690.4 514.8 689.9C510.0 688.7 507.8 689.8 504.5 695.0C500.1 701.9 492.9 701.5 491.5 694.3C490.4 688.5 489.6 688.0 481.0 688.0C474.1 688.0 471.8 688.5 461.9 692.4C449.7 697.2 447.0 697.2 447.0 692.5C447.0 688.7 442.3 688.1 414.3 688.5L389.0 688.9L384.3 692.2C381.6 694.0 374.8 700.1 369.0 705.7C357.8 716.7 354.4 718.8 337.0 725.7C325.8 730.2 316.4 730.8 311.3 727.5C305.9 724.0 295.9 713.5 292.4 707.8C288.4 701.2 286.5 700.6 280.2 704.0C278.2 705.0 275.2 706.2 273.7 706.5C271.4 707.0 271.0 707.5 271.6 708.8C273.7 713.9 273.3 715.5 268.8 718.6C264.6 721.4 264.3 721.5 251.2 721.5C238.4 721.5 237.8 721.6 236.1 723.8C234.5 726.0 234.0 726.1 230.4 725.1C224.5 723.4 221.0 723.8 215.0 726.6C210.2 728.9 208.7 729.1 203.0 728.5C193.0 727.4 188.6 724.4 186.8 717.2C184.8 709.2 181.4 708.7 169.3 714.9C162.2 718.4 159.8 718.6 148.5 716.5C137.2 714.4 134.9 711.4 139.3 704.9C142.6 700.2 160.8 682.2 166.6 678.0C173.5 673.1 173.5 670.9 166.9 656.7C160.3 642.6 159.0 638.2 159.0 630.5C159.0 626.1 157.5 619.1 153.6 605.3C150.6 594.8 147.4 582.7 146.6 578.4C145.7 573.8 143.2 566.4 140.6 560.7C138.1 555.3 135.7 549.0 135.4 546.7C134.7 542.4 132.2 537.0 130.8 537.0C129.4 537.0 127.8 532.7 124.5 519.7C120.2 503.0 119.8 501.9 115.6 497.2C113.2 494.6 111.7 491.6 111.0 488.3C110.4 485.5 108.3 480.9 106.4 477.9C104.6 475.0 103.0 471.9 103.0 471.2C103.0 470.4 100.1 463.4 96.6 455.6C93.1 447.9 89.1 438.4 87.6 434.5C84.8 427.1 72.0 401.4 66.5 392.0C64.7 389.0 62.9 385.4 62.5 384.0C60.4 376.3 52.3 362.5 47.7 358.6C45.0 356.4 40.7 351.6 38.2 348.0C33.9 342.0 33.5 341.1 33.6 335.5C33.7 322.5 35.1 316.1 39.2 309.9C45.4 300.6 47.1 299.6 55.5 300.6C68.0 301.9 70.5 301.8 70.8 299.5C70.9 298.4 69.4 293.7 67.4 289.0C65.4 284.3 63.2 278.2 62.5 275.5C61.8 272.8 60.3 268.5 59.1 266.0C57.8 263.2 57.0 259.4 57.0 256.0C57.0 252.7 56.1 248.7 55.0 246.1C52.9 241.6 50.6 231.8 47.5 215.3C45.9 206.7 45.9 205.8 47.5 201.0C49.5 194.9 49.1 193.5 44.6 191.6C42.1 190.6 40.9 189.3 40.5 187.3C39.3 182.0 38.1 178.9 36.0 176.0C32.6 171.2 32.4 167.7 35.5 161.9C38.9 155.3 40.2 147.8 38.8 142.1C37.9 138.6 38.0 136.9 39.4 133.1C40.3 130.6 41.4 125.2 41.9 121.2C43.1 111.5 44.8 109.6 51.2 110.3C56.8 111.0 62.7 113.7 68.7 118.2L73.0 121.4L81.2 120.2C85.8 119.5 93.1 118.3 97.5 117.4C101.9 116.5 108.7 115.7 112.5 115.6C125.5 115.1 125.9 114.5 123.6 98.8C121.7 86.4 121.7 84.7 123.1 79.7C126.0 69.2 141.2 60.8 146.2 67.0C147.9 69.1 148.0 70.4 147.4 76.9C147.1 81.1 146.1 86.8 145.2 89.5C143.1 96.7 143.0 107.0 145.2 108.3C147.0 109.5 147.8 109.2 157.5 103.5C169.0 96.7 183.3 90.0 186.2 90.0C187.8 90.0 191.6 89.1 194.8 88.0C197.9 86.9 203.7 85.5 207.5 84.9C211.3 84.3 219.2 82.3 225.0 80.5C230.8 78.7 238.8 76.5 242.9 75.5C247.0 74.6 252.1 72.9 254.2 71.8C256.6 70.5 263.2 69.1 272.2 67.9C280.1 66.8 288.3 65.5 290.5 65.0C296.7 63.4 328.6 61.9 358.5 61.8C384.1 61.8 395.1 62.6 401.5 65.0C403.0 65.6 407.0 66.0 410.6 66.0C418.3 66.0 451.2 59.7 457.3 57.1C463.8 54.3 481.2 43.3 494.5 33.6C531.9 6.4 537.5 3.2 544.9 4.6C546.7 5.0 549.6 6.7 551.4 8.4C555.4 12.2 556.5 18.6 555.5 31.6C554.8 39.7 554.9 40.3 557.9 46.4C560.8 52.4 566.0 57.9 571.5 60.8C573.3 61.7 585.0 62.4 593.1 62.1C597.4 61.9 600.0 59.0 602.0 52.0C604.6 42.7 614.4 20.1 617.5 16.3C621.5 11.3 627.4 8.6 634.7 8.6C642.5 8.5 647.4 11.7 653.9 21.1C661.5 32.1 686.6 57.7 692.5 60.4C708.7 67.9 711.3 68.5 722.7 67.2C728.5 66.6 733.6 66.3 734.1 66.6C734.6 66.9 743.2 66.4 753.3 65.4C767.9 64.1 773.1 64.0 779.5 64.9C793.5 66.8 802.2 67.4 814.5 67.5C825.8 67.5 826.9 67.3 832.5 64.6C837.9 62.0 839.7 61.6 850.7 61.2C864.9 60.7 880.4 62.9 889.0 66.6C892.0 67.8 896.5 69.4 899.0 70.1C904.3 71.4 910.2 74.3 914.8 77.7C916.7 79.1 922.3 82.0 927.3 84.2C935.8 88.0 937.4 88.3 949.0 89.0C960.2 89.7 962.4 90.2 970.0 93.4C974.9 95.4 979.6 98.2 981.0 99.8C982.4 101.4 986.5 105.4 990.2 108.7C996.7 114.5 997.2 114.8 1003.7 115.5C1012.0 116.4 1019.4 119.0 1026.0 123.6C1031.9 127.6 1033.0 127.7 1036.7 124.6C1043.3 119.2 1048.8 118.6 1056.7 122.5C1064.5 126.4 1065.4 128.8 1064.7 145.1C1064.4 155.2 1063.7 160.0 1062.1 164.4C1058.8 173.8 1059.9 184.0 1064.3 184.0C1066.6 184.0 1077.7 189.8 1079.9 192.1C1081.8 194.2 1082.1 195.2 1081.5 199.3C1081.0 203.6 1081.2 204.6 1083.7 207.8C1085.2 209.8 1087.6 214.0 1089.1 217.0C1090.5 220.0 1092.5 223.1 1093.4 223.9C1095.8 225.9 1098.0 230.4 1098.0 233.4C1098.0 236.3 1093.4 240.5 1087.2 243.1C1083.8 244.6 1082.6 245.8 1081.1 249.4C1079.1 253.9 1076.9 255.8 1062.2 265.0C1056.4 268.7 1055.6 269.7 1052.3 276.8C1050.4 281.0 1048.1 287.6 1047.3 291.5C1046.5 295.3 1045.0 301.5 1044.0 305.3C1043.0 309.0 1041.8 315.2 1041.4 319.0C1040.8 325.6 1040.9 326.0 1042.7 326.0C1045.4 326.0 1046.8 324.2 1047.2 320.0C1047.4 317.2 1048.3 316.0 1051.8 313.7C1054.3 312.0 1056.6 309.4 1057.6 307.2C1058.4 305.2 1059.8 302.7 1060.8 301.6C1063.3 298.8 1075.4 293.4 1086.1 290.4C1101.1 286.3 1102.3 286.3 1114.7 290.8C1120.6 293.0 1127.5 295.1 1129.9 295.5C1132.4 295.9 1136.9 297.1 1139.9 298.2C1149.3 301.4 1165.6 302.6 1173.7 300.6C1182.4 298.5 1187.5 298.6 1198.0 301.0C1202.7 302.1 1209.1 303.0 1212.3 303.0C1216.8 303.0 1219.5 303.7 1225.0 306.5C1232.5 310.3 1233.6 311.6 1234.6 317.9C1235.2 321.8 1235.1 322.2 1229.7 327.5C1222.3 334.9 1219.5 341.9 1220.5 350.5C1221.3 357.1 1221.3 356.7 1220.8 366.2C1220.5 372.4 1220.7 373.2 1224.0 377.7C1227.8 382.9 1228.4 388.0 1226.6 398.2C1225.8 402.8 1226.0 403.3 1236.8 425.2C1242.9 437.5 1250.1 452.2 1252.9 458.0C1259.6 472.0 1270.3 490.7 1273.3 493.7C1275.3 495.8 1277.5 496.4 1287.6 497.6C1299.5 499.1 1314.2 502.4 1325.7 506.1C1333.6 508.7 1339.3 512.8 1340.9 517.1C1343.9 525.2 1345.5 527.1 1353.4 532.5C1363.5 539.3 1370.8 545.0 1374.0 548.5L1376.5 551.2L1376.4 596.8C1376.3 621.9 1375.7 656.7 1375.1 674.1L1373.8 705.7L1379.0 721.0C1383.2 733.3 1384.3 738.1 1384.9 746.2C1385.7 755.7 1385.9 756.4 1388.9 759.2L1392.0 762.1L1389.8 766.2C1388.4 768.6 1385.2 771.8 1381.8 774.2C1373.7 779.6 1373.8 782.2 1382.0 790.5C1389.6 798.2 1390.0 800.1 1385.8 810.5C1382.0 819.7 1379.5 821.8 1369.1 825.1C1356.5 829.0 1347.7 827.6 1337.5 820.1C1334.1 817.6 1331.4 816.8 1319.5 814.8C1305.9 812.5 1305.2 812.5 1296.0 814.1C1290.8 814.9 1285.2 816.2 1283.5 816.9C1281.8 817.6 1276.5 819.0 1271.5 820.0C1266.5 821.1 1260.9 822.4 1259.0 823.0C1257.1 823.5 1253.2 824.0 1250.4 824.0C1247.6 824.0 1243.2 824.7 1240.5 825.6C1236.7 827.0 1233.9 827.1 1226.1 826.5C1216.8 825.8 1205.7 825.5 1173.0 825.0L1157.6 824.8L1148.0 819.7C1107.2 798.2 1092.6 792.0 1082.7 792.0C1081.2 792.0 1074.7 790.9 1068.2 789.5C1061.8 788.1 1052.2 786.0 1047.0 784.9C1041.8 783.8 1034.3 782.1 1030.5 781.0C1026.7 780.0 1021.7 778.9 1019.6 778.5C1017.4 778.1 1012.5 776.3 1008.7 774.4C1004.2 772.1 1000.8 771.0 998.7 771.2C995.5 771.5 995.5 771.5 995.7 777.0C996.6 798.2 996.7 798.1 989.4 808.7C986.3 813.2 986.6 817.3 990.5 825.0C994.7 833.3 993.6 840.3 988.0 841.5C986.3 841.9 983.2 843.9 981.0 846.1C976.6 850.5 975.3 850.7 966.5 847.9ZM339.2 806.2C343.9 801.3 344.3 792.5 339.7 793.2C337.0 793.6 335.1 797.4 334.3 804.0C333.6 809.9 335.1 810.6 339.2 806.2ZM1095.1 756.8C1095.7 754.4 1097.0 751.6 1097.9 750.5C1102.3 745.5 1100.7 740.6 1094.3 739.4C1089.5 738.6 1085.9 736.7 1081.8 733.1C1071.8 724.5 1031.8 704.7 1014.8 700.0C1000.4 696.0 998.4 696.5 999.4 703.8C999.7 706.3 999.5 711.0 998.8 714.1C997.3 721.6 998.6 723.1 1011.6 729.6C1022.3 734.9 1028.6 735.9 1039.5 734.0C1054.9 731.4 1064.7 731.8 1073.6 735.5C1079.3 737.9 1077.8 745.0 1071.6 745.0C1066.2 745.0 1064.4 747.4 1067.6 750.1C1070.2 752.2 1089.2 760.8 1091.7 760.9C1093.5 761.0 1094.1 760.2 1095.1 756.8ZM1243.5 715.4C1244.5 714.3 1244.8 713.2 1244.3 712.1C1243.9 711.2 1243.5 706.2 1243.5 701.0L1243.5 691.4L1238.4 685.5C1231.1 676.8 1229.2 673.8 1225.4 664.7C1221.3 654.9 1221.1 651.8 1224.6 648.4C1227.0 646.0 1227.5 645.8 1233.9 646.5C1242.0 647.3 1242.4 646.9 1248.6 633.3C1254.0 621.4 1255.7 618.0 1259.5 611.5C1262.1 607.0 1263.0 604.3 1263.0 600.9C1263.0 598.4 1263.3 592.9 1263.6 588.7C1264.3 581.3 1264.5 580.8 1269.8 574.4C1272.8 570.8 1276.6 567.0 1278.3 566.1C1282.9 563.7 1291.0 556.0 1291.0 554.0C1291.0 551.5 1289.6 550.7 1280.0 547.6C1275.3 546.1 1267.2 543.2 1262.0 541.0C1256.7 538.9 1247.7 535.8 1241.9 534.1C1229.9 530.6 1219.1 526.0 1214.0 522.2C1210.2 519.3 1208.5 519.2 1186.9 520.6C1172.0 521.5 1168.1 518.4 1167.4 504.6C1167.1 496.7 1167.6 497.4 1155.6 488.6C1149.7 484.4 1144.9 482.0 1136.0 479.0C1134.6 478.5 1129.0 477.9 1123.4 477.6C1117.9 477.3 1111.6 476.5 1109.4 475.7C1107.3 474.9 1100.5 472.3 1094.5 470.0C1081.8 465.0 1075.4 464.1 1067.8 466.3C1064.9 467.1 1060.7 468.2 1058.5 468.7C1053.3 469.8 1051.2 473.8 1050.3 484.6C1049.7 492.6 1047.1 500.9 1042.4 510.3C1040.0 514.9 1039.8 516.2 1040.4 522.2C1040.9 528.0 1040.6 530.6 1037.9 539.7C1031.9 561.0 1029.6 567.4 1026.9 570.5C1025.4 572.2 1023.9 574.7 1023.5 576.1C1023.2 577.4 1022.2 579.4 1021.4 580.5C1018.0 585.1 1016.8 575.8 1019.6 566.3C1020.7 562.6 1021.0 559.3 1020.5 556.6C1018.8 546.2 1021.0 531.6 1025.2 525.9C1026.3 524.5 1027.4 521.3 1027.7 518.9C1027.9 516.5 1028.8 512.9 1029.5 510.9C1030.7 507.8 1030.6 506.5 1029.4 502.2C1028.0 497.6 1028.0 496.5 1029.5 491.3C1034.9 472.4 1035.9 467.9 1035.9 462.3C1036.0 454.0 1034.6 452.5 1027.2 453.4C1020.1 454.2 1018.4 455.2 1015.8 460.3C1013.4 465.0 1011.5 480.3 1011.9 492.7C1012.0 498.3 1011.6 500.7 1009.9 503.9C1008.0 507.6 1007.9 508.6 1008.9 512.5C1009.8 516.2 1009.7 517.7 1008.5 520.6C1007.7 522.6 1007.0 526.6 1007.0 529.6C1007.0 532.5 1006.3 537.0 1005.4 539.6C1004.4 542.6 1004.1 545.4 1004.5 547.4C1006.2 554.9 1005.0 567.2 1002.0 573.0C1000.7 575.6 1000.0 580.0 999.5 589.4C999.0 598.3 998.4 603.1 997.3 604.6C994.6 608.9 993.9 614.3 995.5 620.4C996.5 624.1 996.8 628.0 996.3 632.0C996.0 635.6 996.2 639.7 997.0 642.4C998.3 647.2 997.2 651.0 994.5 651.0C993.7 651.0 993.0 651.6 993.0 652.4C993.0 654.1 1001.0 657.0 1005.9 657.0C1007.9 657.0 1011.3 657.9 1013.5 658.9C1015.7 659.9 1022.9 662.4 1029.5 664.4C1036.1 666.5 1043.5 669.2 1046.0 670.5C1048.5 671.7 1051.8 673.0 1053.5 673.4C1055.2 673.8 1058.2 675.2 1060.2 676.6C1062.3 677.9 1064.2 679.0 1064.6 679.0C1065.5 679.0 1096.4 695.6 1101.5 698.9C1111.7 705.3 1120.3 709.0 1124.9 709.0C1128.0 709.0 1131.5 710.0 1136.0 712.2C1143.4 715.8 1145.1 715.9 1193.0 714.5C1209.9 714.1 1218.1 714.3 1226.0 715.3C1240.1 717.3 1241.6 717.3 1243.5 715.4ZM988.4 712.8C989.2 711.5 990.8 707.6 992.0 704.0C994.0 698.0 994.1 697.5 992.4 696.3C989.0 693.8 984.2 699.8 982.4 708.9C981.2 714.8 985.3 717.5 988.4 712.8ZM692.1 678.4C693.9 677.3 695.5 675.9 695.8 675.1C696.8 672.1 673.7 676.3 670.9 679.6C668.8 682.2 687.5 681.1 692.1 678.4ZM278.4 629.4C282.6 626.9 290.8 620.6 296.6 615.4C302.5 610.2 309.5 604.4 312.4 602.5C315.2 600.6 321.1 596.6 325.5 593.5C340.9 582.7 357.9 575.5 380.2 570.5C383.9 569.7 390.6 567.2 395.1 565.0C409.2 557.9 424.6 556.4 444.6 560.1L455.9 562.2L471.2 559.0C494.1 554.3 500.7 553.3 521.2 552.0C537.8 551.0 540.8 551.0 548.0 552.5C561.7 555.3 564.1 553.4 561.6 542.0C560.7 538.2 560.0 532.1 560.0 528.4C560.0 519.3 558.3 506.3 555.8 496.2C554.1 489.6 553.8 486.3 554.3 479.2C555.0 469.8 553.7 453.9 551.3 442.2C550.5 438.2 549.7 429.4 549.5 422.7C549.2 413.2 548.6 409.4 547.1 405.9C543.4 397.6 541.5 340.5 543.4 294.2C544.3 273.1 544.2 272.8 542.0 267.9C539.8 263.3 539.8 262.7 541.0 257.5C542.0 253.4 542.2 247.3 541.7 234.0C541.1 216.4 541.0 216.0 537.9 209.8C534.1 202.2 526.6 191.5 523.7 189.5C522.5 188.7 516.1 182.9 509.5 176.7C498.1 166.0 490.7 160.2 480.1 153.6C477.6 152.1 473.7 149.3 471.5 147.5C466.2 143.3 452.4 134.9 448.0 133.3C440.6 130.7 421.0 133.3 410.0 138.4C407.0 139.8 404.0 141.0 403.4 141.0C400.8 141.0 398.7 144.9 399.3 148.6C400.3 154.4 401.3 155.0 410.7 155.0C420.3 155.0 423.0 156.0 423.0 159.5C423.0 162.7 420.7 163.8 410.4 165.5C404.1 166.5 400.1 167.9 394.7 170.8C390.0 173.4 384.6 175.4 379.1 176.5C372.8 177.8 366.3 180.3 352.5 187.0C342.4 191.9 333.9 196.4 333.5 197.1C333.1 197.7 330.7 199.2 328.1 200.4C318.5 204.9 309.5 210.9 307.8 213.9C306.8 215.7 303.9 218.0 300.3 219.9C297.1 221.5 293.2 224.3 291.6 226.0C287.6 230.4 282.6 230.0 282.2 225.3C281.9 222.5 282.9 220.9 289.8 213.3C294.1 208.5 301.4 201.6 306.0 198.0C310.6 194.4 316.5 189.6 319.2 187.3C321.8 184.9 325.3 182.4 326.8 181.6C328.4 180.8 330.9 178.3 332.5 176.0C335.9 171.1 339.1 169.4 352.3 165.0C363.1 161.4 366.7 159.2 365.7 156.7C365.2 155.3 361.9 155.2 336.3 155.6C320.5 155.9 305.7 156.5 303.5 157.0C301.3 157.5 297.4 158.0 294.8 158.0C292.2 158.0 287.9 158.4 285.3 158.9C282.7 159.4 276.0 160.3 270.5 161.0C239.7 164.5 232.1 167.9 225.4 181.1C217.1 197.6 205.3 210.9 197.0 213.4C194.0 214.3 191.0 215.0 190.2 215.0C187.5 215.0 176.6 221.5 171.3 226.3C164.2 232.9 164.2 237.0 171.3 237.0C177.3 237.0 191.3 245.8 197.2 253.2C200.9 258.0 202.8 267.8 202.9 283.3C203.0 290.8 203.4 292.8 205.7 297.3C208.4 302.3 208.5 303.0 208.5 318.6L208.5 334.7L204.8 342.1C199.9 351.7 198.2 356.8 196.6 366.1C195.8 370.2 194.3 375.7 193.1 378.2C192.0 380.8 191.0 383.5 191.0 384.3C191.0 386.2 188.4 388.3 187.0 387.5C186.5 387.2 186.0 384.6 186.0 381.9C186.0 376.2 184.2 372.0 179.7 367.2C173.8 361.1 171.3 363.9 174.5 373.0C175.3 375.3 176.0 378.6 176.0 380.2C176.0 383.5 177.3 386.5 180.2 389.7C181.8 391.4 182.1 392.6 181.5 395.2C180.1 400.9 180.9 415.9 183.1 425.9C184.4 431.8 185.5 441.3 185.9 450.5C186.9 471.1 188.1 474.6 201.7 493.1C202.9 494.8 204.9 499.3 206.1 503.2C207.3 507.0 209.9 512.7 211.8 515.8C213.6 519.0 216.6 524.2 218.2 527.5C219.9 530.8 222.9 535.5 225.0 538.0C227.1 540.5 230.0 545.0 231.5 548.0C233.0 551.0 236.2 555.7 238.6 558.4C243.6 563.9 243.8 564.6 241.0 570.0C238.2 575.4 238.5 577.4 242.2 580.4C247.7 584.8 248.9 586.1 249.5 589.0C249.8 590.5 251.2 593.2 252.5 595.0C253.8 596.8 255.2 600.4 255.5 602.9C255.9 605.4 257.0 610.0 258.0 613.0C259.0 616.0 260.6 621.0 261.4 624.0C264.6 635.4 267.0 636.2 278.4 629.4ZM900.7 624.8C901.2 624.1 902.4 619.5 903.4 614.5C904.3 609.5 906.0 603.8 907.1 601.7C908.1 599.6 909.0 596.7 909.0 595.2C909.0 590.8 911.6 588.0 915.6 588.0C919.5 588.0 920.6 586.4 919.6 582.5C919.1 580.4 918.4 580.0 915.5 580.0C912.7 580.0 911.7 579.5 910.9 577.6C908.6 572.6 912.3 563.9 917.3 562.6C918.7 562.3 920.3 560.6 921.4 558.3C922.4 556.2 924.7 552.2 926.6 549.5C930.2 544.2 932.9 532.7 933.0 522.8C933.0 520.2 933.4 517.0 934.0 515.5C935.8 510.6 937.4 499.5 937.4 490.4C937.5 482.2 937.8 480.8 940.7 475.3C945.0 467.1 945.5 463.1 946.3 434.8C946.5 428.6 946.9 426.6 948.8 424.3C953.4 418.6 953.6 417.3 951.0 412.4L948.6 408.0L950.4 396.3C952.9 380.6 953.4 371.6 952.0 366.6C951.1 363.1 951.2 361.6 952.9 356.8C954.5 352.3 954.6 350.4 953.9 346.9C953.2 343.9 953.2 341.1 953.9 338.3C955.4 332.5 955.2 326.4 953.5 320.6C951.5 313.9 951.6 306.8 953.9 298.7C956.2 290.9 956.2 277.3 954.0 270.2C952.9 266.8 952.9 265.0 954.0 260.6C954.7 257.7 955.0 254.6 954.8 253.9C954.5 253.1 954.9 250.7 955.7 248.5C956.6 246.0 957.0 241.7 956.8 237.1C956.5 230.2 956.7 229.6 959.1 227.8C964.2 223.9 968.8 224.3 976.0 229.2C982.2 233.3 982.6 233.8 984.8 240.5C987.8 249.3 989.5 270.3 989.5 299.2C989.5 310.5 989.8 320.1 990.2 320.5C991.2 321.6 994.8 315.2 996.6 309.3C997.4 306.5 998.5 299.4 998.9 293.7C999.5 286.4 1000.4 281.8 1002.0 278.4C1003.6 275.0 1004.4 270.9 1004.8 264.8C1005.3 255.3 1004.7 254.2 996.6 248.7C993.8 246.8 993.2 242.4 994.9 236.4C995.5 234.3 995.3 232.2 994.3 229.4C993.5 227.3 992.5 221.4 992.1 216.3C990.9 201.3 986.1 195.6 970.8 191.0C967.0 189.8 961.2 187.6 957.8 186.0C954.3 184.3 950.7 183.0 949.7 183.0C948.7 183.0 944.8 181.7 941.0 180.0C937.2 178.4 932.6 177.0 930.8 177.0C928.9 177.0 920.2 175.9 911.4 174.5C902.7 173.1 889.4 171.1 881.9 170.0C874.5 168.9 866.4 167.3 863.9 166.5C861.5 165.6 852.3 163.3 843.5 161.5C834.7 159.6 821.4 156.0 814.0 153.5C789.9 145.3 793.2 145.8 765.5 146.4C717.0 147.4 692.0 148.9 687.5 151.0C678.8 155.2 664.5 177.3 658.4 196.0C655.1 205.8 654.6 206.8 648.6 212.6C644.9 216.1 641.2 221.0 639.7 224.1C636.9 229.8 634.0 242.1 634.0 248.0C634.0 249.9 633.6 253.1 633.0 255.0C632.5 256.9 631.2 264.8 630.0 272.5C626.4 297.5 626.0 299.9 624.1 307.8C623.0 312.0 621.8 319.1 621.5 323.5C621.1 327.9 619.9 334.2 618.9 337.6C617.9 340.9 616.5 347.2 615.9 351.5C615.3 355.9 614.2 360.6 613.5 362.0C612.4 364.2 610.7 376.5 610.0 387.0C609.1 403.0 611.6 453.9 613.4 456.9C613.7 457.3 614.4 460.7 615.0 464.4C615.6 468.1 617.4 475.3 619.0 480.3C625.3 499.5 625.9 501.8 627.4 509.0C630.0 522.2 630.3 525.8 628.9 532.6C627.3 540.8 628.3 542.0 637.2 542.0C646.1 542.0 655.9 545.7 663.5 551.8C666.2 554.0 667.1 554.2 673.0 553.7C676.6 553.4 681.5 552.3 684.0 551.4C686.5 550.4 692.5 549.3 697.5 548.9C702.5 548.5 712.1 547.4 719.0 546.5C740.3 543.6 767.3 545.1 789.0 550.5C794.2 551.8 800.5 553.1 803.0 553.5C805.5 553.8 810.2 554.9 813.5 555.9C816.8 557.0 823.8 558.8 829.0 559.9C848.3 564.3 865.9 577.1 867.6 588.1C868.0 590.5 869.5 593.6 871.1 595.5C873.5 598.2 874.0 599.7 874.0 604.0C874.0 611.2 877.6 614.7 895.3 624.7C898.1 626.3 899.5 626.3 900.7 624.8ZM1016.6 608.4C1015.8 606.2 1018.8 601.4 1020.2 602.8C1021.7 604.3 1020.7 609.4 1018.9 609.8C1018.0 610.0 1017.0 609.3 1016.6 608.4ZM1041.8 406.8C1042.3 406.1 1043.5 402.8 1044.4 399.5C1045.4 396.2 1047.5 390.7 1049.2 387.3C1052.2 381.5 1052.3 380.9 1051.1 377.0C1049.2 370.6 1037.8 364.3 1035.3 368.2C1034.9 368.9 1034.3 373.8 1034.0 379.0C1033.5 386.4 1032.8 389.9 1030.6 394.7C1027.4 401.6 1027.7 404.2 1031.8 406.5C1035.1 408.3 1040.4 408.4 1041.8 406.8ZM167.1 290.5C166.5 287.5 165.4 283.7 164.5 282.1C163.7 280.4 163.0 278.0 163.0 276.7C163.0 273.5 161.0 268.0 159.9 268.0C157.5 268.0 157.0 273.2 159.0 277.8C160.1 280.4 161.4 284.5 161.9 287.0C162.5 289.5 163.6 293.3 164.5 295.5C166.9 301.1 168.5 298.1 167.1 290.5ZM36.1 275.3C33.2 273.2 28.3 269.2 25.1 266.4C16.9 259.0 13.6 257.0 9.8 257.0C5.5 257.0 4.0 255.5 4.0 251.0C4.0 244.3 5.8 240.7 12.7 233.8C20.9 225.5 23.9 224.9 28.9 230.5C34.3 236.7 42.0 254.2 42.0 260.5C42.0 262.7 43.0 266.9 44.2 269.8C45.9 273.8 46.2 275.5 45.4 276.8C43.6 279.6 41.8 279.3 36.1 275.3ZM94.5 155.5C97.7 152.4 97.7 150.0 94.6 150.0C91.6 150.0 86.8 154.4 87.6 156.4C88.5 158.8 91.8 158.3 94.5 155.5Z"/></symbol>
+</svg>
+
+<header class="cab" data-suelo="menta">
+  <div class="envoltura">
+    <a class="marca" href="#inicio" aria-label="Librería Itinerante y Más, inicio"><svg aria-hidden="true"><use href="#camioneta"/></svg><span>Itinerante y Más</span></a>
+    <nav aria-label="Secciones"><a href="#eventos">Eventos</a><a href="#destacados">Libros</a><a href="#visita">Visita</a></nav>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+<section class="portada" id="inicio" data-suelo="menta">
+  <div class="portada-arriba">
+    <h1>Librería Itinerante y&nbsp;Más</h1>
+  </div>
+  <div class="camion" aria-hidden="true">
+    <div class="carga" id="carga"><img src="../assets/portadas-400/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp" alt="" width="400" height="600" style="left:2%;transform:rotate(-8deg)" data-r="-8"><img src="../assets/portadas-400/los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux.webp" alt="" width="400" height="600" style="left:24%;transform:rotate(4deg)" data-r="4"><img src="../assets/portadas-400/lo-que-el-doc-quiso-decir-antonio-zamudio.webp" alt="" width="400" height="600" style="left:46%;transform:rotate(-3deg)" data-r="-3"><img src="../assets/portadas-400/las-ruinas-de-la-caza-alfredo-leal.webp" alt="" width="400" height="600" style="left:68%;transform:rotate(7deg)" data-r="7"></div>
+    <svg class="trazo" viewBox="0 0 1396 982"><use href="#camioneta"/></svg>
+  </div>
+  <div class="portada-abajo">
+    <p id="linea">Libros de editoriales independientes y café en el Centro de Monterrey.</p>
+    <a class="boton boton--tinta" id="cta-portada" href="#eventos">Ver eventos <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+  </div>
+</section>
+
+<section class="eventos" id="eventos" data-suelo="papel" aria-labelledby="t-eventos">
+  <div class="envoltura">
+    <div class="cabeza-seccion">
+      <h2 class="h2" id="t-eventos">Eventos</h2>
+      <div class="controles" id="ruta-controles" hidden>
+        <button class="flecha" id="ruta-ant" aria-label="Eventos anteriores"><svg aria-hidden="true"><use href="#i-izq"/></svg></button>
+        <button class="flecha" id="ruta-sig" aria-label="Eventos siguientes"><svg aria-hidden="true"><use href="#i-der"/></svg></button>
+      </div>
+    </div>
+    <div class="ruta" id="ruta"><article class="parada destacada" data-fecha="2026-11-27">
+      <div class="fecha"><i></i>VIE 27 NOV</div>
+      <div class="tarjeta-evento">
+        <div><h3>6.º Aniversario</h3><p class="dato hora-dato"><svg aria-hidden="true"><use href="#i-reloj"/></svg>Hora por anunciar</p><p class="dato"><svg aria-hidden="true"><use href="#i-lugar"/></svg>En la librería</p></div>
+        <div class="cartel cartel--menta" aria-hidden="true"><svg><use href="#camioneta"/></svg></div>
+        <div class="acciones"><span class="precio"></span><a class="boton boton--borde" href="https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/" target="_blank" rel="noopener">Ver en Instagram <svg aria-hidden="true"><use href="#i-sale"/></svg></a></div>
+      </div></article><article class="parada" data-fecha="">
+      <div class="fecha"><i></i>Sábados cada 15 días</div>
+      <div class="tarjeta-evento">
+        <div><h3>Club de Dibujo y Pintura</h3><p class="dato hora-dato"><svg aria-hidden="true"><use href="#i-reloj"/></svg>14:00–16:00</p><p class="dato"><svg aria-hidden="true"><use href="#i-persona"/></svg>Con Santiago González</p><p class="dato"><svg aria-hidden="true"><use href="#i-lugar"/></svg>En la librería</p><p class="dato"><svg aria-hidden="true"><use href="#i-check"/></svg>Incluye material</p></div>
+        <div class="cartel cartel--noche" aria-hidden="true"><svg><use href="#camioneta"/></svg></div>
+        <div class="acciones"><span class="precio">$150 MXN</span><a class="boton boton--borde" href="https://www.instagram.com/libreriaitineranteymasmty/p/DfYBKN-oZea/" target="_blank" rel="noopener">Ver en Instagram <svg aria-hidden="true"><use href="#i-sale"/></svg></a></div>
+      </div></article></div>
+  </div>
+</section>
+
+<section class="destacados oscuro" id="destacados" data-suelo="vitrina" aria-labelledby="t-destacados">
+  <div class="envoltura">
+    <div class="cabeza-seccion">
+      <div>
+        <h2 class="h2" id="t-destacados">Destacados</h2>
+        <p class="resumen">8 libros de la selección. Los 41 están abajo, en el catálogo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="vitrina" id="vitrina" tabindex="0" role="group" aria-roledescription="carrusel" aria-label="Destacados: 8 libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.">
+    <p class="pista" aria-hidden="true"><kbd><svg><use href="#i-izq"/></svg></kbd><kbd><svg><use href="#i-der"/></svg></kbd>para hojear</p>
+    <div class="lampara"></div><div class="piso"></div>
+    <div class="escenario" id="escenario"><div class="pieza" data-i="0" data-id="las-hojas-de-fabre-jesus-ferreiro"><div class="cara"><img src="../assets/portadas-400/las-hojas-de-fabre-jesus-ferreiro.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="1" data-id="lo-que-el-doc-quiso-decir-antonio-zamudio"><div class="cara"><img src="../assets/portadas-400/lo-que-el-doc-quiso-decir-antonio-zamudio.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="2" data-id="acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h"><div class="cara"><img src="../assets/portadas-400/acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="3" data-id="amigos-rodrigo-garnica"><div class="cara"><img src="../assets/portadas-400/amigos-rodrigo-garnica.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="4" data-id="rito-de-iniciacion-diego-uribe"><div class="cara"><img src="../assets/portadas-400/rito-de-iniciacion-diego-uribe.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="5" data-id="perorata-luis-felipe-lomeli"><div class="cara"><img src="../assets/portadas-400/perorata-luis-felipe-lomeli.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="6" data-id="los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla"><div class="cara"><img src="../assets/portadas-400/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div><div class="pieza" data-i="7" data-id="las-ruinas-de-la-caza-alfredo-leal"><div class="cara"><img data-src="../assets/portadas-400/las-ruinas-de-la-caza-alfredo-leal.webp" alt="" draggable="false" loading="lazy" decoding="async" width="400" height="600"></div></div></div>
+  </div>
+  <div class="envoltura vitrina-pie">
+    <div class="ficha-vitrina" id="ficha-vitrina" aria-live="polite"><h3>Amigos</h3><p>Rodrigo Garnica · Abismos Casa Editorial · <span class="precio">$289 MXN</span></p></div>
+    <div class="vitrina-controles">
+      <button class="flecha" id="v-ant" aria-label="Libro anterior"><svg aria-hidden="true"><use href="#i-izq"/></svg></button>
+      <span class="contador" id="v-cont">4 de 8</span>
+      <button class="flecha" id="v-sig" aria-label="Libro siguiente"><svg aria-hidden="true"><use href="#i-der"/></svg></button>
+    </div>
+    <a class="al-estante" href="#libros">Ver el catálogo completo <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+  </div>
+</section>
+
+<section class="catalogo" id="libros" data-suelo="papel" aria-labelledby="t-libros">
+  <div class="envoltura">
+    <div class="cat-cabeza">
+      <h2 class="h2" id="t-libros" tabindex="-1">Catálogo</h2>
+      <p class="cat-resumen">41 libros · 4 editoriales</p>
+      <form class="busqueda" role="search" id="busqueda" action="#libros" onsubmit="return false">
+        <label for="q" class="sr">Buscar en el catálogo</label>
+        <svg class="lupa" aria-hidden="true"><use href="#i-buscar"/></svg>
+        <input id="q" type="search" placeholder="Título, autor o editorial" autocomplete="off" enterkeyhint="search" aria-describedby="q-atajo">
+        <button type="button" class="borrar" id="q-borrar" aria-label="Borrar búsqueda" hidden><svg aria-hidden="true"><use href="#i-cerrar"/></svg></button>
+        <kbd class="atajo" id="q-atajo" title="Atajo de teclado"><span class="sr">Atajo: </span>/</kbd>
+      </form>
+    </div>
+    <div class="cat-cuerpo">
+      <aside class="panel" id="panel" aria-labelledby="t-filtros">
+        <div class="panel-cabeza"><h3 id="t-filtros" tabindex="-1">Filtros</h3><button type="button" class="limpiar" id="limpiar" hidden>Limpiar</button></div>
+        <div class="panel-cuerpo" id="panel-cuerpo">
+          <div class="grupo"><h4 id="g-genero">Género</h4><div class="pildoras" role="group" aria-labelledby="g-genero" data-campo="genero"><button type="button" class="pildora" data-campo="genero" data-v="narrativa" aria-pressed="false"><span>Narrativa</span> <small>26</small></button><button type="button" class="pildora" data-campo="genero" data-v="poesia" aria-pressed="false"><span>Poesía</span> <small>8</small></button><button type="button" class="pildora" data-campo="genero" data-v="ensayo" aria-pressed="false"><span>Ensayo</span> <small>9</small></button></div></div>
+          <div class="grupo"><h4 id="g-editorial">Editorial</h4><div class="pildoras" role="group" aria-labelledby="g-editorial" data-campo="editorial"><button type="button" class="pildora" data-campo="editorial" data-v="Abismos Casa Editorial" aria-pressed="false"><span>Abismos</span> <small>19</small></button><button type="button" class="pildora" data-campo="editorial" data-v="Capítulo Siete" aria-pressed="false"><span>Capítulo Siete</span> <small>10</small></button><button type="button" class="pildora" data-campo="editorial" data-v="Iridiscencias" aria-pressed="false"><span>Iridiscencias</span> <small>10</small></button><button type="button" class="pildora" data-campo="editorial" data-v="Libro Objeto" aria-pressed="false"><span>Libro Objeto</span> <small>1</small></button></div></div>
+        </div>
+      </aside>
+      <div class="resultados-col">
+        <div class="barra-res">
+          <button type="button" class="boton-filtros" id="abrir-filtros" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-embudo"/></svg>Filtros<span class="insignia" id="n-activos" hidden></span></button>
+          <p class="conteo" id="conteo" role="status" aria-live="polite">41 libros</p>
+          <label class="orden"><span>Ordenar</span>
+            <select id="orden">
+              <option value="portada">Con portada primero</option>
+              <option value="titulo">Título (A–Z)</option>
+              <option value="autor">Autor (A–Z)</option>
+              <option value="precio-asc">Precio (menor a mayor)</option>
+              <option value="precio-desc">Precio (mayor a menor)</option>
+            </select>
+          </label>
+          <div class="vistas" role="group" aria-label="Vista de resultados">
+            <button type="button" id="vista-rejilla" aria-pressed="true" aria-label="Vista de cuadrícula"><svg aria-hidden="true"><use href="#i-rejilla"/></svg></button>
+            <button type="button" id="vista-lista" aria-pressed="false" aria-label="Vista de lista"><svg aria-hidden="true"><use href="#i-lista"/></svg></button>
+          </div>
+        </div>
+        <ul class="aplicados" id="aplicados" aria-label="Filtros aplicados" hidden></ul>
+        <div id="resultados" tabindex="-1">
+          <h3 class="sr">Resultados</h3>
+          <ul class="rejilla" id="rejilla" role="list"><li data-id="amanecer-de-california-j-enrique-vazquez-m" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/amanecer-de-california-j-enrique-vazquez-m.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABAmanecer%20de%20California%C2%BB%20de%20J.%20Enrique%20Vazquez%20M%20%28%24230%20MXN%29%3F" target="_blank" rel="noopener">Amanecer de California</a></h3><p class="meta">J. Enrique Vazquez M · Abismos Casa Editorial</p><p class="precio">$230 MXN</p></article></li><li data-id="amigos-rodrigo-garnica" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/amigos-rodrigo-garnica.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABAmigos%C2%BB%20de%20Rodrigo%20Garnica%20%28%24289%20MXN%29%3F" target="_blank" rel="noopener">Amigos</a></h3><p class="meta">Rodrigo Garnica · Abismos Casa Editorial</p><p class="precio">$289 MXN</p></article></li><li data-id="cartografias-del-pensamiento-latinoamericano-compiladora-mai" data-genero="ensayo" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/cartografias-del-pensamiento-latinoamericano-compiladora-mai.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABCartograf%C3%ADas%20del%20pensamiento%20latinoamericano%C2%BB%20de%20Compiladora%3A%20Maira%20Col%C3%ADn%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Cartografías del pensamiento latinoamericano</a></h3><p class="meta">Compiladora: Maira Colín · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="demonios-huascar-robles" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/demonios-huascar-robles.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABDemonios%C2%BB%20de%20Hu%C3%A1scar%20Robles%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Demonios</a></h3><p class="meta">Huáscar Robles · Abismos Casa Editorial</p><p class="precio">$250 MXN</p></article></li><li data-id="el-lugar-de-la-noche-david-ornelas" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/el-lugar-de-la-noche-david-ornelas.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABEl%20lugar%20de%20la%20noche%C2%BB%20de%20David%20Ornelas%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">El lugar de la noche</a></h3><p class="meta">David Ornelas · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="la-sombra-del-guerrero-hermes-millan" data-genero="poesia" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/la-sombra-del-guerrero-hermes-millan.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLa%20sombra%20del%20Guerrero%C2%BB%20de%20Hermes%20Mill%C3%A1n%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">La sombra del Guerrero</a></h3><p class="meta">Hermes Millán · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="la-voz-vertical-bruno-clemet" data-genero="ensayo" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/la-voz-vertical-bruno-clemet.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLa%20voz%20vertical%C2%BB%20de%20Bruno%20Cl%C3%A9met%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">La voz vertical</a></h3><p class="meta">Bruno Clémet · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="las-funciones-del-placer-carlos-rangel" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/las-funciones-del-placer-carlos-rangel.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLas%20funciones%20del%20placer%C2%BB%20de%20Carlos%20Rangel%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Las funciones del placer</a></h3><p class="meta">Carlos Rangel · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla" data-genero="poesia" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLos%20que%20se%20fueron%2C%20los%20que%20llegaron%C2%BB%20de%20Javier%20Cravioto%20Padilla%20%28%24180%20MXN%29%3F" target="_blank" rel="noopener">Los que se fueron, los que llegaron</a></h3><p class="meta">Javier Cravioto Padilla · Abismos Casa Editorial</p><p class="precio">$180 MXN</p></article></li><li data-id="maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp" data-genero="ensayo" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABMar%C3%ADa%20Zambrano%3A%20Lo%20tr%C3%A1gico%2C%20la%20quimera%C2%BB%20de%20Horacio%20Alejandro%20Gonz%C3%A1lez%20S%C3%A1nchez%2C%20Sergio%20Espinosa%20Proa%20y%20Pablo%20Mu%C3%B1oz%20Covarrubias%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">María Zambrano: Lo trágico, la quimera</a></h3><p class="meta">Horacio Alejandro González Sánchez, Sergio Espinosa Proa y Pablo Muñoz Covarrubias · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="maurice-blanchot-sergio-espinosa-proa" data-genero="ensayo" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/maurice-blanchot-sergio-espinosa-proa.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABMaurice%20Blanchot%3A%20la%20fuerza%20y%20el%20fastidio%C2%BB%20de%20Sergio%20Espinosa%20Proa%20%28%24180%20MXN%29%3F" target="_blank" rel="noopener">Maurice Blanchot: la fuerza y el fastidio</a></h3><p class="meta">Sergio Espinosa Proa · Abismos Casa Editorial</p><p class="precio">$180 MXN</p></article></li><li data-id="otra-vez-el-crepusculo-asbel-hernandez" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/otra-vez-el-crepusculo-asbel-hernandez.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABOtra%20vez%20el%20Crep%C3%BAsculo%C2%BB%20de%20Asbel%20Hern%C3%A1ndez%20%28%24230%20MXN%29%3F" target="_blank" rel="noopener">Otra vez el Crepúsculo</a></h3><p class="meta">Asbel Hernández · Abismos Casa Editorial</p><p class="precio">$230 MXN</p></article></li><li data-id="pensamiento-e-ideologia-en-america-latina-compiladora-sidhar" data-genero="ensayo" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABPensamiento%20e%20ideolog%C3%ADa%20en%20Am%C3%A9rica%20Latina%C2%BB%20de%20Compiladora%3A%20Sidharta%20Ochoa%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Pensamiento e ideología en América Latina</a></h3><p class="meta">Compiladora: Sidharta Ochoa · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="perlas-de-obsidiana-olaf-marin" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/perlas-de-obsidiana-olaf-marin.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABPerlas%20de%20obsidiana%C2%BB%20de%20Olaf%20Mar%C3%ADn%20%28%24180%20MXN%29%3F" target="_blank" rel="noopener">Perlas de obsidiana</a></h3><p class="meta">Olaf Marín · Abismos Casa Editorial</p><p class="precio">$180 MXN</p></article></li><li data-id="perorata-luis-felipe-lomeli" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/perorata-luis-felipe-lomeli.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABPerorata%C2%BB%20de%20Luis%20Felipe%20Lomel%C3%AD%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Perorata</a></h3><p class="meta">Luis Felipe Lomelí · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="polvo-carlos-bortoni" data-genero="poesia" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/polvo-carlos-bortoni.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABPolvo%C2%BB%20de%20Carlos%20Bortoni%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Polvo</a></h3><p class="meta">Carlos Bortoni · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="rito-de-iniciacion-diego-uribe" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/rito-de-iniciacion-diego-uribe.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABRito%20de%20iniciaci%C3%B3n%C2%BB%20de%20Diego%20Uribe%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Rito de iniciación</a></h3><p class="meta">Diego Uribe · Abismos Casa Editorial</p><p class="precio">$200 MXN</p></article></li><li data-id="yita-y-el-arcoiris-cristi-na-han" data-genero="narrativa" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/yita-y-el-arcoiris-cristi-na-han.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABYita%20y%20el%20arco%C3%ADris%C2%BB%20de%20Cristi%20Na%20Han%20%28%24300%20MXN%29%3F" target="_blank" rel="noopener">Yita y el arcoíris</a></h3><p class="meta">Cristi Na Han · Abismos Casa Editorial</p><p class="precio">$300 MXN</p></article></li><li data-id="antologia-gris-compilador-francisco-javier-hernandez-m" data-genero="poesia" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/antologia-gris-compilador-francisco-javier-hernandez-m.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABAntolog%C3%ADa%20Gris%C2%BB%20de%20Compilador%3A%20Francisco%20Javier%20Hern%C3%A1ndez%20M.%20%28%24160%20MXN%29%3F" target="_blank" rel="noopener">Antología Gris</a></h3><p class="meta">Compilador: Francisco Javier Hernández M. · Capítulo Siete</p><p class="precio">$160 MXN</p></article></li><li data-id="cuanto-ha-visto-el-hombre-antonio-estudillo" data-genero="narrativa" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/cuanto-ha-visto-el-hombre-antonio-estudillo.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%AB%C2%BFCu%C3%A1nto%20ha%20visto%20el%20hombre%3F%C2%BB%20de%20Antonio%20Estudillo%20%28%24180%20MXN%29%3F" target="_blank" rel="noopener">¿Cuánto ha visto el hombre?</a></h3><p class="meta">Antonio Estudillo · Capítulo Siete</p><p class="precio">$180 MXN</p></article></li><li data-id="domingo-por-la-tarde-cuando-llueve-alejandro-mandujano" data-genero="narrativa" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABDomingo%20por%20la%20tarde%20cuando%20llueve%C2%BB%20de%20Alejandro%20Mandujano%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Domingo por la tarde cuando llueve</a></h3><p class="meta">Alejandro Mandujano · Capítulo Siete</p><p class="precio">$200 MXN</p></article></li><li data-id="el-circo-miguel-del-valle" data-genero="narrativa" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/el-circo-miguel-del-valle.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABEl%20Circo%C2%BB%20de%20Miguel%20del%20Valle%20%28%24170%20MXN%29%3F" target="_blank" rel="noopener">El Circo</a></h3><p class="meta">Miguel del Valle · Capítulo Siete</p><p class="precio">$170 MXN</p></article></li><li data-id="los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux" data-genero="narrativa" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLos%20habitantes%3A%20antolog%C3%ADa%20de%20cuentos%C2%BB%20de%20Francisco%20Trejo%2C%20Carlomagno%20Sol%2C%20Jasm%C3%ADn%20Cacheux%2C%20Odette%20Alonso%2C%20Jos%C3%A9%20S%C3%A1nchez%2C%20Luis%20Fernando%20Rangel%2C%20Norberto%20Flores%2C%20Neri%20Tello%2C%20Yenitza%20Villanueva%2C%20Cuquis%20Sandoval%20%28%24160%20MXN%29%3F" target="_blank" rel="noopener">Los habitantes: antología de cuentos</a></h3><p class="meta">Francisco Trejo, Carlomagno Sol, Jasmín Cacheux, Odette Alonso, José Sánchez, Luis Fernando Rangel, Norberto Flores, Neri Tello, Yenitza Villanueva, Cuquis Sandoval · Capítulo Siete</p><p class="precio">$160 MXN</p></article></li><li data-id="material-sensible-francisco-javier-hernandez-m" data-genero="poesia" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/material-sensible-francisco-javier-hernandez-m.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABMaterial%20sensible%C2%BB%20de%20Francisco%20Javier%20Hern%C3%A1ndez%20M.%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Material sensible</a></h3><p class="meta">Francisco Javier Hernández M. · Capítulo Siete</p><p class="precio">$200 MXN</p></article></li><li data-id="me-llaman-loca-cristina-arreola-marquez" data-genero="poesia" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/me-llaman-loca-cristina-arreola-marquez.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABMe%20llaman%20loca%C2%BB%20de%20Cristina%20Arreola%20M%C3%A1rquez%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Me llaman loca</a></h3><p class="meta">Cristina Arreola Márquez · Capítulo Siete</p><p class="precio">$200 MXN</p></article></li><li data-id="no-pelear-pelear-arturo-r-orozco-padilla" data-genero="narrativa" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/no-pelear-pelear-arturo-r-orozco-padilla.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABNo%20pelear%20pelear%C2%BB%20de%20Arturo%20R.%20Orozco%20Padilla%20%28%24260%20MXN%29%3F" target="_blank" rel="noopener">No pelear pelear</a></h3><p class="meta">Arturo R. Orozco Padilla · Capítulo Siete</p><p class="precio">$260 MXN</p></article></li><li data-id="reino-mundo-juan-mireles" data-genero="narrativa" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/reino-mundo-juan-mireles.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABReino%20mundo%C2%BB%20de%20Juan%20Mireles%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Reino mundo</a></h3><p class="meta">Juan Mireles · Capítulo Siete</p><p class="precio">$200 MXN</p></article></li><li data-id="todas-las-lluvias-francisco-javier-hernandez-m" data-genero="poesia" data-editorial="Capítulo Siete"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/todas-las-lluvias-francisco-javier-hernandez-m.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABTodas%20las%20lluvias%C2%BB%20de%20Francisco%20Javier%20Hern%C3%A1ndez%20M.%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Todas las lluvias</a></h3><p class="meta">Francisco Javier Hernández M. · Capítulo Siete</p><p class="precio">$200 MXN</p></article></li><li data-id="acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABAcaso%20un%20descubrimiento%20a%20mitad%20de%20la%20noche%C2%BB%20de%20H%C3%A9ctor%20Justino%20Hern%C3%A1ndez%20%28%24200%20MXN%29%3F" target="_blank" rel="noopener">Acaso un descubrimiento a mitad de la noche</a></h3><p class="meta">Héctor Justino Hernández · Iridiscencias</p><p class="precio">$200 MXN</p></article></li><li data-id="las-hojas-de-fabre-jesus-ferreiro" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/las-hojas-de-fabre-jesus-ferreiro.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLas%20hojas%20de%20Fabre%C2%BB%20de%20Jes%C3%BAs%20Ferreiro%20%28%24300%20MXN%29%3F" target="_blank" rel="noopener">Las hojas de Fabre</a></h3><p class="meta">Jesús Ferreiro · Iridiscencias</p><p class="precio">$300 MXN</p></article></li><li data-id="lo-que-el-doc-quiso-decir-antonio-zamudio" data-genero="ensayo" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/lo-que-el-doc-quiso-decir-antonio-zamudio.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLo%20que%20el%20doc%20quiso%20decir%3A%20Glosario%20de%20frases%20m%C3%A9dicas%20no%20especializadas%20pero%20igual%20de%20confusas%C2%BB%20de%20Antonio%20Zamudio%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Lo que el doc quiso decir: Glosario de frases médicas no especializadas pero igual de confusas</a></h3><p class="meta">Antonio Zamudio · Iridiscencias</p><p class="precio">$250 MXN</p></article></li><li data-id="las-ruinas-de-la-caza-alfredo-leal" data-genero="narrativa" data-editorial=""><article class="libro"><div class="portada-libro"><img src="../assets/portadas-400/las-ruinas-de-la-caza-alfredo-leal.webp" alt="" loading="lazy" decoding="async" width="400" height="600"></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLas%20ruinas%20de%20la%20caza%C2%BB%20de%20Alfredo%20Leal%3F" target="_blank" rel="noopener">Las ruinas de la caza</a></h3><p class="meta">Alfredo Leal</p></article></li><li data-id="cronicas-de-lo-habitual-claudia-guillen" data-genero="narrativa ensayo" data-editorial="Abismos Casa Editorial"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Abismos Casa Editorial</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABCr%C3%B3nicas%20de%20lo%20habitual%C2%BB%20de%20Claudia%20Guill%C3%A9n%20%28%24199%20MXN%29%3F" target="_blank" rel="noopener">Crónicas de lo habitual</a></h3><p class="meta">Claudia Guillén · Abismos Casa Editorial</p><p class="precio">$199 MXN</p></article></li><li data-id="bestiaria-brenda-cristina-rosas" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABBestiaria%C2%BB%20de%20Brenda%20Cristina%20Rosas%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Bestiaria</a></h3><p class="meta">Brenda Cristina Rosas · Iridiscencias</p><p class="precio">$250 MXN</p></article></li><li data-id="hipercodex-emmanuel-vizcaya" data-genero="poesia ensayo" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABHiperc%C3%B3dex%3A%20Ensayo%20po%C3%A9tico%20hiperb%C3%B3lico%C2%BB%20de%20Emmanuel%20Vizcaya%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Hipercódex: Ensayo poético hiperbólico</a></h3><p class="meta">Emmanuel Vizcaya · Iridiscencias</p><p class="precio">$250 MXN</p></article></li><li data-id="las-noches-rotas-abraham-valenzuela-hernandez" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABLas%20noches%20rotas%C2%BB%20de%20Abraham%20Valenzuela%20Hern%C3%A1ndez%20%28%24400%20MXN%29%3F" target="_blank" rel="noopener">Las noches rotas</a></h3><p class="meta">Abraham Valenzuela Hernández · Iridiscencias</p><p class="precio">$400 MXN</p></article></li><li data-id="pongo-esta-fruta-degustada-en-tu-cuerpo-mariana-del-vergel" data-genero="ensayo" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABPongo%20esta%20fruta%20degustada%20en%20tu%20cuerpo%C2%BB%20de%20Mariana%20del%20Vergel%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Pongo esta fruta degustada en tu cuerpo</a></h3><p class="meta">Mariana del Vergel · Iridiscencias</p><p class="precio">$250 MXN</p></article></li><li data-id="tres-tristes-tristes-iasura-esquivel" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABTres%20tristes.%20Tristes%C2%BB%20de%20Iasura%20Esquivel%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Tres tristes. Tristes</a></h3><p class="meta">Iasura Esquivel · Iridiscencias</p><p class="precio">$250 MXN</p></article></li><li data-id="tuneles-cabellos-y-otros-miedos-maitane-aguirre-gonzalez" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABT%C3%BAneles%2C%20cabellos%20y%20otros%20miedos%C2%BB%20de%20Maitane%20Aguirre%20Gonz%C3%A1lez%20%28%24250%20MXN%29%3F" target="_blank" rel="noopener">Túneles, cabellos y otros miedos</a></h3><p class="meta">Maitane Aguirre González · Iridiscencias</p><p class="precio">$250 MXN</p></article></li><li data-id="yenpox-enrique-ortega" data-genero="narrativa" data-editorial="Iridiscencias"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Iridiscencias</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABYenpox%C2%BB%20de%20Enrique%20Ortega%20%28%24300%20MXN%29%3F" target="_blank" rel="noopener">Yenpox</a></h3><p class="meta">Enrique Ortega · Iridiscencias</p><p class="precio">$300 MXN</p></article></li><li data-id="sukuachi-savi-ninos-lluvia-rain-children-nadia-lopez-garcia" data-genero="narrativa" data-editorial="Libro Objeto"><article class="libro"><div class="portada-libro"><div class="sin-portada" aria-hidden="true"><span>Libro Objeto</span><svg><use href="#camioneta"/></svg></div></div><h3><a href="https://wa.me/528180875940?text=Hola%2C%20%C2%BFtienen%20disponible%20%C2%ABSukuachi%20savi%20Ni%C3%B1os%20lluvia%20Rain%20children%C2%BB%20de%20Nadia%20L%C3%B3pez%20Garc%C3%ADa%20%28%24320%20MXN%29%3F" target="_blank" rel="noopener">Sukuachi savi Niños lluvia Rain children</a></h3><p class="meta">Nadia López García · Libro Objeto</p><p class="precio">$320 MXN</p></article></li></ul>
+          <div class="vacio-cat" id="vacio" hidden>
+            <h3 id="vacio-t">Ningún libro cumple con estos filtros</h3>
+            <p>Prueba con menos palabras o revisa la ortografía.</p>
+            <div class="vacio-acciones"><button type="button" class="boton boton--borde" id="vacio-borrar" hidden>Borrar búsqueda</button><button type="button" class="boton boton--borde" id="vacio-quitar" hidden>Quitar filtros</button></div>
+            <p class="vacio-pedir">Si no lo tenemos, te lo podemos pedir. <a href="https://wa.me/528180875940?text=Hola%2C%20busco%20un%20libro%3A%20" target="_blank" rel="noopener">Pregúntanos por WhatsApp</a>.</p>
+          </div>
+          <div class="mas" id="mas" hidden><p class="sr" role="status" id="mas-estado"></p><button type="button" class="boton boton--borde" id="mas-boton"></button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dialog class="hoja-filtros" id="hoja-filtros" aria-labelledby="hf-t">
+    <div class="lamina">
+      <div class="lamina-cabeza"><h3 id="hf-t" tabindex="-1">Filtros</h3><button type="button" class="limpiar" id="hf-limpiar" hidden>Limpiar</button><button type="button" class="cerrar-hf" id="hf-cerrar" aria-label="Cerrar filtros"><svg aria-hidden="true"><use href="#i-cerrar"/></svg></button></div>
+      <div class="lamina-cuerpo" id="hf-cuerpo"></div>
+      <div class="lamina-pie"><button type="button" class="boton boton--tinta" id="hf-ver">Ver 41 libros</button></div>
+    </div>
+  </dialog>
+</section>
+
+<section class="tienda" id="tienda" data-suelo="papel2" aria-labelledby="t-tienda">
+  <div class="envoltura">
+    <div class="tienda-cabeza">
+      <h2 id="t-tienda">Tienda</h2><span class="sello">Próximamente</span>
+    </div>
+    <p class="proximo">Merch y talleres: próximamente.</p>
+    <ul class="esqueleto" aria-label="Lo que se subirá a la tienda">
+      <li class="hueco"><div class="hueco-img" aria-hidden="true"><svg><use href="#camioneta"/></svg></div><span class="hueco-cat">Libros</span><span class="barra-g" aria-hidden="true"></span><span class="barra-g corta" aria-hidden="true"></span></li>
+      <li class="hueco"><div class="hueco-img" aria-hidden="true"><svg><use href="#camioneta"/></svg></div><span class="hueco-cat">Merch</span><span class="barra-g" aria-hidden="true"></span><span class="barra-g corta" aria-hidden="true"></span></li>
+      <li class="hueco"><div class="hueco-img" aria-hidden="true"><svg><use href="#camioneta"/></svg></div><span class="hueco-cat">Talleres</span><span class="barra-g" aria-hidden="true"></span><span class="barra-g corta" aria-hidden="true"></span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="visita" id="visita" data-suelo="menta" aria-labelledby="t-visita">
+  <div class="envoltura">
+    <div class="visita-reticula">
+      <div class="datos">
+        <h2 class="h2" id="t-visita">Visita</h2>
+        <p class="direccion">Matamoros 421 Pte., Centro, Monterrey</p>
+        <p class="entre">Entre Juan Aldama e Ignacio Rayón</p>
+        <dl class="horario"><dt>Lunes a sábado</dt><dd>11:00–20:00</dd><dt>Domingo</dt><dd>Cerrado</dd></dl>
+        <a class="boton boton--tinta" href="https://www.google.com/maps/dir/?api=1&amp;destination=Librer%C3%ADa%20Itinerante%20y%20M%C3%A1s%2C%20Mariano%20Matamoros%20Pte.%20421%2C%20Centro%2C%20Monterrey" target="_blank" rel="noopener">Cómo llegar <svg aria-hidden="true"><use href="#i-sale"/></svg></a>
+        <ul class="contacto"><li><a href="https://wa.me/528180875940" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-msj"/></svg>WhatsApp</a></li><li><a href="tel:+528180875940"><svg aria-hidden="true"><use href="#i-tel"/></svg>Tel. 81 8087 5940</a></li><li><a href="https://www.instagram.com/libreriaitineranteymasmty/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-camara"/></svg>Instagram</a></li><li><a href="https://www.facebook.com/people/Librer%C3%ADa-Itinerante-y-m%C3%A1s/100095548961064/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pagina"/></svg>Facebook</a></li><li><a href="mailto:libreriaitineranteymasmty@gmail.com"><svg aria-hidden="true"><use href="#i-correo"/></svg>libreriaitineranteymasmty@gmail.com</a></li><li><a href="https://forms.gle/RDaEfgVitEFbDnyU7" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-forma"/></svg>Rentar el espacio</a></li></ul>
+      </div>
+      <figure class="foto">
+        <img src="../assets/img/01-entrada-pasillo-800.webp" srcset="../assets/img/01-entrada-pasillo-800.webp 800w, ../assets/img/01-entrada-pasillo.webp 1212w" sizes="(max-width:900px) 92vw, 50vw" alt="El pasillo de entrada: una mesa y estantes bajos a la izquierda, un librero alto a la derecha y cuadros en los muros." width="1212" height="682" loading="lazy">
+        <figcaption>El pasillo de entrada · Foto: Aldo G. Pineda</figcaption>
+      </figure>
+    </div>
+    <div class="barra" id="cafe">
+      <h3>En la barra</h3>
+      <div class="carta"><div><h4>Cafés</h4><ul><li><b>Café de olla</b><span>$65 MXN</span></li><li><b>Café americano</b><span>$45 MXN</span></li><li><b>Cappuccino</b><span>$65 MXN</span></li><li><b>Latte</b><span>$65 MXN</span></li><li><b>Macchiato</b><span>$45 MXN</span></li><li><b>Espresso</b><span>$45 MXN</span></li><li><b>Affogato</b><span>$70 MXN</span></li></ul></div><div><h4>Bebidas sin café</h4><ul><li><b>Chocolate</b><span>$65 MXN</span></li><li><b>Hierbabuena</b><span></span></li><li><b>Manzanilla</b><span></span></li><li><b>7 azahares</b><span></span></li><li><b>Limón</b><span></span></li><li><b>Jamaica</b><span></span></li><li><b>Té verde</b><span></span></li><li><b>Aguas frescas</b><span></span></li></ul></div><div><h4>Salado</h4><ul><li><b>Sándwich</b><span>$80 MXN</span><span class="d">Queso panela, hummus, espinaca, tomate y aguacate.</span></li><li><b>Quesadilla campesina</b><span>$55 MXN</span><span class="d">Queso de rancho y guiso del día.</span></li><li><b>Molletes</b><span>$65 MXN</span></li></ul></div><div><h4>Postres</h4><ul><li><b>Empanada de cajeta</b><span>$35 MXN</span></li><li><b>Empanada de piña</b><span>$35 MXN</span></li><li><b>Tarta del día</b><span>$70 MXN</span><span class="d">Rebanada.</span></li></ul></div></div>
+    </div>
+    <div class="preguntas">
+      <details><summary>¿Tienen el libro que busco?</summary><p>Búscalo en el <a href="#libros">catálogo</a> y, en su ficha, toca «Consultar disponibilidad por WhatsApp»: se abre WhatsApp con el mensaje ya escrito. Si no lo tenemos, te lo podemos pedir.</p></details>
+      <details><summary>¿Abren en días festivos?</summary><p>Pregúntanos antes por WhatsApp.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="pie-pagina">
+  <div class="envoltura"><strong>Librería Itinerante y Más</strong><span>© 2026 · Fotos: Aldo G. Pineda. Portadas: sus editoriales.</span></div>
+</footer>
+
+<div class="velo" id="velo"></div>
+<div class="hoja" id="hoja" role="dialog" aria-modal="true" aria-labelledby="hoja-t">
+  <button class="cerrar" id="hoja-cerrar" aria-label="Cerrar ficha"><svg aria-hidden="true"><use href="#i-cerrar"/></svg></button>
+  <div id="hoja-cuerpo"></div>
+</div>
+
+<script src="datos.js" defer></script>
+<script src="vendor/gsap.min.js" defer></script>
+<script src="vendor/Flip.min.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

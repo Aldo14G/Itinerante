@@ -1,0 +1,554 @@
+{
+ "1440-no-preference": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 450918,
+   "Document": 98863,
+   "Image": 120510,
+   "Font": 78028,
+   "Script": 153517
+  },
+  "pesoTrasRecorrer": 856216,
+  "axe": [],
+  "dom": {
+   "proximamente": 1,
+   "proxDonde": [
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "Las ruinas de la caza | Alfredo Leal",
+   "visitaTop": 7671,
+   "docH": 9639,
+   "librosVisibles": 41,
+   "verTodos": null,
+   "primeraFila": [
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    }
+   ],
+   "contador": "5 de 32 con portada",
+   "alEstante": "#libros",
+   "h": [
+    "H1:LibreríaItinerantey Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Tienda",
+    "H3:Rito de iniciación",
+    "H2:Todos los libros",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [
+    [
+     129,
+     0,
+     "NAV,[object SVGAnimatedString]"
+    ]
+   ],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 4249
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 9,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "6 de 32 con portada"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía",
+    "frames": 69,
+    "fueraRect": 368,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 7
+   },
+   {
+    "texto": "Todos",
+    "frames": 68,
+    "fueraRect": 1093,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 41
+   }
+  ],
+  "gestos": {
+   "inicio": 6,
+   "tras180": 7,
+   "ruedaScrollY": [
+    1788,
+    2388
+   ]
+  }
+ },
+ "1440-reduce": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 450918,
+   "Font": 78028,
+   "Image": 120510,
+   "Document": 98863,
+   "Script": 153517
+  },
+  "pesoTrasRecorrer": 856216,
+  "axe": [],
+  "dom": {
+   "proximamente": 1,
+   "proxDonde": [
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "Las ruinas de la caza | Alfredo Leal",
+   "visitaTop": 7671,
+   "docH": 9639,
+   "librosVisibles": 41,
+   "verTodos": null,
+   "primeraFila": [
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    }
+   ],
+   "contador": "5 de 32 con portada",
+   "alEstante": "#libros",
+   "h": [
+    "H1:LibreríaItinerantey Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Tienda",
+    "H3:Rito de iniciación",
+    "H2:Todos los libros",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [
+    [
+     62,
+     0,
+     "NAV,[object SVGAnimatedString]"
+    ]
+   ],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 4249
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 9,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "6 de 32 con portada"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 7
+   },
+   {
+    "texto": "Todos",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 41
+   }
+  ],
+  "gestos": {
+   "inicio": 6,
+   "tras180": 7,
+   "ruedaScrollY": [
+    1788,
+    2388
+   ]
+  }
+ },
+ "390-no-preference": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 450918,
+   "Font": 78028,
+   "Image": 120510,
+   "Document": 98863,
+   "Script": 153517
+  },
+  "pesoTrasRecorrer": 742917,
+  "axe": [],
+  "dom": {
+   "proximamente": 1,
+   "proxDonde": [
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "Las ruinas de la cazaAlfredo Leal",
+   "visitaTop": 5326,
+   "docH": 8704,
+   "librosVisibles": 12,
+   "verTodos": {
+    "txt": "Ver los 41 libros",
+    "h": 52,
+    "exp": "false"
+   },
+   "primeraFila": [
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    }
+   ],
+   "contador": "5 de 32 con portada",
+   "alEstante": "#libros",
+   "h": [
+    "H1:LibreríaItinerantey Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Tienda",
+    "H3:Rito de iniciación",
+    "H2:Todos los libros",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 2401
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 10,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "6 de 32 con portada"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía",
+    "frames": 69,
+    "fueraRect": 353,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 7
+   },
+   {
+    "texto": "Todos",
+    "frames": 69,
+    "fueraRect": 140,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "clip",
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 12
+   }
+  ],
+  "gestos": {
+   "inicio": 6,
+   "tras180": 7,
+   "tras180rapido": 8,
+   "verticalScrollY": [
+    1587,
+    2109
+   ]
+  }
+ },
+ "390-reduce": {
+  "errs": [],
+  "hostsExternos": [],
+  "carga": {
+   "total": 450918,
+   "Font": 78028,
+   "Document": 98863,
+   "Image": 120510,
+   "Script": 153517
+  },
+  "pesoTrasRecorrer": 742917,
+  "axe": [],
+  "dom": {
+   "proximamente": 1,
+   "proxDonde": [
+    {
+     "tag": "P",
+     "role": null,
+     "enTienda": true,
+     "clickable": false,
+     "texto": "Merch y talleres: próximamente."
+    }
+   ],
+   "precioEnTienda": 0,
+   "ruinas": "Las ruinas de la cazaAlfredo Leal",
+   "visitaTop": 5326,
+   "docH": 8704,
+   "librosVisibles": 12,
+   "verTodos": {
+    "txt": "Ver los 41 libros",
+    "h": 52,
+    "exp": "false"
+   },
+   "primeraFila": [
+    {
+     "portada": true,
+     "titulos": 1
+    },
+    {
+     "portada": true,
+     "titulos": 1
+    }
+   ],
+   "contador": "5 de 32 con portada",
+   "alEstante": "#libros",
+   "h": [
+    "H1:LibreríaItinerantey Más",
+    "H2:Eventos",
+    "H3:6.º Aniversario",
+    "H3:Club de Dibujo y Pintura",
+    "H2:Tienda",
+    "H3:Rito de iniciación",
+    "H2:Todos los libros",
+    "H2:Visita",
+    "H3:En la barra"
+   ],
+   "fuentes": [
+    "Barlow Condensed 600",
+    "Barlow Condensed 700",
+    "Barlow 400",
+    "Barlow 600"
+   ],
+   "cls": 0,
+   "shifts": [],
+   "vitrinaSrc": 7,
+   "fechasAniv": 1,
+   "overflowX": false,
+   "inlineTienda": 34,
+   "texto": 2401
+  },
+  "primerTab": {
+   "txt": "Ir al contenido",
+   "vis": true
+  },
+  "foco": {
+   "tabs": 10,
+   "outline": "solid 3px rgb(232, 160, 32)",
+   "offset": "-6px",
+   "fondo": "rgb(8, 39, 36)",
+   "color": "rgb(232, 160, 32)",
+   "matchesFV": true,
+   "pista": "1",
+   "pistaTxt": "para hojear",
+   "contraste": 7.15,
+   "trasFlecha": "6 de 32 con portada"
+  },
+  "buscar": {
+   "outline": "solid 3px",
+   "color": "rgb(6, 26, 24)",
+   "fondo": "rgb(241, 245, 242)",
+   "contraste": 16.33
+  },
+  "filtro": [
+   {
+    "texto": "Poesía",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 7
+   },
+   {
+    "texto": "Todos",
+    "frames": 67,
+    "fueraRect": 0,
+    "fueraVisible": 0,
+    "overflowDurante": [
+     "visible"
+    ],
+    "deltaTop": 0,
+    "visibles": 12
+   }
+  ],
+  "gestos": {
+   "inicio": 6,
+   "tras180": 7,
+   "tras180rapido": 8,
+   "verticalScrollY": [
+    1587,
+    2119
+   ]
+  }
+ },
+ "nojs-1440": {
+  "texto": 4147,
+  "libros": 41,
+  "eventos": 2,
+  "carta": 21,
+  "direccion": true,
+  "proximamente": 1,
+  "docH": 8947
+ },
+ "nojs-390": {
+  "texto": 4130,
+  "libros": 41,
+  "eventos": 2,
+  "carta": 21,
+  "direccion": true,
+  "proximamente": 1,
+  "docH": 14102
+ }
+}
