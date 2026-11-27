@@ -518,8 +518,8 @@ function aplicar(cambio, opciones = {}) {
   });
 }
 leeUrl();
-// El servidor ya entrega la rejilla en el orden de la URL (html-consulta.ts), sin resaltar la búsqueda.
-ordenPintado = cat.orden;
+// En Pages el inicio es un archivo estático: la rejilla llega en el orden de portada y aquí se aplica el de la URL
+// (si el HTML ya viene ordenado por el servidor, reacomodarlo en el mismo orden no cambia nada).
 pintaCat({ sinUrl: true });
 $('#q').value = cat.q;
 $$('.pildora').forEach((pl) => pl.addEventListener('click', (ev) => {
