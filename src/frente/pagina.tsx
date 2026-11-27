@@ -803,8 +803,18 @@ function Pie() {
         <div className="pie-creditos">
           <strong>Librería Itinerante y Más</strong>
           <div className="pie-autoria">
-            <p>© 2026 · Página creada por Aldo G. Martinez Pineda</p>
-            <p>Diseño y textos originales · <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es" rel="license">CC BY-NC-ND 4.0</a></p>
+            <p>
+              © 2026 · Diseño y desarrollo:{' '}
+              <a
+                className="pie-autor"
+                href="https://aldo-portfolio-one.vercel.app/"
+                target="_blank"
+                rel="noopener"
+                aria-label="Aldo G. Martínez Pineda, portafolio (se abre en otra pestaña)"
+              >
+                Aldo G. Martínez Pineda<Icon id="i-sale" />
+              </a>
+            </p>
           </div>
         </div>
       </div>

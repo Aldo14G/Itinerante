@@ -265,8 +265,12 @@ html.entrada :is(.camion,#carga img){visibility:hidden}
 .contacto svg{width:18px;height:18px;flex:none;color:var(--sala)}
 .pie-creditos{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:var(--s4)}
 .pie-autoria p{margin:0}
-.pie-autoria p+p{margin-top:var(--s1)}
-.pie-autoria a{display:inline-block;padding-block:var(--s2);font-weight:600}
+.pie-autor{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:inherit;font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.pie-autor svg{width:16px;height:16px;flex:none;transition:translate var(--d-rapida) var(--e-out)}
+@media (hover:hover) and (pointer:fine){.pie-autor:hover svg{translate:2px -2px}}
+@media (prefers-reduced-motion:reduce){.pie-autor:hover svg{translate:none}}
+.contacto a[href^="mailto"]{overflow-wrap:normal}
+@media (min-width:761px){.contacto li:has(> a[href^="mailto"]){grid-column:span 2}}
 .pie-pagina strong{color:var(--noche);font:700 22px/1 var(--f-disp)}
 
 @media (max-width:900px){

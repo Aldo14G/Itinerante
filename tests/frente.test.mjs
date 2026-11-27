@@ -119,13 +119,14 @@ test('El pie concentra el contacto: «Matamoros» 1 vez, 1 enlace a Maps, teléf
   assert.ok(!/<footer[\s\S]*Matamoros[\s\S]*<\/footer>/.test(h));
 });
 
-test('la portada omite la frase visible y el pie acredita la autoría y la licencia elegida', () => {
+test('la portada omite la frase visible y el pie acredita la autoría con enlace al portafolio, sin licencia CC', () => {
   const h = html();
   assert.doesNotMatch(seccion(h, 'inicio'), /id="linea"|Libros de editoriales independientes y café en el Centro de Monterrey\./);
   const pie = h.slice(h.indexOf('<footer'));
-  assert.match(pie, /Página creada por Aldo G\. Martinez Pineda/);
+  assert.match(pie, /© 2026 · Diseño y desarrollo:/);
+  assert.match(pie, /<a class="pie-autor" href="https:\/\/aldo-portfolio-one\.vercel\.app\/" target="_blank" rel="noopener"[^>]*>Aldo G\. Martínez Pineda<svg[^>]*><use href="#i-sale"/);
   assert.doesNotMatch(pie, /Fotos del espacio|Portadas y carteles/);
-  assert.match(pie, /Diseño y textos originales · <a href="https:\/\/creativecommons\.org\/licenses\/by-nc-nd\/4\.0\/deed\.es" rel="license">CC BY-NC-ND 4\.0<\/a>/);
+  assert.doesNotMatch(pie, /creativecommons|CC BY/);
 });
 
 test('horario confirmado: un solo campo, una vez en Visita y en el JSON-LD; nunca Abierto/Cerrado en vivo', () => {
