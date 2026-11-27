@@ -44,6 +44,8 @@ const csp = [
   `style-src ${hashCsp(css)}`,
   `style-src-attr 'unsafe-hashes' ${attrs.join(' ')}`,
   "img-src 'self' data:",
+  // Reels propios de la carta (assets/), sin orígenes externos.
+  "media-src 'self'",
   "font-src 'self'",
   "connect-src 'self'",
   "base-uri 'none'",

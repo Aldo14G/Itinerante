@@ -358,7 +358,7 @@ test('carta: una tarjeta por producto, fotografía y precio según los datos', (
   }
   assert.ok(barra.includes('Hierbabuena') && barra.includes('Té verde') && barra.includes('Aguas frescas'));
   assert.ok(!barra.includes('Los tés'));
-  const carta = barra.slice(barra.indexOf('id="carta-completa"'), barra.indexOf('class="menu-vitrina"'));
+  const carta = barra.slice(barra.indexOf('id="carta-completa"'), barra.indexOf('class="carta-visita"'));
   assert.equal(cuenta(carta, /class="carta-precio"/g), CARTA.flatMap((categoria) => categoria.productos).filter((producto) => producto.precio != null).length);
   assert.ok(!barra.includes('$0 MXN'));
 });
@@ -587,23 +587,20 @@ test('taller con proximaSesion vigente: el cartel anuncia la fecha y al pasar vu
   assert.ok(pasada.includes('Sábados cada 15 días'));
 });
 
-test('la carta de Café se consulta antes de las recomendaciones y enlaza a Visita', () => {
+test('la carta de Café: cada plato es una tarjeta con su lugar para el reel (icono mientras no hay foto ni video) y enlaza a Visita', () => {
   const h = html();
   const cafe = seccion(h, 'cafe');
-  const inicioVitrina = cafe.indexOf('class="menu-vitrina"');
-  assert.ok(inicioVitrina > cafe.indexOf('id="carta-completa"'));
-  const vitrina = cafe.slice(inicioVitrina);
-  assert.match(vitrina, /<a class="carta-visita" href="#visita">Planear la visita/);
-  assert.ok(!vitrina.includes('llegada-sala'));
-  assert.match(vitrina, /role="region" aria-roledescription="carrusel" aria-labelledby="t-cafe-muestra"/);
-  assert.equal(cuenta(vitrina, /aria-controls="cafe-carrusel"/g), 2);
-  assert.equal(cuenta(vitrina, /aria-current="true"/g), 1);
-  assert.match(vitrina, /id="cafe-posicion">1 de 3<\/span>/);
-  for (const id of ['quesadilla-campesina', 'molletes', 'tarta-del-dia']) {
-    const producto = CARTA.flatMap((categoria) => categoria.productos).find((p) => p.id === id);
-    assert.ok(vitrina.includes(producto.nombre));
-    assert.ok(vitrina.includes(`$${producto.precio} MXN`));
+  assert.ok(!cafe.includes('Recomendaciones de la carta') && !cafe.includes('cafe-carrusel'), 'sin la vitrina de recomendaciones');
+  assert.match(cafe, /<a class="carta-visita" href="#visita">Planear la visita/);
+  assert.ok(cafe.indexOf('class="carta-visita"') > cafe.indexOf('id="carta-completa"'));
+  for (const producto of CARTA.flatMap((categoria) => categoria.productos)) {
+    const tarjeta = cafe.split(`data-producto="${producto.id}"`)[1].split('</li>')[0];
+    assert.match(tarjeta, /class="carta-producto-media"/, producto.nombre);
+    if (!producto.foto && !producto.video) assert.ok(tarjeta.includes(`href="#c-${producto.icono}"`), `${producto.nombre}: icono ${producto.icono}`);
+    assert.ok(h.includes(`id="c-${producto.icono}"`), `el sprite trae c-${producto.icono}`);
   }
+  assert.equal(CARTA.find((c) => c.id === 'salado').productos.find((p) => p.id === 'sandwich').icono, 'sandwich');
+  assert.equal(CARTA.find((c) => c.id === 'sin-cafe').productos.find((p) => p.id === 'manzanilla').icono, 'te');
   const visita = seccion(h, 'visita');
   assert.ok(visita.includes('01-entrada-pasillo-800.webp'));
   assert.ok(!visita.includes('llegada-sala'));

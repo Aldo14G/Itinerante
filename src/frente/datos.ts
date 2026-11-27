@@ -266,9 +266,27 @@ export function generosConFiltro(libros = LIBROS): Array<{ nombre: string; n: nu
 export const NOMBRE_TIENDA = MERCH.length ? 'Tienda' : 'Libros';
 
 type FotoProducto = { src: string; alt: string };
-type Producto = { id: string; nombre: string; descripcion: string | null; precio: number | null; foto: FotoProducto | null };
-type ProductoCrudo = Omit<Producto, 'foto'> & { foto?: FotoProducto | null };
+/** Video corto propio del plato (vertical, sin sonido, en bucle): `src` local bajo assets/, `poster` opcional. */
+type VideoProducto = { src: string; poster: string | null };
+export type IconoCarta =
+  | 'taza' | 'espresso' | 'olla' | 'affogato' | 'chocolate' | 'te' | 'vaso'
+  | 'sandwich' | 'quesadilla' | 'mollete' | 'empanada' | 'tarta' | 'plato';
+type Producto = {
+  id: string; nombre: string; descripcion: string | null; precio: number | null;
+  foto: FotoProducto | null; video: VideoProducto | null; icono: IconoCarta;
+};
+type ProductoCrudo = Omit<Producto, 'foto' | 'video' | 'icono'> & {
+  foto?: FotoProducto | null; video?: { src: string; poster?: string | null } | null;
+};
 export type CategoriaCarta = { id: string; nombre: string; productos: Producto[] };
+
+// El icono de cada plato mientras no haya foto ni video; lo que no esté aquí toma el de su categoría.
+const ICONO_PRODUCTO: Record<string, IconoCarta> = {
+  'cafe-de-olla': 'olla', espresso: 'espresso', affogato: 'affogato', chocolate: 'chocolate',
+  jamaica: 'vaso', 'aguas-frescas': 'vaso', sandwich: 'sandwich', 'quesadilla-campesina': 'quesadilla',
+  molletes: 'mollete', 'empanada-de-cajeta': 'empanada', 'empanada-de-pina': 'empanada', 'tarta-del-dia': 'tarta',
+};
+const ICONO_CATEGORIA: Record<string, IconoCarta> = { cafe: 'taza', 'sin-cafe': 'te', salado: 'plato', postres: 'tarta' };
 
 /** Carta «En la barra»: categorías y productos de menu.json. Las notas no se imprimen (S-6). */
 export const CARTA: CategoriaCarta[] = carta.categorias.map((c) => ({
@@ -280,6 +298,8 @@ export const CARTA: CategoriaCarta[] = carta.categorias.map((c) => ({
     descripcion: p.descripcion ?? null,
     precio: typeof p.precio === 'number' ? p.precio : null,
     foto: p.foto ? { src: '/' + p.foto.src, alt: p.foto.alt } : null,
+    video: p.video ? { src: '/' + p.video.src, poster: p.video.poster ? '/' + p.video.poster : null } : null,
+    icono: ICONO_PRODUCTO[p.id] ?? ICONO_CATEGORIA[c.id] ?? 'plato',
   })),
 }));
 

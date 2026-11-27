@@ -20,6 +20,7 @@ import {
   precioMXN,
   whatsapp,
   type Evento,
+  type IconoCarta,
   type Libro,
   type PlanTienda,
   type ProductoTienda,
@@ -134,9 +135,31 @@ function Sprite() {
       <symbol id="i-lista" viewBox="0 0 24 24"><path d="M4 6h3m3 0h10M4 12h3m3 0h10M4 18h3m3 0h10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></symbol>
       <symbol id="i-forma" viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v12.5H7Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /><path d="M10 12h6m-6 4h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></symbol>
       <symbol id="camioneta" viewBox={TRAZO_VB}><path fill="currentColor" fillRule="evenodd" d={TRAZO_D} /></symbol>
+      {Object.entries(ICONOS_CARTA).map(([id, d]) => (
+        <symbol id={'c-' + id} viewBox="0 0 24 24" key={id}>
+          <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </symbol>
+      ))}
     </svg>
   );
 }
+
+// Iconos de la carta, uno por tipo de plato o bebida: esperan en la tarjeta mientras no hay foto ni video propios.
+const ICONOS_CARTA: Record<IconoCarta, string> = {
+  taza: 'M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5ZM16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M4 21h14M9 3.5c-.8 1 .8 2 0 3M12.5 3.5c-.8 1 .8 2 0 3',
+  espresso: 'M7 11h8v3a4 4 0 0 1-8 0ZM15 12h1a2 2 0 0 1 0 4h-1.3M5 20.5h13M11 5.5c-.8 1 .8 2 0 3',
+  olla: 'M5 9.5h14M6 9.5c0 6 2.5 10 6 10s6-4 6-10M6 11.5H4a1.5 1.5 0 0 0 0 3h2.3M18 11.5h2a1.5 1.5 0 0 1 0 3h-2.3M10 6.5c-.8 1 .8 1.5 0 2.5M14 6.5c-.8 1 .8 1.5 0 2.5',
+  affogato: 'M6 11h12l-1.5 8.5a1.5 1.5 0 0 1-1.5 1.2H9a1.5 1.5 0 0 1-1.5-1.2ZM7.5 11a4.5 4.5 0 0 1 9 0M8.5 15c1.2.8 2.3.8 3.5 0s2.3-.8 3.5 0',
+  chocolate: 'M5 7h11v10a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3ZM16 9.5h1.5a2.5 2.5 0 0 1 0 5H16M5 11h11M8 3.5v1.5M11 3v2M14 3.5v1.5',
+  te: 'M4 11h12v3a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5ZM16 12h1.5a2 2 0 0 1 0 4H15.6M3 21.5h14M14 3c-3 0-4.5 1.8-4.5 4.2 2.7 0 4.5-1.7 4.5-4.2ZM9.5 7.2 12 5.5',
+  vaso: 'M6.5 8h11l-1.3 11.6a1.5 1.5 0 0 1-1.5 1.4H9.3a1.5 1.5 0 0 1-1.5-1.4ZM7 12.5h10M13 8l2.5-5.5H18',
+  sandwich: 'M4 14.5 12 5l8 9.5M3.5 14.5h17V17a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17ZM6.5 11.5c1.8.9 3.7-.9 5.5 0s3.7-.9 5.5 0',
+  quesadilla: 'M3.5 17a8.5 8.5 0 0 1 17 0ZM7 17c.5-3.2 2.4-5.4 5-5.8M9.5 13.8h.01M14.5 13.2h.01M12.5 15.5h.01',
+  mollete: 'M3.5 13c0-4 3.8-6.5 8.5-6.5s8.5 2.5 8.5 6.5c0 2.5-3.8 4.5-8.5 4.5S3.5 15.5 3.5 13ZM6.5 12.5c1.5-1 3-1 4.5 0s3 1 4.5 0',
+  empanada: 'M3.5 15.5a8.5 8.5 0 0 1 17 0c0 1-.8 1.5-1.8 1.5H5.3c-1 0-1.8-.5-1.8-1.5ZM6.2 13.3l1.1-1.2M9 12l.5-1.5M12 11.5V10M15 12l-.5-1.5M17.8 13.3l-1.1-1.2',
+  tarta: 'M3.5 17 19.5 9v8ZM3.5 17v2.5h16V17M19.5 9c-.6-2-2.3-2.7-4-2.1',
+  plato: 'M3 14h18M5 14a7 7 0 0 1 14 0M12 7V5.5M4 17.5h16',
+};
 
 function SinPortada({ editorial }: { editorial: string | null }) {
   return (
@@ -263,23 +286,21 @@ export function Eventos({ agenda = EVENTOS }: { agenda?: readonly Evento[] } = {
         <div className="agenda-carrusel" role="group" aria-roledescription="carrusel" aria-labelledby="t-eventos">
           <div className="cabeza-seccion agenda-cabecera">
             <h2 className="h2" id="t-eventos">Eventos{hayTalleres && <span className="agenda-talleres"> y talleres</span>}</h2>
-            <div className="agenda-controles" hidden>
-              <button className="boton boton--borde" type="button" id="agenda-rotacion" aria-label="Pausar avance automático" aria-controls="agenda-eventos">Pausar</button>
-              <div className="vitrina-controles">
-                <button className="boton boton--borde" type="button" aria-label="Actividad anterior" aria-controls="agenda-eventos" aria-disabled="true" data-agenda-paso="-1"><Icon id="i-izq" /><span>Anterior</span></button>
-                <span className="contador" id="agenda-posicion" aria-live="off" aria-atomic="true" />
-                <button className="boton boton--borde" type="button" aria-label="Actividad siguiente" aria-controls="agenda-eventos" data-agenda-paso="1"><span>Siguiente</span><Icon id="i-der" /></button>
-              </div>
-            </div>
           </div>
           {hayTalleres && <span id="talleres" className="ancla" />}
-          <ol className="agenda-eventos" role="list" id="agenda-eventos" aria-label="Actividades de la librería" tabIndex={0}>
-            {agenda.map((e) => (
-              <li key={e.id} data-taller={e.seccion === 'talleres' ? '' : undefined} className={e.fecha ? 'evento-fechado' : undefined}>
-                {e.fecha ? <Hasta d={e.fecha}><Parada e={e} /></Hasta> : <Parada e={e} />}
-              </li>
-            ))}
-          </ol>
+          <div className="agenda-pista">
+            <ol className="agenda-eventos" role="list" id="agenda-eventos" aria-label="Actividades de la librería" tabIndex={0}>
+              {agenda.map((e) => (
+                <li key={e.id} data-taller={e.seccion === 'talleres' ? '' : undefined} className={e.fecha ? 'evento-fechado' : undefined}>
+                  {e.fecha ? <Hasta d={e.fecha}><Parada e={e} /></Hasta> : <Parada e={e} />}
+                </li>
+              ))}
+            </ol>
+            <div className="agenda-controles" hidden>
+              <button className="flecha agenda-flecha agenda-flecha--ant" type="button" aria-label="Actividad anterior" aria-controls="agenda-eventos" aria-disabled="true" data-agenda-paso="-1"><Icon id="i-izq" /></button>
+              <button className="flecha agenda-flecha agenda-flecha--sig" type="button" aria-label="Actividad siguiente" aria-controls="agenda-eventos" data-agenda-paso="1"><Icon id="i-der" /></button>
+            </div>
+          </div>
           <p className="agenda-vacia">Por ahora no hay actividades anunciadas. Sigue a la librería en <a href={NEGOCIO.instagram}>Instagram</a>.</p>
         </div>
         {agenda.some((e) => e.instagramUrl === AGENDA_SEMANAL.instagramUrl) && (
@@ -699,13 +720,20 @@ function Visita() {
 function ContenidoProductoCarta({ producto }: {
   producto: (typeof CARTA)[number]['productos'][number];
 }) {
+  // Cada tarjeta reserva su lugar vertical para el reel del plato: video propio si lo hay, si no la foto,
+  // y mientras no haya ninguno, el icono del plato (sin fotos de banco ni recreaciones).
   return (
     <>
-      {producto.foto ? (
-        <div className="carta-producto-media">
+      <div className="carta-producto-media">
+        {producto.video ? (
+          <video className="carta-producto-video" src={producto.video.src} poster={producto.video.poster ?? producto.foto?.src}
+            muted loop playsInline preload="none" aria-label={producto.foto?.alt ?? producto.nombre} />
+        ) : producto.foto ? (
           <img className="carta-producto-foto" src={producto.foto.src} alt={producto.foto.alt} loading="lazy" decoding="async" />
-        </div>
-      ) : null}
+        ) : (
+          <span className="carta-producto-icono"><Icon id={'c-' + producto.icono} /></span>
+        )}
+      </div>
       <div className="carta-producto-texto">
         <h4>{producto.nombre}</h4>
         {producto.descripcion ? <p>{producto.descripcion}</p> : null}
@@ -716,8 +744,6 @@ function ContenidoProductoCarta({ producto }: {
 }
 
 function Carta() {
-  const muestraIds = ['quesadilla-campesina', 'molletes', 'tarta-del-dia'];
-  const muestra = CARTA.flatMap((categoria) => categoria.productos).filter((producto) => muestraIds.includes(producto.id));
   return (
     <section id="cafe" className="menu-cafe" data-suelo="papel" aria-labelledby="t-cafe" tabIndex={-1}>
       <div className="envoltura menu-carta">
@@ -746,30 +772,6 @@ function Carta() {
             </article>
           ))}
         </div>
-        {muestra.length ? (
-          <div className="menu-vitrina">
-            <h3 id="t-cafe-muestra">Recomendaciones de la carta</h3>
-            <div className="menu-escena" role="region" aria-roledescription="carrusel" aria-labelledby="t-cafe-muestra">
-              <ul className="menu-muestra" id="cafe-carrusel" aria-label="Platos destacados" role="list" tabIndex={muestra.length > 1 ? 0 : undefined}>
-                {muestra.map((producto, indice) => (
-                  <li key={producto.id} aria-current={indice === 0 ? 'true' : undefined}>
-                    <article className="carta-producto">
-                      <ContenidoProductoCarta producto={producto} />
-                    </article>
-                  </li>
-                ))}
-              </ul>
-              {muestra.length > 1 ? (
-                <div className="vitrina-controles menu-controles" role="group" aria-label="Cambiar plato" hidden>
-                  <button className="boton boton--borde" type="button" aria-label="Plato anterior" aria-controls="cafe-carrusel" aria-disabled="true" data-cafe-paso="-1"><Icon id="i-izq" /> Anterior</button>
-                  <span className="contador" aria-hidden="true" id="cafe-posicion">1 de {muestra.length}</span>
-                  <button className="boton boton--borde" type="button" aria-label="Plato siguiente" aria-controls="cafe-carrusel" aria-disabled="false" data-cafe-paso="1">Siguiente <Icon id="i-der" /></button>
-                  <span className="sr" role="status" id="cafe-plato-activo" />
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
         <a className="carta-visita" href="#visita">Planear la visita <Icon id="i-der" /></a>
       </div>
     </section>
@@ -871,7 +873,7 @@ export function Pagina({ css, js, consulta = CONSULTA_VACIA }: { css: string; js
         <link rel="apple-touch-icon" href="/Logo.png" />
         <link rel="preload" href="/assets/frente/fuentes/BarlowCondensed-700.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="preload" href="/assets/frente/fuentes/Barlow-400.woff2" as="font" type="font/woff2" crossOrigin="" />
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        <script dangerouslySetInnerHTML={{ __html: "(function(d){d.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('entrada');setTimeout(function(){d.classList.remove('entrada')},2500)}})(document.documentElement)" }} />
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd()).replace(/</g, '\\u003c') }} />
       </head>

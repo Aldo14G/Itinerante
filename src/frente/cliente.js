@@ -26,127 +26,156 @@ const hoyISO = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey',
 $$('fecha-hasta').forEach((e) => { if (hoyISO > e.getAttribute('d')) e.remove(); });
 $$('fecha-desde').forEach((e) => { if (hoyISO < e.getAttribute('d')) e.remove(); else e.hidden = false; });
 
-// Agenda: scroll nativo y una pausa real al tomar el control.
+// Agenda: varias actividades a la vista, avanza sola una a una y se detiene en cuanto la persona la toma
+// (arrastre, flechas, teclado, trackpad). El cursor encima solo la pausa. Con «reducir movimiento» no avanza sola.
 const agenda = $('#agenda-eventos');
 const carruselAgenda = $('.agenda-carrusel');
 const controlesAgenda = $('.agenda-controles');
 const botonesAgenda = [...controlesAgenda.querySelectorAll('[data-agenda-paso]')];
-const rotacionAgenda = $('#agenda-rotacion');
-const posicionAgenda = $('#agenda-posicion');
 const tarjetasAgenda = [...agenda.querySelectorAll(':scope > li:has(.parada)')];
-const INTERVALO_AGENDA = 12_000;
-let indiceAgenda = -1;
+const INTERVALO_AGENDA = 5_000;
+let indiceAgenda = 0;
 let avanzarAgenda = !preferenciaMovimiento.matches;
 let agendaAlaVista = false;
-let punteroEnAgenda = false;
+let agendaEnPausa = false;
 let temporizadorAgenda;
+let rellenoAgenda = 0;
+let marcoAgenda = 0;
 
-function destinoAgenda(tarjeta) {
-  return tarjeta.offsetLeft + (tarjeta.offsetWidth - agenda.clientWidth) / 2;
-}
+const destinoAgenda = (tarjeta) => tarjeta.offsetLeft - rellenoAgenda;
+const finAgenda = () => agenda.scrollWidth - agenda.clientWidth;
 
 function actualizarAgenda() {
-  const distancias = tarjetasAgenda.map((tarjeta) => Math.abs(destinoAgenda(tarjeta) - agenda.scrollLeft));
-  const indice = distancias.indexOf(Math.min(...distancias));
-  if (indice === indiceAgenda) return;
-  indiceAgenda = indice;
-  botonesAgenda[0].setAttribute('aria-disabled', String(indiceAgenda <= 0));
-  botonesAgenda[1].setAttribute('aria-disabled', String(indiceAgenda >= tarjetasAgenda.length - 1));
-  tarjetasAgenda.forEach((tarjeta, i) => {
-    if (i === indiceAgenda) tarjeta.setAttribute('aria-current', 'true');
-    else tarjeta.removeAttribute('aria-current');
-  });
-  posicionAgenda.textContent = `${indiceAgenda + 1} de ${tarjetasAgenda.length}`;
+  marcoAgenda = 0;
+  const x = agenda.scrollLeft;
+  const distancias = tarjetasAgenda.map((tarjeta) => Math.abs(destinoAgenda(tarjeta) - x));
+  indiceAgenda = distancias.indexOf(Math.min(...distancias));
+  botonesAgenda[0].setAttribute('aria-disabled', String(x <= 2));
+  botonesAgenda[1].setAttribute('aria-disabled', String(x >= finAgenda() - 2));
 }
+const pedirActualizarAgenda = () => { marcoAgenda ||= requestAnimationFrame(actualizarAgenda); };
 
 function irAgenda(indice, inmediato = false) {
-  const tarjeta = tarjetasAgenda[indice];
+  const tarjeta = tarjetasAgenda[Math.max(0, Math.min(indice, tarjetasAgenda.length - 1))];
   if (!tarjeta) return;
   agenda.scrollTo({
-    left: destinoAgenda(tarjeta),
+    left: Math.min(destinoAgenda(tarjeta), finAgenda()),
     behavior: inmediato || preferenciaMovimiento.matches ? 'instant' : 'smooth',
   });
 }
 
 function programarAgenda() {
   clearTimeout(temporizadorAgenda);
-  if (!avanzarAgenda || preferenciaMovimiento.matches || punteroEnAgenda ||
-      !agendaAlaVista || document.hidden || tarjetasAgenda.length < 2) return;
+  if (!avanzarAgenda || preferenciaMovimiento.matches || agendaEnPausa ||
+      !agendaAlaVista || document.hidden || agenda.scrollWidth <= agenda.clientWidth + 2) return;
   temporizadorAgenda = setTimeout(() => {
-    const siguiente = (indiceAgenda + 1) % tarjetasAgenda.length;
-    irAgenda(siguiente, siguiente === 0);
+    // Al llegar al final vuelve al principio sin recorrer todo de regreso.
+    if (agenda.scrollLeft >= finAgenda() - 2) irAgenda(0, true);
+    else irAgenda(indiceAgenda + 1);
     programarAgenda();
   }, INTERVALO_AGENDA);
 }
 
-function rotarAgenda(activar) {
-  avanzarAgenda = activar;
-  const accion = activar ? 'Pausar' : 'Reanudar';
-  rotacionAgenda.textContent = accion;
-  rotacionAgenda.setAttribute('aria-label', `${accion} avance automático`);
-  rotacionAgenda.hidden = preferenciaMovimiento.matches;
-  posicionAgenda.setAttribute('aria-live', activar ? 'off' : 'polite');
-  programarAgenda();
+function detenerAgenda() {
+  avanzarAgenda = false;
+  clearTimeout(temporizadorAgenda);
 }
 
-rotacionAgenda.addEventListener('click', () => rotarAgenda(!avanzarAgenda));
 botonesAgenda.forEach((b) => b.addEventListener('click', () => {
   if (b.getAttribute('aria-disabled') === 'true') return;
-  rotarAgenda(false);
+  detenerAgenda();
   irAgenda(indiceAgenda + Number(b.dataset.agendaPaso));
 }));
 agenda.addEventListener('keydown', (e) => {
   if (e.target !== agenda || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
   e.preventDefault();
-  rotarAgenda(false);
+  detenerAgenda();
   if (e.key === 'Home') irAgenda(0);
   else if (e.key === 'End') irAgenda(tarjetasAgenda.length - 1);
   else irAgenda(indiceAgenda + (e.key === 'ArrowRight' ? 1 : -1));
 });
-
 carruselAgenda.addEventListener('focusin', (e) => {
-  if (e.target !== rotacionAgenda || e.target.matches(':focus-visible')) rotarAgenda(false);
-  const i = tarjetasAgenda.indexOf(e.target.closest('li'));
-  if (i >= 0) irAgenda(i, true);
+  if (!e.target.matches(':focus-visible')) return;
+  detenerAgenda();
+  const tarjeta = e.target.closest('li');
+  // Solo se mueve si la tarjeta enfocada con el teclado quedó fuera de la vista.
+  if (tarjeta && (tarjeta.offsetLeft < agenda.scrollLeft || tarjeta.offsetLeft + tarjeta.offsetWidth > agenda.scrollLeft + agenda.clientWidth)) {
+    irAgenda(tarjetasAgenda.indexOf(tarjeta), true);
+  }
 });
-agenda.addEventListener('pointerdown', () => rotarAgenda(false));
-agenda.addEventListener('wheel', (e) => {
-  if (e.deltaX || e.shiftKey) rotarAgenda(false);
-}, { passive: true });
+agenda.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) detenerAgenda(); }, { passive: true });
+agenda.addEventListener('touchstart', detenerAgenda, { passive: true });
 carruselAgenda.addEventListener('pointerenter', (e) => {
   if (e.pointerType !== 'mouse') return;
-  punteroEnAgenda = true;
+  agendaEnPausa = true;
   programarAgenda();
 });
 carruselAgenda.addEventListener('pointerleave', () => {
-  punteroEnAgenda = false;
+  agendaEnPausa = false;
   programarAgenda();
 });
+
+// Arrastrar con el ratón: la pista sigue al cursor y al soltar se ajusta a la tarjeta más cercana.
+// Si hubo arrastre, el clic que sigue no abre el enlace que quedó debajo.
+let arrastreAgenda = null;
+agenda.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse' || e.button !== 0) return;
+  detenerAgenda();
+  arrastreAgenda = { x: e.clientX, inicio: agenda.scrollLeft, movio: false, id: e.pointerId };
+});
+agenda.addEventListener('pointermove', (e) => {
+  if (!arrastreAgenda) return;
+  const dx = e.clientX - arrastreAgenda.x;
+  if (!arrastreAgenda.movio) {
+    if (Math.abs(dx) < 6) return;
+    arrastreAgenda.movio = true;
+    agenda.setPointerCapture(arrastreAgenda.id);
+    agenda.classList.add('arrastrando');
+  }
+  agenda.scrollLeft = arrastreAgenda.inicio - dx;
+});
+const soltarAgenda = () => {
+  if (!arrastreAgenda) return;
+  const movio = arrastreAgenda.movio;
+  arrastreAgenda = null;
+  if (!movio) return;
+  agenda.classList.remove('arrastrando');
+  irAgenda(indiceAgenda);
+  const anular = (e) => { e.preventDefault(); e.stopPropagation(); };
+  addEventListener('click', anular, { capture: true, once: true });
+  setTimeout(() => removeEventListener('click', anular, { capture: true }), 0);
+};
+agenda.addEventListener('pointerup', soltarAgenda);
+agenda.addEventListener('pointercancel', soltarAgenda);
+agenda.addEventListener('dragstart', (e) => e.preventDefault());
+
 new IntersectionObserver(([entrada]) => {
   agendaAlaVista = entrada.intersectionRatio >= .35;
   programarAgenda();
 }, { threshold: .35 }).observe(agenda);
 document.addEventListener('visibilitychange', programarAgenda);
-preferenciaMovimiento.addEventListener('change', () => rotarAgenda(false));
+preferenciaMovimiento.addEventListener('change', detenerAgenda);
 
 function abrirAnclaAgenda() {
   const hash = location.hash.slice(1);
   if (hash === 'eventos' || hash === 'cartelera') return irAgenda(0, true);
   const indice = tarjetasAgenda.findIndex((li) => hash === 'talleres' ? li.hasAttribute('data-taller') : li.querySelector('.parada').id === hash);
   if (indice < 0) return;
-  rotarAgenda(false);
+  detenerAgenda();
   irAgenda(indice, true);
 }
-agenda.addEventListener('scroll', actualizarAgenda, { passive: true });
-new ResizeObserver(actualizarAgenda).observe(agenda);
+agenda.addEventListener('scroll', pedirActualizarAgenda, { passive: true });
+new ResizeObserver(() => {
+  rellenoAgenda = parseFloat(getComputedStyle(agenda).scrollPaddingInlineStart) || 0;
+  actualizarAgenda();
+  programarAgenda();
+}).observe(agenda);
 addEventListener('hashchange', abrirAnclaAgenda);
 $('.cab a[href="#eventos"]').addEventListener('click', () => {
   if (location.hash === '#eventos') abrirAnclaAgenda();
 });
 abrirAnclaAgenda();
 controlesAgenda.hidden = tarjetasAgenda.length < 2;
-actualizarAgenda();
-rotarAgenda(avanzarAgenda);
 $$('.cartel img').forEach((img) => {
   const preparada = () => {
     if (!img.naturalWidth) img.hidden = true;
@@ -172,13 +201,18 @@ function marcaPortadas(raiz = document) {
 }
 marcaPortadas();
 
-// Portada: la camioneta llega una sola vez y termina centrada.
+// Portada: la camioneta llega una sola vez y termina centrada. Empieza después del primer fotograma: medir sus estilos
+// antes de pintar retrasaba la primera pintura. Mientras tanto la cabecera (`html.entrada`, puesta en <head>) la oculta.
+const raizDoc = document.documentElement;
 if (!reducir) {
-  const tl = gsap.timeline({ delay: 0.15 });
-  tl.from('.camion', { xPercent: -38, duration: 1.1, ease: E_OUT })
-    .from('.camion .trazo', { clipPath: 'inset(0 100% 0 0)', duration: 0.9, ease: 'power3.out' }, 0)
-    .from('#carga img', { y: -70, opacity: 0, rotation: (i, el) => +el.dataset.r - 14, duration: 0.7, ease: E_OUT, stagger: 0.08 }, 0.55);
-}
+  requestAnimationFrame(() => setTimeout(() => {
+    const tl = gsap.timeline({ delay: 0.05 });
+    tl.from('.camion', { xPercent: -38, duration: 1.1, ease: E_OUT })
+      .from('.camion .trazo', { clipPath: 'inset(0 100% 0 0)', duration: 0.9, ease: 'power3.out' }, 0)
+      .from('#carga img', { y: -70, opacity: 0, rotation: (i, el) => +el.dataset.r - 14, duration: 0.7, ease: E_OUT, stagger: 0.08 }, 0.55);
+    raizDoc.classList.remove('entrada');
+  }, 0));
+} else raizDoc.classList.remove('entrada');
 
 // Vitrina.
 const vit = $('#vitrina');
@@ -208,16 +242,23 @@ if (vit) {
     controles(i);
     if (!reducir) gsap.fromTo(f, { opacity: .8 }, { opacity: 1, duration: D.rapida, ease: E_OUT, overwrite: true });
   }
+  // Por fotograma solo transform, opacidad y el velo de cada portada (una opacidad, no un `filter` que obliga a
+  // volver a pintar la portada); zIndex y visibilidad se escriben solo cuando cambian.
+  const zPrevio = [];
+  const ocultaPrevia = [];
   function pinta() {
     vit.style.perspective = `${W * 4}px`;
+    const movil = innerWidth < 700;
     piezas.forEach((p, i) => {
       const d = i - st.pos;
-      const k = poseVitrina(d, { w: W, flat: reducir, movil: innerWidth < 700 });
+      const k = poseVitrina(d, { w: W, flat: reducir, movil });
       p.style.transform = transformVitrina(k);
       p.style.opacity = k.op;
-      p.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
-      p.style.visibility = k.op <= 0 ? 'hidden' : 'visible';
-      p.firstChild.style.filter = `brightness(${(1 - Math.min(k.dim, 1) * 0.38).toFixed(3)})`;
+      const z = 100 - Math.round(Math.abs(d) * 10);
+      if (zPrevio[i] !== z) { zPrevio[i] = z; p.style.zIndex = String(z); }
+      const oculta = k.op <= 0;
+      if (ocultaPrevia[i] !== oculta) { ocultaPrevia[i] = oculta; p.style.visibility = oculta ? 'hidden' : 'visible'; }
+      p.firstChild.style.setProperty('--velo', (Math.min(k.dim, 1) * 0.38).toFixed(3));
     });
     const c = Math.round(st.pos);
     if (c !== centroPrevio) {
@@ -383,18 +424,30 @@ function leeUrl() {
   const pag = Number(p.get('pagina') || 0);
   if (pag > 1) cat.mostrados = pag * tamPagina();
 }
+// Lo que ya está pintado: reordenar o resaltar las 41 tarjetas solo cuando cambian el orden o la búsqueda
+// (rehacerlas en cada clic forzaba una maquetación completa de la rejilla).
+let ordenPintado = 'portada';
+let busquedaPintada = '';
 function pintaCat(opciones = {}) {
   const toks = tokens(cat.q);
   const orden = [...items].sort(ORDEN[cat.orden]);
-  orden.forEach((it) => rejilla.appendChild(it.li));
+  if (cat.orden !== ordenPintado) {
+    orden.forEach((it) => rejilla.appendChild(it.li));
+    ordenPintado = cat.orden;
+  }
   const coinciden = orden.filter(pasa);
   if (!cat.mostrados) cat.mostrados = tamPagina();
   const visibles = new Set(coinciden.slice(0, cat.mostrados));
+  const resaltar = toks.join(' ') !== busquedaPintada;
+  busquedaPintada = toks.join(' ');
   items.forEach((it) => {
-    it.li.classList.toggle('fuera', !visibles.has(it));
-    it.li.hidden = false;
-    it.a.innerHTML = resalta(it.t0, toks);
-    it.meta.innerHTML = resalta(it.m0, toks);
+    const fuera = !visibles.has(it);
+    if (it.li.classList.contains('fuera') !== fuera) it.li.classList.toggle('fuera', fuera);
+    if (it.li.hidden) it.li.hidden = false;
+    if (resaltar) {
+      it.a.innerHTML = resalta(it.t0, toks);
+      it.meta.innerHTML = resalta(it.m0, toks);
+    }
   });
   const n = coinciden.length;
   const mostrados = Math.min(n, cat.mostrados);
@@ -435,8 +488,11 @@ function aplicar(cambio, opciones = {}) {
   const top0 = resultados.getBoundingClientRect().top;
   const h0 = rejilla.offsetHeight;
   const anima = opciones.animar !== false && !preferenciaMovimiento.matches;
-  const lis = items.map((it) => it.li);
-  const estado = anima ? Flip.getState(lis) : null;
+  // Flip solo sobre lo que se ve (antes ≤ 20 tarjetas, no las 41) y sin `absolute`: cada tarjeta se desplaza con
+  // transform desde donde estaba. Con `absolute` Flip sacaba las 41 del flujo y forzaba cientos de maquetaciones por clic.
+  // Cambiar de vista (rejilla ↔ lista) mueve todo: ahí basta un fundido.
+  const vistas = () => items.filter((it) => !it.li.classList.contains('fuera')).map((it) => it.li);
+  const estado = anima && !opciones.vista ? Flip.getState(vistas()) : null;
   if (opciones.reinicia !== false) cat.mostrados = tamPagina();
   if (cambio) cambio();
   pintaCat();
@@ -447,15 +503,21 @@ function aplicar(cambio, opciones = {}) {
   };
   fija();
   if (!anima) return;
+  if (opciones.vista) {
+    animando = gsap.fromTo(rejilla, { opacity: .35 }, { opacity: 1, duration: D.rapida, ease: E_OUT, clearProps: 'opacity', onComplete: () => { animando = null; } });
+    return;
+  }
   resultados.classList.add('recortando');
   rejilla.style.minHeight = `${h0}px`;
   animando = Flip.from(estado, {
-    targets: lis, duration: D.media, ease: E_OUT, absolute: true, scale: !!opciones.vista,
-    onEnter: (x) => gsap.fromTo(x, { opacity: .85 }, { opacity: 1, duration: D.rapida, ease: E_OUT }),
+    targets: vistas(), duration: D.media, ease: E_OUT,
+    onEnter: (x) => gsap.fromTo(x, { opacity: 0 }, { opacity: 1, duration: D.rapida, ease: E_OUT }),
     onComplete: () => { rejilla.style.minHeight = ''; resultados.classList.remove('recortando'); animando = null; fija(); },
   });
 }
 leeUrl();
+// El servidor ya entrega la rejilla en el orden de la URL (html-consulta.ts), sin resaltar la búsqueda.
+ordenPintado = cat.orden;
 pintaCat({ sinUrl: true });
 $('#q').value = cat.q;
 $$('.pildora').forEach((pl) => pl.addEventListener('click', (ev) => {
@@ -707,53 +769,16 @@ if (recomendaciones) {
   abrirPorAncla();
 }
 
-// Vitrina de Café: ajuste nativo al centro y un solo plato protagonista.
-const carruselCafe = $('#cafe-carrusel');
-const controlesCafe = $('.menu-controles');
-if (carruselCafe && controlesCafe) {
-  const platos = [...carruselCafe.children];
-  const anterior = $('[data-cafe-paso="-1"]');
-  const siguiente = $('[data-cafe-paso="1"]');
-  const posicion = $('#cafe-posicion');
-  const estado = $('#cafe-plato-activo');
-  let activo = 0;
-
-  function distancias() {
-    const centro = carruselCafe.getBoundingClientRect().left + carruselCafe.clientWidth / 2;
-    return platos.map((plato) => {
-      const rect = plato.getBoundingClientRect();
-      return rect.left + rect.width / 2 - centro;
-    });
-  }
-
-  function actualizarPlato() {
-    const cerca = distancias().map(Math.abs);
-    const nuevo = cerca.indexOf(Math.min(...cerca));
-    if (nuevo === activo) return;
-    platos[activo].removeAttribute('aria-current');
-    platos[nuevo].setAttribute('aria-current', 'true');
-    activo = nuevo;
-    posicion.textContent = `${activo + 1} de ${platos.length}`;
-    estado.textContent = `${posicion.textContent}: ${platos[activo].querySelector('h4').textContent}`;
-    anterior.setAttribute('aria-disabled', String(activo === 0));
-    siguiente.setAttribute('aria-disabled', String(activo === platos.length - 1));
-  }
-
-  function irAPlato(indice) {
-    if (indice >= 0 && indice < platos.length) carruselCafe.scrollTo({ left: carruselCafe.scrollLeft + distancias()[indice] });
-  }
-
-  anterior.addEventListener('click', () => irAPlato(activo - 1));
-  siguiente.addEventListener('click', () => irAPlato(activo + 1));
-  carruselCafe.addEventListener('scroll', actualizarPlato, { passive: true });
-  carruselCafe.addEventListener('keydown', (evento) => {
-    const destino = { ArrowLeft: activo - 1, ArrowRight: activo + 1, Home: 0, End: platos.length - 1 }[evento.key];
-    if (destino == null) return;
-    evento.preventDefault();
-    irAPlato(destino);
-  });
-  controlesCafe.hidden = false;
-  actualizarPlato();
+// Reels de la carta: cada video corre sin sonido solo mientras su tarjeta está a la vista y no se pidió reducir movimiento.
+const reelsCarta = $$('.carta-producto-video');
+if (reelsCarta.length) {
+  const visor = new IntersectionObserver((entradas) => {
+    for (const { target, isIntersecting } of entradas) {
+      if (isIntersecting && !preferenciaMovimiento.matches) target.play().catch(() => {});
+      else target.pause();
+    }
+  }, { threshold: .6 });
+  reelsCarta.forEach((video) => visor.observe(video));
 }
 
 // Carta: los enlaces conservan su destino y el historial de la selección.
@@ -801,7 +826,8 @@ function alinearIndicador() {
   if (!enlaceActual) return;
   const inset = parseFloat(getComputedStyle(enlaceActual).paddingLeft);
   navegacion.style.setProperty('--nav-x', (enlaceActual.offsetLeft + inset) + 'px');
-  navegacion.style.setProperty('--nav-ancho', (enlaceActual.offsetWidth - 2 * inset) + 'px');
+  // El subrayado mide 100 px y se escala: animar `width` maquetaba la barra en cada fotograma.
+  navegacion.style.setProperty('--nav-escala', String((enlaceActual.offsetWidth - 2 * inset) / 100));
 }
 
 function suelo() {
@@ -824,8 +850,8 @@ function suelo() {
 }
 addEventListener('hashchange', suelo);
 addEventListener('scroll', () => { if (!cuadro) cuadro = requestAnimationFrame(suelo); }, { passive: true });
+// El ResizeObserver también corre al empezar, ya con la maquetación hecha: no hace falta medir antes de pintar.
 new ResizeObserver(() => { suelo(); alinearIndicador(); }).observe(navegacion);
-suelo();
 
 const idLibro = new URLSearchParams(location.search).get('libro');
 if (idLibro && porId[idLibro] && hoja.dataset.id !== idLibro) abrirFicha(porId[idLibro], null);

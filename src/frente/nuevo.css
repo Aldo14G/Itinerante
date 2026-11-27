@@ -26,8 +26,9 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-padding-top:var(--alto-cabecera);-webkit-text-size-adjust:100%}
-@media (prefers-reduced-motion:no-preference){html.js{scroll-behavior:smooth}}
+/* scrollbar-gutter: al abrir la ficha (overflow:hidden) la barra no desaparece y la página no cambia de ancho;
+   antes eso volvía a maquetar y pintar toda la página en el clic. */
+html{scroll-padding-top:var(--alto-cabecera);-webkit-text-size-adjust:100%;scrollbar-gutter:stable}@media (prefers-reduced-motion:no-preference){html.js{scroll-behavior:smooth}}
 body{margin:0;font:400 var(--t-cuerpo)/1.55 var(--f-text);color:var(--noche);background:var(--papel)}
 .precio,.carta-precio,.fecha-evento,.contador,.horario,.conteo,time{font-variant-numeric:tabular-nums}
 ::selection{background:var(--ambar);color:var(--noche)}
@@ -63,10 +64,12 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 .cab nav a::after{content:"";position:absolute;left:14px;right:14px;bottom:9px;height:2px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform var(--d-media) var(--e-out)}
 @media (hover:hover){.cab nav a:hover::after{transform:scaleX(1)}}
 .cab nav:not([data-indicador]) a[aria-current="true"]::after{transform:scaleX(1)}
-.cab nav::before{content:"";position:absolute;left:0;bottom:9px;width:var(--nav-ancho,0px);height:2px;background:currentColor;transform:translateX(var(--nav-x,0px));opacity:0;pointer-events:none;transition:transform var(--d-media) var(--e-out),width var(--d-media) var(--e-out),opacity var(--d-rapida)}
+.cab nav::before{content:"";position:absolute;left:0;bottom:9px;width:100px;height:2px;background:currentColor;transform-origin:0 0;transform:translateX(var(--nav-x,0px)) scaleX(var(--nav-escala,0));opacity:0;pointer-events:none;transition:transform var(--d-media) var(--e-out),opacity var(--d-rapida)}
 .cab nav[data-indicador]::before{opacity:1}
 
 /* Portada */
+/* La camioneta y su carga esperan a la animación de entrada, que empieza tras el primer fotograma (cliente.js). */
+html.entrada :is(.camion,#carga img){visibility:hidden}
 .camion .trazo{position:relative;z-index:2;filter:drop-shadow(0 6px 0 rgba(6,26,24,.10))}
 .carga{position:absolute;left:13%;right:31%;top:12%;height:44%;z-index:1}
 .carga img{position:absolute;bottom:0;width:23%;height:auto;aspect-ratio:2/3;object-fit:cover;border-radius:var(--r-portada);box-shadow:0 10px 22px -8px rgba(6,26,24,.45)}
@@ -75,24 +78,33 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 .eventos{background:var(--papel);padding:var(--seccion-aire) 0 var(--s12)}
 .cabeza-seccion{margin-bottom:clamp(var(--s6),3vw,var(--s12))}
 .agenda-cabecera{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--s4);margin-bottom:var(--s6)}
-.agenda-controles{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2)}
-.agenda-controles > .boton,.agenda-controles .vitrina-controles .boton{min-height:44px;justify-content:center;padding-inline:var(--s3)}
-.agenda-controles .boton[aria-disabled="true"]{opacity:.65}
-#agenda-rotacion{min-width:6.5rem}
+/* Agenda: varias actividades a la vista (2–3 en una laptop), flechas a los lados de la pista, arrastre con el ratón. */
+.agenda-pista{position:relative}
+.agenda-controles{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding-inline:var(--s2);pointer-events:none}
+.agenda-controles[hidden]{display:none}
+.agenda-flecha{pointer-events:auto;background:var(--papel);color:var(--noche);border:1px solid var(--linea);box-shadow:var(--sombra-tarjeta)}
+/* Atenuada y en su sitio (no desaparece): si tenía el foco al llegar al final, el foco no se pierde. */
+.agenda-flecha[aria-disabled="true"]{opacity:.35;cursor:default}
+@media(hover:none) and (pointer:coarse){.agenda-controles{display:none}}
+@media(min-width:1024px){.agenda-controles{inset-inline:calc(-1 * var(--s6));padding-inline:0}}
 .agenda-eventos{position:relative;display:grid;gap:var(--s4);border-radius:var(--r-tarjeta);margin:0;padding:0;list-style:none}
 .js .agenda-eventos{
-  --ancho-tarjeta-agenda:min(78vw,740px);
+  --ancho-tarjeta-agenda:clamp(280px,calc((100% - 2 * var(--s4)) / 2.6),400px);
   grid-auto-flow:column;grid-auto-columns:var(--ancho-tarjeta-agenda);
-  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;
-  padding:var(--s4) max(var(--s4),calc((100% - var(--ancho-tarjeta-agenda))/2)) var(--s6);
+  /* proximity: un deslizamiento corto del trackpad avanza y no rebota a la tarjeta de antes (con mandatory, sí). */
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;
+  padding:var(--s4) var(--s4) var(--s6);scroll-padding-inline:var(--s4);
   background:radial-gradient(ellipse at 18% 10%,#bce8e1 0%,transparent 65%),linear-gradient(120deg,#eff8f5,#bfe8df);
 }
+@media(hover:hover) and (pointer:fine){.js .agenda-eventos{cursor:grab}}
+.js .agenda-eventos.arrastrando{scroll-snap-type:none;cursor:grabbing;user-select:none}
+.agenda-eventos.arrastrando a{pointer-events:none}
 .agenda-eventos::-webkit-scrollbar{display:none}
 .agenda-eventos:focus-visible{outline-offset:-3px}
-.agenda-eventos > li{min-width:0;display:grid;scroll-snap-align:center}
-.js .agenda-eventos:not(:has(> li:has(.parada) ~ li:has(.parada))){grid-auto-columns:100%;padding-inline:var(--s4)}
+.agenda-eventos > li{min-width:0;display:grid;scroll-snap-align:start}
+.js .agenda-eventos:not(:has(> li:has(.parada) ~ li:has(.parada))){grid-auto-columns:min(100%,400px);padding-inline:var(--s4)}
 .agenda-eventos > li > fecha-hasta{display:grid}
-.agenda-eventos > .evento-fechado:not(:has(.parada)),.agenda-eventos:not(:has(.parada)),.agenda-eventos:has(.parada) + .agenda-vacia,
+.agenda-eventos > .evento-fechado:not(:has(.parada)),.agenda-eventos:not(:has(.parada)),.agenda-pista:has(.parada) + .agenda-vacia,
 .eventos:not(:has([data-taller] .parada)) .agenda-talleres{display:none}
 .agenda-vacia,.agenda-fuente{margin:var(--s2) 0 0;color:var(--tinta-2)}
 :is(.agenda-vacia,.agenda-fuente) a{display:inline-flex;align-items:center;min-height:44px}
@@ -101,21 +113,15 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 .agenda-reciente p{margin:var(--s1) 0 0}
 .agenda-reciente .versal{margin-bottom:var(--s2);color:var(--sala)}
 .agenda-reciente-fecha{color:var(--tinta-2);font-size:var(--t-nota)}
-.parada{display:grid;grid-template-columns:minmax(0,41fr) minmax(0,59fr);min-width:0;background:#f6fbf9;border:1px solid #fff;border-radius:var(--r-tarjeta);box-shadow:var(--sombra-tarjeta)}
-@supports (backdrop-filter:blur(12px)) or (-webkit-backdrop-filter:blur(12px)){
-  .parada{background:rgba(255,255,255,.71);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
-}
-@media(prefers-reduced-transparency:reduce){
-  .parada{background:#f6fbf9;-webkit-backdrop-filter:none;backdrop-filter:none}
-}
-.agenda-eventos > li[aria-current="true"] .parada{border-color:rgba(13,74,69,.48);box-shadow:0 12px 26px -14px rgba(6,26,24,.4)}
+/* Tarjeta opaca: el desenfoque de fondo (vidrio) en ocho tarjetas que se desplazan costaba pintura en cada fotograma. */
+.parada{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;min-width:0;background:#f6fbf9;border:1px solid #fff;border-radius:var(--r-tarjeta);box-shadow:var(--sombra-tarjeta)}
 .parada:target{outline:2px solid var(--sala);outline-offset:-3px}
-.cartel{display:grid;position:relative;place-items:center;min-height:300px;padding:var(--s3);overflow:clip;border-radius:calc(var(--r-tarjeta) - 1px) 0 0 calc(var(--r-tarjeta) - 1px);background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(93,196,180,.23))}
+.cartel{display:grid;position:relative;place-items:center;min-height:0;padding:var(--s3);overflow:clip;border-radius:calc(var(--r-tarjeta) - 1px) calc(var(--r-tarjeta) - 1px) 0 0;background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(93,196,180,.23))}
 .cartel-trazo{width:42%;max-width:210px;color:var(--noche);transform:rotate(-8deg)}
 .cartel-trazo svg{display:block;width:100%;height:auto;aspect-ratio:1.2}
 .cartel--taller:not(:has(img))::before,.cartel--taller:not(:has(img))::after{content:"";position:absolute;inset:0 12%;background:repeating-linear-gradient(116deg,transparent 0 9px,var(--sala) 10px 11px,transparent 12px 17px);opacity:.48;clip-path:polygon(0 68%,87% 4%,100% 40%,14% 96%)}
 .cartel--taller:not(:has(img))::after{transform:rotate(-10deg);opacity:.32;clip-path:polygon(8% 60%,83% 22%,79% 70%,16% 81%)}
-.cartel img{width:100%;height:clamp(250px,27vw,340px);object-fit:contain;filter:drop-shadow(0 11px 11px rgba(6,26,24,.18))}
+.cartel img{width:100%;height:clamp(200px,17vw,250px);object-fit:contain;filter:drop-shadow(0 11px 11px rgba(6,26,24,.18))}
 .tarjeta-evento{display:flex;flex:1;flex-direction:column;padding:clamp(var(--s4),2.4vw,var(--s8));gap:var(--s3)}
 .tarjeta-evento h3{font:700 var(--t-h3)/1 var(--f-disp);overflow-wrap:anywhere;margin:0;text-wrap:pretty}
 .agenda-tipo{margin:0;color:var(--sala)}
@@ -138,14 +144,8 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
   }
 }
 @media(max-width:740px){
-  .js .agenda-eventos{--ancho-tarjeta-agenda:calc(100vw - 72px);gap:var(--s3);margin-inline:calc(-1 * var(--margen));padding-inline:calc((100vw - var(--ancho-tarjeta-agenda))/2);border-radius:0}
-  .parada{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
-  .cartel{min-height:0;border-radius:calc(var(--r-tarjeta) - 1px) calc(var(--r-tarjeta) - 1px) 0 0}
+  .js .agenda-eventos{--ancho-tarjeta-agenda:calc(100vw - 72px);gap:var(--s3);margin-inline:calc(-1 * var(--margen));padding-inline:var(--margen);scroll-padding-inline:var(--margen);border-radius:0}
   .cartel img{height:clamp(202px,58vw,260px)}
-}
-@media(max-width:480px){
-  .agenda-controles .vitrina-controles .boton{min-width:44px}
-  .agenda-controles .vitrina-controles .boton span{display:none}
 }
 
 /* Tienda / Vitrina */
@@ -160,7 +160,9 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 .piso{position:absolute;left:0;right:0;bottom:9%;height:1px;background:linear-gradient(90deg,transparent,rgba(6,26,24,.24),transparent)}
 @media (max-width:760px){.vitrina{height:calc(var(--w,196px) * 1.5 + 72px)}}
 .pieza{position:absolute;left:50%;top:46%;width:var(--w);aspect-ratio:2/3;margin-left:calc(var(--w)/-2);transform-style:preserve-3d;will-change:transform}
-.pieza .cara{position:absolute;inset:0;transform:translateY(-50%);border-radius:var(--r-portada);overflow:hidden;background:var(--vitrina);box-shadow:0 30px 50px -24px rgba(0,0,0,.65);transition:transform var(--d-mover) var(--e-out),filter var(--d-media)}
+.pieza .cara{position:absolute;inset:0;transform:translateY(-50%);border-radius:var(--r-portada);overflow:hidden;background:var(--vitrina);box-shadow:0 30px 50px -24px rgba(0,0,0,.65);transition:transform var(--d-mover) var(--e-out)}
+/* Oscurece las portadas laterales con un velo (opacidad) en lugar de filter: brightness en cada fotograma. */
+.pieza .cara::after{content:"";position:absolute;inset:0;z-index:1;background:#000;opacity:var(--velo,0);pointer-events:none}
 .pieza img{width:100%;height:100%;object-fit:cover}
 .pieza.centro .cara{box-shadow:0 40px 60px -26px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06)}
 .ficha-vitrina{grid-area:ficha;min-width:0}
@@ -194,7 +196,7 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 /* Ficha */
 .velo{position:fixed;inset:0;background:rgba(6,26,24,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity var(--d-media) var(--e-out)}
 .velo.abierto{opacity:1;pointer-events:auto}
-.hoja{position:fixed;z-index:61;top:0;right:0;bottom:0;width:min(560px,100vw);background:var(--papel);overflow:auto;padding:28px 40px 40px;box-shadow:-30px 0 60px -30px rgba(0,0,0,.4);visibility:hidden}
+.hoja{position:fixed;z-index:61;top:0;right:0;bottom:0;width:min(560px,100vw);background:var(--papel);overflow:auto;padding:28px 40px 40px;box-shadow:-12px 0 28px -14px rgba(0,0,0,.32);visibility:hidden}
 .hoja .cerrar{position:sticky;top:0;margin-left:auto;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:0;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(6,26,24,.15)}
 .hoja .cerrar svg{width:20px;height:20px}
 .hoja .portada-hoja{width:min(260px,60%);aspect-ratio:2/3;border-radius:var(--r-portada);overflow:hidden;background:var(--papel-2);margin:4px 0 28px;box-shadow:0 30px 50px -26px rgba(6,26,24,.6)}
@@ -222,15 +224,6 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 .menu-cafe{padding:clamp(var(--s8),4vw,var(--s16)) 0 var(--seccion-aire)}
 .visita-acciones{display:flex;flex-wrap:wrap;gap:var(--s3)}
 .menu-cabecera p{max-width:36ch;margin:var(--s2) 0 var(--s4)}
-.menu-vitrina{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);align-items:center;gap:var(--s4);margin-top:clamp(var(--s6),5vw,var(--s12));padding:clamp(var(--s4),2.4vw,var(--s8));background:var(--menta);border-radius:var(--r-tarjeta)}
-.menu-vitrina>h3{font-size:var(--t-h3);line-height:1;max-width:15ch}
-.menu-muestra{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3);list-style:none;margin:0;padding:0}
-.menu-escena{min-width:0}
-.menu-muestra>li{display:grid;min-width:0}
-.js .menu-muestra:has(>li+li){grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:100%;gap:0;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:12px}
-.js .menu-muestra>li{scroll-snap-align:center;scroll-snap-stop:always}
-.menu-muestra:focus-visible{outline-offset:-3px}
-.menu-controles{max-width:340px;margin:var(--s2) 0 0}
 .carta{display:flex;flex-wrap:wrap;gap:var(--s2);padding-bottom:var(--s3);border-bottom:1px solid var(--linea)}
 .carta-categoria{display:flex;min-height:48px;padding:var(--s2) var(--s4);align-items:center;justify-content:center;text-align:center;border-radius:var(--r-ui);color:var(--noche);font-weight:600;text-decoration:none}
 .carta-categoria{transition:background-color var(--d-rapida) var(--e-out),border-color var(--d-rapida) var(--e-out),transform var(--d-presion) var(--e-out)}
@@ -241,32 +234,19 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;le
 .carta-detalles{display:grid;gap:var(--s8);margin:var(--s6) 0 0}
 .carta-panel{min-width:0}
 .carta-panel h3{font-size:var(--t-h4);line-height:1;margin-bottom:var(--s3)}
-.carta-galeria{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 clamp(var(--s3),2.8vw,var(--s8));list-style:none;margin:0;padding:0}
+/* Carta: una tarjeta por plato con su lugar vertical (3:4, como un reel en la cuadrícula de Instagram). */
+.carta-galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:var(--s6) clamp(var(--s3),2vw,var(--s6));list-style:none;margin:0;padding:0}
 .carta-producto{min-width:0;border-radius:var(--r-tarjeta)}
-.carta-producto-media{aspect-ratio:4/5;overflow:hidden;border-radius:inherit;background:var(--papel-2)}
-.carta-producto-foto{width:100%;height:100%;object-fit:cover}
-.carta-producto-texto{display:grid;align-items:baseline;grid-template-columns:minmax(0,1fr) auto;gap:var(--s1) var(--s3);padding:var(--s3) 0}
-.carta-galeria .carta-producto:not(:has(.carta-producto-media)){border-top:1px solid var(--linea);border-radius:0;padding:var(--s3) 0}
-.carta-producto:not(:has(.carta-producto-media)) .carta-producto-texto{padding:0}
+.carta-producto-media{aspect-ratio:3/4;overflow:hidden;border-radius:inherit;background:var(--papel-2)}
+.carta-producto-foto,.carta-producto-video{display:block;width:100%;height:100%;object-fit:cover}
+.carta-producto-icono{display:grid;place-items:center;height:100%;color:var(--sala);background:radial-gradient(circle at 50% 42%,var(--menta-claro,#d9f1ec) 0 34%,transparent 35%)}
+.carta-producto-icono svg{width:42%;height:auto;aspect-ratio:1}
+.carta-producto-texto{display:grid;align-items:baseline;grid-template-columns:minmax(0,1fr) auto;gap:var(--s1) var(--s3);padding:var(--s3) 0 0}
 .carta-producto :is(h3,h4){margin:0;font:700 var(--t-h4)/1.1 var(--f-disp);overflow-wrap:anywhere}
 .carta-producto p{grid-column:1/-1;grid-row:2;margin:0;color:var(--tinta-2)}
 .carta-precio{grid-column:2;grid-row:1;color:var(--sala);font-weight:600;white-space:nowrap}
-.menu-muestra .carta-producto{display:flex;flex-direction:column;justify-content:center;min-height:104px;background:var(--papel);padding:var(--s4);box-shadow:var(--sombra-tarjeta)}
-.menu-muestra .carta-producto-media{aspect-ratio:1;border-radius:10px}
-.menu-muestra .carta-producto-texto{display:flex;flex:1;flex-direction:column;gap:var(--s2);padding-bottom:0}
-.menu-muestra .carta-precio{margin-top:auto;padding-top:var(--s2)}
-.js .menu-muestra .carta-producto-texto{justify-content:center}
-.menu-muestra .carta-precio{margin-top:0;padding-top:0}
 .carta-visita{display:inline-flex;align-items:center;gap:var(--s2);min-height:48px;margin-top:var(--s3);font-weight:600}
 .carta-visita svg{width:16px;height:16px}
-@media(min-width:900px){
-  .js .menu-muestra .carta-producto:has(.carta-producto-media){display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr);align-items:start;gap:var(--s4)}
-}
-@media(prefers-reduced-motion:no-preference){
-  .js .menu-muestra{scroll-behavior:smooth}
-  .js .menu-muestra .carta-producto{transition:transform var(--d-mover) var(--e-out)}
-  .js .menu-muestra >li:not([aria-current="true"]) .carta-producto{transform:scale(.97)}
-}
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
   .carta-producto-foto{transition:scale var(--d-mover) var(--e-out)}
   .carta-producto:hover .carta-producto-foto{scale:1.04}
@@ -470,9 +450,8 @@ button.sr,h3.sr{font:400 var(--t-cuerpo)/1 var(--f-text)}
   .camion{width:min(80vw,400px,calc((100svh - 400px) * 1.42))}
 }
 @media (max-width:767px){
-  .menu-vitrina{grid-template-columns:minmax(0,1fr);margin-inline:calc(-1 * var(--margen));padding-inline:var(--margen);border-radius:0}
-  .menu-vitrina>h3{max-width:none}
-  .carta-galeria{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .carta-galeria{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4) var(--s3)}
+  .carta-producto :is(h3,h4){font-size:var(--t-cuerpo,1rem)}
   .rejilla{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 16px}
   .orden span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .barra-res .orden{flex:1 1 auto;min-width:0}
@@ -481,8 +460,6 @@ button.sr,h3.sr{font:400 var(--t-cuerpo)/1 var(--f-text)}
   .barra-res .vistas{order:6}
 }
 @media(max-width:540px){
-  .carta-galeria{grid-template-columns:1fr}
-  .menu-muestra{grid-template-columns:1fr}
   .carta{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s1)}
   .carta-categoria{grid-column:span 2;padding-inline:var(--s2);line-height:1.18}
   .carta:has(> :nth-child(5):last-child)> :nth-last-child(-n+2){grid-column:span 3}
