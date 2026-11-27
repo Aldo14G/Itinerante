@@ -1,16 +1,26 @@
 {
   "meta": {
-    "nota": "Fuente de verdad de Eventos en /nuevo, revisada el 2026-11-22 con los posts oficiales de @libreriaitineranteymasmty. No se inventan eventos, fechas, precios ni imágenes. `fecha` ISO (hora de Monterrey) o null si es recurrente sin próxima fecha: un evento con fecha anterior a hoy se oculta solo (servidor y navegador). `hora` null se imprime «Hora por anunciar». `lugar` visible es «En la librería»: la dirección vive solo en Visita. `registroUrl` (https, Luma o formulario del evento) cambia el botón a «Registrarme»; si no hay, el botón es «Ver en Instagram» hacia `instagramUrl`. `imagen` es una ruta local bajo /assets/ o null (no se descarga el cartel: el sync de Instagram solo propone). El registro de renta de espacio (https://forms.gle/RDaEfgVitEFbDnyU7) no es un evento. El taller Skribh queda fuera hasta que el dueño lo autorice. El nombre de Santiago González sale de la revisión oficial del post del Club."
+    "nota": "Agenda curada de /nuevo. La agenda semanal se verificó el 2026-11-26 con las fichas individuales del carrusel oficial, que dan los horarios exactos. Los recurrentes se enumeran en orden semanal y no tienen fecha inventada. Los eventos con fecha ISO de Monterrey vencen después de ese día. `instagramUrl` conserva la fuente de la ficha y `facilitadorInstagram` es el usuario público indicado para consultas. El Club de Dibujo de adultos conserva WhatsApp. `registroUrl` solo permite HTTPS en Luma. `imagen` es un cartel local con procedencia registrada. Skribh queda fuera hasta que lo autorice el dueño."
+  },
+  "agendaSemanal": {
+    "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
+  },
+  "actividadReciente": {
+    "titulo": "Sábado de Poesía",
+    "descripcion": "Ejercicios de escritura, un poema colectivo y lectura de textos con maniFESTarte.",
+    "fechaPublicacion": "2026-11-23",
+    "instagramUrl": "https://www.instagram.com/mani.fest_arte/p/DgGEB7zlX7k/"
   },
   "eventos": [
     {
       "id": "aniversario-6",
       "titulo": "6.º Aniversario",
+      "descripcion": "Café, música y lecturas.",
       "fecha": "2026-11-27",
       "hora": null,
       "lugar": "En la librería",
       "organizador": null,
-      "imagen": null,
+      "imagen": "/assets/img/eventos/aniversario-6-cartel.webp",
       "registroUrl": null,
       "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/",
       "recurrencia": null,
@@ -18,18 +28,101 @@
       "incluye": null
     },
     {
+      "id": "actuacion-gestual-lunes",
+      "imagen": "/assets/img/eventos/actuacion-gestual-cartel.webp",
+      "seccion": "talleres",
+      "titulo": "Actuación gestual (lunes)",
+      "descripcion": "Clases de mimos.",
+      "recurrencia": "Lunes",
+      "hora": "20:00–22:00",
+      "lugar": "En la librería",
+      "organizador": "Patricio Botello",
+      "costo": "$150 MXN por sesión",
+      "facilitadorInstagram": "patingo_terrier",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
+    },
+    {
+      "id": "actuacion-gestual-martes",
+      "imagen": "/assets/img/eventos/actuacion-gestual-cartel.webp",
+      "seccion": "talleres",
+      "titulo": "Actuación gestual (martes)",
+      "descripcion": "Clases de mimos.",
+      "recurrencia": "Martes",
+      "hora": "20:00–22:00",
+      "lugar": "En la librería",
+      "organizador": "Cristian Molina",
+      "costo": "$150 MXN por sesión",
+      "facilitadorInstagram": "cristianibarramolina",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
+    },
+    {
+      "id": "taller-cuento-escritura-creativa",
+      "imagen": "/assets/img/eventos/taller-cuento-cartel.webp",
+      "seccion": "talleres",
+      "titulo": "Taller de cuento: escritura creativa",
+      "recurrencia": "Jueves",
+      "hora": "19:00–21:00",
+      "lugar": "En la librería",
+      "organizador": "Eduardo Pérez Espinosa",
+      "costo": "$150 MXN por sesión",
+      "facilitadorInstagram": "eduardopespinosa",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
+    },
+    {
+      "id": "taller-dibujo-ninos",
+      "imagen": "/assets/img/eventos/taller-dibujo-ninos-cartel.webp",
+      "seccion": "talleres",
+      "titulo": "Taller de dibujo para niños",
+      "recurrencia": "Sábados cada 15 días",
+      "hora": "11:30–14:00",
+      "lugar": "En la librería",
+      "organizador": "Cris",
+      "costo": "$250 MXN",
+      "facilitadorInstagram": "creatividadinfantil_arte",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
+    },
+    {
+      "id": "club-cine-manifestarte",
+      "imagen": "/assets/img/eventos/club-cine-manifestarte-cartel.webp",
+      "titulo": "Club de cine Manifestarte",
+      "descripcion": "Cupo limitado.",
+      "recurrencia": "Sábados",
+      "hora": "12:30–14:00",
+      "lugar": "En la librería",
+      "organizador": "Manifestarte",
+      "costo": "$85 MXN",
+      "facilitadorInstagram": "mani.fest_arte",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
+    },
+    {
       "id": "club-dibujo-pintura",
       "titulo": "Club de Dibujo y Pintura",
+      "descripcion": "Clases de dibujo y pintura para adultos.",
       "fecha": null,
+      "proximaSesion": null,
       "hora": "14:00–16:00",
       "lugar": "En la librería",
       "organizador": "Santiago González",
-      "imagen": null,
+      "imagen": "/assets/img/eventos/club-dibujo-adultos-cartel.webp",
       "registroUrl": null,
-      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DfYBKN-oZea/",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
       "recurrencia": "Sábados cada 15 días",
-      "costo": "$150 MXN",
-      "incluye": "Material"
+      "costo": "$150 MXN por sesión",
+      "incluye": "Material",
+      "registroWhatsApp": true,
+      "seccion": "talleres"
+    },
+    {
+      "id": "circulo-lectura-mitopoietica",
+      "imagen": "/assets/img/eventos/circulo-lectura-mitopoietica-cartel.webp",
+      "titulo": "Círculo de Lectura Mitopoiética",
+      "recurrencia": "Sábados",
+      "hora": "16:30–18:30",
+      "lugar": "En la librería",
+      "organizador": "Marina Ortiz",
+      "costo": "$50 MXN",
+      "facilitadorInstagram": "marobaker",
+      "instagramUrl": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/"
     }
   ]
 }

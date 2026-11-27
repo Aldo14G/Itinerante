@@ -5,6 +5,8 @@
 // el esqueleto de la Tienda, Visita y la carta. El cliente solo anima y hace instantáneos los filtros.
 import { Fragment, type ReactNode } from 'react';
 import {
+  ACTIVIDAD_RECIENTE,
+  AGENDA_SEMANAL,
   CARTA,
   DESTACADOS,
   EVENTOS,
@@ -52,22 +54,6 @@ function Hasta({ d, children }: { d: string; children: ReactNode }) {
 }
 function Desde({ d, children }: { d: string; children: ReactNode }) {
   return <fecha-desde d={d}>{children}</fecha-desde>;
-}
-
-function ultimoDiaConFecha(): string | null {
-  const fechas = EVENTOS.map((e) => e.fecha).filter((f): f is string => f != null).sort();
-  return fechas.length ? fechas[fechas.length - 1] : null;
-}
-
-function SegunEventos({ con, sin }: { con: ReactNode; sin: ReactNode }) {
-  const ultimo = ultimoDiaConFecha();
-  if (!ultimo) return <>{sin}</>;
-  return (
-    <>
-      <Hasta d={ultimo}>{con}</Hasta>
-      <Desde d={diaSiguiente(ultimo)}>{sin}</Desde>
-    </>
-  );
 }
 
 function Icon({ id, oculto = true }: { id: string; oculto?: boolean }) {
@@ -161,17 +147,18 @@ function SinPortada({ editorial }: { editorial: string | null }) {
   );
 }
 
-function Cabecera({ hrefLibros }: { hrefLibros: string }) {
+function Cabecera() {
   return (
-    <header className="cab" data-suelo="menta">
+    <header className="cab" data-portada="">
       <div className="envoltura">
         <a className="marca" href="#inicio" aria-label="Librería Itinerante y Más, inicio">
           <Icon id="camioneta" />
           <span>Itinerante y Más</span>
         </a>
         <nav aria-label="Secciones">
-          <a href="#eventos">Eventos</a>
-          <a href={hrefLibros}>Libros</a>
+          <a href="#eventos">Agenda</a>
+          <a href="#libros">Libros</a>
+          <a href="#cafe">Café</a>
           <a href="#visita">Visita</a>
         </nav>
       </div>
@@ -181,7 +168,6 @@ function Cabecera({ hrefLibros }: { hrefLibros: string }) {
 
 function Portada() {
   const porId = new Map(LIBROS.map((l) => [l.id, l]));
-  const librosHref = DESTACADOS.length ? '#destacados' : '#libros';
   return (
     <section id="inicio" className="portada" data-suelo="menta">
       <span id="portada" className="ancla" />
@@ -210,77 +196,104 @@ function Portada() {
         <svg className="trazo" viewBox={TRAZO_VB}><use href="#camioneta" /></svg>
       </div>
       <div className="portada-abajo">
-        <p id="linea">{NEGOCIO.linea}</p>
-        <SegunEventos
-          con={<a className="boton boton--tinta cta-portada" href="#eventos">Ver eventos <Icon id="i-flecha" /></a>}
-          sin={<a className="boton boton--tinta cta-portada" href={librosHref}>Ver libros <Icon id="i-flecha" /></a>}
-        />
+        <div className="portada-acciones">
+          <a className="boton boton--tinta" href="#libros">Explorar catálogo <Icon id="i-flecha" /></a>
+          <a className="boton boton--borde" href="#eventos">Ver agenda <Icon id="i-flecha" /></a>
+        </div>
       </div>
     </section>
   );
 }
 
-function Parada({ e, destacada }: { e: Evento; destacada: boolean }) {
-  const f = e.fecha ? fechaCorta(e.fecha) : null;
-  const cartel = e.fecha ? 'cartel cartel--menta' : 'cartel cartel--noche';
-  const hora = e.hora ?? 'Hora por anunciar';
+function Parada({ e }: { e: Evento }) {
+  const taller = e.seccion === 'talleres';
+  const fecha = (iso: string) => <time dateTime={iso}>{fechaCorta(iso).larga}</time>;
+  const registro = e.registroUrl
+    ? { url: e.registroUrl, texto: 'Registrarme en Luma' }
+    : e.registroWhatsApp
+      ? { url: whatsapp(`Hola, quisiera inscribirme en ${e.titulo}. Mi nombre es: `), texto: 'Registrarme por WhatsApp' }
+      : e.facilitadorInstagram
+        ? { url: `https://www.instagram.com/${e.facilitadorInstagram}/`, texto: 'Consultar en Instagram' }
+        : { url: e.instagramUrl, texto: 'Ver detalles en Instagram' };
   return (
-    <article className={destacada ? 'parada destacada' : 'parada'} data-fecha={e.fecha ?? ''}>
-      <div className="fecha">
-        <i />
-        {f ? f.dia + ' ' + f.numero + ' ' + f.mes : e.recurrencia}
-        {f ? <span className="sr">, <time dateTime={e.fecha!}>{f.larga}</time></span> : null}
+    <article className="parada" id={`evento-${e.id}`} aria-labelledby={`titulo-${e.id}`}>
+      <div className={`cartel ${taller ? 'cartel--taller' : 'cartel--evento'}`} aria-hidden="true">
+        {e.imagen
+          ? <img src={e.imagen} alt="" width={720} height={900} loading="lazy" decoding="async" />
+          : !taller && <div className="cartel-trazo"><Icon id="camioneta" /></div>}
       </div>
       <div className="tarjeta-evento">
-        <div>
-          <h3>{e.titulo}</h3>
-          <p className="dato hora-dato"><Icon id="i-reloj" />{hora}</p>
-          {e.organizador ? <p className="dato"><Icon id="i-persona" />Con {e.organizador}</p> : null}
-          {e.lugar ? <p className="dato"><Icon id="i-lugar" />{e.lugar}</p> : null}
-          {e.incluye ? <p className="dato"><Icon id="i-check" />Incluye {e.incluye.toLowerCase()}</p> : null}
-        </div>
-        <div className={cartel} aria-hidden="true"><Icon id="camioneta" oculto={false} /></div>
+        <p className="agenda-tipo versal">{taller ? 'Taller' : e.fecha ? 'Evento' : 'Actividad fija'}</p>
+        <h3 id={`titulo-${e.id}`}>{e.titulo}</h3>
+        <p className="agenda-horario">
+          <Icon id="i-reloj" />
+          <span>
+            {e.fecha ? fecha(e.fecha) : e.proximaSesion ? (
+              <>
+                <Hasta d={e.proximaSesion}>Próxima sesión: {fecha(e.proximaSesion)}</Hasta>
+                <Desde d={diaSiguiente(e.proximaSesion)}>{e.recurrencia}</Desde>
+              </>
+            ) : e.recurrencia}
+            <span className="agenda-hora">{e.hora ?? 'Hora por anunciar'}</span>
+          </span>
+        </p>
+        {e.descripcion && <p className="agenda-descripcion">{e.descripcion}</p>}
+        <ul className="evento-datos" role="list">
+          {e.lugar && <li><Icon id="i-lugar" />{e.lugar}</li>}
+          {e.organizador && <li><Icon id="i-persona" />Con {e.organizador}</li>}
+          {e.incluye && <li><Icon id="i-check" />Incluye {e.incluye.toLowerCase()}</li>}
+        </ul>
         <div className="acciones">
-          {e.costo ? <span className="precio">{e.costo}</span> : <span />}
-          {e.registroUrl ? (
-            <a className="boton boton--tinta" href={e.registroUrl} target="_blank" rel="noopener noreferrer">Registrarme <Icon id="i-sale" /></a>
-          ) : (
-            <a className="boton boton--borde" href={e.instagramUrl} target="_blank" rel="noopener noreferrer">Ver en Instagram <Icon id="i-sale" /></a>
-          )}
+          {e.costo && <span className="precio">{e.costo}</span>}
+          <a className={`boton ${e.registroUrl || e.registroWhatsApp ? 'boton--tinta' : 'boton--borde'}`} href={registro.url} target="_blank" rel="noopener noreferrer">
+            {registro.texto} <Icon id="i-sale" />
+          </a>
         </div>
       </div>
     </article>
   );
 }
 
-function Eventos() {
-  const fechados = EVENTOS.filter((e) => e.fecha);
-  const resto = EVENTOS.filter((e) => !e.fecha);
+export function Eventos({ agenda = EVENTOS }: { agenda?: readonly Evento[] } = {}) {
+  const hayTalleres = agenda.some((e) => e.seccion === 'talleres');
   return (
     <section id="eventos" className="eventos" data-suelo="papel" aria-labelledby="t-eventos">
       <span id="cartelera" className="ancla" />
       <div className="envoltura">
-        <div className="cabeza-seccion">
-          <h2 className="h2" id="t-eventos">Eventos</h2>
-          <div className="controles" id="ruta-controles" hidden>
-            <button className="flecha" id="ruta-ant" type="button" aria-label="Eventos anteriores"><Icon id="i-izq" /></button>
-            <button className="flecha" id="ruta-sig" type="button" aria-label="Eventos siguientes"><Icon id="i-der" /></button>
+        <div className="agenda-carrusel" role="group" aria-roledescription="carrusel" aria-labelledby="t-eventos">
+          <div className="cabeza-seccion agenda-cabecera">
+            <h2 className="h2" id="t-eventos">Eventos{hayTalleres && <span className="agenda-talleres"> y talleres</span>}</h2>
+            <div className="agenda-controles" hidden>
+              <button className="boton boton--borde" type="button" id="agenda-rotacion" aria-label="Pausar avance automático" aria-controls="agenda-eventos">Pausar</button>
+              <div className="vitrina-controles">
+                <button className="boton boton--borde" type="button" aria-label="Actividad anterior" aria-controls="agenda-eventos" aria-disabled="true" data-agenda-paso="-1"><Icon id="i-izq" /><span>Anterior</span></button>
+                <span className="contador" id="agenda-posicion" aria-live="off" aria-atomic="true" />
+                <button className="boton boton--borde" type="button" aria-label="Actividad siguiente" aria-controls="agenda-eventos" data-agenda-paso="1"><span>Siguiente</span><Icon id="i-der" /></button>
+              </div>
+            </div>
           </div>
+          {hayTalleres && <span id="talleres" className="ancla" />}
+          <ol className="agenda-eventos" role="list" id="agenda-eventos" aria-label="Actividades de la librería" tabIndex={0}>
+            {agenda.map((e) => (
+              <li key={e.id} data-taller={e.seccion === 'talleres' ? '' : undefined} className={e.fecha ? 'evento-fechado' : undefined}>
+                {e.fecha ? <Hasta d={e.fecha}><Parada e={e} /></Hasta> : <Parada e={e} />}
+              </li>
+            ))}
+          </ol>
+          <p className="agenda-vacia">Por ahora no hay actividades anunciadas. Sigue a la librería en <a href={NEGOCIO.instagram}>Instagram</a>.</p>
         </div>
-        <div className="ruta" id="ruta">
-          {EVENTOS.length ? (
-            <>
-              {fechados.map((e) => (
-                <Hasta key={e.id} d={e.fecha!}>
-                  <Parada e={e} destacada={e === fechados[0]} />
-                </Hasta>
-              ))}
-              {resto.map((e) => <Parada key={e.id} e={e} destacada={false} />)}
-            </>
-          ) : (
-            <p className="vacio">Sin fechas publicadas por ahora. La agenda sale primero en <a href={NEGOCIO.instagram}>Instagram</a>.</p>
-          )}
-        </div>
+        {agenda.some((e) => e.instagramUrl === AGENDA_SEMANAL.instagramUrl) && (
+          <p className="agenda-fuente"><a href={AGENDA_SEMANAL.instagramUrl} target="_blank" rel="noopener noreferrer">Ver la agenda semanal en Instagram</a></p>
+        )}
+        <aside className="agenda-reciente" aria-labelledby="t-actividad-reciente">
+          <div>
+            <p className="versal">Así fue</p>
+            <h3 id="t-actividad-reciente">{ACTIVIDAD_RECIENTE.titulo}</h3>
+            <p>{ACTIVIDAD_RECIENTE.descripcion}</p>
+            <p className="agenda-reciente-fecha">Publicado el <time dateTime={ACTIVIDAD_RECIENTE.fechaPublicacion}>{fechaCorta(ACTIVIDAD_RECIENTE.fechaPublicacion).larga}</time></p>
+          </div>
+          <a className="boton boton--borde" href={ACTIVIDAD_RECIENTE.instagramUrl} target="_blank" rel="noopener noreferrer">Ver en Instagram <Icon id="i-sale" /></a>
+        </aside>
       </div>
     </section>
   );
@@ -295,6 +308,7 @@ function FichaBreve({ l }: { l: Libro }) {
         {l.editorial ? ` · ${l.editorial}` : ''}
         {l.precio != null ? <> · <span className="precio">{precioMXN(l.precio)}</span></> : null}
       </p>
+      {l.sinopsis ? <p className="ficha-sinopsis">{l.sinopsis}</p> : null}
     </>
   );
 }
@@ -304,12 +318,12 @@ function Destacados() {
   const centro = Math.min(3, DESTACADOS.length - 1);
   const n = DESTACADOS.length;
   return (
-    <section id="destacados" className="destacados oscuro" data-suelo="vitrina" aria-labelledby="t-destacados">
+    <section id="destacados" className="destacados" data-suelo="menta" aria-labelledby="t-destacados">
       <div className="envoltura">
         <div className="cabeza-seccion">
           <div>
-            <h2 className="h2" id="t-destacados">Destacados</h2>
-            <p className="resumen">{n} libros de la selección. Los {LIBROS.length} están abajo, en el catálogo.</p>
+            <h2 className="h2" id="t-destacados">Para empezar</h2>
+            <p className="resumen">Hojea {n} libros de la librería.</p>
           </div>
         </div>
         <ul className="destacados-lista">
@@ -333,7 +347,7 @@ function Destacados() {
         tabIndex={0}
         role="group"
         aria-roledescription="carrusel"
-        aria-label={`Destacados: ${n} libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.`}
+        aria-label={`Para empezar: ${n} libros. Flechas izquierda y derecha para hojear; Enter abre la ficha.`}
       >
         <p className="pista" aria-hidden="true"><kbd><Icon id="i-izq" oculto={false} /></kbd><kbd><Icon id="i-der" oculto={false} /></kbd>para hojear</p>
         <div className="lampara" />
@@ -362,15 +376,21 @@ function Destacados() {
         </div>
       </div>
       <div className="envoltura vitrina-pie">
+        <div className="vitrina-navegacion">
+          <div className="vitrina-controles" role="group" aria-label="Navegar libros destacados">
+            <button className="boton boton--borde" id="v-ant" type="button" aria-label="Libro anterior" aria-disabled={centro === 0}><Icon id="i-izq" /> Anterior</button>
+            <span className="contador" id="v-cont">{centro + 1} de {n}</span>
+            <button className="boton boton--borde" id="v-sig" type="button" aria-label="Libro siguiente" aria-disabled={centro === n - 1}>Siguiente <Icon id="i-der" /></button>
+          </div>
+          <p className="vitrina-ayuda" id="vitrina-ayuda" hidden><span className="ayuda-toque">Toca la portada del centro para ver su ficha.</span> <span className="ayuda-clic">Haz clic en la portada del centro para ver su ficha.</span></p>
+        </div>
         <div className="ficha-vitrina" id="ficha-vitrina" aria-live="polite">
           <FichaBreve l={DESTACADOS[centro]} />
         </div>
-        <div className="vitrina-controles">
-          <button className="flecha" id="v-ant" type="button" aria-label="Libro anterior" disabled={centro === 0}><Icon id="i-izq" /></button>
-          <span className="contador" id="v-cont">{centro + 1} de {n}</span>
-          <button className="flecha" id="v-sig" type="button" aria-label="Libro siguiente" disabled={centro === n - 1}><Icon id="i-der" /></button>
+        <div className="vitrina-acciones">
+          <button className="boton boton--tinta" id="v-ficha" type="button" hidden>Ver ficha del libro</button>
+          <a className="boton boton--borde" href="#libros">Ver catálogo completo</a>
         </div>
-        <a className="al-estante" href="#libros">Ver el catálogo completo <Icon id="i-flecha" /></a>
       </div>
     </section>
   );
@@ -432,6 +452,33 @@ function CuerpoFicha({ l }: { l: Libro }) {
   );
 }
 
+function Recomendaciones() {
+  return (
+    <details className="recomendaciones" id="recomendaciones" hidden>
+      <summary>Tu próxima lectura <Icon id="i-der" /></summary>
+      <div className="recomendaciones-cuerpo">
+        <form id="gusto-lector">
+          <fieldset>
+            <legend>¿Qué géneros te gustan?</legend>
+            <div className="gusto-opciones">
+              {generosColeccion().map((genero) => (
+                <label key={genero.id}><input type="checkbox" name="gusto" value={genero.id} />{genero.nombre}</label>
+              ))}
+            </div>
+          </fieldset>
+          <label className="gusto-explorar"><input type="checkbox" name="explorar" />Incluye otros géneros</label>
+          <div className="gusto-acciones">
+            <button type="submit" className="boton boton--tinta">Sugiéreme libros</button>
+            <button type="reset" className="boton boton--borde" hidden>Empezar de nuevo</button>
+          </div>
+        </form>
+        <div id="estado-recomendaciones" role="status" tabIndex={-1} />
+        <ol className="libros-recomendados" id="libros-recomendados" role="list" />
+      </div>
+    </details>
+  );
+}
+
 function Catalogo({ c }: { c: Consulta }) {
   const generos = generosColeccion();
   const editoriales = editorialesCatalogo();
@@ -471,6 +518,7 @@ function Catalogo({ c }: { c: Consulta }) {
             <button className="sr" type="submit">Buscar</button>
             <kbd className="atajo" id="q-atajo" title="Atajo de teclado"><span className="sr">Atajo: </span>/</kbd>
           </form>
+          <Recomendaciones />
         </div>
         <div className="cat-cuerpo">
           <aside className="panel" id="panel" aria-labelledby="t-filtros">
@@ -583,25 +631,14 @@ function TarjetaReal({ p }: { p: ProductoTienda }) {
 }
 
 export function BloqueTienda({ plan }: { plan: PlanTienda }) {
+  const productos = plan.huecos.flatMap((grupo) => grupo.tarjetas ?? []);
+  if (!productos.length) return null;
   return (
-    <section id="tienda" className="tienda" data-suelo="papel2" aria-labelledby="t-tienda">
+    <section id="tienda" className="tienda" data-suelo="papel" aria-labelledby="t-tienda">
       <div className="envoltura">
-        <div className="tienda-cabeza">
-          <h2 id="t-tienda">Tienda</h2>
-          {plan.sello ? <span className="sello">Próximamente</span> : null}
-        </div>
-        {plan.linea ? <p className="proximo">{plan.linea}</p> : null}
-        <ul className="esqueleto" aria-label="Lo que se subirá a la tienda">
-          {plan.huecos.map((h) => h.tarjetas ? (
-            <Fragment key={h.id}>{h.tarjetas.map((p) => <TarjetaReal key={p.id} p={p} />)}</Fragment>
-          ) : (
-            <li className="hueco" key={h.id} data-tipo={h.id}>
-              <div className="hueco-img" aria-hidden="true"><Icon id="camioneta" oculto={false} /></div>
-              <span className="hueco-cat">{h.nombre}</span>
-              <span className="barra-g" aria-hidden="true" />
-              <span className="barra-g corta" aria-hidden="true" />
-            </li>
-          ))}
+        <h2 id="t-tienda" className="h2">Tienda</h2>
+        <ul className="productos-tienda" aria-label="Productos de la tienda">
+          {productos.map((producto) => <TarjetaReal key={producto.id} p={producto} />)}
         </ul>
       </div>
     </section>
@@ -611,16 +648,8 @@ export function BloqueTienda({ plan }: { plan: PlanTienda }) {
 function Visita() {
   const h = NEGOCIO.horario;
   const fotos = NEGOCIO.fotos.filter((f) => f.permisoRegistrado);
-  const contacto: Array<[string, string, string, boolean]> = [
-    ['i-msj', 'WhatsApp', whatsapp(), true],
-    ['i-tel', `Tel. ${NEGOCIO.telefonoVisible}`, `tel:+${NEGOCIO.telefono}`, false],
-    ['i-camara', 'Instagram', NEGOCIO.instagram, true],
-    ['i-pagina', 'Facebook', NEGOCIO.facebook, true],
-    ['i-correo', NEGOCIO.correo, `mailto:${NEGOCIO.correo}`, false],
-    ['i-forma', 'Rentar el espacio', NEGOCIO.renta, true],
-  ];
   return (
-    <section id="visita" className="visita" data-suelo="menta" aria-labelledby="t-visita">
+    <section id="visita" className="visita" data-suelo="papel" aria-labelledby="t-visita">
       <div className="envoltura">
         <div className="visita-reticula">
           <div className="datos">
@@ -639,42 +668,16 @@ function Visita() {
             ) : (
               <p className="entre">Confírmalo por WhatsApp antes de venir.</p>
             )}
-            <a className="boton boton--tinta" href={NEGOCIO.comoLlegar} target="_blank" rel="noopener noreferrer">Cómo llegar <Icon id="i-sale" /></a>
-            <ul className="contacto">
-              {contacto.map(([icono, texto, href, externo]) => (
-                <li key={texto}>
-                  <a href={href} {...(externo ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                    <Icon id={icono} />{texto}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div className="visita-acciones">
+              <a className="boton boton--tinta" href={NEGOCIO.comoLlegar} target="_blank" rel="noopener noreferrer">Cómo llegar <Icon id="i-sale" /></a>
+              <a className="boton boton--borde" href="#cafe">Ver la carta</a>
+            </div>
           </div>
           {fotos.map((f) => (
             <figure className="foto" key={f.src}>
               <img src={f.src} srcSet={f.srcset} sizes="(max-width: 900px) 400px, 640px" alt={f.alt} width={f.ancho} height={f.alto} loading="lazy" />
-              <figcaption>{f.pie} · Foto: {f.credito}</figcaption>
             </figure>
           ))}
-        </div>
-        <div className="barra" id="cafe">
-          <h3>En la barra</h3>
-          <div className="carta">
-            {CARTA.map((cat) => (
-              <div key={cat.id}>
-                <h4>{cat.nombre}</h4>
-                <ul>
-                  {cat.productos.map((p) => (
-                    <li key={p.id}>
-                      <b>{p.nombre}</b>
-                      {p.precio != null ? <span>{precioMXN(p.precio)}</span> : null}
-                      {p.descripcion ? <span className="d">{p.descripcion}</span> : null}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
         </div>
         <div className="preguntas">
           {PREGUNTAS.map((q) => (
@@ -693,13 +696,115 @@ function Visita() {
   );
 }
 
-function Pie() {
-  const creditos = [...new Set(NEGOCIO.fotos.filter((f) => f.permisoRegistrado).map((f) => f.credito))];
+function ContenidoProductoCarta({ producto }: {
+  producto: (typeof CARTA)[number]['productos'][number];
+}) {
   return (
-    <footer className="pie-pagina">
+    <>
+      {producto.foto ? (
+        <div className="carta-producto-media">
+          <img className="carta-producto-foto" src={producto.foto.src} alt={producto.foto.alt} loading="lazy" decoding="async" />
+        </div>
+      ) : null}
+      <div className="carta-producto-texto">
+        <h4>{producto.nombre}</h4>
+        {producto.descripcion ? <p>{producto.descripcion}</p> : null}
+        {producto.precio != null ? <span className="carta-precio">{precioMXN(producto.precio)}</span> : null}
+      </div>
+    </>
+  );
+}
+
+function Carta() {
+  const muestraIds = ['quesadilla-campesina', 'molletes', 'tarta-del-dia'];
+  const muestra = CARTA.flatMap((categoria) => categoria.productos).filter((producto) => muestraIds.includes(producto.id));
+  return (
+    <section id="cafe" className="menu-cafe" data-suelo="papel" aria-labelledby="t-cafe" tabIndex={-1}>
+      <div className="envoltura menu-carta">
+        <header className="menu-cabecera">
+          <h2 className="h2" id="t-cafe">Café y comida</h2>
+          <p>Pide en la barra y quédate a leer con tu café.</p>
+        </header>
+        <nav id="carta-categorias" className="carta" aria-label="Categorías de la carta">
+          {CARTA.map((cat) => (
+            <a className="carta-categoria" href={'#carta-' + cat.id} key={cat.id}>{cat.nombre}</a>
+          ))}
+          <a className="carta-categoria" href="#carta-completa">Toda la carta</a>
+        </nav>
+        <p className="sr" role="status" id="carta-estado" />
+        <div className="carta-detalles" id="carta-completa" tabIndex={-1}>
+          {CARTA.map((cat) => (
+            <article className="carta-panel" id={'carta-' + cat.id} key={cat.id} tabIndex={-1}>
+              <h3>{cat.nombre}</h3>
+              <ul className="carta-galeria" role="list">
+                {cat.productos.map((producto) => (
+                  <li className="carta-producto" key={producto.id} data-producto={producto.id}>
+                    <ContenidoProductoCarta producto={producto} />
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+        {muestra.length ? (
+          <div className="menu-vitrina">
+            <h3 id="t-cafe-muestra">Recomendaciones de la carta</h3>
+            <div className="menu-escena" role="region" aria-roledescription="carrusel" aria-labelledby="t-cafe-muestra">
+              <ul className="menu-muestra" id="cafe-carrusel" aria-label="Platos destacados" role="list" tabIndex={muestra.length > 1 ? 0 : undefined}>
+                {muestra.map((producto, indice) => (
+                  <li key={producto.id} aria-current={indice === 0 ? 'true' : undefined}>
+                    <article className="carta-producto">
+                      <ContenidoProductoCarta producto={producto} />
+                    </article>
+                  </li>
+                ))}
+              </ul>
+              {muestra.length > 1 ? (
+                <div className="vitrina-controles menu-controles" role="group" aria-label="Cambiar plato" hidden>
+                  <button className="boton boton--borde" type="button" aria-label="Plato anterior" aria-controls="cafe-carrusel" aria-disabled="true" data-cafe-paso="-1"><Icon id="i-izq" /> Anterior</button>
+                  <span className="contador" aria-hidden="true" id="cafe-posicion">1 de {muestra.length}</span>
+                  <button className="boton boton--borde" type="button" aria-label="Plato siguiente" aria-controls="cafe-carrusel" aria-disabled="false" data-cafe-paso="1">Siguiente <Icon id="i-der" /></button>
+                  <span className="sr" role="status" id="cafe-plato-activo" />
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+        <a className="carta-visita" href="#visita">Planear la visita <Icon id="i-der" /></a>
+      </div>
+    </section>
+  );
+}
+
+function Pie() {
+  const contacto: Array<[string, string, string, boolean]> = [
+    ['i-msj', 'WhatsApp', whatsapp(), true],
+    ['i-tel', `Tel. ${NEGOCIO.telefonoVisible}`, `tel:+${NEGOCIO.telefono}`, false],
+    ['i-camara', 'Instagram', NEGOCIO.instagram, true],
+    ['i-pagina', 'Facebook', NEGOCIO.facebook, true],
+    ['i-correo', NEGOCIO.correo, `mailto:${NEGOCIO.correo}`, false],
+    ['i-forma', 'Rentar el espacio', NEGOCIO.renta, true],
+  ];
+  return (
+    <footer className="pie-pagina" id="contacto">
       <div className="envoltura">
-        <strong>Librería Itinerante y Más</strong>
-        <span>© 2026{creditos.length ? ` · Fotos: ${creditos.join(', ')}` : ''}. Portadas: sus editoriales.</span>
+        <h2 id="t-contacto">Contacto</h2>
+        <ul className="contacto">
+          {contacto.map(([icono, texto, href, externo]) => (
+            <li key={texto}>
+              <a href={href} {...(externo ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                <Icon id={icono} />{texto}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className="pie-creditos">
+          <strong>Librería Itinerante y Más</strong>
+          <div className="pie-autoria">
+            <p>© 2026 · Página creada por Aldo G. Martinez Pineda</p>
+            <p>Diseño y textos originales · <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es" rel="license">CC BY-NC-ND 4.0</a></p>
+          </div>
+        </div>
       </div>
     </footer>
   );
@@ -740,7 +845,6 @@ function datosCliente() {
 export function Pagina({ css, js, consulta = CONSULTA_VACIA }: { css: string; js: string; consulta?: Consulta }) {
   const c = consulta;
   const libro = c.libro ? LIBROS.find((l) => l.id === c.libro) ?? null : null;
-  const hrefLibros = DESTACADOS.length ? '#destacados' : '#libros';
   const plan = planTienda();
   return (
     <html lang="es-MX">
@@ -752,11 +856,19 @@ export function Pagina({ css, js, consulta = CONSULTA_VACIA }: { css: string; js
         <meta name="robots" content="noindex" />
         <link rel="canonical" href="https://itinerante.vercel.app/" />
         <meta name="theme-color" content="#5dc4b4" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://itinerante.vercel.app/" />
+        <meta property="og:locale" content="es_MX" />
+        <meta property="og:site_name" content={NEGOCIO.nombre} />
         <meta property="og:title" content={NEGOCIO.nombre} />
         <meta property="og:description" content={NEGOCIO.linea} />
         <meta property="og:image" content="https://itinerante.vercel.app/assets/img/compartir.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Logotipo de la camioneta junto a una foto del interior de Librería Itinerante y Más" />
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="icon" href="/Logo.png" />
+        <link rel="apple-touch-icon" href="/Logo.png" />
         <link rel="preload" href="/assets/frente/fuentes/BarlowCondensed-700.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="preload" href="/assets/frente/fuentes/Barlow-400.woff2" as="font" type="font/woff2" crossOrigin="" />
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
@@ -766,13 +878,14 @@ export function Pagina({ css, js, consulta = CONSULTA_VACIA }: { css: string; js
       <body>
         <a className="saltar" href="#contenido">Ir al contenido</a>
         <Sprite />
-        <Cabecera hrefLibros={hrefLibros} />
+        <Cabecera />
         <main id="contenido" tabIndex={-1}>
           <Portada />
           <Eventos />
           <Destacados />
           <Catalogo c={c} />
           <BloqueTienda plan={plan} />
+          <Carta />
           <Visita />
         </main>
         <Pie />

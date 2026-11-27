@@ -2,11 +2,11 @@
 """Carga la foto de un producto de la carta de Café y té (#cafe) que manda Aldo.
 
 Uso:  python3 scripts/foto-carta.py RUTA/foto.jpg ID_DEL_PRODUCTO --alt "Texto alternativo" [--fecha AAAA-MM-DD] [--autor "…"]
-      después:  npm run carta   (pinta la carta y, con 5 productos con foto o más, la galería)
+      después:  npm run nuevo   (incorpora la foto a la galería y al servidor local)
 
 - ID_DEL_PRODUCTO es el «id» de un producto de assets/data/menu.json (p. ej. latte); si no existe, falla sin tocar nada.
 - --alt es obligatorio (lo que se ve en la foto, para quien no la ve); sin él, o vacío, falla.
-- Recorta al centro a un cuadrado (la fila y la galería muestran la foto cuadrada), respeta la orientación EXIF del teléfono y guarda:
+- Recorta al centro a un cuadrado para la galería, respeta la orientación EXIF del teléfono y guarda:
     assets/img/carta/<id>.webp      lado ≤ 1200 (la galería en pantallas de 2×)
     assets/img/carta/<id>-600.webp  lado ≤ 600  (la fila de la carta; build-carta.mjs la usa en srcset si existe)
   WebP calidad 80 con Pillow. No amplía: una foto más chica que 1200 se queda de su lado.
@@ -101,7 +101,7 @@ def main():
     escribe_json(MENU, menu)
     con_foto = sum(1 for c in menu['categorias'] for p in c['productos'] if p.get('foto'))
     print(f'{a.id}: assets/{rel(grande)} ({l1} px) y assets/{rel(chica)} ({l2} px), registradas en assets/provenance.json; foto escrita en menu.json.')
-    print(f'Productos con foto: {con_foto} (la galería aparece desde 5). Ahora corre: npm run carta')
+    print(f'Productos con foto: {con_foto}. Ahora corre: npm run nuevo')
 
 
 if __name__ == '__main__':

@@ -108,7 +108,8 @@ test("_headers: seguridad conservada y cache sin immutable para lo que no tiene 
     else rules.get(cur).push(line.trim());
   }
   const header = (rule, name) => (rules.get(rule) || []).find((l) => l.toLowerCase().startsWith(name.toLowerCase() + ":"));
-  assert.match(header("/*", "Content-Security-Policy"), /frame-ancestors 'self'/);
+  assert.match(header("/*", "Content-Security-Policy"), /frame-ancestors 'none'/);
+  assert.equal(header("/*", "X-Frame-Options"), "X-Frame-Options: DENY");
   for (const h of ["Strict-Transport-Security", "X-Content-Type-Options", "X-Frame-Options", "Referrer-Policy", "Permissions-Policy"]) {
     assert.ok(header("/*", h), `falta ${h}`);
   }
@@ -152,11 +153,15 @@ test("isInternal marca provenance.json, sources.json, dotfiles y mapas", () => {
   for (const n of ["catalog.json", "fonts.css", "f001.webp", "OFL-archivo.txt"]) assert.ok(!isInternal(n), n);
 });
 
-test("cf:dev y cf:deploy regeneran public/ antes de wrangler y se abortan si falla", async () => {
+test("Cloudflare prepara /nuevo y el emulador web histórico de Firebase sigue bloqueado", async () => {
   const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
-  for (const s of ["cf:dev", "cf:deploy"]) {
-    assert.match(pkg.scripts[s], /^node scripts\/prepare-public\.mjs && wrangler /, s);
-  }
-  const wr = await readFile(join(root, "wrangler.jsonc"), "utf8");
-  assert.match(wr, /"directory": "\.\/public"/);
+  assert.match(pkg.scripts["cf:prepare"], /^npm run nuevo && .*scripts\/prepare-nuevo-cloudflare\.mjs$/);
+  assert.equal(pkg.scripts["cf:dev"], "npm run cf:prepare && wrangler dev --local");
+  assert.equal(pkg.scripts["cf:preview"], "npm run cf:prepare && wrangler preview");
+  assert.equal(pkg.scripts["cf:deploy"], "npm run cf:prepare && wrangler deploy");
+  assert.equal(pkg.scripts["backend:dev:emulator"], "node tools/legacy-disabled.mjs");
+  const firebase = JSON.parse(await readFile(join(root, "firebase.json"), "utf8"));
+  assert.deepEqual(firebase.hosting.predeploy, ['node tools/legacy-disabled.mjs']);
+  assert.equal(pkg.scripts.emulators, 'npm run emulators:dataconnect');
+  assert.equal(pkg.scripts['emulators:dataconnect'], 'firebase emulators:start --only dataconnect');
 });

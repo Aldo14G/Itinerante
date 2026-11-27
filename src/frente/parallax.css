@@ -1,0 +1,58 @@
+@supports (animation-timeline: view()) and (animation-range: entry 0% exit 100%) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root { --desplazamiento-visual: 16px; }
+
+    @media (max-width: 767px) {
+      :root { --desplazamiento-visual: 5px; }
+    }
+
+    .camion {
+      animation: desplazar-camion 1s linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 100svh;
+    }
+
+    /* La agenda tiene scroll horizontal. Su caja sigue el scroll vertical de la página. */
+    .agenda-eventos { view-timeline-name: --paso-agenda; }
+    .vitrina { view-timeline-name: --paso-vitrina; }
+
+    .visita .foto {
+      align-self: start;
+      border-radius: 14px;
+      overflow: clip;
+      view-timeline-name: --paso-visita;
+    }
+
+    .visita .foto img { scale: 1.16; }
+
+    .cartel-trazo,
+    .cartel--taller::before,
+    .cartel--taller::after {
+      animation-timeline: --paso-agenda;
+    }
+
+    .vitrina .escenario { animation-timeline: --paso-vitrina; }
+    .visita .foto img { animation-timeline: --paso-visita; }
+
+    .cartel-trazo,
+    .cartel--taller::before,
+    .cartel--taller::after,
+    .vitrina .escenario,
+    .visita .foto img {
+      animation-name: desplazar-imagen;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes desplazar-camion {
+      to { translate: 0 calc(var(--desplazamiento-visual) * 2.25); }
+    }
+
+    @keyframes desplazar-imagen {
+      from { translate: 0 calc(-1 * var(--desplazamiento-visual)); }
+      to { translate: 0 var(--desplazamiento-visual); }
+    }
+  }
+}

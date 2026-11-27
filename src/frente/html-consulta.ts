@@ -75,7 +75,7 @@ export function aplicarConsultaHtml(html: string, c: Consulta): string {
     : marca;
   html = html.slice(0, desde) + ul + piezas + html.slice(hasta);
 
-  html = html.replace(/name="q" value="[^"]*"/, `name="q" value="${esc(c.q)}"`);
+  html = html.replace(/name="q" value="[^"]*"/, () => `name="q" value="${esc(c.q)}"`);
   if (c.genero.length && !html.includes('name="genero"')) {
     html = html.replace(
       /name="q" value="[^"]*"\/>/,
@@ -129,7 +129,7 @@ export function aplicarConsultaHtml(html: string, c: Consulta): string {
 
   if (n === 0) {
     html = html.replace('id="vacio" hidden=""', 'id="vacio"');
-    html = html.replace(/(<h3 id="vacio-t">)[^<]*/, `$1${esc(tituloVacio(c))}`);
+    html = html.replace(/(<h3 id="vacio-t">)[^<]*/, (_texto, prefijo) => prefijo + esc(tituloVacio(c)));
   }
   const sinQ = hrefCatalogo(c, { q: '' });
   const sinFiltros = hrefCatalogo(c, { genero: [], editorial: [], q: c.q });

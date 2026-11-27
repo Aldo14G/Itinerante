@@ -1,26 +1,18 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "libreria-itinerante",
-  "main": "worker/index.ts",
+  "main": "worker/nuevo.ts",
   "compatibility_date": "2026-10-30",
-  "upload_source_maps": true,
-  "observability": { "enabled": true },
+  "workers_dev": true,
+  "previews": {},
+  "observability": { "enabled": false },
+  "vars": { "PUBLIC_SITE_ORIGIN": "https://libreria-itinerante.aldo14g.workers.dev" },
   "assets": {
-    // public/ lo regenera desde cero scripts/prepare-public.mjs (lista de permitidos: index.html, CSS/JS de la raiz,
-    // assets/ sin provenance.json ni sources.json, logos, robots.txt y worker/_headers como _headers). `cf:dev` y `cf:deploy`
-    // lo ejecutan antes de wrangler y se abortan si falla, asi que nunca se publica un public/ viejo.
-    "directory": "./public",
+    // Solo archivos referenciados por /nuevo. El build histórico queda fuera de este destino.
+    "directory": "./.wrangler/nuevo-assets",
     "binding": "ASSETS",
-    // Una ruta que no existe se sirve con 404.html y estado 404 (404.html se publica con el resto de la raíz; ver scripts/prepare-public.mjs).
+    "html_handling": "none",
     "not_found_handling": "404-page",
-    // Solo /api/* pasa por el Worker; todo lo demás se sirve como asset sin invocar código.
-    "run_worker_first": ["/api/*"]
-  },
-  // Límites de Iti IA (por ubicación de Cloudflare; no son un tope global estricto).
-  "ratelimits": [
-    { "name": "IA_PER_IP", "namespace_id": "1101", "simple": { "limit": 10, "period": 60 } },
-    { "name": "IA_GLOBAL", "namespace_id": "1102", "simple": { "limit": 120, "period": 60 } }
-  ]
-  // Secretos opcionales (wrangler secret put): GEMINI_API_KEY. Sin ella Iti IA responde con el ranking local.
-  // Variables opcionales: ITI_IA_ALLOWED_ORIGINS (orígenes extra, separados por coma), ITI_IA_MODEL, ITI_IA_FALLBACK_MODEL.
+    "run_worker_first": ["/", "/robots.txt", "/sitemap.xml", "/nuevo", "/nuevo/", "/index", "/index/", "/index.html", "/index.html/", "/prototypes", "/prototypes/*", "/_archive", "/_archive/*"]
+  }
 }

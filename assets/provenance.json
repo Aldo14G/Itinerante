@@ -1,7 +1,86 @@
 {
-  "updated": "2026-11-18",
+  "updated": "2026-11-26",
   "rule": "Todas las imágenes del sitio son fotografías reales de la casa, salvo las portadas de los libros (img/portadas/, registradas aparte en «covers»): el lote oficial entregado por Aldo (2026-10-27), fotos publicadas por la cuenta oficial de Instagram (con su autor) y fotos de Aldo (2026-11-10). No quedan recreaciones generadas con IA; la secuencia de fotogramas del inicio se retiró el 2026-11-10. La procedencia es un dato interno (data-kind y este archivo): la página no imprime rótulos. Pendiente de la librería: confirmar el permiso de uso de las fotos de @sharonmirelesgong y @alfonso_boeta, o sustituirlas por la sesión profesional.",
   "real": [
+    {
+      "file": "img/eventos/aniversario-6-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgBRv40IC_N/",
+      "date": "2026-11-21",
+      "slide": 1,
+      "sourceSha256": "7710fcb645079cfc6504de1ca291b06ed5ca68769ede435612b016ff6a40b693",
+      "sha256": "232c8b241a7828b20cdbef25160c55a3e063dacfa7967aa126f4842124c4c133",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/actuacion-gestual-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
+      "date": "2026-11-26",
+      "slide": 2,
+      "sourceSha256": "bdf25fef98fdc0f73e1bdebee7f7a9d9aad24701dde859c9f844a005b039ada6",
+      "sha256": "982f59657ddca97051bff2de8d5a165e0940f27deb35a029f4145ea1998c0174",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/taller-cuento-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
+      "date": "2026-11-26",
+      "slide": 3,
+      "sourceSha256": "2ddbedba64822d931bd4b3b7fd8621258793a47dd35258a7e17fd5e1c57b45dd",
+      "sha256": "bcaefaaa513d11bfd4a0149c7c2368f353d843f4afae9742616defe980313848",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/club-dibujo-adultos-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
+      "date": "2026-11-26",
+      "slide": 4,
+      "sourceSha256": "0d21f1369c64b55e4878a6b7b61500389b76672302e38372d980bbaa300bbffd",
+      "sha256": "7691575fab9018ccd483ab3e1437af1390e0a5c140e08f96b589373e5a277f10",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/club-cine-manifestarte-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
+      "date": "2026-11-26",
+      "slide": 5,
+      "sourceSha256": "40cd3b5c0dcf00e93c0d75f08e89d0d75621fa15f2119cb274a4f02a86df126a",
+      "sha256": "1a576066bb0a8b69689707719b610c16a9c874ba249f32caa7831f3df265011a",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/taller-dibujo-ninos-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
+      "date": "2026-11-26",
+      "slide": 6,
+      "sourceSha256": "ead0bbe89efe065ae8e5238fdfd12c50a30235549c12238ab2d5750e9c8078e1",
+      "sha256": "eb2eee2ac9b54e38b4e86fafcfa0eaafbfddc06f7d1228265b80171ddce9cdd5",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/circulo-lectura-mitopoietica-cartel.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DgN_kbtI-bm/",
+      "date": "2026-11-26",
+      "slide": 7,
+      "sourceSha256": "71a3b11b25546cc999a5de5fd0f081c806a8a3c1814f60e1f276810a512606a9",
+      "sha256": "a64d38b8cc9fc99cb7f369443981ca483b440918b1f31d427b3c696771be5f3d",
+      "note": "WebP 720 × 900 sin recorte. Arte del cartel excluido de la licencia del sitio."
+    },
+    {
+      "file": "img/eventos/club-dibujo-pintura.webp",
+      "origin": "Cartel publicado en el Instagram oficial de Librería Itinerante y Más",
+      "source": "https://www.instagram.com/libreriaitineranteymasmty/p/DfYBKN-oZea/",
+      "date": "2026-11-05",
+      "sourceSha256": "155e9ba7c3aaeee6fa04aabb45d3004bba9e204abb56d08f2c3038d129641764",
+      "sha256": "164449767fbfea9f7a01b01493ec8bf9a1b6c7f78123c49236844dff7e67cb26",
+      "note": "Cartel incorporado por instrucción de Aldo el 2026-11-25. WebP 800 x 1000, sin recorte. El arte del cartel queda fuera de la licencia del sitio."
+    },
     {
       "file": "img/oficial-mesa-800.webp",
       "origin": "images/gallery/oficial-mesa-800.webp",

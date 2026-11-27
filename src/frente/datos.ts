@@ -6,6 +6,7 @@ import carta from '../../assets/data/menu.json';
 import faq from '../../assets/data/faq.json';
 import merch from '../../assets/data/merch.json';
 import eventosCurados from './eventos.json';
+import agendaPublica from '../../assets/data/eventos.json';
 import negocio from './negocio.json';
 import correcciones from './correcciones.json';
 import destacadosCurados from './destacados.json';
@@ -139,7 +140,7 @@ export const MERCH: MerchItem[] = (merch.productos as MerchCrudo[]).flatMap((m) 
   return [{ id: m.id, nombre: m.nombre, precio: typeof m.precio === 'number' ? m.precio : null, descripcion: m.descripcion ?? null, tipo: m.tipo ?? null, foto: { src: m.foto.src, alt: m.foto.alt } }];
 });
 
-/** Talleres vendibles de la tienda. Hoy ninguno: el Club de Dibujo vive solo en Eventos. */
+/** Talleres vendibles de la tienda. Hoy ninguno: el Club de Dibujo vive en Talleres y se registra por separado. */
 export type TallerTienda = { id: string; titulo: string; precio: number | null };
 export const TALLERES: TallerTienda[] = [];
 
@@ -264,60 +265,26 @@ export function generosConFiltro(libros = LIBROS): Array<{ nombre: string; n: nu
 /** El ítem del menú de la tienda dice «Libros» mientras no haya merch (S-18). */
 export const NOMBRE_TIENDA = MERCH.length ? 'Tienda' : 'Libros';
 
-export type Producto = { id: string; nombre: string; descripcion: string | null; precio: number | null };
+type FotoProducto = { src: string; alt: string };
+type Producto = { id: string; nombre: string; descripcion: string | null; precio: number | null; foto: FotoProducto | null };
+type ProductoCrudo = Omit<Producto, 'foto'> & { foto?: FotoProducto | null };
 export type CategoriaCarta = { id: string; nombre: string; productos: Producto[] };
 
 /** Carta «En la barra»: categorías y productos de menu.json. Las notas no se imprimen (S-6). */
 export const CARTA: CategoriaCarta[] = carta.categorias.map((c) => ({
   id: c.id,
   nombre: c.nombre,
-  productos: c.productos.map((p) => ({
+  productos: c.productos.map((p: ProductoCrudo) => ({
     id: p.id,
     nombre: p.nombre,
     descripcion: p.descripcion ?? null,
     precio: typeof p.precio === 'number' ? p.precio : null,
+    foto: p.foto ? { src: '/' + p.foto.src, alt: p.foto.alt } : null,
   })),
 }));
 
-export type FilaCarta = { id: string; nombre: string; detalle: string | null; lineas: string[]; precio: number | null };
-
-const TES = new Set(['hierbabuena', 'manzanilla', '7 azahares', 'limon', 'jamaica', 'te verde']);
-
 function sinAcento(s: string): string {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-}
-
-/** Une una racha de productos sin precio en una sola fila, para que ninguna columna quede con precios vacíos seguidos. */
-function colapsarSinPrecio(grupo: Producto[]): FilaCarta {
-  if (grupo.length === 1) return { id: grupo[0].id, nombre: grupo[0].nombre, detalle: grupo[0].descripcion, lineas: [], precio: null };
-  const aguas = grupo.filter((p) => sinAcento(p.nombre) === 'aguas frescas');
-  const resto = grupo.filter((p) => sinAcento(p.nombre) !== 'aguas frescas');
-  const esTes = resto.length > 1 && resto.every((p) => TES.has(sinAcento(p.nombre)));
-  return {
-    id: grupo.map((p) => p.id).join('-'),
-    nombre: esTes ? 'Tés' : (resto[0]?.nombre ?? aguas[0].nombre),
-    detalle: esTes ? resto.map((p) => p.nombre).join(', ') : resto.slice(1).map((p) => p.nombre).join(', ') || null,
-    lineas: aguas.map((a) => a.nombre),
-    precio: null,
-  };
-}
-
-export function filasDeCategoria(productos: Producto[]): FilaCarta[] {
-  const filas: FilaCarta[] = [];
-  let sin: Producto[] = [];
-  const volcar = () => {
-    if (sin.length) filas.push(colapsarSinPrecio(sin));
-    sin = [];
-  };
-  for (const p of productos) {
-    if (p.precio == null) sin.push(p);
-    else {
-      volcar();
-      filas.push({ id: p.id, nombre: p.nombre, detalle: p.descripcion, lineas: [], precio: p.precio });
-    }
-  }
-  volcar();
-  return filas;
 }
 
 /**
@@ -335,13 +302,19 @@ export const PREGUNTAS: Array<{ id: string; pregunta: string; respuesta: string 
 
 export type Evento = {
   id: string;
+  seccion: 'eventos' | 'talleres';
   titulo: string;
   fecha: string | null;
+  /** Solo talleres recurrentes: la siguiente sesión confirmada. Pasado ese día vuelve a verse solo la recurrencia. */
+  proximaSesion: string | null;
   hora: string | null;
   lugar: string | null;
   organizador: string | null;
   imagen: string | null;
+  descripcion: string | null;
   registroUrl: string | null;
+  registroWhatsApp: boolean;
+  facilitadorInstagram: string | null;
   instagramUrl: string;
   recurrencia: string | null;
   costo: string | null;
@@ -350,31 +323,61 @@ export type Evento = {
 
 type EventoCrudo = {
   id: string;
+  seccion?: 'eventos' | 'talleres';
   titulo: string;
   fecha?: string | null;
+  proximaSesion?: string | null;
   hora?: string | null;
   lugar?: string | null;
   organizador?: string | null;
   imagen?: string | null;
+  descripcion?: string | null;
   registroUrl?: string | null;
+  registroWhatsApp?: boolean;
+  facilitadorInstagram?: string | null;
   instagramUrl: string;
   recurrencia?: string | null;
   costo?: string | null;
   incluye?: string | null;
 };
 
+export function enlaceLuma(valor?: string | null): string | null {
+  if (!valor) return null;
+  try {
+    const url = new URL(valor);
+    const dominios = ['luma.com', 'lu.ma', 'www.luma.com', 'www.lu.ma'];
+    return url.protocol === 'https:' && dominios.includes(url.host) && !url.username && !url.password
+      && url.pathname !== '/' ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Fecha ISO real (AAAA-MM-DD, hora de Monterrey) o null: un valor inválido no se imprime. */
+function fechaIso(valor: unknown): string | null {
+  if (typeof valor !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(valor)) return null;
+  const d = new Date(`${valor}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === valor ? valor : null;
+}
+
 function aEvento(e: EventoCrudo): Evento {
-  const imagen = e.imagen && e.imagen.startsWith('/assets/') ? e.imagen : null;
-  const registro = e.registroUrl && /^https:\/\//.test(e.registroUrl) ? e.registroUrl : null;
+  const imagen = e.imagen && /^\/assets\/img\/[a-z0-9_/-]+\.(webp|avif|png|jpe?g)$/i.test(e.imagen) ? e.imagen : null;
+  const registro = enlaceLuma(e.registroUrl);
   return {
     id: e.id,
+    seccion: e.seccion === 'talleres' ? 'talleres' : 'eventos',
     titulo: e.titulo,
-    fecha: e.fecha ?? null,
+    fecha: fechaIso(e.fecha),
+    proximaSesion: fechaIso(e.proximaSesion),
     hora: e.hora ?? null,
     lugar: e.lugar ?? null,
     organizador: e.organizador ?? null,
     imagen,
+    descripcion: e.descripcion?.trim() || null,
     registroUrl: registro,
+    registroWhatsApp: !registro && e.registroWhatsApp === true,
+    facilitadorInstagram: e.facilitadorInstagram && /^[a-z0-9_][a-z0-9_.]{0,29}$/i.test(e.facilitadorInstagram)
+      ? e.facilitadorInstagram : null,
     instagramUrl: e.instagramUrl,
     recurrencia: e.recurrencia ?? null,
     costo: e.costo ?? null,
@@ -382,14 +385,61 @@ function aEvento(e: EventoCrudo): Evento {
   };
 }
 
-/** Fechados primero, por fecha; después los recurrentes (sin próxima fecha, no se ocultan). */
-export const EVENTOS: Evento[] = (eventosCurados.eventos as EventoCrudo[])
-  .map(aEvento)
+type TallerHoja = {
+  id: string;
+  titulo: string;
+  tipo?: string;
+  origen?: string;
+  fecha?: string | null;
+  hora?: string | null;
+  fin?: string | null;
+  con?: string | null;
+  lugar?: string | null;
+  incluye?: string | null;
+  imagen?: string | null;
+  descripcion?: string | null;
+  costo?: readonly string[];
+  reserva?: { tipo?: string; url?: string; telefono?: string } | null;
+};
+
+export function talleresDeHoja(filas: readonly TallerHoja[], curados: readonly Evento[]) {
+  const ids = new Set(curados.map((evento) => evento.id));
+  const titulos = new Set(curados.map((evento) => sinAcento(evento.titulo).trim()));
+  return filas.flatMap((fila) => {
+    if (fila.origen !== 'hoja' || fila.tipo?.trim().toLowerCase() !== 'taller' || !fila.fecha ||
+        ids.has(fila.id) || titulos.has(sinAcento(fila.titulo).trim())) return [];
+    ids.add(fila.id);
+    const reserva = fila.reserva;
+    return [aEvento({
+      id: fila.id,
+      seccion: 'talleres',
+      titulo: fila.titulo,
+      fecha: fila.fecha,
+      hora: fila.hora && fila.fin ? fila.hora + '–' + fila.fin : fila.hora,
+      organizador: fila.con,
+      lugar: fila.lugar,
+      incluye: fila.incluye,
+      imagen: fila.imagen ? '/' + fila.imagen : null,
+      descripcion: fila.descripcion,
+      costo: fila.costo?.join(' · '),
+      registroUrl: reserva?.tipo === 'luma' ? reserva.url : null,
+      registroWhatsApp: reserva?.tipo === 'whatsapp' && reserva.telefono === NEGOCIO.telefono.slice(-10),
+      instagramUrl: NEGOCIO.instagram,
+    })];
+  });
+}
+
+const agendaCurada = (eventosCurados.eventos as EventoCrudo[]).map(aEvento);
+export const ACTIVIDAD_RECIENTE = eventosCurados.actividadReciente;
+export const AGENDA_SEMANAL = eventosCurados.agendaSemanal;
+
+// Fechados primero, por fecha. Las actividades fijas conservan el orden de la semana.
+export const EVENTOS: Evento[] = [...agendaCurada, ...talleresDeHoja(agendaPublica.eventos, agendaCurada)]
   .sort((a, b) => {
     if (a.fecha && b.fecha) return a.fecha.localeCompare(b.fecha) || a.titulo.localeCompare(b.titulo, 'es');
     if (a.fecha) return -1;
     if (b.fecha) return 1;
-    return a.titulo.localeCompare(b.titulo, 'es');
+    return 0;
   });
 
 export const FECHADOS = EVENTOS.filter((e): e is Evento & { fecha: string } => e.fecha != null);
@@ -401,7 +451,7 @@ export function eventosFechados(hoy = hoyMonterrey()): Array<Evento & { fecha: s
   return FECHADOS.filter((e) => e.fecha >= hoy);
 }
 
-/** Último día con un evento fechado vigente: hasta ese día el CTA de la portada es «Ver eventos» (S-18). */
+/** Último día con una actividad fechada en la agenda. */
 export function ultimoDiaConEventos(): string | null {
   return FECHADOS.length ? FECHADOS[FECHADOS.length - 1].fecha : null;
 }

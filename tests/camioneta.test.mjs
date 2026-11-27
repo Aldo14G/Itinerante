@@ -68,6 +68,31 @@ async function peso(page, url) {
   return { bytes, hosts: [...hosts], errores };
 }
 
+test('navegador: Escape cancela la apertura de la ficha y devuelve el foco', async () => {
+  const browser = await chromium.launch(process.platform === 'win32' ? { channel: 'msedge' } : {});
+  const { server, puerto } = await servir();
+  try {
+    const page = await browser.newPage({ reducedMotion: 'no-preference' });
+    await page.goto(`http://127.0.0.1:${puerto}/nuevo#libros`);
+    const libro = page.locator('#rejilla > li:not(.fuera) h3 a').first();
+    await libro.focus();
+    const durante = await libro.evaluate((enlace) => {
+      enlace.click();
+      const clon = document.querySelector('.clon');
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      return { animaba: Boolean(clon), clonEliminado: !clon?.isConnected };
+    });
+    assert.deepEqual(durante, { animaba: true, clonEliminado: true });
+    await page.waitForFunction(() => document.querySelector('#hoja').hidden);
+    assert.equal(new URL(page.url()).searchParams.has('libro'), false);
+    assert.equal(await libro.evaluate((enlace) => document.activeElement === enlace), true);
+    assert.equal(await page.locator('main').evaluate((main) => main.inert), false);
+  } finally {
+    await browser.close();
+    server.close();
+  }
+});
+
 test('navegador: axe, centro, gestos, peso y capturas', async () => {
   await mkdir(artefactos, { recursive: true });
   const { server, puerto } = await servir();
@@ -280,7 +305,7 @@ test('navegador: axe, centro, gestos, peso y capturas', async () => {
     anotar('anillo vitrina', parseFloat(focoV.w) >= 3 && Number(focoV.op) > 0.9, JSON.stringify(focoV));
 
     // Capturas.
-    const secciones = [['inicio', '#inicio'], ['eventos', '#eventos'], ['destacados', '#destacados'], ['catalogo', '#libros'], ['tienda', '#tienda'], ['visita', '#visita']];
+    const secciones = [['inicio', '#inicio'], ['eventos', '#eventos'], ['destacados', '#destacados'], ['catalogo', '#libros'], ['visita', '#visita']];
     for (const [pagina, nombre, ancho] of [[pA, '1440', 1440], [pM, '390', 390], [pR, '1440-reducido', 1440]]) {
       for (const [id, sel] of secciones) {
         await pagina.evaluate((s) => document.querySelector(s).scrollIntoView(), sel);

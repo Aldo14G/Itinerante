@@ -1,0 +1,34 @@
+/* Generado por generar-tintes.mjs el 2026-11-27 desde https://libreria-itinerante.aldo14g.workers.dev/: color medio de cada portada (MT-06).
+   No se edita a mano: se vuelve a generar cuando cambian las portadas. 32 portadas. */
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/polvo-carlos-bortoni-"], > img[src$="/portadas/polvo-carlos-bortoni.webp"]) { background-color: #d94d44; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/amigos-rodrigo-garnica-"], > img[src$="/portadas/amigos-rodrigo-garnica.webp"]) { background-color: #d0bba2; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/demonios-huascar-robles-"], > img[src$="/portadas/demonios-huascar-robles.webp"]) { background-color: #6c6a6d; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/reino-mundo-juan-mireles-"], > img[src$="/portadas/reino-mundo-juan-mireles.webp"]) { background-color: #344b60; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/el-circo-miguel-del-valle-"], > img[src$="/portadas/el-circo-miguel-del-valle.webp"]) { background-color: #94887f; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/perorata-luis-felipe-lomeli-"], > img[src$="/portadas/perorata-luis-felipe-lomeli.webp"]) { background-color: #4888ae; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/la-voz-vertical-bruno-clemet-"], > img[src$="/portadas/la-voz-vertical-bruno-clemet.webp"]) { background-color: #e9e3d7; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/perlas-de-obsidiana-olaf-marin-"], > img[src$="/portadas/perlas-de-obsidiana-olaf-marin.webp"]) { background-color: #95bda6; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/rito-de-iniciacion-diego-uribe-"], > img[src$="/portadas/rito-de-iniciacion-diego-uribe.webp"]) { background-color: #f7e4e5; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/yita-y-el-arcoiris-cristi-na-han-"], > img[src$="/portadas/yita-y-el-arcoiris-cristi-na-han.webp"]) { background-color: #a4a9b1; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/las-hojas-de-fabre-jesus-ferreiro-"], > img[src$="/portadas/las-hojas-de-fabre-jesus-ferreiro.webp"]) { background-color: #460912; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/el-lugar-de-la-noche-david-ornelas-"], > img[src$="/portadas/el-lugar-de-la-noche-david-ornelas.webp"]) { background-color: #9d9d93; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/las-ruinas-de-la-caza-alfredo-leal-"], > img[src$="/portadas/las-ruinas-de-la-caza-alfredo-leal.webp"]) { background-color: #c9d5d7; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/la-sombra-del-guerrero-hermes-millan-"], > img[src$="/portadas/la-sombra-del-guerrero-hermes-millan.webp"]) { background-color: #746b5c; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/maurice-blanchot-sergio-espinosa-proa-"], > img[src$="/portadas/maurice-blanchot-sergio-espinosa-proa.webp"]) { background-color: #e9e2d6; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/las-funciones-del-placer-carlos-rangel-"], > img[src$="/portadas/las-funciones-del-placer-carlos-rangel.webp"]) { background-color: #615f62; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/otra-vez-el-crepusculo-asbel-hernandez-"], > img[src$="/portadas/otra-vez-el-crepusculo-asbel-hernandez.webp"]) { background-color: #aa9888; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/me-llaman-loca-cristina-arreola-marquez-"], > img[src$="/portadas/me-llaman-loca-cristina-arreola-marquez.webp"]) { background-color: #4d2555; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/no-pelear-pelear-arturo-r-orozco-padilla-"], > img[src$="/portadas/no-pelear-pelear-arturo-r-orozco-padilla.webp"]) { background-color: #a53e22; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/lo-que-el-doc-quiso-decir-antonio-zamudio-"], > img[src$="/portadas/lo-que-el-doc-quiso-decir-antonio-zamudio.webp"]) { background-color: #807983; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/amanecer-de-california-j-enrique-vazquez-m-"], > img[src$="/portadas/amanecer-de-california-j-enrique-vazquez-m.webp"]) { background-color: #729cda; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/cuanto-ha-visto-el-hombre-antonio-estudillo-"], > img[src$="/portadas/cuanto-ha-visto-el-hombre-antonio-estudillo.webp"]) { background-color: #939393; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/material-sensible-francisco-javier-hernandez-m-"], > img[src$="/portadas/material-sensible-francisco-javier-hernandez-m.webp"]) { background-color: #bbbbb9; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/todas-las-lluvias-francisco-javier-hernandez-m-"], > img[src$="/portadas/todas-las-lluvias-francisco-javier-hernandez-m.webp"]) { background-color: #d4a73b; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/antologia-gris-compilador-francisco-javier-hernandez-m-"], > img[src$="/portadas/antologia-gris-compilador-francisco-javier-hernandez-m.webp"]) { background-color: #3d3d3d; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano-"], > img[src$="/portadas/domingo-por-la-tarde-cuando-llueve-alejandro-mandujano.webp"]) { background-color: #b89037; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla-"], > img[src$="/portadas/los-que-se-fueron-los-que-llegaron-javier-cravioto-padilla.webp"]) { background-color: #bb6f65; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h-"], > img[src$="/portadas/acaso-un-descubrimiento-a-mitad-de-la-noche-hector-justino-h.webp"]) { background-color: #648675; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/cartografias-del-pensamiento-latinoamericano-compiladora-mai-"], > img[src$="/portadas/cartografias-del-pensamiento-latinoamericano-compiladora-mai.webp"]) { background-color: #e8e1d6; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux-"], > img[src$="/portadas/los-habitantes-francisco-trejo-carlomagno-sol-jasmin-cacheux.webp"]) { background-color: #42423f; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp-"], > img[src$="/portadas/maria-zambrano-horacio-alejandro-gonzalez-sanchez-sergio-esp.webp"]) { background-color: #e8e1d6; }
+:is(.portada-libro, .portada-hoja):has(> img[src*="/portadas/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar-"], > img[src$="/portadas/pensamiento-e-ideologia-en-america-latina-compiladora-sidhar.webp"]) { background-color: #e8e2d7; }

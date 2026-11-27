@@ -2,6 +2,7 @@
 // Paso del dedo: 0.74·W. Al soltar, menos de 24 px vuelve; menos de 2 pasos avanza 1 libro; si no, lo recorrido.
 
 export function anchoPieza(anchoVentana) {
+  if (anchoVentana <= 760) return Math.round(Math.min(260, Math.max(190, anchoVentana * 0.5)));
   return Math.round(Math.min(260, Math.max(150, anchoVentana * 0.17)));
 }
 

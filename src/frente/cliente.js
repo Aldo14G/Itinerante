@@ -2,14 +2,19 @@
 // GSAP entra por el bundle (npm). Nada de CDN. prefers-reduced-motion suaviza; no apaga los estados.
 import { gsap } from 'gsap';
 import { Flip } from 'gsap/Flip';
+import { recomendarLibros } from './recomendaciones.js';
+import { iniciarMovimiento } from './movimiento.js';
 import { anchoPieza, poseVitrina, transformVitrina, destinoGesto } from './vitrina.js';
 
 gsap.registerPlugin(Flip);
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
-const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const preferenciaMovimiento = matchMedia('(prefers-reduced-motion: reduce)');
+const reducir = preferenciaMovimiento.matches;
 const E_OUT = 'expo.out';
+// Espejo de los tokens de duración de nuevo.css (--d-*), en segundos para GSAP.
+const D = { presion: .12, rapida: .18, media: .3, mover: .48, salir: .36 };
 const libros = JSON.parse($('#datos-libros').textContent);
 const porId = Object.fromEntries(libros.map((b) => [b.id, b]));
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -20,42 +25,159 @@ const scrollYa = (y) => window.scrollTo({ top: y, behavior: 'instant' });
 const hoyISO = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 $$('fecha-hasta').forEach((e) => { if (hoyISO > e.getAttribute('d')) e.remove(); });
 $$('fecha-desde').forEach((e) => { if (hoyISO < e.getAttribute('d')) e.remove(); else e.hidden = false; });
-$$('.parada[data-fecha]').forEach((p) => { if (p.dataset.fecha && p.dataset.fecha < hoyISO) p.remove(); });
-if (!$$('.parada').some((p) => p.dataset.fecha)) {
-  const destino = $('#destacados') ? '#destacados' : '#libros';
-  $$('a.cta-portada').forEach((a) => {
-    if (a.closest('[hidden]')) return;
-    a.setAttribute('href', destino);
-    if (a.firstChild && a.firstChild.nodeType === 3) a.firstChild.textContent = 'Ver libros ';
+
+// Agenda: scroll nativo y una pausa real al tomar el control.
+const agenda = $('#agenda-eventos');
+const carruselAgenda = $('.agenda-carrusel');
+const controlesAgenda = $('.agenda-controles');
+const botonesAgenda = [...controlesAgenda.querySelectorAll('[data-agenda-paso]')];
+const rotacionAgenda = $('#agenda-rotacion');
+const posicionAgenda = $('#agenda-posicion');
+const tarjetasAgenda = [...agenda.querySelectorAll(':scope > li:has(.parada)')];
+const INTERVALO_AGENDA = 12_000;
+let indiceAgenda = -1;
+let avanzarAgenda = !preferenciaMovimiento.matches;
+let agendaAlaVista = false;
+let punteroEnAgenda = false;
+let temporizadorAgenda;
+
+function destinoAgenda(tarjeta) {
+  return tarjeta.offsetLeft + (tarjeta.offsetWidth - agenda.clientWidth) / 2;
+}
+
+function actualizarAgenda() {
+  const distancias = tarjetasAgenda.map((tarjeta) => Math.abs(destinoAgenda(tarjeta) - agenda.scrollLeft));
+  const indice = distancias.indexOf(Math.min(...distancias));
+  if (indice === indiceAgenda) return;
+  indiceAgenda = indice;
+  botonesAgenda[0].setAttribute('aria-disabled', String(indiceAgenda <= 0));
+  botonesAgenda[1].setAttribute('aria-disabled', String(indiceAgenda >= tarjetasAgenda.length - 1));
+  tarjetasAgenda.forEach((tarjeta, i) => {
+    if (i === indiceAgenda) tarjeta.setAttribute('aria-current', 'true');
+    else tarjeta.removeAttribute('aria-current');
+  });
+  posicionAgenda.textContent = `${indiceAgenda + 1} de ${tarjetasAgenda.length}`;
+}
+
+function irAgenda(indice, inmediato = false) {
+  const tarjeta = tarjetasAgenda[indice];
+  if (!tarjeta) return;
+  agenda.scrollTo({
+    left: destinoAgenda(tarjeta),
+    behavior: inmediato || preferenciaMovimiento.matches ? 'instant' : 'smooth',
   });
 }
 
-// Portada: la camioneta llega una sola vez y termina centrada. El título y el llamado no se animan.
+function programarAgenda() {
+  clearTimeout(temporizadorAgenda);
+  if (!avanzarAgenda || preferenciaMovimiento.matches || punteroEnAgenda ||
+      !agendaAlaVista || document.hidden || tarjetasAgenda.length < 2) return;
+  temporizadorAgenda = setTimeout(() => {
+    const siguiente = (indiceAgenda + 1) % tarjetasAgenda.length;
+    irAgenda(siguiente, siguiente === 0);
+    programarAgenda();
+  }, INTERVALO_AGENDA);
+}
+
+function rotarAgenda(activar) {
+  avanzarAgenda = activar;
+  const accion = activar ? 'Pausar' : 'Reanudar';
+  rotacionAgenda.textContent = accion;
+  rotacionAgenda.setAttribute('aria-label', `${accion} avance automático`);
+  rotacionAgenda.hidden = preferenciaMovimiento.matches;
+  posicionAgenda.setAttribute('aria-live', activar ? 'off' : 'polite');
+  programarAgenda();
+}
+
+rotacionAgenda.addEventListener('click', () => rotarAgenda(!avanzarAgenda));
+botonesAgenda.forEach((b) => b.addEventListener('click', () => {
+  if (b.getAttribute('aria-disabled') === 'true') return;
+  rotarAgenda(false);
+  irAgenda(indiceAgenda + Number(b.dataset.agendaPaso));
+}));
+agenda.addEventListener('keydown', (e) => {
+  if (e.target !== agenda || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  e.preventDefault();
+  rotarAgenda(false);
+  if (e.key === 'Home') irAgenda(0);
+  else if (e.key === 'End') irAgenda(tarjetasAgenda.length - 1);
+  else irAgenda(indiceAgenda + (e.key === 'ArrowRight' ? 1 : -1));
+});
+
+carruselAgenda.addEventListener('focusin', (e) => {
+  if (e.target !== rotacionAgenda || e.target.matches(':focus-visible')) rotarAgenda(false);
+  const i = tarjetasAgenda.indexOf(e.target.closest('li'));
+  if (i >= 0) irAgenda(i, true);
+});
+agenda.addEventListener('pointerdown', () => rotarAgenda(false));
+agenda.addEventListener('wheel', (e) => {
+  if (e.deltaX || e.shiftKey) rotarAgenda(false);
+}, { passive: true });
+carruselAgenda.addEventListener('pointerenter', (e) => {
+  if (e.pointerType !== 'mouse') return;
+  punteroEnAgenda = true;
+  programarAgenda();
+});
+carruselAgenda.addEventListener('pointerleave', () => {
+  punteroEnAgenda = false;
+  programarAgenda();
+});
+new IntersectionObserver(([entrada]) => {
+  agendaAlaVista = entrada.intersectionRatio >= .35;
+  programarAgenda();
+}, { threshold: .35 }).observe(agenda);
+document.addEventListener('visibilitychange', programarAgenda);
+preferenciaMovimiento.addEventListener('change', () => rotarAgenda(false));
+
+function abrirAnclaAgenda() {
+  const hash = location.hash.slice(1);
+  if (hash === 'eventos' || hash === 'cartelera') return irAgenda(0, true);
+  const indice = tarjetasAgenda.findIndex((li) => hash === 'talleres' ? li.hasAttribute('data-taller') : li.querySelector('.parada').id === hash);
+  if (indice < 0) return;
+  rotarAgenda(false);
+  irAgenda(indice, true);
+}
+agenda.addEventListener('scroll', actualizarAgenda, { passive: true });
+new ResizeObserver(actualizarAgenda).observe(agenda);
+addEventListener('hashchange', abrirAnclaAgenda);
+$('.cab a[href="#eventos"]').addEventListener('click', () => {
+  if (location.hash === '#eventos') abrirAnclaAgenda();
+});
+abrirAnclaAgenda();
+controlesAgenda.hidden = tarjetasAgenda.length < 2;
+actualizarAgenda();
+rotarAgenda(avanzarAgenda);
+$$('.cartel img').forEach((img) => {
+  const preparada = () => {
+    if (!img.naturalWidth) img.hidden = true;
+    else if (!reducir) img.animate([{ opacity: 0, scale: 1.025 }, { opacity: 1, scale: 1 }], { duration: D.media * 1000, easing: 'ease-out' });
+  };
+  if (img.complete) { if (!img.naturalWidth) img.hidden = true; }
+  else {
+    img.addEventListener('load', preparada, { once: true });
+    img.addEventListener('error', preparada, { once: true });
+  }
+});
+
+// Portadas: entran con fundido y leve zoom al cargar (CSS: html.js + img.cargada). Sin JS se ven normal.
+const SELECTOR_PORTADAS = '.pieza .cara img, .hoja .portada-hoja img';
+function marcaPortadas(raiz = document) {
+  for (const im of raiz.querySelectorAll(SELECTOR_PORTADAS)) {
+    if (im.dataset.cargaMarcada) continue;
+    im.dataset.cargaMarcada = '1';
+    const lista = () => im.classList.add('cargada');
+    if (im.complete && im.getAttribute('src')) lista();
+    else { im.addEventListener('load', lista); im.addEventListener('error', lista); }
+  }
+}
+marcaPortadas();
+
+// Portada: la camioneta llega una sola vez y termina centrada.
 if (!reducir) {
   const tl = gsap.timeline({ delay: 0.15 });
   tl.from('.camion', { xPercent: -38, duration: 1.1, ease: E_OUT })
     .from('.camion .trazo', { clipPath: 'inset(0 100% 0 0)', duration: 0.9, ease: 'power3.out' }, 0)
     .from('#carga img', { y: -70, opacity: 0, rotation: (i, el) => +el.dataset.r - 14, duration: 0.7, ease: E_OUT, stagger: 0.08 }, 0.55);
-}
-
-// Eventos: flechas solo cuando la ruta desborda.
-const ruta = $('#ruta');
-const rutaCtl = $('#ruta-controles');
-if (ruta && rutaCtl) {
-  const revisaRuta = () => {
-    rutaCtl.hidden = !(ruta.scrollWidth > ruta.clientWidth + 48);
-    $('#ruta-ant').disabled = ruta.scrollLeft < 4;
-    $('#ruta-sig').disabled = ruta.scrollLeft + ruta.clientWidth > ruta.scrollWidth - 4;
-  };
-  ruta.addEventListener('scroll', revisaRuta, { passive: true });
-  addEventListener('resize', revisaRuta);
-  revisaRuta();
-  const pasoRuta = (dir) => {
-    const p = ruta.querySelector('.parada');
-    if (p) ruta.scrollBy({ left: dir * p.offsetWidth, behavior: reducir ? 'auto' : 'smooth' });
-  };
-  $('#ruta-ant').onclick = () => pasoRuta(-1);
-  $('#ruta-sig').onclick = () => pasoRuta(1);
 }
 
 // Vitrina.
@@ -76,15 +198,15 @@ if (vit) {
   let centroPrevio = -1;
   function controles(i) {
     $('#v-cont').textContent = `${i + 1} de ${destacados.length}`;
-    $('#v-ant').disabled = i === 0;
-    $('#v-sig').disabled = i === destacados.length - 1;
+    $('#v-ant').setAttribute('aria-disabled', String(i === 0));
+    $('#v-sig').setAttribute('aria-disabled', String(i === destacados.length - 1));
   }
   function fichaVitrina(i) {
     const b = destacados[i];
     const f = $('#ficha-vitrina');
-    f.innerHTML = `<h3>${esc(b.t)}</h3><p>${esc(b.a)}${b.p ? ` · ${esc(b.p)}` : ''}${b.pr != null ? ` · <span class="precio">${precio(b.pr)}</span>` : ''}</p>`;
+    f.innerHTML = `<h3>${esc(b.t)}</h3><p>${esc(b.a)}${b.p ? ` · ${esc(b.p)}` : ''}${b.pr != null ? ` · <span class="precio">${precio(b.pr)}</span>` : ''}</p>${b.s ? `<p class="ficha-sinopsis">${esc(b.s)}</p>` : ''}`;
     controles(i);
-    gsap.fromTo(f, { opacity: 0, y: reducir ? 0 : 8, filter: reducir ? 'none' : 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: reducir ? 0.15 : 0.38, ease: E_OUT });
+    if (!reducir) gsap.fromTo(f, { opacity: .8 }, { opacity: 1, duration: D.rapida, ease: E_OUT, overwrite: true });
   }
   function pinta() {
     vit.style.perspective = `${W * 4}px`;
@@ -112,11 +234,23 @@ if (vit) {
     if (reducir) { st.pos = i; pinta(); return; }
     gsap.to(st, { pos: i, duration: dur ?? 0.75, ease: E_OUT, onUpdate: pinta, overwrite: true });
   }
-  function medir() { W = anchoPieza(innerWidth); piezas.forEach((p) => p.style.setProperty('--w', `${W}px`)); pinta(); }
+  function medir() { W = anchoPieza(innerWidth); vit.style.setProperty('--w', `${W}px`); piezas.forEach((p) => p.style.setProperty('--w', `${W}px`)); pinta(); }
   addEventListener('resize', medir);
   medir();
-  $('#v-ant').onclick = () => ir(Math.round(st.pos) - 1);
-  $('#v-sig').onclick = () => ir(Math.round(st.pos) + 1);
+  const ayuda = $('#vitrina-ayuda');
+  if (ayuda) ayuda.hidden = false;
+  const verFicha = $('#v-ficha');
+  verFicha.hidden = false;
+  verFicha.addEventListener('click', () => {
+    const i = Math.round(st.pos);
+    abrirFicha(destacados[i], piezas[i].querySelector('img'), verFicha);
+  });
+  for (const [selector, paso] of [['#v-ant', -1], ['#v-sig', 1]]) {
+    const boton = $(selector);
+    boton.onclick = () => {
+      if (boton.getAttribute('aria-disabled') === 'false') ir(Math.round(st.pos) + paso, D.mover);
+    };
+  }
   vit.addEventListener('keydown', (e) => {
     const c = Math.round(st.pos);
     if (e.key === 'ArrowRight') { ir(c + 1); e.preventDefault(); }
@@ -146,10 +280,10 @@ if (vit) {
       id = null;
       if (!horizontal) return;
       const dx = e.clientX - x0;
-      ir(destinoGesto(dx, paso(), p0), Math.abs(dx) < 24 ? 0.4 : Math.abs(dx / paso()) < 2 ? 0.5 : 0.6);
+      ir(destinoGesto(dx, paso(), p0), Math.abs(dx / paso()) < 2 ? D.mover : 0.6);
     };
     vit.addEventListener('pointerup', suelta);
-    vit.addEventListener('pointercancel', (e) => { if (e.pointerId === id) { id = null; ir(Math.round(st.pos), 0.4); } });
+    vit.addEventListener('pointercancel', (e) => { if (e.pointerId === id) { id = null; ir(Math.round(st.pos), D.mover); } });
     vit.addEventListener('click', (e) => {
       if (movido) { movido = false; return; }
       const p = e.target.closest('.pieza');
@@ -297,12 +431,12 @@ function pintaCat(opciones = {}) {
 }
 let animando = null;
 function aplicar(cambio, opciones = {}) {
+  animando?.progress(1);
   const top0 = resultados.getBoundingClientRect().top;
   const h0 = rejilla.offsetHeight;
-  const anima = !reducir;
+  const anima = opciones.animar !== false && !preferenciaMovimiento.matches;
   const lis = items.map((it) => it.li);
   const estado = anima ? Flip.getState(lis) : null;
-  if (animando) { animando.progress(1); animando = null; }
   if (opciones.reinicia !== false) cat.mostrados = tamPagina();
   if (cambio) cambio();
   pintaCat();
@@ -316,9 +450,8 @@ function aplicar(cambio, opciones = {}) {
   resultados.classList.add('recortando');
   rejilla.style.minHeight = `${h0}px`;
   animando = Flip.from(estado, {
-    targets: lis, duration: 0.5, ease: E_OUT, absolute: true, scale: !!opciones.vista, stagger: { amount: 0.1 },
-    onEnter: (x) => gsap.fromTo(x, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.4, ease: E_OUT }),
-    onLeave: (x) => gsap.to(x, { opacity: 0, scale: 0.94, duration: 0.2 }),
+    targets: lis, duration: D.media, ease: E_OUT, absolute: true, scale: !!opciones.vista,
+    onEnter: (x) => gsap.fromTo(x, { opacity: .85 }, { opacity: 1, duration: D.rapida, ease: E_OUT }),
     onComplete: () => { rejilla.style.minHeight = ''; resultados.classList.remove('recortando'); animando = null; fija(); },
   });
 }
@@ -349,8 +482,8 @@ $('#hf-limpiar').addEventListener('click', (ev) => { limpiar(ev); $('#hf-t').foc
 $('#vacio-quitar').addEventListener('click', (ev) => { limpiar(ev); $('#q').focus(); });
 $('#vacio-borrar').addEventListener('click', (ev) => { ev.preventDefault(); $('#q').value = ''; aplicar(() => { cat.q = ''; }); $('#q').focus(); });
 let tq;
-$('#q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => aplicar(() => { cat.q = e.target.value.trim(); }), 160); });
-$('#busqueda').addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(tq); aplicar(() => { cat.q = $('#q').value.trim(); }); });
+$('#q').addEventListener('input', (e) => { clearTimeout(tq); tq = setTimeout(() => aplicar(() => { cat.q = e.target.value.trim(); }, { animar: false }), 160); });
+$('#busqueda').addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(tq); aplicar(() => { cat.q = $('#q').value.trim(); }, { animar: false }); });
 $('#q-borrar').addEventListener('click', (ev) => { ev.preventDefault(); $('#q').value = ''; aplicar(() => { cat.q = ''; }); $('#q').focus(); });
 addEventListener('keydown', (e) => {
   if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
@@ -363,31 +496,20 @@ $('#orden').addEventListener('change', (e) => aplicar(() => { cat.orden = e.targ
 $('#vista-rejilla').addEventListener('click', (ev) => { if (cat.vista === 'rejilla') return; ev.preventDefault(); aplicar(() => { cat.vista = 'rejilla'; }, { reinicia: false, vista: true }); });
 $('#vista-lista').addEventListener('click', (ev) => { if (cat.vista === 'lista') return; ev.preventDefault(); aplicar(() => { cat.vista = 'lista'; }, { reinicia: false, vista: true }); });
 $('#mas-boton').onclick = () => {
-  const antes = items.filter((it) => !it.li.classList.contains('fuera')).map((it) => it.li);
+  animando?.progress(1);
+  const antes = new Set(rejilla.querySelectorAll('li:not(.fuera)'));
   cat.mostrados += tamPagina();
   pintaCat();
-  const nuevos = [...rejilla.children].filter((li) => !li.classList.contains('fuera') && !antes.includes(li));
-  if (nuevos[0]) nuevos[0].querySelector('h3 a').focus({ preventScroll: true });
-  if (!reducir) gsap.from(nuevos, { y: 20, opacity: 0, duration: 0.6, ease: E_OUT, stagger: { amount: 0.25 }, clearProps: 'transform,opacity' });
+  const nuevo = [...rejilla.children].find((li) => !li.classList.contains('fuera') && !antes.has(li));
+  nuevo?.querySelector('h3 a').focus();
 };
 addEventListener('resize', () => { const t = tamPagina(); if (cat.mostrados < t) { cat.mostrados = t; pintaCat({ sinUrl: true }); } });
 items.forEach((it) => {
   it.a.addEventListener('click', (ev) => {
-    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button) return;
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button) return;
     ev.preventDefault();
-    abrirFicha(it.b, it.li.querySelector('.portada-libro img, .portada-libro .sin-portada'));
+    abrirFicha(it.b, it.li.querySelector('.portada-libro img, .portada-libro .sin-portada'), it.a);
   });
-  if (matchMedia('(pointer:fine)').matches && !reducir) {
-    const pl = it.li.querySelector('.portada-libro');
-    const art = it.li.firstElementChild;
-    art.addEventListener('pointermove', (e) => {
-      if (cat.vista === 'lista') return;
-      const r = art.getBoundingClientRect();
-      pl.style.setProperty('--ry', `${((e.clientX - r.left) / r.width - 0.5) * 12}deg`);
-      pl.style.setProperty('--rx', `${-((e.clientY - r.top) / r.height - 0.5) * 8}deg`);
-    });
-    art.addEventListener('pointerleave', () => { pl.style.setProperty('--ry', '0deg'); pl.style.setProperty('--rx', '0deg'); });
-  }
 });
 
 const hf = $('#hoja-filtros');
@@ -396,11 +518,11 @@ $('#abrir-filtros').onclick = () => {
   $('#hf-cuerpo').appendChild(panelCuerpo);
   hf.showModal();
   $('#hf-t').focus();
-  if (!reducir) gsap.fromTo(hf.querySelector('.lamina'), { yPercent: 100 }, { yPercent: 0, duration: 0.45, ease: E_OUT });
+  if (!reducir) gsap.fromTo(hf.querySelector('.lamina'), { yPercent: 100 }, { yPercent: 0, duration: D.mover, ease: E_OUT });
 };
 const cierraHf = () => {
   const fin = () => hf.close();
-  if (!reducir) gsap.to(hf.querySelector('.lamina'), { yPercent: 100, duration: 0.25, ease: 'power3.in', onComplete: fin });
+  if (!reducir) gsap.to(hf.querySelector('.lamina'), { yPercent: 100, duration: D.rapida, ease: 'power3.in', onComplete: fin });
   else fin();
 };
 hf.addEventListener('close', () => { $('#panel').appendChild(panelCuerpo); $('#abrir-filtros').focus({ preventScroll: true }); });
@@ -409,24 +531,36 @@ hf.addEventListener('click', (e) => { if (e.target === hf) cierraHf(); });
 $('#hf-cerrar').onclick = cierraHf;
 $('#hf-ver').onclick = cierraHf;
 
-if (!reducir && 'IntersectionObserver' in window) {
-  const io = new IntersectionObserver(([en]) => {
-    if (!en.isIntersecting) return;
-    io.disconnect();
-    gsap.from(items.filter((it) => !it.li.classList.contains('fuera')).slice(0, 8).map((it) => it.li), { y: 24, opacity: 0, duration: 0.7, ease: E_OUT, stagger: { amount: 0.3 }, clearProps: 'transform,opacity' });
-  }, { threshold: 0.05 });
-  io.observe(rejilla);
-}
-
 // Ficha.
 const hoja = $('#hoja');
 const velo = $('#velo');
 const sinPortada = (b) => `<div class="sin-portada" aria-hidden="true"><span>${esc(b.p || '')}</span><svg><use href="#camioneta"/></svg></div>`;
-const esconde = () => gsap.set(hoja, innerWidth <= 900 ? { xPercent: 0, yPercent: 100 } : { yPercent: 0, xPercent: 100 });
-if (!hoja.classList.contains('abierta')) esconde();
+const alBorde = () => innerWidth <= 900 ? { xPercent: 0, yPercent: 100 } : { xPercent: 100, yPercent: 0 };
+const enPantalla = { xPercent: 0, yPercent: 0 };
+const fondoFicha = [$('.saltar'), $('.cab'), $('#contenido'), $('#contacto')];
+function bloquearFondoFicha(abierta) {
+  fondoFicha.forEach((el) => { el.inert = abierta; });
+  document.body.style.overflow = abierta ? 'hidden' : '';
+}
 let foco = null;
-function abrirFicha(b, fuente) {
-  foco = document.activeElement;
+let movimientoFicha;
+let clonFicha;
+function quitarClonFicha() {
+  if (!clonFicha) return;
+  clonFicha.remove();
+  clonFicha = null;
+  hoja.querySelector('.portada-hoja').style.opacity = '';
+}
+preferenciaMovimiento.addEventListener('change', (e) => {
+  if (!e.matches) return;
+  animando?.progress(1);
+  movimientoFicha?.progress(1);
+});
+function abrirFicha(b, fuente, disparador = document.activeElement) {
+  movimientoFicha?.kill();
+  quitarClonFicha();
+  const origen = fuente?.getBoundingClientRect();
+  if (!hoja.contains(disparador)) foco = disparador !== document.body ? disparador : $('#t-libros');
   const u = new URL(location.href);
   u.searchParams.set('libro', b.id);
   history.replaceState(history.state, '', u);
@@ -440,70 +574,265 @@ function abrirFicha(b, fuente) {
     <dl class="atributos">${attrs.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
     ${b.s ? `<p class="sinopsis">${esc(b.s)}</p>` : ''}
     <a class="boton boton--tinta" href="${baseWa}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Consultar disponibilidad por WhatsApp <svg aria-hidden="true"><use href="#i-sale"/></svg></a>`;
+  marcaPortadas(hoja);
   hoja.hidden = false;
   hoja.style.visibility = 'visible';
   hoja.dataset.id = b.id;
   velo.classList.add('abierto');
-  document.body.style.overflow = 'hidden';
-  const movil = innerWidth <= 900;
-  const destino = hoja.querySelector('.portada-hoja');
-  if (reducir) { gsap.set(hoja, { xPercent: 0, yPercent: 0 }); gsap.from(hoja, { opacity: 0, duration: 0.15 }); $('#hoja-cerrar').focus(); return; }
-  gsap.fromTo(hoja, movil ? { yPercent: 100, xPercent: 0 } : { xPercent: 100 }, { xPercent: 0, yPercent: 0, duration: 0.5, ease: E_OUT });
-  if (fuente) {
-    const r0 = fuente.getBoundingClientRect();
-    gsap.set(destino, { opacity: 0 });
-    requestAnimationFrame(() => {
-      gsap.set(hoja, { xPercent: 0, yPercent: 0 });
-      const r1 = destino.getBoundingClientRect();
-      gsap.set(hoja, movil ? { yPercent: 100 } : { xPercent: 100 });
-      gsap.to(hoja, { xPercent: 0, yPercent: 0, duration: 0.5, ease: E_OUT, overwrite: true });
-      const clon = document.createElement('div');
-      clon.className = 'clon';
-      clon.innerHTML = destino.innerHTML;
-      Object.assign(clon.style, { left: `${r0.left}px`, top: `${r0.top}px`, width: `${r0.width}px`, height: `${r0.height}px` });
-      document.body.appendChild(clon);
-      gsap.to(clon, { left: r1.left, top: r1.top, width: r1.width, height: r1.height, duration: 0.55, ease: E_OUT, onComplete: () => { gsap.set(destino, { opacity: 1 }); clon.remove(); } });
-    });
+  bloquearFondoFicha(true);
+  hoja.scrollTop = 0;
+  gsap.set(hoja, enPantalla);
+  if (!preferenciaMovimiento.matches) {
+    const destino = hoja.querySelector('.portada-hoja');
+    const fin = destino.getBoundingClientRect();
+    movimientoFicha = gsap.timeline({ onComplete: quitarClonFicha });
+    movimientoFicha.fromTo(hoja, alBorde(), { ...enPantalla, duration: D.media, ease: E_OUT }, 0);
+    if (origen?.width && origen.height && fin.width && fin.height) {
+      destino.style.opacity = '0';
+      clonFicha = document.createElement('div');
+      clonFicha.className = 'clon';
+      clonFicha.setAttribute('aria-hidden', 'true');
+      clonFicha.innerHTML = destino.innerHTML;
+      Object.assign(clonFicha.style, { left: `${fin.left}px`, top: `${fin.top}px`, width: `${fin.width}px`, height: `${fin.height}px` });
+      document.body.appendChild(clonFicha);
+      movimientoFicha.fromTo(clonFicha, {
+        x: origen.left - fin.left, y: origen.top - fin.top,
+        scaleX: origen.width / fin.width, scaleY: origen.height / fin.height,
+      }, { x: 0, y: 0, scaleX: 1, scaleY: 1, duration: D.media, ease: E_OUT }, 0);
+    }
   }
   $('#hoja-cerrar').focus({ preventScroll: true });
 }
 function cerrarFicha() {
+  if (!velo.classList.contains('abierto')) return;
+  movimientoFicha?.kill();
+  quitarClonFicha();
   const u = new URL(location.href);
   u.searchParams.delete('libro');
   history.replaceState(history.state, '', u);
-  const fin = () => { hoja.style.visibility = 'hidden'; hoja.hidden = true; document.body.style.overflow = ''; if (foco) foco.focus({ preventScroll: true }); };
+  const fin = () => {
+    hoja.style.visibility = 'hidden';
+    hoja.hidden = true;
+    bloquearFondoFicha(false);
+    (foco?.isConnected ? foco : $('#t-libros')).focus({ preventScroll: true });
+    foco = null;
+  };
   velo.classList.remove('abierto');
-  if (reducir) { esconde(); fin(); return; }
-  gsap.to(hoja, innerWidth <= 900 ? { yPercent: 100, duration: 0.3, ease: 'power3.in', onComplete: fin } : { xPercent: 100, duration: 0.3, ease: 'power3.in', onComplete: fin });
+  if (preferenciaMovimiento.matches) { fin(); return; }
+  movimientoFicha = gsap.to(hoja, { ...alBorde(), duration: D.rapida, ease: 'power3.in', onComplete: fin });
 }
 $('#hoja-cerrar').addEventListener('click', (ev) => { ev.preventDefault(); cerrarFicha(); });
 velo.addEventListener('click', cerrarFicha);
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && velo.classList.contains('abierto')) cerrarFicha(); });
 
-// Cabecera: sigue el suelo. Destacados y Catálogo marcan «Libros».
-const cab = $('.cab');
-const secciones = $$('main [data-suelo]');
-const navs = $$('.cab nav a');
-function suelo() {
-  const y = 80;
-  let actual = secciones[0];
-  for (const s of secciones) {
-    const r = s.getBoundingClientRect();
-    if (r.top <= y && r.bottom > y) actual = s;
-  }
-  cab.dataset.suelo = actual.dataset.suelo;
-  const id = actual.id === 'libros' || actual.id === 'destacados' ? 'destacados' : actual.id;
-  navs.forEach((a) => {
-    const href = a.getAttribute('href');
-    const marca = href === `#${id}` || (id === 'destacados' && (href === '#destacados' || href === '#libros') && actual.id !== 'inicio' && actual.id !== 'eventos' && actual.id !== 'visita' && actual.id !== 'tienda');
-    if (marca && (href === '#destacados' || href === '#libros') && (actual.id === 'libros' || actual.id === 'destacados')) a.setAttribute('aria-current', 'true');
-    else if (href === `#${actual.id}`) a.setAttribute('aria-current', 'true');
-    else a.removeAttribute('aria-current');
+// La memoria de gustos vive en la página durante esta visita.
+const recomendaciones = $('#recomendaciones');
+if (recomendaciones) {
+  const formulario = $('#gusto-lector');
+  const lista = $('#libros-recomendados');
+  const estado = $('#estado-recomendaciones');
+  const reiniciar = formulario.querySelector('[type=reset]');
+  const valoraciones = new Map();
+  let gustos = null;
+  const razones = {
+    gusto: 'Marcaste este título como de tu gusto.',
+    genero: 'Coincide con un género que elegiste.',
+    afinidad: 'Comparte género, autor o editorial con algo que te gustó.',
+    explorar: 'Un género distinto de los que elegiste.',
+    catalogo: 'Una opción del catálogo para explorar.',
+  };
+  const pintar = (mensaje = '') => {
+    const nuevos = recomendarLibros(libros, gustos.generos, gustos.explorar, valoraciones);
+    lista.innerHTML = nuevos.map(({libro, razon}) => {
+      const id = esc(libro.id);
+      const titulo = esc(libro.t);
+      return [
+        '<li data-libro="' + id + '">',
+        '<h3><a data-ficha href="?libro=' + encodeURIComponent(libro.id) + '#recomendaciones">' + titulo + '</a></h3>',
+        libro.a ? '<p>' + esc(libro.a) + '</p>' : '',
+        '<p class="razon">' + razones[razon] + '</p>',
+        '<div class="gusto-acciones">',
+        '<button class="boton boton--borde" type="button" data-gusto="si" aria-label="Me interesa: ' + titulo + '" aria-pressed="' + (valoraciones.get(libro.id) === 'si') + '">Me interesa</button>',
+        '<button class="boton boton--borde" type="button" data-gusto="no" aria-label="Otra opción en lugar de: ' + titulo + '">Otra opción</button>',
+        '</div></li>',
+      ].join('');
+    }).join('');
+    if (nuevos.length) {
+      estado.textContent = mensaje + nuevos.length + (nuevos.length === 1 ? ' sugerencia.' : ' sugerencias.');
+    } else {
+      const aviso = gustos.generos.size && !gustos.explorar
+        ? 'No quedan sugerencias en los géneros que elegiste.'
+        : 'No quedan sugerencias para esta selección.';
+      estado.innerHTML = aviso + ' Puedes empezar de nuevo o <a href="#libros">ver el catálogo</a>.';
+    }
+  };
+  formulario.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const datos = new FormData(formulario);
+    gustos = {generos: new Set(datos.getAll('gusto')), explorar: datos.has('explorar')};
+    reiniciar.hidden = false;
+    pintar();
   });
+  formulario.addEventListener('reset', () => {
+    gustos = null;
+    valoraciones.clear();
+    lista.replaceChildren();
+    estado.textContent = 'Preferencias borradas.';
+    formulario.querySelector('[type=submit]').focus();
+    reiniciar.hidden = true;
+  });
+  lista.addEventListener('click', (evento) => {
+    const tarjeta = evento.target.closest('[data-libro]');
+    if (!tarjeta) return;
+    const libro = porId[tarjeta.dataset.libro];
+    const ficha = evento.target.closest('[data-ficha]');
+    if (ficha && !evento.ctrlKey && !evento.metaKey && !evento.shiftKey && !evento.altKey) {
+      evento.preventDefault();
+      abrirFicha(libro, null);
+    }
+    const accion = evento.target.closest('button[data-gusto]');
+    if (!accion) return;
+    const activo = valoraciones.get(libro.id) === 'si';
+    if (accion.dataset.gusto === 'si' && activo) valoraciones.delete(libro.id);
+    else valoraciones.set(libro.id, accion.dataset.gusto);
+    pintar(accion.dataset.gusto === 'no' ? 'Se actualizó la selección. ' : 'Preferencias actualizadas. ');
+    const reemplazo = [...lista.children].find((li) => li.dataset.libro === libro.id);
+    (reemplazo?.querySelector('[data-gusto="si"]') ?? estado).focus({preventScroll: true});
+  });
+  recomendaciones.hidden = false;
+  const abrirPorAncla = () => {
+    if (location.hash === '#recomendaciones') recomendaciones.open = true;
+  };
+  addEventListener('hashchange', abrirPorAncla);
+  abrirPorAncla();
 }
-addEventListener('scroll', suelo, { passive: true });
+
+// Vitrina de Café: ajuste nativo al centro y un solo plato protagonista.
+const carruselCafe = $('#cafe-carrusel');
+const controlesCafe = $('.menu-controles');
+if (carruselCafe && controlesCafe) {
+  const platos = [...carruselCafe.children];
+  const anterior = $('[data-cafe-paso="-1"]');
+  const siguiente = $('[data-cafe-paso="1"]');
+  const posicion = $('#cafe-posicion');
+  const estado = $('#cafe-plato-activo');
+  let activo = 0;
+
+  function distancias() {
+    const centro = carruselCafe.getBoundingClientRect().left + carruselCafe.clientWidth / 2;
+    return platos.map((plato) => {
+      const rect = plato.getBoundingClientRect();
+      return rect.left + rect.width / 2 - centro;
+    });
+  }
+
+  function actualizarPlato() {
+    const cerca = distancias().map(Math.abs);
+    const nuevo = cerca.indexOf(Math.min(...cerca));
+    if (nuevo === activo) return;
+    platos[activo].removeAttribute('aria-current');
+    platos[nuevo].setAttribute('aria-current', 'true');
+    activo = nuevo;
+    posicion.textContent = `${activo + 1} de ${platos.length}`;
+    estado.textContent = `${posicion.textContent}: ${platos[activo].querySelector('h4').textContent}`;
+    anterior.setAttribute('aria-disabled', String(activo === 0));
+    siguiente.setAttribute('aria-disabled', String(activo === platos.length - 1));
+  }
+
+  function irAPlato(indice) {
+    if (indice >= 0 && indice < platos.length) carruselCafe.scrollTo({ left: carruselCafe.scrollLeft + distancias()[indice] });
+  }
+
+  anterior.addEventListener('click', () => irAPlato(activo - 1));
+  siguiente.addEventListener('click', () => irAPlato(activo + 1));
+  carruselCafe.addEventListener('scroll', actualizarPlato, { passive: true });
+  carruselCafe.addEventListener('keydown', (evento) => {
+    const destino = { ArrowLeft: activo - 1, ArrowRight: activo + 1, Home: 0, End: platos.length - 1 }[evento.key];
+    if (destino == null) return;
+    evento.preventDefault();
+    irAPlato(destino);
+  });
+  controlesCafe.hidden = false;
+  actualizarPlato();
+}
+
+// Carta: los enlaces conservan su destino y el historial de la selección.
+const cartaNav = $('#carta-categorias');
+if (cartaNav) {
+  const enlaces = [...cartaNav.querySelectorAll('a')];
+  const paneles = $$('.carta-detalles .carta-panel');
+  const completa = cartaNav.querySelector('a[href="#carta-completa"]');
+  const estado = $('#carta-estado');
+
+  const mostrarCarta = (anunciar = false) => {
+    const activa = enlaces.find((enlace) => enlace.hash === location.hash) ?? enlaces[0];
+    if (!activa) return;
+    for (const panel of paneles) panel.hidden = activa !== completa && '#' + panel.id !== activa.hash;
+    for (const enlace of enlaces) {
+      if (enlace === activa) enlace.setAttribute('aria-current', 'true');
+      else enlace.removeAttribute('aria-current');
+    }
+    if (anunciar) estado.textContent = activa === completa ? 'Se muestra toda la carta.' : 'Carta de ' + activa.textContent.trim() + '.';
+  };
+
+  const seleccionarCarta = (evento) => {
+    const enlace = evento.target.closest('a');
+    if (!enlace || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) return;
+    evento.preventDefault();
+    if (location.hash !== enlace.hash) history.pushState(history.state, '', enlace.hash);
+    mostrarCarta(true);
+  };
+
+  cartaNav.addEventListener('click', seleccionarCarta);
+  addEventListener('hashchange', () => mostrarCarta(true));
+  mostrarCarta();
+}
+
+// Cabecera: acompaña el cambio de sección con una sola línea activa.
+const cab = $('.cab');
+const navegacion = cab.querySelector('nav');
+const secciones = $$('main > [data-suelo]');
+const destinos = [...navegacion.querySelectorAll('a')];
+let seccionActual = null;
+let enlaceActual;
+let cuadro = 0;
+
+function alinearIndicador() {
+  if (!enlaceActual) return;
+  const inset = parseFloat(getComputedStyle(enlaceActual).paddingLeft);
+  navegacion.style.setProperty('--nav-x', (enlaceActual.offsetLeft + inset) + 'px');
+  navegacion.style.setProperty('--nav-ancho', (enlaceActual.offsetWidth - 2 * inset) + 'px');
+}
+
+function suelo() {
+  cuadro = 0;
+  const y = cab.offsetHeight + 12;
+  const actual = secciones.find((seccion) => {
+    const rect = seccion.getBoundingClientRect();
+    return rect.top <= y && rect.bottom > y;
+  });
+  if (actual === seccionActual) return;
+  seccionActual = actual;
+  const id = actual?.id;
+  cab.toggleAttribute('data-portada', id === 'inicio');
+  const enLibros = id === 'libros' || id === 'destacados';
+  enlaceActual?.removeAttribute('aria-current');
+  enlaceActual = destinos.find((a) => a.hash.slice(1) === id || (enLibros && (a.hash === '#destacados' || a.hash === '#libros')));
+  enlaceActual?.setAttribute('aria-current', 'true');
+  alinearIndicador();
+  navegacion.toggleAttribute('data-indicador', Boolean(enlaceActual));
+}
+addEventListener('hashchange', suelo);
+addEventListener('scroll', () => { if (!cuadro) cuadro = requestAnimationFrame(suelo); }, { passive: true });
+new ResizeObserver(() => { suelo(); alinearIndicador(); }).observe(navegacion);
 suelo();
 
 const idLibro = new URLSearchParams(location.search).get('libro');
 if (idLibro && porId[idLibro] && hoja.dataset.id !== idLibro) abrirFicha(porId[idLibro], null);
-else if (idLibro && hoja.classList.contains('abierta')) $('#hoja-cerrar').focus({ preventScroll: true });
+else if (idLibro && hoja.classList.contains('abierta')) {
+  bloquearFondoFicha(true);
+  $('#hoja-cerrar').focus({ preventScroll: true });
+}
+
+// Presión visible en iPhone y deslizar para cerrar la ficha y Filtros (spec de movimiento y tacto, 2026-11-27).
+iniciarMovimiento();

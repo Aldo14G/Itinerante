@@ -1,0 +1,49 @@
+@font-face {
+  font-family: Barlow;
+  src: url("/assets/frente/fuentes/Barlow-400.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow Condensed";
+  src: url("/assets/frente/fuentes/BarlowCondensed-700.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+body {
+  box-sizing: border-box;
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: #5dc4b4;
+  color: #061a18;
+  font: 1.125rem/1.5 Barlow, Arial, sans-serif;
+}
+
+main { width: min(100%, 38rem); }
+
+h1 {
+  margin: 0;
+  font: 700 clamp(2.5rem, 7vw, 5rem)/.95 "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  text-wrap: balance;
+}
+
+nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+a {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: #061a18;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a + a { background: transparent; color: #061a18; box-shadow: inset 0 0 0 2px #061a18; }
+a:focus-visible { outline: 3px solid #061a18; outline-offset: 3px; }

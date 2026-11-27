@@ -1,4 +1,37 @@
-# Repository Guidelines
+# Contrato vigente: trabajar siempre en /nuevo
+
+Decisión de Aldo del 2026-11-24: **la única superficie oficial de la librería es
+`http://localhost:3108/nuevo`**. `#cafe` es una sección de esa misma página.
+Toda mejora de secciones, interfaz, estilos o comportamiento se implementa en
+`src/frente/`; `src/app/nuevo/route.ts` sirve el HTML generado por
+`scripts/build-nuevo.mjs`. No editar `documento.generado.ts` a mano.
+
+Antes de trabajar, comprobar el checkout, la rama y el árbol. El servidor 3108
+se verificó en `C:/Users/aldog/AppData/Local/Temp/Itinerante-pr8-lista-eventos`,
+rama `agent/claude/landing-v4-camioneta`; verificar de nuevo el proceso si cambia
+la sesión. Una copia anterior de Itinerante no es una base de trabajo válida.
+
+- Arranque oficial: `npm run dev` (genera el documento y sirve Next en 3108).
+- Validación: `npm run nuevo:check`, `npm run test:frente`, `npm run test:rutas`.
+- Diseño vigente: `DESIGN.md`, dirección «La camioneta» v4.2.
+- `/`, `/index`, `/index.html`, `/prototypes/*` y `/_archive/*` redirigen a
+  `/nuevo` mediante `next.config.ts`, conservando las consultas. Los recursos,
+  las API y los errores 404 mantienen su función.
+- `index.html`, B.4, Higgsfield y sus CSS/JS de raíz son historia: no reciben
+  mejoras, no son otra home y no se usan para validar la interfaz vigente.
+  No arrancar sus servidores estáticos ni publicar sus builds.
+- Conservar las fuentes históricas sin borrarlas. No hacer commit, push ni
+  despliegue sin autorización concreta. Esta decisión de ruta es local.
+- Cloudflare sirve la portada en `/` desde `worker/nuevo.ts`, redirige
+  `/nuevo` a `/` y publica los recursos que
+  prepara `npm run cf:prepare`. Verificar con `cf:dev` y `cf:preview` antes
+  de publicar con `cf:deploy`. El emulador web, los CLI estáticos históricos
+  y el predeploy de Firebase siguen bloqueados porque preparaban B.4.
+
+Este contrato prevalece sobre las instrucciones históricas de abajo y sobre
+documentos antiguos que todavía nombren B.4 o `index.html` como oficiales.
+
+# Referencia histórica de B.4 (no gobierna /nuevo)
 
 ## Project Structure & Module Organization
 
