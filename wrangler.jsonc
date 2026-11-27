@@ -1,12 +1,12 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "libreria-itinerante",
+  "name": "libreria",
   "main": "worker/nuevo.ts",
   "compatibility_date": "2026-10-30",
   "workers_dev": true,
   "previews": {},
   "observability": { "enabled": false },
-  "vars": { "PUBLIC_SITE_ORIGIN": "https://libreria-itinerante.aldo14g.workers.dev" },
+  "vars": { "PUBLIC_SITE_ORIGIN": "https://libreria.itinerante.workers.dev" },
   "assets": {
     // Solo archivos referenciados por /nuevo. El build histórico queda fuera de este destino.
     "directory": "./.wrangler/nuevo-assets",
