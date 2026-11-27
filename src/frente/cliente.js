@@ -210,6 +210,8 @@ if (!reducir) {
     tl.from('.camion', { xPercent: -38, duration: 1.1, ease: E_OUT })
       .from('.camion .trazo', { clipPath: 'inset(0 100% 0 0)', duration: 0.9, ease: 'power3.out' }, 0)
       .from('#carga img', { y: -70, opacity: 0, rotation: (i, el) => +el.dataset.r - 14, duration: 0.7, ease: E_OUT, stagger: 0.08 }, 0.55);
+    // Aniversario: la banderola se despliega desde el enganche mientras la camioneta avanza y se queda quieta al parar.
+    if ($('.banderola')) tl.from('.banderola', { scaleX: 0, rotation: 8, transformOrigin: '100% 55%', duration: 0.9, ease: E_OUT }, 0.2);
     raizDoc.classList.remove('entrada');
   }, 0));
 } else raizDoc.classList.remove('entrada');

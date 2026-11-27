@@ -304,6 +304,19 @@ html:not(.js) .vitrina-pie{display:block}
 .portada-arriba{align-self:end;padding:88px 0 clamp(16px,2.6vh,32px)}
 .portada h1{font-size:clamp(52px,7.4vw,116px);line-height:.88;letter-spacing:-.02em;max-width:none;margin:0 auto}
 .camion{position:relative;width:min(44vw,620px,calc((100svh - 420px) * 1.42));color:#fff;pointer-events:none}
+/* 6.º aniversario: banderola remolcada detrás de la camioneta (pagina.tsx, <fecha-hasta>). El conjunto se recentra. */
+.banderola{position:absolute;right:94%;top:38%;width:72%;height:auto;overflow:visible}
+.banderola-cuerda{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round}
+.banderola-tela{fill:currentColor;stroke:currentColor;stroke-width:4;stroke-linejoin:round}
+.banderola text{font:700 27px/1 var(--f-disp);fill:var(--noche)}
+.camion:has(.banderola){translate:33% 0}
+/* En el teléfono la camioneta se achica para dejar sitio a la banderola, pero su caja conserva el alto de siempre
+   (margen vertical) para que las acciones sigan en la zona del pulgar (UX-05). 1.42 = proporción del trazo. */
+@media (max-width:740px){.camion:has(.banderola){
+  --sin:min(80vw,400px,calc((100svh - 400px) * 1.42));
+  --con:min(54vw,300px,calc((100svh - 400px) * 1.42));
+  width:var(--con);margin-block:calc((var(--sin) - var(--con)) / 1.42 / 2)
+}}
 .portada-abajo{align-self:start;padding:clamp(16px,2.6vh,32px) 0 40px}
 .portada-acciones{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s3)}
 .portada-acciones .boton{justify-content:center;padding-inline:clamp(14px,3.7vw,26px)}

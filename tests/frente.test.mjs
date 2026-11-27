@@ -119,6 +119,14 @@ test('El pie concentra el contacto: «Matamoros» 1 vez, 1 enlace a Maps, teléf
   assert.ok(!/<footer[\s\S]*Matamoros[\s\S]*<\/footer>/.test(h));
 });
 
+test('la camioneta remolca la banderola del 6.º aniversario hasta el 3 de diciembre y luego desaparece', () => {
+  const portada = (hoy) => seccion(aplicarFechas(DOCUMENTO, hoy), 'inicio');
+  const vigente = portada('2026-12-03');
+  const camion = vigente.slice(vigente.indexOf('<div class="camion" aria-hidden="true">'));
+  assert.match(camion, /<fecha-hasta d="2026-12-03"><svg class="banderola"[\s\S]*?>6\.º aniversario<\/text>/);
+  assert.doesNotMatch(portada('2026-12-04'), /banderola|aniversario/);
+});
+
 test('la portada omite la frase visible y el pie acredita la autoría con enlace al portafolio, sin licencia CC', () => {
   const h = html();
   assert.doesNotMatch(seccion(h, 'inicio'), /id="linea"|Libros de editoriales independientes y café en el Centro de Monterrey\./);

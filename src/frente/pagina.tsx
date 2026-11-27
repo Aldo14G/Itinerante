@@ -50,6 +50,8 @@ const CARGA: Array<[string, number, number]> = [
   ['las-ruinas-de-la-caza-alfredo-leal', 68, 7],
 ];
 
+const ANIVERSARIO = { texto: '6.º aniversario', hasta: '2026-12-03' };
+
 function Hasta({ d, children }: { d: string; children: ReactNode }) {
   return <fecha-hasta d={d}>{children}</fecha-hasta>;
 }
@@ -217,6 +219,18 @@ function Portada() {
           })}
         </div>
         <svg className="trazo" viewBox={TRAZO_VB}><use href="#camioneta" /></svg>
+        {/* 6.º aniversario (27/11/2026): la camioneta llega remolcando una banderola. Decoración (la camioneta ya es
+            aria-hidden); se va sola después del 3 de diciembre (decisión de Aldo del 2026-11-27). */}
+        <Hasta d={ANIVERSARIO.hasta}>
+          <svg className="banderola" viewBox="0 0 320 72">
+            <path className="banderola-cuerda" d="M320 40C304 46 288 46 270 38" />
+            <path
+              className="banderola-tela"
+              d="M270 14C206 9 150 20 96 14S34 12 12 17L34 36 12 57C62 52 100 62 156 56S226 52 270 58Z"
+            />
+            <text x="148" y="44" textAnchor="middle">{ANIVERSARIO.texto}</text>
+          </svg>
+        </Hasta>
       </div>
       <div className="portada-abajo">
         <div className="portada-acciones">
