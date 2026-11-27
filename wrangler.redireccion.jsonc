@@ -1,0 +1,9 @@
+{
+  // Nombre anterior de la landing: redirige todo a https://libreria.itinerante.workers.dev (worker/redireccion.ts).
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "libreria-itinerante",
+  "main": "worker/redireccion.ts",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": true,
+  "observability": { "enabled": false }
+}
