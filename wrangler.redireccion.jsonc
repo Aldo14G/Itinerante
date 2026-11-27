@@ -1,5 +1,6 @@
 {
-  // Nombre anterior de la landing: redirige todo a https://libreria.itinerante.workers.dev (worker/redireccion.ts).
+  // Direcciones anteriores de la landing: redirigen todo a https://libreriaitinerante.pages.dev (worker/redireccion.ts).
+  // Se despliega con --name libreria, libreria-itinerante y libreriaitinerante.
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "libreria-itinerante",
   "main": "worker/redireccion.ts",

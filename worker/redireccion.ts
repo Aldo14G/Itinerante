@@ -1,7 +1,8 @@
-// Worker «libreria-itinerante»: el nombre anterior de la landing. Desde el 2026-11-27 la landing vive en el Worker
-// «libreria» (https://libreria.itinerante.workers.dev); este solo redirige ahí conservando ruta y consulta.
-// Se despliega con: npx wrangler deploy -c wrangler.redireccion.jsonc
-const DESTINO = "https://libreria.itinerante.workers.dev";
+// Redirección de las direcciones anteriores de la landing. Desde el 2026-11-27 la landing vive en Cloudflare Pages
+// (https://libreriaitinerante.pages.dev). Este worker se despliega con los nombres que tuvo en workers.dev
+// («libreria», «libreria-itinerante» y «libreriaitinerante») y solo redirige, conservando ruta y consulta:
+//   npx wrangler deploy -c wrangler.redireccion.jsonc --name <nombre>
+const DESTINO = "https://libreriaitinerante.pages.dev";
 
 export default {
   fetch(request: Request): Response {

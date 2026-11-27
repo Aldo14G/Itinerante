@@ -39,7 +39,7 @@
     "cf:prepare": "npm run nuevo && node --import tsx/esm scripts/prepare-nuevo-cloudflare.mjs",
     "cf:dev": "npm run cf:prepare && wrangler dev --local",
     "cf:preview": "npm run cf:prepare && wrangler preview",
-    "cf:deploy": "npm run cf:prepare && wrangler deploy",
+    "cf:deploy": "npm run cf:prepare && node scripts/prepare-pages.mjs && wrangler pages deploy .wrangler/pages-dist --project-name libreriaitinerante --branch main --commit-dirty=true",
     "tokens": "node scripts/build-tokens.mjs",
     "tokens:check": "node scripts/build-tokens.mjs --check",
     "componentes": "node scripts/build-componentes.mjs",

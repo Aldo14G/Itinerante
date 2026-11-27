@@ -1,12 +1,15 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
+  // Producción vive en Cloudflare Pages (proyecto «libreriaitinerante», `npm run cf:deploy`, worker/pages.ts). Este
+  // archivo da la lista de rutas del worker (run_worker_first → _routes.json) y sirve para `wrangler dev`. No ejecutar
+  // `wrangler deploy` con él: «libreria» en workers.dev ahora solo redirige (wrangler.redireccion.jsonc).
   "name": "libreria",
   "main": "worker/nuevo.ts",
   "compatibility_date": "2026-10-30",
   "workers_dev": true,
   "previews": {},
   "observability": { "enabled": false },
-  "vars": { "PUBLIC_SITE_ORIGIN": "https://libreria.itinerante.workers.dev" },
+  "vars": { "PUBLIC_SITE_ORIGIN": "https://libreriaitinerante.pages.dev" },
   "assets": {
     // Solo archivos referenciados por /nuevo. El build histórico queda fuera de este destino.
     "directory": "./.wrangler/nuevo-assets",
